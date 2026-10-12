@@ -35,6 +35,22 @@ Open **http://localhost:5173** and sign in with an account created above. Use th
 
 If port 5173 is occupied, stop the conflicting development server or change the Vite port and `CRM_APP_ORIGIN` together. If the API port changes, update `CRM_BIND_ADDRESS` and `CRM_API_PROXY` together.
 
+## Module map
+
+`services/crm-api/src/` is grouped by domain. Shared infrastructure stays at the crate root.
+
+| Path                                                                        | Responsibility                                                                                  |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `main.rs`, `bootstrap.rs`, `config.rs`, `state.rs`, `error.rs`, `routes.rs` | Startup, account CLI, configuration, shared state, API errors and the route table               |
+| `auth/`                                                                     | Passwords, sessions, login throttling, Origin/CSRF protection, profiles and module permissions  |
+| `workspaces/`                                                               | Workspace locks and access guards (`mod.rs`); directory and activity endpoints (`handlers.rs`)  |
+| `records/`                                                                  | Connected collection definitions, CRUD handlers, transactional mutation/deletion and activity   |
+| `records/validation/`                                                       | Record shape, reserved fields, numeric ranges, scalar workbook fields and media checks          |
+| `imports/`                                                                  | Super Admin import preview, planning, credential rejection and atomic commit                    |
+| `team/`                                                                     | Role catalogue, team access and validation; `invitations/`, `members/` and `archive/` workflows |
+
+New domains from the [roadmap](claude-implementation-roadmap.md#suggested-future-module-locations) become sibling folders under `src/`. Within a group, modules import each other through `super::`; cross-group imports use `crate::` paths.
+
 ## Docker database
 
 `compose.yaml` runs PostgreSQL 17 on **127.0.0.1:55432**, with database/user `kws_crm`. It uses SCRAM host authentication, a health check and the named `keys-with-simoni_crm-postgres` volume. There is no host PostgreSQL dependency.

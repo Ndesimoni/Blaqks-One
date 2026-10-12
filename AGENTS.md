@@ -65,8 +65,8 @@ Professional real estate CRM focused on the UAE market.
 - src/main.jsx — React entry point
 - tests/ — Active unit, storage contract, browser, and offline smoke checks
 - docs/architecture-audit.md — Architecture findings and staged refactoring plan
-- backend/ — Retained local Rust/Axum Google Calendar companion
-- services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI
+- backend/ — Retained local Rust/Axum Google Calendar companion: `api/` handlers, `google/` transport, `store/` encrypted storage, `sync.rs` worker
+- services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI; see [module map](docs/backend-foundation.md#module-map). Add new backend domains as sibling modules under `src/`; group a module into subfolders once it holds several workflows
 - compose.yaml / compose.test.yaml — Persistent development PostgreSQL and disposable test PostgreSQL
 - docs/google-calendar.md — Account setup, syncing behavior, and integration verification
 
@@ -117,7 +117,7 @@ The user has authorised backend development. The first local CRM backend slice i
 
 Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
 
-See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md) for future public listings and customer enquiries. The user requires Super Admin approval before public publication. Keep private CRM data separate from approved public listing versions and preserve enquiry ownership; public catalogue, enquiry and social-provider services remain later implementation stages.
+Follow the owner's [product decisions](docs/product-decisions.md) (record visibility, assignment, listing limits and enquiry routing); they override the roadmap's suggested defaults. The current plan is the [implementation roadmap](docs/claude-implementation-roadmap.md). See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md) for future public listings and customer enquiries. The user requires Super Admin approval before public publication. Keep private CRM data separate from approved public listing versions and preserve enquiry ownership; public catalogue, enquiry and social-provider services remain later implementation stages.
 
 The frontend foundations are implemented; see `docs/frontend-completion.md`. Node 20 or later is required by the patched router dependency. Complete the remaining scoped CRM modules, live team flows, private media storage and publication/enquiry pipeline before hosted deployment. If work on the retained Calendar backend is explicitly requested, verify it with `npm run test:calendar`, relevant browser checks, `cargo fmt`, and Clippy in addition to the standard checks (Rust 1.89+).
 
