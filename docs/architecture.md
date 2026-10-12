@@ -2,7 +2,21 @@
 
 The modern React application is the source of truth for development. It uses feature folders, shared components, and a workspace provider. The original offline prototype is preserved separately.
 
-## Application flow
+## Connected CRM slice
+
+`src/main.jsx` selects the app at build time using `VITE_CRM_MODE`. Default demo composition and storage contracts stay intact. In `server` mode, `features/server/ServerApp.jsx` composes the same design system, hash router and navigation guard around `ServerSession`, `ServerDirectory` and a workspace provider keyed by authenticated user and selected owner.
+
+`services/crm/client.js` uses same-origin cookie requests and an in-memory CSRF token. `useServerRecords` loads authorised Clients, Contacts and Properties; `useServerMutations` waits for server commits and retains failed/conflicting form drafts. Canonical UUID/version metadata stays separate from workbook objects. The shared editor/details/property/contacts components work in both modes. The connected shell restores the familiar navigation groups and Settings links, filtering them by current grants. Clients, Contacts, Properties and Team open their working screens; unfinished routes are labelled **Not connected** and open status-only panels, without demo providers, forms or unsupported record actions. Server failures never fall back to demo identity or data.
+
+Connected Dashboard navigation uses `/#/dashboard`; the normal sign-in home `/#/` still opens the first available connected collection. `useWorkspaceNavigation` accepts this connected Dashboard path while preserving the demo's original `/#/` dashboard. The active workspace query survives navigation, reload and browser history. The shared sidebar scroll hook keeps the current main navigation item visible, and mobile navigation retains the native dialog's focus and Escape behaviour.
+
+`services/crm-api/` is the new Rust/Axum service. Its authentication, workspace access, record validation/mutations and redacted transactional audit are distinct modules backed by versioned PostgreSQL migrations. Local PostgreSQL runs through Docker Compose; integration tests use a separate disposable Compose project. The retained Calendar companion is independent. See [Backend foundation](backend-foundation.md) for setup, API contracts, verification and remaining production work.
+
+Connected team UI lives in `features/server-team/`, independently of the older local preview. The API's `team/` modules separate role presets, member validation, invitation persistence/activation/renewal and scoped updates. Staff membership maps to the owning Admin's existing workspace; permission checks filter record reads and guard every collection mutation. Admin team-management authority does not grant Super Admin workspace switching or imports. Profile/session reads use current database membership and owner activity. See [Admin-owned teams](admin-owned-teams.md).
+
+The Super Admin migration flow separates source reading/backup export, destination mapping, asynchronous media preparation, server preview and token commit. The source stays intact. Preview plans are actor/workspace scoped, expire after 30 minutes and use the same workspace transaction lock as normal CRUD; destination changes invalidate the snapshot. See [Data migration](data-migration.md). Property presentation uses labelled static demo fallbacks without mutating the model; import copies may embed deterministic sample media from `lib/demoPropertyPhotos.js`.
+
+## Default demo application flow
 
 ```text
 index.html
@@ -97,7 +111,7 @@ Failed writes keep the in-memory records and activity, expose a persistent expor
 
 JSON restoration validates the backup format/version, records, media, and size before confirmation or replacement. Excel import reads namespace-prefixed or default-namespace OOXML, rich/shared strings, numeric zero, and dates. Missing workbook parts and unmatched sheets fail before replacement. Excel and JSZip are loaded on demand; Excel exports omit attachments while JSON backups retain them.
 
-The repositories remain synchronous and browser-local. Calendar integration is deferred: `WorkspaceProvider` does not mount `useCalendarSync` or `CalendarContext`, and Calendar is absent from navigation and feature loading. Follow-up/viewing forms show local scheduling fields; sync, invitation and provider reminder controls are hidden. Retained integration metadata does not block local edits or change on save. The companion, hook and historical browser scenarios in `tests/deferred/` remain available for a later phase. Other record repositories still need asynchronous loading/error states for the future shared database. No cross-device CRM or cross-tab record synchronization is implemented.
+The repositories remain synchronous and browser-local. Calendar integration is deferred: `WorkspaceProvider` does not mount `useCalendarSync` or `CalendarContext`, and Calendar is absent from navigation and feature loading. Follow-up/viewing forms show local scheduling fields; sync, invitation and provider reminder controls are hidden. Retained integration metadata does not block local edits or change on save. The companion, hook and historical browser scenarios in `tests/deferred/` remain available for a later phase. The separate connected slice implements asynchronous loading and mutation states for its three modules. Remaining demo modules still need server repositories. Cross-device persistence exists only in connected mode; live cross-tab change notifications are not implemented.
 
 The companion in `backend/` separates HTTP/OAuth handlers (`api.rs`), Google transport (`google.rs`), validated events and encrypted atomic storage (`store.rs`), and the background retry worker (`sync.rs`). Browser-bound OAuth state/PKCE and CSRF protect authorization and mutations. Queued events, stable event IDs and tokens survive service restarts in an encrypted local store; tokens stay out of the browser. Sync is one-way from CRM to Google, and scoped to explicitly enabled follow-ups/viewings. Client meetings and calls reuse follow-up records. See [Google Calendar integration](google-calendar.md) for setup and the local-only boundary.
 
@@ -121,7 +135,7 @@ The companion in `backend/` separates HTTP/OAuth handlers (`api.rs`), Google tra
 
 ## Future platform
 
-The proposed [CRM, website and mobile platform design](platform-system-design.md) describes the next shared backend, private/public data boundaries, exact-version publication approvals and enquiry routing. Super Admin approval before public publication is a confirmed product decision; the proposal does not change the current browser-local architecture.
+The proposed [CRM, website and mobile platform design](platform-system-design.md) describes the next shared backend, private/public data boundaries, exact-version publication approvals and enquiry routing. Super Admin approval before public publication is a confirmed product decision; the public catalogue and enquiry pipeline remain unimplemented; the first connected private CRM slice is described above.
 
 ## Legacy boundary
 

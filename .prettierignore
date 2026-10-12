@@ -6,6 +6,10 @@ package-lock.json
 coverage/
 playwright-report/
 test-results/
+test-results-server/
 backend/target/
 backend/data/
 backend/Cargo.lock
+services/crm-api/target/
+services/crm-api/Cargo.lock
+public/demo/demo-workspace-backup.json

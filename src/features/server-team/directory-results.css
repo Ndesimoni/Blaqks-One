@@ -1,0 +1,82 @@
+.team-directory-table {
+  min-width: 760px;
+}
+.team-directory-table th {
+  font-size: 12px;
+}
+.team-directory-table td {
+  vertical-align: middle;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.connected-team .team-directory-table h2 {
+  font-size: 14px;
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.team-directory-contact {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.team-directory-roles {
+  display: block;
+  max-width: 200px;
+  line-height: 1.6;
+}
+.team-directory-status {
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+.team-directory-status-suspended,
+.team-directory-status-cancelled {
+  color: var(--danger);
+}
+.team-directory-status-archived {
+  color: var(--muted);
+}
+.team-directory-workspace {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+}
+.team-directory-workspace > span {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.team-directory-table .btn {
+  white-space: nowrap;
+}
+.team-directory-action-list {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+.team-directory-action-list > div {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+.team-directory-danger-action {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.team-directory-actions {
+  --dialog-width: 620px;
+  --dialog-height: 620px;
+}
+.team-directory-mobile-card .connected-team-card-heading {
+  align-items: center;
+}
+.team-directory-mobile-card > .team-directory-status {
+  margin-bottom: 12px;
+}
+.team-directory-mobile-card .team-directory-workspace {
+  margin-top: 16px;
+}

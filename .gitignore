@@ -8,8 +8,10 @@ dist/
 coverage/
 playwright-report/
 test-results/
+test-results-server/
 __pycache__/
 *.pyc
 backend/target/
 backend/data/
+services/crm-api/target/
 *.enc

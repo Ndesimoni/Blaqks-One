@@ -1,0 +1,46 @@
+import { spawn } from 'node:child_process';
+import { setTimeout } from 'node:timers/promises';
+
+export function run(command, args, env, { capture = false } = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      env,
+      stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+    });
+    let output = '';
+    if (capture) {
+      child.stdout.on('data', (chunk) => (output += chunk));
+      child.stderr.on('data', (chunk) => (output += chunk));
+    }
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code === 0) resolve(output.trim());
+      else reject(Error(`${command} exited with ${code}.${capture ? ` ${output}` : ''}`));
+    });
+  });
+}
+
+export async function waitForApi(url, child) {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    if (child.exitCode !== null) throw Error('CRM API stopped before it was ready.');
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(1000) });
+      if (response.ok) return;
+    } catch {
+      // The listener or migration may still be starting.
+    }
+    await setTimeout(200);
+  }
+  throw Error('CRM API did not become ready within 20 seconds.');
+}
+
+export async function stop(child) {
+  if (!child || child.exitCode !== null) return;
+  const closed = new Promise((resolve) => child.once('exit', resolve));
+  child.kill('SIGTERM');
+  await Promise.race([closed, setTimeout(5000)]);
+  if (child.exitCode === null) {
+    child.kill('SIGKILL');
+    await closed;
+  }
+}

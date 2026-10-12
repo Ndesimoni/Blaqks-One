@@ -2,30 +2,27 @@ import React from 'react';
 import { isCommercialProperty, listingIntent, propertyPrice } from '../../lib/properties.js';
 import { get } from '../../lib/records.js';
 import { mediaPhotos } from '../../lib/media.js';
+import { demoListingPhoto } from '../../lib/demoPropertyPhotos.js';
 import { N } from '../../lib/format.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
 
 export function PropertyCard({ property: p, index: i, onSelect }) {
   const photos = mediaPhotos(p);
+  const cover = photos[0] || demoListingPhoto(p);
   return (
     <button className="property-card modern-property-card" type="button" onClick={onSelect}>
       <div className={'property-photo variant-' + (i % 4)}>
-        <>
-          {photos.length ? (
-            <img
-              className="property-cover-img"
-              src={photos[0].src}
-              alt={`${get(p, 'Listing title') || 'Property'} cover`}
-            />
-          ) : (
-            <div className="building-graphic">
-              <span />
-              <span />
-              <span />
-            </div>
-          )}
-        </>
+        <img
+          className={photos.length ? 'property-cover-img' : 'property-demo-cover'}
+          src={cover.src}
+          alt={
+            photos.length && !cover.demo
+              ? `${get(p, 'Listing title') || 'Property'} cover`
+              : cover.name
+          }
+          loading="lazy"
+        />
         <span className="property-intent-tag">
           {listingIntent(p) === 'Holiday home'
             ? 'HOLIDAY HOME'
@@ -41,6 +38,9 @@ export function PropertyCard({ property: p, index: i, onSelect }) {
         <div className="property-card-meta">
           <span>{get(p, 'Property type') || 'Property'}</span>
           <span>{get(p, 'Ready / off-plan') || 'Ready'}</span>
+          {(!photos.length || cover.demo) && (
+            <span className="property-demo-label">Demo photo</span>
+          )}
           {photos.length > 0 && (
             <span className="photo-count">
               <Icon name="image" size={12} /> {photos.length}

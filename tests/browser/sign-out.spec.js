@@ -90,7 +90,7 @@ test('sign-out warns about unsaved storage changes and retry preserves them', as
     await dialog.dismiss();
   });
   await page.getByRole('link', { name: 'Sign out' }).click();
-  expect(warning).toContain('Export a full backup');
+  await expect.poll(() => warning).toContain('Export a full backup');
   await expect(page.getByText('Admin in-memory client', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('kws-crm-v1:workspace:aidah'))).toBe(
     before,

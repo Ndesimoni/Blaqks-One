@@ -1,10 +1,12 @@
 # CRM, website and mobile platform design
 
-This is the proposed production system design for Keys with Simoni. The existing CRM is a browser-local frontend prototype; this document defines the next platform rather than claiming those services are implemented.
+Implementation update: the first private CRM backend slice now exists with Docker PostgreSQL, server sessions and scoped Clients/Contacts/Properties. See [Backend foundation](backend-foundation.md). Publication approvals, the public catalogue, customer enquiries, website/mobile clients and provider connections remain planned.
+
+This is the proposed production system design for Keys with Simoni. The default CRM remains a browser-local frontend prototype alongside the first opt-in private backend slice; this document defines the wider production platform.
 
 Confirmed product decision: **Super Admin approval is required before a property listing appears on the public website or mobile app.**
 
-Working assumptions: one agency, privately owned member CRM workspaces, and a customer-facing mobile app. Staff continue to use the CRM. External agencies, delegated access to another member's workspace and a dedicated staff mobile app would require additional product decisions.
+Confirmed team model: one agency with Admin-owned workspaces; each Admin may create staff accounts and grant access inside their own workspace. The Super Admin oversees all teams and creates Admins. Staff can hold multiple positions with explicit module and messaging grants. The customer-facing mobile app remains a working assumption. External agencies, cross-Admin delegation and a dedicated staff mobile app would require additional product decisions. See [Admin-owned teams](admin-owned-teams.md).
 
 ## One platform, three applications
 
@@ -54,7 +56,7 @@ Keep the backend modular: identity/workspaces; relationships; private properties
 
 For the first release, default the public listing agent and enquiry assignee to the workspace owner, with an eligible approved public profile. Showing another agent must not silently grant that person access to the owner's private records.
 
-Admin A can manage only A's private workspace. Admin B can manage only B's. Super Admin can inspect and manage all workspaces with actions attributed to the actual actor. Both admins may see each other's intentionally published listings as public visitors; that does not expose their underlying CRM data.
+Admin A and A's authorised staff can use only A's private workspace. Admin B and B's authorised staff can use only B's. Each Admin manages their own staff; only the Super Admin creates Admin accounts. Super Admin can inspect and manage all workspaces with actions attributed to the actual actor. Both admins may see each other's intentionally published listings as public visitors; that does not expose their underlying CRM data.
 
 Enforce workspace access on every server read/write, linked record, report, export, upload and download. Treat user-supplied workspace or record IDs as untrusted selectors requiring authorization. These requirements address the object-access risks described by [OWASP](https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/).
 
@@ -164,6 +166,6 @@ Define measurable targets for catalogue update/removal time, enquiry acknowledge
 
 ## Current implementation and design verification
 
-Today the CRM provides scoped browser-local records, demo identity, media editing, workbook/JSON compatibility, schedules and messaging previews. The shared production backend, real authentication, publication approvals, public catalogue, website/app and dependable provider delivery are future work.
+The default CRM provides scoped browser-local records, demo identity, media editing, workbook/JSON compatibility, schedules and messaging previews. The first opt-in private backend now implements real authentication and scoped Clients/Contacts/Properties using Docker PostgreSQL. Publication approvals, the public catalogue, website/app, remaining CRM modules and dependable provider delivery remain future work. See [Backend foundation](backend-foundation.md) for the implemented boundary and runtime verification.
 
-Architecture and security specialists reviewed this proposal's boundaries and workflows. This is a documentation/design change; it does not establish that proposed production controls pass runtime tests. Existing repository size checks still report 53 oversized files, which must be split when implementation touches them.
+Architecture and security specialists reviewed this proposal's boundaries and workflows. That design review does not establish that the wider proposed production controls pass runtime tests. The first implemented private slice has separate API/browser checks. The current repository size check reports 48 outstanding oversized files; split each when implementation touches it.

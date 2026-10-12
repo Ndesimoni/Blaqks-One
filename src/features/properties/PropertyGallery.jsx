@@ -3,6 +3,7 @@ import { get } from '../../lib/records.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import React from 'react';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
+import { PropertyDemoPreview } from './PropertyDemoPreview.jsx';
 
 function PropertyGallery({ record, onEdit }) {
   const photos = mediaPhotos(record);
@@ -18,25 +19,22 @@ function PropertyGallery({ record, onEdit }) {
           >
             <img
               src={photos[0].src}
-              alt={`${get(record, 'Listing title') || 'Property'} main photo`}
+              alt={
+                photos[0].demo
+                  ? photos[0].name
+                  : `${get(record, 'Listing title') || 'Property'} main photo`
+              }
             />
           </a>
           <span>
             <Icon name="image" size={16} />
-            {photos.length} photo{photos.length === 1 ? '' : 's'}
+            {photos[0].demo
+              ? 'Demo photo'
+              : `${photos.length} photo${photos.length === 1 ? '' : 's'}`}
           </span>
         </div>
       ) : (
-        <div className="media-placeholder">
-          <Icon name="image" size={27} />
-          <strong>No property photos yet</strong>
-          <span>Add photos to make this listing presentation-ready.</span>
-          {onEdit && (
-            <button type="button" onClick={onEdit}>
-              Add property photos
-            </button>
-          )}
-        </div>
+        <PropertyDemoPreview record={record} onEdit={onEdit} />
       )}
       {photos.length > 1 && (
         <OverflowList

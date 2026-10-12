@@ -11,7 +11,7 @@ import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/u
 function RecordsPage({ module, tabs = recordTabs(module), matchesTab, emptyDetail }) {
   const { data } = useRecords();
   const { tab, setTab, setPage, query, setQuery } = useWorkspaceView();
-  const { add } = useWorkspaceActions();
+  const { add, readOnly = false } = useWorkspaceActions();
 
   const arr = useRecordSearch(module, (record) =>
     matchesTab ? matchesTab(record, tab) : matchesRecordTab(module, record, tab),
@@ -27,21 +27,23 @@ function RecordsPage({ module, tabs = recordTabs(module), matchesTab, emptyDetai
             <p>{descriptions[module]}</p>
           </div>
         </div>
-        <Button icon="plus" onClick={() => add(module)}>
-          Add{' '}
-          {{
-            Clients: 'client',
-            Contacts: 'contact',
-            Deals: 'deal',
-            'Follow-ups': 'follow-up',
-            Viewings: 'viewing',
-            'Client care': 'touchpoint',
-            'Interaction log': 'conversation',
-            Payments: 'payment',
-            Expenses: 'expense',
-            Shortlist: 'match',
-          }[module] || 'record'}
-        </Button>
+        {!readOnly && (
+          <Button icon="plus" onClick={() => add(module)}>
+            Add{' '}
+            {{
+              Clients: 'client',
+              Contacts: 'contact',
+              Deals: 'deal',
+              'Follow-ups': 'follow-up',
+              Viewings: 'viewing',
+              'Client care': 'touchpoint',
+              'Interaction log': 'conversation',
+              Payments: 'payment',
+              Expenses: 'expense',
+              Shortlist: 'match',
+            }[module] || 'record'}
+          </Button>
+        )}
       </div>
       <div className="filters-toolbar">
         <div className="tabs" role="group" aria-label={`Filter ${module}`}>

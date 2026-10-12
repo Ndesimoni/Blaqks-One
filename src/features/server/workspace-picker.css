@@ -1,0 +1,128 @@
+.connected-shell .workspace-picker-label {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.connected-shell .workspace-picker-trigger {
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+}
+.connected-shell .workspace-picker-trigger > span {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: 0;
+}
+.connected-shell .workspace-picker-trigger > span > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+.workspace-picker-dialog {
+  --dialog-width: 600px;
+  --dialog-height: 680px;
+}
+.workspace-picker-dialog .workspace-picker-body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.workspace-picker-search {
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.workspace-picker-count,
+.workspace-picker-note {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+.workspace-picker-count {
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+.workspace-picker-collection {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.workspace-picker-collection > .overflow-list-scroll {
+  max-height: none;
+  padding: 4px;
+}
+.workspace-picker-group + .workspace-picker-group {
+  margin-top: 24px;
+}
+.workspace-picker-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+.workspace-picker-group h3 span {
+  font-variant-numeric: tabular-nums;
+}
+.workspace-picker-options {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.workspace-picker-option {
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 12px;
+}
+.workspace-picker-option > span:first-child {
+  min-width: 0;
+}
+.workspace-picker-option strong,
+.workspace-picker-option small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.workspace-picker-option strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.workspace-picker-option small {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.workspace-picker-option:hover:not(:disabled),
+.workspace-picker-option[aria-pressed='true'] {
+  background: var(--hover);
+  border-color: var(--focus);
+}
+.workspace-picker-selected {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.workspace-picker-empty {
+  padding: 24px 0;
+}

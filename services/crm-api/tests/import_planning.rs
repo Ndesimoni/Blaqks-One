@@ -1,0 +1,101 @@
+use kws_crm_api::imports::{
+    model::ImportRecords,
+    planning::plan,
+    snapshot::{fingerprint, TargetRow},
+};
+use serde_json::json;
+use uuid::Uuid;
+
+fn source(value: serde_json::Value) -> ImportRecords {
+    serde_json::from_value::<ImportRecords>(value)
+        .unwrap()
+        .normalize()
+        .unwrap()
+}
+
+fn target(collection: &str, id: &str, payload: serde_json::Value) -> TargetRow {
+    TargetRow {
+        id: Uuid::new_v4(),
+        version: 1,
+        collection: collection.into(),
+        legacy_id: id.into(),
+        payload,
+    }
+}
+
+#[test]
+fn skips_identical_records_and_preserves_new_private_fields() {
+    let row = json!({"contact_id":"CT-1","full_name":"Existing"});
+    let existing = vec![target("Contacts", "CT-1", row.clone())];
+    let input = source(
+        json!({"Clients":[{"client_id":" CL-1 ","extra":{"code":12}}],
+        "Contacts":[row],"Properties":[{"property_id":"PR-1","contact_id":"CT-1"}]}),
+    );
+    let plan = plan(input, &existing).unwrap();
+    assert_eq!(plan.skipped["Contacts"], 1);
+    assert_eq!(plan.counts["Clients"], 1);
+    assert_eq!(plan.counts["Properties"], 1);
+    assert_eq!(plan.records.clients[0]["client_id"], "CL-1");
+    assert_eq!(plan.records.clients[0]["extra"]["code"], 12);
+}
+
+#[test]
+fn conflicting_records_and_missing_contacts_block_whole_plan() {
+    let existing = vec![target(
+        "Contacts",
+        "CT-1",
+        json!({"contact_id":"CT-1","full_name":"First"}),
+    )];
+    let input = source(
+        json!({"Clients":[],"Contacts":[{"contact_id":"CT-1","full_name":"Different"}],
+        "Properties":[]}),
+    );
+    let error = match plan(input, &existing) {
+        Ok(_) => panic!("expected conflict"),
+        Err(error) => error,
+    };
+    assert_eq!(error.2, "import_conflict");
+    let input = source(
+        json!({"Clients":[],"Contacts":[],"Properties":[{"property_id":"PR-1","contact_id":"CT-OTHER"}]}),
+    );
+    assert!(plan(input, &existing).is_err());
+}
+
+#[test]
+fn linked_contacts_can_arrive_in_same_import() {
+    let input = source(json!({"Clients":[],"Contacts":[{"contact_id":"CT-1"}],
+        "Properties":[{"property_id":"PR-1","contact_id":"CT-1"}]}));
+    let plan = plan(input, &[]).unwrap();
+    assert_eq!(plan.counts["Contacts"], 1);
+    assert_eq!(plan.counts["Properties"], 1);
+    assert_eq!(plan.records.collections()[0].0, "Contacts");
+}
+
+#[test]
+fn rejects_duplicate_source_ids_and_oversized_row_counts() {
+    let duplicate =
+        serde_json::from_value::<ImportRecords>(json!({"Clients":[{"client_id":"CL-1"},
+        {"client_id":" CL-1 "}],"Contacts":[],"Properties":[]}))
+        .unwrap();
+    assert!(duplicate.normalize().is_err());
+    let clients = (0..1001)
+        .map(|id| json!({"client_id":format!("CL-{id}")}))
+        .collect();
+    assert!(ImportRecords {
+        clients,
+        contacts: vec![],
+        properties: vec![]
+    }
+    .normalize()
+    .is_err());
+}
+
+#[test]
+fn fingerprint_changes_when_target_version_or_membership_changes() {
+    let mut existing = vec![target("Clients", "CL-1", json!({"client_id":"CL-1"}))];
+    let first = fingerprint(&existing);
+    existing[0].version = 2;
+    assert_ne!(first, fingerprint(&existing));
+    existing.clear();
+    assert_ne!(first, fingerprint(&existing));
+}

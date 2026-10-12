@@ -1,0 +1,46 @@
+.property-demo-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.property-demo-preview {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.property-demo-preview > img {
+  display: block;
+  width: 100%;
+  height: clamp(180px, 30vw, 300px);
+  object-fit: cover;
+}
+
+.property-demo-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+}
+
+.property-demo-caption strong,
+.property-demo-caption span {
+  display: block;
+}
+
+.property-demo-caption span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.property-demo-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}

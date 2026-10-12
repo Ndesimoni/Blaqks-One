@@ -13,7 +13,7 @@ export function PropertyDirectory() {
   const directory = usePropertyDirectory();
   const { all, f, result, activeCount } = directory;
   const { viewMode } = useWorkspaceView();
-  const { add } = useWorkspaceActions();
+  const { add, readOnly = false } = useWorkspaceActions();
   return (
     <div className="page-stack inventory-page">
       <section className="directory-top" aria-label="Portfolio summary">
@@ -24,9 +24,11 @@ export function PropertyDirectory() {
             <p>Manage your listings and availability.</p>
           </div>
         </div>
-        <Button icon="plus" onClick={() => add('Properties')}>
-          Add property
-        </Button>
+        {!readOnly && (
+          <Button icon="plus" onClick={() => add('Properties')}>
+            Add property
+          </Button>
+        )}
       </section>
       <PropertyPurposes all={all} purpose={f.purpose} updateFilter={directory.updateFilter} />
       <PropertyToolbar result={result} f={f} activeCount={activeCount} />

@@ -17,6 +17,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev -- --host 127.0.0.1 --port 5174',
+      env: { VITE_CRM_MODE: 'demo' },
       url: 'http://127.0.0.1:5174',
       reuseExistingServer: false,
       timeout: 30000,

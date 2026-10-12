@@ -1,0 +1,24 @@
+name: keys-with-simoni
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kws_crm
+      POSTGRES_USER: kws_crm
+      POSTGRES_PASSWORD: ${CRM_POSTGRES_PASSWORD:?Run npm run setup:crm first}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    ports:
+      - '127.0.0.1:${CRM_POSTGRES_PORT:-55432}:5432'
+    volumes:
+      - crm-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U kws_crm -d kws_crm']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    shm_size: 128mb
+
+volumes:
+  crm-postgres:

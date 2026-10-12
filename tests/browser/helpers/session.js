@@ -12,6 +12,7 @@ export async function signIn(page, admin = demoAdmins[0]) {
 export const test = base.extend({
   page: async ({ page }, use) => {
     await page.goto('/#/sign-in');
+    await expect(page.getByLabel('Email address', { exact: true })).toBeVisible();
     const before = await page.evaluate(() => ({
       records: localStorage.getItem('kws-crm-v1:workspace:aidah'),
       preferences: localStorage.getItem('kws-crm-preferences'),

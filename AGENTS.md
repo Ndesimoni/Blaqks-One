@@ -19,9 +19,10 @@ Professional real estate CRM focused on the UAE market.
 ## Technology
 
 - React 18 and Vite
-- Rust/Axum for the local Google Calendar companion
+- Rust/Axum for the private CRM API and retained Google Calendar companion
 - JavaScript and CSS
-- Browser-local storage for current MVP
+- Browser-local storage for the default demo; opt-in PostgreSQL connected mode
+- PostgreSQL 17 through Docker Compose for local CRM development and isolated API tests
 - Excel import/export
 - JSON backup with property media
 
@@ -44,6 +45,7 @@ Professional real estate CRM focused on the UAE market.
 - Private member workspaces, Super Admin workspace directory and scoped activity history; see docs/private-workspaces.md
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
 - Responsive desktop/mobile interface
+- Opt-in connected Clients, Contacts and Properties with server sessions, scoped CRUD, optimistic versions and redacted transactional activity; see docs/backend-foundation.md
 
 ## Current Project Structure
 
@@ -53,6 +55,8 @@ Professional real estate CRM focused on the UAE market.
 - src/hooks/ — Workspace access, data persistence, and preferences hooks
 - src/services/storage/ — Validated browser storage repositories
 - src/services/files/ — Backup validation and browser downloads
+- src/services/crm/ — Same-origin API client; cookie sessions and in-memory CSRF
+- src/features/server/ — Connected shell, identity and asynchronous scoped record hooks
 - src/lib/ — Business rules, selectors, media, and Excel utilities
 - src/config/ — Navigation, fields, themes, and storage constants
 - src/styles/index.css — Ordered stylesheet imports; maintain the cascade when editing the imported files
@@ -61,7 +65,9 @@ Professional real estate CRM focused on the UAE market.
 - src/main.jsx — React entry point
 - tests/ — Active unit, storage contract, browser, and offline smoke checks
 - docs/architecture-audit.md — Architecture findings and staged refactoring plan
-- backend/ — Local Rust/Axum Google Calendar authorization, encrypted queue, and sync worker
+- backend/ — Retained local Rust/Axum Google Calendar companion
+- services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI
+- compose.yaml / compose.test.yaml — Persistent development PostgreSQL and disposable test PostgreSQL
 - docs/google-calendar.md — Account setup, syncing behavior, and integration verification
 
 ## Engineering Standards
@@ -74,9 +80,15 @@ Act as a senior software engineer and UI/UX designer.
 - Split files by responsibility before adding code that exceeds the limit. Keep feature components together, extract hooks/selectors/services appropriately, and preserve CSS import order. Never compress statements, remove useful formatting or create numbered fragments to bypass the limit.
 - Run `npm run check:lines`. Existing oversized files are outstanding refactoring work, not exemptions. If a task changes one, split it safely within that task; report any remaining repository violations explicitly. Do not claim the size check passes until it exits successfully.
 - Preserve working features during refactoring.
-- Resolve workspace access before reading records. Non-Super Admins may use only their own member ID. Keep every linked CRM collection, recipient directory, report and export within the selected workspace.
+- Resolve workspace access before reading records. In connected mode, Admins use their own workspace and staff use the workspace assigned by their owning Admin; only the Super Admin may open other teams. Resolve membership and permissions from the server on every request. The independent demo retains its per-member workspace keys. Keep every linked CRM collection, recipient directory, report and export within the selected workspace.
 - Original `kws-crm-v1` records belong to the Super Admin organisation workspace. Personal records and targets use per-member keys. Never copy organisation records into a member's workspace; Aidah's fresh fictional examples are generated independently.
-- Store activity alongside the affected workspace envelope. Keep actor and workspace IDs distinct, and never store message bodies, recipient addresses, passwords or provider tokens in activity. The frontend remains a preview; real isolation and trustworthy auditing require backend enforcement.
+- Store demo activity alongside the affected workspace envelope. Connected activity must commit transactionally with scoped record mutations. Keep actor and workspace IDs distinct, and never store message bodies, recipient addresses, passwords or provider tokens in activity. Default demo isolation remains a preview; connected access must be enforced by the API.
+- Use Docker for PostgreSQL. Integration tests must use the disposable test project, never development or user data. Preserve development volumes during routine verification.
+- Keep connected identity and records separate from the demo. Server errors must never fall back to demo accounts or browser records. No automatic migration of browser records.
+- Admins may invite and manage staff only inside their own team. Only the Super Admin may create Admin accounts. Never offer Super Admin creation or promotion in member forms. Multiple staff positions set permission defaults; explicit module and messaging grants remain separate. See [Admin-owned teams](docs/admin-owned-teams.md).
+- Normal account deletion archives identity and data without removing saved records. Only the Super Admin can archive accounts; archiving an Admin archives their whole team and freezes that workspace. Keep archived accounts out of current lists and expose their data only through Super Admin read-only views. Revoke sessions/invitations transactionally, check live membership after workspace locks, and never allow an edit/renewal to restore an archive. Hard deletion is a separate future feature requiring explicit permanent-loss review.
+- Browser/backup imports require the live Super Admin, explicit source/destination review and an atomic add-only commit. Organisation sources stay in the organisation workspace; personal sources require an explicitly selected server member UUID. Preserve every source collection in full backups; only the three supported collections currently migrate. See [Data migration](docs/data-migration.md).
+- Demo listing photos must stay labelled. Display fallbacks never alter stored browser records; imports may embed deterministic sample assets only for empty galleries. Preserve actual photos and floor plans. See [Demo property photos](docs/demo-property-photos.md).
 - Prefer reusable components and custom hooks.
 - Separate UI, business logic and data access.
 - Use consistent typography and spacing.
@@ -101,11 +113,13 @@ Use the eight project specialists in `.codex/agents/` through the [Development a
 
 ## Roadmap
 
-The current scope is frontend development. Calendar navigation, connection controls and background sync are removed from the active frontend; retain existing scheduling metadata and the companion source for a later phase. Browser tests start only Vite and require no Rust service. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
+The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts and Properties only. Preserve the complete default demo during staged migration. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
 
-See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md) for future public listings and customer enquiries. The user requires Super Admin approval before public publication. Keep private CRM data separate from approved public listing versions and preserve enquiry ownership; production services remain a later implementation phase.
+Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
 
-The frontend foundations are implemented; see `docs/frontend-completion.md`. Node 20 or later is required by the patched router dependency. The shared PostgreSQL CRM, application authentication and hosted backend remain the next phase. If work on the retained Calendar backend is explicitly requested, verify it with `npm run test:calendar`, relevant browser checks, `cargo fmt`, and Clippy in addition to the standard checks (Rust 1.89+).
+See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md) for future public listings and customer enquiries. The user requires Super Admin approval before public publication. Keep private CRM data separate from approved public listing versions and preserve enquiry ownership; public catalogue, enquiry and social-provider services remain later implementation stages.
+
+The frontend foundations are implemented; see `docs/frontend-completion.md`. Node 20 or later is required by the patched router dependency. Complete the remaining scoped CRM modules, live team flows, private media storage and publication/enquiry pipeline before hosted deployment. If work on the retained Calendar backend is explicitly requested, verify it with `npm run test:calendar`, relevant browser checks, `cargo fmt`, and Clippy in addition to the standard checks (Rust 1.89+).
 
 1. Refactor monolithic React components.
 2. Improve property-management workflows.
@@ -119,8 +133,7 @@ The frontend foundations are implemented; see `docs/frontend-completion.md`. Nod
 
 ## Important
 
-This is currently a browser-local demo.
-The sign-in screen uses public sample credentials and a tab-local identity, not server authentication. See `docs/frontend-sign-in.md`; never put real passwords into the demo account configuration.
-Team configuration is separate under `kws-crm-team-preview-v1`; keep passwords/provider tokens out of it and preserve CRM/workbook/backup contracts. Messaging and invitation previews never deliver externally. Roles control frontend modules; the backend must enforce actual access.
-Do not treat it as a secure multi-user CRM.
+The default application is a browser-local demo. Its sign-in uses public sample credentials and a tab-local identity, not server authentication. Connected mode uses server-created accounts and PostgreSQL sessions with enforced workspace access; it is a local development foundation, not a deployed production service. See `docs/frontend-sign-in.md`; never put real passwords into the demo account configuration.
+Demo team configuration is separate under `kws-crm-team-preview-v1`; keep passwords/provider tokens out of it and preserve CRM/workbook/backup contracts. Messaging and invitation previews never deliver externally. Demo roles control frontend modules; connected roles and access come from the server.
+Do not treat the demo or first connected slice as a complete production multi-user CRM. Additional roles, account recovery, provider delivery, object storage, operations and deployment remain unfinished.
 Do not remove existing data features without approval.

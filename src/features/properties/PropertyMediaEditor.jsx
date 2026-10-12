@@ -1,45 +1,24 @@
-import React, { useState } from 'react';
-import { makeMediaAsset, mediaPhotos, mediaPlans } from '../../lib/media.js';
-import { MAX_MEDIA_TOTAL } from '../../config/storage.js';
+import React from 'react';
+import { mediaPhotos, mediaPlans } from '../../lib/media.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
-import { AMENITIES } from '../../config/properties.js';
-import { amenityList } from '../../lib/properties.js';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 
-export function PropertyMediaEditor({ form, setForm, uploading, setUploading }) {
-  const [mediaError, setMediaError] = useState('');
-  async function addMedia(e, kind) {
-    const input = e.currentTarget;
-    const selected = Array.from(input.files || []);
-    if (!selected.length) return;
-    const field = kind === 'photo' ? 'media_photos' : 'media_floorplans';
-    const max = kind === 'photo' ? 8 : 3;
-    const current = Array.isArray(form[field]) ? form[field] : [];
-    if (current.length + selected.length > max) {
-      setMediaError(`Maximum ${max} ${kind === 'photo' ? 'photos' : 'floor plans'} per property.`);
-      input.value = '';
-      return;
-    }
-    setUploading(true);
-    setMediaError('');
-    try {
-      const assets = [];
-      for (const file of selected) assets.push(await makeMediaAsset(file, kind));
-      const updated = [...current, ...assets];
-      if (JSON.stringify({ ...form, [field]: updated }).length > MAX_MEDIA_TOTAL / 1.6)
-        throw Error('Media exceeds the browser limit. Try fewer or smaller files.');
-      setForm((p) => ({ ...p, [field]: updated }));
-    } catch (err) {
-      setMediaError(err.message);
-    } finally {
-      setUploading(false);
-      input.value = '';
-    }
-  }
-  function removeMedia(key, index) {
-    setForm((p) => ({ ...p, [key]: (p[key] || []).filter((_, i) => i !== index) }));
-  }
+import { usePropertyMediaEditor } from './usePropertyMediaEditor.js';
+import { PropertyAmenityPicker } from './PropertyAmenityPicker.jsx';
+
+export function PropertyMediaEditor({
+  form,
+  setForm,
+  uploading,
+  setUploading,
+  storageMode = 'browser',
+}) {
+  const { mediaError, addMedia, removeMedia } = usePropertyMediaEditor({
+    form,
+    setForm,
+    setUploading,
+  });
   return (
     <section className="editor-media">
       <div className="editor-media-heading">
@@ -48,7 +27,7 @@ export function PropertyMediaEditor({ form, setForm, uploading, setUploading }) 
           <h3>Photos & floor plans</h3>
           <p>Make your property attractive, complete and easy to share.</p>
         </div>
-        <Badge tone="slate">Browser storage</Badge>
+        <Badge tone="slate">{storageMode === 'server' ? 'CRM storage' : 'Browser storage'}</Badge>
       </div>
       <OverflowList
         mode="all"
@@ -133,40 +112,11 @@ export function PropertyMediaEditor({ form, setForm, uploading, setUploading }) 
         </p>
       )}
       <p className="media-note">
-        Files are optimized for local storage. Use “Full backup with photos” in Data & export;
-        standard Excel export includes listing text only.
+        {storageMode === 'server'
+          ? 'Photos and floor plans are saved with this property in your private CRM workspace.'
+          : 'Files are optimized for local storage. Use “Full backup with photos” in Data & export; standard Excel export includes listing text only.'}
       </p>
-      <div className="amenity-picker">
-        <strong>Quick-add amenities</strong>
-        <OverflowList
-          mode="scroll"
-          className="amenity-options-list"
-          items={AMENITIES}
-          getKey={(name) => name}
-          label="Amenity options"
-          listClassName="amenity-chip-list"
-          renderItem={(name) => (
-            <button
-              type="button"
-              className={amenityList(form).includes(name) ? 'checked' : ''}
-              aria-pressed={amenityList(form).includes(name)}
-              onClick={() =>
-                setForm((p) => {
-                  const a = amenityList(p);
-                  return {
-                    ...p,
-                    amenities: (a.includes(name) ? a.filter((x) => x !== name) : [...a, name]).join(
-                      ', ',
-                    ),
-                  };
-                })
-              }
-            >
-              {amenityList(form).includes(name) && <Icon name="check" size={12} />} {name}
-            </button>
-          )}
-        />
-      </div>
+      <PropertyAmenityPicker form={form} setForm={setForm} />
     </section>
   );
 }

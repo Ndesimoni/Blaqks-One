@@ -1,0 +1,15 @@
+.import-photo-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  line-height: 1.5;
+}
+:root[data-theme] .import-photo-choice input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  accent-color: var(--focus);
+}
