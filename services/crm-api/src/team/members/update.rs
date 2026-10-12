@@ -28,11 +28,32 @@ pub struct UpdateRequest {
     pub permissions: Option<Permissions>,
     pub channel_access: Option<ChannelAccess>,
     pub active: Option<bool>,
+    pub record_scope: Option<RecordScopeGrant>,
+}
+
+/// The staff-only full-team grant (M7); positions and invitations never set it.
+#[derive(Clone, Copy, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum RecordScopeGrant {
+    Assigned,
+    Team,
+}
+
+impl RecordScopeGrant {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Assigned => "assigned",
+            Self::Team => "team",
+        }
+    }
 }
 
 pub fn prepare(request: &mut UpdateRequest, current: &directory::MemberRow) -> ApiResult<()> {
     if request.version < 1 {
         return Err(ApiError::invalid("A positive member version is required."));
+    }
+    if request.record_scope.is_some() && current.user.role != "staff" {
+        return Err(ApiError::invalid("Full-team access applies to staff only."));
     }
     request.name = Some(
         request

@@ -50,7 +50,7 @@ pub async fn update(
     let active = request.active.unwrap_or(current.active);
     sqlx::query(
         "UPDATE crm_users SET name=$2,phone=$3,positions=$4,permissions=$5,channel_access=$6, \
-         active=$7,version=version+1 WHERE id=$1",
+         active=$7,record_scope=COALESCE($8,record_scope),version=version+1 WHERE id=$1",
     )
     .bind(id)
     .bind(&request.name)
@@ -59,6 +59,7 @@ pub async fn update(
     .bind(sqlx::types::Json(request.permissions.as_ref().unwrap()))
     .bind(sqlx::types::Json(request.channel_access.as_ref().unwrap()))
     .bind(active)
+    .bind(request.record_scope.map(update::RecordScopeGrant::as_str))
     .execute(&mut *transaction)
     .await?;
     if request.active == Some(false) && !current.accepted {

@@ -9,6 +9,32 @@ use serde_json::{Map, Value};
 
 pub const MAX_RECORD_BYTES: usize = 12 * 1024 * 1024;
 
+/// Server-owned fields a record payload may never carry. Assignment, scope and the
+/// read projections (contract section 5, M2) come only from the database.
+pub const RESERVED_KEYS: &[&str] = &[
+    "id",
+    "workspace_id",
+    "workspaceId",
+    "owner_id",
+    "ownerId",
+    "actor_id",
+    "actorId",
+    "version",
+    "approval",
+    "approved_by",
+    "published",
+    "audit",
+    "created_by",
+    "assignee",
+    "assigneeId",
+    "assignee_id",
+    "record_scope",
+    "recordScope",
+    "references",
+    "taskClients",
+    "listingViewings",
+];
+
 pub struct ValidatedRecord {
     pub payload: Value,
     pub legacy_id: String,
@@ -31,22 +57,8 @@ pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedReco
     let object = payload
         .as_object_mut()
         .ok_or_else(|| ApiError::invalid("Record must be an object."))?;
-    for reserved in [
-        "id",
-        "workspace_id",
-        "workspaceId",
-        "owner_id",
-        "ownerId",
-        "actor_id",
-        "actorId",
-        "version",
-        "approval",
-        "approved_by",
-        "published",
-        "audit",
-        "created_by",
-    ] {
-        if object.contains_key(reserved) {
+    for reserved in RESERVED_KEYS {
+        if object.contains_key(*reserved) {
             return Err(ApiError::invalid(
                 "Server ownership and publication fields cannot be set.",
             ));

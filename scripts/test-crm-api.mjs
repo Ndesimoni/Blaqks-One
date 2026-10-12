@@ -81,6 +81,9 @@ try {
         'tests/api/team-archive-imports.test.mjs',
         'tests/api/team-archive-races.test.mjs',
         'tests/api/team-archive-transaction.test.mjs',
+        'tests/api/assignment-scope.test.mjs',
+        'tests/api/assignment-migration.test.mjs',
+        'tests/api/assignment-triggers.test.mjs',
       ],
       env,
     );
