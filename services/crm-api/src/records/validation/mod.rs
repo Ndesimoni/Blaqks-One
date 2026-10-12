@@ -1,3 +1,8 @@
+pub mod media;
+pub mod numbers;
+pub mod workbook_fields;
+pub mod workflow_fields;
+
 use super::collections::{self, Links};
 use crate::error::{ApiError, ApiResult};
 use serde_json::{Map, Value};
@@ -60,9 +65,9 @@ pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedReco
     }
     object.insert(id_key.into(), Value::String(legacy_id.clone()));
     let links = links(collection, object)?;
-    super::validation_numbers::validate(collection, &payload)?;
-    super::workbook_fields::validate(collection, &payload)?;
-    super::media::validate(&payload)?;
+    numbers::validate(collection, &payload)?;
+    workbook_fields::validate(collection, &payload)?;
+    media::validate(&payload)?;
     Ok(ValidatedRecord {
         payload,
         legacy_id,

@@ -1,4 +1,4 @@
-use super::{access, catalogue};
+use crate::team::{access, catalogue};
 use crate::{
     auth::{
         profile::{Profile, UserRow},

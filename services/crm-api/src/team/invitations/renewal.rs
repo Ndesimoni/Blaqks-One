@@ -1,4 +1,4 @@
-use super::{access, audit, members};
+use crate::team::{access, audit, members};
 use crate::{
     auth::{
         protection,

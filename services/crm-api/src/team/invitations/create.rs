@@ -1,4 +1,5 @@
-use super::{access, catalogue, invitation_store, members, validation};
+use super::store;
+use crate::team::{access, catalogue, members, validation};
 use crate::{
     auth::{
         permissions::{ChannelAccess, Permissions},
@@ -57,7 +58,7 @@ pub async fn create(
         }
         _ => return Err(ApiError::forbidden()),
     };
-    let created = invitation_store::create(
+    let created = store::create(
         &state.pool,
         session.user.id,
         owner,

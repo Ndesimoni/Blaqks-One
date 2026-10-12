@@ -1,4 +1,5 @@
-use super::{access, audit, invitations, validation};
+use super::inspect;
+use crate::team::{access, audit, validation};
 use crate::{
     auth::{password, protection, session, throttle},
     error::{ApiError, ApiResult},
@@ -44,7 +45,7 @@ pub async fn accept(
             "Provide a phone number including country code.",
         ));
     }
-    let invitation = invitations::find(&state.pool, &request.token).await?;
+    let invitation = inspect::find(&state.pool, &request.token).await?;
     let permit = state
         .password_workers
         .acquire()
@@ -63,7 +64,7 @@ pub async fn accept(
     .fetch_one(&mut *transaction)
     .await?;
     if !pending {
-        return Err(invitations::unavailable());
+        return Err(inspect::unavailable());
     }
     let consumed = sqlx::query(
         "UPDATE crm_team_invitations SET consumed_at=now() WHERE token_hash=$1 AND user_id=$2 \
@@ -77,7 +78,7 @@ pub async fn accept(
     .execute(&mut *transaction)
     .await?;
     if consumed.rows_affected() != 1 {
-        return Err(invitations::unavailable());
+        return Err(inspect::unavailable());
     }
     sqlx::query(
         "UPDATE crm_users SET password_hash=$2,phone=COALESCE($3,phone),active=true, \

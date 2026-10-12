@@ -1,4 +1,4 @@
-use super::access;
+use crate::team::access;
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},

@@ -1,4 +1,4 @@
-use super::{archive_access, archive_snapshot, archive_store};
+use super::{scope, snapshot, store};
 use crate::{
     auth::{protection, session::Session},
     error::{ApiError, ApiResult},
@@ -27,10 +27,10 @@ pub async fn preview(
     Path((workspace, id)): Path<(String, String)>,
 ) -> ApiResult<Json<Value>> {
     let id = Uuid::parse_str(&id).map_err(|_| ApiError::invalid("Invalid member ID."))?;
-    let scope = archive_access::scope(&state, &session, workspace, id).await?;
+    let scope = scope::scope(&state, &session, workspace, id).await?;
     let mut transaction = state.pool.begin().await?;
-    archive_access::lock(&mut transaction, &scope).await?;
-    let snapshot = archive_snapshot::read(
+    scope::lock(&mut transaction, &scope).await?;
+    let snapshot = snapshot::read(
         &mut transaction,
         id,
         scope.owner,
@@ -61,7 +61,7 @@ pub async fn archive(
         ));
     }
     let id = Uuid::parse_str(&id).map_err(|_| ApiError::invalid("Invalid member ID."))?;
-    let scope = archive_access::scope(&state, &session, workspace, id).await?;
-    let result = archive_store::archive(&state.pool, session.user.id, id, &scope, request).await?;
+    let scope = scope::scope(&state, &session, workspace, id).await?;
+    let result = store::archive(&state.pool, session.user.id, id, &scope, request).await?;
     Ok(Json(result))
 }

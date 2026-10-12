@@ -1,4 +1,5 @@
-use super::{access, audit, invite::InviteRequest};
+use super::create::InviteRequest;
+use crate::team::{access, audit};
 use crate::{
     auth::{permissions::Permissions, session},
     error::ApiResult,

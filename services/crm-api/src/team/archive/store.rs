@@ -1,9 +1,10 @@
 use super::{
-    archive::ArchiveRequest,
-    archive_access::{self, Scope},
-    archive_snapshot, audit, members,
+    handlers::ArchiveRequest,
+    scope::{self, Scope},
+    snapshot,
 };
 use crate::error::{ApiError, ApiResult};
+use crate::team::{audit, members};
 use serde_json::{json, Value};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -16,8 +17,8 @@ pub async fn archive(
     request: ArchiveRequest,
 ) -> ApiResult<Value> {
     let mut transaction = pool.begin().await?;
-    archive_access::lock(&mut transaction, scope).await?;
-    let snapshot = archive_snapshot::read(
+    scope::lock(&mut transaction, scope).await?;
+    let snapshot = snapshot::read(
         &mut transaction,
         id,
         scope.owner,

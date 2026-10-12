@@ -1,4 +1,5 @@
-use super::{access, catalogue, members, update_store, validation};
+use super::{directory, update_store};
+use crate::team::{access, catalogue, validation};
 use crate::{
     auth::{
         permissions::{ChannelAccess, Permissions},
@@ -29,7 +30,7 @@ pub struct UpdateRequest {
     pub active: Option<bool>,
 }
 
-pub fn prepare(request: &mut UpdateRequest, current: &members::MemberRow) -> ApiResult<()> {
+pub fn prepare(request: &mut UpdateRequest, current: &directory::MemberRow) -> ApiResult<()> {
     if request.version < 1 {
         return Err(ApiError::invalid("A positive member version is required."));
     }
@@ -110,6 +111,6 @@ pub async fn update(
     )
     .await?;
     Ok(Json(
-        json!({"member":members::find(&state.pool, id).await?}),
+        json!({"member":directory::find(&state.pool, id).await?}),
     ))
 }

@@ -1,4 +1,4 @@
-use super::members::{Member, MemberRow};
+use crate::team::members::{Member, MemberRow};
 use crate::{
     auth::session,
     error::{ApiError, ApiResult},

@@ -1,8 +1,8 @@
 use super::{
-    access, audit,
-    members::MemberRow,
+    directory::MemberRow,
     update::{self, UpdateRequest},
 };
+use crate::team::{access, audit};
 use crate::{
     error::{ApiError, ApiResult},
     workspaces,
