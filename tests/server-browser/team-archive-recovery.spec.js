@@ -14,7 +14,11 @@ test('a lost archive response can be checked without deleting twice or losing th
   await closeInvitation(page);
   await page.getByLabel('Search team').fill('Browser archive-response');
   const card = teamCard(page, 'Browser archive-response');
-  await clickMemberAction(page, 'Browser archive-response', 'Delete account for Browser archive-response');
+  await clickMemberAction(
+    page,
+    'Browser archive-response',
+    'Delete account for Browser archive-response',
+  );
   const dialog = page.getByRole('dialog', { name: 'Delete account', exact: true });
   await dialog
     .getByLabel('Type archive-response@browser-team.test to confirm')
@@ -33,7 +37,7 @@ test('a lost archive response can be checked without deleting twice or losing th
   await expect(dialog.getByRole('button', { name: 'Delete and archive' })).toBeDisabled();
   await dialog.getByRole('button', { name: 'Close', exact: true }).click();
   await expect(card).toHaveCount(0);
-  await page.getByRole('button', { name: 'Archived accounts', exact: true }).click();
+  await page.getByLabel('Account status').selectOption('archived');
   await expect(card).toContainText('Archived · Sign-in blocked');
   await expect(card.getByRole('button')).toHaveCount(0);
   await expect(card).toContainText('archive-response@browser-team.test');

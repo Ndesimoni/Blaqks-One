@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { workspaceStatusLabel } from './workspacePickerModel.js';
+import { workspaceOpenLabel, workspaceStatusLabel } from './workspacePickerModel.js';
 
 function WorkspaceGroup({ label, workspaces, owner, busy, onSelect }) {
   if (!workspaces.length) return null;
@@ -15,7 +15,7 @@ function WorkspaceGroup({ label, workspaces, owner, busy, onSelect }) {
             <button
               type="button"
               className="workspace-picker-option"
-              aria-label={`Open ${workspace.name} workspace`}
+              aria-label={workspaceOpenLabel(workspace)}
               aria-pressed={workspace.id === owner.id}
               disabled={busy}
               onClick={() => onSelect(workspace.id)}

@@ -7,7 +7,7 @@ import {
   openTeam,
   startInvitation,
 } from './team-helpers.js';
-import { expectSuspended, teamCard } from './team-status-helpers.js';
+import { expectSuspended, openMemberActions, teamCard } from './team-status-helpers.js';
 import { textContrast } from '../browser/helpers/contrast.js';
 
 test('Super Admin deletes an Admin into a read-only archive with their team and all records', async ({
@@ -29,13 +29,21 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     const staffLink = await finishInvitation(admin.page, staffForm);
     staff = await activateInNewContext(browser, staffLink, 'archive-staff@browser-team.test');
     await closeInvitation(admin.page);
-    await expect(admin.page.getByRole('button', { name: /Delete account/ })).toHaveCount(0);
-    await expect(admin.page.getByRole('button', { name: 'Archived accounts' })).toHaveCount(0);
+    const staffActions = await openMemberActions(admin.page, 'Browser archive-staff');
+    await expect(staffActions.getByRole('button', { name: /Delete account/ })).toHaveCount(0);
+    await staffActions.getByRole('button', { name: 'Close account actions' }).click();
+    const adminStatus = admin.page.getByLabel('Account status');
+    await expect(adminStatus.locator('option')).toHaveCount(5);
+    await expect(adminStatus.locator('option[value="archived"]')).toHaveCount(0);
     await closeInvitation(page);
     await page.reload();
     await page.getByLabel('Search team').fill('Browser archive-admin');
     const card = teamCard(page, 'Browser archive-admin');
-    const remove = card.getByRole('button', { name: 'Delete account for Browser archive-admin' });
+    const more = card.getByRole('button', { name: 'More actions for Browser archive-admin' });
+    const actions = await openMemberActions(page, 'Browser archive-admin');
+    const remove = actions.getByRole('button', {
+      name: 'Delete account for Browser archive-admin',
+    });
     await remove.click();
     const dialog = page.getByRole('dialog', { name: 'Delete account', exact: true });
     const confirm = dialog.getByRole('button', { name: 'Delete and archive', exact: true });
@@ -46,7 +54,8 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     await expect(confirm).toBeDisabled();
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
-    await expect(remove).toBeFocused();
+    await expect(more).toBeFocused();
+    await openMemberActions(page, 'Browser archive-admin');
     await remove.click();
     await expect(dialog).toContainText('1 retained');
     await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -88,7 +97,7 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     await expect(card).toHaveCount(0);
     await expectSuspended(admin.page, 'archive-admin@browser-team.test');
     await expectSuspended(staff.page, 'archive-staff@browser-team.test');
-    await page.getByRole('button', { name: 'Archived accounts', exact: true }).click();
+    await page.getByLabel('Account status').selectOption('archived');
     await expect(card).toContainText('Archived · Sign-in blocked');
     await expect(card.getByRole('button')).toHaveCount(0);
     await card.getByRole('link', { name: 'View archived records' }).click();
@@ -104,6 +113,10 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     await expect(teamCard(page, 'Browser archive-staff')).toContainText(
       'Archived · Sign-in blocked',
     );
+    const frozenStatus = page.getByLabel('Account status');
+    await expect(frozenStatus).toBeDisabled();
+    await expect(frozenStatus).toHaveValue('archived');
+    await expect(frozenStatus.locator('option')).toHaveText([/^Archived \(\d+\)$/]);
     await expect(
       page.getByRole('button', {
         name: /Invite teammate|Renew invitation|Restore account|Edit Browser/,

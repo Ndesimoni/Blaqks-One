@@ -10,6 +10,7 @@ import {
 import {
   changeAccountStatus,
   expectSuspended,
+  openMemberActions,
   signInActivatedMember,
   teamCard,
 } from './team-status-helpers.js';
@@ -27,10 +28,16 @@ test('an Admin suspends and restores their staff with clear pending and activate
   await page.getByLabel('Search team').fill('Browser status-staff');
   const card = teamCard(page, 'Browser status-staff');
   await expect(card).toContainText('Invitation pending');
-  await expect(card.getByRole('button', { name: /Cancel invitation/ })).toBeEnabled();
-  await expect(card.getByRole('button', { name: /Suspend account|Restore account/ })).toHaveCount(
-    0,
-  );
+  const actions = await openMemberActions(page, 'Browser status-staff');
+  await expect(actions.getByRole('button', { name: /Cancel invitation/ })).toBeEnabled();
+  await expect(
+    actions.getByRole('button', { name: /Suspend account|Restore account/ }),
+  ).toHaveCount(0);
+  await actions.getByRole('button', { name: 'Close account actions' }).click();
+  await expect(actions).toHaveCount(0);
+  await expect(
+    card.getByRole('button', { name: 'More actions for Browser status-staff' }),
+  ).toBeFocused();
   const staff = await activateInNewContext(browser, link, 'status-staff@browser-team.test');
   try {
     await page.reload();

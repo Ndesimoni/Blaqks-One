@@ -41,9 +41,13 @@ export function ServerTeamPage({ owner }) {
         busy={team.loading || !!team.error || !!memberActions.pendingId}
         onInvite={() => setEditing({ member: null })}
       />
-      <TeamDirectoryFilters directory={directory} roles={team.roles}
-        canReviewArchive={canReviewArchive} frozen={frozen}
-        busy={team.loading || !!memberActions.pendingId} />
+      <TeamDirectoryFilters
+        directory={directory}
+        roles={team.roles}
+        canReviewArchive={canReviewArchive}
+        frozen={frozen}
+        busy={team.loading || !!memberActions.pendingId}
+      />
       {memberActions.error && (
         <p className="field-error" role="alert">
           {memberActions.error}
@@ -54,7 +58,7 @@ export function ServerTeamPage({ owner }) {
         owner={owner}
         filtered={directory.filtered}
         query={directory.filters.query}
-        hasFilters={directory.filters.query || directory.filters.role !== 'all' || directory.filters.status !== 'current'}
+        hasFilters={directory.hasFilters}
         archived={archived}
         current={directory.current}
         onPage={directory.onPage}

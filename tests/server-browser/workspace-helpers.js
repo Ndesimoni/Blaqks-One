@@ -10,6 +10,7 @@ export async function openWorkspacePicker(page) {
 export async function selectWorkspace(page, name) {
   const dialog = await openWorkspacePicker(page);
   await dialog.getByLabel('Search workspaces', { exact: true }).fill(name);
-  await dialog.getByRole('button', { name, exact: true }).click();
+  const label = /\bworkspace$/i.test(name) ? `Open ${name}` : `Open ${name} workspace`;
+  await dialog.getByRole('button', { name: label, exact: true }).click();
   await expect(dialog).toHaveCount(0);
 }

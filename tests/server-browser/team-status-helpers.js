@@ -7,7 +7,9 @@ export function teamCard(page, name) {
 }
 
 export async function openMemberActions(page, name) {
-  await teamCard(page, name).getByRole('button', { name: `More actions for ${name}` }).click();
+  await teamCard(page, name)
+    .getByRole('button', { name: `More actions for ${name}` })
+    .click();
   const dialog = page.getByRole('dialog', { name: `${name} account actions`, exact: true });
   await expect(dialog).toBeVisible();
   return dialog;

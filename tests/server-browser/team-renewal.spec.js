@@ -20,7 +20,11 @@ test('renewing a pending invitation replaces its old link and activates the same
   const original = await finishInvitation(page, dialog);
   await closeInvitation(page);
   await page.getByLabel('Search team').fill('Browser renewed-link');
-  await clickMemberAction(page, 'Browser renewed-link', 'Renew invitation for Browser renewed-link');
+  await clickMemberAction(
+    page,
+    'Browser renewed-link',
+    'Renew invitation for Browser renewed-link',
+  );
   const ready = page.getByRole('dialog', { name: 'Invitation ready' });
   await expect(ready).toBeVisible();
   const link = await ready.getByLabel('Activation link').inputValue();

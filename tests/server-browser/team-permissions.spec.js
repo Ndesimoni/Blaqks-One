@@ -24,7 +24,7 @@ test('owner edits staff access, invalidates the session and retains the new gran
     await closeInvitation(page);
     await page.reload();
     await page.getByLabel('Search team').fill('Browser changed-access');
-  await clickMemberAction(page, 'Browser changed-access', 'Edit Browser changed-access');
+    await clickMemberAction(page, 'Browser changed-access', 'Edit Browser changed-access');
     dialog = page.getByRole('dialog', { name: 'Edit teammate' });
     await dialog.getByRole('button', { name: 'Continue', exact: true }).click();
     await dialog

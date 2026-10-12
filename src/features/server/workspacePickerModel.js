@@ -6,6 +6,11 @@ export function workspaceStatusLabel(workspace) {
   return 'Active';
 }
 
+export function workspaceOpenLabel(workspace) {
+  const name = String(workspace.name || '').trim();
+  return /\bworkspace$/i.test(name) ? `Open ${name}` : `Open ${name} workspace`;
+}
+
 export function filterWorkspaces(workspaces, query) {
   const search = query.trim().toLocaleLowerCase();
   return workspaces

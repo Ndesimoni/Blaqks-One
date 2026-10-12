@@ -7,6 +7,19 @@ export const STATUS_LABELS = {
   archived: 'Archived accounts',
 };
 
+// Short labels keep the closed status dropdown readable at phone width.
+export const STATUS_OPTION_LABELS = {
+  current: 'All current',
+  active: 'Active',
+  suspended: 'Suspended',
+  pending: 'Pending invite',
+  cancelled: 'Cancelled invite',
+  archived: 'Archived',
+};
+
+// Per-account badges describe one account's state, so archived is singular.
+export const STATUS_BADGE_LABELS = { ...STATUS_LABELS, archived: 'Archived' };
+
 export function memberStatus(member) {
   if (member.status === 'archived' || member.deletedAt) return 'archived';
   if (member.invitationPending) return member.status === 'invited' ? 'pending' : 'cancelled';
@@ -25,7 +38,8 @@ export function directoryModel(members, roles, { query, role, status, sort }) {
       role === 'all' || member.roleId === role || positions.includes(role.replace('position:', ''));
     const names = positions.map((id) => roles.find((entry) => entry.id === id)?.label || id);
     const text = [member.name, member.email, member.phone, ...names].join(' ').toLowerCase();
-    const searchMatch = text.includes(term) ||
+    const searchMatch =
+      text.includes(term) ||
       (phoneQuery && (member.phone || '').replace(/\D/g, '').includes(digits));
     return roleMatch && searchMatch;
   });
@@ -36,11 +50,13 @@ export function directoryModel(members, roles, { query, role, status, sort }) {
     if (state !== 'archived') counts.current += 1;
   });
   const filtered = matching
-    .filter((member) => status === 'current'
-      ? memberStatus(member) !== 'archived'
-      : memberStatus(member) === status)
+    .filter((member) =>
+      status === 'current' ? memberStatus(member) !== 'archived' : memberStatus(member) === status,
+    )
     .sort((a, b) => {
-      const order = collator.compare(a.name, b.name) || collator.compare(a.email, b.email) ||
+      const order =
+        collator.compare(a.name, b.name) ||
+        collator.compare(a.email, b.email) ||
         collator.compare(a.id, b.id);
       return sort === 'desc' ? -order : order;
     });

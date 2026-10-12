@@ -10,6 +10,7 @@ import {
 import {
   changeAccountStatus,
   expectSuspended,
+  openMemberActions,
   signInActivatedMember,
   teamCard,
 } from './team-status-helpers.js';
@@ -38,10 +39,13 @@ test('Super Admin suspends and restores an Admin and their staff from the accoun
     await page.reload();
     await page.getByLabel('Search team').fill('Browser status-admin');
     const card = teamCard(page, 'Browser status-admin');
-    const suspend = card.getByRole('button', { name: 'Suspend account for Browser status-admin' });
+    let actions = await openMemberActions(page, 'Browser status-admin');
+    const suspend = actions.getByRole('button', {
+      name: 'Suspend account for Browser status-admin',
+    });
     await expect(suspend).toBeEnabled();
-    await expect(card.getByRole('button', { name: /Cancel invitation/ })).toHaveCount(0);
-    await card.getByRole('button', { name: 'Edit Browser status-admin', exact: true }).click();
+    await expect(actions.getByRole('button', { name: /Cancel invitation/ })).toHaveCount(0);
+    await actions.getByRole('button', { name: 'Edit Browser status-admin', exact: true }).click();
     const edit = page.getByRole('dialog', { name: 'Edit teammate' });
     await expect(edit.getByLabel('Account active', { exact: true })).toHaveCount(0);
     await edit.getByRole('button', { name: 'Continue', exact: true }).click();
@@ -53,6 +57,7 @@ test('Super Admin suspends and restores an Admin and their staff from the accoun
       for (const theme of ['dark', 'light']) {
         if ((await page.locator('html').getAttribute('data-theme')) !== theme)
           await page.getByRole('button', { name: `Switch to ${theme} mode` }).click();
+        actions = await openMemberActions(page, 'Browser status-admin');
         await suspend.scrollIntoViewIfNeeded();
         await expect(suspend).toBeVisible();
         await expect.poll(() => textContrast(suspend.locator('span'))).toBeGreaterThanOrEqual(4.5);
@@ -60,19 +65,24 @@ test('Super Admin suspends and restores an Admin and their staff from the accoun
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
         ).toBe(true);
         await page.screenshot({ path: testInfo.outputPath(`team-status-${width}-${theme}.png`) });
+        await actions.getByRole('button', { name: 'Close account actions' }).click();
       }
     }
     page.once('dialog', (confirmation) => confirmation.dismiss());
+    await openMemberActions(page, 'Browser status-admin');
     await suspend.click();
     await expect(card).toContainText('Active');
     page.once('dialog', (confirmation) => {
       expect(confirmation.message()).toContain('Admin and their staff');
       confirmation.accept();
     });
+    await openMemberActions(page, 'Browser status-admin');
     await suspend.click();
     await expect(card).toContainText('Suspended');
+    actions = await openMemberActions(page, 'Browser status-admin');
     await expect(suspend).toHaveCount(0);
-    await expect(card.getByRole('button', { name: /Restore account/ })).toBeEnabled();
+    await expect(actions.getByRole('button', { name: /Restore account/ })).toBeEnabled();
+    await actions.getByRole('button', { name: 'Close account actions' }).click();
     await expectSuspended(admin.page, 'status-admin@browser-team.test');
     await expectSuspended(staff.page, 'status-admin-staff@browser-team.test');
     await page.reload();
