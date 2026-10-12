@@ -18,8 +18,8 @@ pub async fn insert(
             let id = Uuid::new_v4();
             sqlx::query(
                 "INSERT INTO crm_records \
-                 (id,workspace_id,collection,legacy_id,payload,contact_id,client_ref,property_ref) \
-                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+                 (id,workspace_id,collection,legacy_id,payload,contact_id,client_ref,property_ref,\
+                 referral_ref) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
             )
             .bind(id)
             .bind(workspace)
@@ -29,6 +29,7 @@ pub async fn insert(
             .bind(record.links.contact)
             .bind(record.links.client)
             .bind(record.links.property)
+            .bind(record.links.referral)
             .execute(&mut **transaction)
             .await?;
             audit::append(transaction, actor, workspace, "created", collection, id).await?;

@@ -65,6 +65,11 @@ pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedReco
     }
     object.insert(id_key.into(), Value::String(legacy_id.clone()));
     let links = links(collection, object)?;
+    if collection == "Clients" && links.referral.as_deref() == Some(legacy_id.as_str()) {
+        return Err(ApiError::invalid(
+            "A client cannot be recorded as their own referrer.",
+        ));
+    }
     numbers::validate(collection, &payload)?;
     workbook_fields::validate(collection, &payload)?;
     media::validate(&payload)?;
@@ -89,7 +94,7 @@ fn links(collection: &str, object: &mut Map<String, Value>) -> ApiResult<Links> 
         if let Some(id) = &value {
             object.insert(link.field.into(), Value::String(id.clone()));
         }
-        links.set(link.target, value);
+        links.set(link.slot, value);
     }
     Ok(links)
 }

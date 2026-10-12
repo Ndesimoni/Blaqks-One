@@ -27,6 +27,10 @@ impl ApiError {
         Self(StatusCode::CONFLICT, message, "conflict")
     }
 
+    pub fn link_missing(message: &'static str) -> Self {
+        Self(StatusCode::CONFLICT, message, "link_missing")
+    }
+
     pub fn stale(message: &'static str) -> Self {
         Self(StatusCode::CONFLICT, message, "version_conflict")
     }
