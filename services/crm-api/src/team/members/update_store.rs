@@ -4,6 +4,7 @@ use super::{
 };
 use crate::team::{access, audit};
 use crate::{
+    assignments::departure,
     error::{ApiError, ApiResult},
     workspaces,
 };
@@ -46,6 +47,7 @@ pub async fn update(
             "This member changed. Reload before saving.",
         ));
     }
+    let before = current.user.effective_permissions();
     update::prepare(&mut request, &current)?;
     let active = request.active.unwrap_or(current.active);
     sqlx::query(
@@ -62,6 +64,13 @@ pub async fn update(
     .bind(request.record_scope.map(update::RecordScopeGrant::as_str))
     .execute(&mut *transaction)
     .await?;
+    // M3: a staff member who is suspended or loses a grant releases those records in
+    // this transaction. Admins and recordScope changes release nothing.
+    if current.user.role == "staff" {
+        let after = request.permissions.as_ref().unwrap();
+        let (collections, reason) = departure::releases(current.active, active, &before, after);
+        departure::release(&mut transaction, workspace, id, &collections, actor, reason).await?;
+    }
     if request.active == Some(false) && !current.accepted {
         sqlx::query("UPDATE crm_team_invitations SET revoked_at=now() WHERE user_id=$1 AND consumed_at IS NULL")
             .bind(id).execute(&mut *transaction).await?;

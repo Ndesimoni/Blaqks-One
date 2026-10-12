@@ -88,3 +88,29 @@ export async function setScope(admin, staff, recordScope) {
   assert.equal(result.status, 200, JSON.stringify(result.value));
   return staffLogin(member.email);
 }
+
+/** `PUT …/assignee`; `options` may override the body or drop the CSRF token. */
+export const assign = (session, collection, entry, assigneeId, options = {}) =>
+  session.request(`${workspacePath(session, collection, entry.id)}/assignee`, {
+    method: 'PUT',
+    body: { version: entry.version, assigneeId, ...options.body },
+    ...(options.csrf === false ? { csrf: undefined } : {}),
+  });
+
+export const bulkAssign = (session, body, options = {}) =>
+  session.request(`/workspaces/${session.user.workspaceId}/assignments/bulk`, {
+    method: 'POST',
+    body,
+    ...options,
+  });
+
+export const assignmentLog = (session, collection, id, workspace = session.user.workspaceId) =>
+  session.request(`${workspacePath(session, collection, id, workspace)}/assignments`);
+
+export const assignees = (session, collection, workspace = session.user.workspaceId) =>
+  session.request(
+    `/workspaces/${workspace}/assignees?collection=${encodeURIComponent(collection)}`,
+  );
+
+export const versionOf = (recordId) =>
+  Number(query(`SELECT version FROM crm_records WHERE id='${recordId}'`));

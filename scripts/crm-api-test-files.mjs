@@ -32,4 +32,9 @@ export const apiTestFiles = [
   'tests/api/assignment-rules.test.mjs',
   'tests/api/assignment-ids.test.mjs',
   'tests/api/assignment-race.test.mjs',
+  'tests/api/assignment-assignees.test.mjs',
+  'tests/api/assignment-put.test.mjs',
+  'tests/api/assignment-bulk.test.mjs',
+  'tests/api/assignment-log.test.mjs',
+  'tests/api/assignment-departure.test.mjs',
 ];

@@ -3,6 +3,7 @@ use super::{
     scope::{self, Scope},
     snapshot,
 };
+use crate::assignments::departure;
 use crate::error::{ApiError, ApiResult};
 use crate::team::{audit, members};
 use serde_json::{json, Value};
@@ -64,6 +65,13 @@ pub async fn archive(
     .bind(&ids)
     .execute(&mut *transaction)
     .await?;
+    // A staff archive releases their records to the queue; an Admin archive freezes the
+    // whole workspace, so its assignments are kept as they are (contract §7).
+    if !admin {
+        let all = crate::records::visibility::ASSIGNABLE;
+        let workspace = &scope.target_workspace;
+        departure::release(&mut transaction, workspace, id, &all, actor, "departure").await?;
+    }
     for member in &ids {
         audit::append(
             &mut transaction,

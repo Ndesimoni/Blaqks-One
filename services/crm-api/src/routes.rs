@@ -1,4 +1,5 @@
 use crate::{
+    assignments,
     auth::handlers as auth,
     error::{ApiError, ApiResult},
     imports,
@@ -11,7 +12,7 @@ use axum::{
     http::{header, HeaderValue, StatusCode},
     middleware::{self, Next},
     response::Response,
-    routing::{get, post},
+    routing::{get, post, put},
     Json, Router,
 };
 use serde_json::{json, Value};
@@ -110,6 +111,23 @@ pub fn app(state: AppState) -> Router {
         .route(
             "/api/crm/workspaces/{workspace}/records/{collection}/{id}",
             axum::routing::patch(records::update).delete(records::delete),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/records/{collection}/{id}/assignee",
+            put(assignments::assign::assign).layer(DefaultBodyLimit::max(16 * 1024)),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/records/{collection}/{id}/assignments",
+            get(assignments::log::history),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/assignees",
+            get(assignments::assignees::assignees),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/assignments/bulk",
+            post(assignments::bulk::bulk)
+                .layer(DefaultBodyLimit::max(assignments::requests::MAX_BULK_BYTES)),
         )
         .fallback(unknown_route)
         .method_not_allowed_fallback(unsupported_method)
