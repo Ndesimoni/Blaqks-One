@@ -26,6 +26,16 @@ Owner decisions that settle open questions in the [implementation roadmap](claud
 | Dashboards and filters      | Staff dashboards count only their own records. Admins and full-team members get an **"Assigned to"** filter for any team member's workload.                                                                                                                                   |
 | Full-team access boundaries | Full-team access never overrides module permissions; a member without finance permission still cannot see finance records.                                                                                                                                                    |
 
+### Assignment details (decided 2026-10-12, after security review)
+
+| Topic                              | Decision                                                                                                                                                                                                                     |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contacts                           | Owner/landlord **Contacts also carry an assignee**, so a contact a staff member creates stays visible to them even before it is linked to a property.                                                                        |
+| Client on a directly assigned task | A staff member given a Follow-up for a client they do not hold sees that client's **name, phone and email only**, never the rest of the profile. This narrow exception applies only to Follow-ups directly assigned to them. |
+| Record IDs                         | **Sequential workbook-style IDs are kept** (for example CL-045). Staff may infer approximate team volume; this is accepted for Excel compatibility.                                                                          |
+| Deleting parent records            | Until granular actions (roadmap A2) exist, **only Admins and full-team members may delete Clients, Properties and Contacts**. Staff can still edit records they hold and delete their own activity records.                  |
+| Viewings on a held listing         | The holder of a Property sees that other agents' viewings are booked on it, showing **date/time and the responsible agent only**, with no client details.                                                                    |
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |
