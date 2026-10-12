@@ -38,6 +38,16 @@
 :root[data-theme] :is(.field [aria-invalid='true'], .team-fields [aria-invalid='true']) {
   border-color: var(--danger);
 }
+:root[data-theme] .form-grid .field :is(input[readonly], select.link-locked) {
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+  cursor: default;
+}
+:root[data-theme] .form-grid .field .field-hint {
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
 :root[data-theme] :is(.field-error, .required) {
   color: var(--danger);
 }

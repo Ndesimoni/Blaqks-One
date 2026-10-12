@@ -126,5 +126,10 @@ test('record payloads cannot carry assignment, scope or projection keys', async 
     });
     assert.equal(updated.status, 400, key);
   }
-  assert.equal(query(`SELECT assignee_id IS NULL FROM crm_records WHERE id='${existing.id}'`), 't');
+  // The Admin's own record keeps its database assignee; payload keys never change it.
+  assert.equal(existing.assignee, admin.user.id);
+  assert.equal(
+    query(`SELECT assignee_id FROM crm_records WHERE id='${existing.id}'`),
+    admin.user.id,
+  );
 });

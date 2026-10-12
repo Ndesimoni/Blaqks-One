@@ -51,9 +51,11 @@ test('already authenticated writes queued behind Admin and staff archival are re
     try {
       deleting = archive(owner, scope, review);
       await waitForWorkspaceQueue(1);
+      // Assigned-only staff cannot type IDs, so their client is named instead.
+      const record = actor === staff ? { full_name: id } : { client_id: id };
       writing = actor.request(recordsPath(admin, 'Clients'), {
         method: 'POST',
-        body: { record: { client_id: id } },
+        body: { record },
       });
       await waitForWorkspaceQueue(2);
     } finally {
@@ -62,6 +64,10 @@ test('already authenticated writes queued behind Admin and staff archival are re
     assert.equal((await deleting).status, 200);
     assert.equal((await writing).status, 403);
     assert.equal(recordCount(admin.user.id, id), 0);
+    assert.equal(
+      query(`SELECT count(*) FROM crm_records WHERE payload->>'full_name'='${id}'`),
+      '0',
+    );
     assert.equal(
       query(`SELECT count(*) FROM crm_activity WHERE workspace_id='${admin.user.id}'`),
       '0',

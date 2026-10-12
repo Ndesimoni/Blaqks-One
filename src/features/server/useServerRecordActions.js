@@ -1,4 +1,5 @@
-import { newId, schema } from '../../lib/schema.js';
+import { schema } from '../../lib/schema.js';
+import { canDeleteRecord } from './access.js';
 import { useServerMutations } from './useServerMutations.js';
 
 export function useServerRecordActions(options) {
@@ -16,8 +17,10 @@ export function useServerRecordActions(options) {
       readOnly
         ? Promise.resolve({ message: 'Archived workspaces are read-only.' })
         : mutations.saveRecord(...args),
-    deleteRecord: (...args) => {
-      if (!readOnly) return mutations.deleteRecord(...args);
+    canDelete: (module) => !readOnly && canDeleteRecord(records.scope, module),
+    deleteRecord: (module, ...args) => {
+      if (!readOnly && canDeleteRecord(records.scope, module))
+        return mutations.deleteRecord(module, ...args);
     },
     reloadRecord: (...args) => {
       if (!readOnly) return mutations.reloadRecord(...args);
@@ -28,7 +31,8 @@ export function useServerRecordActions(options) {
       view.setDetail(null);
       view.setDrawer({
         module,
-        record: { [schema(module)[0].key]: newId(module, records.data[module]), ...defaults },
+        // Connected IDs are issued by the server when the record is first saved.
+        record: { [schema(module)[0].key]: '', ...defaults },
         original: null,
       });
     },

@@ -20,6 +20,8 @@ function RecordDetails({
   busy = false,
   showMessaging = true,
   readOnly = false,
+  canDelete = true,
+  extras = null,
 }) {
   const { module, record: r } = detail;
   const { route } = useNavigation();
@@ -60,6 +62,7 @@ function RecordDetails({
         </button>
       </div>
       <div className="drawer-body">
+        {extras}
         {module === 'Clients' && showMessaging && !readOnly && (
           <div className="record-message-action">
             <Button
@@ -88,14 +91,16 @@ function RecordDetails({
           </Button>
         ) : (
           <>
-            <Button
-              variant="danger-light"
-              icon="trash"
-              onClick={() => remove(module, r)}
-              disabled={busy}
-            >
-              Delete
-            </Button>
+            {canDelete && (
+              <Button
+                variant="danger-light"
+                icon="trash"
+                onClick={() => remove(module, r)}
+                disabled={busy}
+              >
+                Delete
+              </Button>
+            )}
             <Button
               icon="edit"
               disabled={busy}

@@ -1,4 +1,5 @@
 import { blank, schema } from '../../lib/schema.js';
+import { readListingViewings, readReferences, readTaskClients } from './projections.js';
 
 export const connectedCollections = [
   'Clients',
@@ -10,28 +11,68 @@ export const connectedCollections = [
   'Interaction log',
   'Client care',
 ];
+export const assignableCollections = ['Clients', 'Properties', 'Contacts', 'Follow-ups'];
+export const recordUnavailableMessage = 'This record is no longer available to you.';
 
+/** Server metadata keys that must never enter or leave a workbook record payload. */
+const reservedKeys = new Set([
+  'assignee',
+  'assigneeId',
+  'assignee_id',
+  'record_scope',
+  'recordScope',
+  'references',
+  'taskClients',
+  'listingViewings',
+]);
+const incomplete = () => Error('The CRM server returned incomplete records.');
+const invalid = () => Error('The CRM server returned invalid record information.');
+
+export function readServerEntry(collection, row) {
+  const identifier = schema(collection)[0].key;
+  const assignee = row?.assignee;
+  if (
+    !row?.id ||
+    !Number.isSafeInteger(row.version) ||
+    row.version < 1 ||
+    !row.record ||
+    typeof row.record !== 'object' ||
+    !row.record[identifier] ||
+    !(assignee === null || (typeof assignee === 'string' && assignee)) ||
+    (assignee && !assignableCollections.includes(collection))
+  )
+    throw invalid();
+  const record = Object.fromEntries(
+    Object.entries(row.record).filter(([key]) => !reservedKeys.has(key)),
+  );
+  return { id: row.id, version: row.version, record, assignee };
+}
+
+/** Parses the scoped list response: visible entries plus read-only projections. */
 export function readServerRecords(payload) {
   const entries = {};
   for (const collection of connectedCollections) {
     const rows = payload?.records?.[collection];
-    if (!Array.isArray(rows)) throw Error('The CRM server returned incomplete records.');
+    if (!Array.isArray(rows)) throw incomplete();
     const keys = new Set();
     const identifier = schema(collection)[0].key;
     entries[collection] = rows.map((row) => {
-      if (
-        !row?.id ||
-        !Number.isSafeInteger(row.version) ||
-        row.version < 1 ||
-        !row.record?.[identifier] ||
-        keys.has(row.record[identifier])
-      )
-        throw Error('The CRM server returned invalid record information.');
-      keys.add(row.record[identifier]);
-      return { id: row.id, version: row.version, record: row.record };
+      const entry = readServerEntry(collection, row);
+      if (keys.has(entry.record[identifier])) throw invalid();
+      keys.add(entry.record[identifier]);
+      return entry;
     });
   }
-  return entries;
+  for (const key of ['scope', 'references', 'taskClients', 'listingViewings'])
+    if (payload[key] === undefined) throw incomplete();
+  if (!['team', 'assigned'].includes(payload.scope)) throw invalid();
+  return {
+    scope: payload.scope,
+    entries,
+    references: readReferences(payload.references),
+    taskClients: readTaskClients(payload.taskClients),
+    listingViewings: readListingViewings(payload.listingViewings),
+  };
 }
 
 export function serverWorkspaceData(entries) {
@@ -54,12 +95,26 @@ export function serverRecordMetadata(entries, collection, record) {
 }
 
 export function installServerRecord(entries, collection, saved) {
-  readServerRecords({ records: { ...entries, [collection]: [saved] } });
-  const found = entries[collection].some((row) => row.id === saved.id);
+  const entry = readServerEntry(collection, saved);
+  const rows = entries[collection] || [];
+  const found = rows.some((row) => row.id === entry.id);
   return {
     ...entries,
-    [collection]: found
-      ? entries[collection].map((row) => (row.id === saved.id ? saved : row))
-      : [saved, ...entries[collection]],
+    [collection]: found ? rows.map((row) => (row.id === entry.id ? entry : row)) : [entry, ...rows],
   };
+}
+
+/** L5: a record that is hidden or gone is dropped locally without touching other entries. */
+export function removeServerRecord(entries, collection, id) {
+  const rows = entries[collection] || [];
+  if (!rows.some((row) => row.id === id)) return entries;
+  return { ...entries, [collection]: rows.filter((row) => row.id !== id) };
+}
+
+/** Applies a PUT assignee response; `entry: null` means the caller can no longer see it. */
+export function applyAssigneeResult(entries, collection, id, result) {
+  if (!result || typeof result !== 'object' || !('entry' in result)) throw invalid();
+  if (result.entry === null) return removeServerRecord(entries, collection, id);
+  if (result.entry.id !== id) throw invalid();
+  return installServerRecord(entries, collection, result.entry);
 }

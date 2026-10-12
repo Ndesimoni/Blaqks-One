@@ -8,7 +8,14 @@ import { RecordTable } from './RecordTable.jsx';
 import React from 'react';
 import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 
-function RecordsPage({ module, tabs = recordTabs(module), matchesTab, emptyDetail }) {
+/** `toolbarExtras` is an optional slot (connected mode supplies the "Assigned to" filter). */
+function RecordsPage({
+  module,
+  tabs = recordTabs(module),
+  matchesTab,
+  emptyDetail,
+  toolbarExtras = null,
+}) {
   const { data } = useRecords();
   const { tab, setTab, setPage, query, setQuery } = useWorkspaceView();
   const { add, readOnly = false } = useWorkspaceActions();
@@ -75,6 +82,7 @@ function RecordsPage({ module, tabs = recordTabs(module), matchesTab, emptyDetai
             />
           </div>
         </div>
+        {toolbarExtras}
       </div>
       <RecordTable module={module} arr={arr} emptyDetail={emptyDetail} />
     </div>

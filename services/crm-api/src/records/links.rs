@@ -1,4 +1,7 @@
-use super::collections::{Links, Slot};
+use super::{
+    collections::{Links, Slot},
+    visibility::{predicate, RecordScope},
+};
 use crate::error::{ApiError, ApiResult};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
@@ -38,19 +41,24 @@ pub fn missing_message(slot: Slot) -> &'static str {
     }
 }
 
-/// Reports the first linked record missing from the workspace with a specific
-/// message. Call under the workspace lock; the database foreign keys stay the
-/// authoritative check. `saving` is the record being updated, which never
-/// counts as its own target (its legacy ID may be changing in this request).
-pub async fn ensure_present(
+/// Step 8 (contract §4): reports the first changed link whose target is missing from
+/// the workspace or hidden from the caller, with the same per-slot message for both.
+/// A link equal to `previous` (the locked row's columns) is allowed even when its
+/// target is hidden. Call under the workspace lock; the foreign keys stay the
+/// authoritative existence check. `saving` never counts as its own target, because
+/// its legacy ID may be changing in this request.
+pub async fn ensure_linkable(
     transaction: &mut Transaction<'_, Postgres>,
     workspace: &str,
+    scope: RecordScope,
     links: &Links,
+    previous: Option<&Links>,
     saving: Option<Uuid>,
 ) -> ApiResult<()> {
     let wanted: Vec<(Slot, &str, &str)> = SLOTS
         .iter()
         .filter_map(|(slot, collection)| Some((*slot, *collection, value(links, *slot)?)))
+        .filter(|(slot, _, id)| previous.and_then(|old| value(old, *slot)) != Some(*id))
         .collect();
     if wanted.is_empty() {
         return Ok(());
@@ -60,19 +68,22 @@ pub async fn ensure_present(
         .map(|(_, collection, _)| *collection)
         .collect();
     let ids: Vec<&str> = wanted.iter().map(|(_, _, id)| *id).collect();
-    let present: Vec<bool> = sqlx::query_scalar(
+    let sql = format!(
         "SELECT EXISTS(SELECT 1 FROM crm_records AS target WHERE target.workspace_id=$1 \
          AND target.collection=wanted.collection AND target.legacy_id=wanted.legacy_id \
-         AND target.id IS DISTINCT FROM $4) \
+         AND target.id IS DISTINCT FROM $4 AND {}) \
          FROM unnest($2::text[],$3::text[]) WITH ORDINALITY AS wanted(collection,legacy_id,position) \
          ORDER BY wanted.position",
-    )
-    .bind(workspace)
-    .bind(&collections)
-    .bind(&ids)
-    .bind(saving)
-    .fetch_all(&mut **transaction)
-    .await?;
+        predicate("target", "$1", "$5")
+    );
+    let present: Vec<bool> = sqlx::query_scalar(&sql)
+        .bind(workspace)
+        .bind(&collections)
+        .bind(&ids)
+        .bind(saving)
+        .bind(scope.caller())
+        .fetch_all(&mut **transaction)
+        .await?;
     match wanted.iter().zip(present).find(|(_, present)| !present) {
         Some(((slot, _, _), _)) => Err(ApiError::link_missing(missing_message(*slot))),
         None => Ok(()),

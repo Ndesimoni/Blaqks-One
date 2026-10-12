@@ -2,6 +2,7 @@ import React from 'react';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { TeamAccountStatus } from './TeamAccountStatus.jsx';
 import { TeamChannelFields } from './TeamChannelFields.jsx';
+import { TeamRecordScopeFields } from './TeamRecordScopeFields.jsx';
 import { accessFields, positionDefaults } from './model.js';
 
 export function TeamAccessFields({ form, change, roles, member, busy }) {
@@ -71,6 +72,7 @@ export function TeamAccessFields({ form, change, roles, member, busy }) {
           </label>
         ))}
       </fieldset>
+      {member && <TeamRecordScopeFields form={form} change={change} busy={busy} />}
       <TeamChannelFields form={form} change={change} busy={busy} />
       {member && <TeamAccountStatus form={form} change={change} member={member} busy={busy} />}
     </div>

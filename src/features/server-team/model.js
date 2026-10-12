@@ -14,6 +14,10 @@ export const channelFields = [
   ['email', 'Email'],
   ['whatsapp', 'WhatsApp'],
 ];
+export const recordScopeOptions = [
+  ['assigned', 'Only records assigned to them'],
+  ['team', "Whole team's records"],
+];
 export const teamSteps = [
   { id: 'person', title: 'Person' },
   { id: 'access', title: 'Roles & access' },
@@ -34,6 +38,7 @@ export function blankMember(member) {
     ),
     active: member?.active === true,
     accountRole: member?.roleId === 'admin' ? 'admin' : 'staff',
+    recordScope: member?.recordScope === 'team' ? 'team' : 'assigned',
   };
 }
 
@@ -73,6 +78,10 @@ export function memberPayload(form, member) {
       permissions,
       channelAccess,
       active,
+      // Full-team visibility applies to staff only and is sent only on member updates.
+      ...(form.accountRole === 'staff' && member.roleId !== 'admin'
+        ? { recordScope: form.recordScope === 'team' ? 'team' : 'assigned' }
+        : {}),
     };
   return {
     name: name.trim(),

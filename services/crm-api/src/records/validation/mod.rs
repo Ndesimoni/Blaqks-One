@@ -1,5 +1,6 @@
 pub mod media;
 pub mod numbers;
+pub mod reserved;
 pub mod workbook_fields;
 pub mod workflow_fields;
 
@@ -7,33 +8,9 @@ use super::collections::{self, Links};
 use crate::error::{ApiError, ApiResult};
 use serde_json::{Map, Value};
 
-pub const MAX_RECORD_BYTES: usize = 12 * 1024 * 1024;
+pub use reserved::RESERVED_KEYS;
 
-/// Server-owned fields a record payload may never carry. Assignment, scope and the
-/// read projections (contract section 5, M2) come only from the database.
-pub const RESERVED_KEYS: &[&str] = &[
-    "id",
-    "workspace_id",
-    "workspaceId",
-    "owner_id",
-    "ownerId",
-    "actor_id",
-    "actorId",
-    "version",
-    "approval",
-    "approved_by",
-    "published",
-    "audit",
-    "created_by",
-    "assignee",
-    "assigneeId",
-    "assignee_id",
-    "record_scope",
-    "recordScope",
-    "references",
-    "taskClients",
-    "listingViewings",
-];
+pub const MAX_RECORD_BYTES: usize = 12 * 1024 * 1024;
 
 pub struct ValidatedRecord {
     pub payload: Value,
@@ -45,7 +22,31 @@ pub fn collection_key(collection: &str) -> ApiResult<&'static str> {
     Ok(collections::find(collection)?.id_key)
 }
 
-pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedRecord> {
+impl ValidatedRecord {
+    /// Stores a server-issued ID (L1) in both the payload and the legacy ID.
+    pub fn issue_id(&mut self, collection: &str, id: String) -> ApiResult<()> {
+        let key = collection_key(collection)?;
+        self.payload[key] = Value::String(id.clone());
+        self.legacy_id = id;
+        Ok(())
+    }
+}
+
+/// Validates a record whose ID is required (updates and imports).
+pub fn validate(collection: &str, payload: Value) -> ApiResult<ValidatedRecord> {
+    validate_with(collection, payload, false)
+}
+
+/// Create variant: a missing or blank ID leaves `legacy_id` empty for the server to issue.
+pub fn validate_new(collection: &str, payload: Value) -> ApiResult<ValidatedRecord> {
+    validate_with(collection, payload, true)
+}
+
+fn validate_with(
+    collection: &str,
+    mut payload: Value,
+    optional: bool,
+) -> ApiResult<ValidatedRecord> {
     let id_key = collection_key(collection)?;
     if serde_json::to_vec(&payload)
         .map_err(|_| ApiError::invalid("Invalid record."))?
@@ -64,20 +65,28 @@ pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedReco
             ));
         }
     }
-    let legacy_id = object
-        .get(id_key)
+    let supplied = object.get(id_key).filter(|value| !value.is_null());
+    let legacy_id = supplied
         .and_then(Value::as_str)
         .unwrap_or("")
         .trim()
         .to_owned();
-    if legacy_id.is_empty() || legacy_id.len() > 128 {
+    let issued = optional && legacy_id.is_empty() && supplied.is_none_or(Value::is_string);
+    if !issued && (legacy_id.is_empty() || legacy_id.len() > 128) {
         return Err(ApiError::invalid(
             "A record ID of 1 to 128 characters is required.",
         ));
     }
-    object.insert(id_key.into(), Value::String(legacy_id.clone()));
+    if issued {
+        object.remove(id_key);
+    } else {
+        object.insert(id_key.into(), Value::String(legacy_id.clone()));
+    }
     let links = links(collection, object)?;
-    if collection == "Clients" && links.referral.as_deref() == Some(legacy_id.as_str()) {
+    if collection == "Clients"
+        && !legacy_id.is_empty()
+        && links.referral.as_deref() == Some(legacy_id.as_str())
+    {
         return Err(ApiError::invalid(
             "A client cannot be recorded as their own referrer.",
         ));

@@ -1,7 +1,8 @@
 import React from 'react';
-import { get } from '../../lib/records.js';
+import { LinkSelect } from './LinkSelect.jsx';
 
-export function RecordField({ field: f, module, data, idField, value, error, change }) {
+/** `idPolicy` (connected only): `issued` makes a blank ID valid; `readOnly` locks the ID input. */
+export function RecordField({ field: f, module, data, idField, idPolicy, value, error, change }) {
   const relation = (f) => {
     if (f.key === idField.key) return null;
     if (
@@ -20,11 +21,16 @@ export function RecordField({ field: f, module, data, idField, value, error, cha
   };
   const v = value ?? '';
   const rel = relation(f);
+  const isId = f.key === idField.key;
+  const issued = isId && Boolean(idPolicy?.issued);
+  const idLocked = isId && Boolean(idPolicy?.readOnly);
+  const hint = issued || idLocked ? `${f.key}-hint` : undefined;
   const inputProps = {
     'aria-invalid': Boolean(error),
-    'aria-describedby': error ? `${f.key}-error` : undefined,
-    required: f.key === idField.key,
-    'data-initial-focus': f.key === idField.key ? true : undefined,
+    'aria-describedby':
+      [error ? `${f.key}-error` : '', hint].filter(Boolean).join(' ') || undefined,
+    required: isId && !issued,
+    'data-initial-focus': isId ? true : undefined,
   };
   return (
     <div className={'field ' + (f.type === 'textarea' ? 'span-all' : '')} key={f.key}>
@@ -32,25 +38,17 @@ export function RecordField({ field: f, module, data, idField, value, error, cha
         {module === 'Properties' && f.name === 'Price / annual rent AED'
           ? 'Asking price / rent AED'
           : f.name}
-        {f.key === idField.key && <span className="required"> *</span>}
+        {isId && !issued && <span className="required"> *</span>}
       </label>
       {rel ? (
-        <select
-          {...inputProps}
-          id={f.key}
+        <LinkSelect
+          field={f}
+          module={module}
+          relation={rel}
           value={v}
-          onChange={(e) => change(f.key, e.target.value)}
-        >
-          <option value="">Select {f.name.toLowerCase()}</option>
-          {v && !rel.data.some((row) => get(row, rel.id) === v) && (
-            <option value={v}>{v} · Linked record unavailable</option>
-          )}
-          {rel.data.map((r) => (
-            <option key={get(r, rel.id)} value={get(r, rel.id)}>
-              {get(r, rel.id)} · {get(r, rel.name)}
-            </option>
-          ))}
-        </select>
+          inputProps={inputProps}
+          change={change}
+        />
       ) : f.options ? (
         <select
           {...inputProps}
@@ -81,9 +79,25 @@ export function RecordField({ field: f, module, data, idField, value, error, cha
           min={f.type === 'number' ? '0' : undefined}
           step={f.type === 'number' ? 'any' : undefined}
           value={v}
+          readOnly={idLocked || undefined}
           onChange={(e) => change(f.key, e.target.value)}
-          placeholder={f.type === 'number' ? '0' : `Enter ${f.name.toLowerCase()}...`}
+          placeholder={
+            issued
+              ? 'Issued when saved'
+              : f.type === 'number'
+                ? '0'
+                : `Enter ${f.name.toLowerCase()}...`
+          }
         />
+      )}
+      {hint && (
+        <small id={hint} className="field-hint">
+          {!issued
+            ? 'Record IDs cannot be changed.'
+            : idLocked
+              ? 'Issued when saved. Record IDs are assigned by the CRM server.'
+              : 'Issued when saved. Leave blank for the next ID, or enter your own.'}
+        </small>
       )}
       {error && (
         <p id={`${f.key}-error`} className="field-error">

@@ -30,6 +30,8 @@ test('staff share their owner workspace without exposing other Admin teams or co
   assert.equal(query(`SELECT COUNT(*) FROM crm_workspaces WHERE id='${staff.user.id}'`), '0');
   const client = await create(adminA, 'Clients', { client_id: 'TEAM-SHARED-CLIENT' });
   const property = await create(adminA, 'Properties', { property_id: 'TEAM-HIDDEN-PROPERTY' });
+  // Assigned-only staff see the clients they hold (assignments contract §3).
+  query(`UPDATE crm_records SET assignee_id='${staff.user.id}' WHERE id='${client.id}'`);
   const records = await staff.request(`/workspaces/${staff.user.workspaceId}/records`);
   assert.equal(records.status, 200);
   assert.ok(records.value.records.Clients.some((item) => item.id === client.id));
@@ -50,9 +52,10 @@ test('staff share their owner workspace without exposing other Admin teams or co
   );
   const created = await staff.request(`/workspaces/${adminA.user.id}/records/Clients`, {
     method: 'POST',
-    body: { record: { client_id: 'TEAM-STAFF-AUTHOR' } },
+    body: { record: { full_name: 'TEAM-STAFF-AUTHOR' } },
   });
   assert.equal(created.status, 201);
+  assert.equal(created.value.assignee, staff.user.id);
   const activity = query(
     `SELECT actor_id::text || ':' || workspace_id FROM crm_activity WHERE record_id='${created.value.id}'`,
   );

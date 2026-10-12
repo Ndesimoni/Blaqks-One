@@ -1,59 +1,29 @@
-use super::{audit, validation::ValidatedRecord};
-use crate::error::{ApiError, ApiResult};
+use super::{
+    audit,
+    history::{self, Change},
+    links, target,
+    validation::ValidatedRecord,
+    visibility::RecordScope,
+};
+use crate::error::ApiResult;
 use serde::Serialize;
 use serde_json::Value;
 use sqlx::{FromRow, PgPool};
 use uuid::Uuid;
 
+/// One record as the API returns it. `assignee` comes only from the database column.
 #[derive(Serialize, FromRow)]
 pub struct Entry {
     pub id: Uuid,
     pub version: i64,
     #[sqlx(rename = "payload")]
     pub record: Value,
+    #[sqlx(rename = "assignee_id")]
+    pub assignee: Option<Uuid>,
 }
 
-pub async fn create(
-    pool: &PgPool,
-    actor: Uuid,
-    workspace: &str,
-    collection: &str,
-    record: ValidatedRecord,
-) -> ApiResult<Entry> {
-    let id = Uuid::new_v4();
-    let mut transaction = pool.begin().await?;
-    crate::workspaces::lock(&mut transaction, workspace).await?;
-    crate::workspaces::ensure_writable(&mut transaction, workspace, actor, Some(collection))
-        .await?;
-    super::links::ensure_present(&mut transaction, workspace, &record.links, None).await?;
-    let saved = sqlx::query_as::<_, Entry>(
-        "INSERT INTO crm_records \
-         (id,workspace_id,collection,legacy_id,payload,contact_id,client_ref,property_ref,\
-         referral_ref) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id,version,payload",
-    )
-    .bind(id)
-    .bind(workspace)
-    .bind(collection)
-    .bind(record.legacy_id)
-    .bind(record.payload)
-    .bind(record.links.contact)
-    .bind(record.links.client)
-    .bind(record.links.property)
-    .bind(record.links.referral)
-    .fetch_one(&mut *transaction)
-    .await?;
-    audit::append(
-        &mut transaction,
-        actor,
-        workspace,
-        "created",
-        collection,
-        id,
-    )
-    .await?;
-    transaction.commit().await?;
-    Ok(saved)
-}
+/// Columns every statement returning an [`Entry`] selects.
+pub const ENTRY_COLUMNS: &str = "id,version,payload,assignee_id";
 
 pub struct Update<'a> {
     pub actor: Uuid,
@@ -64,64 +34,82 @@ pub struct Update<'a> {
     pub record: ValidatedRecord,
 }
 
+/// Steps 4–10 of an update (contract §4); the handler has run steps 1–3.
 pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
+    let (workspace, collection) = (update.workspace, update.collection);
     let mut transaction = pool.begin().await?;
-    crate::workspaces::lock(&mut transaction, update.workspace).await?;
-    crate::workspaces::ensure_writable(
+    crate::workspaces::lock(&mut transaction, workspace).await?;
+    let user = crate::workspaces::ensure_writable(
         &mut transaction,
-        update.workspace,
+        workspace,
         update.actor,
-        Some(update.collection),
+        Some(collection),
     )
     .await?;
-    super::links::ensure_present(
+    let scope = RecordScope::of(&user);
+    let found = target::fetch(&mut transaction, workspace, collection, update.id, scope).await?;
+    target::ensure_version(
+        &found,
+        update.version,
+        "This record changed. Reload before saving.",
+    )?;
+    let record = update.record;
+    target::ensure_update_allowed(scope, collection, &found, &record)?;
+    let previous = found.links();
+    links::ensure_linkable(
         &mut transaction,
-        update.workspace,
-        &update.record.links,
-        Some(update.id),
+        workspace,
+        scope,
+        &record.links,
+        Some(&previous),
+        Some(found.id),
     )
     .await?;
-    let saved = sqlx::query_as::<_, Entry>(
+    target::ensure_client(scope, collection, &record.links)?;
+    let clientless = record.links.client.is_none();
+    // assignee_id is deliberately absent: plain edits never fire the eligibility trigger.
+    let sql = format!(
         "UPDATE crm_records SET legacy_id=$1,payload=$2,contact_id=$3,client_ref=$4,\
          property_ref=$5,referral_ref=$6,version=version+1,updated_at=now() \
-         WHERE id=$7 AND workspace_id=$8 AND collection=$9 AND version=$10 \
-         RETURNING id,version,payload",
-    )
-    .bind(update.record.legacy_id)
-    .bind(update.record.payload)
-    .bind(update.record.links.contact)
-    .bind(update.record.links.client)
-    .bind(update.record.links.property)
-    .bind(update.record.links.referral)
-    .bind(update.id)
-    .bind(update.workspace)
-    .bind(update.collection)
-    .bind(update.version)
-    .fetch_optional(&mut *transaction)
-    .await?;
-    let saved = match saved {
-        Some(saved) => saved,
-        None => {
-            let exists: bool = sqlx::query_scalar(
-                "SELECT EXISTS(SELECT 1 FROM crm_records WHERE id=$1 AND workspace_id=$2 AND collection=$3)",
-            ).bind(update.id).bind(update.workspace).bind(update.collection)
-                .fetch_one(&mut *transaction).await?;
-            return Err(if exists {
-                ApiError::stale("This record changed. Reload before saving.")
-            } else {
-                ApiError::missing()
-            });
-        }
-    };
+         WHERE id=$7 RETURNING {ENTRY_COLUMNS}"
+    );
+    let mut saved = sqlx::query_as::<_, Entry>(&sql)
+        .bind(record.legacy_id)
+        .bind(record.payload)
+        .bind(record.links.contact)
+        .bind(record.links.client)
+        .bind(record.links.property)
+        .bind(record.links.referral)
+        .bind(found.id)
+        .fetch_one(&mut *transaction)
+        .await?;
+    let actor = update.actor;
     audit::append(
         &mut transaction,
-        update.actor,
-        update.workspace,
+        actor,
+        workspace,
         "updated",
-        update.collection,
-        update.id,
+        collection,
+        found.id,
     )
     .await?;
+    // H3: an assigned-only caller who leaves a Follow-up with no client and no
+    // assignee keeps it, so it never becomes invisible to everyone but the team.
+    if let RecordScope::Assigned(caller) = scope {
+        if collection == "Follow-ups" && clientless && found.assignee_id.is_none() {
+            let change = Change {
+                workspace,
+                record: found.id,
+                collection,
+                from: None,
+                to: Some(caller),
+                actor,
+                reason: "reassigned",
+            };
+            history::reassign(&mut transaction, &change, false).await?;
+            saved.assignee = Some(caller);
+        }
+    }
     transaction.commit().await?;
     Ok(saved)
 }

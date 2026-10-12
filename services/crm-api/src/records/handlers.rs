@@ -1,9 +1,10 @@
+pub use super::list::list;
 use super::{
-    collections::COLLECTIONS,
-    deletion,
+    creation, deletion,
     mutation::{self, Entry, Update},
     requests::{CreateRequest, DeleteRequest, UpdateRequest},
     validation,
+    visibility::RecordScope,
 };
 use crate::{
     auth::{protection, session::Session},
@@ -19,31 +20,6 @@ use axum::{
 use serde_json::{json, Value};
 use uuid::Uuid;
 
-pub async fn list(
-    State(state): State<AppState>,
-    session: Session,
-    Path(workspace): Path<String>,
-) -> ApiResult<Json<Value>> {
-    ensure_access(&state, &session, &workspace).await?;
-    let mut records = json!({});
-    for collection in COLLECTIONS.iter().map(|collection| collection.name) {
-        records[collection] = json!([]);
-        if !session.user.can_collection(collection) {
-            continue;
-        }
-        let entries = sqlx::query_as::<_, Entry>(
-            "SELECT id,version,payload FROM crm_records WHERE workspace_id=$1 AND collection=$2 \
-             ORDER BY created_at,id",
-        )
-        .bind(&workspace)
-        .bind(collection)
-        .fetch_all(&state.pool)
-        .await?;
-        records[collection] = json!(entries);
-    }
-    Ok(Json(json!({"records": records})))
-}
-
 pub async fn create(
     State(state): State<AppState>,
     session: Session,
@@ -55,8 +31,9 @@ pub async fn create(
     protection::mutation(&state, &headers, &session.csrf_token)?;
     ensure_collection(&session, &collection)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record."))?;
-    let record = validation::validate(&collection, body.record)?;
-    let entry = mutation::create(
+    let record = validation::validate_new(&collection, body.record)?;
+    creation::ensure_id_allowed(RecordScope::of(&session.user), &record)?;
+    let entry = creation::create(
         &state.pool,
         session.user.id,
         &workspace,
@@ -108,6 +85,8 @@ pub async fn delete(
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
     ensure_collection(&session, &collection)?;
+    // H2 comes first in step 3, before the body or any record is examined.
+    RecordScope::of(&session.user).ensure_can_delete(&collection)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record version."))?;
     if body.version < 1 {
         return Err(ApiError::invalid("A positive record version is required."));

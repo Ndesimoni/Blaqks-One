@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { schema } from '../../lib/schema.js';
 import { normalizeRecord, validateRecord } from '../records/validation.js';
-import { installServerRecord, readServerRecords, serverRecordMetadata } from './records.js';
+import {
+  installServerRecord,
+  readServerEntry,
+  readServerRecords,
+  recordUnavailableMessage,
+  removeServerRecord,
+  serverRecordMetadata,
+} from './records.js';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { serverMutationFailure } from './errors.js';
 
@@ -16,10 +23,25 @@ export function useServerMutations({ api, workspaceId, records, view }) {
     };
   }, []);
   useUnsavedChanges(false, busy);
+  /** L5: a 404 on an existing record means it is hidden or gone, so drop it locally. */
+  const unavailable = (error, module, metadata) => {
+    if (error.status !== 404 || !metadata || !alive.current) return false;
+    records.setEntries((entries) => removeServerRecord(entries, module, metadata.id));
+    return true;
+  };
   const saveRecord = async (module, record, original) => {
     if (pending.current) return { message: 'A save is already in progress.' };
     const normalized = normalizeRecord(module, record);
-    const errors = validateRecord(module, normalized, records.data[module], original, records.data);
+    // Connected creates may leave the ID blank; the server issues it (contract §5, L1).
+    const idRule = { idOptional: !original };
+    const errors = validateRecord(
+      module,
+      normalized,
+      records.data[module],
+      original,
+      records.data,
+      idRule,
+    );
     if (Object.keys(errors).length) return { errors };
     const metadata = original ? serverRecordMetadata(records.entries, module, original) : undefined;
     pending.current = true;
@@ -27,13 +49,14 @@ export function useServerMutations({ api, workspaceId, records, view }) {
     try {
       const saved = await api.save(workspaceId, module, normalized, metadata);
       if (!alive.current) return {};
-      readServerRecords({ records: { ...records.entries, [module]: [saved] } });
+      readServerEntry(module, saved);
       records.setEntries((entries) => installServerRecord(entries, module, saved));
       view.setDrawer(null);
       view.setToast(original ? 'Record saved' : 'Record created');
       return { workspace: true };
     } catch (error) {
-      return serverMutationFailure(error, original);
+      if (!unavailable(error, module, metadata)) return serverMutationFailure(error, original);
+      return { message: recordUnavailableMessage };
     } finally {
       pending.current = false;
       if (alive.current) setBusy(false);
@@ -58,7 +81,9 @@ export function useServerMutations({ api, workspaceId, records, view }) {
       view.setDetail(null);
       view.setToast('Record deleted');
     } catch (error) {
-      if (alive.current) view.setToast(error.message);
+      if (!alive.current) return;
+      if (unavailable(error, module, metadata)) view.setDetail(null);
+      view.setToast(error.status === 404 ? recordUnavailableMessage : error.message);
     } finally {
       pending.current = false;
       if (alive.current) setBusy(false);
@@ -66,11 +91,11 @@ export function useServerMutations({ api, workspaceId, records, view }) {
   };
   const reloadRecord = async (module, original) => {
     const metadata = serverRecordMetadata(records.entries, module, original);
-    const entries = readServerRecords(await api.records(workspaceId));
+    const parsed = readServerRecords(await api.records(workspaceId));
     if (!alive.current) return;
-    const latest = entries[module].find((entry) => entry.id === metadata.id);
-    if (!latest) throw Error('This record has been deleted. Your draft has been retained.');
-    records.setEntries(entries);
+    records.install(parsed);
+    const latest = parsed.entries[module].find((entry) => entry.id === metadata.id);
+    if (!latest) throw Error(`${recordUnavailableMessage} Your draft has been retained.`);
     view.setDrawer({
       module,
       record: latest.record,

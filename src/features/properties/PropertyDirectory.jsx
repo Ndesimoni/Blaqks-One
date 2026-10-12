@@ -9,7 +9,7 @@ import { PropertyToolbar } from './PropertyToolbar.jsx';
 import { PropertyFilters } from './PropertyFilters.jsx';
 import { PropertyResults } from './PropertyResults.jsx';
 
-export function PropertyDirectory() {
+export function PropertyDirectory({ toolbarExtras = null }) {
   const directory = usePropertyDirectory();
   const { all, f, result, activeCount } = directory;
   const { viewMode } = useWorkspaceView();
@@ -31,7 +31,7 @@ export function PropertyDirectory() {
         )}
       </section>
       <PropertyPurposes all={all} purpose={f.purpose} updateFilter={directory.updateFilter} />
-      <PropertyToolbar result={result} f={f} activeCount={activeCount} />
+      <PropertyToolbar result={result} f={f} activeCount={activeCount} extras={toolbarExtras} />
       <PropertyFilters {...directory} />
       {viewMode === 'table' ? (
         <RecordTable module="Properties" arr={result} />

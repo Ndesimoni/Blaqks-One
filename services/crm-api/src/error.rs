@@ -15,6 +15,11 @@ impl ApiError {
         Self(StatusCode::FORBIDDEN, "Access denied.", "forbidden")
     }
 
+    /// A 403 with a specific, non-revealing explanation (for example H2 deletes).
+    pub fn denied(message: &'static str) -> Self {
+        Self(StatusCode::FORBIDDEN, message, "forbidden")
+    }
+
     pub fn unauthorized() -> Self {
         Self(
             StatusCode::UNAUTHORIZED,

@@ -15,7 +15,7 @@ import {
 } from './selectors.js';
 
 /** Leads and clients share one profile throughout the enquiry and transaction lifecycle. */
-export function LeadsPage() {
+export function LeadsPage({ toolbarExtras = null }) {
   const { data } = useRecords();
   const { add } = useWorkspaceActions();
   const { query, setQuery, setPage } = useWorkspaceView();
@@ -105,6 +105,7 @@ export function LeadsPage() {
         >
           Clear filters
         </Button>
+        {toolbarExtras}
       </div>
       <RecordTable
         module="Clients"

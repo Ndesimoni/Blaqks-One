@@ -56,7 +56,7 @@ test('permission updates affect live access and optimistic versions prevent lost
     (
       await refreshed.request(`${path}/Properties`, {
         method: 'POST',
-        body: { record: { property_id: 'TEAM-GRANTED' } },
+        body: { record: { listing_title: 'TEAM-GRANTED' } },
       })
     ).status,
     201,

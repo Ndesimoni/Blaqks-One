@@ -1,8 +1,15 @@
 pub mod audit;
 pub mod collections;
+pub mod creation;
 pub mod deletion;
 pub mod handlers;
+pub mod history;
+pub mod ids;
 pub mod links;
+pub mod list;
 pub mod mutation;
+pub mod projections;
 pub mod requests;
+pub mod target;
 pub mod validation;
+pub mod visibility;

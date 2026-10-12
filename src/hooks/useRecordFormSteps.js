@@ -10,7 +10,9 @@ export function useRecordFormSteps({
   initialSection,
   busy,
   data,
+  idOptional = false,
 }) {
+  const rules = { idOptional };
   const sections = useMemo(() => recordFormSections(module), [module]);
   const multiStep = sections.length > 1;
   const steps = useMemo(
@@ -59,7 +61,7 @@ export function useRecordFormSteps({
   const validateCurrent = () => {
     if (review) return true;
     const fields = sections[activeStep].fields;
-    const validation = validateRecordSection(module, form, records, original, fields, data);
+    const validation = validateRecordSection(module, form, records, original, fields, data, rules);
     setErrors((previous) => {
       const next = { ...previous };
       fields.forEach((field) => delete next[field.key]);
@@ -83,7 +85,7 @@ export function useRecordFormSteps({
     moveTo(index);
   };
   const validateAll = () => {
-    const validation = validateRecord(module, form, records, original, data);
+    const validation = validateRecord(module, form, records, original, data, rules);
     reportErrors(validation);
     return !Object.keys(validation).length;
   };

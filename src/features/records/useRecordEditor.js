@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { useRecordFormSteps } from '../../hooks/useRecordFormSteps.js';
 
-export function useRecordEditor({ drawer, data, onClose, onSave, onReload }) {
+export function useRecordEditor({ drawer, data, onClose, onSave, onReload, idOptional }) {
   const { module, original } = drawer;
   const [form, setForm] = useState({ ...drawer.record });
   const [uploading, setUploading] = useState(false);
@@ -24,6 +24,7 @@ export function useRecordEditor({ drawer, data, onClose, onSave, onReload }) {
     initialSection: drawer.initialSection,
     busy,
     data,
+    idOptional,
   });
   const change = (key, value) => {
     steps.setErrors((previous) => ({ ...previous, [key]: '' }));

@@ -6,7 +6,15 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { pad } from '../../lib/dates.js';
 
-export function RecordEditorBody({ module, data, stepTitleId, onReload, storageMode, state }) {
+export function RecordEditorBody({
+  module,
+  data,
+  stepTitleId,
+  onReload,
+  storageMode,
+  idPolicy,
+  state,
+}) {
   const {
     form,
     setForm,
@@ -91,6 +99,7 @@ export function RecordEditorBody({ module, data, stepTitleId, onReload, storageM
                     module={module}
                     data={data}
                     idField={idField}
+                    idPolicy={idPolicy}
                     value={form[field.key]}
                     error={errors[field.key]}
                     change={change}

@@ -1,7 +1,7 @@
 pub mod handlers;
 
 use crate::{
-    auth::session::Session,
+    auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
 };
@@ -34,12 +34,32 @@ pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str)
     Ok(())
 }
 
+/// Re-reads the caller's live profile for `workspace` inside `transaction` (H4, L3).
+/// Inactive members, suspended owners and other teams are refused.
+pub async fn member(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspace: &str,
+    actor: uuid::Uuid,
+) -> ApiResult<UserRow> {
+    sqlx::query_as::<_, UserRow>(
+        "SELECT * FROM crm_user_profiles WHERE id=$1 AND active AND owner_active",
+    )
+    .bind(actor)
+    .fetch_optional(&mut **transaction)
+    .await?
+    .filter(|user| user.role == "super-admin" || user.workspace_id == workspace)
+    .ok_or_else(ApiError::forbidden)
+}
+
+/// Call under `lock`: the workspace must not be archived and the re-read caller must
+/// still be a member holding the collection's grant. Returns that live profile, which
+/// is the only source of the caller's record scope for the write.
 pub async fn ensure_writable(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     workspace: &str,
     actor: uuid::Uuid,
     collection: Option<&str>,
-) -> ApiResult<()> {
+) -> ApiResult<UserRow> {
     let writable: bool = sqlx::query_scalar(
         "SELECT u.deleted_at IS NULL FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
          WHERE w.id=$1",
@@ -48,19 +68,12 @@ pub async fn ensure_writable(
     .fetch_optional(&mut **transaction)
     .await?
     .unwrap_or(false);
-    let user = sqlx::query_as::<_, crate::auth::profile::UserRow>(
-        "SELECT * FROM crm_user_profiles WHERE id=$1 AND active AND owner_active",
-    )
-    .bind(actor)
-    .fetch_optional(&mut **transaction)
-    .await?;
-    if !writable
-        || user.is_none_or(|user| {
-            (user.role != "super-admin" && user.workspace_id != workspace)
-                || collection.is_some_and(|key| !user.can_collection(key))
-        })
-    {
+    if !writable {
         return Err(ApiError::forbidden());
     }
-    Ok(())
+    let user = member(transaction, workspace, actor).await?;
+    if collection.is_some_and(|key| !user.can_collection(key)) {
+        return Err(ApiError::forbidden());
+    }
+    Ok(user)
 }

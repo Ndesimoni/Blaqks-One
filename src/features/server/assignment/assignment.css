@@ -1,0 +1,148 @@
+/* Connected assignment UI. Semantic tokens only, so light and dark themes follow the baseline. */
+.assignment-details {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.assignment-panel {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 16px;
+  background: var(--panel);
+}
+.assignment-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.assignment-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+.assignment-current {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.assignment-current h3 {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+.assignment-current strong {
+  color: var(--ink);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.assignment-current .assignment-queue {
+  color: var(--accent);
+}
+.assignment-current small,
+.assignment-hint,
+.assignment-note-count,
+.assignment-history-item time {
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.assignment-history {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.assignment-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.assignment-history-heading h4 {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.assignment-history-list,
+.listing-viewings-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.assignment-history-item,
+.listing-viewings-list .overflow-list-item {
+  border-radius: 9px;
+  padding: 10px 12px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.assignment-history-item > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.assignment-history-item p {
+  margin: 4px 0 0;
+}
+.assignment-history-item blockquote {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--gold);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.assignment-contact {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+.assignment-contact dt {
+  color: var(--muted-dark);
+}
+.assignment-contact dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.assignment-dialog-body {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.assignment-warning {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+}
+.assignment-warning p {
+  margin: 0;
+  line-height: 1.5;
+}
+.assignment-warning.assignment-error {
+  border-color: var(--danger);
+  background: var(--danger-surface);
+}
+@media (max-width: 650px) {
+  .assignment-row {
+    flex-wrap: wrap;
+  }
+  .assignment-row > .btn {
+    width: 100%;
+  }
+}
