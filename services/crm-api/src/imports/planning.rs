@@ -4,7 +4,7 @@ use super::{
 };
 use crate::{
     error::{ApiError, ApiResult},
-    records::validation::collection_key,
+    records::{collections::find, validation::collection_key},
 };
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
@@ -25,38 +25,12 @@ pub fn plan(source: ImportRecords, target: &[TargetRow]) -> ApiResult<Plan> {
             )
         })
         .collect();
-    let mut contacts: HashSet<&str> = target
-        .iter()
-        .filter(|row| row.collection == "Contacts")
-        .map(|row| row.legacy_id.as_str())
-        .collect();
-    contacts.extend(
-        source
-            .contacts
-            .iter()
-            .filter_map(|row| row["contact_id"].as_str()),
-    );
-    for property in &source.properties {
-        if property
-            .get("contact_id")
-            .and_then(Value::as_str)
-            .is_some_and(|id| !id.trim().is_empty() && !contacts.contains(id))
-        {
-            return Err(ApiError::invalid(
-                "A property references a contact missing from this workspace.",
-            ));
-        }
-    }
+    ensure_links(&source, target)?;
     let mut planned = ImportRecords::default();
     let mut counts = zero_counts();
     let mut skipped = zero_counts();
     for (collection, rows) in source.collections() {
         let key = collection_key(collection)?;
-        let output = match collection {
-            "Clients" => &mut planned.clients,
-            "Contacts" => &mut planned.contacts,
-            _ => &mut planned.properties,
-        };
         for row in rows {
             let id = row[key]
                 .as_str()
@@ -65,7 +39,7 @@ pub fn plan(source: ImportRecords, target: &[TargetRow]) -> ApiResult<Plan> {
                 Some(payload) if **payload == *row => *skipped.get_mut(collection).unwrap() += 1,
                 Some(_) => return Err(conflict()),
                 None => {
-                    output.push(row.clone());
+                    planned.push(collection, row.clone());
                     *counts.get_mut(collection).unwrap() += 1;
                 }
             }
@@ -76,4 +50,34 @@ pub fn plan(source: ImportRecords, target: &[TargetRow]) -> ApiResult<Plan> {
         counts,
         skipped,
     })
+}
+
+/// Every linked ID must exist in the target workspace or arrive in the same import.
+fn ensure_links(source: &ImportRecords, target: &[TargetRow]) -> ApiResult<()> {
+    let mut known: HashSet<(&str, &str)> = target
+        .iter()
+        .map(|row| (row.collection.as_str(), row.legacy_id.as_str()))
+        .collect();
+    for (collection, rows) in source.collections() {
+        let key = collection_key(collection)?;
+        known.extend(
+            rows.iter()
+                .filter_map(|row| Some((collection, row[key].as_str()?))),
+        );
+    }
+    for (collection, rows) in source.collections() {
+        for link in find(collection)?.links {
+            let missing = rows.iter().any(|row| {
+                row.get(link.field)
+                    .and_then(Value::as_str)
+                    .is_some_and(|id| !id.is_empty() && !known.contains(&(link.target, id)))
+            });
+            if missing {
+                return Err(ApiError::invalid(
+                    "A record links to a client, contact or property missing from this workspace.",
+                ));
+            }
+        }
+    }
+    Ok(())
 }

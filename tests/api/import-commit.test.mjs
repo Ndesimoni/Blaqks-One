@@ -4,6 +4,7 @@ import { create } from './helpers.mjs';
 import {
   activityCount,
   commit,
+  counts,
   emptyRecords,
   fixtures,
   planned,
@@ -22,6 +23,7 @@ test('commit retains normalized workbook IDs, private metadata and inline photos
     src: 'data:image/png;base64,iVBORw0KGgo=',
   };
   const records = {
+    ...emptyRecords(),
     Clients: [
       { client_id: ' IMP-CLIENT ', full_name: 'Synthetic lead', extra: { import_code: 42 } },
     ],
@@ -33,7 +35,7 @@ test('commit retains normalized workbook IDs, private metadata and inline photos
   const plan = await planned(owner, admin.user.id, records);
   const result = await commit(owner, admin.user.id, plan.token);
   assert.equal(result.status, 200);
-  assert.deepEqual(result.value.imported, { Clients: 1, Contacts: 1, Properties: 1 });
+  assert.deepEqual(result.value.imported, counts({ Clients: 1, Contacts: 1, Properties: 1 }));
   assert.deepEqual(result.value.skipped, zeroCounts);
   const list = await owner.request(`/workspaces/${admin.user.id}/records`);
   const client = list.value.records.Clients.find(
@@ -47,7 +49,7 @@ test('commit retains normalized workbook IDs, private metadata and inline photos
   assert.deepEqual(property.record.media_photos, [photo]);
   const repeated = await planned(owner, admin.user.id, records);
   assert.deepEqual(repeated.counts, zeroCounts);
-  assert.deepEqual(repeated.skipped, { Clients: 1, Contacts: 1, Properties: 1 });
+  assert.deepEqual(repeated.skipped, counts({ Clients: 1, Contacts: 1, Properties: 1 }));
   const before = activityCount(admin.user.id);
   assert.equal((await commit(owner, admin.user.id, repeated.token)).status, 200);
   assert.equal(activityCount(admin.user.id), before);

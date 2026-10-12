@@ -28,7 +28,7 @@ pub async fn preview(
     workspaces::ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
     let Json(request) =
-        body.map_err(|_| ApiError::invalid("Provide source workspace and three record arrays."))?;
+        body.map_err(|_| ApiError::invalid("Provide a source workspace and record arrays."))?;
     let source = request.source_workspace_id.trim();
     if source.is_empty() || source.len() > 256 {
         return Err(ApiError::invalid(

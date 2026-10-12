@@ -1,4 +1,5 @@
 use super::{
+    collections::COLLECTIONS,
     deletion,
     mutation::{self, Entry, Update},
     requests::{CreateRequest, DeleteRequest, UpdateRequest},
@@ -24,8 +25,9 @@ pub async fn list(
     Path(workspace): Path<String>,
 ) -> ApiResult<Json<Value>> {
     ensure_access(&state, &session, &workspace).await?;
-    let mut records = json!({"Clients": [], "Contacts": [], "Properties": []});
-    for collection in ["Clients", "Contacts", "Properties"] {
+    let mut records = json!({});
+    for collection in COLLECTIONS.iter().map(|collection| collection.name) {
+        records[collection] = json!([]);
         if !session.user.can_collection(collection) {
             continue;
         }

@@ -45,7 +45,7 @@ Professional real estate CRM focused on the UAE market.
 - Private member workspaces, Super Admin workspace directory and scoped activity history; see docs/private-workspaces.md
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
 - Responsive desktop/mobile interface
-- Opt-in connected Clients, Contacts and Properties with server sessions, scoped CRUD, optimistic versions and redacted transactional activity; see docs/backend-foundation.md
+- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care with server sessions, scoped CRUD, optimistic versions and redacted transactional activity; see docs/backend-foundation.md
 
 ## Current Project Structure
 
@@ -87,7 +87,7 @@ Act as a senior software engineer and UI/UX designer.
 - Keep connected identity and records separate from the demo. Server errors must never fall back to demo accounts or browser records. No automatic migration of browser records.
 - Admins may invite and manage staff only inside their own team. Only the Super Admin may create Admin accounts. Never offer Super Admin creation or promotion in member forms. Multiple staff positions set permission defaults; explicit module and messaging grants remain separate. See [Admin-owned teams](docs/admin-owned-teams.md).
 - Normal account deletion archives identity and data without removing saved records. Only the Super Admin can archive accounts; archiving an Admin archives their whole team and freezes that workspace. Keep archived accounts out of current lists and expose their data only through Super Admin read-only views. Revoke sessions/invitations transactionally, check live membership after workspace locks, and never allow an edit/renewal to restore an archive. Hard deletion is a separate future feature requiring explicit permanent-loss review.
-- Browser/backup imports require the live Super Admin, explicit source/destination review and an atomic add-only commit. Organisation sources stay in the organisation workspace; personal sources require an explicitly selected server member UUID. Preserve every source collection in full backups; only the three supported collections currently migrate. See [Data migration](docs/data-migration.md).
+- Browser/backup imports require the live Super Admin, explicit source/destination review and an atomic add-only commit. Organisation sources stay in the organisation workspace; personal sources require an explicitly selected server member UUID. Preserve every source collection in full backups; only the eight connected collections currently migrate. See [Data migration](docs/data-migration.md).
 - Demo listing photos must stay labelled. Display fallbacks never alter stored browser records; imports may embed deterministic sample assets only for empty galleries. Preserve actual photos and floor plans. See [Demo property photos](docs/demo-property-photos.md).
 - Prefer reusable components and custom hooks.
 - Separate UI, business logic and data access.
@@ -113,7 +113,7 @@ Use the eight project specialists in `.codex/agents/` through the [Development a
 
 ## Roadmap
 
-The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts and Properties only. Preserve the complete default demo during staged migration. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
+The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients); Deals, Payments and Expenses remain demo-only. Preserve the complete default demo during staged migration. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
 
 Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
 

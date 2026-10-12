@@ -1,6 +1,15 @@
 import { blank, schema } from '../../lib/schema.js';
 
-export const connectedCollections = ['Clients', 'Contacts', 'Properties'];
+export const connectedCollections = [
+  'Clients',
+  'Contacts',
+  'Properties',
+  'Follow-ups',
+  'Viewings',
+  'Shortlist',
+  'Interaction log',
+  'Client care',
+];
 
 export function readServerRecords(payload) {
   const entries = {};

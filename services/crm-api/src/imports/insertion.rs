@@ -17,10 +17,20 @@ pub async fn insert(
             let record = validation::validate(collection, row.clone())?;
             let id = Uuid::new_v4();
             sqlx::query(
-                "INSERT INTO crm_records (id,workspace_id,collection,legacy_id,payload,contact_id) \
-                 VALUES ($1,$2,$3,$4,$5,$6)",
-            ).bind(id).bind(workspace).bind(collection).bind(record.legacy_id)
-                .bind(record.payload).bind(record.contact_id).execute(&mut **transaction).await?;
+                "INSERT INTO crm_records \
+                 (id,workspace_id,collection,legacy_id,payload,contact_id,client_ref,property_ref) \
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+            )
+            .bind(id)
+            .bind(workspace)
+            .bind(collection)
+            .bind(record.legacy_id)
+            .bind(record.payload)
+            .bind(record.links.contact)
+            .bind(record.links.client)
+            .bind(record.links.property)
+            .execute(&mut **transaction)
+            .await?;
             audit::append(transaction, actor, workspace, "created", collection, id).await?;
         }
     }

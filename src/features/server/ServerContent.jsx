@@ -4,6 +4,7 @@ import { useRecords, useNavigation } from '../../hooks/useWorkspace.js';
 import { Button } from '../../components/ui/Button.jsx';
 import { RecordsPage } from '../records/RecordsPage.jsx';
 import { ContactsPage } from '../contacts/ContactsPage.jsx';
+import { LeadsPage } from '../leads/LeadsPage.jsx';
 import { PropertyDirectory } from '../properties/PropertyDirectory.jsx';
 import { ServerTeamPage } from '../server-team/ServerTeamPage.jsx';
 import { canOpenSection } from './access.js';
@@ -22,7 +23,7 @@ export function ServerContent({ owner }) {
           Your assigned access determines which connected sections you can open. Contact your team
           Admin to adjust your permissions.
         </p>
-        <p>Scheduling, finance, reports and messaging connections are still being developed.</p>
+        <p>Finance, reports and messaging connections are still being developed.</p>
       </section>
     );
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
@@ -37,7 +38,8 @@ export function ServerContent({ owner }) {
         <Button onClick={retry}>Retry</Button>
       </section>
     );
-  if (route === 'Clients') return <RecordsPage module="Clients" />;
+  if (route === 'Leads') return <LeadsPage />;
   if (route === 'Contacts') return <ContactsPage />;
-  return <PropertyDirectory />;
+  if (route === 'Properties') return <PropertyDirectory />;
+  return <RecordsPage key={route} module={route} />;
 }

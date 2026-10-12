@@ -25,14 +25,8 @@ test('connected Admin navigation restores every group and unfinished routes neve
   }
   for (const name of [
     'Dashboard',
-    'Leads',
     'Messages',
     'Deals',
-    'Follow-ups',
-    'Viewings',
-    'Shortlist',
-    'Interaction log',
-    'Client care',
     'CRM insights',
     'Client desk',
     'Payments',
@@ -51,6 +45,20 @@ test('connected Admin navigation restores every group and unfinished routes neve
     await expect(
       page.getByRole('button', { name: 'Import saved records', exact: true }),
     ).toHaveCount(0);
+  }
+  for (const [name, action] of [
+    ['Leads', 'Add lead'],
+    ['Follow-ups', 'Add follow-up'],
+    ['Viewings', 'Add viewing'],
+    ['Shortlist', 'Add match'],
+    ['Interaction log', 'Add conversation'],
+    ['Client care', 'Add touchpoint'],
+  ]) {
+    await sidebar.getByRole('button', { name, exact: true }).click();
+    await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
+    await expect(page.getByRole('button', { name: action, exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: `${name} connection status` })).toHaveCount(0);
+    await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);
   }
   await sidebar.getByRole('button', { name: 'Dashboard', exact: true }).click();
   await expect(page).toHaveURL(/#\/dashboard$/);

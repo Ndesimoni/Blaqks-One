@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { before, test } from 'node:test';
 import { parseFullBackup } from '../../src/services/files/backup.js';
-import { commit, fixtures, organisation, planned } from './import-helpers.mjs';
+import { collections, commit, counts, fixtures, organisation, planned } from './import-helpers.mjs';
 
 let owner;
 before(async () => ({ owner } = await fixtures()));
@@ -14,11 +14,21 @@ test('the complete generated demo backup imports all supported records and label
   assert.equal(backup.demo, true);
   const data = parseFullBackup(raw);
   assert.ok(data['Follow-ups'].length > 0);
-  const records = Object.fromEntries(
-    ['Clients', 'Contacts', 'Properties'].map((name) => [name, data[name]]),
-  );
+  const records = Object.fromEntries(collections.map((name) => [name, data[name]]));
   const plan = await planned(owner, organisation, records, organisation);
-  assert.deepEqual(plan.counts, { Clients: 8, Contacts: 3, Properties: 13 });
+  assert.deepEqual(
+    plan.counts,
+    counts({
+      Clients: 8,
+      Contacts: 3,
+      Properties: 13,
+      'Follow-ups': 6,
+      Viewings: 4,
+      Shortlist: 3,
+      'Interaction log': 2,
+      'Client care': 1,
+    }),
+  );
   const result = await commit(owner, organisation, plan.token);
   assert.equal(result.status, 200);
   const saved = await owner.request(`/workspaces/${organisation}/records`);

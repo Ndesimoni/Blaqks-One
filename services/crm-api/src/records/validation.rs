@@ -1,21 +1,17 @@
+use super::collections::{self, Links};
 use crate::error::{ApiError, ApiResult};
-use serde_json::Value;
+use serde_json::{Map, Value};
 
 pub const MAX_RECORD_BYTES: usize = 12 * 1024 * 1024;
 
 pub struct ValidatedRecord {
     pub payload: Value,
     pub legacy_id: String,
-    pub contact_id: Option<String>,
+    pub links: Links,
 }
 
 pub fn collection_key(collection: &str) -> ApiResult<&'static str> {
-    match collection {
-        "Clients" => Ok("client_id"),
-        "Contacts" => Ok("contact_id"),
-        "Properties" => Ok("property_id"),
-        _ => Err(ApiError::invalid("Unsupported record collection.")),
-    }
+    Ok(collections::find(collection)?.id_key)
 }
 
 pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedRecord> {
@@ -63,25 +59,32 @@ pub fn validate(collection: &str, mut payload: Value) -> ApiResult<ValidatedReco
         ));
     }
     object.insert(id_key.into(), Value::String(legacy_id.clone()));
-    let contact_id = if collection == "Properties" {
-        match object.get("contact_id") {
-            None | Some(Value::Null) => None,
-            Some(Value::String(value)) if value.trim().is_empty() => None,
-            Some(Value::String(value)) if value.len() <= 128 => Some(value.trim().to_owned()),
-            _ => return Err(ApiError::invalid("Contact ID must be a string.")),
-        }
-    } else {
-        None
-    };
-    if let Some(contact) = &contact_id {
-        object.insert("contact_id".into(), Value::String(contact.clone()));
-    }
+    let links = links(collection, object)?;
     super::validation_numbers::validate(collection, &payload)?;
     super::workbook_fields::validate(collection, &payload)?;
     super::media::validate(&payload)?;
     Ok(ValidatedRecord {
         payload,
         legacy_id,
-        contact_id,
+        links,
     })
+}
+
+fn links(collection: &str, object: &mut Map<String, Value>) -> ApiResult<Links> {
+    let mut links = Links::default();
+    for link in collections::find(collection)?.links {
+        let value = match object.get(link.field) {
+            None | Some(Value::Null) => None,
+            Some(Value::String(value)) if value.trim().is_empty() => None,
+            Some(Value::String(value)) if value.trim().len() <= 128 => {
+                Some(value.trim().to_owned())
+            }
+            _ => return Err(ApiError::invalid("Linked record IDs must be strings.")),
+        };
+        if let Some(id) = &value {
+            object.insert(link.field.into(), Value::String(id.clone()));
+        }
+        links.set(link.target, value);
+    }
+    Ok(links)
 }

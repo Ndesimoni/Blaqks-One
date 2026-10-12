@@ -26,7 +26,8 @@ impl Permissions {
     pub fn collection(&self, collection: &str) -> bool {
         match collection {
             "Clients" | "Contacts" => self.relationships,
-            "Properties" => self.properties,
+            "Properties" | "Shortlist" => self.properties,
+            "Follow-ups" | "Viewings" | "Interaction log" | "Client care" => self.schedule,
             _ => false,
         }
     }
@@ -52,6 +53,13 @@ mod tests {
         assert!(access.collection("Clients"));
         assert!(access.collection("Contacts"));
         assert!(!access.collection("Properties"));
+        assert!(!access.collection("Viewings"));
+        let schedule = Permissions {
+            schedule: true,
+            ..Default::default()
+        };
+        assert!(schedule.collection("Follow-ups") && schedule.collection("Client care"));
+        assert!(!schedule.collection("Shortlist") && !schedule.collection("Deals"));
         assert!(!Permissions::full().collection("Anything"));
         assert!(serde_json::from_str::<Permissions>("{\"admin\":true}").is_err());
         assert!(!ChannelAccess::default().email);

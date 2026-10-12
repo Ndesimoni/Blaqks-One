@@ -23,12 +23,12 @@ export function useServerRecordActions(options) {
       if (!readOnly) return mutations.reloadRecord(...args);
     },
     edit,
-    add(module) {
+    add(module, defaults = {}) {
       if (readOnly || mutations.busy) return;
       view.setDetail(null);
       view.setDrawer({
         module,
-        record: { [schema(module)[0].key]: newId(module, records.data[module]) },
+        record: { [schema(module)[0].key]: newId(module, records.data[module]), ...defaults },
         original: null,
       });
     },

@@ -3,8 +3,20 @@ import { createHash } from 'node:crypto';
 import { login, query } from './helpers.mjs';
 
 export const organisation = 'super-admin-workspace';
-export const emptyRecords = () => ({ Clients: [], Contacts: [], Properties: [] });
-export const zeroCounts = { Clients: 0, Contacts: 0, Properties: 0 };
+export const collections = [
+  'Clients',
+  'Contacts',
+  'Properties',
+  'Follow-ups',
+  'Viewings',
+  'Shortlist',
+  'Interaction log',
+  'Client care',
+];
+export const emptyRecords = () => Object.fromEntries(collections.map((name) => [name, []]));
+export const counts = (values = {}) =>
+  Object.fromEntries(collections.map((name) => [name, values[name] || 0]));
+export const zeroCounts = counts();
 export const importsPath = (workspace, action) => `/workspaces/${workspace}/imports/${action}`;
 export const tokenHash = (token) => createHash('sha256').update(token).digest('hex');
 

@@ -16,11 +16,23 @@ test('Admins can reach the familiar sections while only implemented screens are 
     for (const name of ['My profile', 'Team & access', 'Workspaces', 'Team activity'])
       assert.equal(canOpenSection(user, name), true);
   }
-  for (const name of ['Clients', 'Contacts', 'Properties', 'Team & access'])
-    assert.equal(isConnectedSection(name), true);
+  for (const name of [
+    'Leads',
+    'Clients',
+    'Contacts',
+    'Properties',
+    'Follow-ups',
+    'Viewings',
+    'Shortlist',
+    'Interaction log',
+    'Client care',
+    'Team & access',
+  ])
+    assert.equal(isConnectedSection(name), true, name);
   for (const name of [
     'Dashboard',
-    'Leads',
+    'Deals',
+    'Expenses',
     'Messages',
     'Payments',
     'Performance',

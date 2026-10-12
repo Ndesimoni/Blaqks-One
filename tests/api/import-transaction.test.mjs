@@ -4,6 +4,8 @@ import { query } from './helpers.mjs';
 import {
   activityCount,
   commit,
+  counts,
+  emptyRecords,
   fixtures,
   planned,
   recordCount,
@@ -15,6 +17,7 @@ before(async () => ({ owner, admin } = await fixtures()));
 
 test('a database failure rolls back every inserted record, audit entry and completion marker', async () => {
   const plan = await planned(owner, admin.user.id, {
+    ...emptyRecords(),
     Clients: [{ client_id: 'IMP-TX-CLIENT' }],
     Contacts: [{ contact_id: 'IMP-TX-CONTACT' }],
     Properties: [{ property_id: 'IMP-TX-FAIL', contact_id: 'IMP-TX-CONTACT' }],
@@ -53,6 +56,6 @@ test('a database failure rolls back every inserted record, audit entry and compl
   const retry = await commit(owner, admin.user.id, plan.token);
   assert.equal(retry.status, 200);
   assert.equal(retry.value.replayed, false);
-  assert.deepEqual(retry.value.imported, { Clients: 1, Contacts: 1, Properties: 1 });
+  assert.deepEqual(retry.value.imported, counts({ Clients: 1, Contacts: 1, Properties: 1 }));
   assert.equal(activityCount(admin.user.id), before + 3);
 });

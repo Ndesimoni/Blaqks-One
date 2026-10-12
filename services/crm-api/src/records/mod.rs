@@ -1,4 +1,5 @@
 pub mod audit;
+pub mod collections;
 pub mod deletion;
 pub mod handlers;
 pub mod media;
@@ -7,3 +8,4 @@ pub mod requests;
 pub mod validation;
 pub mod validation_numbers;
 pub mod workbook_fields;
+pub mod workflow_fields;

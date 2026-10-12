@@ -1,11 +1,11 @@
 export const accessFields = [
+  ['relationships', 'Clients, leads and contacts', 'Clients, leads and contacts are connected.'],
   [
-    'relationships',
-    'Clients, leads and contacts',
-    'Clients and Contacts are connected. Leads are planned.',
+    'properties',
+    'Properties',
+    'Listings and shortlists are connected. Publication approval is planned.',
   ],
-  ['properties', 'Properties', 'Create and manage listings. Publication approval is planned.'],
-  ['schedule', 'Scheduling', 'Follow-ups and viewings: backend planned.'],
+  ['schedule', 'Scheduling', 'Follow-ups, viewings, interactions and client care are connected.'],
   ['finance', 'Finance', 'Expenses and commissions: backend planned.'],
   ['reports', 'Reports', 'Team reporting: backend planned.'],
   ['exports', 'Exports', 'Connected exports: planned.'],

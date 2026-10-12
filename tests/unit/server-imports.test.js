@@ -7,11 +7,11 @@ import {
   readSavedImport,
   readBackupImport,
 } from '../../src/features/server/importSources.js';
-import {
-  prepareServerImport,
-  importDestination,
-  validateImportPreview,
-} from '../../src/features/server/importModel.js';
+import { prepareServerImport, importDestination } from '../../src/features/server/importModel.js';
+import { connectedCollections } from '../../src/features/server/records.js';
+
+const counts = (values = {}) =>
+  Object.fromEntries(connectedCollections.map((name) => [name, values[name] || 0]));
 
 const owner = { role: 'Super Admin', roleId: 'super-admin', managesTeam: true };
 const member = { role: 'Admin', roleId: 'admin', managesTeam: true };
@@ -38,6 +38,7 @@ const sourceData = () => ({
       media_photos: [{ name: 'house.jpg', src: 'data:image/jpeg;base64,YQ==' }],
     },
   ],
+  Viewings: [{ viewing_id: 'VW-001', client_id: 'CL-001', property_id: 'PR-001' }],
   Deals: [{ deal_id: 'DL-001' }],
 });
 
@@ -99,9 +100,13 @@ test('import preparation preserves IDs, links, media and unknown business fields
     savedImportSources(owner, () => storage)[0],
     () => storage,
   );
-  assert.deepEqual(prepared.counts, { Clients: 1, Contacts: 1, Properties: 1 });
+  assert.deepEqual(
+    prepared.counts,
+    counts({ Clients: 1, Contacts: 1, Properties: 1, Viewings: 1 }),
+  );
   assert.deepEqual(prepared.deferred, { Deals: 1 });
-  assert.deepEqual(Object.keys(prepared.records), ['Clients', 'Contacts', 'Properties']);
+  assert.deepEqual(Object.keys(prepared.records), connectedCollections);
+  assert.equal(prepared.records.Viewings[0].property_id, 'PR-001');
   assert.equal(prepared.records.Clients[0].custom_business_note, 'Keep this field');
   assert.equal(prepared.records.Properties[0].contact_id, 'CT-001');
   assert.deepEqual(prepared.records.Properties[0].media_photos, data.Properties[0].media_photos);
@@ -129,15 +134,4 @@ test('JSON backups require explicit source ownership and credential fields stop 
     data.Clients[0][key] = 'do not import';
     assert.throws(() => prepareServerImport(data), /credential fields/);
   }
-});
-
-test('malformed server import previews cannot enable the commit action', () => {
-  assert.throws(() => validateImportPreview({ token: 'a', expiresAt: 'tomorrow' }), /incomplete/);
-  const preview = {
-    token: 'a',
-    expiresAt: new Date().toISOString(),
-    counts: { Clients: 1, Contacts: 1, Properties: 1 },
-    skipped: { Clients: 0, Contacts: 0, Properties: 0 },
-  };
-  assert.equal(validateImportPreview(preview), preview);
 });

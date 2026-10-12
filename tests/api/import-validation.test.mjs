@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
-import { fixtures, emptyRecords, preview, zeroCounts } from './import-helpers.mjs';
+import { counts, fixtures, emptyRecords, preview, zeroCounts } from './import-helpers.mjs';
 
 let owner, admin;
 before(async () => ({ owner, admin } = await fixtures()));
@@ -12,6 +12,7 @@ test('preview validates complete source shapes, IDs and same-workspace contact l
     { ...emptyRecords(), Clients: {} },
     { ...emptyRecords(), Clients: [{ client_id: 'IMP-DUP' }, { client_id: ' IMP-DUP ' }] },
     { ...emptyRecords(), Properties: [{ property_id: 'IMP-DANGLING', contact_id: 'IMP-MISSING' }] },
+    { ...emptyRecords(), Viewings: [{ viewing_id: 'IMP-VIEW', client_id: 'IMP-MISSING' }] },
     { ...emptyRecords(), Clients: [{ client_id: 'IMP-NUM', maximum_budget_aed: true }] },
     { ...emptyRecords(), Properties: [{ property_id: 'IMP-OBJECT', listing_title: {} }] },
     { ...emptyRecords(), Clients: [{ client_id: 'IMP-FORGED', owner_id: admin.user.id }] },
@@ -60,13 +61,14 @@ test('preview rejects credentials recursively and unsupported media assets', asy
 
 test('preview reports counts without creating records', async () => {
   const records = {
+    ...emptyRecords(),
     Clients: [{ client_id: 'IMP-PREVIEW-CLIENT', private_extra: { code: 123 } }],
     Contacts: [{ contact_id: 'IMP-PREVIEW-CONTACT' }],
     Properties: [{ property_id: 'IMP-PREVIEW-PROPERTY', contact_id: 'IMP-PREVIEW-CONTACT' }],
   };
   const response = await preview(owner, admin.user.id, records);
   assert.equal(response.status, 200);
-  assert.deepEqual(response.value.counts, { Clients: 1, Contacts: 1, Properties: 1 });
+  assert.deepEqual(response.value.counts, counts({ Clients: 1, Contacts: 1, Properties: 1 }));
   assert.deepEqual(response.value.skipped, zeroCounts);
   const list = await owner.request(`/workspaces/${admin.user.id}/records`);
   assert.ok(

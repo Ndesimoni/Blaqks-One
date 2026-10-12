@@ -5,6 +5,7 @@ import {
   serverWorkspaceData,
   serverRecordMetadata,
   installServerRecord,
+  connectedCollections,
 } from '../../src/features/server/records.js';
 import { serverMutationFailure } from '../../src/features/server/errors.js';
 
@@ -14,7 +15,10 @@ const client = (id, version, clientId, name) => ({
   record: { client_id: clientId, full_name: name },
 });
 const payload = () => ({
-  records: { Clients: [client('uuid-a', 1, 'CL-001', 'Own client')], Contacts: [], Properties: [] },
+  records: {
+    ...Object.fromEntries(connectedCollections.map((name) => [name, []])),
+    Clients: [client('uuid-a', 1, 'CL-001', 'Own client')],
+  },
 });
 
 test('server metadata stays separate from workbook records and unconnected collections remain empty', () => {
@@ -24,6 +28,7 @@ test('server metadata stays separate from workbook records and unconnected colle
   assert.equal(data.Clients[0].id, undefined);
   assert.equal(data.Clients[0].version, undefined);
   assert.deepEqual(data.Deals, []);
+  assert.deepEqual(data.Payments, []);
   assert.deepEqual(data.Viewings, []);
   assert.deepEqual(serverRecordMetadata(entries, 'Clients', data.Clients[0]), {
     id: 'uuid-a',
@@ -53,6 +58,12 @@ test('record updates follow immutable server identity even when workbook IDs cha
 
 test('incomplete, stale-shaped and duplicate server responses are rejected before installation', () => {
   assert.throws(() => readServerRecords({}), /incomplete/);
+  const missingWorkflow = payload();
+  delete missingWorkflow.records['Client care'];
+  assert.throws(() => readServerRecords(missingWorkflow), /incomplete/);
+  const workflow = payload();
+  workflow.records.Viewings.push({ id: 'uuid-v', version: 1, record: { client_id: 'CL-001' } });
+  assert.throws(() => readServerRecords(workflow), /invalid/);
   const missingVersion = payload();
   delete missingVersion.records.Clients[0].version;
   assert.throws(() => readServerRecords(missingVersion), /invalid/);

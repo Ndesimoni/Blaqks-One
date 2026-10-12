@@ -7,16 +7,15 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { ServerHeader } from './ServerHeader.jsx';
 import { ServerNavigation } from './ServerNavigation.jsx';
 import { ServerDialogs } from './ServerDialogs.jsx';
-import { connectedCollections } from './records.js';
 import { ServerImportAction } from './ServerImportAction.jsx';
 import { ServerContent } from './ServerContent.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
-import { sectionDescription } from './sectionStatus.js';
+import { isRecordSection, sectionDescription } from './sectionStatus.js';
 
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();
   const { route } = useNavigation();
-  const supported = connectedCollections.includes(route);
+  const supported = isRecordSection(route);
   const team = route === 'Team & access';
   const { toast, setToast } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
@@ -55,7 +54,7 @@ export function ServerShell({ owner, workspaces }) {
               <p>
                 {owner.status === 'archived'
                   ? 'This Admin account and its team have been removed. Saved records remain available for review; changes are disabled.'
-                  : 'Clients, contacts and properties are saved to your CRM server.'}
+                  : 'Clients, contacts, properties and client activity are saved to your CRM server.'}
               </p>
             </div>
             {user.roleId === 'super-admin' && (

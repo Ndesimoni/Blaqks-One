@@ -107,7 +107,7 @@ pub fn validate(collection: &str, payload: &Value) -> ApiResult<()> {
         "Clients" => CLIENT_FIELDS,
         "Properties" => PROPERTY_FIELDS,
         "Contacts" => CONTACT_FIELDS,
-        _ => &[],
+        _ => super::workflow_fields::fields(collection),
     };
     for field in fields {
         if matches!(payload.get(field), Some(Value::Array(_) | Value::Object(_))) {

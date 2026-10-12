@@ -1,8 +1,11 @@
 import { expect } from '@playwright/test';
 import { blank } from '../../src/lib/schema.js';
+import { connectedCollections } from '../../src/features/server/records.js';
 
 export const organisation = 'super-admin-workspace';
 export const storageKey = 'kws-crm-v1';
+export const counts = (values = {}) =>
+  Object.fromEntries(connectedCollections.map((name) => [name, values[name] || 0]));
 
 export function migrationData(prefix) {
   return {
@@ -17,7 +20,8 @@ export function migrationData(prefix) {
         contact_id: `${prefix}-CT`,
       },
     ],
-    'Follow-ups': [{ activity_id: `${prefix}-FU`, notes: 'Keep for later migration' }],
+    'Follow-ups': [{ activity_id: `${prefix}-FU`, client_id: `${prefix}-CL` }],
+    Deals: [{ deal_id: `${prefix}-DL`, notes: 'Keep for later migration' }],
   };
 }
 

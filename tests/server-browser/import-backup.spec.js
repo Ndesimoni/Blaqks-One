@@ -3,6 +3,7 @@ import { test, expect } from './fixtures.js';
 import { signIn } from './helpers.js';
 import { createFullBackup, parseFullBackup } from '../../src/services/files/backup.js';
 import {
+  counts,
   migrationData,
   savedSource,
   openImport,
@@ -30,7 +31,9 @@ test('download creates a complete backup and import keeps linked records, demo p
   const backup = parseFullBackup(await readFile(path, 'utf8'));
   expect(backup).toEqual(data);
   const preview = await reviewImport(page);
-  expect(preview.counts).toEqual({ Clients: 1, Contacts: 1, Properties: 1 });
+  expect(preview.counts).toEqual(
+    counts({ Clients: 1, Contacts: 1, Properties: 1, 'Follow-ups': 1 }),
+  );
   await committed(page);
   const records = await serverRecords(page);
   const property = records.Properties.find(
@@ -55,8 +58,10 @@ test('download creates a complete backup and import keeps linked records, demo p
   await page.keyboard.press('Escape');
   await openImport(page);
   const repeat = await reviewImport(page);
-  expect(repeat.counts).toEqual({ Clients: 0, Contacts: 0, Properties: 0 });
-  expect(repeat.skipped).toEqual({ Clients: 1, Contacts: 1, Properties: 1 });
+  expect(repeat.counts).toEqual(counts());
+  expect(repeat.skipped).toEqual(
+    counts({ Clients: 1, Contacts: 1, Properties: 1, 'Follow-ups': 1 }),
+  );
   await committed(page);
 });
 

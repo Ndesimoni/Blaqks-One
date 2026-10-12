@@ -1,6 +1,6 @@
 # Save and import existing CRM records
 
-The Super Admin can review and import **Clients, Contacts and Properties** into Docker PostgreSQL. Other collections remain in the source browser and the complete backup. Nothing is copied automatically when connected mode starts.
+The Super Admin can review and import **Clients, Contacts, Properties, Follow-ups, Viewings, Shortlist, Interaction log and Client care** into Docker PostgreSQL. Every linked client, contact or property must already exist in the destination workspace or arrive in the same import; otherwise the preview is rejected and nothing is saved. Other collections remain in the source browser and the complete backup. Nothing is copied automatically when connected mode starts.
 
 ## Create the backup file first
 

@@ -1,16 +1,25 @@
-use kws_crm_api::imports::{
-    model::ImportRecords,
-    planning::plan,
-    snapshot::{fingerprint, TargetRow},
+use kws_crm_api::{
+    imports::{
+        model::ImportRecords,
+        planning::plan,
+        snapshot::{fingerprint, TargetRow},
+    },
+    records::collections::COLLECTIONS,
 };
 use serde_json::json;
 use uuid::Uuid;
 
+/// Fills every collection the test leaves out, as the browser client does.
+fn complete(value: serde_json::Value) -> ImportRecords {
+    let mut records = serde_json::from_value::<ImportRecords>(value).unwrap();
+    for collection in COLLECTIONS {
+        records.0.entry(collection.name.into()).or_default();
+    }
+    records
+}
+
 fn source(value: serde_json::Value) -> ImportRecords {
-    serde_json::from_value::<ImportRecords>(value)
-        .unwrap()
-        .normalize()
-        .unwrap()
+    complete(value).normalize().unwrap()
 }
 
 fn target(collection: &str, id: &str, payload: serde_json::Value) -> TargetRow {
@@ -35,8 +44,8 @@ fn skips_identical_records_and_preserves_new_private_fields() {
     assert_eq!(plan.skipped["Contacts"], 1);
     assert_eq!(plan.counts["Clients"], 1);
     assert_eq!(plan.counts["Properties"], 1);
-    assert_eq!(plan.records.clients[0]["client_id"], "CL-1");
-    assert_eq!(plan.records.clients[0]["extra"]["code"], 12);
+    assert_eq!(plan.records.rows("Clients")[0]["client_id"], "CL-1");
+    assert_eq!(plan.records.rows("Clients")[0]["extra"]["code"], 12);
 }
 
 #[test]
@@ -72,22 +81,45 @@ fn linked_contacts_can_arrive_in_same_import() {
 }
 
 #[test]
+fn workflow_links_resolve_against_target_and_same_import() {
+    let existing = vec![target("Properties", "PR-1", json!({"property_id":"PR-1"}))];
+    let input = source(json!({"Clients":[{"client_id":"CL-1"}],
+        "Viewings":[{"viewing_id":"VW-1","client_id":"CL-1","property_id":"PR-1"}],
+        "Client care":[{"care_id":"CC-1","client_id":"CL-1","property_id_optional":""}]}));
+    let plan = plan(input, &existing).unwrap();
+    assert_eq!(plan.counts["Viewings"], 1);
+    assert_eq!(plan.counts["Client care"], 1);
+    assert_eq!(plan.counts["Follow-ups"], 0);
+    for missing in [
+        json!({"Follow-ups":[{"activity_id":"FU-1","client_id":"CL-MISSING"}]}),
+        json!({"Interaction log":[{"log_id":"LG-1","property_id_optional":"PR-MISSING"}]}),
+    ] {
+        assert!(plan_fails(source(missing), &existing));
+    }
+}
+
+fn plan_fails(input: ImportRecords, existing: &[TargetRow]) -> bool {
+    plan(input, existing).is_err()
+}
+
+#[test]
 fn rejects_duplicate_source_ids_and_oversized_row_counts() {
-    let duplicate =
-        serde_json::from_value::<ImportRecords>(json!({"Clients":[{"client_id":"CL-1"},
-        {"client_id":" CL-1 "}],"Contacts":[],"Properties":[]}))
-        .unwrap();
+    let duplicate = complete(json!({"Clients":[{"client_id":"CL-1"},{"client_id":" CL-1 "}]}));
     assert!(duplicate.normalize().is_err());
+    let partial = json!({"Clients":[],"Contacts":[],"Properties":[]});
+    let partial = serde_json::from_value::<ImportRecords>(partial).unwrap();
+    assert!(partial.normalize().is_err());
     let clients = (0..1001)
         .map(|id| json!({"client_id":format!("CL-{id}")}))
         .collect();
-    assert!(ImportRecords {
-        clients,
-        contacts: vec![],
-        properties: vec![]
-    }
-    .normalize()
-    .is_err());
+    let mut oversized = complete(json!({}));
+    oversized.0.insert("Clients".into(), clients);
+    assert!(oversized.normalize().is_err());
+    let mut unknown = complete(json!({}));
+    unknown
+        .0
+        .insert("Deals".into(), vec![json!({"deal_id":"DL-1"})]);
+    assert!(unknown.normalize().is_err());
 }
 
 #[test]

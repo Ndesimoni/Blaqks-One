@@ -59,6 +59,7 @@ try {
         '--test-concurrency=1',
         'tests/api/auth.test.mjs',
         'tests/api/records.test.mjs',
+        'tests/api/workflow-records.test.mjs',
         'tests/api/scope.test.mjs',
         'tests/api/validation.test.mjs',
         'tests/api/import-access.test.mjs',

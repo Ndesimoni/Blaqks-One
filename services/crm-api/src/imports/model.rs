@@ -1,6 +1,9 @@
 use crate::{
     error::{ApiError, ApiResult},
-    records::validation,
+    records::{
+        collections::{self, COLLECTIONS},
+        validation,
+    },
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -19,27 +22,35 @@ pub struct PreviewRequest {
 }
 
 #[derive(Default, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct ImportRecords {
-    #[serde(rename = "Clients")]
-    pub clients: Vec<Value>,
-    #[serde(rename = "Contacts")]
-    pub contacts: Vec<Value>,
-    #[serde(rename = "Properties")]
-    pub properties: Vec<Value>,
-}
+#[serde(transparent)]
+pub struct ImportRecords(pub BTreeMap<String, Vec<Value>>);
 
 impl ImportRecords {
-    pub fn collections(&self) -> [(&'static str, &[Value]); 3] {
-        [
-            ("Contacts", &self.contacts),
-            ("Clients", &self.clients),
-            ("Properties", &self.properties),
-        ]
+    /// Collections in insertion order, including empty ones.
+    pub fn collections(&self) -> Vec<(&'static str, &[Value])> {
+        COLLECTIONS
+            .iter()
+            .map(|collection| (collection.name, self.rows(collection.name)))
+            .collect()
+    }
+
+    pub fn rows(&self, collection: &str) -> &[Value] {
+        self.0.get(collection).map(Vec::as_slice).unwrap_or(&[])
+    }
+
+    pub fn push(&mut self, collection: &str, row: Value) {
+        self.0.entry(collection.into()).or_default().push(row);
     }
 
     pub fn normalize(mut self) -> ApiResult<Self> {
-        let total = self.clients.len() + self.contacts.len() + self.properties.len();
+        if self.0.len() != COLLECTIONS.len()
+            || self.0.keys().any(|name| collections::find(name).is_err())
+        {
+            return Err(ApiError::invalid(
+                "Provide every supported record collection and no others.",
+            ));
+        }
+        let total: usize = self.0.values().map(Vec::len).sum();
         if total > 1000
             || serde_json::to_vec(&self)
                 .map_err(|_| ApiError::invalid("Invalid import."))?
@@ -50,11 +61,7 @@ impl ImportRecords {
                 "Imports allow at most 1000 records and 12 MiB.",
             ));
         }
-        for (collection, records) in [
-            ("Clients", &mut self.clients),
-            ("Contacts", &mut self.contacts),
-            ("Properties", &mut self.properties),
-        ] {
+        for (collection, records) in &mut self.0 {
             let mut ids = HashSet::new();
             for record in records {
                 super::credentials::reject(record)?;
@@ -72,9 +79,9 @@ impl ImportRecords {
 }
 
 pub fn zero_counts() -> Counts {
-    ["Clients", "Contacts", "Properties"]
-        .into_iter()
-        .map(|collection| (collection.into(), 0))
+    COLLECTIONS
+        .iter()
+        .map(|collection| (collection.name.into(), 0))
         .collect()
 }
 
