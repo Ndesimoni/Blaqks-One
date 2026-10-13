@@ -17,7 +17,9 @@ export function AssignmentPageScope({ module, children }) {
   const records = useRecords();
   const { user } = useSession();
   const { setPage } = useWorkspaceView();
-  const { readOnly = false } = useWorkspaceActions();
+  const { readOnly = false, can } = useWorkspaceActions();
+  // Bulk moves need team scope and the Hand on grant (contract §4, §12 M-B).
+  const canBulk = !readOnly && Boolean(can?.(module, 'assign'));
   const enabled = records.scope === 'team' && isAssignable(module);
   const assignees = useAssignees(module, enabled);
   const [filter, setFilter] = useState('');
@@ -45,13 +47,13 @@ export function AssignmentPageScope({ module, children }) {
       assignees={assignees}
       me={user?.id}
       count={rows?.length ?? 0}
-      onBulk={readOnly ? undefined : () => setBulkOpen(true)}
+      onBulk={canBulk ? () => setBulkOpen(true) : undefined}
     />
   ) : null;
   return (
     <RecordsContext.Provider value={scoped}>
       {children(toolbar)}
-      {bulkOpen && active && (
+      {bulkOpen && active && canBulk && (
         <BulkReassignDialog
           module={module}
           filter={filter}

@@ -2,6 +2,7 @@ import React from 'react';
 import { TeamMemberStatus } from './TeamMemberStatus.jsx';
 import { TeamMemberWorkspace } from './TeamMemberWorkspace.jsx';
 import { TeamMemberActions } from './TeamMemberActions.jsx';
+import { TeamMemberActionNote } from './TeamMemberActionNote.jsx';
 
 export function TeamDirectoryTable({ members, roles, owner, archived, actions, onEdit, onDelete }) {
   return (
@@ -35,6 +36,7 @@ export function TeamDirectoryTable({ members, roles, owner, archived, actions, o
                         .join(', ')}
                     </span>
                   )}
+                  {archived && <TeamMemberActionNote member={member} />}
                 </td>
                 <td>
                   <TeamMemberStatus member={member} />

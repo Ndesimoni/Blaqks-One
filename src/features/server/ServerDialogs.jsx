@@ -8,7 +8,7 @@ import { AssignmentDetails } from './assignment/AssignmentDetails.jsx';
 export function ServerDialogs() {
   const { data, scope } = useRecords();
   const { drawer, setDrawer, detail, setDetail } = useWorkspaceView();
-  const { saveRecord, deleteRecord, reloadRecord, edit, busy, readOnly, canDelete } =
+  const { saveRecord, deleteRecord, reloadRecord, edit, busy, readOnly, can, canDelete } =
     useWorkspaceActions();
   return (
     <>
@@ -18,7 +18,8 @@ export function ServerDialogs() {
           data={data}
           edit={edit}
           remove={deleteRecord}
-          canDelete={canDelete(detail.module)}
+          canDelete={canDelete(detail.module, detail.record)}
+          canEdit={can(detail.module, 'edit')}
           extras={<AssignmentDetails module={detail.module} record={detail.record} />}
           close={() => {
             if (!busy) setDetail(null);

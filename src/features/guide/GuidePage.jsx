@@ -2,10 +2,12 @@ import { Button } from '../../components/ui/Button.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import React from 'react';
 import { useNavigation, useWorkspaceActions } from '../../hooks/useWorkspace.js';
+import { useRecordAccess } from '../records/useRecordAccess.js';
 
 function GuidePage() {
   const { navigate } = useNavigation();
   const { add, uploadRef, exportWorkbook } = useWorkspaceActions();
+  const can = useRecordAccess();
 
   return (
     <div className="page-stack">
@@ -19,9 +21,11 @@ function GuidePage() {
         <p>
           A complete workflow for Keys with Simoni, from the first introduction to repeat referrals.
         </p>
-        <Button icon="plus" onClick={() => add('Clients')}>
-          Add your first client
-        </Button>
+        {can('Clients', 'create') && (
+          <Button icon="plus" onClick={() => add('Clients')}>
+            Add your first client
+          </Button>
+        )}
       </div>
       <div className="guide-grid">
         {[

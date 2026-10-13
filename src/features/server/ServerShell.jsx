@@ -10,6 +10,7 @@ import { ServerDialogs } from './ServerDialogs.jsx';
 import { ServerImportAction } from './ServerImportAction.jsx';
 import { ServerContent } from './ServerContent.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
+import { ViewOnlyChip } from './ViewOnlyChip.jsx';
 import { isRecordSection, sectionDescription } from './sectionStatus.js';
 
 export function ServerShell({ owner, workspaces }) {
@@ -79,6 +80,7 @@ export function ServerShell({ owner, workspaces }) {
               </p>
             </div>
             <div className="heading-actions">
+              {supported && <ViewOnlyChip module={route} />}
               {(supported || team) && <ServerImportAction owner={owner} workspaces={workspaces} />}
             </div>
           </div>

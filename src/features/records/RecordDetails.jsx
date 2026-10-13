@@ -21,6 +21,7 @@ function RecordDetails({
   showMessaging = true,
   readOnly = false,
   canDelete = true,
+  canEdit = true,
   extras = null,
 }) {
   const { module, record: r } = detail;
@@ -31,6 +32,7 @@ function RecordDetails({
   const fields = schema(module);
   const id = get(r, fields[0].name);
   const titleId = useId();
+  const changeable = !readOnly && (canDelete || canEdit);
   return (
     <Drawer
       className="detail-drawer"
@@ -80,12 +82,17 @@ function RecordDetails({
           <RecordSchedule module={module} record={r} data={data} />
         )}
         {module === 'Properties' && (
-          <PropertyRecordDetails record={r} edit={edit} close={close} readOnly={readOnly} />
+          <PropertyRecordDetails
+            record={r}
+            edit={edit}
+            close={close}
+            readOnly={readOnly || !canEdit}
+          />
         )}
         <RecordDetailFields module={module} record={r} fields={fields} id={id} data={data} />
       </div>
       <div className="drawer-footer">
-        {readOnly ? (
+        {!changeable ? (
           <Button variant="light" onClick={close}>
             Close
           </Button>
@@ -101,16 +108,18 @@ function RecordDetails({
                 Delete
               </Button>
             )}
-            <Button
-              icon="edit"
-              disabled={busy}
-              onClick={() => {
-                close();
-                edit(module, r);
-              }}
-            >
-              {lead ? 'Edit lead' : 'Edit record'}
-            </Button>
+            {canEdit && (
+              <Button
+                icon="edit"
+                disabled={busy}
+                onClick={() => {
+                  close();
+                  edit(module, r);
+                }}
+              >
+                {lead ? 'Edit lead' : 'Edit record'}
+              </Button>
+            )}
           </>
         )}
       </div>

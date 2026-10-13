@@ -1,5 +1,6 @@
 import React from 'react';
 import { recordScopeOptions } from './model.js';
+import { normaliseActions } from './actionModel.js';
 
 /** Staff-only, edit-only grant (contract §6 M7). Invitations and positions never set it. */
 export function TeamRecordScopeFields({ form, change, busy }) {
@@ -14,12 +15,20 @@ export function TeamRecordScopeFields({ form, change, busy }) {
             value={value}
             checked={form.recordScope === value}
             disabled={busy}
-            onChange={() => change('recordScope', value)}
+            onChange={() =>
+              change('recordScope', value, {
+                // Assigned-only visibility clears any delete-main ticks (A2 §1.4).
+                actions: normaliseActions(form.actions, { ...form, recordScope: value }),
+              })
+            }
           />
           {label}
         </label>
       ))}
-      <small>Whole-team access still respects the sections allowed above.</small>
+      <small>
+        Whole-team access still respects the sections allowed above. Deleting clients, contacts or
+        properties needs whole-team visibility.
+      </small>
     </fieldset>
   );
 }

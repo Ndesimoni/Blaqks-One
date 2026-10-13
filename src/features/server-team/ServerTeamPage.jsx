@@ -12,6 +12,7 @@ import { useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { useTeamDirectory } from './useTeamDirectory.js';
 import { TeamDirectoryFilters } from './TeamDirectoryFilters.jsx';
 import './team.css';
+import './team-actions.css';
 
 export function ServerTeamPage({ owner }) {
   const { user } = useSession();

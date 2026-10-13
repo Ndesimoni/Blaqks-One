@@ -3,6 +3,7 @@ import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { TeamMemberStatus } from './TeamMemberStatus.jsx';
 import { TeamMemberWorkspace } from './TeamMemberWorkspace.jsx';
 import { TeamMemberActions } from './TeamMemberActions.jsx';
+import { TeamMemberActionNote } from './TeamMemberActionNote.jsx';
 
 export function TeamMemberCard({ member, roles, owner, archived, onEdit, actions, onDelete }) {
   const names = member.positions.map((id) => roles.find((role) => role.id === id)?.label || id);
@@ -39,6 +40,7 @@ export function TeamMemberCard({ member, roles, owner, archived, onEdit, actions
         />
       )}
       <TeamMemberWorkspace member={member} owner={owner} archived={archived} />
+      {archived && <TeamMemberActionNote member={member} />}
       {archived && <p className="muted">Records are retained. This account cannot be changed.</p>}
     </article>
   );

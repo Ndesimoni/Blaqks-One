@@ -19,13 +19,15 @@ export function useAssignment(module, record) {
   const { owner } = useContext(WorkspaceScopeContext);
   const records = useRecords();
   const view = useWorkspaceView();
-  const { readOnly = false } = useWorkspaceActions();
+  const { readOnly = false, can } = useWorkspaceActions();
   const [busy, setBusy] = useState(false);
   const me = user?.id;
   const entry = findEntry(records.entries, module, record);
   const holder = effectiveHolder(records.entries, module, entry);
   const inherited = inheritedVisibility(records.entries, module, record, me);
   const returnOnly = returnsOnly(records.entries, module, entry, records.scope, me);
+  // Contract §12 M-A: returning a client-linked Follow-up needs no Hand on grant.
+  const canAssign = Boolean(can?.(module, 'assign'));
   const assign = async (toId, note) => {
     if (busy || !entry) return {};
     setBusy(true);
@@ -42,8 +44,13 @@ export function useAssignment(module, record) {
     holder,
     scope: records.scope,
     busy,
+    canAssign,
     canReassign:
-      !readOnly && Boolean(entry) && isAssignable(module) && canReassign(records.scope, holder, me),
+      !readOnly &&
+      Boolean(entry) &&
+      isAssignable(module) &&
+      canReassign(records.scope, holder, me) &&
+      (canAssign || returnOnly),
     canQueue: records.scope === 'team',
     returnOnly,
     willLose: (toId) => losesVisibility({ scope: records.scope, me, toId, inherited }),

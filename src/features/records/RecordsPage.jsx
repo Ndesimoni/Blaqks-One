@@ -7,6 +7,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { RecordTable } from './RecordTable.jsx';
 import React from 'react';
 import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
+import { useRecordAccess } from './useRecordAccess.js';
 
 /** `toolbarExtras` is an optional slot (connected mode supplies the "Assigned to" filter). */
 function RecordsPage({
@@ -18,7 +19,8 @@ function RecordsPage({
 }) {
   const { data } = useRecords();
   const { tab, setTab, setPage, query, setQuery } = useWorkspaceView();
-  const { add, readOnly = false } = useWorkspaceActions();
+  const { add } = useWorkspaceActions();
+  const can = useRecordAccess();
 
   const arr = useRecordSearch(module, (record) =>
     matchesTab ? matchesTab(record, tab) : matchesRecordTab(module, record, tab),
@@ -34,7 +36,7 @@ function RecordsPage({
             <p>{descriptions[module]}</p>
           </div>
         </div>
-        {!readOnly && (
+        {can(module, 'create') && (
           <Button icon="plus" onClick={() => add(module)}>
             Add{' '}
             {{

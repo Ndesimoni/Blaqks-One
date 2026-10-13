@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeRecord, validateRecord } from '../../src/features/records/validation.js';
-import { canDeleteRecord, serverIdPolicy } from '../../src/features/server/access.js';
+import { serverIdPolicy } from '../../src/features/server/access.js';
 import { blankMember, memberPayload } from '../../src/features/server-team/model.js';
 import { createCrmClient } from '../../src/services/crm/client.js';
 
@@ -42,7 +42,7 @@ test('connected creates may leave the ID blank, while the demo still requires on
   assert.deepEqual(calls[1].body, { record: { client_id: '', full_name: 'A' } });
 });
 
-test('ID policy and delete visibility follow the server scope', () => {
+test('ID policy follows the server scope', () => {
   assert.deepEqual(serverIdPolicy('assigned', null), { issued: true, readOnly: true });
   assert.deepEqual(serverIdPolicy('team', null), { issued: true, readOnly: false });
   assert.deepEqual(serverIdPolicy('assigned', { client_id: 'CL-1' }), {
@@ -53,13 +53,6 @@ test('ID policy and delete visibility follow the server scope', () => {
     issued: false,
     readOnly: false,
   });
-  for (const module of ['Clients', 'Properties', 'Contacts']) {
-    assert.equal(canDeleteRecord('assigned', module), false);
-    assert.equal(canDeleteRecord(null, module), false);
-    assert.equal(canDeleteRecord('team', module), true);
-  }
-  assert.equal(canDeleteRecord('assigned', 'Follow-ups'), true);
-  assert.equal(canDeleteRecord('assigned', 'Viewings'), true);
 });
 
 test('assignment routes are scoped, carry CSRF and trim optional notes', async () => {

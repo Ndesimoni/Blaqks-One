@@ -1,12 +1,7 @@
 import React from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 
-export function TeamDirectoryToolbar({
-  owner,
-  archived,
-  onInvite,
-  busy,
-}) {
+export function TeamDirectoryToolbar({ owner, archived, onInvite, busy }) {
   const frozen = owner.status === 'archived';
   return (
     <>

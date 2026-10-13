@@ -4,12 +4,11 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { get } from '../../lib/records.js';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { formatValue } from '../../lib/crm.js';
-import { Empty } from '../../components/ui/Empty.jsx';
-import { Button } from '../../components/ui/Button.jsx';
 import { Pagination } from '../../components/ui/Pagination.jsx';
 import React, { useEffect } from 'react';
 import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 import { RecordRowActions } from './RecordRowActions.jsx';
+import { RecordTableEmpty } from './RecordTableEmpty.jsx';
 
 function RecordTable({
   module,
@@ -23,7 +22,7 @@ function RecordTable({
 }) {
   const { data } = useRecords();
   const { page, setSort, setPage, sort, query } = useWorkspaceView();
-  const { dispatchRow, add, readOnly = false } = useWorkspaceActions();
+  const { dispatchRow, readOnly = false } = useWorkspaceActions();
 
   const columns = schema(module);
   const pick = (columnNames || preferredCols[module] || [])
@@ -106,25 +105,13 @@ function RecordTable({
         </table>
       </div>
       {!arr.length && (
-        <Empty
+        <RecordTableEmpty
+          module={module}
           title={emptyTitle}
-          detail={
-            emptyDetail ||
-            (query
-              ? 'Try another search or clear filters.'
-              : readOnly
-                ? 'No records were saved in this archived workspace.'
-                : 'Use Add record to start building your workspace.')
-          }
-          action={
-            readOnly
-              ? undefined
-              : (emptyAction ?? (
-                  <Button icon="plus" onClick={() => add(module)}>
-                    Add record
-                  </Button>
-                ))
-          }
+          detail={emptyDetail}
+          action={emptyAction}
+          query={query}
+          readOnly={readOnly}
         />
       )}
       <Pagination

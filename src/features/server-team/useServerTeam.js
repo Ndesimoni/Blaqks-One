@@ -22,10 +22,11 @@ export function useServerTeam(workspaceId, includeArchived = false) {
           if (!Array.isArray(result.members) || !Array.isArray(result.roles))
             throw Error('The team response was incomplete. Please retry.');
         }
-        if (!controller.signal.aborted) setData({
-          roles: results[0].roles,
-          members: results.flatMap((result) => result?.members || []),
-        });
+        if (!controller.signal.aborted)
+          setData({
+            roles: results[0].roles,
+            members: results.flatMap((result) => result?.members || []),
+          });
       })
       .catch((failure) => {
         if (!controller.signal.aborted) setError(failure.message);

@@ -1,0 +1,95 @@
+/* Per-action grants nested under each enabled connected module (A2 §6). Loads after team.css. */
+.connected-team-options .team-action-fields {
+  border: 0;
+  border-left: 2px solid var(--line);
+  margin: 0 0 8px 8px;
+  padding: 0 0 4px 20px;
+  min-width: 0;
+}
+.connected-team-options .team-action-fields legend {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0;
+}
+.team-action-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 20px;
+}
+.connected-team-options .team-action-options label {
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+}
+.connected-team-options .team-action-options label.team-action-sensitive {
+  color: var(--accent);
+  font-weight: 600;
+}
+.connected-team-options .team-action-options label[data-disabled] {
+  color: var(--muted);
+  font-weight: 400;
+  cursor: not-allowed;
+}
+.connected-team-options .team-action-options input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.team-action-help {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+.team-action-defaults {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.team-action-defaults .btn {
+  min-height: 44px;
+}
+.team-action-review {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 20px;
+  margin: 0 0 12px;
+}
+.team-action-review dt {
+  color: var(--muted);
+}
+.team-action-review dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.team-action-flag {
+  display: inline-block;
+  margin-top: 4px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 2px 10px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (max-width: 650px) {
+  .connected-team-options .team-action-fields {
+    margin-left: 4px;
+    padding-left: 14px;
+  }
+  .team-action-options {
+    gap: 0 16px;
+  }
+  .team-action-review {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .team-action-review dd + dt {
+    margin-top: 8px;
+  }
+}

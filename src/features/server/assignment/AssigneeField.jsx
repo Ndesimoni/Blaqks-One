@@ -12,7 +12,9 @@ import { AssignmentHistory } from './AssignmentHistory.jsx';
 export function AssigneeField({ module, record }) {
   const headingId = useId();
   const assignment = useAssignment(module, record);
-  const assignees = useAssignees(module, Boolean(assignment.entry));
+  // GET assignees needs Hand on or team scope (contract §12 L-5); others see generic names.
+  const listed = assignment.canAssign || assignment.scope === 'team';
+  const assignees = useAssignees(module, Boolean(assignment.entry) && listed);
   const [open, setOpen] = useState(false);
   const { entry, holder, me } = assignment;
   if (!entry) return null;
