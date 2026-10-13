@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:net';
 import { setTimeout } from 'node:timers/promises';
 
 export function run(command, args, env, { capture = false } = {}) {
@@ -17,6 +18,17 @@ export function run(command, args, env, { capture = false } = {}) {
       if (code === 0) resolve(output.trim());
       else reject(Error(`${command} exited with ${code}.${capture ? ` ${output}` : ''}`));
     });
+  });
+}
+
+/** Fails fast when another server already holds the port, so tests never reach it. */
+export function ensurePortFree(host, port) {
+  return new Promise((resolve, reject) => {
+    const probe = createServer();
+    probe.once('error', () =>
+      reject(Error(`Port ${port} is already in use; another CRM test run may be active.`)),
+    );
+    probe.listen(port, host, () => probe.close(resolve));
   });
 }
 

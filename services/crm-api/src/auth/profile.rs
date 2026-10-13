@@ -21,8 +21,10 @@ pub struct UserRow {
 
 impl UserRow {
     /// Admins and the Super Admin see their whole team by role; staff need the grant.
+    /// An allowlist, so any other role string falls back to assigned-only.
     pub fn has_team_scope(&self) -> bool {
-        self.role != "staff" || self.record_scope == "team"
+        matches!(self.role.as_str(), "admin" | "super-admin")
+            || (self.role == "staff" && self.record_scope == "team")
     }
 
     pub fn record_scope_label(&self) -> &'static str {
@@ -92,3 +94,7 @@ impl From<UserRow> for Profile {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "profile_tests.rs"]
+mod tests;

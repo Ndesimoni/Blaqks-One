@@ -1,5 +1,6 @@
 use super::{
     eligibility::{apply, eligible, ensure_holder, visible_entry},
+    handoff,
     requests::{self, AssignRequest},
 };
 use crate::{
@@ -16,8 +17,6 @@ use axum::{
 };
 use serde_json::{json, Value};
 use uuid::Uuid;
-
-const QUEUE_DENIED: &str = "Only your Admin can move records to the queue.";
 
 /// `PUT /workspaces/{ws}/records/{collection}/{id}/assignee` in the §4 order.
 pub async fn assign(
@@ -39,17 +38,13 @@ pub async fn assign(
     let to = requests::target(body.assignee_id)?;
     let note = requests::note(body.note)?;
     let id = Uuid::parse_str(&id).map_err(|_| ApiError::invalid("Invalid server record ID."))?;
-    if to.is_none() && !RecordScope::of(&session.user).is_team() {
-        return Err(ApiError::denied(QUEUE_DENIED));
-    }
+    handoff::ensure_queue(RecordScope::of(&session.user), &collection, to)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     let actor = session.user.id;
     let user = workspaces::ensure_writable(&mut tx, &workspace, actor, Some(&collection)).await?;
     let scope = RecordScope::of(&user);
-    if to.is_none() && !scope.is_team() {
-        return Err(ApiError::denied(QUEUE_DENIED));
-    }
+    handoff::ensure_queue(scope, &collection, to)?;
     let found = target::fetch(&mut tx, &workspace, &collection, id, scope).await?;
     target::ensure_version(
         &found,
@@ -57,6 +52,7 @@ pub async fn assign(
         "This record changed. Reload before saving.",
     )?;
     ensure_holder(scope, &collection, &found)?;
+    handoff::ensure_target(scope, &collection, &found, to)?;
     if let Some(member) = to {
         eligible(&mut tx, &workspace, &collection, member).await?;
     }

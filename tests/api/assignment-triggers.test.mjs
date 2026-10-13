@@ -97,3 +97,13 @@ test('activity accepts the assigned action and still rejects unknown actions', (
   seedQuery(insert('assigned'));
   assert.match(seedFailure(insert('handed-off')), /crm_activity_action_check/);
 });
+
+// error.rs maps only an unnamed 23514 (this trigger) to 409; named CHECKs stay 503.
+test('the backstop raises 23514 without a constraint name, unlike CHECK constraints', () => {
+  const diagnose = (statement) =>
+    seedFailure(`DO $$ DECLARE state text; name text; BEGIN ${statement};
+      EXCEPTION WHEN others THEN GET STACKED DIAGNOSTICS state=RETURNED_SQLSTATE,
+        name=CONSTRAINT_NAME; RAISE EXCEPTION 'diag %/%', state, name; END $$`);
+  assert.match(diagnose(assign('A-CL-ADMIN', ids.otherTeam)), /diag 23514\/\s*$/m);
+  assert.match(diagnose(assign('A-VW-CHILD', ids.eligible)), /diag 23514\/crm_records_assignable/);
+});

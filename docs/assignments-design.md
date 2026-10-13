@@ -115,6 +115,8 @@ CREATE TRIGGER crm_records_assignee BEFORE INSERT OR UPDATE OF assignee_id ON cr
 
 The module grant is checked in Rust by `assignments::eligible`. A 23514 from the trigger means a Rust bug and surfaces as the generic 503.
 
+> **Amended 2026-10-12 (security re-check, owner-approved):** the trigger's 23514 (raised without a constraint name) now maps to 409 `conflict` "That team member can no longer receive this record.", which reveals nothing about the member or the record. A 23514 from a named CHECK constraint is still a server bug and stays on the generic 503.
+
 ## 3. Visibility (`records/visibility.rs`, the only place)
 
 `RecordScope::{Team, Assigned(Uuid)}` comes from the **profile row re-read under the workspace lock** (H4). `workspaces::ensure_writable` returns that `UserRow`; reads re-read the profile inside the list transaction. Every result is also filtered by `can_collection` (M7), so team scope never bypasses module grants.
@@ -175,6 +177,7 @@ The stale-vs-missing follow-up `EXISTS` queries in `mutation.rs` and `deletion.r
   - Only Follow-ups may have no client; otherwise the step 9 rule applies.
   - A Follow-up direct assignee who isn't the client holder may not change `client_ref`: 403 `forbidden` "Only the client's holder can move this follow-up."
   - If an update leaves a Follow-up with no client and no assignee, the server sets `assignee_id` to the caller (reason `reassigned`).
+  - **Hand-on chain (owner decision, 2026-10-12):** a direct assignee of a client-linked Follow-up who does not hold that client may only **return** it with `PUT …/assignee {"assigneeId": null}`. That clears the direct assignee, so the Follow-up falls back to the client's holder (history reason `reassigned`). Any other target gets 403 `forbidden` "Only the client's holder, the Admin or a full-team member can pass this follow-up on. You can return it to the client's holder." This stops the client's `taskClients` details passing to a third person. The client's holder, the Admin and full-team members keep the existing rules. On a Follow-up with no client, `null` is still the team-only Admin queue. Bulk reassignment is team-only, so it cannot bypass this rule.
 - **Default assignee on create:**
   - Clients, Properties and Contacts go to the creator if staff, to the Admin if the Admin creates, and to the owner when the Super Admin creates in another workspace.
   - A Follow-up gets the creator as assignee only when it has no client; otherwise NULL.
@@ -219,6 +222,9 @@ PUT /workspaces/{ws}/records/{collection}/{id}/assignee
     (else 403 "Only your Admin can move records to the queue.").
   Steps 4–6 as §4. Step 7: caller is holder or team scope,
     else 403 "Only the current assignee, the Admin or a full-team member can reassign this record."
+  Amended 2026-10-12: for Follow-ups the null check moves to step 7, after the 404 fetch.
+    A non-holding direct assignee of a client-linked Follow-up may only send null
+    (§5 hand-on chain); any other assigned-only null still gets the queue 403.
   Eligibility (eligible(): FOR SHARE on the target user row): unknown, other-team, inactive,
     or lacking the grant → 400 "Choose an active team member with access to this record type."
   Same assignee → 200, no write. Otherwise version+1, updated_at, history row(s), note row,

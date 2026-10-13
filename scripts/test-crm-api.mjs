@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { apiTestFiles } from './crm-api-test-files.mjs';
-import { run, stop, waitForApi } from './crm-test-processes.mjs';
+import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
 
 const project = `kws-crm-test-${randomBytes(6).toString('hex')}`;
 const dbPassword = randomBytes(32).toString('hex');
@@ -50,6 +50,7 @@ try {
       CRM_BOOTSTRAP_PASSWORD: env.CRM_FIXTURE_PASSWORD,
     });
   }
+  await ensurePortFree('127.0.0.1', 8790);
   server = spawn(binary, [], { env, stdio: 'inherit' });
   await waitForApi(`${env.CRM_TEST_API}/health`, server);
   if (!process.argv.includes('--browser-only')) {

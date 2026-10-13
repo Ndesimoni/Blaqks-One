@@ -4,5 +4,6 @@ pub mod assignees;
 pub mod bulk;
 pub mod departure;
 pub mod eligibility;
+pub mod handoff;
 pub mod log;
 pub mod requests;

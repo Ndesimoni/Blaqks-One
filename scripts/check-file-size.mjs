@@ -34,6 +34,7 @@ const generatedDirectories = new Set([
   'target',
   '.vite',
   '__pycache__',
+  '.claude',
 ]);
 const inactivePaths = new Set(['legacy', 'backend/data']);
 const generatedFiles = new Set([

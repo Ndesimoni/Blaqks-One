@@ -51,6 +51,11 @@ impl From<sqlx::Error> for ApiError {
             match database.code().as_deref() {
                 Some("23505") => return Self::conflict("That record ID is already in use."),
                 Some("23503") => return Self::conflict("A linked record prevents this change."),
+                // The crm_check_assignee trigger raises 23514 with no constraint name; a
+                // named CHECK constraint is a server bug and stays on the generic 503.
+                Some("23514") if database.constraint().is_none() => {
+                    return Self::conflict("That team member can no longer receive this record.")
+                }
                 _ => {}
             }
         }
@@ -67,3 +72,7 @@ impl IntoResponse for ApiError {
         (self.0, Json(json!({"message": self.1, "code": self.2}))).into_response()
     }
 }
+
+#[cfg(test)]
+#[path = "error_tests.rs"]
+mod tests;
