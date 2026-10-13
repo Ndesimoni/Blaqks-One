@@ -45,7 +45,7 @@ Professional real estate CRM focused on the UAE market.
 - Private member workspaces, Super Admin workspace directory and scoped activity history; see docs/private-workspaces.md
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
 - Responsive desktop/mobile interface
-- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care with server sessions, scoped CRUD, optimistic versions and redacted transactional activity; see docs/backend-foundation.md
+- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
 
 ## Current Project Structure
 

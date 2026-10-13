@@ -28,7 +28,7 @@ The browser copy and selected file stay intact. This import does not publish lis
 
 ## Duplicate and failure behaviour
 
-Imports add records without overwriting existing records. Legacy IDs, contact links, optional business metadata and inline media are preserved. Normalised matching records already saved in that workspace are skipped. Different records with the same collection/ID stop the entire import and show a conflict; resolve the difference in a copy before reviewing again.
+Imported Clients, Properties and Contacts are assigned to the destination workspace owner (history reason `import`); imported Follow-ups have no direct assignee and follow their client. Imports add records without overwriting existing records. Legacy IDs, contact links, optional business metadata and inline media are preserved. Normalised matching records already saved in that workspace are skipped. Different records with the same collection/ID stop the entire import and show a conflict; resolve the difference in a copy before reviewing again.
 
 The server validates the entire batch, inserts Contacts before linked Properties, checks client referrals when the transaction commits, and commits all records and redacted activity together. If any insert fails, the transaction rolls back. Every normal CRUD mutation and import uses the same workspace lock. Changes to the destination after preview require a fresh preview.
 
