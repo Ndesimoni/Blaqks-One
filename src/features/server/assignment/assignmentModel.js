@@ -43,6 +43,16 @@ export function canReassign(scope, holderId, me) {
   return scope === 'team' || (Boolean(me) && holderId === me);
 }
 
+/**
+ * Decision 2026-10-12: an assigned-only direct assignee of a client's Follow-up who does not hold
+ * that client may only return it (assignee null), so it falls back to the client's holder.
+ */
+export function returnsOnly(entries, collection, entry, scope, me) {
+  if (collection !== 'Follow-ups' || scope === 'team' || !me || !entry?.record.client_id)
+    return false;
+  return entry.assignee === me && !inheritedVisibility(entries, collection, entry.record, me);
+}
+
 /** Assigned-only callers lose a record they pass on unless a held parent still shows it. */
 export function losesVisibility({ scope, me, toId, inherited = false }) {
   return scope !== 'team' && toId !== me && !inherited;

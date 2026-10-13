@@ -13,6 +13,8 @@ import { assignmentFailure } from './assignmentResponses.js';
 const refreshQuietly = (records, view) =>
   records.refresh().catch(() => view.setToast('Reload the workspace to see the latest records.'));
 
+const returnedMessage = "Follow-up returned to the client's holder.";
+
 /** PUT assignee; `entry: null` and 404 drop the record locally, then records are re-fetched (L5). */
 export async function performAssignment({
   api,
@@ -21,6 +23,7 @@ export async function performAssignment({
   entry,
   toId,
   note,
+  returnOnly = false,
   records,
   view,
 }) {
@@ -30,7 +33,9 @@ export async function performAssignment({
     applyAssigneeResult(records.entries, module, entry.id, result);
     records.setEntries((entries) => applyAssigneeResult(entries, module, entry.id, result));
     view.setDetail(result.entry ? { module, record: result.entry.record } : null);
-    view.setToast(result.entry ? 'Assignment updated' : 'Record handed off. You no longer see it.');
+    if (returnOnly) view.setToast(returnedMessage);
+    else if (result.entry) view.setToast('Assignment updated');
+    else view.setToast('Record handed off. You no longer see it.');
     refreshQuietly(records, view);
     return { done: true };
   } catch (error) {

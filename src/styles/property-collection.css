@@ -293,9 +293,6 @@
   min-width: 250px;
   height: 37px;
 }
-.inventory-results-bar .view-switch {
-  height: 37px;
-}
 .property-grid-refined {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 15px;

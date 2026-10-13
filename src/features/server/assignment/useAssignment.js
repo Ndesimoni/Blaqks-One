@@ -9,6 +9,7 @@ import {
   inheritedVisibility,
   isAssignable,
   losesVisibility,
+  returnsOnly,
 } from './assignmentModel.js';
 import { performAssignment } from './assignmentActions.js';
 
@@ -24,12 +25,13 @@ export function useAssignment(module, record) {
   const entry = findEntry(records.entries, module, record);
   const holder = effectiveHolder(records.entries, module, entry);
   const inherited = inheritedVisibility(records.entries, module, record, me);
+  const returnOnly = returnsOnly(records.entries, module, entry, records.scope, me);
   const assign = async (toId, note) => {
     if (busy || !entry) return {};
     setBusy(true);
     try {
       const context = { api, workspaceId: owner.id, records, view };
-      return await performAssignment({ ...context, module, entry, toId, note });
+      return await performAssignment({ ...context, module, entry, toId, note, returnOnly });
     } finally {
       setBusy(false);
     }
@@ -43,6 +45,7 @@ export function useAssignment(module, record) {
     canReassign:
       !readOnly && Boolean(entry) && isAssignable(module) && canReassign(records.scope, holder, me),
     canQueue: records.scope === 'team',
+    returnOnly,
     willLose: (toId) => losesVisibility({ scope: records.scope, me, toId, inherited }),
     assign,
   };

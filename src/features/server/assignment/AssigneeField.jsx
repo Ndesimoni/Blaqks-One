@@ -8,7 +8,7 @@ import { assigneeLabel, personName, queueCollections } from './assignmentModel.j
 import { HandoffDialog } from './HandoffDialog.jsx';
 import { AssignmentHistory } from './AssignmentHistory.jsx';
 
-/** Current holder in record details, with Reassign for the holder or team scope. */
+/** Current holder in record details, with Reassign (or Return, for a return-only follow-up). */
 export function AssigneeField({ module, record }) {
   const headingId = useId();
   const assignment = useAssignment(module, record);
@@ -35,7 +35,7 @@ export function AssigneeField({ module, record }) {
         </div>
         {assignment.canReassign && (
           <Button variant="light" icon="users" onClick={() => setOpen(true)}>
-            Reassign
+            {assignment.returnOnly ? 'Return to holder' : 'Reassign'}
           </Button>
         )}
       </div>

@@ -83,6 +83,20 @@
   color: var(--muted);
   font-size: 12px;
 }
+/* The view switch is as tall as its 44px buttons, matching the search field beside it. */
+:root[data-theme] .inventory-results-bar .view-switch {
+  position: relative;
+  padding: 0;
+  border: 0;
+}
+:root[data-theme] .inventory-results-bar .view-switch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: inherit;
+  pointer-events: none;
+}
 :root[data-theme] .modern-property-card {
   background: var(--panel);
   border-color: var(--line);

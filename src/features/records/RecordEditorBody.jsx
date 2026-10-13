@@ -36,6 +36,10 @@ export function RecordEditorBody({
   } = state;
   const idField = sections[0].fields[0];
   const currentSection = sections[activeStep];
+  // A locked ID ("Issued when saved") is read-only, so focus starts on the first editable field.
+  const idLocked = Boolean(idPolicy?.readOnly);
+  const focusCandidate = (field) =>
+    field.key === idField.key ? !idLocked : idLocked && currentSection === sections[0];
   return (
     <div className="drawer-body" ref={bodyRef}>
       {Object.values(errors).some(Boolean) && (
@@ -100,6 +104,7 @@ export function RecordEditorBody({
                     data={data}
                     idField={idField}
                     idPolicy={idPolicy}
+                    initialFocus={focusCandidate(field)}
                     value={form[field.key]}
                     error={errors[field.key]}
                     change={change}

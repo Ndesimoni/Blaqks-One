@@ -1,5 +1,6 @@
 import { test, expect } from './fixtures.js';
-import { signIn, addClient } from './helpers.js';
+import { signIn, addClient, session } from './helpers.js';
+import { assignInBrowser } from './assign-helpers.js';
 import {
   activateInNewContext,
   closeInvitation,
@@ -34,6 +35,10 @@ test('Super Admin suspends and restores an Admin and their staff from the accoun
     const staffLink = await finishInvitation(admin.page, staffForm);
     staff = await activateInNewContext(browser, staffLink, 'status-admin-staff@browser-team.test');
     await closeInvitation(admin.page);
+    await expect(staff.page.getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
+    const staffId = (await session(staff.page)).user.id;
+    await assignInBrowser(admin.page, 'Clients', 'client_id', 'BROWSER-STATUS-CLIENT', staffId);
+    await staff.page.reload();
     await expect(staff.page.getByText('Retained company client', { exact: true })).toBeVisible();
     await closeInvitation(page);
     await page.reload();

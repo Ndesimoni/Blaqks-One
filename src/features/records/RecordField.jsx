@@ -1,8 +1,21 @@
 import React from 'react';
 import { LinkSelect } from './LinkSelect.jsx';
 
-/** `idPolicy` (connected only): `issued` makes a blank ID valid; `readOnly` locks the ID input. */
-export function RecordField({ field: f, module, data, idField, idPolicy, value, error, change }) {
+/**
+ * `idPolicy` (connected only): `issued` makes a blank ID valid; `readOnly` locks the ID input.
+ * `initialFocus` marks a candidate for the dialog's first focus; the Drawer skips disabled ones.
+ */
+export function RecordField({
+  field: f,
+  module,
+  data,
+  idField,
+  idPolicy,
+  initialFocus,
+  value,
+  error,
+  change,
+}) {
   const relation = (f) => {
     if (f.key === idField.key) return null;
     if (
@@ -30,7 +43,7 @@ export function RecordField({ field: f, module, data, idField, idPolicy, value, 
     'aria-describedby':
       [error ? `${f.key}-error` : '', hint].filter(Boolean).join(' ') || undefined,
     required: isId && !issued,
-    'data-initial-focus': isId ? true : undefined,
+    'data-initial-focus': initialFocus || undefined,
   };
   return (
     <div className={'field ' + (f.type === 'textarea' ? 'span-all' : '')} key={f.key}>

@@ -16,7 +16,7 @@ export function Drawer({
     const opener = document.activeElement;
     const overflow = document.body.style.overflow;
     dialog.showModal();
-    dialog.querySelector('[data-initial-focus]')?.focus();
+    dialog.querySelector('[data-initial-focus]:not(:disabled)')?.focus();
     document.body.style.overflow = 'hidden';
     return () => {
       dialog.close();
@@ -31,7 +31,8 @@ export function Drawer({
       aria-modal="true"
       aria-labelledby={titleId || generatedId}
       onKeyDown={(event) => {
-        if (event.key !== 'Tab') return;
+        // A nested dialog's keys bubble through React; only this dialog's own Tab is handled.
+        if (event.key !== 'Tab' || event.target.closest('dialog') !== dialogRef.current) return;
         const elements = Array.from(
           dialogRef.current.querySelectorAll(
             'button, a[href], input, select, textarea, [tabindex]',
@@ -55,6 +56,8 @@ export function Drawer({
         }
       }}
       onCancel={(event) => {
+        // React bubbles `cancel` to an outer Drawer; Escape must close only the topmost dialog.
+        event.stopPropagation();
         event.preventDefault();
         onClose();
       }}
