@@ -115,7 +115,14 @@ test('contact filters work with keyboard controls on mobile in both themes witho
   await page.screenshot({ path: testInfo.outputPath('contacts-mobile-light.png') });
   await page.getByRole('button', { name: 'Switch to dark mode' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  for (const name of ['All', 'Landlords', 'Clients', 'Other contacts'])
+  for (const name of [
+    'All',
+    'Landlords',
+    'Clients',
+    'Security guards',
+    'Building managers',
+    'Other contacts',
+  ])
     await expect(filters.getByRole('button', { name, exact: true })).toBeInViewport();
   await page.getByRole('textbox', { name: 'Search Contacts', exact: true }).fill('');
   await filters.getByRole('button', { name: 'Other contacts', exact: true }).click();
