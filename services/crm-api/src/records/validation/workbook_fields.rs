@@ -98,6 +98,9 @@ const CONTACT_FIELDS: &[&str] = &[
     "company",
     "phone",
     "email",
+    "building_project",
+    "community",
+    "emirate",
     "notes",
     "record_check",
 ];

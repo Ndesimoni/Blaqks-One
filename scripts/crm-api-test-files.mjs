@@ -12,6 +12,7 @@ export const apiTestFiles = [
   'tests/api/import-validation.test.mjs',
   'tests/api/import-commit.test.mjs',
   'tests/api/import-transaction.test.mjs',
+  'tests/api/contact-location.test.mjs',
   'tests/api/demo-backup.test.mjs',
   'tests/api/team-access.test.mjs',
   'tests/api/team-invitations.test.mjs',

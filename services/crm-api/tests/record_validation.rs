@@ -59,3 +59,20 @@ fn workflow_records_extract_trimmed_links_and_reject_invalid_ones() {
     assert!(validate("Shortlist", json!({"match_id":"MT-1","notes":["x"]})).is_err());
     assert!(validate("Follow-ups", json!({"client_id":"CL-1"})).is_err());
 }
+
+#[test]
+fn contacts_keep_location_fields_and_any_contact_type() {
+    let record = validate(
+        "Contacts",
+        json!({"contact_id":"CT-2","contact_type":"Security guard",
+            "building_project":"Marina Gate","community":"Dubai Marina","emirate":"Dubai"}),
+    )
+    .unwrap();
+    assert_eq!(record.payload["contact_type"], "Security guard");
+    assert_eq!(record.payload["community"], "Dubai Marina");
+    for field in ["building_project", "community", "emirate"] {
+        for value in [json!({"nested":true}), json!(["Dubai"])] {
+            assert!(validate("Contacts", json!({"contact_id":"CT-2", field:value})).is_err());
+        }
+    }
+}
