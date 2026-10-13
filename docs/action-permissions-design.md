@@ -133,3 +133,17 @@ The owner accepted every recommendation; see [Product decisions](product-decisio
 3. View-only members remain assignable (eligibility stays a module-view check).
 4. M-C referencing-module coverage applies to parent deletes and parent ID changes. The backfill sets deleteMain only where coverage holds, and the migration test lists the members who lose it.
 5. **Direct-assignee delete (new rule, B2):** for a client-linked Follow-up, an assigned-only caller who is the direct assignee but does not hold the client cannot delete it: 403 "Only the client's holder, the Admin or a full-team member can delete this follow-up." This check sits after the visibility-filtered fetch, so hidden and unknown IDs still give the identical 404.
+
+## 14. Implementation notes (B1/B2, 2026-10-13)
+
+Deviations and clarifications made while implementing; everything else follows §1–§13.
+
+1. **Relationships deleteMain backfill.** One flag covers Clients and Contacts, whose M-C coverage differs. The backfill sets `relationships.deleteMain = relationships ∧ team ∧ properties` (Contacts coverage), so team members without Scheduling keep Contact deletes; Clients additionally need Scheduling, enforced by `can`. `properties.deleteMain = properties ∧ team ∧ schedule`. The seeded test lists the members who lose a parent delete; 0009 carries the same report query as a comment.
+2. **Coverage at check time only.** PATCH does not refuse `deleteMain` when a referencing module is off; `actions.*.deleteMain` shows the stored tick and `recordActions.<Collection>.delete` shows the effective result.
+3. **Unrecorded actions.** Staff whose stored value is `{}` (archived before 0009) get `"actions": {}` and all-false `recordActions`; every other staff profile gets the complete normalised object.
+4. **Invitation shape.** Invitation `actions` may omit `deleteMain` (treated as false); unknown keys and `deleteMain: true` are still refused (400). PATCH requires complete objects.
+5. **Explicit actions are normalised.** Flags sent for a module that is off are cleared rather than refused.
+6. **Activity.** `access_changed` is added (alongside `updated`/`suspended`) when stored modules, actions, record scope or channel access change; it never stores contents.
+7. **Messages.** `GET assignees` without Assign or team scope returns the Assign 403. Bulk refuses callers without Assign on any assignable collection before reading the body; a listed non-assignable collection is still a 400 for other callers. The §13 item 5 delete check runs after the version check (step 7 order).
+8. **Unknown roles.** The database limits roles to three, so the unknown-role allowlist is covered by unit tests (`grants_tests.rs`, `action_grants.rs`); such a role gets no modules, actions or team management. Its display label stays "Staff".
+9. **Rollback dry-run.** `tests/api/permission-rollback.test.mjs` runs a pre-0009 build (`CRM_PRE_A2_BINARY`) against the migrated test database: it exits with "CRM schema migration failed." and leaves `_sqlx_migrations` unchanged. Without the variable the check is skipped.

@@ -142,6 +142,8 @@ visible AS (  -- Assigned(me); $1 = workspace, $2 = caller
 
 ## 4. Canonical check order (H1)
 
+> **A2 amendment (2026-10-13):** step 2 also checks the caller's action grant (create, edit, delete or assign) and step 4 repeats it on the live row; this replaces the H2 parent-delete rule. See [Action permissions design](action-permissions-design.md) §4, §12 and §13.
+
 Every endpoint runs these steps in this order, and no step runs after an earlier failure. Hidden and unknown targets use the same single query (L2).
 
 | #   | Step                                                                                                                                | Failure                                                                                                                                      |
