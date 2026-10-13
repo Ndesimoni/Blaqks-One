@@ -5,7 +5,7 @@ use super::{
     validation::ValidatedRecord,
     visibility::RecordScope,
 };
-use crate::error::ApiResult;
+use crate::{auth::grants::Action, error::ApiResult};
 use serde::Serialize;
 use serde_json::Value;
 use sqlx::{FromRow, PgPool};
@@ -44,6 +44,7 @@ pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
         workspace,
         update.actor,
         Some(collection),
+        Some(Action::Edit),
     )
     .await?;
     let scope = RecordScope::of(&user);
@@ -54,7 +55,7 @@ pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
         "This record changed. Reload before saving.",
     )?;
     let record = update.record;
-    target::ensure_update_allowed(scope, collection, &found, &record)?;
+    target::ensure_update_allowed(&user, collection, &found, &record)?;
     let previous = found.links();
     links::ensure_linkable(
         &mut transaction,

@@ -7,7 +7,10 @@ use super::{
     validation::ValidatedRecord,
     visibility::RecordScope,
 };
-use crate::error::{ApiError, ApiResult};
+use crate::{
+    auth::grants::Action,
+    error::{ApiError, ApiResult},
+};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -32,9 +35,14 @@ pub async fn create(
     let id = Uuid::new_v4();
     let mut transaction = pool.begin().await?;
     crate::workspaces::lock(&mut transaction, workspace).await?;
-    let user =
-        crate::workspaces::ensure_writable(&mut transaction, workspace, actor, Some(collection))
-            .await?;
+    let user = crate::workspaces::ensure_writable(
+        &mut transaction,
+        workspace,
+        actor,
+        Some(collection),
+        Some(Action::Create),
+    )
+    .await?;
     let scope = RecordScope::of(&user);
     ensure_id_allowed(scope, &record)?;
     if record.legacy_id.is_empty() {

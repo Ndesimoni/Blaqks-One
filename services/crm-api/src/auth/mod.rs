@@ -1,3 +1,6 @@
+pub mod actions;
+mod actions_wire;
+pub mod grants;
 pub mod handlers;
 pub mod password;
 pub mod permissions;

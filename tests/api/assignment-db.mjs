@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
 import { query } from './helpers.mjs';
@@ -11,7 +12,7 @@ export const seedDatabase = 'kws_assign_0007';
 const migrations = 'services/crm-api/migrations';
 const project = process.env.CRM_TEST_PROJECT;
 
-function psql(args, input) {
+function psql(args, input, database = seedDatabase) {
   if (!project?.startsWith('kws-crm-test-')) throw Error('Seeded checks need a test project.');
   return execFileSync(
     'docker',
@@ -30,7 +31,7 @@ function psql(args, input) {
       '-U',
       'kws_crm_test',
       '-d',
-      seedDatabase,
+      database,
       ...args,
     ],
     { input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] },
@@ -71,3 +72,35 @@ export const viewColumns = (view) =>
     `SELECT string_agg(attname, ',' ORDER BY attnum) FROM pg_attribute
      WHERE attrelid='${view}'::regclass AND attnum>0 AND NOT attisdropped`,
   ).split(',');
+
+/** The same helpers for another disposable database migrated up to `before` (exclusive). */
+export function seededDatabase(name, before) {
+  assert(/^kws_[a-z0-9_]+$/.test(name), 'Seeded database names are fixed test names.');
+  const run = (sql) => psql(['-tAc', sql], undefined, name);
+  const migrateFile = (file) =>
+    psql(
+      ['--single-transaction', '-q', '-f', '-'],
+      readFileSync(`${migrations}/${file}`, 'utf8'),
+      name,
+    );
+  return {
+    query: run,
+    failure(sql) {
+      try {
+        run(sql);
+      } catch (error) {
+        return String(error.stderr);
+      }
+      throw Error(`Expected failure: ${sql}`);
+    },
+    migrate: migrateFile,
+    create() {
+      query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
+      query(`CREATE DATABASE ${name}`);
+      migrationFiles()
+        .filter((file) => file < before)
+        .forEach(migrateFile);
+    },
+    drop: () => query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`),
+  };
+}

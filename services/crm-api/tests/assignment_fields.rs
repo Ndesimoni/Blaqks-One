@@ -4,10 +4,7 @@ use kws_crm_api::{
         profile::{Profile, UserRow},
     },
     records::validation::validate,
-    team::members::{
-        update::{prepare, UpdateRequest},
-        MemberRow,
-    },
+    team::members::{prepare::prepare, update::UpdateRequest, MemberRow},
 };
 use serde_json::{json, Value};
 use sqlx::types::Json;
@@ -30,6 +27,7 @@ fn user(role: &str, record_scope: &str) -> UserRow {
         permissions: Json(Permissions::default()),
         channel_access: Json(ChannelAccess::default()),
         record_scope: record_scope.into(),
+        actions: Json(json!({})),
     }
 }
 

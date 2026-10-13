@@ -7,7 +7,7 @@ use super::{
     visibility::RecordScope,
 };
 use crate::{
-    auth::{protection, session::Session},
+    auth::{grants::Action, protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces::ensure_access,
@@ -29,7 +29,7 @@ pub async fn create(
 ) -> ApiResult<(StatusCode, Json<Entry>)> {
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
-    ensure_collection(&session, &collection)?;
+    ensure_collection(&session, &collection, Action::Create)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record."))?;
     let record = validation::validate_new(&collection, body.record)?;
     creation::ensure_id_allowed(RecordScope::of(&session.user), &record)?;
@@ -53,7 +53,7 @@ pub async fn update(
 ) -> ApiResult<Json<Entry>> {
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
-    ensure_collection(&session, &collection)?;
+    ensure_collection(&session, &collection, Action::Edit)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record and version."))?;
     if body.version < 1 {
         return Err(ApiError::invalid("A positive record version is required."));
@@ -84,9 +84,8 @@ pub async fn delete(
 ) -> ApiResult<Json<Value>> {
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
-    ensure_collection(&session, &collection)?;
-    // H2 comes first in step 3, before the body or any record is examined.
-    RecordScope::of(&session.user).ensure_can_delete(&collection)?;
+    // Step 2 absorbs H2: parents need team scope, deleteMain and coverage (M-C).
+    ensure_collection(&session, &collection, Action::Delete)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record version."))?;
     if body.version < 1 {
         return Err(ApiError::invalid("A positive record version is required."));
@@ -105,10 +104,9 @@ pub async fn delete(
     Ok(Json(json!({"ok": true})))
 }
 
-fn ensure_collection(session: &Session, collection: &str) -> ApiResult<()> {
+/// Steps 1–2 after access: an unknown collection is a path-only 400 (I-1), then the
+/// module grant and the action, from the session profile, before any body or target.
+fn ensure_collection(session: &Session, collection: &str, action: Action) -> ApiResult<()> {
     validation::collection_key(collection)?;
-    if !session.user.can_collection(collection) {
-        return Err(ApiError::forbidden());
-    }
-    Ok(())
+    session.user.ensure(collection, action)
 }

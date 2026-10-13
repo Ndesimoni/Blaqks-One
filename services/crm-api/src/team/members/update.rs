@@ -1,7 +1,8 @@
 use super::{directory, update_store};
-use crate::team::{access, catalogue, validation};
+use crate::team::access;
 use crate::{
     auth::{
+        actions::Actions,
         permissions::{ChannelAccess, Permissions},
         protection,
         session::Session,
@@ -29,6 +30,8 @@ pub struct UpdateRequest {
     pub channel_access: Option<ChannelAccess>,
     pub active: Option<bool>,
     pub record_scope: Option<RecordScopeGrant>,
+    /// Complete staff action grants; absent keeps or presets them (M-D).
+    pub actions: Option<Actions>,
 }
 
 /// The staff-only full-team grant (M7); positions and invitations never set it.
@@ -46,67 +49,6 @@ impl RecordScopeGrant {
             Self::Team => "team",
         }
     }
-}
-
-pub fn prepare(request: &mut UpdateRequest, current: &directory::MemberRow) -> ApiResult<()> {
-    if request.version < 1 {
-        return Err(ApiError::invalid("A positive member version is required."));
-    }
-    if request.record_scope.is_some() && current.user.role != "staff" {
-        return Err(ApiError::invalid("Full-team access applies to staff only."));
-    }
-    request.name = Some(
-        request
-            .name
-            .as_deref()
-            .unwrap_or(&current.user.name)
-            .trim()
-            .into(),
-    );
-    request.phone = Some(
-        request
-            .phone
-            .as_deref()
-            .unwrap_or(&current.user.phone)
-            .trim()
-            .into(),
-    );
-    validation::identity(
-        request.name.as_deref().unwrap(),
-        &current.user.email,
-        request.phone.as_deref().unwrap(),
-    )?;
-    if !current.accepted && request.active == Some(true) {
-        return Err(ApiError::conflict(
-            "Activate the invitation before enabling this account.",
-        ));
-    }
-    if current.user.role == "admin" {
-        request.positions = Some(vec![]);
-        request.permissions = Some(Permissions::full());
-    } else {
-        let selected = request
-            .positions
-            .clone()
-            .unwrap_or_else(|| current.user.positions.0.clone());
-        let defaults = catalogue::defaults(&selected)
-            .ok_or_else(|| ApiError::invalid("Select valid, distinct team positions."))?;
-        request.permissions = Some(request.permissions.clone().unwrap_or_else(|| {
-            if request.positions.is_some() {
-                defaults
-            } else {
-                current.user.permissions.0.clone()
-            }
-        }));
-        request.positions = Some(selected);
-    }
-    request.channel_access = Some(
-        request
-            .channel_access
-            .clone()
-            .unwrap_or_else(|| current.user.channel_access.0.clone()),
-    );
-    Ok(())
 }
 
 pub async fn update(

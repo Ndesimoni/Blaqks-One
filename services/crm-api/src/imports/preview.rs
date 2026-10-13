@@ -41,7 +41,7 @@ pub async fn preview(
     let normalized = request.records.normalize()?;
     let mut transaction = state.pool.begin().await?;
     workspaces::lock(&mut transaction, &workspace).await?;
-    workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None).await?;
+    workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None, None).await?;
     let target = snapshot::read(&mut transaction, &workspace).await?;
     let fingerprint = snapshot::fingerprint(&target);
     let plan = planning::plan(normalized, &target)?;

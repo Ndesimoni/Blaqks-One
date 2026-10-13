@@ -38,4 +38,12 @@ export const apiTestFiles = [
   'tests/api/assignment-bulk.test.mjs',
   'tests/api/assignment-log.test.mjs',
   'tests/api/assignment-departure.test.mjs',
+  'tests/api/permission-migration.test.mjs',
+  'tests/api/permission-team.test.mjs',
+  'tests/api/permission-audit.test.mjs',
+  'tests/api/permission-matrix.test.mjs',
+  'tests/api/permission-leakage.test.mjs',
+  'tests/api/permission-assign.test.mjs',
+  'tests/api/permission-race.test.mjs',
+  'tests/api/permission-rollback.test.mjs',
 ];

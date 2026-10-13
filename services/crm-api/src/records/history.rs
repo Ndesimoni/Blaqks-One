@@ -95,10 +95,12 @@ pub async fn default_holder(
     workspace: &str,
     creator: &UserRow,
 ) -> ApiResult<Option<Uuid>> {
-    if creator.role == "staff" {
-        return Ok(Some(creator.id));
+    // Role allowlist (L-4); any other role is refused.
+    match creator.role.as_str() {
+        "staff" => Ok(Some(creator.id)),
+        "admin" | "super-admin" => active_owner(transaction, workspace).await,
+        _ => Err(crate::error::ApiError::forbidden()),
     }
-    active_owner(transaction, workspace).await
 }
 
 /// Assignee for a new record: parents get the holder; a Follow-up gets it only when it

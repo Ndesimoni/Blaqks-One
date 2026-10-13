@@ -1,6 +1,11 @@
-use super::permissions::{ChannelAccess, Permissions};
-use serde::{Deserialize, Serialize};
+use super::{
+    grants::RecordActions,
+    permissions::{ChannelAccess, Permissions},
+};
+use serde::Serialize;
+use serde_json::Value;
 use sqlx::{types::Json, FromRow};
+use std::collections::BTreeMap;
 use uuid::Uuid;
 
 #[derive(Clone, FromRow)]
@@ -17,6 +22,8 @@ pub struct UserRow {
     pub channel_access: Json<ChannelAccess>,
     /// Raw `crm_users.record_scope`; only meaningful for staff.
     pub record_scope: String,
+    /// Raw `crm_users.actions`, decoded leniently by `Actions::from_stored`.
+    pub actions: Json<Value>,
 }
 
 impl UserRow {
@@ -35,11 +42,12 @@ impl UserRow {
         }
     }
 
+    /// Role allowlist: any role other than the three known ones gets nothing.
     pub fn effective_permissions(&self) -> Permissions {
-        if self.role == "staff" {
-            self.permissions.0.clone()
-        } else {
-            Permissions::full()
+        match self.role.as_str() {
+            "admin" | "super-admin" => Permissions::full(),
+            "staff" => self.permissions.0.clone(),
+            _ => Permissions::default(),
         }
     }
 
@@ -48,7 +56,7 @@ impl UserRow {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
     pub id: Uuid,
@@ -65,12 +73,16 @@ pub struct Profile {
     pub permissions: Permissions,
     pub channel_access: ChannelAccess,
     pub record_scope: String,
+    pub actions: Value,
+    pub record_actions: BTreeMap<&'static str, RecordActions>,
 }
 
 impl From<UserRow> for Profile {
     fn from(user: UserRow) -> Self {
         let permissions = user.effective_permissions();
         let record_scope = user.record_scope_label().into();
+        let actions = user.profile_actions();
+        let record_actions = user.record_actions();
         Self {
             id: user.id,
             name: user.name,
@@ -82,7 +94,7 @@ impl From<UserRow> for Profile {
                 _ => "Staff",
             }
             .into(),
-            manages_team: user.role != "staff",
+            manages_team: matches!(user.role.as_str(), "admin" | "super-admin"),
             role_id: user.role,
             owner_id: user.owner_id.unwrap_or(user.id),
             workspace_id: user.workspace_id,
@@ -91,6 +103,8 @@ impl From<UserRow> for Profile {
             permissions,
             channel_access: user.channel_access.0,
             record_scope,
+            actions,
+            record_actions,
         }
     }
 }

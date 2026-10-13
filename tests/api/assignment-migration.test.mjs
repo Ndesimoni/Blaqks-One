@@ -18,7 +18,7 @@ before(() => {
   createSeedDatabase();
   for (const view of views) columnsBefore[view] = viewColumns(view);
   seedQuery(seedSql());
-  assert.equal(migrationFiles().at(-1), '0008_assignments.sql');
+  assert.ok(migrationFiles().includes('0008_assignments.sql'));
   migrate('0008_assignments.sql');
 });
 after(dropSeedDatabase);

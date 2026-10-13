@@ -4,7 +4,7 @@ use super::{
     requests::{self, AssignRequest},
 };
 use crate::{
-    auth::{protection, session::Session},
+    auth::{grants::Action, protection, session::Session},
     error::{ApiError, ApiResult},
     records::{history::Change, target, validation::collection_key, visibility::RecordScope},
     state::AppState,
@@ -33,16 +33,20 @@ pub async fn assign(
         return Err(ApiError::forbidden());
     }
     requests::ensure_assignable(&collection)?;
+    handoff::ensure_assign_grant(&session.user, &collection, true)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a version and an assignee."))?;
     requests::ensure_version(body.version)?;
     let to = requests::target(body.assignee_id)?;
+    handoff::ensure_assign_grant(&session.user, &collection, to.is_none())?;
     let note = requests::note(body.note)?;
     let id = Uuid::parse_str(&id).map_err(|_| ApiError::invalid("Invalid server record ID."))?;
     handoff::ensure_queue(RecordScope::of(&session.user), &collection, to)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     let actor = session.user.id;
-    let user = workspaces::ensure_writable(&mut tx, &workspace, actor, Some(&collection)).await?;
+    let user =
+        workspaces::ensure_writable(&mut tx, &workspace, actor, Some(&collection), None).await?;
+    handoff::ensure_assign_grant(&user, &collection, to.is_none())?;
     let scope = RecordScope::of(&user);
     handoff::ensure_queue(scope, &collection, to)?;
     let found = target::fetch(&mut tx, &workspace, &collection, id, scope).await?;
@@ -51,6 +55,9 @@ pub async fn assign(
         body.version,
         "This record changed. Reload before saving.",
     )?;
+    if !user.can(&collection, Action::Assign) {
+        handoff::ensure_return(scope, &found, to)?;
+    }
     ensure_holder(scope, &collection, &found)?;
     handoff::ensure_target(scope, &collection, &found, to)?;
     if let Some(member) = to {

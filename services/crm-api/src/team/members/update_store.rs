@@ -1,10 +1,12 @@
 use super::{
     directory::MemberRow,
+    prepare::prepare,
     update::{self, UpdateRequest},
 };
 use crate::team::{access, audit};
 use crate::{
     assignments::departure,
+    auth::actions::Actions,
     error::{ApiError, ApiResult},
     workspaces,
 };
@@ -48,11 +50,14 @@ pub async fn update(
         ));
     }
     let before = current.user.effective_permissions();
-    update::prepare(&mut request, &current)?;
+    prepare(&mut request, &current)?;
     let active = request.active.unwrap_or(current.active);
+    let access_changed = grants_changed(&current, &request);
+    // Admin rows keep '{}' (L-2): their `actions` stays None and COALESCE keeps it.
     sqlx::query(
         "UPDATE crm_users SET name=$2,phone=$3,positions=$4,permissions=$5,channel_access=$6, \
-         active=$7,record_scope=COALESCE($8,record_scope),version=version+1 WHERE id=$1",
+         active=$7,record_scope=COALESCE($8,record_scope),actions=COALESCE($9,actions), \
+         version=version+1 WHERE id=$1",
     )
     .bind(id)
     .bind(&request.name)
@@ -62,11 +67,16 @@ pub async fn update(
     .bind(sqlx::types::Json(request.channel_access.as_ref().unwrap()))
     .bind(active)
     .bind(request.record_scope.map(update::RecordScopeGrant::as_str))
+    .bind(request.actions.map(sqlx::types::Json))
     .execute(&mut *transaction)
     .await?;
+    if access_changed {
+        // L-6: the action name only, never the grant contents.
+        audit::append(&mut transaction, actor, workspace, id, "access_changed").await?;
+    }
     // M3: a staff member who is suspended or loses a grant releases those records in
     // this transaction. Admins and recordScope changes release nothing.
-    if current.user.role == "staff" {
+    if matches!(current.user.role.as_str(), "staff") {
         let after = request.permissions.as_ref().unwrap();
         let (collections, reason) = departure::releases(current.active, active, &before, after);
         departure::release(&mut transaction, workspace, id, &collections, actor, reason).await?;
@@ -91,4 +101,20 @@ pub async fn update(
     .await?;
     transaction.commit().await?;
     Ok(())
+}
+
+/// Whether a stored grant changes: modules, actions, record scope or channels.
+fn grants_changed(current: &MemberRow, request: &UpdateRequest) -> bool {
+    let user = &current.user;
+    let channels = request.channel_access.as_ref() != Some(&user.channel_access.0);
+    if user.role != "staff" {
+        return channels;
+    }
+    let scope = request
+        .record_scope
+        .is_some_and(|scope| scope.as_str() != user.record_scope);
+    let actions = request.actions.is_some_and(|actions| {
+        !user.actions_recorded() || actions != Actions::from_stored(&user.actions.0)
+    });
+    channels || scope || actions || request.permissions.as_ref() != Some(&user.permissions.0)
 }

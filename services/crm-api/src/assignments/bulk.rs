@@ -3,12 +3,12 @@ use super::{
     requests::{self, BulkRequest, MAX_BULK_RECORDS},
 };
 use crate::{
-    auth::{protection, session::Session},
+    auth::{grants::Action, profile::UserRow, protection, session::Session},
     error::{ApiError, ApiResult},
     records::{
         history::Change,
         mutation::{Entry, ENTRY_COLUMNS},
-        visibility::RecordScope,
+        visibility::{RecordScope, ASSIGNABLE},
     },
     state::AppState,
     workspaces,
@@ -36,6 +36,13 @@ pub async fn bulk(
     if !RecordScope::of(&session.user).is_team() {
         return Err(ApiError::forbidden());
     }
+    // M-B: without Assign on any assignable collection, 403 before the body is read.
+    if !ASSIGNABLE
+        .iter()
+        .any(|name| session.user.can(name, Action::Assign))
+    {
+        return Err(Action::Assign.denied());
+    }
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide up to 500 records to move."))?;
     let collections: BTreeSet<&str> = body.records.iter().map(|r| r.collection.as_str()).collect();
     if collections
@@ -47,6 +54,7 @@ pub async fn bulk(
     collections
         .iter()
         .try_for_each(|name| requests::ensure_assignable(name))?;
+    ensure_assign(&session.user, &collections)?;
     let ids: Vec<Uuid> = body.records.iter().map(|record| record.id).collect();
     let distinct: BTreeSet<Uuid> = ids.iter().copied().collect();
     if ids.is_empty() || ids.len() > MAX_BULK_RECORDS || distinct.len() != ids.len() {
@@ -60,10 +68,11 @@ pub async fn bulk(
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     let actor = session.user.id;
-    let user = workspaces::ensure_writable(&mut tx, &workspace, actor, None).await?;
+    let user = workspaces::ensure_writable(&mut tx, &workspace, actor, None, None).await?;
     if !RecordScope::of(&user).is_team() || collections.iter().any(|c| !user.can_collection(c)) {
         return Err(ApiError::forbidden());
     }
+    ensure_assign(&user, &collections)?;
     let rows: Vec<(Uuid, String, i64, Option<Uuid>)> = sqlx::query_as(
         "SELECT id,collection,version,assignee_id FROM crm_records \
          WHERE workspace_id=$1 AND id=ANY($2) ORDER BY id FOR UPDATE",
@@ -123,4 +132,15 @@ pub async fn bulk(
     let mut by_id: HashMap<Uuid, Entry> = saved.into_iter().map(|e| (e.id, e)).collect();
     let entries: Vec<Entry> = ids.iter().filter_map(|id| by_id.remove(id)).collect();
     Ok(Json(json!({ "entries": entries })))
+}
+
+/// M-B: Assign for every listed collection, re-checked on the live row under the lock.
+fn ensure_assign(user: &UserRow, collections: &BTreeSet<&str>) -> ApiResult<()> {
+    if collections
+        .iter()
+        .any(|name| !user.can(name, Action::Assign))
+    {
+        return Err(Action::Assign.denied());
+    }
+    Ok(())
 }

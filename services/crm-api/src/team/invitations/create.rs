@@ -1,7 +1,8 @@
 use super::store;
-use crate::team::{access, catalogue, members, validation};
+use crate::team::{access, catalogue, members, members::prepare, validation};
 use crate::{
     auth::{
+        actions::Actions,
         permissions::{ChannelAccess, Permissions},
         protection,
         session::Session,
@@ -28,6 +29,8 @@ pub struct InviteRequest {
     pub permissions: Option<Permissions>,
     pub channel_access: Option<ChannelAccess>,
     pub account_role: Option<String>,
+    /// Staff action grants; `deleteMain` may be omitted and can never be true here.
+    pub actions: Option<Value>,
 }
 
 pub async fn create(
@@ -46,15 +49,20 @@ pub async fn create(
     request.phone = request.phone.trim().into();
     validation::identity(&request.name, &request.email, &request.phone)?;
     let role = request.account_role.as_deref().unwrap_or("staff");
-    let permissions = match role {
+    let (permissions, actions) = match role {
         "staff" => {
             let defaults = catalogue::defaults(&request.positions)
                 .ok_or_else(|| ApiError::invalid("Select valid, distinct team positions."))?;
-            request.permissions.clone().unwrap_or(defaults)
+            let permissions = request.permissions.clone().unwrap_or(defaults);
+            let actions = staff_actions(request.actions.take(), &permissions)?;
+            (permissions, Some(actions))
         }
         "admin" if access::can_manage_admin(&session, &workspace) => {
+            if request.actions.is_some() {
+                return Err(ApiError::invalid(prepare::STAFF_ONLY));
+            }
             request.positions.clear();
-            Permissions::full()
+            (Permissions::full(), None)
         }
         _ => return Err(ApiError::forbidden()),
     };
@@ -65,6 +73,7 @@ pub async fn create(
         &workspace,
         &request,
         &permissions,
+        actions.as_ref(),
     )
     .await?;
     let member = members::find(&state.pool, created.id).await?;
@@ -75,4 +84,18 @@ pub async fn create(
             "invitation":{"token":created.token,"expiresAt":created.expires_at}
         })),
     ))
+}
+
+/// Presets by default; explicit grants are decoded strictly and normalised. New
+/// members are assigned-only, so deleteMain is refused (L-2).
+fn staff_actions(value: Option<Value>, permissions: &Permissions) -> ApiResult<Actions> {
+    let Some(value) = value else {
+        return Ok(Actions::preset(permissions));
+    };
+    let actions = Actions::from_invitation(value)
+        .ok_or_else(|| ApiError::invalid("Provide valid invitation details."))?;
+    if actions.deletes_main() {
+        return Err(ApiError::invalid(prepare::DELETE_NEEDS_TEAM));
+    }
+    Ok(actions.normalised(permissions, false))
 }

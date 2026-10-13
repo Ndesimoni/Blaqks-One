@@ -1,5 +1,9 @@
 //! Which assignee an assigned-only caller may choose (contract §5, §6).
 use crate::{
+    auth::{
+        grants::{Action, ASSIGN_DENIED},
+        profile::UserRow,
+    },
     error::{ApiError, ApiResult},
     records::{target::Target, visibility::RecordScope},
 };
@@ -39,6 +43,30 @@ pub fn ensure_target(
         (true, Some(_)) => Err(ApiError::denied(CHAIN_DENIED)),
         (false, None) => Err(ApiError::denied(QUEUE_DENIED)),
     }
+}
+
+/// M-A, steps 2 and 4: handing on needs the Assign grant. Only a Follow-up that may
+/// be returned (`may_return`: the target is unknown yet or `null`) waits for step 7.
+pub fn ensure_assign_grant(user: &UserRow, collection: &str, may_return: bool) -> ApiResult<()> {
+    if user.can(collection, Action::Assign) || (collection == "Follow-ups" && may_return) {
+        return Ok(());
+    }
+    Err(Action::Assign.denied())
+}
+
+/// M-A, step 7 on the live row, for a caller without Assign: the only permitted move
+/// is an assigned-only direct assignee returning a client-linked Follow-up whose
+/// client they do not hold.
+pub fn ensure_return(scope: RecordScope, target: &Target, to: Option<Uuid>) -> ApiResult<()> {
+    let returning = matches!(scope, RecordScope::Assigned(caller)
+        if target.assignee_id == Some(caller)
+            && target.client_ref.is_some()
+            && !target.holds_client
+            && to.is_none());
+    if !returning {
+        return Err(ApiError::denied(ASSIGN_DENIED));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

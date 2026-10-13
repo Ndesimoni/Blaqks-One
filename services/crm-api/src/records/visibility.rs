@@ -1,11 +1,12 @@
 //! The only definition of which records a caller may see (assignments contract §3).
 //! Every result is additionally limited to the caller's granted collections.
-use crate::{auth::profile::UserRow, error::ApiError};
+use crate::auth::profile::UserRow;
 use uuid::Uuid;
 
 /// Collections that carry `assignee_id`.
 pub const ASSIGNABLE: [&str; 4] = ["Clients", "Properties", "Contacts", "Follow-ups"];
-/// Parent records that only team scope may delete (H2) and that fall to the Admin queue.
+/// Parent records: deleting one needs team scope, deleteMain and reference coverage
+/// (H2, A2 M-C), and they fall to the Admin queue.
 pub const PARENTS: [&str; 3] = ["Clients", "Properties", "Contacts"];
 /// Activity records whose visibility follows their linked client.
 pub const CHILDREN: [&str; 5] = [
@@ -47,14 +48,6 @@ impl RecordScope {
     pub fn is_team(self) -> bool {
         self == Self::Team
     }
-
-    /// H2: assigned-only callers may not delete Clients, Properties or Contacts.
-    pub fn ensure_can_delete(self, collection: &str) -> Result<(), ApiError> {
-        if !self.is_team() && PARENTS.contains(&collection) {
-            return Err(ApiError::denied("Ask your Admin to delete this record."));
-        }
-        Ok(())
-    }
 }
 
 /// SQL condition that the `crm_records` row aliased `alias` is visible. `workspace`
@@ -79,19 +72,10 @@ mod tests {
     use super::*;
 
     #[test]
-    fn scope_follows_the_profile_and_parents_need_team_scope_to_delete() {
+    fn scope_follows_the_profile_and_the_predicate_covers_children() {
         let staff = Uuid::new_v4();
         assert_eq!(RecordScope::Assigned(staff).caller(), Some(staff));
         assert_eq!(RecordScope::Team.caller(), None);
-        let denied = RecordScope::Assigned(staff).ensure_can_delete("Contacts");
-        assert_eq!(
-            denied.unwrap_err().1,
-            "Ask your Admin to delete this record."
-        );
-        assert!(RecordScope::Assigned(staff)
-            .ensure_can_delete("Viewings")
-            .is_ok());
-        assert!(RecordScope::Team.ensure_can_delete("Clients").is_ok());
         let sql = predicate("r", "$1", "$4");
         assert!(sql.starts_with("($4::uuid IS NULL OR r.assignee_id=$4"));
         assert!(sql.contains("held.workspace_id=$1") && !sql.contains("$2"));

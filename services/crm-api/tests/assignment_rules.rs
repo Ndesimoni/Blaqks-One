@@ -1,11 +1,32 @@
-use kws_crm_api::records::{
-    creation::ensure_id_allowed,
-    target::{ensure_client, ensure_update_allowed, ensure_version, Target},
-    validation::{validate, validate_new},
-    visibility::RecordScope,
+use kws_crm_api::{
+    auth::{permissions::Permissions, profile::UserRow},
+    records::{
+        creation::ensure_id_allowed,
+        target::{ensure_client, ensure_update_allowed, ensure_version, Target},
+        validation::{validate, validate_new},
+        visibility::RecordScope,
+    },
 };
 use serde_json::json;
+use sqlx::types::Json;
 use uuid::Uuid;
+
+fn staff(id: Uuid, scope: &str) -> UserRow {
+    UserRow {
+        id,
+        name: "Synthetic".into(),
+        email: "synthetic@example.test".into(),
+        phone: "+971501234567".into(),
+        role: "staff".into(),
+        owner_id: Some(Uuid::new_v4()),
+        workspace_id: "workspace".into(),
+        positions: Json(vec![]),
+        permissions: Json(Permissions::full()),
+        channel_access: Json(Default::default()),
+        record_scope: scope.into(),
+        actions: Json(json!({})),
+    }
+}
 
 fn task(assignee: Option<Uuid>, holds_client: bool) -> Target {
     Target {
@@ -41,7 +62,7 @@ fn create_ids_are_optional_and_only_team_scope_may_type_one() {
 #[test]
 fn assigned_only_updates_keep_ids_and_direct_assignees_keep_their_client() {
     let me = Uuid::new_v4();
-    let scope = RecordScope::Assigned(me);
+    let scope = &staff(me, "assigned");
     let same = validate(
         "Follow-ups",
         json!({"activity_id":"FU-001","client_id":"CL-001"}),
@@ -61,7 +82,8 @@ fn assigned_only_updates_keep_ids_and_direct_assignees_keep_their_client() {
     assert_eq!(ids.1, "Record IDs cannot be changed.");
     assert!(ensure_update_allowed(scope, "Follow-ups", &task(Some(me), true), &moved).is_ok());
     assert!(ensure_update_allowed(scope, "Follow-ups", &task(None, false), &moved).is_ok());
-    assert!(ensure_update_allowed(RecordScope::Team, "Follow-ups", &target, &renamed).is_ok());
+    let team = staff(me, "team");
+    assert!(ensure_update_allowed(&team, "Follow-ups", &target, &renamed).is_ok());
     assert_eq!(
         ensure_version(&target, 2, "stale").unwrap_err().2,
         "version_conflict"
@@ -79,4 +101,21 @@ fn only_follow_ups_may_lack_a_client_for_assigned_only_staff() {
     }
     assert!(ensure_client(staff, "Follow-ups", &none).is_ok());
     assert!(ensure_client(staff, "Clients", &none).is_ok());
+}
+
+#[test]
+fn team_scope_staff_rename_parents_only_with_reference_coverage() {
+    let mut team = staff(Uuid::new_v4(), "team");
+    let mut client = task(None, false);
+    client.legacy_id = "CL-001".into();
+    let renamed = validate("Clients", json!({"client_id":"CL-002"})).unwrap();
+    let same = validate("Clients", json!({"client_id":"CL-001"})).unwrap();
+    assert!(ensure_update_allowed(&team, "Clients", &client, &renamed).is_ok());
+    team.permissions.0.schedule = false;
+    let error = ensure_update_allowed(&team, "Clients", &client, &renamed).unwrap_err();
+    assert_eq!(
+        (error.0.as_u16(), error.1),
+        (400, "Record IDs cannot be changed.")
+    );
+    assert!(ensure_update_allowed(&team, "Clients", &client, &same).is_ok());
 }

@@ -13,6 +13,7 @@ fn user(role: &str, record_scope: &str) -> UserRow {
         permissions: Json(Permissions::default()),
         channel_access: Json(ChannelAccess::default()),
         record_scope: record_scope.into(),
+        actions: Json(serde_json::json!({})),
     }
 }
 

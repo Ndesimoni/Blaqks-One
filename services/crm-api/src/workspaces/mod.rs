@@ -1,7 +1,7 @@
 pub mod handlers;
 
 use crate::{
-    auth::{profile::UserRow, session::Session},
+    auth::{grants::Action, profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
 };
@@ -52,13 +52,16 @@ pub async fn member(
 }
 
 /// Call under `lock`: the workspace must not be archived and the re-read caller must
-/// still be a member holding the collection's grant. Returns that live profile, which
-/// is the only source of the caller's record scope for the write.
+/// still be a member holding the collection's grant and, when given, the action
+/// (step 4 repeats step 2 on the live row). Returns that live profile, which is the
+/// only source of the caller's record scope and grants for the write. Imports and bulk
+/// pass `None` and check their own rules on the returned profile.
 pub async fn ensure_writable(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     workspace: &str,
     actor: uuid::Uuid,
     collection: Option<&str>,
+    action: Option<Action>,
 ) -> ApiResult<UserRow> {
     let writable: bool = sqlx::query_scalar(
         "SELECT u.deleted_at IS NULL FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
@@ -72,8 +75,12 @@ pub async fn ensure_writable(
         return Err(ApiError::forbidden());
     }
     let user = member(transaction, workspace, actor).await?;
-    if collection.is_some_and(|key| !user.can_collection(key)) {
-        return Err(ApiError::forbidden());
+    if let Some(key) = collection {
+        match action {
+            Some(action) => user.ensure(key, action)?,
+            None if !user.can_collection(key) => return Err(ApiError::forbidden()),
+            None => {}
+        }
     }
     Ok(user)
 }

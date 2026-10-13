@@ -2,11 +2,16 @@
 use super::{
     collections::Links,
     validation::ValidatedRecord,
-    visibility::{predicate, RecordScope, CHILDREN},
+    visibility::{predicate, RecordScope, CHILDREN, PARENTS},
 };
-use crate::error::{ApiError, ApiResult};
+use crate::{
+    auth::profile::UserRow,
+    error::{ApiError, ApiResult},
+};
 use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
+
+const IDS_FIXED: &str = "Record IDs cannot be changed.";
 
 /// The locked, visible row an update or delete acts on.
 #[derive(FromRow)]
@@ -70,19 +75,25 @@ pub fn ensure_version(target: &Target, version: i64, message: &'static str) -> A
     Ok(())
 }
 
-/// Step 7 for assigned-only callers: IDs are immutable and a Follow-up's direct
-/// assignee who does not hold its client may not move it to another client (H3).
+/// Step 7. Assigned-only callers cannot change IDs; team-scope callers may change a
+/// parent's ID only when they can see every module that may reference it (M-C), so
+/// a foreign-key refusal never reveals hidden records. A Follow-up's direct assignee
+/// who does not hold its client may not move it to another client (H3).
 pub fn ensure_update_allowed(
-    scope: RecordScope,
+    user: &UserRow,
     collection: &str,
     target: &Target,
     record: &ValidatedRecord,
 ) -> ApiResult<()> {
-    let RecordScope::Assigned(caller) = scope else {
+    let renamed = record.legacy_id != target.legacy_id;
+    let RecordScope::Assigned(caller) = RecordScope::of(user) else {
+        if renamed && PARENTS.contains(&collection) && !user.covers_references(collection) {
+            return Err(ApiError::invalid(IDS_FIXED));
+        }
         return Ok(());
     };
-    if record.legacy_id != target.legacy_id {
-        return Err(ApiError::invalid("Record IDs cannot be changed."));
+    if renamed {
+        return Err(ApiError::invalid(IDS_FIXED));
     }
     if collection == "Follow-ups"
         && target.assignee_id == Some(caller)
@@ -93,6 +104,29 @@ pub fn ensure_update_allowed(
         return Err(ApiError::denied(
             "Only the client's holder can move this follow-up.",
         ));
+    }
+    Ok(())
+}
+
+/// Step 7 of a delete (§13 item 5): a direct assignee who does not hold the linked
+/// client may complete or return a Follow-up, but not delete it. Runs after the
+/// visibility-filtered fetch, so hidden and unknown IDs still get the identical 404.
+pub fn ensure_delete_allowed(
+    scope: RecordScope,
+    collection: &str,
+    target: &Target,
+) -> ApiResult<()> {
+    if let RecordScope::Assigned(caller) = scope {
+        if collection == "Follow-ups"
+            && target.assignee_id == Some(caller)
+            && target.client_ref.is_some()
+            && !target.holds_client
+        {
+            return Err(ApiError::denied(
+                "Only the client's holder, the Admin or a full-team member can delete this \
+                 follow-up.",
+            ));
+        }
     }
     Ok(())
 }

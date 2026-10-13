@@ -1,6 +1,6 @@
 use super::requests;
 use crate::{
-    auth::{profile::UserRow, session::Session},
+    auth::{grants::Action, profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces,
@@ -36,6 +36,10 @@ pub async fn assignees(
     requests::ensure_assignable(&collection)?;
     if !session.user.can_collection(&collection) {
         return Err(ApiError::forbidden());
+    }
+    // L-5: only callers who can hand records on (or see the whole team) list assignees.
+    if !session.user.can(&collection, Action::Assign) && !session.user.has_team_scope() {
+        return Err(Action::Assign.denied());
     }
     let members = sqlx::query_as::<_, UserRow>(
         "SELECT p.* FROM crm_user_profiles p WHERE p.active AND p.owner_active AND \

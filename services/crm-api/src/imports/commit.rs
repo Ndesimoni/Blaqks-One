@@ -56,7 +56,7 @@ pub async fn commit(
     let token_hash = session::digest(&request.token);
     let mut transaction = state.pool.begin().await?;
     workspaces::lock(&mut transaction, &workspace).await?;
-    workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None).await?;
+    workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None, None).await?;
     let plan = sqlx::query_as::<_, ImportPlan>(
         "SELECT records,fingerprint,counts,skipped,result,expires_at<=clock_timestamp() AS expired \
          FROM crm_import_plans WHERE token_hash=$1 AND actor_id=$2 AND workspace_id=$3 FOR UPDATE",

@@ -56,7 +56,7 @@ pub async fn activity(
     Path(workspace): Path<String>,
 ) -> ApiResult<Json<Value>> {
     ensure_access(&state, &session, &workspace).await?;
-    if session.user.role == "staff" {
+    if !matches!(session.user.role.as_str(), "admin" | "super-admin") {
         return Err(ApiError::forbidden());
     }
     let activity = sqlx::query_as::<_, Activity>(

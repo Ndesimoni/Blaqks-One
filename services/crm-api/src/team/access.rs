@@ -26,7 +26,8 @@ async fn resolve_owner(
     workspace: &str,
     include_archived: bool,
 ) -> ApiResult<Uuid> {
-    if session.user.role == "staff" {
+    // Role allowlist (L-4): only Admins and the Super Admin manage a team.
+    if !matches!(session.user.role.as_str(), "admin" | "super-admin") {
         return Err(ApiError::forbidden());
     }
     workspaces::ensure_access(state, session, workspace).await?;
@@ -40,7 +41,7 @@ async fn resolve_owner(
     .fetch_optional(&state.pool)
     .await?
     .ok_or_else(ApiError::forbidden)?;
-    if session.user.role == "admin" && owner != session.user.id {
+    if session.user.role != "super-admin" && owner != session.user.id {
         return Err(ApiError::forbidden());
     }
     Ok(owner)

@@ -1,5 +1,8 @@
 use super::*;
+use crate::auth::permissions::Permissions;
 use axum::http::StatusCode;
+use serde_json::json;
+use sqlx::types::Json;
 
 const ME: Uuid = Uuid::from_u128(1);
 const OTHER: Uuid = Uuid::from_u128(2);
@@ -65,4 +68,53 @@ fn client_less_follow_ups_and_parents_never_reach_the_queue_from_staff() {
     assert_eq!(message(ensure_queue(mine, "Contacts", None)), QUEUE_DENIED);
     assert!(ensure_queue(mine, "Follow-ups", None).is_ok());
     assert!(ensure_queue(RecordScope::Team, "Clients", None).is_ok());
+}
+
+#[test]
+fn without_assign_only_the_direct_assignee_may_return_a_linked_follow_up() {
+    let mine = RecordScope::Assigned(ME);
+    let linked = task(Some("CL-001"), false);
+    assert!(ensure_return(mine, &linked, None).is_ok());
+    assert_eq!(
+        message(ensure_return(mine, &linked, Some(OTHER))),
+        ASSIGN_DENIED
+    );
+    for refused in [
+        ensure_return(RecordScope::Team, &linked, None),
+        ensure_return(RecordScope::Assigned(OTHER), &linked, None),
+        ensure_return(mine, &task(Some("CL-001"), true), None),
+        ensure_return(mine, &task(None, false), None),
+    ] {
+        assert_eq!(message(refused), ASSIGN_DENIED);
+    }
+}
+
+fn staff_without_assign() -> UserRow {
+    UserRow {
+        id: ME,
+        name: "Viewer".into(),
+        email: "viewer@example.test".into(),
+        phone: "+971500000000".into(),
+        role: "staff".into(),
+        owner_id: Some(OTHER),
+        workspace_id: "workspace".into(),
+        positions: Json(vec![]),
+        permissions: Json(Permissions::full()),
+        channel_access: Json(Default::default()),
+        record_scope: "team".into(),
+        actions: Json(json!({"relationships": {"create": true}})),
+    }
+}
+
+#[test]
+fn the_assign_grant_is_required_except_for_a_possible_follow_up_return() {
+    let viewer = staff_without_assign();
+    for (collection, may_return) in [("Clients", true), ("Follow-ups", false)] {
+        let refused = ensure_assign_grant(&viewer, collection, may_return);
+        assert_eq!(message(refused), ASSIGN_DENIED);
+    }
+    assert!(ensure_assign_grant(&viewer, "Follow-ups", true).is_ok());
+    let mut agent = viewer;
+    agent.actions = Json(json!({"relationships": {"assign": true}}));
+    assert!(ensure_assign_grant(&agent, "Clients", false).is_ok());
 }
