@@ -1,3 +1,5 @@
+import { preferredCols } from './tableColumns.js';
+
 const nav = [
   {
     header: 'WORKSPACE',
@@ -69,7 +71,8 @@ const descriptions = {
   'My profile': 'Update your contact details and review account access and sender connections.',
   Leads: 'Track enquiries, contact details, and where every lead came from.',
   Clients: 'Manage relationships, qualification, budgets, and conversion.',
-  Contacts: 'A single record for every landlord, client, owner, developer, and broker.',
+  Contacts:
+    'A single record for every landlord, client, owner, developer, broker and building contact.',
   Properties: 'Organize listings, pricing, availability, and permit tracking.',
   Deals: 'Manage each transaction from offer to completion and commission.',
   'Follow-ups': 'Stay in touch and never miss an important next action.',
@@ -79,81 +82,6 @@ const descriptions = {
   Expenses: 'Understand what you spend to grow your business.',
   'Interaction log': 'The full story behind every client conversation.',
   'Client care': 'Turn one successful transaction into a lasting relationship.',
-};
-
-const preferredCols = {
-  Clients: [
-    'Client ID',
-    'Full name',
-    'Lead stage',
-    'Buy / rent',
-    'Preferred communities',
-    'Maximum budget AED',
-    'Lead quality score / 100',
-    'Next follow-up auto',
-  ],
-  Contacts: ['Contact ID', 'Full name', 'Contact type', 'Company', 'Phone', 'Email'],
-  Properties: [
-    'Property ID',
-    'Listing title',
-    'Community',
-    'Property type',
-    'Sale / rental',
-    'Price / annual rent AED',
-    'Listing status',
-    'Ready / off-plan',
-  ],
-  Deals: [
-    'Deal ID',
-    'Client ID',
-    'Property ID',
-    'Deal stage',
-    'Pipeline type',
-    'Agreed value AED',
-    'Your expected fee AED',
-    'Next action due',
-  ],
-  'Follow-ups': ['Activity ID', 'Client ID', 'Next action', 'Due date', 'Task status', 'Channel'],
-  Viewings: [
-    'Viewing ID',
-    'Client ID',
-    'Property ID',
-    'Appointment date & time',
-    'Viewing status',
-    'Next action',
-  ],
-  Shortlist: [
-    'Match ID',
-    'Client ID',
-    'Property ID',
-    'Date sent',
-    'Client response',
-    'Next action',
-  ],
-  'Interaction log': [
-    'Log ID',
-    'Client ID',
-    'Contacted on UAE time',
-    'Channel',
-    'Conversation topic',
-    'Next action',
-    'Action status',
-  ],
-  'Client care': ['Care ID', 'Client ID', 'Touchpoint type', 'Next contact', 'Task status'],
-  Payments: [
-    'Payment ID',
-    'Deal ID',
-    'Receipt date',
-    'Your fee received AED ex VAT',
-    'Total received AED',
-  ],
-  Expenses: [
-    'Expense ID',
-    'Date paid',
-    'Expense category',
-    'Platform / supplier',
-    'Amount paid AED',
-  ],
 };
 
 export { nav, labels, descriptions, preferredCols };

@@ -1,5 +1,6 @@
 import { PropertyRecordDetails } from './PropertyRecordDetails.jsx';
 import { RecordDetailFields } from './RecordDetailFields.jsx';
+import { recordDetailFields } from './formSections.js';
 import { schema } from '../../lib/schema.js';
 import { get } from '../../lib/records.js';
 import { Icon } from '../../components/ui/Icon.jsx';
@@ -89,7 +90,13 @@ function RecordDetails({
             readOnly={readOnly || !canEdit}
           />
         )}
-        <RecordDetailFields module={module} record={r} fields={fields} id={id} data={data} />
+        <RecordDetailFields
+          module={module}
+          record={r}
+          fields={recordDetailFields(module)}
+          id={id}
+          data={data}
+        />
       </div>
       <div className="drawer-footer">
         {!changeable ? (

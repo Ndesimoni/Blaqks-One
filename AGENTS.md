@@ -58,9 +58,9 @@ Professional real estate CRM focused on the UAE market.
 - src/services/crm/ — Same-origin API client; cookie sessions and in-memory CSRF
 - src/features/server/ — Connected shell, identity and asynchronous scoped record hooks
 - src/lib/ — Business rules, selectors, media, and Excel utilities
-- src/config/ — Navigation, fields, themes, and storage constants
+- src/config/ — Navigation, table columns, field options (split under src/config/fields/), themes, and storage constants
 - src/styles/index.css — Ordered stylesheet imports; maintain the cascade when editing the imported files
-- src/data/schemas.js — Workbook data definitions
+- src/data/schemas.js — Workbook data definitions, re-exported from per-sheet modules in src/data/schemas/ (column letters derived in order; append new workbook columns at the end)
 - src/data/demo.js — Demo records
 - src/main.jsx — React entry point
 - tests/ — Active unit, storage contract, browser, and offline smoke checks
