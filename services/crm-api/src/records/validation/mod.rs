@@ -1,3 +1,4 @@
+pub mod map_link;
 pub mod media;
 pub mod numbers;
 pub mod reserved;
@@ -92,6 +93,7 @@ fn validate_with(
         ));
     }
     numbers::validate(collection, &payload)?;
+    map_link::validate(collection, &payload)?;
     workbook_fields::validate(collection, &payload)?;
     media::validate(&payload)?;
     Ok(ValidatedRecord {

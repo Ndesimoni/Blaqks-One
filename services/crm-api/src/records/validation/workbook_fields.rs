@@ -101,6 +101,8 @@ const CONTACT_FIELDS: &[&str] = &[
     "building_project",
     "community",
     "emirate",
+    "address",
+    "map_link",
     "notes",
     "record_check",
 ];

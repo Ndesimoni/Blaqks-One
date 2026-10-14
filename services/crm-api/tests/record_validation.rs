@@ -76,3 +76,32 @@ fn contacts_keep_location_fields_and_any_contact_type() {
         }
     }
 }
+
+#[test]
+fn contacts_keep_address_and_validate_map_links() {
+    let record = validate(
+        "Contacts",
+        json!({"contact_id":"CT-3","address":"Tower 2, Marina Walk",
+            "map_link":"https://maps.google.com/?q=Marina+Gate"}),
+    )
+    .unwrap();
+    assert_eq!(record.payload["address"], "Tower 2, Marina Walk");
+    assert_eq!(
+        record.payload["map_link"],
+        "https://maps.google.com/?q=Marina+Gate"
+    );
+    assert!(validate("Contacts", json!({"contact_id":"CT-3","map_link":""})).is_ok());
+    assert!(validate("Contacts", json!({"contact_id":"CT-3","address":["x"]})).is_err());
+    for link in [
+        json!("javascript:alert(1)"),
+        json!("data:text/html,hi"),
+        json!("www.google.com/maps"),
+        json!(["https://maps.google.com"]),
+    ] {
+        let error = validate("Contacts", json!({"contact_id":"CT-3","map_link":link}));
+        assert_eq!(
+            error.err().map(|error| error.1),
+            Some("Enter a complete http:// or https:// map link.")
+        );
+    }
+}
