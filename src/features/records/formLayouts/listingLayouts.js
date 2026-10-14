@@ -13,6 +13,8 @@ export const listingLayouts = {
       'community',
       'building_project',
       'unit_reference',
+      'address',
+      'map_link',
       'property_type',
       'bedrooms',
       'bathrooms',

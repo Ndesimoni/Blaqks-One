@@ -57,7 +57,11 @@ const longRegex =
 const fieldPlaceholders = { 'Map link': 'https://maps.google.com/…' };
 
 /** Detail views open these URL fields as labelled external links when the value is safe. */
-const detailLinkLabels = { 'Map link': 'Open map' };
+const detailLinkLabels = {
+  'Map link': 'Open map',
+  'Listing URL': 'Open listing',
+  'Photos / documents URL': 'Open photos & documents',
+};
 
 export {
   OPTIONS,

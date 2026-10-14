@@ -5,9 +5,15 @@ import { get } from '../../lib/records.js';
 import { propertyPrice } from '../../lib/properties.js';
 import { formatValue } from '../../lib/crm.js';
 import { detailLink } from '../../lib/detailLinks.js';
+import { LinkedContact } from './LinkedContact.jsx';
 
-/** Safe configured links open externally; every other value, including unsafe URLs, is text. */
+/**
+ * Safe configured links open externally and a property's contact opens its details; every other
+ * value, including unsafe URLs, is text.
+ */
 function DetailValue({ module, record: r, field: f, data }) {
+  if (module === 'Properties' && f.key === 'contact_id')
+    return <LinkedContact id={r[f.key]} contacts={data?.Contacts} />;
   const link = detailLink(f, r[f.key]);
   if (link)
     return (

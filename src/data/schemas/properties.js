@@ -1,5 +1,6 @@
 import { sheetColumns } from './columns.js';
 
+// Address and Map link follow Viewing instructions so earlier workbooks and backups still import.
 export const propertiesColumns = sheetColumns([
   'Property ID',
   'Listing title',
@@ -40,4 +41,6 @@ export const propertiesColumns = sheetColumns([
   'Virtual tour URL',
   'Floor plan URL',
   'Viewing instructions',
+  'Address',
+  'Map link',
 ]);

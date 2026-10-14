@@ -1,5 +1,6 @@
 import { PropertyRecordDetails } from './PropertyRecordDetails.jsx';
 import { RecordDetailFields } from './RecordDetailFields.jsx';
+import { LinkedProperties } from './LinkedProperties.jsx';
 import { recordDetailFields } from './formSections.js';
 import { schema } from '../../lib/schema.js';
 import { get } from '../../lib/records.js';
@@ -35,7 +36,9 @@ function RecordDetails({
   const titleId = useId();
   const changeable = !readOnly && (canDelete || canEdit);
   return (
+    // Opening a related record remounts the dialog so focus, scroll and the opener reset cleanly.
     <Drawer
+      key={`${module}:${id}`}
       className="detail-drawer"
       size={module === 'Properties' ? 'wide' : 'standard'}
       titleId={titleId}
@@ -85,6 +88,7 @@ function RecordDetails({
         {module === 'Properties' && (
           <PropertyRecordDetails
             record={r}
+            contacts={data?.Contacts}
             edit={edit}
             close={close}
             readOnly={readOnly || !canEdit}
@@ -97,6 +101,7 @@ function RecordDetails({
           id={id}
           data={data}
         />
+        {module === 'Contacts' && <LinkedProperties contact={r} properties={data?.Properties} />}
       </div>
       <div className="drawer-footer">
         {!changeable ? (

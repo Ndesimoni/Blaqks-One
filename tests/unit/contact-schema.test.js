@@ -14,6 +14,9 @@ const without = (object, key) =>
   Object.fromEntries(Object.entries(object).filter(([k]) => k !== key));
 const newColumns = ['Building / project', 'Community', 'Emirate'];
 const appendedColumns = [...newColumns, 'Address', 'Map link'];
+const propertyColumns = appendedColumns.slice(-2);
+const earlierKeys = (section) =>
+  section.fields.map((f) => f.key).filter((key) => !['address', 'map_link'].includes(key));
 
 test('Contacts appends location, address and map link columns after Record check', () => {
   assert.deepEqual(
@@ -55,6 +58,7 @@ test('Contacts appends location, address and map link columns after Record check
 test('split workbook schemas keep every earlier sheet and column exactly', () => {
   const earlier = structuredClone(WORKBOOK_SCHEMAS);
   earlier.Contacts = earlier.Contacts.filter((column) => !appendedColumns.includes(column.name));
+  earlier.Properties = earlier.Properties.filter((col) => !propertyColumns.includes(col.name));
   assert.equal(digest(earlier), 'b80cf7714c2a12bdace85a0ada163e29df5215b562191a99636a768c187e44cd');
   for (const columns of Object.values(WORKBOOK_SCHEMAS))
     columns.forEach((column, index) => assert.equal(column.col, columnLetter(index)));
@@ -102,7 +106,7 @@ test('split navigation and form layouts keep every other module unchanged', () =
     .filter((module) => module !== 'Contacts')
     .map((module) => [
       module,
-      recordFormSections(module).map((s) => [s.id, s.title, s.media, s.fields.map((f) => f.key)]),
+      recordFormSections(module).map((s) => [s.id, s.title, s.media, earlierKeys(s)]),
     ]);
   assert.equal(digest(forms), 'c05d50cc2babcbf96618f3c993cec4204dffe5e43e2a1c5c8f75f8124e00251b');
 });
@@ -132,7 +136,7 @@ test('the contact form places location after Company and the table shows the bui
     recordDetailFields('Contacts').map((field) => field.key),
     [...sections[0].fields.map((field) => field.key), 'record_check'],
   );
-  for (const module of ['Clients', 'Properties', 'Deals'])
+  for (const module of ['Clients', 'Deals'])
     assert.deepEqual(recordDetailFields(module), schema(module));
   assert.deepEqual(preferredCols.Contacts, [
     'Contact ID',

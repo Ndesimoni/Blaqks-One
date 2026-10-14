@@ -50,9 +50,22 @@ export function errorSectionIndex(sections, errors) {
 
 const formOrderedDetails = new Set(['Contacts']);
 
-/** Contact details follow the form order so the appended location fields sit beside Company. */
+/** Appended workbook columns shown beside related details instead of at the end. */
+const detailPlacements = { Properties: { after: 'unit_reference', keys: ['address', 'map_link'] } };
+
+/**
+ * Contact details follow the form order so the appended location fields sit beside Company;
+ * property Address and Map link follow Unit reference.
+ */
 export function recordDetailFields(module) {
   const fields = schema(module);
+  const placement = detailPlacements[module];
+  if (placement) {
+    const moved = fields.filter((field) => placement.keys.includes(field.key));
+    const rest = fields.filter((field) => !placement.keys.includes(field.key));
+    const at = rest.findIndex((field) => field.key === placement.after) + 1;
+    return [...rest.slice(0, at), ...moved, ...rest.slice(at)];
+  }
   if (!formOrderedDetails.has(module)) return fields;
   const keys = recordFormSections(module).flatMap((section) =>
     section.fields.map((field) => field.key),
