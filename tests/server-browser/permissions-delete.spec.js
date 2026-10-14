@@ -10,6 +10,10 @@ import {
   refused,
   setGrants,
 } from './permissions-fixtures.js';
+import { FINANCE, withFinance } from '../api/permission-helpers.mjs';
+
+/** Record actions plus "See team finance", which Client deletes also need (owner Q9, L-F2). */
+const teamFinance = (base) => withFinance(base, { ...FINANCE.preset, teamView: true });
 
 /** Signs the member in afresh (a grant change revokes their sessions) and reads their grants. */
 async function signedIn(browser, email) {
@@ -28,7 +32,7 @@ test('whole-team Delete clients & contacts follows the tick and the linked-modul
   const kept = (await held(team, 'Clients', { full_name: 'Keep me' })).record.client_id;
   const owner = (await held(team, 'Contacts', { full_name: 'Linked owner' })).record.contact_id;
 
-  await setGrants(team, 'one', { recordScope: 'team', actions: actions() });
+  await setGrants(team, 'one', { recordScope: 'team', actions: teamFinance(actions()) });
   let staff = await signedIn(browser, one.email);
   try {
     const { page } = staff;
@@ -50,7 +54,7 @@ test('whole-team Delete clients & contacts follows the tick and the linked-modul
   // Without the tick: Delete is hidden and the server refuses.
   await setGrants(team, 'one', {
     recordScope: 'team',
-    actions: actions(true, { relationships: { deleteMain: false } }),
+    actions: teamFinance(actions(true, { relationships: { deleteMain: false } })),
   });
   staff = await signedIn(browser, one.email);
   try {
@@ -65,13 +69,36 @@ test('whole-team Delete clients & contacts follows the tick and the linked-modul
     await staff.context.close();
   }
 
-  // Tick kept but Scheduling off: Clients lose Delete (M-C); Contacts only need Properties.
+  // Tick kept without "See team finance": Clients lose Delete (a deal may link them, L-F2);
+  // Contacts are not linked by finance and keep it.
+  await setGrants(team, 'one', {
+    recordScope: 'team',
+    actions: withFinance(actions(), FINANCE.preset),
+  });
+  staff = await signedIn(browser, one.email);
+  try {
+    const { page } = staff;
+    expect(staff.grants.Clients).toEqual({ create: true, edit: true, delete: false, assign: true });
+    expect(staff.grants.Contacts.delete).toBe(true);
+    await page.goto('/#/clients');
+    const details = await openRecord(page, kept);
+    await expect(footer(details)).toHaveText(['Edit record']);
+    await page.keyboard.press('Escape');
+    await refused(await recordCall(page, 'DELETE', 'Clients', 'client_id', kept), MESSAGES.delete);
+    await page.goto('/#/contacts');
+    await expect(footer(await openRecord(page, owner))).toHaveText(['Delete', 'Edit record']);
+  } finally {
+    await staff.context.close();
+  }
+
+  // Tick and team finance kept but Scheduling off: Clients lose Delete (M-C); Contacts only need Properties.
   const member = await setGrants(team, 'one', (current) => ({
     recordScope: 'team',
     permissions: { ...current.permissions, schedule: false },
-    actions: actions(),
+    actions: teamFinance(actions()),
   }));
   expect(member.actions.relationships.deleteMain).toBe(true);
+  expect(member.actions.finance.teamView).toBe(true);
   expect(member.actions.schedule).toEqual({
     create: false,
     edit: false,

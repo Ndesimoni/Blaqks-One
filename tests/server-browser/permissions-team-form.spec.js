@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { memberPage } from './assign-helpers.js';
 import { findMember, staffLogin } from '../api/team-helpers.mjs';
+import { FINANCE } from '../api/permission-helpers.mjs';
 import { assignTeam, editTeammate, LABELS, moduleBox, ticks } from './permissions-fixtures.js';
 
 const box = (group, name) => group.getByRole('checkbox', { name, exact: true });
@@ -85,8 +86,9 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
 
     const stored = await findMember(team.admin, team.one.user.id);
     expect(stored.recordScope).toBe('team');
-    // Finance grants are checked in the finance specs; this form edits record actions.
-    const { finance: _finance, ...recordActions } = stored.actions;
+    // This form edits record actions only; the stored finance preset carries over unchanged.
+    const { finance, ...recordActions } = stored.actions;
+    expect(finance).toEqual(FINANCE.preset);
     expect(recordActions).toEqual({
       relationships: { create: true, edit: false, assign: true, deleteMain: true },
       properties: {
@@ -98,13 +100,16 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
       },
       schedule: { create: true, edit: true, assign: false, deleteActivity: true },
     });
+    // Clients also need "See team finance" to delete (owner Q9, finance-design §13 L-F2);
+    // this form cannot grant it yet, so only Contacts gain Delete from the tick.
     const staff = await staffLogin(team.people.one.email);
     expect(staff.user.recordActions.Clients).toEqual({
       create: true,
       edit: false,
-      delete: true,
+      delete: false,
       assign: true,
     });
+    expect(staff.user.recordActions.Contacts.delete).toBe(true);
 
     await page.reload();
     const again = await editTeammate(page, name);

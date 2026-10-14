@@ -127,10 +127,14 @@ test('whole-team visibility shows the team records but never ungranted sections'
     );
     await expect(staff.page.getByText('Team client of two', { exact: true })).toBeVisible();
     await expect(staff.page.getByRole('group', { name: 'Assignment' })).toBeVisible();
-    await staff.page.goto('/#/payments');
-    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
-    await staff.page.goto('/#/expenses');
-    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+    // Property Agents hold own-view finance by default (owner Q12); whole-team record
+    // visibility never adds "See team finance", messaging channels or team management.
+    const session = await (await staff.page.request.get('/api/crm/auth/session')).json();
+    expect(session.user.financeAccess).toMatchObject({ scope: 'own', teamView: false });
+    for (const path of ['/#/messages', '/#/team-access']) {
+      await staff.page.goto(path);
+      await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+    }
   } finally {
     await owner.context.close();
     await staff.context.close();
