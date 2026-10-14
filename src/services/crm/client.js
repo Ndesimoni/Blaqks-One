@@ -1,4 +1,5 @@
 import { assignmentRoutes } from './assignments.js';
+import { financeRoutes } from './finance.js';
 
 export class CrmApiError extends Error {
   constructor(message, status, details = {}) {
@@ -104,5 +105,6 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         body: { version: metadata.version },
       }),
     ...assignmentRoutes({ request, scope, recordPath }),
+    ...financeRoutes({ request, scope }),
   };
 }
