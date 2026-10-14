@@ -48,6 +48,18 @@ The project configuration caps specialist concurrency at three, alongside the pr
 
 QA owns tests, fixtures and evidence rather than application fixes. Architecture, product design and security return findings/specifications without editing files. The frontend or appropriate later-phase engineer implements fixes; the primary agent checks acceptance.
 
+## Proportionate process (owner decision 2026-10-14)
+
+Match the process to the risk so small changes ship quickly.
+
+| Change                                                                                                                   | Process                                                                | Checks                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| **Small, low-risk** (a field, label, option, filter, copy or styling fix)                                                | One specialist builds it; no separate design, security or QA pass      | Targeted tests for the touched area, `npm test`, build, format and `check:lines` |
+| **Medium** (new screen section, workflow or API endpoint)                                                                | Implementer plus one QA pass                                           | Add the full `npm run test:api` and connected browser suite once per batch       |
+| **Sensitive** (accounts, sessions, passwords, permissions, record visibility, imports, data deletion, external delivery) | Design and security review before building, then implementation and QA | Full suites, security re-check of the fixes                                      |
+
+Batch several small changes and run the full suites once at the end of the batch rather than after each change. The demo is frozen, so demo browser tests are not part of any tier.
+
 ## Configuration and compatibility
 
 `.codex/agents/<name>.toml` contains each agent's `name`, `description`, `developer_instructions` and sandbox default. `.codex/config.toml` enables agents and sets the concurrency cap. Model and reasoning settings are omitted so specialists inherit the parent/default selection. Live permission overrides and platform limits still apply.
