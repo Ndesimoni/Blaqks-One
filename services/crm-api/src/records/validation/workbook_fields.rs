@@ -89,6 +89,8 @@ const PROPERTY_FIELDS: &[&str] = &[
     "virtual_tour_url",
     "floor_plan_url",
     "viewing_instructions",
+    "address",
+    "map_link",
 ];
 
 const CONTACT_FIELDS: &[&str] = &[

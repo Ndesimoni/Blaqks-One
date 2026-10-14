@@ -5,9 +5,12 @@ use url::Url;
 pub const MAP_LINK_MESSAGE: &str = "Enter a complete http:// or https:// map link.";
 pub const MAX_MAP_LINK_LENGTH: usize = 2048;
 
-/// Contact map links must be absolute web URLs; absent, null or blank values are allowed.
+/// Collections whose `map_link` field must hold an absolute web URL.
+const MAP_LINK_COLLECTIONS: &[&str] = &["Contacts", "Properties"];
+
+/// Map links must be absolute web URLs; absent, null or blank values are allowed.
 pub fn validate(collection: &str, payload: &Value) -> ApiResult<()> {
-    if collection != "Contacts" {
+    if !MAP_LINK_COLLECTIONS.contains(&collection) {
         return Ok(());
     }
     match payload.get("map_link") {
@@ -76,8 +79,21 @@ mod tests {
     }
 
     #[test]
+    fn applies_the_same_rule_to_properties() {
+        let link = json!({"property_id":"PR-1","map_link":"https://maps.google.com/?q=1"});
+        assert!(validate("Properties", &link).is_ok());
+        for bad in [json!("javascript:alert(1)"), json!("not a link")] {
+            let payload = json!({"property_id":"PR-1","map_link":bad});
+            let error = validate("Properties", &payload).unwrap_err();
+            assert_eq!(error.1, MAP_LINK_MESSAGE);
+        }
+        let other_urls = json!({"property_id":"PR-1","listing_url":"not a link"});
+        assert!(validate("Properties", &other_urls).is_ok());
+    }
+
+    #[test]
     fn leaves_other_collections_unchanged() {
-        let payload = json!({"property_id":"PR-1","map_link":"not a link"});
-        assert!(validate("Properties", &payload).is_ok());
+        let payload = json!({"client_id":"CL-1","map_link":"not a link"});
+        assert!(validate("Clients", &payload).is_ok());
     }
 }

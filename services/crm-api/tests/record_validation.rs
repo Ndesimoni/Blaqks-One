@@ -78,30 +78,42 @@ fn contacts_keep_location_fields_and_any_contact_type() {
 }
 
 #[test]
-fn contacts_keep_address_and_validate_map_links() {
-    let record = validate(
-        "Contacts",
-        json!({"contact_id":"CT-3","address":"Tower 2, Marina Walk",
-            "map_link":"https://maps.google.com/?q=Marina+Gate"}),
-    )
-    .unwrap();
-    assert_eq!(record.payload["address"], "Tower 2, Marina Walk");
-    assert_eq!(
-        record.payload["map_link"],
-        "https://maps.google.com/?q=Marina+Gate"
-    );
-    assert!(validate("Contacts", json!({"contact_id":"CT-3","map_link":""})).is_ok());
-    assert!(validate("Contacts", json!({"contact_id":"CT-3","address":["x"]})).is_err());
-    for link in [
-        json!("javascript:alert(1)"),
-        json!("data:text/html,hi"),
-        json!("www.google.com/maps"),
-        json!(["https://maps.google.com"]),
-    ] {
-        let error = validate("Contacts", json!({"contact_id":"CT-3","map_link":link}));
+fn contacts_and_properties_keep_address_and_validate_map_links() {
+    for (collection, key) in [("Contacts", "contact_id"), ("Properties", "property_id")] {
+        let record = validate(
+            collection,
+            json!({key:"ID-3","address":"Tower 2, Marina Walk",
+                "map_link":"https://maps.google.com/?q=Marina+Gate"}),
+        )
+        .unwrap();
+        assert_eq!(record.payload["address"], "Tower 2, Marina Walk");
         assert_eq!(
-            error.err().map(|error| error.1),
-            Some("Enter a complete http:// or https:// map link.")
+            record.payload["map_link"],
+            "https://maps.google.com/?q=Marina+Gate"
         );
+        assert!(validate(collection, json!({key:"ID-3","map_link":""})).is_ok());
+        assert!(validate(collection, json!({key:"ID-3","address":["x"]})).is_err());
+        for link in [
+            json!("javascript:alert(1)"),
+            json!("data:text/html,hi"),
+            json!("www.google.com/maps"),
+            json!(["https://maps.google.com"]),
+        ] {
+            let error = validate(collection, json!({key:"ID-3","map_link":link}));
+            assert_eq!(
+                error.err().map(|error| error.1),
+                Some("Enter a complete http:// or https:// map link.")
+            );
+        }
     }
+}
+
+#[test]
+fn other_property_urls_stay_unvalidated() {
+    let record = validate(
+        "Properties",
+        json!({"property_id":"PR-3","listing_url":"listing page",
+            "virtual_tour_url":"tour","floor_plan_url":"plan"}),
+    );
+    assert!(record.is_ok());
 }
