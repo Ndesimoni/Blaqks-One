@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { apiTestFiles } from './crm-api-test-files.mjs';
 import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
+import { markDatabase } from './mark-dev-database.mjs';
 
 const project = `kws-crm-test-${randomBytes(6).toString('hex')}`;
 const dbPassword = randomBytes(32).toString('hex');
@@ -30,6 +31,7 @@ try {
   );
   containerStarted = true;
   await run('docker', [...compose, 'up', '-d', '--wait'], env);
+  markDatabase(compose, env);
   const address = await run('docker', [...compose, 'port', 'postgres', '5432'], env, {
     capture: true,
   });

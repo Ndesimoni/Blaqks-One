@@ -47,6 +47,8 @@ struct Activity {
     action: String,
     collection: String,
     record_id: uuid::Uuid,
+    /// `app`, or `sample` for rows written by the sample-data command.
+    source: String,
     timestamp: String,
 }
 
@@ -60,7 +62,7 @@ pub async fn activity(
         return Err(ApiError::forbidden());
     }
     let activity = sqlx::query_as::<_, Activity>(
-        "SELECT a.id,a.actor_id,u.name AS actor_name,a.workspace_id,a.action,a.collection,a.record_id, \
+        "SELECT a.id,a.actor_id,u.name AS actor_name,a.workspace_id,a.action,a.collection,a.record_id,a.source, \
          to_char(a.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS timestamp \
          FROM crm_activity a JOIN crm_users u ON u.id=a.actor_id \
          WHERE a.workspace_id=$1 ORDER BY a.created_at DESC,a.id DESC LIMIT 100",

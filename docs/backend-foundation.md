@@ -35,6 +35,22 @@ Open **http://localhost:5173** and sign in with an account created above. Use th
 
 If port 5173 is occupied, stop the conflicting development server or change the Vite port and `CRM_APP_ORIGIN` together. If the API port changes, update `CRM_BIND_ADDRESS` and `CRM_API_PROXY` together.
 
+## Sample data for local testing
+
+Real client data is never used for testing. To try the CRM with realistic, clearly fictional data, fill one Admin's local workspace. Mark the local Docker database once (new volumes are marked automatically):
+
+```bash
+npm run db:up
+npm run db:mark-dev              # one time: marks the local Docker database
+npm run crm:sample-data          # add sample records and three sample staff
+npm run crm:sample-data -- --no-staff
+npm run crm:clear-sample         # remove only the sample records
+```
+
+The command asks for the Admin's email, shows the database (`host:port/db`, never credentials), workspace and Admin, and asks `Continue? [y/N]`; without a terminal it needs `--yes`. It adds 52 records labelled "Sample · …" with IDs in an `-S` range (`CL-S01`, `PR-S01`, …): 10 Clients (contact permission "No"), 12 Properties in real Dubai and Abu Dhabi communities with map links, 8 Contacts (landlords, a security guard and building managers with invented company names) and linked Follow-ups, Viewings, Shortlist, Interaction log and Client care. Phones are obvious placeholders (`+971 50 000 03xx/04xx`, not a reserved range) and emails use `@example.test`. Three sample staff show the permission features: Layla (assigned records, standard actions), Karim (whole team, can delete clients and contacts) and Noura (view only). Staff passwords are typed twice at a hidden prompt or generated and printed once; they are never stored, and generated output should not be saved to logs.
+
+Running the seed again adds nothing new. Sample records are tracked by server ID (migration 10), so clearing never touches your own records. Clearing is refused, with a list, while any of your records links to a sample record, and while sample records were changed in the app unless you pass `--include-edited`. Sample staff are suspended (sessions revoked, records returned to the Admin queue) and reactivated by the next seed, except accounts an Admin suspended in the app. Activity, team activity and assignment history written by these commands carry `source = 'sample'` (other rows `app`). The Super Admin organisation workspace needs `--organisation`. Both commands refuse unless `CRM_ALLOW_INSECURE_LOCAL=true`, the database host is loopback, and the database carries the local-development marker, so a tunnel to a hosted database is refused.
+
 ## Module map
 
 `services/crm-api/src/` is grouped by domain. Shared infrastructure stays at the crate root.

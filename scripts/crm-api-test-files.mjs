@@ -49,4 +49,7 @@ export const apiTestFiles = [
   'tests/api/permission-assign.test.mjs',
   'tests/api/permission-race.test.mjs',
   'tests/api/permission-rollback.test.mjs',
+  'tests/api/sample-seed.test.mjs',
+  'tests/api/sample-clear.test.mjs',
+  'tests/api/sample-safety.test.mjs',
 ];

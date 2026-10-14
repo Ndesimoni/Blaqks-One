@@ -11,15 +11,19 @@ use crate::{
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
+/// One inserted row: its collection, record ID and server row ID.
+pub type Inserted = (&'static str, String, Uuid);
+
 pub async fn insert(
     transaction: &mut Transaction<'_, Postgres>,
     workspace: &str,
     actor: Uuid,
     records: ImportRecords,
-) -> ApiResult<()> {
+) -> ApiResult<Vec<Inserted>> {
     // Imported parents go to the destination owner (reason `import`); Follow-ups and
     // child records start unassigned. A suspended owner leaves them in the queue.
     let owner = history::active_owner(transaction, workspace).await?;
+    let mut inserted = Vec::new();
     for (collection, rows) in records.collections() {
         for row in rows {
             let record = validation::validate(collection, row.clone())?;
@@ -33,7 +37,7 @@ pub async fn insert(
             .bind(id)
             .bind(workspace)
             .bind(collection)
-            .bind(record.legacy_id)
+            .bind(&record.legacy_id)
             .bind(record.payload)
             .bind(record.links.contact)
             .bind(record.links.client)
@@ -55,7 +59,8 @@ pub async fn insert(
                 };
                 history::append(transaction, &change).await?;
             }
+            inserted.push((collection, record.legacy_id, id));
         }
     }
-    Ok(())
+    Ok(inserted)
 }

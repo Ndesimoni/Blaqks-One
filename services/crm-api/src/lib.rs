@@ -6,6 +6,7 @@ pub mod error;
 pub mod imports;
 pub mod records;
 pub mod routes;
+pub mod sample;
 pub mod state;
 pub mod team;
 pub mod workspaces;

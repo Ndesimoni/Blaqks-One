@@ -53,7 +53,8 @@ test('team activity names access changes without recording grant contents (L-6)'
     `SELECT string_agg(DISTINCT key, ',' ORDER BY key) FROM crm_team_activity a,
        jsonb_object_keys(to_jsonb(a)) key WHERE member_id='${id}'`,
   );
-  assert.equal(columns, 'action,actor_id,created_at,id,member_id,workspace_id');
+  // `source` (0010) is only 'app' or 'sample' by CHECK constraint; never grant contents.
+  assert.equal(columns, 'action,actor_id,created_at,id,member_id,source,workspace_id');
   assert.equal(
     query(`SELECT count(*) FROM crm_team_activity a WHERE a::text ~ '(deleteMain|create|true)'`),
     '0',
