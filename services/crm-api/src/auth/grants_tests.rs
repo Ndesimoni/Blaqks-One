@@ -61,7 +61,7 @@ fn admins_can_everything_and_unknown_roles_nothing() {
         }
         assert_eq!(
             admin.profile_actions(),
-            serde_json::to_value(Actions::full()).unwrap()
+            serde_json::to_value(Actions::full(role)).unwrap()
         );
     }
     let full = full_staff("team");

@@ -2,7 +2,7 @@ use super::{directory, update_store};
 use crate::team::access;
 use crate::{
     auth::{
-        actions::Actions,
+        actions_request::ActionsRequest,
         permissions::{ChannelAccess, Permissions},
         protection,
         session::Session,
@@ -30,8 +30,9 @@ pub struct UpdateRequest {
     pub channel_access: Option<ChannelAccess>,
     pub active: Option<bool>,
     pub record_scope: Option<RecordScopeGrant>,
-    /// Complete staff action grants; absent keeps or presets them (M-D).
-    pub actions: Option<Actions>,
+    /// Complete staff action grants; absent keeps or presets them (M-D). The `finance`
+    /// key may be omitted and is then carried over the same way.
+    pub actions: Option<ActionsRequest>,
 }
 
 /// The staff-only full-team grant (M7); positions and invitations never set it.

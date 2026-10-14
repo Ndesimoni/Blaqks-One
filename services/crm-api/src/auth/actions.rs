@@ -2,6 +2,7 @@
 //! Module grants mean "can view"; these flags decide what a staff member may change.
 use super::{
     actions_wire::Wire,
+    finance_access::FinanceActions,
     permissions::{Module, Permissions},
 };
 use serde::{Deserialize, Serialize};
@@ -25,23 +26,27 @@ pub struct Actions {
     pub relationships: ModuleActions,
     pub properties: ModuleActions,
     pub schedule: ModuleActions,
+    /// The finance key (finance-design §5.1); never read by `UserRow::can`.
+    pub finance: FinanceActions,
 }
 
 impl Actions {
-    fn each(flags: impl Fn(Module) -> ModuleActions) -> Self {
+    fn each(finance: FinanceActions, flags: impl Fn(Module) -> ModuleActions) -> Self {
         let mut actions = Self {
             relationships: flags(Module::Relationships),
             properties: flags(Module::Properties),
             schedule: flags(Module::Schedule),
+            finance,
         };
         actions.relationships.delete_activity = false;
         actions.schedule.delete_main = false;
         actions
     }
 
-    /// Admins and the Super Admin: every action, by role.
-    pub fn full() -> Self {
-        Self::each(|_| ModuleActions {
+    /// Admins and the Super Admin: every record action by role; finance follows the
+    /// role (`FinanceActions::by_role`).
+    pub fn full(role: &str) -> Self {
+        Self::each(FinanceActions::by_role(role), |_| ModuleActions {
             create: true,
             edit: true,
             assign: true,
@@ -50,9 +55,10 @@ impl Actions {
         })
     }
 
-    /// Position preset for granted modules; deleteMain is never granted by default.
+    /// Position preset for granted modules; deleteMain, finance approve and teamView are
+    /// never granted by default.
     pub fn preset(permissions: &Permissions) -> Self {
-        Self::each(|module| {
+        Self::each(FinanceActions::preset(permissions), |module| {
             let on = module.granted(permissions);
             ModuleActions {
                 create: on,
@@ -67,7 +73,7 @@ impl Actions {
     /// Lenient stored decoder (M-E): unknown keys are ignored and any value other
     /// than JSON `true` is false, so a malformed row never fails decoding.
     pub fn from_stored(value: &Value) -> Self {
-        Self::each(|module| {
+        Self::each(FinanceActions::from_stored(value), |module| {
             let name = Wire::key(module);
             let flag = |key: &str| {
                 value.get(name).and_then(|flags| flags.get(key)) == Some(&Value::Bool(true))
@@ -85,7 +91,7 @@ impl Actions {
     /// Save invariants: a module that is off has no actions, and deleteMain needs
     /// whole-team scope.
     pub fn normalised(self, permissions: &Permissions, team: bool) -> Self {
-        Self::each(|module| {
+        Self::each(self.finance.normalised(permissions, team), |module| {
             let mut flags = self.module(module);
             if !module.granted(permissions) {
                 flags = ModuleActions::default();
@@ -100,7 +106,11 @@ impl Actions {
     /// widen an enabled module. Then the save invariants apply.
     pub fn carried_over(self, before: &Permissions, after: &Permissions, team: bool) -> Self {
         let preset = Self::preset(after);
-        Self::each(|module| match module.granted(before) {
+        let finance = match before.finance {
+            true => self.finance,
+            false => preset.finance,
+        };
+        Self::each(finance, |module| match module.granted(before) {
             true => self.module(module),
             false => preset.module(module),
         })
@@ -117,7 +127,7 @@ impl Actions {
 
     /// Decodes an invitation's `actions`, where `deleteMain` may be omitted.
     pub fn from_invitation(value: Value) -> Option<Self> {
-        super::actions_wire::invitation(value)
+        super::actions_request::invitation(value)
     }
 
     pub fn deletes_main(&self) -> bool {

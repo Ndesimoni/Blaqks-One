@@ -85,7 +85,9 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
 
     const stored = await findMember(team.admin, team.one.user.id);
     expect(stored.recordScope).toBe('team');
-    expect(stored.actions).toEqual({
+    // Finance grants are checked in the finance specs; this form edits record actions.
+    const { finance: _finance, ...recordActions } = stored.actions;
+    expect(recordActions).toEqual({
       relationships: { create: true, edit: false, assign: true, deleteMain: true },
       properties: {
         create: true,

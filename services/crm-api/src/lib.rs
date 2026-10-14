@@ -3,6 +3,7 @@ pub mod auth;
 pub mod bootstrap;
 pub mod config;
 pub mod error;
+pub mod finance;
 pub mod imports;
 pub mod records;
 pub mod routes;

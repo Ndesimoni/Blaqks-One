@@ -52,6 +52,14 @@ export function actions(base = true, flags = {}) {
   };
 }
 
+/** Finance flags (finance-design §5.1): none, the position preset, and an Admin's. */
+export const FINANCE = {
+  none: { create: false, edit: false, assign: false, approve: false, teamView: false },
+  preset: { create: true, edit: true, assign: true, approve: false, teamView: false },
+  all: { create: true, edit: true, assign: true, approve: true, teamView: true },
+};
+export const withFinance = (value, finance) => ({ ...value, finance });
+
 /** Preset actions for all three modules: everything except deleteMain. */
 export const preset = () =>
   actions(true, { relationships: { deleteMain: false }, properties: { deleteMain: false } });

@@ -1,4 +1,5 @@
 use super::{
+    finance_access::FinanceAccess,
     grants::RecordActions,
     permissions::{ChannelAccess, Permissions},
 };
@@ -75,6 +76,7 @@ pub struct Profile {
     pub record_scope: String,
     pub actions: Value,
     pub record_actions: BTreeMap<&'static str, RecordActions>,
+    pub finance_access: FinanceAccess,
 }
 
 impl From<UserRow> for Profile {
@@ -83,6 +85,7 @@ impl From<UserRow> for Profile {
         let record_scope = user.record_scope_label().into();
         let actions = user.profile_actions();
         let record_actions = user.record_actions();
+        let finance_access = user.finance_access();
         Self {
             id: user.id,
             name: user.name,
@@ -105,6 +108,7 @@ impl From<UserRow> for Profile {
             record_scope,
             actions,
             record_actions,
+            finance_access,
         }
     }
 }

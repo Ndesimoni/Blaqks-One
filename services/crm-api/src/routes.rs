@@ -129,6 +129,7 @@ pub fn app(state: AppState) -> Router {
             post(assignments::bulk::bulk)
                 .layer(DefaultBodyLimit::max(assignments::requests::MAX_BULK_BYTES)),
         )
+        .merge(crate::finance::routes::router())
         .fallback(unknown_route)
         .method_not_allowed_fallback(unsupported_method)
         .layer(DefaultBodyLimit::max(12 * 1024 * 1024 + 1024))

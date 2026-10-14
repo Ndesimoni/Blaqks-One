@@ -90,5 +90,17 @@ mod tests {
         }
         let receptionist = &positions()[0];
         assert!(receptionist.actions.relationships.assign && !receptionist.actions.properties.edit);
+        for position in positions() {
+            let finance = position.actions.finance;
+            assert_eq!(
+                finance.create, position.permissions.finance,
+                "{}",
+                position.id
+            );
+            assert!(!finance.approve && !finance.team_view, "{}", position.id);
+        }
+        let finance = |id: &str| defaults(&[id.into()]).unwrap().finance;
+        assert!(finance("property-agent") && finance("accountant"));
+        assert!(!finance("team-supervisor") && !finance("receptionist"));
     }
 }

@@ -48,7 +48,11 @@ impl ApiError {
 impl From<sqlx::Error> for ApiError {
     fn from(error: sqlx::Error) -> Self {
         if let Some(database) = error.as_database_error() {
-            match database.code().as_deref() {
+            let code = database.code();
+            if let Some(finance) = code.as_deref().and_then(crate::finance::errors::mapped) {
+                return finance;
+            }
+            match code.as_deref() {
                 Some("23505") => return Self::conflict("That record ID is already in use."),
                 Some("23503") => return Self::conflict("A linked record prevents this change."),
                 // The crm_check_assignee trigger raises 23514 with no constraint name; a

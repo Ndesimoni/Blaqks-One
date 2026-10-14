@@ -9,7 +9,7 @@ import {
   staffLogin,
   teamPath,
 } from './team-helpers.mjs';
-import { MESSAGES, actions, grant, preset } from './permission-helpers.mjs';
+import { FINANCE, MESSAGES, actions, grant, preset, withFinance } from './permission-helpers.mjs';
 
 let owner, admin;
 before(async () => {
@@ -32,22 +32,25 @@ const sendInvite = (session, body) =>
 const stored = (id) => JSON.parse(query(`SELECT actions FROM crm_users WHERE id='${id}'`));
 
 test('profiles and positions carry actions; Admins hold everything by role', async () => {
-  assert.deepEqual(admin.user.actions, actions());
+  assert.deepEqual(admin.user.actions, withFinance(actions(), FINANCE.all));
   assert.ok(Object.values(admin.user.recordActions).every((a) => a.create && a.delete));
   assert.deepEqual(stored(admin.user.id), {});
   const team = await admin.request(teamPath(admin));
   const agent = team.value.roles.find((role) => role.id === 'property-agent');
-  assert.deepEqual(agent.actions, preset());
+  assert.deepEqual(agent.actions, withFinance(preset(), FINANCE.preset));
   const accountant = team.value.roles.find((role) => role.id === 'accountant');
-  assert.deepEqual(accountant.actions, actions(false));
+  assert.deepEqual(accountant.actions, withFinance(actions(false), FINANCE.preset));
 });
 
 test('invitations default to presets, accept the omitted-deleteMain shape and refuse deleteMain', async () => {
   const defaulted = await invite(admin, 'perm-default', { positions: ['receptionist'] });
-  const expected = actions(false, {
-    relationships: { create: true, edit: true, assign: true },
-    schedule: { create: true, edit: true, assign: true, deleteActivity: true },
-  });
+  const expected = withFinance(
+    actions(false, {
+      relationships: { create: true, edit: true, assign: true },
+      schedule: { create: true, edit: true, assign: true, deleteActivity: true },
+    }),
+    FINANCE.none,
+  );
   assert.deepEqual(defaulted.member.actions, expected);
   assert.deepEqual(stored(defaulted.member.id), expected);
   const shaped = {
@@ -60,6 +63,7 @@ test('invitations default to presets, accept the omitted-deleteMain shape and re
   const want = structuredClone(shaped);
   want.relationships.deleteMain = false;
   want.properties.deleteMain = false;
+  want.finance = FINANCE.preset; // an omitted finance key takes the position preset
   assert.deepEqual(stored(custom.value.member.id), want);
   const refusals = [
     [{ ...shaped, properties: { ...shaped.properties, deleteMain: true } }, MESSAGES.teamOnly],
@@ -122,7 +126,7 @@ test('M-D: a view-only member stays view-only when positions change', async () =
   const want = actions(false, {
     properties: { create: true, edit: true, assign: true, deleteActivity: true },
   });
-  assert.deepEqual(moved.user.actions, want);
+  assert.deepEqual(moved.user.actions, withFinance(want, FINANCE.preset));
   const reset = await grant(admin, moved, { actions: preset() });
-  assert.deepEqual(reset.user.actions, preset());
+  assert.deepEqual(reset.user.actions, withFinance(preset(), FINANCE.preset));
 });

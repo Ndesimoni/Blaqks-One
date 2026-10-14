@@ -3,6 +3,7 @@ use crate::team::{access, catalogue, members, members::prepare, validation};
 use crate::{
     auth::{
         actions::Actions,
+        finance_access::{self, FinanceActions},
         permissions::{ChannelAccess, Permissions},
         protection,
         session::Session,
@@ -87,15 +88,23 @@ pub async fn create(
 }
 
 /// Presets by default; explicit grants are decoded strictly and normalised. New
-/// members are assigned-only, so deleteMain is refused (L-2).
+/// members are assigned-only, so deleteMain, finance approve and teamView are refused
+/// (L-2, finance-design §5.1). An omitted `finance` key takes the finance preset.
 fn staff_actions(value: Option<Value>, permissions: &Permissions) -> ApiResult<Actions> {
     let Some(value) = value else {
         return Ok(Actions::preset(permissions));
     };
-    let actions = Actions::from_invitation(value)
+    let finance_given = value.get("finance").is_some();
+    let mut actions = Actions::from_invitation(value)
         .ok_or_else(|| ApiError::invalid("Provide valid invitation details."))?;
     if actions.deletes_main() {
         return Err(ApiError::invalid(prepare::DELETE_NEEDS_TEAM));
+    }
+    if actions.finance.approve || actions.finance.team_view {
+        return Err(ApiError::invalid(finance_access::NEEDS_TEAM));
+    }
+    if !finance_given {
+        actions.finance = FinanceActions::preset(permissions);
     }
     Ok(actions.normalised(permissions, false))
 }

@@ -67,7 +67,11 @@ pub async fn update(
     .bind(sqlx::types::Json(request.channel_access.as_ref().unwrap()))
     .bind(active)
     .bind(request.record_scope.map(update::RecordScopeGrant::as_str))
-    .bind(request.actions.map(sqlx::types::Json))
+    .bind(
+        request
+            .actions
+            .map(|requested| sqlx::types::Json(requested.actions)),
+    )
     .execute(&mut *transaction)
     .await?;
     if access_changed {
@@ -113,8 +117,8 @@ fn grants_changed(current: &MemberRow, request: &UpdateRequest) -> bool {
     let scope = request
         .record_scope
         .is_some_and(|scope| scope.as_str() != user.record_scope);
-    let actions = request.actions.is_some_and(|actions| {
-        !user.actions_recorded() || actions != Actions::from_stored(&user.actions.0)
+    let actions = request.actions.is_some_and(|requested| {
+        !user.actions_recorded() || requested.actions != Actions::from_stored(&user.actions.0)
     });
     channels || scope || actions || request.permissions.as_ref() != Some(&user.permissions.0)
 }
