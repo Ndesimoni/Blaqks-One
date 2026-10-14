@@ -4,7 +4,13 @@ import { TitleSection } from '../../components/ui/TitleSection.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useNavigation, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 
-export function UpcomingViewings({ data, summary }) {
+/** Optional name callbacks label hidden linked records in connected mode. */
+export function UpcomingViewings({
+  data,
+  summary,
+  clientName = (id) => clName(data, id),
+  propertyName = (id) => prName(data, id),
+}) {
   const { navigate } = useNavigation();
   const { dispatchRow } = useWorkspaceActions();
   return (
@@ -22,8 +28,8 @@ export function UpcomingViewings({ data, summary }) {
               </small>
             </span>
             <div>
-              <strong>{prName(data, get(v, 'Property ID'))}</strong>
-              <span>{clName(data, get(v, 'Client ID'))}</span>
+              <strong>{propertyName(get(v, 'Property ID'))}</strong>
+              <span>{clientName(get(v, 'Client ID'))}</span>
             </div>
             <Icon name="chevron" size={16} />
           </button>

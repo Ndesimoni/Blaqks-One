@@ -2,7 +2,13 @@ import { descriptions } from '../../config/navigation.js';
 
 import { connectedCollections } from './records.js';
 
-const connectedSections = new Set([...connectedCollections, 'Leads', 'Team & access']);
+const connectedSections = new Set([
+  ...connectedCollections,
+  'Leads',
+  'Team & access',
+  'Dashboard',
+  'Client desk',
+]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
 

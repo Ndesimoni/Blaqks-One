@@ -80,6 +80,9 @@
 :root[data-theme] :is(.profile-stats, .detail-highlight) {
   border-radius: 12px;
 }
+:root[data-theme] .profile-stats {
+  padding: 18px 20px;
+}
 :root[data-theme] :is(.metric-value, .large-count, .chart-total strong, .workspace-card-counts dd) {
   font-weight: 650;
   font-variant-numeric: tabular-nums;

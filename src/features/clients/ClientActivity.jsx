@@ -19,7 +19,11 @@ export function ClientMatches({ client, matches }) {
       <TitleSection
         heading="Curated property matches"
         caption="Filtered by location, purpose and maximum budget"
-        action={<span className="mini-count">{matches.length} matches</span>}
+        action={
+          <span className="mini-count">
+            {matches.length} {matches.length === 1 ? 'match' : 'matches'}
+          </span>
+        }
       />
       {matches.length ? (
         <OverflowList

@@ -79,7 +79,8 @@ export function MessagePreviewDialog({ channel, recipient, staff = false, onClos
       onClose={onClose}
       onFinish={() => {
         if (unavailable) throw Error(unavailable);
-        recordActivity({
+        // Connected previews are not logged: connected activity is written only with record changes.
+        recordActivity?.({
           action: 'message-preview',
           module: 'Messages',
           label: `${staff ? 'Staff' : 'Client'} ${channel === 'email' ? 'email' : 'WhatsApp'} preview · not sent`,

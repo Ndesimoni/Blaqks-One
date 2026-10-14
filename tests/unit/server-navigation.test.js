@@ -27,11 +27,13 @@ test('Admins can reach the familiar sections while only implemented screens are 
     'Interaction log',
     'Client care',
     'Team & access',
+    'Dashboard',
+    'Client desk',
   ])
     assert.equal(isConnectedSection(name), true, name);
   for (const name of [
-    'Dashboard',
     'Deals',
+    'CRM insights',
     'Expenses',
     'Messages',
     'Payments',

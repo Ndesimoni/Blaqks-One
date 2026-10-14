@@ -11,6 +11,8 @@ import { canOpenSection } from './access.js';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
 import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
+import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
+import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -39,6 +41,8 @@ export function ServerContent({ owner }) {
         <Button onClick={retry}>Retry</Button>
       </section>
     );
+  if (route === 'Dashboard') return <ServerDashboard />;
+  if (route === 'Client desk') return <ServerClientDesk />;
   const page = (toolbarExtras) => {
     if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Contacts') return <ContactsPage toolbarExtras={toolbarExtras} />;

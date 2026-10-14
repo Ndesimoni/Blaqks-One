@@ -24,11 +24,9 @@ test('connected Admin navigation restores every group and unfinished routes neve
       await expect(sidebar.getByRole('button', { name, exact: true })).toHaveCount(1);
   }
   for (const name of [
-    'Dashboard',
     'Messages',
     'Deals',
     'CRM insights',
-    'Client desk',
     'Payments',
     'Expenses',
     'Date search',
@@ -47,6 +45,8 @@ test('connected Admin navigation restores every group and unfinished routes neve
     ).toHaveCount(0);
   }
   for (const [name, action] of [
+    ['Dashboard', 'Add new lead'],
+    ['Client desk', 'Add client'],
     ['Leads', 'Add lead'],
     ['Follow-ups', 'Add follow-up'],
     ['Viewings', 'Add viewing'],
@@ -56,7 +56,8 @@ test('connected Admin navigation restores every group and unfinished routes neve
   ]) {
     await sidebar.getByRole('button', { name, exact: true }).click();
     await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
-    await expect(page.getByRole('button', { name: action, exact: true })).toBeVisible();
+    // An empty list repeats its Add action in the empty state.
+    await expect(page.getByRole('button', { name: action, exact: true }).first()).toBeVisible();
     await expect(page.getByRole('region', { name: `${name} connection status` })).toHaveCount(0);
     await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);
   }
@@ -64,7 +65,15 @@ test('connected Admin navigation restores every group and unfinished routes neve
   await expect(page).toHaveURL(/#\/dashboard$/);
   await page.reload();
   await expect(page.locator('.page-heading h1')).toHaveText('Overview');
-  await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
+  for (const name of ['Dashboard', 'Client desk'])
+    await expect(
+      sidebar.getByRole('button', { name, exact: true }).locator('.connected-nav-status'),
+    ).toHaveCount(0);
+  await expect(
+    sidebar.getByRole('button', { name: 'Deals', exact: true }).locator('.connected-nav-status'),
+  ).toHaveText('Not connected');
   await sidebar.getByRole('button', { name: 'Clients', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
   await expect(sidebar.getByRole('button', { name: 'Clients', exact: true })).toHaveAttribute(

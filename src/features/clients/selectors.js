@@ -33,7 +33,7 @@ export function selectClientMatches(properties, client) {
     );
 }
 
-export function selectClientTimeline(data, client) {
+export function selectClientTimeline(data, client, propertyName = (id) => prName(data, id)) {
   if (!client) return [];
   const id = get(client, 'Client ID');
   return [
@@ -48,7 +48,7 @@ export function selectClientTimeline(data, client) {
     ...data.Viewings.filter((row) => get(row, 'Client ID') === id).map((row) => ({
       date: get(row, 'Appointment date & time'),
       title: 'Property viewing',
-      detail: prName(data, get(row, 'Property ID')),
+      detail: propertyName(get(row, 'Property ID')),
       icon: 'calendar',
     })),
   ]

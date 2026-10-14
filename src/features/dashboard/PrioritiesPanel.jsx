@@ -8,11 +8,12 @@ import { Empty } from '../../components/ui/Empty.jsx';
 import { useNavigation, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 import { useRecordAccess } from '../records/useRecordAccess.js';
 
-export function PrioritiesPanel({ data, summary }) {
+/** `clientName` lets connected mode label hidden linked clients without revealing them. */
+export function PrioritiesPanel({ data, summary, clientName = (id) => clName(data, id) }) {
   const { navigate } = useNavigation();
   const { add, dispatchRow } = useWorkspaceActions();
   const canAdd = useRecordAccess()('Follow-ups', 'create');
-  const nameOfTask = (task) => clName(data, get(task, 'Client ID'));
+  const nameOfTask = (task) => clientName(get(task, 'Client ID'));
   return (
     <section className="panel activity-panel">
       <TitleSection

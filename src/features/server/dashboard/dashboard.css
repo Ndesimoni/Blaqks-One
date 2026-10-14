@@ -1,0 +1,21 @@
+/* Connected Dashboard: record totals sit in two columns beside the priorities panel. */
+/* Short lists keep their natural height instead of the demo's fixed minimums. */
+.connected-dashboard .split-main {
+  align-items: start;
+}
+.connected-dashboard .todo-list,
+.connected-dashboard .triple-grid .panel {
+  min-height: 0;
+}
+.record-counts.todo-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+  align-content: start;
+  min-height: 0;
+}
+@media (max-width: 750px) {
+  .record-counts.todo-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -61,7 +61,7 @@
 :root[data-theme] .chart-total strong {
   color: var(--ink);
 }
-:root[data-theme] .todo-indicator {
+:root[data-theme] :is(.todo-indicator, .timeline-dot) {
   background: var(--surface-subtle);
   color: var(--muted);
 }

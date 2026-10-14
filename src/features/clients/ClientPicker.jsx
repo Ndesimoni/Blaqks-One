@@ -16,7 +16,9 @@ export function ClientPicker({ clients, client }) {
     <section className="panel desk-list">
       <div className="desk-list-title">
         <h3>Find a client</h3>
-        <span>{clients.length} contacts</span>
+        <span>
+          {clients.length} {clients.length === 1 ? 'contact' : 'contacts'}
+        </span>
       </div>
       <div className="search-small desk-search">
         <Icon name="search" size={17} />

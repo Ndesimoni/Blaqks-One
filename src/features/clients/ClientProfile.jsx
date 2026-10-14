@@ -52,15 +52,16 @@ export function ClientProfileHero({ client }) {
 }
 
 /** Message shortcuts for the selected client; previews never deliver externally. */
-export function ClientMessageTools({ client, onPreview }) {
+export function ClientMessageTools({
+  client,
+  onPreview,
+  caption = 'Channel access is assigned by your Super Admin. Sender accounts are not connected.',
+}) {
   const { user } = useSession();
   const { startMessage } = useWorkspaceActions();
   return (
     <section className="panel client-message-tools">
-      <TitleSection
-        heading="Contact this client"
-        caption="Channel access is assigned by your Super Admin. Sender accounts are not connected."
-      />
+      <TitleSection heading="Contact this client" caption={caption} />
       <div className="team-inline-actions">
         <Button
           icon="chat"
