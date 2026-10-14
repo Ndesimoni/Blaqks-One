@@ -102,12 +102,27 @@
   align-items: center;
   gap: 6px;
   width: fit-content;
+  /* 44px touch target; negative margins keep the row at text height and the text on the label edge. */
+  min-height: 44px;
+  margin: -11px 0 -11px -8px;
+  padding: 0 8px;
+  border-radius: 8px;
   color: var(--primary);
   text-underline-offset: 3px;
-  transition: color var(--duration) var(--ease);
+  transition:
+    color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease);
 }
 .detail-field .detail-link:hover {
   color: var(--primary-hover);
+  background: var(--hover);
+}
+.detail-field .detail-link:active {
+  background: var(--hover);
+  filter: brightness(0.95);
+}
+:root[data-theme] .detail-field .detail-link:focus-visible {
+  outline-offset: -2px;
 }
 :root[data-theme] .form-intro {
   font-size: 13px;

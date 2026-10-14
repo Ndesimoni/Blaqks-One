@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { errorSectionIndex, recordFormSections } from '../features/records/formSections.js';
 import { validateRecord, validateRecordSection } from '../features/records/validation.js';
+import { focusAndRevealField } from '../features/records/revealField.js';
 
 export function useRecordFormSteps({
   module,
@@ -33,6 +34,7 @@ export function useRecordFormSteps({
   const headingRef = useRef(null);
   const previousStep = useRef(activeStep);
   const focusKey = useRef(null);
+  const revealKey = useRef(null);
   const accessibleStep = original ? steps.length - 1 : furthestStep;
   const review = multiStep && activeStep === sections.length;
 
@@ -40,19 +42,25 @@ export function useRecordFormSteps({
     if (previousStep.current === activeStep) return;
     previousStep.current = activeStep;
     if (bodyRef.current) bodyRef.current.scrollTop = 0;
-    const target = focusKey.current
-      ? document.getElementById(focusKey.current)
-      : headingRef.current;
-    target?.focus();
+    if (focusKey.current) revealKey.current = focusKey.current;
+    else headingRef.current?.focus();
     focusKey.current = null;
   }, [activeStep]);
+
+  // Runs after errors render so the field's message is measured and revealed with it.
+  useEffect(() => {
+    const key = revealKey.current;
+    if (!key) return;
+    revealKey.current = null;
+    focusAndRevealField(document.getElementById(key), bodyRef.current);
+  });
 
   const reportErrors = (validation) => {
     setErrors(validation);
     const targetStep = errorSectionIndex(sections, validation);
     if (targetStep < 0) return;
     const key = sections[targetStep].fields.find((field) => validation[field.key]).key;
-    if (targetStep === activeStep) document.getElementById(key)?.focus();
+    if (targetStep === activeStep) revealKey.current = key;
     else {
       focusKey.current = key;
       setActiveStep(targetStep);
@@ -68,7 +76,7 @@ export function useRecordFormSteps({
       return { ...next, ...validation };
     });
     const first = fields.find((field) => validation[field.key]);
-    if (first) document.getElementById(first.key)?.focus();
+    if (first) revealKey.current = first.key;
     return !first;
   };
   const moveTo = (index) => {
