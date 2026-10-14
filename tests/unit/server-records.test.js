@@ -13,8 +13,13 @@ const client = (id, version, clientId, name) => ({
   id,
   version,
   record: { client_id: clientId, full_name: name },
+  assignee: 'member-a',
 });
 const payload = () => ({
+  scope: 'assigned',
+  references: { Clients: [], Properties: [], Contacts: [] },
+  taskClients: [],
+  listingViewings: [],
   records: {
     ...Object.fromEntries(connectedCollections.map((name) => [name, []])),
     Clients: [client('uuid-a', 1, 'CL-001', 'Own client')],
@@ -22,7 +27,7 @@ const payload = () => ({
 });
 
 test('server metadata stays separate from workbook records and unconnected collections remain empty', () => {
-  const entries = readServerRecords(payload());
+  const { entries } = readServerRecords(payload());
   const data = serverWorkspaceData(entries);
   assert.equal(data.Clients[0].full_name, 'Own client');
   assert.equal(data.Clients[0].id, undefined);
@@ -37,7 +42,7 @@ test('server metadata stays separate from workbook records and unconnected colle
 });
 
 test('record updates follow immutable server identity even when workbook IDs change', () => {
-  const entries = readServerRecords(payload());
+  const { entries } = readServerRecords(payload());
   const updated = installServerRecord(
     entries,
     'Clients',
@@ -62,7 +67,12 @@ test('incomplete, stale-shaped and duplicate server responses are rejected befor
   delete missingWorkflow.records['Client care'];
   assert.throws(() => readServerRecords(missingWorkflow), /incomplete/);
   const workflow = payload();
-  workflow.records.Viewings.push({ id: 'uuid-v', version: 1, record: { client_id: 'CL-001' } });
+  workflow.records.Viewings.push({
+    id: 'uuid-v',
+    version: 1,
+    record: { client_id: 'CL-001' },
+    assignee: null,
+  });
   assert.throws(() => readServerRecords(workflow), /invalid/);
   const missingVersion = payload();
   delete missingVersion.records.Clients[0].version;
@@ -72,7 +82,7 @@ test('incomplete, stale-shaped and duplicate server responses are rejected befor
   assert.throws(() => readServerRecords(duplicate), /invalid/);
   assert.throws(
     () =>
-      serverRecordMetadata(readServerRecords(payload()), 'Clients', {
+      serverRecordMetadata(readServerRecords(payload()).entries, 'Clients', {
         client_id: 'another-workspace',
       }),
     /no longer available/,

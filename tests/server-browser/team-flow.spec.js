@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { signIn, addClient, session } from './helpers.js';
 import { teamCard } from './team-status-helpers.js';
+import { assignInBrowser } from './assign-helpers.js';
 import {
   activateInNewContext,
   closeInvitation,
@@ -31,6 +32,11 @@ test('Admin invites a colleague with multiple positions who signs in to the shar
   );
   const staff = await activateInNewContext(browser, link, 'shared-staff@browser-team.test');
   try {
+    await expect(staff.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+    // Staff see assigned records only, so the Admin hands this client to the new colleague.
+    const staffId = (await session(staff.page)).user.id;
+    await assignInBrowser(page, 'Clients', 'client_id', 'BROWSER-TEAM-CLIENT', staffId);
+    await staff.page.reload();
     await expect(staff.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
     await staff.page.getByLabel('Search Clients', { exact: true }).fill('BROWSER-TEAM-CLIENT');
     await expect(staff.page.getByText('Shared team client', { exact: true })).toBeVisible();

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Permissions {
     pub relationships: bool,
@@ -24,16 +24,40 @@ impl Permissions {
     }
 
     pub fn collection(&self, collection: &str) -> bool {
+        Module::of(collection).is_some_and(|module| module.granted(self))
+    }
+}
+
+/// The connected modules that carry record collections and action grants.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Module {
+    Relationships,
+    Properties,
+    Schedule,
+}
+
+impl Module {
+    pub const ALL: [Self; 3] = [Self::Relationships, Self::Properties, Self::Schedule];
+
+    pub fn of(collection: &str) -> Option<Self> {
         match collection {
-            "Clients" | "Contacts" => self.relationships,
-            "Properties" | "Shortlist" => self.properties,
-            "Follow-ups" | "Viewings" | "Interaction log" | "Client care" => self.schedule,
-            _ => false,
+            "Clients" | "Contacts" => Some(Self::Relationships),
+            "Properties" | "Shortlist" => Some(Self::Properties),
+            "Follow-ups" | "Viewings" | "Interaction log" | "Client care" => Some(Self::Schedule),
+            _ => None,
+        }
+    }
+
+    pub fn granted(self, permissions: &Permissions) -> bool {
+        match self {
+            Self::Relationships => permissions.relationships,
+            Self::Properties => permissions.properties,
+            Self::Schedule => permissions.schedule,
         }
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct ChannelAccess {
     pub email: bool,

@@ -1,8 +1,9 @@
-use super::audit;
-use crate::error::{ApiError, ApiResult};
+use super::{audit, target, visibility::RecordScope};
+use crate::{auth::grants::Action, error::ApiResult};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+/// Steps 4–7 and 10 of a delete (contract §4); the handler has run 1–3, including Delete.
 pub async fn delete(
     pool: &PgPool,
     actor: Uuid,
@@ -13,27 +14,27 @@ pub async fn delete(
 ) -> ApiResult<()> {
     let mut transaction = pool.begin().await?;
     crate::workspaces::lock(&mut transaction, workspace).await?;
-    crate::workspaces::ensure_writable(&mut transaction, workspace, actor, Some(collection))
-        .await?;
-    let deleted = sqlx::query(
-        "DELETE FROM crm_records WHERE id=$1 AND workspace_id=$2 AND collection=$3 AND version=$4",
+    // Step 4 repeats the Delete check on the live profile (scope or grant may be gone).
+    let user = crate::workspaces::ensure_writable(
+        &mut transaction,
+        workspace,
+        actor,
+        Some(collection),
+        Some(Action::Delete),
     )
-    .bind(id)
-    .bind(workspace)
-    .bind(collection)
-    .bind(version)
-    .execute(&mut *transaction)
     .await?;
-    if deleted.rows_affected() == 0 {
-        let exists: bool = sqlx::query_scalar(
-            "SELECT EXISTS(SELECT 1 FROM crm_records WHERE id=$1 AND workspace_id=$2 AND collection=$3)",
-        ).bind(id).bind(workspace).bind(collection).fetch_one(&mut *transaction).await?;
-        return Err(if exists {
-            ApiError::stale("This record changed. Reload before deleting.")
-        } else {
-            ApiError::missing()
-        });
-    }
+    let scope = RecordScope::of(&user);
+    let found = target::fetch(&mut transaction, workspace, collection, id, scope).await?;
+    target::ensure_version(
+        &found,
+        version,
+        "This record changed. Reload before deleting.",
+    )?;
+    target::ensure_delete_allowed(scope, collection, &found)?;
+    sqlx::query("DELETE FROM crm_records WHERE id=$1")
+        .bind(found.id)
+        .execute(&mut *transaction)
+        .await?;
     audit::append(
         &mut transaction,
         actor,

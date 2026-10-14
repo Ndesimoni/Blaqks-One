@@ -1,0 +1,71 @@
+use super::{ensure_access, ORGANISATION};
+use crate::{
+    auth::session::Session,
+    error::{ApiError, ApiResult},
+    state::AppState,
+};
+use axum::{
+    extract::{Path, State},
+    Json,
+};
+use serde::Serialize;
+use serde_json::{json, Value};
+use sqlx::FromRow;
+
+#[derive(Serialize, FromRow)]
+pub struct WorkspaceRow {
+    pub id: String,
+    pub name: String,
+    pub role: String,
+    pub status: String,
+}
+
+pub async fn directory(State(state): State<AppState>, session: Session) -> ApiResult<Json<Value>> {
+    let workspaces = sqlx::query_as::<_, WorkspaceRow>(
+        "SELECT w.id, CASE WHEN w.id=$1 THEN 'Super Admin workspace' ELSE u.name END AS name, \
+         CASE WHEN u.role='super-admin' THEN 'Super Admin' ELSE 'Admin' END AS role, \
+         CASE WHEN u.deleted_at IS NOT NULL THEN 'archived' \
+         WHEN u.active THEN 'active' ELSE 'inactive' END AS status \
+         FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
+         WHERE $2 OR w.id=$3 ORDER BY w.created_at,w.id",
+    )
+    .bind(ORGANISATION)
+    .bind(session.user.role == "super-admin")
+    .bind(&session.user.workspace_id)
+    .fetch_all(&state.pool)
+    .await?;
+    Ok(Json(json!({"workspaces": workspaces})))
+}
+
+#[derive(FromRow, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Activity {
+    id: uuid::Uuid,
+    actor_id: uuid::Uuid,
+    actor_name: String,
+    workspace_id: String,
+    action: String,
+    collection: String,
+    record_id: uuid::Uuid,
+    /// `app`, or `sample` for rows written by the sample-data command.
+    source: String,
+    timestamp: String,
+}
+
+pub async fn activity(
+    State(state): State<AppState>,
+    session: Session,
+    Path(workspace): Path<String>,
+) -> ApiResult<Json<Value>> {
+    ensure_access(&state, &session, &workspace).await?;
+    if !matches!(session.user.role.as_str(), "admin" | "super-admin") {
+        return Err(ApiError::forbidden());
+    }
+    let activity = sqlx::query_as::<_, Activity>(
+        "SELECT a.id,a.actor_id,u.name AS actor_name,a.workspace_id,a.action,a.collection,a.record_id,a.source, \
+         to_char(a.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS timestamp \
+         FROM crm_activity a JOIN crm_users u ON u.id=a.actor_id \
+         WHERE a.workspace_id=$1 ORDER BY a.created_at DESC,a.id DESC LIMIT 100",
+    ).bind(&workspace).fetch_all(&state.pool).await?;
+    Ok(Json(json!({"activity": activity})))
+}

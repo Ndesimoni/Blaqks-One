@@ -1,3 +1,5 @@
+import { assignmentRoutes } from './assignments.js';
+
 export class CrmApiError extends Error {
   constructor(message, status, details = {}) {
     super(message);
@@ -101,5 +103,6 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         method: 'DELETE',
         body: { version: metadata.version },
       }),
+    ...assignmentRoutes({ request, scope, recordPath }),
   };
 }

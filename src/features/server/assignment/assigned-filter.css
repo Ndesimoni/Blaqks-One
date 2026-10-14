@@ -1,0 +1,49 @@
+/* "Assigned to" toolbar slot on connected record pages (team scope only). */
+.assigned-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+.assigned-filter label {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+.assigned-filter select {
+  min-width: 190px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+.assigned-filter select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.assigned-filter-count {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+.filters-toolbar:has(> .assigned-filter),
+.inventory-results-bar:has(> .assigned-filter) {
+  flex-wrap: wrap;
+}
+:is(.filters-toolbar, .inventory-results-bar, .lead-filters) > .assigned-filter {
+  flex-basis: 100%;
+}
+@media (max-width: 750px) {
+  .assigned-filter {
+    flex-basis: 100%;
+  }
+  .assigned-filter label,
+  .assigned-filter select {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}

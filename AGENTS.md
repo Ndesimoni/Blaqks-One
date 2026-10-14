@@ -21,7 +21,7 @@ Professional real estate CRM focused on the UAE market.
 - React 18 and Vite
 - Rust/Axum for the private CRM API and retained Google Calendar companion
 - JavaScript and CSS
-- Browser-local storage for the default demo; opt-in PostgreSQL connected mode
+- PostgreSQL connected mode (the product); browser-local demo frozen since 2026-10-14
 - PostgreSQL 17 through Docker Compose for local CRM development and isolated API tests
 - Excel import/export
 - JSON backup with property media
@@ -45,7 +45,7 @@ Professional real estate CRM focused on the UAE market.
 - Private member workspaces, Super Admin workspace directory and scoped activity history; see docs/private-workspaces.md
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
 - Responsive desktop/mobile interface
-- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care with server sessions, scoped CRUD, optimistic versions and redacted transactional activity; see docs/backend-foundation.md
+- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
 
 ## Current Project Structure
 
@@ -58,15 +58,15 @@ Professional real estate CRM focused on the UAE market.
 - src/services/crm/ — Same-origin API client; cookie sessions and in-memory CSRF
 - src/features/server/ — Connected shell, identity and asynchronous scoped record hooks
 - src/lib/ — Business rules, selectors, media, and Excel utilities
-- src/config/ — Navigation, fields, themes, and storage constants
+- src/config/ — Navigation, table columns, field options (split under src/config/fields/), themes, and storage constants
 - src/styles/index.css — Ordered stylesheet imports; maintain the cascade when editing the imported files
-- src/data/schemas.js — Workbook data definitions
+- src/data/schemas.js — Workbook data definitions, re-exported from per-sheet modules in src/data/schemas/ (column letters derived in order; append new workbook columns at the end)
 - src/data/demo.js — Demo records
 - src/main.jsx — React entry point
 - tests/ — Active unit, storage contract, browser, and offline smoke checks
 - docs/architecture-audit.md — Architecture findings and staged refactoring plan
-- backend/ — Retained local Rust/Axum Google Calendar companion
-- services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI
+- backend/ — Retained local Rust/Axum Google Calendar companion: `api/` handlers, `google/` transport, `store/` encrypted storage, `sync.rs` worker
+- services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI; see [module map](docs/backend-foundation.md#module-map). Add new backend domains as sibling modules under `src/`; group a module into subfolders once it holds several workflows
 - compose.yaml / compose.test.yaml — Persistent development PostgreSQL and disposable test PostgreSQL
 - docs/google-calendar.md — Account setup, syncing behavior, and integration verification
 
@@ -113,11 +113,13 @@ Use the eight project specialists in `.codex/agents/` through the [Development a
 
 ## Roadmap
 
-The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients); Deals, Payments and Expenses remain demo-only. Preserve the complete default demo during staged migration. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
+The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients); Deals, Payments and Expenses remain demo-only until they are connected. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
+
+**Connected-only development (owner decision 2026-10-14).** The connected version is the product. The browser-local demo is **frozen**: do not add demo-specific features, demo data or demo browser tests, and do not run `npm run test:e2e` as a routine check. Keep demo code in place (shared components still serve both modes) and do not delete or deliberately break it without a separate owner decision. Verify work with `npm test`, `npm run build`, `npm run test:api`, `npm run test:server:e2e` and `npm run check:lines`. Where real data is missing, use clearly fictional synthetic data: tests seed their own records in the disposable Docker database, and developers may fill a local workspace with the sample-data command; never use real client data for testing.
 
 Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
 
-See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md) for future public listings and customer enquiries. The user requires Super Admin approval before public publication. Keep private CRM data separate from approved public listing versions and preserve enquiry ownership; public catalogue, enquiry and social-provider services remain later implementation stages.
+Follow the owner's [product decisions](docs/product-decisions.md) (record visibility, assignment, listing limits and enquiry routing); they override the roadmap's suggested defaults. The current plan is the [implementation roadmap](docs/claude-implementation-roadmap.md). See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md) for future public listings and customer enquiries. The user requires Super Admin approval before public publication. Keep private CRM data separate from approved public listing versions and preserve enquiry ownership; public catalogue, enquiry and social-provider services remain later implementation stages.
 
 The frontend foundations are implemented; see `docs/frontend-completion.md`. Node 20 or later is required by the patched router dependency. Complete the remaining scoped CRM modules, live team flows, private media storage and publication/enquiry pipeline before hosted deployment. If work on the retained Calendar backend is explicitly requested, verify it with `npm run test:calendar`, relevant browser checks, `cargo fmt`, and Clippy in addition to the standard checks (Rust 1.89+).
 
@@ -133,7 +135,7 @@ The frontend foundations are implemented; see `docs/frontend-completion.md`. Nod
 
 ## Important
 
-The default application is a browser-local demo. Its sign-in uses public sample credentials and a tab-local identity, not server authentication. Connected mode uses server-created accounts and PostgreSQL sessions with enforced workspace access; it is a local development foundation, not a deployed production service. See `docs/frontend-sign-in.md`; never put real passwords into the demo account configuration.
+The browser-local demo is frozen (see Roadmap); the connected version is the product. Its sign-in uses public sample credentials and a tab-local identity, not server authentication. Connected mode uses server-created accounts and PostgreSQL sessions with enforced workspace access; it is a local development foundation, not a deployed production service. See `docs/frontend-sign-in.md`; never put real passwords into the demo account configuration.
 Demo team configuration is separate under `kws-crm-team-preview-v1`; keep passwords/provider tokens out of it and preserve CRM/workbook/backup contracts. Messaging and invitation previews never deliver externally. Demo roles control frontend modules; connected roles and access come from the server.
 Do not treat the demo or first connected slice as a complete production multi-user CRM. Additional roles, account recovery, provider delivery, object storage, operations and deployment remain unfinished.
 Do not remove existing data features without approval.

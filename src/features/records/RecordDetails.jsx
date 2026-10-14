@@ -1,5 +1,7 @@
 import { PropertyRecordDetails } from './PropertyRecordDetails.jsx';
 import { RecordDetailFields } from './RecordDetailFields.jsx';
+import { LinkedProperties } from './LinkedProperties.jsx';
+import { recordDetailFields } from './formSections.js';
 import { schema } from '../../lib/schema.js';
 import { get } from '../../lib/records.js';
 import { Icon } from '../../components/ui/Icon.jsx';
@@ -20,6 +22,9 @@ function RecordDetails({
   busy = false,
   showMessaging = true,
   readOnly = false,
+  canDelete = true,
+  canEdit = true,
+  extras = null,
 }) {
   const { module, record: r } = detail;
   const { route } = useNavigation();
@@ -29,8 +34,11 @@ function RecordDetails({
   const fields = schema(module);
   const id = get(r, fields[0].name);
   const titleId = useId();
+  const changeable = !readOnly && (canDelete || canEdit);
   return (
+    // Opening a related record remounts the dialog so focus, scroll and the opener reset cleanly.
     <Drawer
+      key={`${module}:${id}`}
       className="detail-drawer"
       size={module === 'Properties' ? 'wide' : 'standard'}
       titleId={titleId}
@@ -60,6 +68,7 @@ function RecordDetails({
         </button>
       </div>
       <div className="drawer-body">
+        {extras}
         {module === 'Clients' && showMessaging && !readOnly && (
           <div className="record-message-action">
             <Button
@@ -77,35 +86,52 @@ function RecordDetails({
           <RecordSchedule module={module} record={r} data={data} />
         )}
         {module === 'Properties' && (
-          <PropertyRecordDetails record={r} edit={edit} close={close} readOnly={readOnly} />
+          <PropertyRecordDetails
+            record={r}
+            contacts={data?.Contacts}
+            edit={edit}
+            close={close}
+            readOnly={readOnly || !canEdit}
+          />
         )}
-        <RecordDetailFields module={module} record={r} fields={fields} id={id} data={data} />
+        <RecordDetailFields
+          module={module}
+          record={r}
+          fields={recordDetailFields(module)}
+          id={id}
+          data={data}
+        />
+        {module === 'Contacts' && <LinkedProperties contact={r} properties={data?.Properties} />}
       </div>
       <div className="drawer-footer">
-        {readOnly ? (
+        {!changeable ? (
           <Button variant="light" onClick={close}>
             Close
           </Button>
         ) : (
           <>
-            <Button
-              variant="danger-light"
-              icon="trash"
-              onClick={() => remove(module, r)}
-              disabled={busy}
-            >
-              Delete
-            </Button>
-            <Button
-              icon="edit"
-              disabled={busy}
-              onClick={() => {
-                close();
-                edit(module, r);
-              }}
-            >
-              {lead ? 'Edit lead' : 'Edit record'}
-            </Button>
+            {canDelete && (
+              <Button
+                variant="danger-light"
+                icon="trash"
+                onClick={() => remove(module, r)}
+                disabled={busy}
+              >
+                Delete
+              </Button>
+            )}
+            {canEdit && (
+              <Button
+                icon="edit"
+                disabled={busy}
+                onClick={() => {
+                  close();
+                  edit(module, r);
+                }}
+              >
+                {lead ? 'Edit lead' : 'Edit record'}
+              </Button>
+            )}
           </>
         )}
       </div>

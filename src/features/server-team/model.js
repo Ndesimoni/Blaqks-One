@@ -1,3 +1,5 @@
+import { actionPayload, emptyActions, memberActions } from './actionModel.js';
+
 export const accessFields = [
   ['relationships', 'Clients, leads and contacts', 'Clients, leads and contacts are connected.'],
   [
@@ -10,9 +12,14 @@ export const accessFields = [
   ['reports', 'Reports', 'Team reporting: backend planned.'],
   ['exports', 'Exports', 'Connected exports: planned.'],
 ];
+export const moduleLabels = Object.fromEntries(accessFields.map(([key, label]) => [key, label]));
 export const channelFields = [
   ['email', 'Email'],
   ['whatsapp', 'WhatsApp'],
+];
+export const recordScopeOptions = [
+  ['assigned', 'Only records assigned to them'],
+  ['team', "Whole team's records"],
 ];
 export const teamSteps = [
   { id: 'person', title: 'Person' },
@@ -21,7 +28,7 @@ export const teamSteps = [
 ];
 
 export function blankMember(member) {
-  return {
+  const form = {
     name: member?.name || '',
     email: member?.email || '',
     phone: member?.phone || '',
@@ -34,7 +41,10 @@ export function blankMember(member) {
     ),
     active: member?.active === true,
     accountRole: member?.roleId === 'admin' ? 'admin' : 'staff',
+    recordScope: member?.recordScope === 'team' ? 'team' : 'assigned',
+    actions: emptyActions(),
   };
+  return { ...form, actions: memberActions(member, form) };
 }
 
 export function positionDefaults(positions, roles) {
@@ -73,6 +83,14 @@ export function memberPayload(form, member) {
       permissions,
       channelAccess,
       active,
+      // Full-team visibility applies to staff only and is sent only on member updates.
+      // Record actions are staff-only; an Admin's synthesised actions are never echoed.
+      ...(form.accountRole === 'staff' && member.roleId !== 'admin'
+        ? {
+            recordScope: form.recordScope === 'team' ? 'team' : 'assigned',
+            actions: actionPayload(form),
+          }
+        : {}),
     };
   return {
     name: name.trim(),
@@ -82,5 +100,8 @@ export function memberPayload(form, member) {
     permissions,
     channelAccess,
     accountRole: form.accountRole,
+    ...(form.accountRole === 'staff'
+      ? { actions: actionPayload({ ...form, recordScope: 'assigned' }, { invitation: true }) }
+      : {}),
   };
 }

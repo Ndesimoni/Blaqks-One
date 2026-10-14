@@ -1,5 +1,12 @@
 import { WORKBOOK_SCHEMAS } from '../data/schemas.js';
-import { OPTIONS, computedByModule, dateRegex, longRegex, numRegex } from '../config/fields.js';
+import {
+  OPTIONS,
+  computedByModule,
+  dateRegex,
+  fieldPlaceholders,
+  longRegex,
+  numRegex,
+} from '../config/fields.js';
 import { slug } from './records.js';
 
 const MODS = WORKBOOK_SCHEMAS;
@@ -10,7 +17,7 @@ function colType(l) {
   if (numRegex.test(l) || /share %|score \//i.test(l)) return 'number';
   if (dateRegex.test(l)) return /time/i.test(l) ? 'datetime-local' : 'date';
   if (/email/i.test(l)) return 'email';
-  if (/url/i.test(l)) return 'url';
+  if (/url|\bmap link\b/i.test(l)) return 'url';
   if (/phone/i.test(l)) return 'tel';
   if (longRegex.test(l)) return 'textarea';
   return 'text';
@@ -22,6 +29,7 @@ const richField = (m, f) => ({
   type: colType(f.name),
   calculated: computed(m, f.name),
   options: OPTIONS[f.name] || null,
+  ...(fieldPlaceholders[f.name] && { placeholder: fieldPlaceholders[f.name] }),
 });
 
 const schema = (m) => (MODS[m] || []).map((f) => richField(m, f));

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { create, login, query } from './helpers.mjs';
 import { activate, invite } from './team-helpers.mjs';
+import { setScope } from './assignment-helpers.mjs';
 
 before(() => query('TRUNCATE crm_login_limits'));
 
@@ -59,11 +60,13 @@ test('client workflow records require same-workspace links and protect linked cl
 test('scheduling staff manage workflow records without seeing relationship records', async () => {
   const admin = await login('admin-a');
   await create(admin, 'Clients', { client_id: 'WF-STAFF-CLIENT', full_name: 'Private' });
-  const staff = await activate(
+  const scheduler = await activate(
     await invite(admin, 'workflow-scheduler', {
       permissions: { schedule: true },
     }),
   );
+  // Full-team access lets a scheduler work on any team client without the relationships grant.
+  const staff = await setScope(admin, scheduler, 'team');
   const workspace = admin.user.id;
   const saved = await staff.request(path(workspace, 'Follow-ups'), {
     method: 'POST',

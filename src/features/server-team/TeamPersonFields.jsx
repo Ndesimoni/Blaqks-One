@@ -1,4 +1,5 @@
 import React from 'react';
+import { blankMember } from './model.js';
 
 export function TeamPersonFields({ form, change, editing, canInviteAdmin, busy }) {
   return (
@@ -52,7 +53,15 @@ export function TeamPersonFields({ form, change, editing, canInviteAdmin, busy }
             id="member-account"
             value={form.accountRole}
             disabled={busy}
-            onChange={(event) => change('accountRole', event.target.value)}
+            onChange={(event) => {
+              const { permissions, actions } = blankMember();
+              // Returning to a teammate restarts access, so positions apply fresh presets.
+              change(
+                'accountRole',
+                event.target.value,
+                event.target.value === 'staff' ? { permissions, actions } : {},
+              );
+            }}
           >
             <option value="staff">Teammate in this workspace</option>
             <option value="admin">Admin with a separate workspace</option>

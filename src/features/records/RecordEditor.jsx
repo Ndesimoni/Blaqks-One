@@ -7,12 +7,28 @@ import { RecordEditorHeader } from './RecordEditorHeader.jsx';
 import { RecordEditorBody } from './RecordEditorBody.jsx';
 import { RecordEditorFooter } from './RecordEditorFooter.jsx';
 
-export function RecordEditor({ drawer, data, onClose, onSave, onReload, storageMode = 'browser' }) {
+/** `idPolicy` is connected-only: `issued` lets the server issue a blank ID; `readOnly` locks it. */
+export function RecordEditor({
+  drawer,
+  data,
+  onClose,
+  onSave,
+  onReload,
+  storageMode = 'browser',
+  idPolicy,
+}) {
   const { module, original } = drawer;
   const { route } = useNavigation();
   const titleId = useId();
   const stepTitleId = useId();
-  const state = useRecordEditor({ drawer, data, onClose, onSave, onReload });
+  const state = useRecordEditor({
+    drawer,
+    data,
+    onClose,
+    onSave,
+    onReload,
+    idOptional: Boolean(idPolicy?.issued),
+  });
   const { multiStep, steps, activeStep, accessibleStep, selectStep, busy } = state;
   return (
     <Drawer
@@ -48,6 +64,7 @@ export function RecordEditor({ drawer, data, onClose, onSave, onReload, storageM
           stepTitleId={stepTitleId}
           onReload={onReload}
           storageMode={storageMode}
+          idPolicy={idPolicy}
           state={state}
         />
         <RecordEditorFooter state={state} original={original} />

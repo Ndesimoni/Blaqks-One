@@ -1,7 +1,9 @@
 import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-import { run, stop, waitForApi } from './crm-test-processes.mjs';
+import { apiTestFiles } from './crm-api-test-files.mjs';
+import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
+import { markDatabase } from './mark-dev-database.mjs';
 
 const project = `kws-crm-test-${randomBytes(6).toString('hex')}`;
 const dbPassword = randomBytes(32).toString('hex');
@@ -29,6 +31,7 @@ try {
   );
   containerStarted = true;
   await run('docker', [...compose, 'up', '-d', '--wait'], env);
+  markDatabase(compose, env);
   const address = await run('docker', [...compose, 'port', 'postgres', '5432'], env, {
     capture: true,
   });
@@ -49,38 +52,11 @@ try {
       CRM_BOOTSTRAP_PASSWORD: env.CRM_FIXTURE_PASSWORD,
     });
   }
+  await ensurePortFree('127.0.0.1', 8790);
   server = spawn(binary, [], { env, stdio: 'inherit' });
   await waitForApi(`${env.CRM_TEST_API}/health`, server);
   if (!process.argv.includes('--browser-only')) {
-    await run(
-      'node',
-      [
-        '--test',
-        '--test-concurrency=1',
-        'tests/api/auth.test.mjs',
-        'tests/api/records.test.mjs',
-        'tests/api/workflow-records.test.mjs',
-        'tests/api/scope.test.mjs',
-        'tests/api/validation.test.mjs',
-        'tests/api/import-access.test.mjs',
-        'tests/api/import-validation.test.mjs',
-        'tests/api/import-commit.test.mjs',
-        'tests/api/import-transaction.test.mjs',
-        'tests/api/demo-backup.test.mjs',
-        'tests/api/team-access.test.mjs',
-        'tests/api/team-invitations.test.mjs',
-        'tests/api/team-invitation-lifecycle.test.mjs',
-        'tests/api/team-permissions.test.mjs',
-        'tests/api/team-renewal.test.mjs',
-        'tests/api/team-archive-access.test.mjs',
-        'tests/api/team-archive-workspace.test.mjs',
-        'tests/api/team-archive-concurrency.test.mjs',
-        'tests/api/team-archive-imports.test.mjs',
-        'tests/api/team-archive-races.test.mjs',
-        'tests/api/team-archive-transaction.test.mjs',
-      ],
-      env,
-    );
+    await run('node', ['--test', '--test-concurrency=1', ...apiTestFiles], env);
     const identity = await fetch(`${env.CRM_TEST_API}/auth/login`, {
       method: 'POST',
       headers: { Origin: env.CRM_APP_ORIGIN, 'Content-Type': 'application/json' },

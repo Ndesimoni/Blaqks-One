@@ -6,7 +6,15 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { pad } from '../../lib/dates.js';
 
-export function RecordEditorBody({ module, data, stepTitleId, onReload, storageMode, state }) {
+export function RecordEditorBody({
+  module,
+  data,
+  stepTitleId,
+  onReload,
+  storageMode,
+  idPolicy,
+  state,
+}) {
   const {
     form,
     setForm,
@@ -28,6 +36,10 @@ export function RecordEditorBody({ module, data, stepTitleId, onReload, storageM
   } = state;
   const idField = sections[0].fields[0];
   const currentSection = sections[activeStep];
+  // A locked ID ("Issued when saved") is read-only, so focus starts on the first editable field.
+  const idLocked = Boolean(idPolicy?.readOnly);
+  const focusCandidate = (field) =>
+    field.key === idField.key ? !idLocked : idLocked && currentSection === sections[0];
   return (
     <div className="drawer-body" ref={bodyRef}>
       {Object.values(errors).some(Boolean) && (
@@ -91,6 +103,8 @@ export function RecordEditorBody({ module, data, stepTitleId, onReload, storageM
                     module={module}
                     data={data}
                     idField={idField}
+                    idPolicy={idPolicy}
+                    initialFocus={focusCandidate(field)}
                     value={form[field.key]}
                     error={errors[field.key]}
                     change={change}

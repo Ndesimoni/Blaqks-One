@@ -2,14 +2,25 @@ import React from 'react';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { TeamAccountStatus } from './TeamAccountStatus.jsx';
 import { TeamChannelFields } from './TeamChannelFields.jsx';
+import { TeamRecordScopeFields } from './TeamRecordScopeFields.jsx';
+import { TeamActionFields } from './TeamActionFields.jsx';
+import { TeamActionDefaults } from './TeamActionDefaults.jsx';
 import { accessFields, positionDefaults } from './model.js';
+import { actionModules, actionsAfterAccessChange } from './actionModel.js';
 
 export function TeamAccessFields({ form, change, roles, member, busy }) {
   const togglePosition = (id, checked) => {
     const positions = checked
       ? [...form.positions, id]
       : form.positions.filter((value) => value !== id);
-    change('positions', positions, { permissions: positionDefaults(positions, roles).permissions });
+    const { permissions } = positionDefaults(positions, roles);
+    const actions = actionsAfterAccessChange(form, permissions, positions, roles);
+    change('positions', positions, { permissions, actions });
+  };
+  const toggleModule = (key, checked) => {
+    const permissions = { ...form.permissions, [key]: checked };
+    const actions = actionsAfterAccessChange(form, permissions, form.positions, roles);
+    change('permissions', permissions, { actions });
   };
   if (form.accountRole === 'admin')
     return (
@@ -31,7 +42,7 @@ export function TeamAccessFields({ form, change, roles, member, busy }) {
         <legend>Positions *</legend>
         <p>
           Select all positions this person handles. Changing positions applies their combined
-          defaults; you can adjust access below.
+          section defaults; sections already on keep the actions you chose below.
         </p>
         <OverflowList
           mode="scroll"
@@ -55,22 +66,34 @@ export function TeamAccessFields({ form, change, roles, member, busy }) {
       <fieldset className="connected-team-options">
         <legend>CRM access</legend>
         {accessFields.map(([key, label, guidance]) => (
-          <label key={key}>
-            <input
-              type="checkbox"
-              checked={form.permissions[key]}
-              disabled={busy}
-              onChange={(event) =>
-                change('permissions', { ...form.permissions, [key]: event.target.checked })
-              }
-            />
-            <span>
-              {label}
-              <small>{guidance}</small>
-            </span>
-          </label>
+          <React.Fragment key={key}>
+            <label>
+              <input
+                type="checkbox"
+                checked={form.permissions[key]}
+                disabled={busy}
+                onChange={(event) => toggleModule(key, event.target.checked)}
+              />
+              <span>
+                {label}
+                <small>{guidance}</small>
+              </span>
+            </label>
+            {key in actionModules && form.permissions[key] && (
+              <TeamActionFields
+                module={key}
+                label={label}
+                form={form}
+                change={change}
+                busy={busy}
+                invitation={!member}
+              />
+            )}
+          </React.Fragment>
         ))}
+        <TeamActionDefaults form={form} change={change} roles={roles} busy={busy} />
       </fieldset>
+      {member && <TeamRecordScopeFields form={form} change={change} busy={busy} />}
       <TeamChannelFields form={form} change={change} busy={busy} />
       {member && <TeamAccountStatus form={form} change={change} member={member} busy={busy} />}
     </div>

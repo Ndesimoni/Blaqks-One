@@ -67,7 +67,7 @@
   color: var(--muted);
   line-height: 1.5;
 }
-:root[data-theme] .connected-team-options input[type='checkbox'] {
+:root[data-theme] .connected-team-options :is(input[type='checkbox'], input[type='radio']) {
   width: 18px;
   height: 18px;
   min-height: 18px;

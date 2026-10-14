@@ -1,0 +1,25 @@
+/// Server-owned fields a record payload may never carry. Assignment, scope and the
+/// read projections (contract section 5, M2) come only from the database.
+pub const RESERVED_KEYS: &[&str] = &[
+    "id",
+    "workspace_id",
+    "workspaceId",
+    "owner_id",
+    "ownerId",
+    "actor_id",
+    "actorId",
+    "version",
+    "approval",
+    "approved_by",
+    "published",
+    "audit",
+    "created_by",
+    "assignee",
+    "assigneeId",
+    "assignee_id",
+    "record_scope",
+    "recordScope",
+    "references",
+    "taskClients",
+    "listingViewings",
+];

@@ -26,7 +26,8 @@ test('Admin archival freezes the entire team and workspace without losing compan
   });
   const clientResponse = await staff.request(recordsPath(admin, 'Clients'), {
     method: 'POST',
-    body: { record: { client_id: 'ARCHIVE-CLIENT', full_name: 'Retained client' } },
+    // Assigned-only staff receive a server-issued ID (assignments contract L1).
+    body: { record: { full_name: 'Retained client' } },
   });
   assert.equal(clientResponse.status, 201);
   const client = clientResponse.value;

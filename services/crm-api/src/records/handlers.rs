@@ -1,12 +1,13 @@
+pub use super::list::list;
 use super::{
-    collections::COLLECTIONS,
-    deletion,
+    creation, deletion,
     mutation::{self, Entry, Update},
     requests::{CreateRequest, DeleteRequest, UpdateRequest},
     validation,
+    visibility::RecordScope,
 };
 use crate::{
-    auth::{protection, session::Session},
+    auth::{grants::Action, protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces::ensure_access,
@@ -19,31 +20,6 @@ use axum::{
 use serde_json::{json, Value};
 use uuid::Uuid;
 
-pub async fn list(
-    State(state): State<AppState>,
-    session: Session,
-    Path(workspace): Path<String>,
-) -> ApiResult<Json<Value>> {
-    ensure_access(&state, &session, &workspace).await?;
-    let mut records = json!({});
-    for collection in COLLECTIONS.iter().map(|collection| collection.name) {
-        records[collection] = json!([]);
-        if !session.user.can_collection(collection) {
-            continue;
-        }
-        let entries = sqlx::query_as::<_, Entry>(
-            "SELECT id,version,payload FROM crm_records WHERE workspace_id=$1 AND collection=$2 \
-             ORDER BY created_at,id",
-        )
-        .bind(&workspace)
-        .bind(collection)
-        .fetch_all(&state.pool)
-        .await?;
-        records[collection] = json!(entries);
-    }
-    Ok(Json(json!({"records": records})))
-}
-
 pub async fn create(
     State(state): State<AppState>,
     session: Session,
@@ -53,10 +29,11 @@ pub async fn create(
 ) -> ApiResult<(StatusCode, Json<Entry>)> {
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
-    ensure_collection(&session, &collection)?;
+    ensure_collection(&session, &collection, Action::Create)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record."))?;
-    let record = validation::validate(&collection, body.record)?;
-    let entry = mutation::create(
+    let record = validation::validate_new(&collection, body.record)?;
+    creation::ensure_id_allowed(RecordScope::of(&session.user), &record)?;
+    let entry = creation::create(
         &state.pool,
         session.user.id,
         &workspace,
@@ -76,7 +53,7 @@ pub async fn update(
 ) -> ApiResult<Json<Entry>> {
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
-    ensure_collection(&session, &collection)?;
+    ensure_collection(&session, &collection, Action::Edit)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record and version."))?;
     if body.version < 1 {
         return Err(ApiError::invalid("A positive record version is required."));
@@ -107,7 +84,8 @@ pub async fn delete(
 ) -> ApiResult<Json<Value>> {
     ensure_access(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
-    ensure_collection(&session, &collection)?;
+    // Step 2 absorbs H2: parents need team scope, deleteMain and coverage (M-C).
+    ensure_collection(&session, &collection, Action::Delete)?;
     let Json(body) = body.map_err(|_| ApiError::invalid("Provide a JSON record version."))?;
     if body.version < 1 {
         return Err(ApiError::invalid("A positive record version is required."));
@@ -126,10 +104,9 @@ pub async fn delete(
     Ok(Json(json!({"ok": true})))
 }
 
-fn ensure_collection(session: &Session, collection: &str) -> ApiResult<()> {
+/// Steps 1–2 after access: an unknown collection is a path-only 400 (I-1), then the
+/// module grant and the action, from the session profile, before any body or target.
+fn ensure_collection(session: &Session, collection: &str, action: Action) -> ApiResult<()> {
     validation::collection_key(collection)?;
-    if !session.user.can_collection(collection) {
-        return Err(ApiError::forbidden());
-    }
-    Ok(())
+    session.user.ensure(collection, action)
 }

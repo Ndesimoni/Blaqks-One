@@ -6,8 +6,9 @@ import { mediaPlans } from '../../lib/media.js';
 import { amenityList } from '../../lib/properties.js';
 import { safeExternalUrl } from '../../lib/validation.js';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
+import { BuildingContacts } from './BuildingContacts.jsx';
 
-export function PropertyRecordDetails({ record: r, edit, close, readOnly = false }) {
+export function PropertyRecordDetails({ record: r, contacts, edit, close, readOnly = false }) {
   return (
     <div className="property-detail-studio">
       <PropertyGallery
@@ -91,6 +92,7 @@ export function PropertyRecordDetails({ record: r, edit, close, readOnly = false
           <p className="property-description">{get(r, 'Property description')}</p>
         )}
       </div>
+      <BuildingContacts property={r} contacts={contacts} />
     </div>
   );
 }

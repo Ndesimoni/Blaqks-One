@@ -4,7 +4,7 @@ import { N } from '../../lib/format.js';
 import { propertyListingTags } from '../../config/properties.js';
 import { useWorkspaceView } from '../../hooks/useWorkspace.js';
 
-export function PropertyToolbar({ result, f, activeCount }) {
+export function PropertyToolbar({ result, f, activeCount, extras = null }) {
   const { query, setQuery, setPage, viewMode, setViewMode } = useWorkspaceView();
   return (
     <div className="inventory-results-bar">
@@ -53,6 +53,7 @@ export function PropertyToolbar({ result, f, activeCount }) {
           </button>
         </div>
       </div>
+      {extras}
     </div>
   );
 }

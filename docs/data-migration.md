@@ -1,6 +1,6 @@
 # Save and import existing CRM records
 
-The Super Admin can review and import **Clients, Contacts, Properties, Follow-ups, Viewings, Shortlist, Interaction log and Client care** into Docker PostgreSQL. Every linked client, contact or property must already exist in the destination workspace or arrive in the same import; otherwise the preview is rejected and nothing is saved. Other collections remain in the source browser and the complete backup. Nothing is copied automatically when connected mode starts.
+The Super Admin can review and import **Clients, Contacts, Properties, Follow-ups, Viewings, Shortlist, Interaction log and Client care** into Docker PostgreSQL. Every linked client, contact or property, including a Client's referrer and a Client care referred client, must already exist in the destination workspace or arrive in the same import (in any order); otherwise the preview is rejected and nothing is saved. A client that names itself as its own referrer is rejected. Other collections remain in the source browser and the complete backup. Nothing is copied automatically when connected mode starts.
 
 ## Create the backup file first
 
@@ -28,9 +28,9 @@ The browser copy and selected file stay intact. This import does not publish lis
 
 ## Duplicate and failure behaviour
 
-Imports add records without overwriting existing records. Legacy IDs, contact links, optional business metadata and inline media are preserved. Normalised matching records already saved in that workspace are skipped. Different records with the same collection/ID stop the entire import and show a conflict; resolve the difference in a copy before reviewing again.
+Imported Clients, Properties and Contacts are assigned to the destination workspace owner (history reason `import`); imported Follow-ups have no direct assignee and follow their client. Imports add records without overwriting existing records. Legacy IDs, contact links, optional business metadata and inline media are preserved. Normalised matching records already saved in that workspace are skipped. Different records with the same collection/ID stop the entire import and show a conflict; resolve the difference in a copy before reviewing again.
 
-The server validates the entire batch, inserts Contacts before linked Properties, and commits all records and redacted activity together. If any insert fails, the transaction rolls back. Every normal CRUD mutation and import uses the same workspace lock. Changes to the destination after preview require a fresh preview.
+The server validates the entire batch, inserts Contacts before linked Properties, checks client referrals when the transaction commits, and commits all records and redacted activity together. If any insert fails, the transaction rolls back. Every normal CRUD mutation and import uses the same workspace lock. Changes to the destination after preview require a fresh preview.
 
 Preview tokens expire after 30 minutes and are bound to the authenticated active Super Admin and destination. Origin and CSRF protection still apply. Tokens are kept in frontend memory and hashed in PostgreSQL. A repeated successful commit with the same token returns its saved result without inserting records or activity again. If a response is lost, retry the current import before closing or starting a new one.
 

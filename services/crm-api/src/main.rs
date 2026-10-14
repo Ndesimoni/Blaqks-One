@@ -3,6 +3,7 @@ use kws_crm_api::{
     bootstrap,
     config::Config,
     routes,
+    sample::{self, guard, marker, options::Options},
     state::AppState,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -19,16 +20,35 @@ async fn main() {
 
 async fn run() -> Result<(), String> {
     let config = Config::from_env()?;
+    let command = std::env::args().nth(1);
+    let sample_options = match command.as_deref() {
+        Some(name @ ("seed-sample" | "clear-sample")) => {
+            let args: Vec<String> = std::env::args().skip(2).collect();
+            let options = Options::parse(name, &args)?;
+            // Before connecting: never reach a database outside local development.
+            guard::ensure_local(!config.secure_cookie, &config.database_url)?;
+            Some(options)
+        }
+        _ => None,
+    };
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&config.database_url)
         .await
         .map_err(|_| "CRM database connection failed.")?;
+    if sample_options.is_some() {
+        // Before migrations or writes: the database itself must be marked as local.
+        marker::ensure(&pool).await?;
+    }
     sqlx::migrate!("./migrations")
         .run(&pool)
         .await
         .map_err(|_| "CRM schema migration failed. Check database access and migration history.")?;
-    let command = std::env::args().nth(1);
+    if let Some(options) = sample_options {
+        let database = guard::describe(&config.database_url);
+        println!("{}", sample::run(&pool, options, &database).await?);
+        return Ok(());
+    }
     if command.as_deref() == Some("migrate") {
         println!("CRM database migrations applied.");
         return Ok(());
@@ -41,7 +61,7 @@ async fn run() -> Result<(), String> {
         return Ok(());
     }
     if command.is_some() {
-        return Err("Supported commands: create-user, migrate.".into());
+        return Err("Supported commands: create-user, migrate, seed-sample, clear-sample.".into());
     }
     let address = config.address;
     let dummy_hash = password::hash(session::random_token())

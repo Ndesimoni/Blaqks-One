@@ -1,5 +1,6 @@
 import React from 'react';
-import { accessFields, channelFields } from './model.js';
+import { accessFields, channelFields, recordScopeOptions } from './model.js';
+import { TeamActionReview } from './TeamActionReview.jsx';
 
 export function TeamMemberReview({ form, roles, editing }) {
   const names = form.positions.map((id) => roles.find((role) => role.id === id)?.label || id);
@@ -31,6 +32,13 @@ export function TeamMemberReview({ form, roles, editing }) {
               .map(([, label]) => label)
               .join(', ') || 'No sections assigned'}
           </p>
+          {editing && (
+            <>
+              <h4>Record visibility</h4>
+              <p>{recordScopeOptions.find(([value]) => value === form.recordScope)?.[1]}</p>
+            </>
+          )}
+          <TeamActionReview form={form} />
         </>
       )}
       <h4>Messaging permissions</h4>

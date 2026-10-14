@@ -10,6 +10,7 @@ import { ServerTeamPage } from '../server-team/ServerTeamPage.jsx';
 import { canOpenSection } from './access.js';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
+import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -38,8 +39,15 @@ export function ServerContent({ owner }) {
         <Button onClick={retry}>Retry</Button>
       </section>
     );
-  if (route === 'Leads') return <LeadsPage />;
-  if (route === 'Contacts') return <ContactsPage />;
-  if (route === 'Properties') return <PropertyDirectory />;
-  return <RecordsPage key={route} module={route} />;
+  const page = (toolbarExtras) => {
+    if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
+    if (route === 'Contacts') return <ContactsPage toolbarExtras={toolbarExtras} />;
+    if (route === 'Properties') return <PropertyDirectory toolbarExtras={toolbarExtras} />;
+    return <RecordsPage module={route} toolbarExtras={toolbarExtras} />;
+  };
+  return (
+    <AssignmentPageScope key={route} module={route === 'Leads' ? 'Clients' : route}>
+      {page}
+    </AssignmentPageScope>
+  );
 }

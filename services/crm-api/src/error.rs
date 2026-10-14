@@ -15,6 +15,11 @@ impl ApiError {
         Self(StatusCode::FORBIDDEN, "Access denied.", "forbidden")
     }
 
+    /// A 403 with a specific, non-revealing explanation (for example H2 deletes).
+    pub fn denied(message: &'static str) -> Self {
+        Self(StatusCode::FORBIDDEN, message, "forbidden")
+    }
+
     pub fn unauthorized() -> Self {
         Self(
             StatusCode::UNAUTHORIZED,
@@ -25,6 +30,10 @@ impl ApiError {
 
     pub fn conflict(message: &'static str) -> Self {
         Self(StatusCode::CONFLICT, message, "conflict")
+    }
+
+    pub fn link_missing(message: &'static str) -> Self {
+        Self(StatusCode::CONFLICT, message, "link_missing")
     }
 
     pub fn stale(message: &'static str) -> Self {
@@ -42,6 +51,11 @@ impl From<sqlx::Error> for ApiError {
             match database.code().as_deref() {
                 Some("23505") => return Self::conflict("That record ID is already in use."),
                 Some("23503") => return Self::conflict("A linked record prevents this change."),
+                // The crm_check_assignee trigger raises 23514 with no constraint name; a
+                // named CHECK constraint is a server bug and stays on the generic 503.
+                Some("23514") if database.constraint().is_none() => {
+                    return Self::conflict("That team member can no longer receive this record.")
+                }
                 _ => {}
             }
         }
@@ -58,3 +72,7 @@ impl IntoResponse for ApiError {
         (self.0, Json(json!({"message": self.1, "code": self.2}))).into_response()
     }
 }
+
+#[cfg(test)]
+#[path = "error_tests.rs"]
+mod tests;

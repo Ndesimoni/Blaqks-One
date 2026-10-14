@@ -16,13 +16,15 @@ export function normalizeRecord(module, record) {
   return normalized;
 }
 
-export function validateRecord(module, record, records = [], original = null, data) {
+/** `idOptional` is for connected creates only, where the server issues a blank ID. */
+export function validateRecord(module, record, records = [], original = null, data, rules = {}) {
   const errors = {};
   const fields = schema(module).filter((field) => !field.calculated);
   const id = fields[0].key;
   const value = String(record[id] ?? '').trim();
-  if (!value) errors[id] = 'A record ID is required.';
-  else if (records.some((row) => String(row[id]).trim() === value && row[id] !== original?.[id]))
+  if (!value) {
+    if (!rules.idOptional) errors[id] = 'A record ID is required.';
+  } else if (records.some((row) => String(row[id]).trim() === value && row[id] !== original?.[id]))
     errors[id] = 'That record ID is already in use.';
   for (const field of fields) {
     const value = record[field.key];
@@ -64,10 +66,10 @@ export function validateRecord(module, record, records = [], original = null, da
 }
 
 /** Advancing a form checks only the fields shown in its current section. */
-export function validateRecordSection(module, record, records, original, fields, data) {
+export function validateRecordSection(module, record, records, original, fields, data, rules) {
   const keys = new Set(fields.map((field) => field.key));
   return Object.fromEntries(
-    Object.entries(validateRecord(module, record, records, original, data)).filter(([key]) =>
+    Object.entries(validateRecord(module, record, records, original, data, rules)).filter(([key]) =>
       keys.has(key),
     ),
   );

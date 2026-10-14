@@ -12,7 +12,7 @@ const contents = [
   'CRM_APP_ORIGIN=http://localhost:5173',
   'CRM_BIND_ADDRESS=127.0.0.1:8788',
   'CRM_ALLOW_INSECURE_LOCAL=true',
-  'VITE_CRM_MODE=demo',
+  'VITE_CRM_MODE=server',
   'CRM_API_PROXY=http://127.0.0.1:8788',
   '',
 ].join('\n');

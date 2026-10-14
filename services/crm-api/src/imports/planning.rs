@@ -52,7 +52,8 @@ pub fn plan(source: ImportRecords, target: &[TargetRow]) -> ApiResult<Plan> {
     })
 }
 
-/// Every linked ID must exist in the target workspace or arrive in the same import.
+/// Every linked ID must exist in the target workspace or arrive anywhere in the
+/// same import, including later rows of the same collection (deferred referrals).
 fn ensure_links(source: &ImportRecords, target: &[TargetRow]) -> ApiResult<()> {
     let mut known: HashSet<(&str, &str)> = target
         .iter()

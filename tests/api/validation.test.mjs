@@ -50,8 +50,7 @@ test('invalid shapes, amounts and media cannot enter records', async () => {
   for (const record of [
     [],
     null,
-    {},
-    { client_id: ' ' },
+    { client_id: 7 },
     { client_id: 'API-BAD', full_name: {} },
     { client_id: 'API-BAD', maximum_budget_aed: -1 },
     { client_id: 'API-BAD', minimum_budget_aed: 200, maximum_budget_aed: 100 },
@@ -81,6 +80,11 @@ test('invalid shapes, amounts and media cannot enter records', async () => {
       ).status,
       400,
     );
+  }
+  // A missing or blank ID on create is issued by the server (assignments contract L1).
+  for (const record of [{}, { client_id: ' ' }]) {
+    const issued = await create(session, 'Clients', record);
+    assert.match(issued.record.client_id, /^CL-\d{3,9}$/);
   }
   assert.equal(
     (

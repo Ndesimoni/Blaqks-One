@@ -1,4 +1,8 @@
-use crate::auth::permissions::{ChannelAccess, Permissions};
+use super::positions::TABLE;
+use crate::auth::{
+    actions::Actions,
+    permissions::{ChannelAccess, Permissions},
+};
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -8,92 +12,33 @@ pub struct Position {
     pub label: &'static str,
     pub permissions: Permissions,
     pub channel_access: ChannelAccess,
+    /// Action preset for the modules this position grants (deleteMain always false).
+    pub actions: Actions,
 }
 
 pub fn positions() -> Vec<Position> {
-    [
-        (
-            "receptionist",
-            "Receptionist",
-            true,
-            false,
-            true,
-            false,
-            false,
-        ),
-        (
-            "lead-manager",
-            "Lead Manager",
-            true,
-            false,
-            true,
-            false,
-            true,
-        ),
-        (
-            "property-agent",
-            "Property Agent",
-            true,
-            true,
-            true,
-            false,
-            true,
-        ),
-        (
-            "listing-coordinator",
-            "Listing Coordinator",
-            true,
-            true,
-            false,
-            false,
-            false,
-        ),
-        ("accountant", "Accountant", false, false, false, true, true),
-        (
-            "property-manager",
-            "Property Manager",
-            true,
-            true,
-            true,
-            false,
-            true,
-        ),
-        (
-            "marketing-coordinator",
-            "Marketing Coordinator",
-            true,
-            false,
-            false,
-            false,
-            true,
-        ),
-        (
-            "team-supervisor",
-            "Team Supervisor",
-            true,
-            true,
-            true,
-            false,
-            true,
-        ),
-    ]
-    .into_iter()
-    .map(
-        |(id, label, relationships, properties, schedule, finance, reports)| Position {
-            id,
-            label,
-            permissions: Permissions {
-                relationships,
-                properties,
-                schedule,
-                finance,
-                reports,
-                exports: false,
+    TABLE
+        .into_iter()
+        .map(
+            |(id, label, [relationships, properties, schedule, finance, reports])| {
+                let permissions = Permissions {
+                    relationships,
+                    properties,
+                    schedule,
+                    finance,
+                    reports,
+                    exports: false,
+                };
+                Position {
+                    id,
+                    label,
+                    actions: Actions::preset(&permissions),
+                    permissions,
+                    channel_access: ChannelAccess::default(),
+                }
             },
-            channel_access: ChannelAccess::default(),
-        },
-    )
-    .collect()
+        )
+        .collect()
 }
 
 pub fn defaults(selected: &[String]) -> Option<Permissions> {
@@ -130,5 +75,20 @@ mod tests {
         assert!(defaults(&["super-admin".into()]).is_none());
         assert!(defaults(&["receptionist".into(), "receptionist".into()]).is_none());
         assert!(positions().iter().all(|role| !role.channel_access.email));
+    }
+
+    #[test]
+    fn presets_follow_granted_modules_and_never_delete_main_records() {
+        for position in positions() {
+            let actions = position.actions;
+            assert!(!actions.deletes_main(), "{}", position.id);
+            assert_eq!(actions.schedule.create, position.permissions.schedule);
+            assert_eq!(
+                actions.properties.delete_activity,
+                position.permissions.properties
+            );
+        }
+        let receptionist = &positions()[0];
+        assert!(receptionist.actions.relationships.assign && !receptionist.actions.properties.edit);
     }
 }

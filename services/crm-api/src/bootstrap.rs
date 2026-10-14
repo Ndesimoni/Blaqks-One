@@ -19,13 +19,20 @@ fn required(key: &str) -> ApiResult<String> {
     Ok(value.trim().to_owned())
 }
 
-fn read_password() -> ApiResult<String> {
-    if let Ok(password) = env::var("CRM_BOOTSTRAP_PASSWORD") {
-        return Ok(password);
+/// Reads a secret from `key`, a hidden terminal prompt or one line of piped input.
+fn read_secret(key: &str, prompt: &str) -> ApiResult<String> {
+    match env::var(key) {
+        Ok(password) => Ok(password),
+        Err(_) => prompt_secret(prompt),
     }
+}
+
+/// A hidden terminal prompt, or one line of piped input. Piped input that ends without
+/// a line yields an empty string.
+pub fn prompt_secret(prompt: &str) -> ApiResult<String> {
     let interactive = io::stdin().is_terminal();
     if interactive {
-        eprint!("New account password: ");
+        eprint!("{prompt}");
         let _ = io::stderr().flush();
         if !std::process::Command::new("stty")
             .arg("-echo")
@@ -71,7 +78,7 @@ pub async fn create_user(pool: &PgPool) -> ApiResult<Uuid> {
             "Provide a valid name, email, international phone and admin role.",
         ));
     }
-    let password = read_password()?;
+    let password = read_secret("CRM_BOOTSTRAP_PASSWORD", "New account password: ")?;
     if !password::valid_length(&password) {
         return Err(ApiError::invalid(
             "Passwords must contain at least 8 characters and at most 1024 bytes.",

@@ -1,4 +1,5 @@
 use crate::{
+    assignments,
     auth::handlers as auth,
     error::{ApiError, ApiResult},
     imports,
@@ -11,7 +12,7 @@ use axum::{
     http::{header, HeaderValue, StatusCode},
     middleware::{self, Next},
     response::Response,
-    routing::{get, post},
+    routing::{get, post, put},
     Json, Router,
 };
 use serde_json::{json, Value};
@@ -58,34 +59,34 @@ pub fn app(state: AppState) -> Router {
         .route("/api/crm/auth/logout", post(auth::logout))
         .route(
             "/api/crm/auth/invitations/inspect",
-            post(team::invitations::inspect).layer(DefaultBodyLimit::max(16 * 1024)),
+            post(team::invitations::inspect::inspect).layer(DefaultBodyLimit::max(16 * 1024)),
         )
         .route(
             "/api/crm/auth/invitations/accept",
-            post(team::activation::accept).layer(DefaultBodyLimit::max(16 * 1024)),
+            post(team::invitations::activation::accept).layer(DefaultBodyLimit::max(16 * 1024)),
         )
-        .route("/api/crm/workspaces", get(workspaces::directory))
+        .route("/api/crm/workspaces", get(workspaces::handlers::directory))
         .route(
             "/api/crm/workspaces/{workspace}/team/{id}/invitations",
-            post(team::renewal::renew).layer(DefaultBodyLimit::max(16 * 1024)),
+            post(team::invitations::renewal::renew).layer(DefaultBodyLimit::max(16 * 1024)),
         )
         .route(
             "/api/crm/workspaces/{workspace}/team",
-            get(team::members::list),
+            get(team::members::directory::list),
         )
         .route(
             "/api/crm/workspaces/{workspace}/team/invitations",
-            post(team::invite::create).layer(DefaultBodyLimit::max(16 * 1024)),
+            post(team::invitations::create::create).layer(DefaultBodyLimit::max(16 * 1024)),
         )
         .route(
             "/api/crm/workspaces/{workspace}/team/{id}",
-            axum::routing::patch(team::update::update)
-                .delete(team::archive::archive)
+            axum::routing::patch(team::members::update::update)
+                .delete(team::archive::handlers::archive)
                 .layer(DefaultBodyLimit::max(16 * 1024)),
         )
         .route(
             "/api/crm/workspaces/{workspace}/team/{id}/archive-preview",
-            get(team::archive::preview),
+            get(team::archive::handlers::preview),
         )
         .route(
             "/api/crm/workspaces/{workspace}/imports/preview",
@@ -101,7 +102,7 @@ pub fn app(state: AppState) -> Router {
         )
         .route(
             "/api/crm/workspaces/{workspace}/activity",
-            get(workspaces::activity),
+            get(workspaces::handlers::activity),
         )
         .route(
             "/api/crm/workspaces/{workspace}/records/{collection}",
@@ -110,6 +111,23 @@ pub fn app(state: AppState) -> Router {
         .route(
             "/api/crm/workspaces/{workspace}/records/{collection}/{id}",
             axum::routing::patch(records::update).delete(records::delete),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/records/{collection}/{id}/assignee",
+            put(assignments::assign::assign).layer(DefaultBodyLimit::max(16 * 1024)),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/records/{collection}/{id}/assignments",
+            get(assignments::log::history),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/assignees",
+            get(assignments::assignees::assignees),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/assignments/bulk",
+            post(assignments::bulk::bulk)
+                .layer(DefaultBodyLimit::max(assignments::requests::MAX_BULK_BYTES)),
         )
         .fallback(unknown_route)
         .method_not_allowed_fallback(unsupported_method)
