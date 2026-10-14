@@ -48,7 +48,8 @@ export const clientsColumns = sheetColumns([
   'Recontact possible',
 ]);
 
-// Location columns follow Record check so earlier workbooks and backups still import.
+// Location columns follow Record check so earlier workbooks and backups still import;
+// Address and Map link were appended after Emirate for the same reason.
 export const contactsColumns = sheetColumns([
   'Contact ID',
   'Full name',
@@ -61,4 +62,6 @@ export const contactsColumns = sheetColumns([
   'Building / project',
   'Community',
   'Emirate',
+  'Address',
+  'Map link',
 ]);

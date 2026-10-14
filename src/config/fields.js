@@ -53,4 +53,18 @@ const dateRegex =
 const longRegex =
   /(notes|summary|criteria|objection|commitment|description|feedback|blocker|interests|amenities|selling points|instructions)/i;
 
-export { OPTIONS, computedByModule, numRegex, dateRegex, longRegex };
+/** Input hints for fields whose name alone does not show the expected format. */
+const fieldPlaceholders = { 'Map link': 'https://maps.google.com/…' };
+
+/** Detail views open these URL fields as labelled external links when the value is safe. */
+const detailLinkLabels = { 'Map link': 'Open map' };
+
+export {
+  OPTIONS,
+  computedByModule,
+  numRegex,
+  dateRegex,
+  longRegex,
+  fieldPlaceholders,
+  detailLinkLabels,
+};

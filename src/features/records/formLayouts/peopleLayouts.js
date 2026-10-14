@@ -61,6 +61,8 @@ export const peopleLayouts = {
       'building_project',
       'community',
       'emirate',
+      'address',
+      'map_link',
       'phone',
       'email',
       'notes',

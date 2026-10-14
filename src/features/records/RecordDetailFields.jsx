@@ -4,6 +4,22 @@ import { Badge } from '../../components/ui/Badge.jsx';
 import { get } from '../../lib/records.js';
 import { propertyPrice } from '../../lib/properties.js';
 import { formatValue } from '../../lib/crm.js';
+import { detailLink } from '../../lib/detailLinks.js';
+
+/** Safe configured links open externally; every other value, including unsafe URLs, is text. */
+function DetailValue({ module, record: r, field: f, data }) {
+  const link = detailLink(f, r[f.key]);
+  if (link)
+    return (
+      <a className="detail-link" href={link.href} target="_blank" rel="noopener noreferrer">
+        {link.label}
+        <Icon name="external" size={14} />
+      </a>
+    );
+  return module === 'Properties' && f.name === 'Price / annual rent AED'
+    ? propertyPrice(r)
+    : formatValue(data, module, r, f);
+}
 
 export function RecordDetailFields({ module, record: r, fields, id, data }) {
   return (
@@ -29,9 +45,7 @@ export function RecordDetailFields({ module, record: r, fields, id, data }) {
           <div className={'detail-field ' + (f.type === 'textarea' ? 'wide' : '')} key={f.key}>
             <span>{f.name}</span>
             <strong>
-              {module === 'Properties' && f.name === 'Price / annual rent AED'
-                ? propertyPrice(r)
-                : formatValue(data, module, r, f)}
+              <DetailValue module={module} record={r} field={f} data={data} />
             </strong>
           </div>
         ))}

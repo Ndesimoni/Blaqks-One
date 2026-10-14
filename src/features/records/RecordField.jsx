@@ -97,9 +97,7 @@ export function RecordField({
           placeholder={
             issued
               ? 'Issued when saved'
-              : f.type === 'number'
-                ? '0'
-                : `Enter ${f.name.toLowerCase()}...`
+              : f.placeholder || (f.type === 'number' ? '0' : `Enter ${f.name.toLowerCase()}...`)
           }
         />
       )}

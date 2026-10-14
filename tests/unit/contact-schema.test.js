@@ -13,8 +13,9 @@ const digest = (value) => createHash('sha256').update(JSON.stringify(value)).dig
 const without = (object, key) =>
   Object.fromEntries(Object.entries(object).filter(([k]) => k !== key));
 const newColumns = ['Building / project', 'Community', 'Emirate'];
+const appendedColumns = [...newColumns, 'Address', 'Map link'];
 
-test('Contacts appends building, community and emirate after Record check', () => {
+test('Contacts appends location, address and map link columns after Record check', () => {
   assert.deepEqual(
     WORKBOOK_SCHEMAS.Contacts.map(({ col, name }) => `${col}:${name}`),
     [
@@ -29,6 +30,8 @@ test('Contacts appends building, community and emirate after Record check', () =
       'I:Building / project',
       'J:Community',
       'K:Emirate',
+      'L:Address',
+      'M:Map link',
     ],
   );
   const properties = schema('Properties');
@@ -51,7 +54,7 @@ test('Contacts appends building, community and emirate after Record check', () =
 
 test('split workbook schemas keep every earlier sheet and column exactly', () => {
   const earlier = structuredClone(WORKBOOK_SCHEMAS);
-  earlier.Contacts = earlier.Contacts.filter((column) => !newColumns.includes(column.name));
+  earlier.Contacts = earlier.Contacts.filter((column) => !appendedColumns.includes(column.name));
   assert.equal(digest(earlier), 'b80cf7714c2a12bdace85a0ada163e29df5215b562191a99636a768c187e44cd');
   for (const columns of Object.values(WORKBOOK_SCHEMAS))
     columns.forEach((column, index) => assert.equal(column.col, columnLetter(index)));
@@ -118,6 +121,8 @@ test('the contact form places location after Company and the table shows the bui
       'building_project',
       'community',
       'emirate',
+      'address',
+      'map_link',
       'phone',
       'email',
       'notes',
