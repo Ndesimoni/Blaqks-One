@@ -17,7 +17,7 @@ pub enum Entity {
 }
 
 impl Entity {
-    fn as_str(self) -> &'static str {
+    pub fn as_str(self) -> &'static str {
         match self {
             Self::Settings => "settings",
             Self::Agreement => "agreement",
@@ -88,6 +88,14 @@ impl Changes {
     pub fn text(mut self, field: &str, changed: bool) -> Self {
         if changed {
             self.0.insert(field.into(), Value::String("changed".into()));
+        }
+        self
+    }
+
+    /// A marker such as `selfDecided` (§13 M-F6): `{field: true}`.
+    pub fn flag(mut self, field: &str, on: bool) -> Self {
+        if on {
+            self.0.insert(field.into(), Value::Bool(true));
         }
         self
     }

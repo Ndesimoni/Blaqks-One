@@ -30,7 +30,6 @@ pub mod row;
 pub mod row_sql;
 pub mod snapshot;
 pub mod split;
-pub mod statement;
 pub mod terms;
 pub mod totals;
 pub mod unearn;

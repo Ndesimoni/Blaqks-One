@@ -1,6 +1,6 @@
 //! Finance routes under `/api/crm/workspaces/{workspace}/finance` (finance-design §6),
 //! merged into the application router with one line in `routes.rs`.
-use super::{agreements, deals, overview, settings};
+use super::{agreements, deals, decisions, expenses, history, overview, payments, settings};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
@@ -48,6 +48,56 @@ fn deal_routes() -> Router<AppState> {
         )
 }
 
+/// Payments and expenses: create, edit, decide and history (finance-design §6.2).
+fn entry_routes() -> Router<AppState> {
+    let body = || DefaultBodyLimit::max(32 * 1024);
+    let path = |suffix: &str| format!("{BASE}/{suffix}");
+    Router::new()
+        .route(
+            &path("payments"),
+            post(payments::create::create).layer(body()),
+        )
+        .route(
+            &path("payments/{id}"),
+            axum::routing::patch(payments::update::update).layer(body()),
+        )
+        .route(
+            &path("payments/{id}/approve"),
+            post(decisions::approve_payment).layer(body()),
+        )
+        .route(
+            &path("payments/{id}/reject"),
+            post(decisions::reject_payment).layer(body()),
+        )
+        .route(
+            &path("payments/{id}/void"),
+            post(decisions::void_payment).layer(body()),
+        )
+        .route(&path("payments/{id}/history"), get(history::payment))
+        .route(
+            &path("expenses"),
+            post(expenses::create::create).layer(body()),
+        )
+        .route(
+            &path("expenses/{id}"),
+            axum::routing::patch(expenses::update::update).layer(body()),
+        )
+        .route(
+            &path("expenses/{id}/approve"),
+            post(decisions::approve_expense).layer(body()),
+        )
+        .route(
+            &path("expenses/{id}/reject"),
+            post(decisions::reject_expense).layer(body()),
+        )
+        .route(
+            &path("expenses/{id}/void"),
+            post(decisions::void_expense).layer(body()),
+        )
+        .route(&path("expenses/{id}/history"), get(history::expense))
+        .route(&path("deals/{id}/history"), get(history::deal))
+}
+
 pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(16 * 1024);
     Router::new()
@@ -65,4 +115,5 @@ pub fn router() -> Router<AppState> {
             delete(agreements::delete),
         )
         .merge(deal_routes())
+        .merge(entry_routes())
 }

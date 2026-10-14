@@ -1,7 +1,8 @@
 //! Team totals and references for `GET /finance` (finance-design §5.4, §6.2). Totals use
 //! current snapshots of the deals in scope and approved receipts only; references name
 //! clients and properties only for callers holding those module grants (M1).
-use super::{list::Loaded, statement::line_figures};
+use super::list::Loaded;
+use crate::finance::statement::line_figures;
 use crate::{auth::profile::UserRow, error::ApiResult};
 use serde_json::{json, Value};
 use sqlx::{Postgres, Transaction};
@@ -57,9 +58,14 @@ pub async fn references<'a>(
     workspace: &str,
     user: &UserRow,
     loaded: &'a Loaded,
+    expense_properties: Vec<&'a str>,
 ) -> ApiResult<Value> {
     let clients = loaded.rows.iter().map(|d| d.client_ref.as_str());
-    let properties = loaded.rows.iter().filter_map(|d| d.property_ref.as_deref());
+    let properties = loaded
+        .rows
+        .iter()
+        .filter_map(|d| d.property_ref.as_deref())
+        .chain(expense_properties);
     let granted = |collection, ids: Vec<&'a str>| match user.can_collection(collection) {
         true => ids,
         false => vec![],

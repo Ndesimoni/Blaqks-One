@@ -1,11 +1,11 @@
 //! `GET /finance` (finance-design §6.2): one REPEATABLE READ snapshot shaped per caller.
-//! Settings, agreements, deals, hand-overs, the statement and team totals; payments and
-//! expenses stay empty until packet B4 adds their tables.
+//! Settings, agreements, deals, hand-overs, payments, expenses, the statement and team
+//! totals. Only approved payments and expenses count in any figure.
 use super::{
     access,
     agreements::AgreementRow,
-    deals::{handover_rows, list, statement, totals, views::Viewer},
-    settings_store,
+    deals::{handover_rows, list, totals, views::Viewer},
+    entry_totals, expenses, payments, settings_store, statement,
 };
 use crate::{
     auth::{finance_access::FinanceScope, session::Session},
@@ -65,7 +65,14 @@ pub async fn overview(
     let loaded = list::load(&mut transaction, &workspace, user, agent, None).await?;
     let lines =
         statement::statement(&mut transaction, &workspace, agent.unwrap_or(user.id)).await?;
-    let references = totals::references(&mut transaction, &workspace, user, &loaded).await?;
+    let paid = payments::row::visible(&mut transaction, &workspace, user, agent, None).await?;
+    let spent = expenses::row::visible(&mut transaction, &workspace, user, agent, None).await?;
+    let properties = spent
+        .iter()
+        .filter_map(|e| e.property_ref.as_deref())
+        .collect();
+    let tx = &mut transaction;
+    let references = totals::references(tx, &workspace, user, &loaded, properties).await?;
     let handovers = handover_rows::pending(&mut transaction, &workspace, &viewer).await?;
     transaction.commit().await?;
     let settings = settings.map(|row| {
@@ -80,13 +87,16 @@ pub async fn overview(
         "scope": if team { "team" } else { "own" },
         "settings": settings,
         "myAgreements": my_agreements,
-        "deals": loaded.views(&viewer), "payments": [], "expenses": [],
+        "deals": loaded.views(&viewer),
+        "payments": paid.iter().map(|row| payments::views::view(row, &viewer)).collect::<Vec<_>>(),
+        "expenses": spent.iter().map(|row| expenses::views::view(row, &viewer)).collect::<Vec<_>>(),
         "handovers": handovers,
         "statement": lines,
         "references": references,
     });
     if team {
         body["teamTotals"] = totals::team(&loaded);
+        entry_totals::add(&mut body["teamTotals"], &paid, &spent);
     }
     Ok(Json(body))
 }

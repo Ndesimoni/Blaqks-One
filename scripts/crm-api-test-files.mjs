@@ -65,4 +65,13 @@ export const apiTestFiles = [
   'tests/api/finance-deals-handover.test.mjs',
   'tests/api/finance-deals-assign.test.mjs',
   'tests/api/finance-deals-departure.test.mjs',
+  'tests/api/finance-approval-payments.test.mjs',
+  'tests/api/finance-approval-reject.test.mjs',
+  'tests/api/finance-approval-duties.test.mjs',
+  'tests/api/finance-approval-money.test.mjs',
+  'tests/api/finance-approval-golden.test.mjs',
+  'tests/api/finance-approval-triggers.test.mjs',
+  'tests/api/finance-approval-views.test.mjs',
+  'tests/api/finance-approval-h1.test.mjs',
+  'tests/api/finance-approval-race.test.mjs',
 ];
