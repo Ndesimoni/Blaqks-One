@@ -14,12 +14,21 @@ export const earnedDealMessage = 'Earned deals can only be changed by your Admin
 export const approvedEntryMessage = 'Approved records can only be changed by your Admin.';
 export const decidedMessage = 'This record has already been decided. Reload to see its status.';
 export const selfReviewMessage = 'Another approver must review your own submissions.';
+export const holderOnlyMessage =
+  "Only the deal's holder can hand it over. Ask your Admin to move it.";
+export const pendingHandoverMessage = 'This deal already has a pending hand-over.';
+export const handoverDecidedMessage = 'This hand-over is no longer pending.';
 
 /** Each operation's caller grant and, for an existing row, its `allowed` key. */
 export const financeOperations = Object.freeze({
   createDeal: { grant: 'create' },
   editDeal: { grant: 'edit', row: 'edit' },
-  assignDeal: { grant: 'assign', row: 'assign' },
+  assignDeal: { grant: 'manage', row: 'assign' },
+  handOverDeal: { grant: 'assign', row: 'handOver' },
+  acceptHandover: { grant: 'module', row: 'accept' },
+  declineHandover: { grant: 'module', row: 'decline' },
+  cancelHandover: { grant: 'module', row: 'cancel' },
+  approveHandover: { grant: 'manage', row: 'approve' },
   earnDeal: { grant: 'approve', row: 'earn' },
   splitDeal: { grant: 'manage', row: 'split' },
   reviseDeal: { grant: 'manage', row: 'revise' },
@@ -43,6 +52,9 @@ function rowMessage(operation, row) {
   if (['approveEntry', 'rejectEntry'].includes(operation))
     return row.status === 'pending' ? selfReviewMessage : decidedMessage;
   if (operation === 'earnDeal' && !row.earnedOn) return selfReviewMessage;
+  if (operation === 'handOverDeal')
+    return row.pendingHandover ? pendingHandoverMessage : holderOnlyMessage;
+  if (operation.endsWith('Handover')) return handoverDecidedMessage;
   return financeDeniedMessages[financeOperations[operation].grant];
 }
 
@@ -54,7 +66,9 @@ export function financeRefusal(access, operation, row = null, readOnly = false) 
   const rule = financeOperations[operation];
   if (!rule || !access || access.scope === 'none') return financeDeniedMessages.module;
   if (readOnly) return archivedMessage;
-  if (access[rule.grant] !== true) return financeDeniedMessages[rule.grant];
+  // `module` operations need only finance access; the row's `allowed` decides the rest.
+  if (rule.grant !== 'module' && access[rule.grant] !== true)
+    return financeDeniedMessages[rule.grant];
   if (!rule.row) return '';
   if (!row) return financeDeniedMessages[rule.grant];
   return row.allowed?.[rule.row] === true ? '' : rowMessage(operation, row);

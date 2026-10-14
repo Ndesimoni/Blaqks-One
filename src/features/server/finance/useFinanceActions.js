@@ -51,13 +51,29 @@ export function useFinanceActions({ api, workspaceId, user, finance, readOnly = 
       // The server decides whether the split changed and so needs a reason.
       splitDeal: (deal, split) => run('splitDeal', deal, () => api.splitDeal(ws, deal, split)),
       earnDeal: (deal, earnedOn) => run('earnDeal', deal, () => api.earnDeal(ws, deal, earnedOn)),
-      reviseDeal: (deal, reason) =>
-        run('reviseDeal', deal, () => api.reviseDeal(ws, deal, reason), { reason }),
+      /** `changes` are optional revise fields (§15.5); a reason is always required. */
+      reviseDeal: (deal, reason, changes) =>
+        run('reviseDeal', deal, () => api.reviseDeal(ws, deal, reason, changes), { reason }),
       unearnDeal: (deal, reason) =>
         run('unearnDeal', deal, () => api.unearnDeal(ws, deal, reason), { reason }),
       deleteDeal: (deal) => run('deleteDeal', deal, () => api.deleteDeal(ws, deal)),
+      /** Admin only (§13 H-F1): moves a deal between people or to the queue, with a reason. */
       assignDeal: (deal, assigneeId, reason) =>
-        run('assignDeal', deal, () => api.assignDeal(ws, deal, assigneeId, reason)),
+        run('assignDeal', deal, () => api.assignDeal(ws, deal, assigneeId, reason), {
+          reason: reason ?? '',
+        }),
+      requestHandover: (deal, toId, referralShareBp) =>
+        run('handOverDeal', deal, () => api.requestHandover(ws, deal, toId, referralShareBp)),
+      /** `decision` is accept, decline or cancel; `handover` carries the server's `allowed`. */
+      decideHandover: (handover, decision) =>
+        run(`${decision}Handover`, handover, () => api.decideHandover(ws, handover.id, decision)),
+      approveHandover: (handover, referralShareBp, reason) =>
+        run(
+          'approveHandover',
+          handover,
+          () => api.approveHandover(ws, handover.id, referralShareBp, reason),
+          { reason: reason ?? '' },
+        ),
       /** `kind` is "payments" or "expenses"; editing an approved row (Admin) needs a reason. */
       saveEntry: (kind, draft, original = null, reason) =>
         original

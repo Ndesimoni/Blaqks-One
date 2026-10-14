@@ -13,6 +13,7 @@ import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
 import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
 import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
+import { FinanceContent } from './finance/FinanceContent.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -26,7 +27,7 @@ export function ServerContent({ owner }) {
           Your assigned access determines which connected sections you can open. Contact your team
           Admin to adjust your permissions.
         </p>
-        <p>Finance, reports and messaging connections are still being developed.</p>
+        <p>Payments, expenses, reports and messaging connections are still being developed.</p>
       </section>
     );
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
@@ -43,6 +44,7 @@ export function ServerContent({ owner }) {
     );
   if (route === 'Dashboard') return <ServerDashboard />;
   if (route === 'Client desk') return <ServerClientDesk />;
+  if (route === 'Deals') return <FinanceContent route={route} owner={owner} />;
   const page = (toolbarExtras) => {
     if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Contacts') return <ContactsPage toolbarExtras={toolbarExtras} />;

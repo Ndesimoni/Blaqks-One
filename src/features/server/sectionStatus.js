@@ -8,6 +8,8 @@ const connectedSections = new Set([
   'Team & access',
   'Dashboard',
   'Client desk',
+  // Finance (finance-design §7): Deals is connected; Payments and Expenses follow in F3.
+  'Deals',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);

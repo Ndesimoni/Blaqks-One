@@ -115,7 +115,11 @@ test('row refusals carry the server’s target-dependent messages', () => {
   assert.equal(refuse('approveEntry', { status: 'pending' }), selfReviewMessage);
   assert.equal(refuse('rejectEntry', { status: 'approved' }), decidedMessage);
   assert.equal(refuse('earnDeal', { earnedOn: null }), selfReviewMessage);
-  assert.equal(refuse('assignDeal', {}), financeDeniedMessages.assign);
+  assert.equal(
+    refuse('assignDeal', {}),
+    financeDeniedMessages.manage,
+    'moving deals is Admin-only',
+  );
 });
 
 test('reasons are 1 to 500 characters after trimming, counted by code point', () => {

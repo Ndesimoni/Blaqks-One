@@ -5,26 +5,9 @@
  * Bodies are built from allowlists because the server refuses unknown keys; money is sent as
  * integer fils and shares as basis points, never as AED decimals.
  */
-const pick = (source, keys) =>
-  Object.fromEntries(
-    keys.filter((key) => source?.[key] !== undefined).map((key) => [key, source[key]]),
-  );
-const segment = (value) => encodeURIComponent(value);
+import { financeDealRoutes, pick, segment } from './financeDeals.js';
 
 const settingsKeys = ['agentShareBp', 'secondAgentSource', 'maxReferralShareBp', 'vatRegistered'];
-const dealKeys = [
-  'clientId',
-  'propertyId',
-  'dealType',
-  'stage',
-  'agreedValueFils',
-  'feeBasis',
-  'feeRateBp',
-  'fixedFeeFils',
-  'partnerShareBp',
-  'partnerName',
-  'details',
-];
 const paymentKeys = ['dealId', 'receiptDate', 'amountFils', 'reference', 'notes'];
 const expenseKeys = [
   'datePaid',
@@ -78,46 +61,15 @@ export function financeRoutes({ request, scope }) {
 }
 
 /**
- * Deals (B3) and payments/expenses (B4) from the frozen contract (§6.2, §13). The server does
- * not serve these yet; callers receive its 404 until those packets land. `metadata` is the
- * parsed view's `{ id, version }`.
+ * Deals and hand-overs (B3, `financeDeals.js`) plus payments/expenses (B4) from the frozen
+ * contract (§6.2, §13). Payments, expenses and history are not served yet; callers receive the
+ * server's 404 until B4 lands. `metadata` is the parsed view's `{ id, version }`.
  */
 function financeRecordRoutes(base, send, request) {
-  const deal = (workspace, metadata, action = '') =>
-    `${base(workspace)}/deals/${segment(metadata.id)}${action}`;
   const entry = (workspace, name, metadata, action = '') =>
     `${base(workspace)}/${name}/${segment(metadata.id)}${action}`;
   return {
-    createDeal: (workspace, draft) =>
-      send(`${base(workspace)}/deals`, 'POST', { deal: pick(draft, dealKeys) }),
-    updateDeal: (workspace, metadata, draft) =>
-      send(deal(workspace, metadata), 'PATCH', {
-        deal: pick(draft, dealKeys),
-        version: metadata.version,
-      }),
-    splitDeal: (workspace, metadata, split) =>
-      send(deal(workspace, metadata, '/split'), 'PUT', {
-        version: metadata.version,
-        secondAgentId: split.secondAgentId ?? null,
-        secondAgentShareBp: split.secondAgentShareBp ?? null,
-        overrideAgentShareBp: split.overrideAgentShareBp ?? null,
-        reason: split.reason ?? null,
-      }),
-    earnDeal: (workspace, metadata, earnedOn) =>
-      send(deal(workspace, metadata, '/earn'), 'POST', { version: metadata.version, earnedOn }),
-    reviseDeal: (workspace, metadata, reason) =>
-      send(deal(workspace, metadata, '/revise'), 'POST', { version: metadata.version, reason }),
-    unearnDeal: (workspace, metadata, reason) =>
-      send(deal(workspace, metadata, '/unearn'), 'POST', { version: metadata.version, reason }),
-    deleteDeal: (workspace, metadata) =>
-      send(deal(workspace, metadata), 'DELETE', { version: metadata.version }),
-    assignDeal: (workspace, metadata, assigneeId, reason) =>
-      send(
-        deal(workspace, metadata, '/assignee'),
-        'PUT',
-        withReason({ version: metadata.version, assigneeId: assigneeId ?? null }, reason),
-      ),
-    financeAssignees: (workspace, signal) => request(`${base(workspace)}/assignees`, { signal }),
+    ...financeDealRoutes(base, send, request),
     financeHistory: (workspace, name, id, signal) => {
       if (name !== 'deals') kind(name);
       return request(`${base(workspace)}/${name}/${segment(id)}/history`, { signal });

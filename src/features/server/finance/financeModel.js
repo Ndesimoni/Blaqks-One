@@ -3,8 +3,10 @@
  * model never holds team settings, team totals, the company share or other agents' figures.
  */
 import { dealTypes, readDeal } from './dealModel.js';
+import { readHandovers } from './dealResponses.js';
 import { readExpense, readPayment } from './entryModel.js';
 import {
+  bp,
   fils,
   id,
   isoDate,
@@ -79,6 +81,7 @@ export function readFinanceOverview(payload) {
     deals: list(body.deals, (row) => readDeal(row, team), 'id'),
     payments: list(body.payments, readPayment, 'id'),
     expenses: list(body.expenses, readExpense, 'id'),
+    handovers: readHandovers(body.handovers),
     statement: readStatement(body.statement),
     teamTotals: team ? readTeamTotals(body.teamTotals) : null,
     references: {

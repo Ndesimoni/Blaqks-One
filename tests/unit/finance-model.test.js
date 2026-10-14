@@ -112,7 +112,7 @@ test('the own overview never keeps team-only figures even when a response carrie
     ['primary'],
   );
   assert.equal(view.override, null);
-  assert.deepEqual(view.secondAgent, { id: null, name: 'Omar', shareBp: null });
+  assert.deepEqual(view.secondAgent, { id: null, name: 'Omar', shareBp: null, kind: null });
   assert.equal(JSON.stringify(model).includes('Private reason'), false);
   assert.equal(JSON.stringify(model).includes('109167'), false);
 });

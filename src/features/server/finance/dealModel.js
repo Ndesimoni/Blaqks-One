@@ -37,7 +37,17 @@ export const dealStages = [
 ];
 export const feeBases = ['percentage', 'fixed'];
 export const paymentStatuses = ['not_earned', 'outstanding', 'paid'];
-export const dealAllowedKeys = ['edit', 'assign', 'earn', 'split', 'revise', 'unearn', 'delete'];
+export const dealAllowedKeys = [
+  'edit',
+  'assign',
+  'handOver',
+  'earn',
+  'split',
+  'revise',
+  'unearn',
+  'delete',
+];
+export const secondAgentKinds = ['split', 'referral'];
 
 function readLine(row) {
   const line = object(row);
@@ -65,6 +75,7 @@ export function readCalculation(value, team) {
     lines: team ? lines : lines.filter((line) => line.role === 'primary'),
     adjusted: calc.adjusted === true,
     splitSource: team ? optional(oneOf(splitSources))(calc.splitSource) : null,
+    agreementId: team ? optional(id)(calc.agreementId) : null,
   };
   const linesFils = lines.reduce((sum, line) => sum + BigInt(line.amountFils), 0n);
   const sums = BigInt(result.partnerFils) + BigInt(result.netFils) === BigInt(result.grossFils);
@@ -76,8 +87,9 @@ export function readCalculation(value, team) {
 function readSecondAgent(value, team) {
   if (value === null || value === undefined) return null;
   const agent = object(value);
-  if (!team) return { id: null, name: text(agent.name), shareBp: null };
-  return { ...person(agent), shareBp: bp(agent.shareBp) };
+  if (!team) return { id: null, name: text(agent.name), shareBp: null, kind: null };
+  const kind = optional(oneOf(secondAgentKinds))(agent.kind);
+  return { ...person(agent), shareBp: bp(agent.shareBp), kind };
 }
 
 function readOverride(value, team) {
@@ -118,6 +130,7 @@ export function readDeal(row, team) {
     receivedFils: fils(deal.receivedFils),
     outstandingFils: fils(deal.outstandingFils),
     paymentStatus: oneOf(paymentStatuses)(deal.paymentStatus),
+    pendingHandover: optional(id)(deal.pendingHandover),
     allowed: allowed(deal.allowed, dealAllowedKeys),
   };
 }

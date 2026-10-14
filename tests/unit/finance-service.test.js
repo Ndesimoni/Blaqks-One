@@ -73,7 +73,7 @@ test('deal, payment and expense routes send allowlisted integer bodies (B3/B4 co
       ['POST', '/deals', { deal }],
       ['PATCH', '/deals/deal%2F1', { deal, version: 4 }],
       ['POST', '/deals/deal%2F1/earn', { version: 4, earnedOn: '2026-10-01' }],
-      ['PUT', '/deals/deal%2F1/assignee', { version: 4, assigneeId: null }],
+      ['PUT', '/deals/deal%2F1/assignee', { version: 4, assigneeId: null, reason: '' }],
       [
         'PUT',
         '/deals/deal%2F1/split',
