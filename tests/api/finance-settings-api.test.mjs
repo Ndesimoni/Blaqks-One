@@ -24,8 +24,8 @@ test('GET /finance is shaped per caller and needs the finance module', async () 
   const own = await overview(agent);
   assert.equal(own.status, 200);
   assert.deepEqual(Object.keys(own.value).sort(), [
-    ...['deals', 'expenses', 'myAgreements', 'payments', 'references', 'scope'],
-    ...['settings', 'statement'],
+    ...['deals', 'expenses', 'handovers', 'myAgreements', 'payments', 'references'],
+    ...['scope', 'settings', 'statement'],
   ]);
   assert.equal(own.value.scope, 'own');
   assert.equal((await overview(owner)).value.scope, 'team', 'Super Admin views by role');

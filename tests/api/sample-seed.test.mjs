@@ -75,7 +75,8 @@ test('seed-sample fills one Admin workspace with linked, assigned and labelled r
   assert.equal(karim.scope, 'team');
   assert.deepEqual(karim.ids, everything.ids);
   const karimActions = accounts['sample.karim'].user.recordActions;
-  assert.ok(karimActions.Clients.delete && karimActions.Contacts.delete);
+  // Deals reference clients, so deleting them also needs team finance (L-F2, Q9).
+  assert.ok(!karimActions.Clients.delete && karimActions.Contacts.delete);
   assert.ok(!karimActions.Properties.delete);
   assert.deepEqual(accounts['sample.karim'].user.channelAccess, { email: true, whatsapp: true });
 

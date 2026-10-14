@@ -134,6 +134,8 @@ test('only future agreements can be deleted, reopening the one each closed', asy
 });
 
 test('M-F3: an agreement reaching back over earned deals is refused', async () => {
+  // Stub the 0013 check, then restore its real definition (deal suites rely on it).
+  const real = query(`SELECT pg_get_functiondef('crm_agreement_applies_to_earned'::regproc)`);
   const fn = (sql) => `CREATE OR REPLACE FUNCTION crm_agreement_applies_to_earned(ws TEXT,
     agent UUID, starts DATE) RETURNS boolean AS $$ ${sql} $$ LANGUAGE sql STABLE`;
   query(fn(`SELECT starts <= '${day(-10)}'::date`));
@@ -143,6 +145,6 @@ test('M-F3: an agreement reaching back over earned deals is refused', async () =
     const ahead = await create(teams.admin, body(two.user.id, 5000, day(-5)));
     assert.equal(ahead.status, 201, JSON.stringify(ahead.value));
   } finally {
-    query(fn('SELECT false'));
+    query(real);
   }
 });

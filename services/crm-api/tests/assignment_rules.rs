@@ -110,6 +110,9 @@ fn team_scope_staff_rename_parents_only_with_reference_coverage() {
     client.legacy_id = "CL-001".into();
     let renamed = validate("Clients", json!({"client_id":"CL-002"})).unwrap();
     let same = validate("Clients", json!({"client_id":"CL-001"})).unwrap();
+    // L-F2: deals reference clients, so renaming one also needs team finance.
+    assert!(ensure_update_allowed(&team, "Clients", &client, &renamed).is_err());
+    team.actions.0 = json!({"finance": {"teamView": true}});
     assert!(ensure_update_allowed(&team, "Clients", &client, &renamed).is_ok());
     team.permissions.0.schedule = false;
     let error = ensure_update_allowed(&team, "Clients", &client, &renamed).unwrap_err();

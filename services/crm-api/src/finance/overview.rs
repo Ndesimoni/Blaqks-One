@@ -1,7 +1,12 @@
 //! `GET /finance` (finance-design §6.2): one REPEATABLE READ snapshot shaped per caller.
-//! B2 serves the settings and agreement parts; deals, payments, expenses, statement and
-//! team totals are empty until their packets (B3/B4) add the tables behind them.
-use super::{access, agreements::AgreementRow, settings_store};
+//! Settings, agreements, deals, hand-overs, the statement and team totals; payments and
+//! expenses stay empty until packet B4 adds their tables.
+use super::{
+    access,
+    agreements::AgreementRow,
+    deals::{handover_rows, list, statement, totals, views::Viewer},
+    settings_store,
+};
 use crate::{
     auth::{finance_access::FinanceScope, session::Session},
     error::{ApiError, ApiResult},
@@ -33,9 +38,13 @@ pub async fn overview(
     if query.agent.is_some() && !team {
         return Err(ApiError::forbidden());
     }
-    if let Some(agent) = &query.agent {
-        Uuid::parse_str(agent).map_err(|_| ApiError::invalid("Provide a valid finance filter."))?;
-    }
+    let agent = match &query.agent {
+        Some(agent) => Some(
+            Uuid::parse_str(agent)
+                .map_err(|_| ApiError::invalid("Provide a valid finance filter."))?,
+        ),
+        None => None,
+    };
     let mut transaction = state.pool.begin().await?;
     sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
         .execute(&mut *transaction)
@@ -51,6 +60,13 @@ pub async fn overview(
     .bind(session.user.id)
     .fetch_all(&mut *transaction)
     .await?;
+    let user = &session.user;
+    let viewer = Viewer::of(user);
+    let loaded = list::load(&mut transaction, &workspace, user, agent, None).await?;
+    let lines =
+        statement::statement(&mut transaction, &workspace, agent.unwrap_or(user.id)).await?;
+    let references = totals::references(&mut transaction, &workspace, user, &loaded).await?;
+    let handovers = handover_rows::pending(&mut transaction, &workspace, &viewer).await?;
     transaction.commit().await?;
     let settings = settings.map(|row| {
         if team {
@@ -60,19 +76,17 @@ pub async fn overview(
         }
     });
     let my_agreements: Vec<Value> = mine.into_iter().map(AgreementRow::own_view).collect();
-    let zero = json!({"earnedFils": 0, "receivedShareFils": 0, "outstandingFils": 0});
     let mut body = json!({
         "scope": if team { "team" } else { "own" },
         "settings": settings,
         "myAgreements": my_agreements,
-        "deals": [], "payments": [], "expenses": [],
-        "statement": {"lines": [], "totals": zero},
-        "references": {"Clients": [], "Properties": []},
+        "deals": loaded.views(&viewer), "payments": [], "expenses": [],
+        "handovers": handovers,
+        "statement": lines,
+        "references": references,
     });
     if team {
-        body["teamTotals"] = json!({"grossFils": 0, "partnerFils": 0, "netFils": 0,
-            "companyFils": 0, "vatFils": 0, "receivedFils": 0, "outstandingFils": 0,
-            "expensesApprovedFils": 0, "pendingCount": 0, "byAgent": []});
+        body["teamTotals"] = totals::team(&loaded);
     }
     Ok(Json(body))
 }

@@ -3,6 +3,7 @@
 use super::{actions::Actions, actions_wire::Wire, permissions::Module, profile::UserRow};
 use crate::{
     error::{ApiError, ApiResult},
+    finance::references,
     records::{
         collections::COLLECTIONS,
         visibility::{ASSIGNABLE, PARENTS},
@@ -72,12 +73,15 @@ impl UserRow {
 
     /// M-C: every collection that can link to `collection` must be visible too, so a
     /// foreign-key refusal never reveals records in a module the caller cannot see.
+    /// Finance references (L-F2, owner Q9) also need team finance.
     pub fn covers_references(&self, collection: &str) -> bool {
         let permissions = self.effective_permissions();
-        COLLECTIONS
-            .iter()
-            .filter(|linking| linking.links.iter().any(|link| link.target == collection))
-            .all(|linking| permissions.collection(linking.name))
+        let finance = !references::referenced(collection) || self.finance_access().team_view;
+        finance
+            && COLLECTIONS
+                .iter()
+                .filter(|linking| linking.links.iter().any(|link| link.target == collection))
+                .all(|linking| permissions.collection(linking.name))
     }
 
     /// `can(collection, action)`: false without the module; parents need team scope,

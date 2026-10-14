@@ -49,7 +49,8 @@ pub const SPECS: [Spec; 3] = [
             email: true,
             whatsapp: true,
         },
-        summary: "whole team, can delete clients & contacts, email and WhatsApp",
+        summary:
+            "whole team, can delete contacts (clients also need team finance), email and WhatsApp",
         holds: &[
             "CL-S01", "CL-S06", "PR-S05", "PR-S07", "PR-S08", "CT-S03", "CT-S04",
         ],
@@ -96,8 +97,8 @@ impl Spec {
         catalogue::defaults(&self.positions()).unwrap_or_default()
     }
 
-    /// Standard preset; the whole-team member also deletes clients and contacts; the
-    /// view-only member holds no actions at all.
+    /// Standard preset; the whole-team member also holds deleteMain for relationships
+    /// (Clients additionally need team finance, §13 L-F2); view-only holds no actions.
     pub fn actions(&self) -> Actions {
         if self.view_only {
             return Actions::default();

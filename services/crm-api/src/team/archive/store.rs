@@ -71,6 +71,8 @@ pub async fn archive(
         let all = crate::records::visibility::ASSIGNABLE;
         let workspace = &scope.target_workspace;
         departure::release(&mut transaction, workspace, id, &all, actor, "departure").await?;
+        crate::finance::departure::release(&mut transaction, workspace, id, actor, "departure")
+            .await?;
     }
     for member in &ids {
         audit::append(

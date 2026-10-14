@@ -57,4 +57,12 @@ export const apiTestFiles = [
   'tests/api/finance-permissions-invite.test.mjs',
   'tests/api/finance-settings-api.test.mjs',
   'tests/api/finance-settings-agreements.test.mjs',
+  'tests/api/finance-deals-h1.test.mjs',
+  'tests/api/finance-deals-views.test.mjs',
+  'tests/api/finance-deals-earn.test.mjs',
+  'tests/api/finance-deals-revise.test.mjs',
+  'tests/api/finance-deals-triggers.test.mjs',
+  'tests/api/finance-deals-handover.test.mjs',
+  'tests/api/finance-deals-assign.test.mjs',
+  'tests/api/finance-deals-departure.test.mjs',
 ];

@@ -8,7 +8,7 @@ use crate::{
     assignments::departure,
     auth::actions::Actions,
     error::{ApiError, ApiResult},
-    workspaces,
+    finance, workspaces,
 };
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -84,6 +84,9 @@ pub async fn update(
         let after = request.permissions.as_ref().unwrap();
         let (collections, reason) = departure::releases(current.active, active, &before, after);
         departure::release(&mut transaction, workspace, id, &collections, actor, reason).await?;
+        if let Some(reason) = finance::departure::releases(current.active, active, &before, after) {
+            finance::departure::release(&mut transaction, workspace, id, actor, reason).await?;
+        }
     }
     if request.active == Some(false) && !current.accepted {
         sqlx::query("UPDATE crm_team_invitations SET revoked_at=now() WHERE user_id=$1 AND consumed_at IS NULL")

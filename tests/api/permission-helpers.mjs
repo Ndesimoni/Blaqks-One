@@ -87,7 +87,11 @@ export async function permissionTeams(prefix) {
   return {
     ...teams,
     assigned: teams.one,
-    teamDelete: await member('team-delete', ['property-agent'], { ...team, actions: actions() }),
+    // Deleting clients and properties also needs team finance (finance-design §13 L-F2).
+    teamDelete: await member('team-delete', ['property-agent'], {
+      ...team,
+      actions: withFinance(actions(), { ...FINANCE.preset, teamView: true }),
+    }),
     teamKeep: await member('team-keep', ['property-agent'], team),
     viewOnly: await member('view-only', ['property-agent'], { ...team, actions: actions(false) }),
     noModule: await member('no-module', ['accountant']),
