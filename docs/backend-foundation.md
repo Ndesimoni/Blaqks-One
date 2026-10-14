@@ -31,7 +31,7 @@ Start the connected frontend in another:
 VITE_CRM_MODE=server npm run dev -- --host 127.0.0.1
 ```
 
-Open **http://localhost:5173** and sign in with an account created above. Use this exact origin, including the port; it must match `CRM_APP_ORIGIN`. The API listens on `127.0.0.1:8788`; Vite forwards `/api/crm` to it. The development server now defaults to a loopback bind. For a permanent local switch, set `VITE_CRM_MODE=server` in `.env` and restart Vite. `npm run dev` without that override uses the saved mode; setup defaults to `demo`.
+Open **http://localhost:5173** and sign in with an account created above. Use this exact origin, including the port; it must match `CRM_APP_ORIGIN`. The API listens on `127.0.0.1:8788`; Vite forwards `/api/crm` to it. The development server now defaults to a loopback bind. `npm run dev` uses the mode saved in `.env`; setup now defaults to `server` (the frozen demo needs `VITE_CRM_MODE=demo`). An `.env` created before 2026-10-14 may still say `demo`; change it to `server` and restart Vite.
 
 If port 5173 is occupied, stop the conflicting development server or change the Vite port and `CRM_APP_ORIGIN` together. If the API port changes, update `CRM_BIND_ADDRESS` and `CRM_API_PROXY` together.
 

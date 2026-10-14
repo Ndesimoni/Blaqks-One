@@ -21,7 +21,7 @@ Professional real estate CRM focused on the UAE market.
 - React 18 and Vite
 - Rust/Axum for the private CRM API and retained Google Calendar companion
 - JavaScript and CSS
-- Browser-local storage for the default demo; opt-in PostgreSQL connected mode
+- PostgreSQL connected mode (the product); browser-local demo frozen since 2026-10-14
 - PostgreSQL 17 through Docker Compose for local CRM development and isolated API tests
 - Excel import/export
 - JSON backup with property media
@@ -113,7 +113,9 @@ Use the eight project specialists in `.codex/agents/` through the [Development a
 
 ## Roadmap
 
-The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients); Deals, Payments and Expenses remain demo-only. Preserve the complete default demo during staged migration. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
+The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients); Deals, Payments and Expenses remain demo-only until they are connected. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
+
+**Connected-only development (owner decision 2026-10-14).** The connected version is the product. The browser-local demo is **frozen**: do not add demo-specific features, demo data or demo browser tests, and do not run `npm run test:e2e` as a routine check. Keep demo code in place (shared components still serve both modes) and do not delete or deliberately break it without a separate owner decision. Verify work with `npm test`, `npm run build`, `npm run test:api`, `npm run test:server:e2e` and `npm run check:lines`. Where real data is missing, use clearly fictional synthetic data: tests seed their own records in the disposable Docker database, and developers may fill a local workspace with the sample-data command; never use real client data for testing.
 
 Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
 
@@ -133,7 +135,7 @@ The frontend foundations are implemented; see `docs/frontend-completion.md`. Nod
 
 ## Important
 
-The default application is a browser-local demo. Its sign-in uses public sample credentials and a tab-local identity, not server authentication. Connected mode uses server-created accounts and PostgreSQL sessions with enforced workspace access; it is a local development foundation, not a deployed production service. See `docs/frontend-sign-in.md`; never put real passwords into the demo account configuration.
+The browser-local demo is frozen (see Roadmap); the connected version is the product. Its sign-in uses public sample credentials and a tab-local identity, not server authentication. Connected mode uses server-created accounts and PostgreSQL sessions with enforced workspace access; it is a local development foundation, not a deployed production service. See `docs/frontend-sign-in.md`; never put real passwords into the demo account configuration.
 Demo team configuration is separate under `kws-crm-team-preview-v1`; keep passwords/provider tokens out of it and preserve CRM/workbook/backup contracts. Messaging and invitation previews never deliver externally. Demo roles control frontend modules; connected roles and access come from the server.
 Do not treat the demo or first connected slice as a complete production multi-user CRM. Additional roles, account recovery, provider delivery, object storage, operations and deployment remain unfinished.
 Do not remove existing data features without approval.

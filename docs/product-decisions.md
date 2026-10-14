@@ -50,6 +50,13 @@ Settles the owner questions in the [Action permissions design](action-permission
 | View-only members                         | A member who can only view a module **can still be assigned records** in it; they see them but cannot change them.                                                                                                                                                                                                             |
 | Directly assigned follow-ups              | A staff member given a client's Follow-up directly may complete or return it but **not delete it**. Only the client's holder, the Admin or a whole-team member may delete it.                                                                                                                                                  |
 
+## Development focus (decided 2026-10-14)
+
+| Topic          | Decision                                                                                                                                                                                                                                                          |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Connected only | All new work targets the **connected version**. The browser-local demo is frozen: no new demo features or demo tests; its code stays until a separate decision removes it.                                                                                        |
+| Test data      | Missing data is replaced by **clearly fictional sample data**: automated tests seed their own records in a disposable database, and a sample-data command fills a local development workspace and can clear it again. Real client data is never used for testing. |
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |
