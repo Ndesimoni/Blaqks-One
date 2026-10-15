@@ -89,7 +89,14 @@ test('turning a module off clears its actions', () => {
 test('deleteMain needs whole-team visibility and referencing-module coverage (M-C)', () => {
   const team = staff({ permissions: allModules, recordScope: 'team' });
   assert.equal(deleteMainBlocker('relationships', team), '');
-  assert.equal(deleteMainBlocker('properties', team), '');
+  // Deleting properties also needs See team finance (owner Q9); clients & contacts keep contacts.
+  assert.equal(deleteMainBlocker('properties', team), 'Needs See team finance under Finance');
+  const teamFinance = {
+    ...team,
+    permissions: { ...allModules, finance: true },
+    actions: { ...team.actions, finance: { ...team.actions.finance, teamView: true } },
+  };
+  assert.equal(deleteMainBlocker('properties', teamFinance), '');
   const assigned = { ...team, recordScope: 'assigned' };
   assert.equal(deleteMainBlocker('relationships', assigned), 'Needs whole-team visibility');
   const noSchedule = { ...team, permissions: { ...allModules, schedule: false } };
@@ -131,6 +138,7 @@ test('staff edits send a complete normalised actions object', () => {
   assert.equal(payload.recordScope, 'assigned');
   assert.equal(payload.actions.relationships.deleteMain, false);
   assert.deepEqual(Object.keys(payload.actions).sort(), [
+    'finance',
     'properties',
     'relationships',
     'schedule',

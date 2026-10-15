@@ -17,7 +17,7 @@ export function TeamRecordScopeFields({ form, change, busy }) {
             disabled={busy}
             onChange={() =>
               change('recordScope', value, {
-                // Assigned-only visibility clears any delete-main ticks (A2 §1.4).
+                // Assigned-only visibility clears delete-main and team finance ticks (A2 §1.4, §5.1).
                 actions: normaliseActions(form.actions, { ...form, recordScope: value }),
               })
             }
@@ -27,7 +27,7 @@ export function TeamRecordScopeFields({ form, change, busy }) {
       ))}
       <small>
         Whole-team access still respects the sections allowed above. Deleting clients, contacts or
-        properties needs whole-team visibility.
+        properties, seeing team finance and approving need whole-team visibility.
       </small>
     </fieldset>
   );

@@ -1,14 +1,34 @@
-// Plain-language record-action text for the review step and archived read-only views.
+// Plain-language record-action text for the form, the review step and archived read-only views.
 import {
+  actionBlocker,
   actionLabel,
   actionModules,
-  deleteMainLabels,
   hasRecordedActions,
+  isSensitive,
   normaliseActions,
   readActions,
 } from './actionModel.js';
+import { clientDeleteNote, financeHelp, financeInvitationNote } from './financeActionModel.js';
 
 export const ARCHIVED_ACTIONS_TEXT = 'Action access not recorded (archived before action grants)';
+const deleteMainText = 'Sensitive: removes records for the whole team. Off by default.';
+
+/** Help under a sensitive tick: why it is unavailable, or what it allows. */
+export function actionHelp(module, key, form) {
+  if (module === 'finance') return financeHelp(key, form);
+  const blocker = actionBlocker(module, key, form);
+  if (blocker) return blocker;
+  const note = module === 'relationships' ? clientDeleteNote(form) : '';
+  return note ? `${deleteMainText} ${note}` : deleteMainText;
+}
+
+/** Invitation guidance for the sensitive ticks a module hides, or ''. */
+export function invitationNote(module) {
+  if (module === 'finance') return financeInvitationNote;
+  if (!actionModules[module].includes('deleteMain')) return '';
+  const records = module === 'properties' ? 'properties' : 'clients and contacts';
+  return `Deleting ${records} can be granted later, with whole-team visibility.`;
+}
 
 /** Plain-language review lines for each enabled connected module. */
 export function actionReview(form, moduleLabels) {
@@ -23,7 +43,10 @@ export function actionReview(form, moduleLabels) {
         text: allowed.length
           ? allowed.map((key) => actionLabel(module, key)).join(', ')
           : 'View only',
-        sensitive: actions[module].deleteMain ? deleteMainLabels[module] : '',
+        sensitive: allowed
+          .filter((key) => isSensitive(module, key))
+          .map((key) => actionLabel(module, key))
+          .join(', '),
       };
     });
 }

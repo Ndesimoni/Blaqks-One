@@ -8,7 +8,7 @@ export const accessFields = [
     'Listings and shortlists are connected. Publication approval is planned.',
   ],
   ['schedule', 'Scheduling', 'Follow-ups, viewings, interactions and client care are connected.'],
-  ['finance', 'Finance', 'Expenses and commissions: backend planned.'],
+  ['finance', 'Finance', 'Deals, commission receipts and expenses are connected.'],
   ['reports', 'Reports', 'Team reporting: backend planned.'],
   ['exports', 'Exports', 'Connected exports: planned.'],
 ];

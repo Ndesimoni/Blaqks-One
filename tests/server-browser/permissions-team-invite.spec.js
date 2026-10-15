@@ -3,6 +3,7 @@ import { memberPage } from './assign-helpers.js';
 import { session, signIn } from './helpers.js';
 import { closeInvitation, openTeam, startInvitation } from './team-helpers.js';
 import { findMember } from '../api/team-helpers.mjs';
+import { FINANCE } from '../api/permission-helpers.mjs';
 import { assignTeam, editTeammate, LABELS, ticks } from './permissions-fixtures.js';
 
 const deleteMain = /^Delete (clients & contacts|properties)$/;
@@ -21,7 +22,7 @@ test('the invitation form offers action ticks but never the delete-main ticks', 
       dialog.getByRole('button', { name: 'Use position defaults', exact: true }),
     ).toHaveCount(0);
     await dialog.getByRole('checkbox', { name: 'Property Agent', exact: true }).check();
-    await expect(dialog.getByRole('group', { name: /: What they can do$/ })).toHaveCount(3);
+    await expect(dialog.getByRole('group', { name: /: What they can do$/ })).toHaveCount(4);
     await expect(dialog.getByRole('checkbox', { name: deleteMain })).toHaveCount(0);
     await expect(dialog.getByRole('group', { name: 'Record visibility' })).toHaveCount(0);
     await expect(ticks(dialog, LABELS.rel)).toContainText(
@@ -48,6 +49,8 @@ test('the invitation form offers action ticks but never the delete-main ticks', 
       deleteMain: false,
     });
     expect(invited.actions.properties.deleteMain).toBe(false);
+    // Invitations never grant See team finance or Approve (finance-design §5.1).
+    expect(invited.actions.finance).toEqual(FINANCE.preset);
     await closeInvitation(page);
   } finally {
     await admin.context.close();

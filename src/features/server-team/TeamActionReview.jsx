@@ -2,7 +2,7 @@ import React from 'react';
 import { moduleLabels } from './model.js';
 import { actionReview } from './actionText.js';
 
-/** Review-step summary of record actions; deleting main records is flagged as sensitive. */
+/** Review-step summary of record actions; deletes and team finance grants are flagged as sensitive. */
 export function TeamActionReview({ form }) {
   const lines = actionReview(form, moduleLabels);
   return (

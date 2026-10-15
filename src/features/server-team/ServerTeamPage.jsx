@@ -11,8 +11,13 @@ import { TeamArchiveDialog } from './TeamArchiveDialog.jsx';
 import { useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { useTeamDirectory } from './useTeamDirectory.js';
 import { TeamDirectoryFilters } from './TeamDirectoryFilters.jsx';
+import { TeamTabs } from './TeamTabs.jsx';
+import { TeamFinanceSection } from './TeamFinanceSection.jsx';
+import { readFinanceAccess } from '../server/finance/financeAccess.js';
 import './team.css';
 import './team-actions.css';
+import './team-finance.css';
+import './team-agreements.css';
 
 export function ServerTeamPage({ owner }) {
   const { user } = useSession();
@@ -26,6 +31,16 @@ export function ServerTeamPage({ owner }) {
   const [editing, setEditing] = useState(null);
   const [invitation, setInvitation] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  // Finance settings are the Admin's (finance-design §7); the tab stays mounted once opened
+  // so an unsaved settings or agreement draft survives switching back to People.
+  const financeTab = readFinanceAccess(user).manage && !frozen;
+  const [tab, setTab] = useState('people');
+  const [financeOpened, setFinanceOpened] = useState(false);
+  const showTab = (next) => {
+    setTab(next);
+    if (next === 'finance') setFinanceOpened(true);
+  };
+  const people = !financeTab || tab === 'people';
   const completed = (result) => {
     setEditing(null);
     if (result.invitation) setInvitation({ ...result.invitation, name: result.member.name });
@@ -42,31 +57,41 @@ export function ServerTeamPage({ owner }) {
         busy={team.loading || !!team.error || !!memberActions.pendingId}
         onInvite={() => setEditing({ member: null })}
       />
-      <TeamDirectoryFilters
-        directory={directory}
-        roles={team.roles}
-        canReviewArchive={canReviewArchive}
-        frozen={frozen}
-        busy={team.loading || !!memberActions.pendingId}
-      />
-      {memberActions.error && (
-        <p className="field-error" role="alert">
-          {memberActions.error}
-        </p>
+      {financeTab && <TeamTabs tab={tab} onChange={showTab} />}
+      {people && (
+        <>
+          <TeamDirectoryFilters
+            directory={directory}
+            roles={team.roles}
+            canReviewArchive={canReviewArchive}
+            frozen={frozen}
+            busy={team.loading || !!memberActions.pendingId}
+          />
+          {memberActions.error && (
+            <p className="field-error" role="alert">
+              {memberActions.error}
+            </p>
+          )}
+          <TeamDirectoryResults
+            team={team}
+            owner={owner}
+            filtered={directory.filtered}
+            query={directory.filters.query}
+            hasFilters={directory.hasFilters}
+            archived={archived}
+            current={directory.current}
+            onPage={directory.onPage}
+            onEdit={(member) => setEditing({ member })}
+            actions={memberActions}
+            onDelete={user.roleId === 'super-admin' ? setDeleting : undefined}
+          />
+        </>
       )}
-      <TeamDirectoryResults
-        team={team}
-        owner={owner}
-        filtered={directory.filtered}
-        query={directory.filters.query}
-        hasFilters={directory.hasFilters}
-        archived={archived}
-        current={directory.current}
-        onPage={directory.onPage}
-        onEdit={(member) => setEditing({ member })}
-        actions={memberActions}
-        onDelete={user.roleId === 'super-admin' ? setDeleting : undefined}
-      />
+      {financeTab && financeOpened && (
+        <div className="team-finance" hidden={tab !== 'finance'}>
+          <TeamFinanceSection owner={owner} members={team.members} />
+        </div>
+      )}
       {editing && (
         <TeamMemberDialog
           member={editing.member}

@@ -19,7 +19,7 @@ export function TeamActionDefaults({ form, change, roles, busy }) {
       </Button>
       <small id={helpId} className="team-action-help">
         {form.positions.length
-          ? 'Resets the actions above to what the selected positions allow. Deleting clients, contacts or properties stays off.'
+          ? 'Resets the actions above to what the selected positions allow. Deleting clients, contacts or properties, seeing team finance and approving stay off.'
           : 'Choose a position to use its defaults.'}
       </small>
     </div>

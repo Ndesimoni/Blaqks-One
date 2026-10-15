@@ -69,6 +69,7 @@ test('review lists actions in plain words and flags deleting main records as sen
       text: 'Add, Hand on, Delete activity',
       sensitive: '',
     },
+    { module: 'finance', label: 'Finance', text: 'View only', sensitive: '' },
   ]);
   const assigned = actionReview({ ...form, recordScope: 'assigned' }, moduleLabels);
   assert.equal(assigned[0].text, 'Add, Edit');

@@ -16,7 +16,7 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
   const { page } = admin;
   try {
     const dialog = await editTeammate(page, name);
-    await expect(dialog.getByRole('group', { name: /: What they can do$/ })).toHaveCount(3);
+    await expect(dialog.getByRole('group', { name: /: What they can do$/ })).toHaveCount(4);
     const [rel, prop] = [ticks(dialog, LABELS.rel), ticks(dialog, LABELS.prop)];
     const schedule = ticks(dialog, LABELS.sched);
     await expect(rel.getByRole('checkbox')).toHaveCount(4);
@@ -45,8 +45,10 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
     await expect(del).toHaveAccessibleDescription('Needs Scheduling and Properties access');
     await expect(propDel).toHaveAccessibleDescription('Needs Scheduling access');
     await moduleBox(dialog, LABELS.sched).check();
+    // Deleting properties also needs See team finance (owner Q9), which this member lacks.
+    await expect(propDel).toBeDisabled();
+    await expect(propDel).toHaveAccessibleDescription('Needs See team finance under Finance');
     await del.check();
-    await propDel.check();
     await dialog.getByRole('radio', { name: 'Only records assigned to them' }).check();
     for (const tick of [del, propDel]) {
       await expect(tick).toBeDisabled();
@@ -72,11 +74,17 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
     await dialog.getByRole('button', { name: 'Continue', exact: true }).click();
     await expect(dialog.getByRole('heading', { name: 'Record actions' })).toBeVisible();
     const review = dialog.locator('.team-action-review');
-    await expect(review.locator('dt')).toHaveText([LABELS.rel, LABELS.prop, LABELS.sched]);
+    await expect(review.locator('dt')).toHaveText([
+      LABELS.rel,
+      LABELS.prop,
+      LABELS.sched,
+      'Finance',
+    ]);
     await expect(review.locator('dd')).toHaveText([
       'Add, Hand on, Delete clients & contactsSensitive: Delete clients & contacts',
       'Add, Edit, Hand on, Delete activity',
       'Add, Edit, Delete activity',
+      'Add, Edit, Hand on',
     ]);
     await expect(review.locator('.team-action-flag')).toHaveText([
       'Sensitive: Delete clients & contacts',
@@ -86,7 +94,7 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
 
     const stored = await findMember(team.admin, team.one.user.id);
     expect(stored.recordScope).toBe('team');
-    // This form edits record actions only; the stored finance preset carries over unchanged.
+    // The Finance ticks were left at their preset, so the saved finance object is the preset.
     const { finance, ...recordActions } = stored.actions;
     expect(finance).toEqual(FINANCE.preset);
     expect(recordActions).toEqual({
@@ -101,7 +109,7 @@ test('an Admin sets per-action ticks with delete guards, M-D, defaults, review a
       schedule: { create: true, edit: true, assign: false, deleteActivity: true },
     });
     // Clients also need "See team finance" to delete (owner Q9, finance-design §13 L-F2);
-    // this form cannot grant it yet, so only Contacts gain Delete from the tick.
+    // without it only Contacts gain Delete from the tick (team-finance-grants covers the grant).
     const staff = await staffLogin(team.people.one.email);
     expect(staff.user.recordActions.Clients).toEqual({
       create: true,
