@@ -142,4 +142,4 @@ Unreadable saved records open a recovery screen that leaves the original data un
 
 The offline edition is documented in [`legacy/offline/README.md`](legacy/offline/README.md). Its independent assets stay outside Vite's production build.
 
-See the [Product guide](docs/product-guide.md) for features and existing production limitations, and [Third-party notices](THIRD_PARTY_NOTICES.md) for bundled library notices.
+See the [Implementation roadmap](docs/claude-implementation-roadmap.md) for planned features and implementation phases, and [Third-party notices](THIRD_PARTY_NOTICES.md) for bundled library notices.
