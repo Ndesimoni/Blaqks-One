@@ -1,0 +1,47 @@
+# Dependency security and licence checks (docs/tech-stack.md, Quality).
+# Runs on every push and weekly, so new advisories surface even without code changes.
+name: Security
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 * * 1'
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rust-dependencies:
+    name: Rust advisories, licences and sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        crate: [services/crm-api, backend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: ${{ matrix.crate }}/Cargo.toml
+          arguments: --all-features --config deny.toml
+          command: check
+          command-arguments: advisories licenses bans sources
+
+  npm-dependencies:
+    name: npm advisories
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: npm audit (high and critical)
+        run: npm audit --audit-level=high

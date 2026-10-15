@@ -3,6 +3,7 @@ name = "kws-crm-api"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.89"
+publish = false
 
 [dependencies]
 argon2 = "0.5"
@@ -20,3 +21,12 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
+
+# Project-wide rules (docs/tech-stack.md, Quality): no unsafe code and no debug leftovers.
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
