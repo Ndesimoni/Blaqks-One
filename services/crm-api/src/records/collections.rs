@@ -7,6 +7,9 @@ pub enum Slot {
     Client,
     Property,
     Referral,
+    /// An Interaction log's deal (`deal_ref`, finance-design §6.3, §13 L-F7). It targets
+    /// `crm_deals`, not a connected collection, and imports always leave it NULL.
+    Deal,
 }
 
 impl Slot {
@@ -14,6 +17,11 @@ impl Slot {
     /// collection to itself (for example a Client referred by another Client).
     pub const fn deferred(self) -> bool {
         matches!(self, Slot::Referral)
+    }
+
+    /// Whether the slot targets a connected `crm_records` collection.
+    pub const fn record(self) -> bool {
+        !matches!(self, Slot::Deal)
     }
 }
 
@@ -60,6 +68,12 @@ const REFERRED_CLIENT: Link = Link {
     slot: Slot::Referral,
 };
 
+const DEAL: Link = Link {
+    field: "deal_id_optional",
+    target: "Deals",
+    slot: Slot::Deal,
+};
+
 const fn workflow(name: &'static str, id_key: &'static str, links: &'static [Link]) -> Collection {
     Collection {
         name,
@@ -69,7 +83,8 @@ const fn workflow(name: &'static str, id_key: &'static str, links: &'static [Lin
 }
 
 /// Connected collections ordered so every linked record follows its target;
-/// deferred referral links may also point within their own collection.
+/// deferred referral links may also point within their own collection. The deal link
+/// targets the finance table, which no import or collection order creates.
 pub const COLLECTIONS: &[Collection] = &[
     workflow("Contacts", "contact_id", &[]),
     workflow("Clients", "client_id", &[REFERRER]),
@@ -77,7 +92,11 @@ pub const COLLECTIONS: &[Collection] = &[
     workflow("Follow-ups", "activity_id", &[CLIENT, PROPERTY]),
     workflow("Viewings", "viewing_id", &[CLIENT, PROPERTY]),
     workflow("Shortlist", "match_id", &[CLIENT, PROPERTY]),
-    workflow("Interaction log", "log_id", &[CLIENT, OPTIONAL_PROPERTY]),
+    workflow(
+        "Interaction log",
+        "log_id",
+        &[CLIENT, OPTIONAL_PROPERTY, DEAL],
+    ),
     workflow(
         "Client care",
         "care_id",
@@ -99,6 +118,7 @@ pub struct Links {
     pub client: Option<String>,
     pub property: Option<String>,
     pub referral: Option<String>,
+    pub deal: Option<String>,
 }
 
 impl Links {
@@ -108,26 +128,11 @@ impl Links {
             Slot::Client => self.client = value,
             Slot::Property => self.property = value,
             Slot::Referral => self.referral = value,
+            Slot::Deal => self.deal = value,
         }
     }
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn links_follow_their_target_unless_deferred_within_a_collection() {
-        for (index, collection) in COLLECTIONS.iter().enumerate() {
-            for link in collection.links {
-                let target = COLLECTIONS.iter().position(|c| c.name == link.target);
-                let target = target.expect("link target must be a connected collection");
-                assert!(target < index || (target == index && link.slot.deferred()));
-            }
-        }
-        let clients = find("Clients").unwrap();
-        assert!(clients.links.iter().all(|link| link.slot == Slot::Referral));
-        assert!(find("Deals").is_err());
-        assert_eq!(find("Viewings").unwrap().id_key, "viewing_id");
-    }
-}
+#[path = "collections_tests.rs"]
+mod tests;

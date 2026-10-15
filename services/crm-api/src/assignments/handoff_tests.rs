@@ -17,6 +17,7 @@ fn task(client: Option<&str>, holds_client: bool) -> Target {
         client_ref: client.map(Into::into),
         property_ref: None,
         referral_ref: None,
+        deal_ref: None,
         holds_client,
     }
 }

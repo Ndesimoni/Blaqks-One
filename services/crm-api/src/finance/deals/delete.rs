@@ -1,5 +1,7 @@
 //! `DELETE /finance/deals/{id} {version}` (Admin, finance-design §6.2): only deals that
-//! were never earned; any remaining reference keeps the generic foreign-key 409.
+//! were never earned; any remaining reference (payments, Interaction log `deal_ref`)
+//! keeps the generic foreign-key 409. M-C: Interaction logs link deals, so the caller
+//! must also see the schedule module; Admins hold it by role.
 use super::{
     gate::{self, Need, STALE},
     row,
@@ -37,6 +39,9 @@ pub async fn delete(
     let id = gate::id(&id)?;
     let mut tx = state.pool.begin().await?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Manage).await?;
+    if !live.covers_references("Deals") {
+        return Err(ApiError::forbidden());
+    }
     let deal = row::locked(&mut tx, &workspace, &live, id).await?;
     if deal.version != version {
         return Err(ApiError::stale(STALE));

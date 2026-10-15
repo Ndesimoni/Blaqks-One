@@ -17,6 +17,7 @@ fn direct_assignees_cannot_delete_a_follow_up_whose_client_they_do_not_hold() {
         client_ref: client.map(Into::into),
         property_ref: None,
         referral_ref: None,
+        deal_ref: None,
         holds_client,
     };
     let mine = RecordScope::Assigned(me);

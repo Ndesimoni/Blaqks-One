@@ -1,6 +1,7 @@
 pub mod audit;
 pub mod collections;
 pub mod creation;
+pub mod deal_links;
 pub mod deletion;
 pub mod handlers;
 pub mod history;

@@ -38,6 +38,7 @@ fn task(assignee: Option<Uuid>, holds_client: bool) -> Target {
         client_ref: Some("CL-001".into()),
         property_ref: None,
         referral_ref: None,
+        deal_ref: None,
         holds_client,
     }
 }

@@ -74,4 +74,7 @@ export const apiTestFiles = [
   'tests/api/finance-approval-views.test.mjs',
   'tests/api/finance-approval-h1.test.mjs',
   'tests/api/finance-approval-race.test.mjs',
+  'tests/api/finance-deal-links-migration.test.mjs',
+  'tests/api/finance-deal-links.test.mjs',
+  'tests/api/finance-deal-links-legacy.test.mjs',
 ];

@@ -1,5 +1,5 @@
 use super::{
-    audit,
+    audit, deal_links,
     history::{self, Change},
     ids, links,
     mutation::{Entry, ENTRY_COLUMNS},
@@ -58,13 +58,14 @@ pub async fn create(
         None,
     )
     .await?;
+    deal_links::ensure(&mut transaction, workspace, &user, &record.links, None).await?;
     target::ensure_client(scope, collection, &record.links)?;
     let holder = history::default_holder(&mut transaction, workspace, &user).await?;
     let assignee = history::initial(collection, holder, &record.links);
     let sql = format!(
         "INSERT INTO crm_records \
          (id,workspace_id,collection,legacy_id,payload,contact_id,client_ref,property_ref,\
-         referral_ref,assignee_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) \
+         referral_ref,deal_ref,assignee_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) \
          RETURNING {ENTRY_COLUMNS}"
     );
     let saved = sqlx::query_as::<_, Entry>(&sql)
@@ -77,6 +78,7 @@ pub async fn create(
         .bind(record.links.client)
         .bind(record.links.property)
         .bind(record.links.referral)
+        .bind(record.links.deal)
         .bind(assignee)
         .fetch_one(&mut *transaction)
         .await?;

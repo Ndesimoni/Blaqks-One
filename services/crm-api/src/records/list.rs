@@ -1,5 +1,6 @@
 use super::{
     collections::COLLECTIONS,
+    deal_links,
     mutation::Entry,
     projections,
     visibility::{predicate, RecordScope},
@@ -29,11 +30,12 @@ pub struct Row {
     pub client_ref: Option<String>,
     pub property_ref: Option<String>,
     pub referral_ref: Option<String>,
+    pub deal_ref: Option<String>,
 }
 
 /// `GET records` (contract §3, L3): one REPEATABLE READ READ ONLY transaction reads the
 /// live profile, the scope, the visible records in granted collections and then the
-/// read-only projections, so they all describe the same snapshot.
+/// read-only projections (including `dealLinks`), so they all describe the same snapshot.
 pub async fn list(
     State(state): State<AppState>,
     session: Session,
@@ -53,7 +55,7 @@ pub async fn list(
         .collect();
     let sql = format!(
         "SELECT r.id,r.version,r.payload,r.assignee_id,r.collection,r.legacy_id,r.contact_id,\
-         r.client_ref,r.property_ref,r.referral_ref FROM crm_records r \
+         r.client_ref,r.property_ref,r.referral_ref,r.deal_ref FROM crm_records r \
          WHERE r.workspace_id=$1 AND r.collection=ANY($2) AND {} ORDER BY r.created_at,r.id",
         predicate("r", "$1", "$3")
     );
@@ -63,7 +65,9 @@ pub async fn list(
         .bind(scope.caller())
         .fetch_all(&mut *transaction)
         .await?;
-    let projected = projections::build(&mut transaction, &workspace, &user, &rows).await?;
+    let mut projected = projections::build(&mut transaction, &workspace, &user, &rows).await?;
+    projected["dealLinks"] =
+        deal_links::projection(&mut transaction, &workspace, &user, &rows).await?;
     transaction.commit().await?;
     let mut records = json!({});
     for collection in COLLECTIONS {
