@@ -103,6 +103,14 @@ Many agent-to-agent and broker-to-broker deals in the UAE rest on verbal promise
 | Evidence                   | Accepted agreements are locked and tamper-evident; changes are amendments both sides accept, keeping every version. Both sides (including guests) keep a copy and a downloadable certificate. Blaqks One records and tracks payments due but never holds or moves money.                                                                                                          |
 | Proposed improvements      | Decline or counter-offer with every round recorded; expiring, revocable links; no amounts in chat link previews; minimal sharing (no client details unless added); earlier agreements attach to a guest's account when they later sign up with the same verified contact. Awaiting owner confirmation.                                                                            |
 
+## Sign-up (decided 2026-10-15, planned)
+
+| Topic            | Decision                                                                                                                                                                                                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Public sign-up   | People can **sign up normally** on Blaqks One instead of only by invitation. Until it ships, accounts are still created by invitation or the trusted account command, and only the Super Admin creates Admin accounts.                                                           |
+| Company members  | Anyone who works under a company is still **invited by that company's Admin** and joins its team.                                                                                                                                                                                |
+| Proposed details | A self sign-up creates a new company with the person as its Admin (a solo agent is a one-person company); verified email; bot protection; rate limits. Guests who accept a cross-company agreement use the same sign-up. Needs design and security review before implementation. |
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |
