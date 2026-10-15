@@ -1,0 +1,87 @@
+/* Dashboard finance figures (finance-design §7): AED values sized to fit at 390px. */
+.finance-widgets {
+  display: grid;
+  gap: 14px;
+}
+.finance-widgets .section-top {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.finance-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.finance-widget {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.finance-widget dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.finance-widget dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.finance-widget small,
+.finance-widget-pending span {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.finance-widget-pending {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.finance-widget-pending > div:first-child {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.finance-widget-count {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.finance-widget-links,
+.finance-widget-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.finance-widget-links .btn,
+.finance-widgets .section-top .btn {
+  min-height: 44px;
+}
+@media (max-width: 750px) {
+  .finance-widget-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .finance-widget dd {
+    font-size: 16px;
+  }
+  .finance-widget-links {
+    width: 100%;
+  }
+  .finance-widget-links .btn {
+    flex: 1 1 auto;
+  }
+}

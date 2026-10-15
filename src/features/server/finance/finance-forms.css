@@ -131,7 +131,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .deal-card button {
+  .deal-card > button {
     transition: none;
   }
 }

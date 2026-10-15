@@ -10,6 +10,7 @@ import { detailFields } from './dealDraft.js';
 import { DealCalculationPanel } from './DealCalculationPanel.jsx';
 import { DealActions } from './DealActions.jsx';
 import { DealActionDialog } from './DealActionDialog.jsx';
+import { FinanceHistory } from './FinanceHistory.jsx';
 
 function Fact({ label, value, wide = false }) {
   return (
@@ -94,6 +95,7 @@ export function DealDetails({ deal, onClose }) {
             ))}
           </dl>
         )}
+        <FinanceHistory kind="deals" row={deal} />
       </div>
       <DealActions deal={deal} onAction={setAction} onClose={onClose} />
       {action && (

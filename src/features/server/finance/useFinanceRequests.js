@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { readEarnPreview, readFinanceAssignees } from './dealResponses.js';
 import { readFinanceOverview } from './financeModel.js';
+import { readHistory } from './historyModel.js';
 
 /** The connected finance page state: `{ api, workspaceId, user, finance, actions, ... }`. */
 export const FinanceContext = createContext(null);
@@ -72,5 +73,18 @@ export function useEarnPreview(api, workspaceId, access, deal, earnedOn) {
       ),
     `${workspaceId}:${deal?.id}:${deal?.version}:${earnedOn}`,
     enabled,
+  );
+}
+
+/** One deal's, payment's or expense's history; reloads when the row's version changes. */
+export function useFinanceHistory(api, workspaceId, access, kind, row) {
+  return useRead(
+    async (signal) =>
+      readHistory(
+        await api.financeHistory(workspaceId, kind, row.id, signal),
+        access.scope === 'team',
+      ),
+    `${workspaceId}:${kind}:${row?.id}:${row?.version}`,
+    Boolean(row) && access.scope !== 'none',
   );
 }

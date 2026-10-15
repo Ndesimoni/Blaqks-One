@@ -8,12 +8,16 @@ import { BarListPanel } from '../../dashboard/BarListPanel.jsx';
 import { AssignedToFilter } from '../assignment/AssignedToFilter.jsx';
 import { ConnectedMetrics } from './ConnectedMetrics.jsx';
 import { RecordCountsPanel } from './RecordCountsPanel.jsx';
+import { FinanceWidgets } from './FinanceWidgets.jsx';
 import { useDashboardWorkload } from './useDashboardWorkload.js';
 import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
 import '../assignment/assigned-filter.css';
 
-/** Connected Dashboard: figures from this session's scoped records only, never demo data. */
-export function ServerDashboard() {
+/**
+ * Connected Dashboard: figures from this session's scoped records only, never demo data.
+ * Finance figures come from the workspace's scoped finance overview.
+ */
+export function ServerDashboard({ owner }) {
   const { user } = useSession();
   // Names use every record the viewer can see; only the figures follow the workload filter.
   const { data: visible, scope, referenceFor } = useRecords();
@@ -49,6 +53,7 @@ export function ServerDashboard() {
         )}
       </div>
       <ConnectedMetrics figures={figures} widgets={widgets} />
+      {widgets.finance && owner && <FinanceWidgets owner={owner} />}
       <div className="split-main">
         <RecordCountsPanel
           collections={widgets.collections}

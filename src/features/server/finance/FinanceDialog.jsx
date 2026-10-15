@@ -85,11 +85,11 @@ export function FinanceDialog({
 
 /**
  * A failed action's text. After a version conflict the dialog already shows the refreshed
- * deal, so the user checks the latest figures and saves again with their entries kept.
+ * deal (or `noun`), so the user checks the latest figures and saves again with entries kept.
  */
-export function failureText(result) {
+export function failureText(result, noun = 'deal') {
   if (result.conflict)
-    return 'This deal changed since you opened it. The latest figures are shown and your entries are kept. Check them and try again.';
+    return `This ${noun} changed since you opened it. The latest figures are shown and your entries are kept. Check them and try again.`;
   return result.message || 'The change could not be saved. Your entries are kept.';
 }
 

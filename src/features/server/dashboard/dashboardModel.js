@@ -1,12 +1,13 @@
 /**
  * Connected Dashboard rules. Every figure is derived from the records the server already returned
  * for this session, so assigned-only members count only their own records and hidden records
- * never reach a total. Deals, Payments and Expenses are not connected, so no widget reads them.
+ * never reach a total. Finance figures come only from `GET /finance` (see financeDashboard.js).
  */
 import { get } from '../../../lib/records.js';
 import { selectWorkspaceSummary } from '../../../lib/workspace.js';
 import { stageAndListingOptions } from '../../../config/fields/stageAndListingOptions.js';
 import { canOpenSection } from '../access.js';
+import { canUseFinance } from '../finance/financeAccess.js';
 import { connectedCollections } from '../records.js';
 import { assignmentCollections, filterAssignedEntries } from '../assignment/assignmentModel.js';
 
@@ -17,6 +18,7 @@ export function dashboardWidgets(user) {
     leads: open('Clients'),
     properties: open('Properties'),
     schedule: open('Follow-ups'),
+    finance: open('Deals') && canUseFinance(user),
     collections: connectedCollections.filter(open),
   };
 }

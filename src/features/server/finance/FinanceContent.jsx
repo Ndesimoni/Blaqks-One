@@ -6,12 +6,17 @@ import { useFinance } from './useFinance.js';
 import { useFinanceActions } from './useFinanceActions.js';
 import { FinanceContext, useFinanceAssignees } from './useFinanceRequests.js';
 import { DealsPage } from './DealsPage.jsx';
+import { PaymentsPage } from './PaymentsPage.jsx';
+import { ExpensesPage } from './ExpensesPage.jsx';
 import './finance.css';
 import './finance-dialogs.css';
 import './finance-forms.css';
+import './finance-entries.css';
 
-/** Finance sections that are connected; Payments and Expenses follow in packet F3. */
-export const connectedFinanceRoutes = ['Deals'];
+/** Connected finance sections and their pages (finance-design §7). */
+const pages = { Deals: DealsPage, Payments: PaymentsPage, Expenses: ExpensesPage };
+const nouns = { Deals: 'deals', Payments: 'payments', Expenses: 'expenses' };
+export const connectedFinanceRoutes = Object.keys(pages);
 
 /**
  * Connected finance (finance-design §7). The overview comes only from `GET /finance` for the
@@ -40,18 +45,19 @@ export function FinanceContent({ route, owner }) {
     }),
     [api, user, owner, readOnly, finance, actions, assignees],
   );
-  if (!connectedFinanceRoutes.includes(route))
-    return <ServerUnavailableSection route={route} owner={owner} />;
+  const Page = pages[route];
+  if (!Page) return <ServerUnavailableSection route={route} owner={owner} />;
+  const noun = nouns[route];
   if (finance.loading && !finance.overview)
     return (
       <p className="finance-status" role="status">
-        Loading deals…
+        Loading {noun}…
       </p>
     );
   if (finance.error || !finance.overview)
     return (
-      <section className="panel recovery-panel" aria-label="Deals unavailable">
-        <h2>Deals could not be loaded</h2>
+      <section className="panel recovery-panel" aria-label={`${route} unavailable`}>
+        <h2>{route} could not be loaded</h2>
         <p className="field-error" role="alert">
           {finance.error || 'The CRM server returned no finance information.'}
         </p>
@@ -60,7 +66,7 @@ export function FinanceContent({ route, owner }) {
     );
   return (
     <FinanceContext.Provider value={value}>
-      <DealsPage />
+      <Page />
     </FinanceContext.Provider>
   );
 }

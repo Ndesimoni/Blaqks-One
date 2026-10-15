@@ -74,7 +74,7 @@
   text-underline-offset: 3px;
 }
 .data-table .table-link:focus-visible,
-.deal-card button:focus-visible {
+.deal-card > button:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
@@ -85,7 +85,7 @@
   padding: 12px;
   gap: 10px;
 }
-.deal-card button {
+.deal-card > button {
   display: grid;
   gap: 6px;
   width: 100%;
@@ -102,11 +102,11 @@
     border-color var(--duration) var(--ease),
     background var(--duration) var(--ease);
 }
-.deal-card button:hover {
+.deal-card > button:hover {
   border-color: var(--focus);
   background: var(--hover);
 }
-.deal-card button:active {
+.deal-card > button:active {
   background: var(--surface-subtle);
 }
 .deal-card-top,

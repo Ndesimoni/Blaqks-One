@@ -27,7 +27,7 @@ export function ServerContent({ owner }) {
           Your assigned access determines which connected sections you can open. Contact your team
           Admin to adjust your permissions.
         </p>
-        <p>Payments, expenses, reports and messaging connections are still being developed.</p>
+        <p>Reports and messaging connections are still being developed.</p>
       </section>
     );
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
@@ -42,9 +42,10 @@ export function ServerContent({ owner }) {
         <Button onClick={retry}>Retry</Button>
       </section>
     );
-  if (route === 'Dashboard') return <ServerDashboard />;
+  if (route === 'Dashboard') return <ServerDashboard owner={owner} />;
   if (route === 'Client desk') return <ServerClientDesk />;
-  if (route === 'Deals') return <FinanceContent route={route} owner={owner} />;
+  if (['Deals', 'Payments', 'Expenses'].includes(route))
+    return <FinanceContent key={route} route={route} owner={owner} />;
   const page = (toolbarExtras) => {
     if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Contacts') return <ContactsPage toolbarExtras={toolbarExtras} />;

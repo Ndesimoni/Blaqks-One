@@ -23,15 +23,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
     for (const [name] of group.items)
       await expect(sidebar.getByRole('button', { name, exact: true })).toHaveCount(1);
   }
-  for (const name of [
-    'Messages',
-    'CRM insights',
-    'Payments',
-    'Expenses',
-    'Date search',
-    'Performance',
-    'Guide',
-  ]) {
+  for (const name of ['Messages', 'CRM insights', 'Date search', 'Performance', 'Guide']) {
     await sidebar.getByRole('button', { name, exact: true }).click();
     await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
     await expect(page.getByRole('region', { name: `${name} connection status` })).toContainText(
@@ -66,13 +58,15 @@ test('connected Admin navigation restores every group and unfinished routes neve
   await expect(page.locator('.page-heading h1')).toHaveText('Overview');
   await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
-  // Deals is connected (finance F2); Payments and Expenses follow in F3.
-  for (const name of ['Dashboard', 'Client desk', 'Deals'])
+  // Finance is connected (F2 Deals, F3 Payments and Expenses).
+  for (const name of ['Dashboard', 'Client desk', 'Deals', 'Payments', 'Expenses'])
     await expect(
       sidebar.getByRole('button', { name, exact: true }).locator('.connected-nav-status'),
     ).toHaveCount(0);
   await expect(
-    sidebar.getByRole('button', { name: 'Payments', exact: true }).locator('.connected-nav-status'),
+    sidebar
+      .getByRole('button', { name: 'Performance', exact: true })
+      .locator('.connected-nav-status'),
   ).toHaveText('Not connected');
   await sidebar.getByRole('button', { name: 'Clients', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
