@@ -36,11 +36,11 @@ npm run db:up
 # Terminal 2 — CRM API on 127.0.0.1:8788 (applies new database migrations on start; keep it running)
 npm run dev:api
 
-# Terminal 3 — website on 127.0.0.1:5173 (keep it running)
+# Terminal 3 — website (keep it running)
 npm run dev
 ```
 
-Open <http://127.0.0.1:5173> and sign in with the account you created. To stop, press **Ctrl+C** in terminals 2 and 3, then run `npm run db:stop`; your data stays in the Docker volume.
+Open <http://localhost:5173> (use `localhost`, not `127.0.0.1`: the API accepts sign-ins only from the origin in `CRM_APP_ORIGIN`, otherwise it answers "Access denied.") and sign in with the account you created. To stop, press **Ctrl+C** in terminals 2 and 3, then run `npm run db:stop`; your data stays in the Docker volume.
 
 After pulling new code, restart `npm run dev:api` so new migrations apply, and run `npm install` if `package.json` changed.
 
