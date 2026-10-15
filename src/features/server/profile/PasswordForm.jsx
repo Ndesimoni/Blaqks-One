@@ -1,7 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
+import { PasswordField } from './PasswordField.jsx';
 import { PasswordRules } from './PasswordRules.jsx';
+import { PasswordStrength } from './PasswordStrength.jsx';
 import { usePasswordChange } from './usePasswordChange.js';
 
 const fields = [
@@ -10,79 +13,78 @@ const fields = [
   ['confirm', 'Confirm new password', 'new-password'],
 ];
 
+function MatchHint({ id, values }) {
+  if (!values.confirm) return null;
+  const match = values.confirm === values.next;
+  return (
+    <p id={id} className={`acct-match${match ? ' is-match' : ''}`}>
+      <Icon name={match ? 'check' : 'close'} size={14} strokeWidth={2.4} />
+      {match ? 'Passwords match.' : 'Passwords do not match yet.'}
+    </p>
+  );
+}
+
 export function PasswordForm({ api, email, onChanged, onReload }) {
   const form = usePasswordChange(api, email, onChanged);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState({});
   const inputs = useRef({});
   useUnsavedChanges(form.dirty, form.busy);
   const submit = async (event) => {
+    setVisible({});
     const field = await form.submit(event);
     if (field) inputs.current[field]?.focus();
   };
-  const { outcome } = form;
+  const { outcome, values } = form;
+  const context = { current: values.current, email };
+  const extras = {
+    next: {
+      describedBy: 'profile-password-strength profile-password-rules',
+      children: (
+        <>
+          <PasswordStrength id="profile-password-strength" password={values.next} {...context} />
+          <PasswordRules id="profile-password-rules" password={values.next} {...context} />
+        </>
+      ),
+    },
+    confirm: {
+      describedBy: values.confirm ? 'profile-password-match' : '',
+      children: form.error?.field !== 'confirm' && (
+        <MatchHint id="profile-password-match" values={values} />
+      ),
+    },
+  };
   return (
-    <section className="panel profile-panel" aria-labelledby="profile-password-title">
-      <h2 id="profile-password-title">Change password</h2>
-      <p className="profile-note">Changing your password signs out every other device.</p>
-      <form className="profile-form" onSubmit={submit} noValidate>
+    <form className="acct-form" onSubmit={submit} noValidate>
+      <div className="acct-card-body acct-password-fields">
         <input type="email" name="username" autoComplete="username" value={email} readOnly hidden />
-        {fields.map(([field, label, autoComplete]) => {
-          const id = `profile-password-${field}`;
-          const invalid = form.error?.field === field;
-          const described = [
-            field === 'next' ? 'profile-password-rules' : '',
-            invalid ? `${id}-error` : '',
-          ].join(' ');
-          return (
-            <div className="field" key={field}>
-              <label htmlFor={id}>{label}</label>
-              <input
-                id={id}
-                ref={(node) => {
-                  inputs.current[field] = node;
-                }}
-                type={visible ? 'text' : 'password'}
-                autoComplete={autoComplete}
-                value={form.values[field]}
-                disabled={form.busy}
-                aria-invalid={invalid}
-                aria-describedby={described.trim() || undefined}
-                onChange={(event) => form.set(field, event.target.value)}
-              />
-              {field === 'next' && (
-                <PasswordRules
-                  id="profile-password-rules"
-                  password={form.values.next}
-                  current={form.values.current}
-                  email={email}
-                />
-              )}
-              {invalid && (
-                <p className="field-error" id={`${id}-error`} role="alert">
-                  {form.error.message}
-                </p>
-              )}
-            </div>
-          );
-        })}
-        <div className="profile-actions">
-          <Button
-            variant="light"
-            aria-pressed={visible}
+        {fields.map(([field, label, autoComplete]) => (
+          <PasswordField
+            key={field}
+            id={`profile-password-${field}`}
+            label={label}
+            autoComplete={autoComplete}
+            value={values[field]}
+            visible={Boolean(visible[field])}
             disabled={form.busy}
-            onClick={() => setVisible((value) => !value)}
-          >
-            {visible ? 'Hide passwords' : 'Show passwords'}
-          </Button>
-          <Button type="submit" disabled={form.busy}>
-            {form.busy ? 'Changing password…' : 'Change password'}
-          </Button>
-        </div>
-        <div aria-live="polite" className="profile-status">
-          {outcome?.kind === 'success' && <p className="profile-success">{outcome.message}</p>}
+            error={form.error?.field === field ? form.error : null}
+            inputRef={(node) => {
+              inputs.current[field] = node;
+            }}
+            onChange={(value) => form.set(field, value)}
+            onToggle={() => setVisible((current) => ({ ...current, [field]: !current[field] }))}
+            {...extras[field]}
+          />
+        ))}
+        <div aria-live="polite" className="acct-status">
+          {outcome?.kind === 'success' && (
+            <p className="acct-success">
+              <Icon name="check" size={15} />
+              {outcome.message}
+            </p>
+          )}
         </div>
         {outcome && outcome.kind !== 'success' && (
-          <div className="profile-alert" role="alert">
+          <div className="acct-alert" role="alert">
             <p className="field-error">{outcome.message}</p>
             {outcome.kind === 'stale' && (
               <Button variant="light" onClick={onReload}>
@@ -91,7 +93,23 @@ export function PasswordForm({ api, email, onChanged, onReload }) {
             )}
           </div>
         )}
-      </form>
-    </section>
+      </div>
+      <div className="acct-card-foot">
+        <p className="acct-muted acct-foot-status">
+          <Icon name="shield" size={15} />
+          Changing your password signs out every other device.
+        </p>
+        <div className="acct-actions">
+          <Button
+            type="submit"
+            className={form.busy ? 'acct-loading' : ''}
+            disabled={form.busy}
+            aria-busy={form.busy}
+          >
+            {form.busy ? 'Changing password…' : 'Change password'}
+          </Button>
+        </div>
+      </div>
+    </form>
   );
 }

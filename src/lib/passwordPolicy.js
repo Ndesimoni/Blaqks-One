@@ -48,3 +48,17 @@ export function passwordRules(password = '', { current, email } = {}) {
 export function meetsPasswordPolicy(password, context) {
   return Boolean(password) && passwordRules(password, context).every((rule) => rule.met);
 }
+
+/**
+ * A strength level that never contradicts the rules: Weak or Fair while any rule is unmet, then
+ * Good once the policy is met and Strong from 12 characters. `score` is 0–4 for a meter.
+ */
+export function passwordStrength(password, context) {
+  const value = String(password || '');
+  if (!value) return { score: 0, label: '' };
+  if (!meetsPasswordPolicy(value, context)) {
+    const met = passwordRules(value, context).filter((rule) => rule.met).length;
+    return met >= 4 ? { score: 2, label: 'Fair' } : { score: 1, label: 'Weak' };
+  }
+  return [...value].length >= 12 ? { score: 4, label: 'Strong' } : { score: 3, label: 'Good' };
+}

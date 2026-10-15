@@ -2,7 +2,6 @@
   "description": "Known oversized files (refactoring debt). Shrink-only: lower counts or remove entries as files are split; never add files or raise counts. Checked by npm run check:lines:ci.",
   "limit": 150,
   "files": {
-    "src/components/ui/Icon.jsx": 298,
     "src/data/demo.js": 620,
     "src/features/activity/TeamActivityPage.jsx": 225,
     "src/features/auth/SignInPage.jsx": 249,

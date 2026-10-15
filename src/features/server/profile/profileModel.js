@@ -25,13 +25,14 @@ export function permissionSummary(user) {
   return granted.map((key) => moduleLabels[key]);
 }
 
-export function channelSummary(user) {
-  const channels = [
+/** The messaging channels the account may use, by label. */
+export const channelLabels = (user) =>
+  [
     ['email', 'Email'],
     ['whatsapp', 'WhatsApp'],
-  ].filter(([key]) => user?.channelAccess?.[key] === true);
-  return channels.length ? channels.map(([, label]) => label).join(' and ') : 'None';
-}
+  ]
+    .filter(([key]) => user?.channelAccess?.[key] === true)
+    .map(([, label]) => label);
 
 export function recordScopeLabel(user) {
   return user?.recordScope === 'team' ? "Whole team's records" : 'Only records assigned to me';
@@ -45,16 +46,34 @@ export function detailsChanges(form, user) {
   return Object.keys(changes).length ? changes : null;
 }
 
-export function detailsError(form) {
-  const name = form.name.trim();
-  if (!name || [...name].length > 100)
-    return { field: 'name', message: 'Enter a name of 1 to 100 characters.' };
-  if (!/^\+\d{7,15}$/.test(form.phone.trim()))
+/** The error for one details field, or null; used on blur and before saving. */
+export function detailsFieldError(field, form) {
+  const value = String(form[field] || '').trim();
+  if (field === 'name' && (!value || [...value].length > 100))
+    return { field, message: 'Enter a name of 1 to 100 characters.' };
+  if (field === 'phone' && !/^\+\d{7,15}$/.test(value))
     return {
-      field: 'phone',
+      field,
       message: 'Enter a phone number including country code, such as +971501234567.',
     };
   return null;
 }
 
-export const deviceLabel = (session) => session.device || 'Unknown browser';
+export const detailsError = (form) =>
+  detailsFieldError('name', form) || detailsFieldError('phone', form);
+
+/** Up to two initials for the avatar. */
+export const initials = (name) =>
+  String(name || '?')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => [...word][0]?.toUpperCase() || '')
+    .join('') || '?';
+
+/** A stable avatar tone (0–3) from the account id, so each member keeps their colour. */
+export function avatarTone(id) {
+  let hash = 0;
+  for (const character of String(id || '')) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+  return hash % 4;
+}

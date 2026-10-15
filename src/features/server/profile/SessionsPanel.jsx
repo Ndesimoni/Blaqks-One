@@ -1,37 +1,23 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { deviceLabel, formatStamp } from './profileModel.js';
+import { Icon } from '../../../components/ui/Icon.jsx';
+import { InlineConfirm } from './InlineConfirm.jsx';
+import { SessionRow } from './SessionRow.jsx';
+import { sortSessions } from './sessionModel.js';
 
-function SessionRow({ session, busy, onRevoke }) {
-  const [confirming, setConfirming] = useState(false);
+function SessionSkeleton() {
   return (
-    <li className="profile-session">
-      <div>
-        <strong>
-          {deviceLabel(session)}
-          {session.current && <span className="profile-badge">This device</span>}
-        </strong>
-        <small>
-          Signed in {formatStamp(session.createdAt)} · Last active {formatStamp(session.lastSeenAt)}
-        </small>
-      </div>
-      {!session.current &&
-        (confirming ? (
-          <div className="profile-confirm" role="group" aria-label="Confirm sign out">
-            <span>Sign out this device?</span>
-            <Button variant="danger-light" disabled={busy} onClick={() => onRevoke(session.id)}>
-              Sign out device
-            </Button>
-            <Button variant="light" disabled={busy} onClick={() => setConfirming(false)}>
-              Cancel
-            </Button>
+    <ul className="acct-sessions" aria-hidden="true">
+      {[0, 1].map((row) => (
+        <li key={row} className="acct-session">
+          <span className="acct-device acct-skeleton" />
+          <div className="acct-session-main">
+            <span className="acct-skeleton acct-skeleton-line" />
+            <span className="acct-skeleton acct-skeleton-line short" />
           </div>
-        ) : (
-          <Button variant="light" disabled={busy} onClick={() => setConfirming(true)}>
-            Sign out
-          </Button>
-        ))}
-    </li>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -39,54 +25,76 @@ export function SessionsPanel({ state }) {
   const { sessions, error, status, busy, reload, revoke, revokeOthers } = state;
   const [confirmAll, setConfirmAll] = useState(false);
   const others = sessions?.filter((session) => !session.current).length || 0;
+  const count = sessions?.length || 0;
   return (
-    <section className="panel profile-panel" aria-labelledby="profile-sessions-title">
-      <div className="profile-panel-head">
-        <h2 id="profile-sessions-title">Active sessions</h2>
-        {others > 0 && !confirmAll && (
-          <Button variant="light" disabled={busy} onClick={() => setConfirmAll(true)}>
-            Sign out all other devices
-          </Button>
+    <div className="panel acct-card">
+      <div className="acct-card-body">
+        <div aria-live="polite" className="acct-status">
+          {status && (
+            <p className="acct-success">
+              <Icon name="check" size={15} />
+              {status}
+            </p>
+          )}
+        </div>
+        {error && (
+          <div className="acct-alert" role="alert">
+            <p className="field-error">{error}</p>
+            <Button variant="light" onClick={reload}>
+              Retry
+            </Button>
+          </div>
+        )}
+        {!sessions && !error && (
+          <>
+            <p className="sr-only" role="status">
+              Loading sessions…
+            </p>
+            <SessionSkeleton />
+          </>
+        )}
+        {sessions && count === 0 && <p className="acct-muted">No active sessions.</p>}
+        {count > 0 && (
+          <ul className="acct-sessions" aria-label="Signed-in devices">
+            {sortSessions(sessions).map((session) => (
+              <SessionRow key={session.id} session={session} busy={busy} onRevoke={revoke} />
+            ))}
+          </ul>
         )}
       </div>
-      {confirmAll && others > 0 && (
-        <div
-          className="profile-confirm"
-          role="group"
-          aria-label="Confirm sign out of other devices"
-        >
-          <span>Sign out {others === 1 ? 'the other device' : `all ${others} other devices`}?</span>
-          <Button
-            variant="danger-light"
-            disabled={busy}
-            onClick={() => revokeOthers().then(() => setConfirmAll(false))}
-          >
-            Sign out other devices
-          </Button>
-          <Button variant="light" disabled={busy} onClick={() => setConfirmAll(false)}>
-            Cancel
-          </Button>
-        </div>
-      )}
-      <div aria-live="polite" className="profile-status">
-        {status && <p className="profile-success">{status}</p>}
-      </div>
-      {error && (
-        <div className="profile-alert" role="alert">
-          <p className="field-error">{error}</p>
-          <Button variant="light" onClick={reload}>
-            Retry
-          </Button>
-        </div>
-      )}
-      {!sessions && !error && <p role="status">Loading sessions…</p>}
       {sessions && (
-        <ul className="profile-sessions" aria-label="Signed-in devices">
-          {sessions.map((session) => (
-            <SessionRow key={session.id} session={session} busy={busy} onRevoke={revoke} />
-          ))}
-        </ul>
+        <div className="acct-card-foot">
+          {confirmAll && others > 0 ? (
+            <InlineConfirm
+              label="Confirm sign out of other devices"
+              prompt={`Sign out ${others === 1 ? 'the other device' : `all ${others} other devices`}?`}
+              confirmLabel="Sign out other devices"
+              busy={busy}
+              onConfirm={() => revokeOthers().then(() => setConfirmAll(false))}
+              onCancel={() => setConfirmAll(false)}
+            />
+          ) : (
+            <>
+              <p className="acct-muted acct-foot-status">
+                {others > 0
+                  ? `Signed in on ${count} devices.`
+                  : 'This is your only active session.'}
+              </p>
+              {others > 0 && (
+                <Button
+                  variant="light"
+                  className="acct-btn-danger"
+                  icon="logout"
+                  disabled={busy}
+                  onClick={() => setConfirmAll(true)}
+                >
+                  Sign out all other devices
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       )}
-    </section>
+    </div>
   );
 }

@@ -29,7 +29,14 @@ test('members edit their details, change their password and manage their session
   await expect(details).toContainText('Contact your Admin to change.');
   await expect(details).toContainText('Fixture Admin A');
 
-  // Name and phone.
+  // Name and phone: Save and Cancel wait for a change, and Cancel restores the saved values.
+  const save = page.getByRole('button', { name: 'Save changes' });
+  const original = await page.getByLabel('Full name *').inputValue();
+  await expect(save).toBeDisabled();
+  await page.getByLabel('Full name *').fill('Discarded Name');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(page.getByLabel('Full name *')).toHaveValue(original);
+  await expect(save).toBeDisabled();
   await page.getByLabel('Full name *').fill('Browser Profile Edited');
   await page.getByLabel('Phone number *').fill('0501234567');
   await page.getByRole('button', { name: 'Save changes' }).click();
@@ -65,6 +72,9 @@ test('members edit their details, change their password and manage their session
   const rules = page.getByRole('list', { name: 'Password requirements' });
   await expect(rules).toContainText('An uppercase letter (not met yet)');
   await expect(rules).toContainText('A lowercase letter (met)');
+  await expect(page.locator('#profile-password-strength')).toHaveText('Strength: Fair');
+  await page.getByRole('button', { name: 'Show new password' }).click();
+  await expect(next).toHaveAttribute('type', 'text');
   await confirm.fill('weakpass');
   await page.getByRole('button', { name: 'Change password', exact: true }).click();
   await expect(page.locator('#profile-password-next-error')).toContainText('Use at least 8');
@@ -99,18 +109,22 @@ test('members edit their details, change their password and manage their session
   await page.screenshot({ path: test.info().outputPath('profile-desktop.png'), fullPage: true });
 });
 
-test('My profile reflows on mobile in both themes', async ({ page }, testInfo) => {
+test('My profile reflows on mobile and desktop in both themes', async ({ page }, testInfo) => {
   const admin = await login('admin-a');
   const invited = await invite(admin, 'browser-profile-mobile');
   await activate(invited);
-  await page.setViewportSize({ width: 390, height: 844 });
   await signInMember(page, invited.email);
-  for (const theme of ['dark', 'light']) {
-    await setTheme(page, theme);
-    await openProfile(page);
-    await expect(page.getByRole('heading', { name: 'Active sessions' })).toBeVisible();
-    await noPageOverflow(page);
-    const path = testInfo.outputPath(`profile-mobile-${theme}.png`);
-    await page.screenshot({ path, fullPage: true });
-  }
+  for (const [width, height] of [
+    [390, 844],
+    [1280, 900],
+  ])
+    for (const theme of ['dark', 'light']) {
+      await page.setViewportSize({ width, height });
+      await setTheme(page, theme);
+      await openProfile(page);
+      await expect(sessionRows(page).first()).toBeVisible();
+      await noPageOverflow(page);
+      const path = testInfo.outputPath(`profile-${width}-${theme}.png`);
+      await page.screenshot({ path, fullPage: true });
+    }
 });

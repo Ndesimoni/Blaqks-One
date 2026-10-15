@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { AccountSummary } from './AccountSummary.jsx';
 import { PasswordForm } from './PasswordForm.jsx';
 import { ProfileDetailsForm } from './ProfileDetailsForm.jsx';
+import { ProfileSkeleton } from './ProfileSkeleton.jsx';
+import { ProfileHeader } from './ProfileHeader.jsx';
 import { SessionsPanel } from './SessionsPanel.jsx';
+import { SettingsSection } from './SettingsSection.jsx';
 import { useAccount } from './useAccount.js';
 import { useSessions } from './useSessions.js';
 import './profile.css';
+import './profile-header.css';
+import './profile-forms.css';
+import './profile-sessions.css';
 
 /**
  * Connected My profile (docs/account-self-service.md): the member's own account, name and phone,
@@ -19,7 +25,6 @@ export function ServerProfile() {
   const { refreshDirectory } = useWorkspaceScope();
   const { account, error, reload, replace } = useAccount(api);
   const sessions = useSessions(api);
-  const [saved, setSaved] = useState('');
   if (error)
     return (
       <section className="panel recovery-panel" role="alert">
@@ -27,44 +32,58 @@ export function ServerProfile() {
         <Button onClick={reload}>Retry</Button>
       </section>
     );
-  if (!account) return <p role="status">Loading your account…</p>;
+  if (!account) return <ProfileSkeleton />;
   const onSaved = (next) => {
     replace(next);
     replaceUser(next.user);
     refreshDirectory();
-    setSaved('Your details were saved.');
   };
   const onPasswordChanged = () => {
     reload();
     sessions.reload();
   };
   return (
-    <div className="page-stack profile-page">
-      <div className="profile-grid">
-        <AccountSummary account={account} />
-        <div className="profile-column">
-          <ProfileDetailsForm
-            key={account.version}
-            api={api}
-            account={account}
-            onSaved={onSaved}
-            onReload={() => {
-              setSaved('');
-              reload();
-            }}
-          />
-          <div aria-live="polite" className="profile-status">
-            {saved && <p className="profile-success">{saved}</p>}
+    <div className="page-stack acct-page">
+      <ProfileHeader account={account} />
+      <div className="acct-sections">
+        <SettingsSection
+          id="account"
+          title="Account details"
+          description="How you sign in and what you can access."
+        >
+          <AccountSummary account={account} />
+        </SettingsSection>
+        <SettingsSection
+          id="details"
+          title="Edit details"
+          description="Your name and phone number as your team sees them."
+        >
+          <div className="panel acct-card">
+            <ProfileDetailsForm api={api} account={account} onSaved={onSaved} onReload={reload} />
           </div>
-        </div>
+        </SettingsSection>
+        <SettingsSection
+          id="password"
+          title="Change password"
+          description="Use a strong password that you do not use anywhere else."
+        >
+          <div className="panel acct-card">
+            <PasswordForm
+              api={api}
+              email={account.user.email}
+              onChanged={onPasswordChanged}
+              onReload={reload}
+            />
+          </div>
+        </SettingsSection>
+        <SettingsSection
+          id="sessions"
+          title="Active sessions"
+          description="Devices that are signed in to your account. Sign out any you do not recognise."
+        >
+          <SessionsPanel state={sessions} />
+        </SettingsSection>
       </div>
-      <PasswordForm
-        api={api}
-        email={account.user.email}
-        onChanged={onPasswordChanged}
-        onReload={reload}
-      />
-      <SessionsPanel state={sessions} />
     </div>
   );
 }

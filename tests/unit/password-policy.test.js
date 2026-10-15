@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   meetsPasswordPolicy,
   passwordRules,
+  passwordStrength,
   weakPasswordMessage,
 } from '../../src/lib/passwordPolicy.js';
 import { createCrmClient } from '../../src/services/crm/client.js';
@@ -41,6 +42,16 @@ test('the new password must differ from the current password and the email', () 
     passwordRules('', context).map((rule) => rule.id),
     ['length', 'upper', 'lower', 'number', 'special', 'current', 'email'],
   );
+});
+
+test('the strength level only reaches Good once every rule is met', () => {
+  const context = { current: 'Old3tic!x', email: 'synthetic.member1@example.test' };
+  assert.deepEqual(passwordStrength('', context), { score: 0, label: '' });
+  assert.equal(passwordStrength('abc', context).label, 'Weak');
+  assert.equal(passwordStrength('Abcdefg1', context).label, 'Fair');
+  assert.equal(passwordStrength('Old3tic!x', context).label, 'Fair');
+  assert.deepEqual(passwordStrength('New3tic!x', context), { score: 3, label: 'Good' });
+  assert.deepEqual(passwordStrength('New3tic!x-long', context), { score: 4, label: 'Strong' });
 });
 
 const response = (status, json) => ({
