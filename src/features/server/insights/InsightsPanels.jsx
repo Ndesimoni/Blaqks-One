@@ -1,74 +1,71 @@
 import React from 'react';
-import { COLORS } from '../../../config/theme.js';
 import { leadTier } from '../../../lib/crm.js';
 import { get, initials } from '../../../lib/records.js';
 import { Badge } from '../../../components/ui/Badge.jsx';
+import { Button } from '../../../components/ui/Button.jsx';
 import { Empty } from '../../../components/ui/Empty.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { TitleSection } from '../../../components/ui/TitleSection.jsx';
+import { ShareBars } from './ShareBars.jsx';
+import { sumOf } from './shareModel.js';
 
-const share = (value, total) => `${(value / total) * 100}%`;
-
-export function LeadTiers({ tiers, total }) {
-  return (
-    <section className="panel" aria-label="Lead quality distribution">
-      <TitleSection
-        heading="Lead quality distribution"
-        caption="Automatic tiers from the clients in view"
-      />
-      <div className="tier-list">
-        {tiers.map((tier, index) => (
-          <div key={tier.title} className="tier-item">
-            <div
-              className="tier-icon"
-              style={{ background: `${COLORS[index]}24`, color: COLORS[index] }}
-            >
-              <Icon name={index === 0 ? 'sparkle' : index === 4 ? 'close' : 'users'} size={17} />
-            </div>
-            <span>{tier.title}</span>
-            <div className="tier-track" aria-hidden="true">
-              <div style={{ background: COLORS[index], width: share(tier.value, total) }} />
-            </div>
-            <strong>{tier.value}</strong>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+export { LeadTiers } from './LeadQuality.jsx';
 
 export function PipelineMix({ pipelines, total, team }) {
+  const typed = sumOf(pipelines);
   return (
-    <section className="panel" aria-label="Active pipelines">
+    <section className="panel insight-panel" aria-label="Active pipelines">
       <TitleSection
         heading="Active pipelines"
         caption={team ? 'Deal mix across your team' : 'Deal mix across the deals you can see'}
       />
-      <div className="pipeline-list">
-        {pipelines.map((row, index) => (
-          <div className="bar-row" key={row.name}>
-            <div className="bar-label">
-              <span>{row.name}</span>
-              <strong>{row.value}</strong>
-            </div>
-            <div className="bar-track" aria-hidden="true">
-              <div
-                style={{
-                  width: share(row.value, total),
-                  background: COLORS[index % COLORS.length],
-                }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+      {typed === 0 ? (
+        <Empty
+          title="No pipeline mix yet"
+          detail="Record a pipeline type on deals to see how your business is split."
+          icon="briefcase"
+        />
+      ) : (
+        <ShareBars
+          rows={pipelines}
+          total={total}
+          label="Deals by pipeline"
+          unit={['deal', 'deals']}
+        />
+      )}
+    </section>
+  );
+}
+
+/** Deal insights while the scoped finance view loads, or after it failed. */
+export function DealsPending({ finance }) {
+  return (
+    <section className="panel insight-panel" aria-label="Active pipelines">
+      <TitleSection heading="Active pipelines" caption="Deal mix from the deals you can see" />
+      {finance.loading ? (
+        <div className="insight-skeleton" role="status">
+          <span className="sr-only">Loading deals…</span>
+          {[70, 45, 30].map((width) => (
+            <span key={width} style={{ width: `${width}%` }} aria-hidden="true" />
+          ))}
+        </div>
+      ) : (
+        <div className="insight-error">
+          <p className="field-error" role="alert">
+            Deal insights could not be loaded. {finance.error}
+          </p>
+          <Button variant="light" onClick={finance.retry}>
+            Retry
+          </Button>
+        </div>
+      )}
     </section>
   );
 }
 
 export function LostReasons({ reasons, withDeals }) {
   return (
-    <section className="panel" aria-label="Lost lead intelligence">
+    <section className="panel insight-panel" aria-label="Lost lead intelligence">
       <TitleSection
         heading="Lost lead intelligence"
         caption={
@@ -76,14 +73,7 @@ export function LostReasons({ reasons, withDeals }) {
         }
       />
       {reasons.length ? (
-        reasons.map((reason) => (
-          <div className="lost-reason" key={reason.name}>
-            <span>{reason.name}</span>
-            <Badge tone="amber">
-              {reason.value} {reason.value === 1 ? 'record' : 'records'}
-            </Badge>
-          </div>
-        ))
+        <ShareBars rows={reasons} total={sumOf(reasons)} label="Lost reasons" />
       ) : (
         <Empty
           title="No lost reasons yet"
@@ -97,28 +87,35 @@ export function LostReasons({ reasons, withDeals }) {
 
 export function NeedsQualification({ clients, onOpen }) {
   return (
-    <section className="panel" aria-label="Needs qualification">
+    <section className="panel insight-panel" aria-label="Needs qualification">
       <TitleSection
         heading="Needs qualification"
-        caption="Clients with incomplete buyer profiles"
+        caption="Clients missing confirmed funds or a decision maker"
       />
-      {clients.map((client) => (
-        <button
-          key={get(client, 'Client ID')}
-          type="button"
-          className="client-mini"
-          onClick={() => onOpen(client)}
-        >
-          <span className="avatar">{initials(get(client, 'Full name'))}</span>
-          <div>
-            <strong>{get(client, 'Full name')}</strong>
-            <small>{get(client, 'Preferred communities') || 'Area not specified'}</small>
-          </div>
-          <Badge>{leadTier(client)}</Badge>
-        </button>
-      ))}
+      <div className="qualify-list">
+        {clients.map((client) => (
+          <button
+            key={get(client, 'Client ID')}
+            type="button"
+            className="client-mini qualify-row"
+            onClick={() => onOpen(client)}
+          >
+            <span className="avatar">{initials(get(client, 'Full name'))}</span>
+            <div>
+              <strong>{get(client, 'Full name')}</strong>
+              <small>{get(client, 'Preferred communities') || 'Area not specified'}</small>
+            </div>
+            <Badge>{leadTier(client)}</Badge>
+            <Icon name="chevron" size={16} />
+          </button>
+        ))}
+      </div>
       {clients.length === 0 && (
-        <Empty detail="Every client in view has a complete buyer profile." />
+        <Empty
+          title="Every profile is complete"
+          detail="Every client in view has a complete buyer profile."
+          icon="check"
+        />
       )}
     </section>
   );

@@ -1,12 +1,19 @@
 import React, { useMemo } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
-import { Button } from '../../../components/ui/Button.jsx';
 import { Metric } from '../../../components/ui/Metric.jsx';
 import { canOpenSection } from '../access.js';
 import { useFinance } from '../finance/useFinance.js';
 import { selectConnectedInsights } from './insightsModel.js';
-import { LeadTiers, LostReasons, NeedsQualification, PipelineMix } from './InsightsPanels.jsx';
+import {
+  DealsPending,
+  LeadTiers,
+  LostReasons,
+  NeedsQualification,
+  PipelineMix,
+} from './InsightsPanels.jsx';
+import './insights.css';
+import './insights-charts.css';
 
 /**
  * Connected CRM insights from the records this session can see. Panels appear only for the
@@ -73,8 +80,8 @@ export function ServerInsights({ owner }) {
           </>
         )}
       </div>
-      <div className="two-grid">
-        {leads && <LeadTiers tiers={insights.tiers} total={insights.tierTotal} />}
+      <div className="two-grid insights-grid">
+        {leads && <LeadTiers tiers={insights.tiers} />}
         {insights.pipelines && (
           <PipelineMix
             pipelines={insights.pipelines}
@@ -82,25 +89,10 @@ export function ServerInsights({ owner }) {
             team={finance.overview.scope === 'team'}
           />
         )}
-        {dealsPending && (
-          <section className="panel" aria-label="Active pipelines">
-            {finance.loading ? (
-              <p role="status">Loading deals…</p>
-            ) : (
-              <p className="field-error" role="alert">
-                Deal insights could not be loaded. {finance.error}
-              </p>
-            )}
-            {!finance.loading && (
-              <Button variant="light" onClick={finance.retry}>
-                Retry
-              </Button>
-            )}
-          </section>
-        )}
+        {dealsPending && <DealsPending finance={finance} />}
       </div>
       {leads && (
-        <div className="two-grid">
+        <div className="two-grid insights-grid">
           <LostReasons reasons={insights.lostReasons} withDeals={Boolean(deals)} />
           <NeedsQualification
             clients={insights.unqualified}

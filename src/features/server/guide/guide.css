@@ -1,0 +1,139 @@
+/* Connected Guide: a compact branded intro and scannable workflow step cards. */
+.connected-guide {
+  gap: 24px;
+}
+.cg-intro {
+  position: relative;
+  overflow: hidden;
+  padding: 28px 32px;
+  border-radius: var(--radius);
+  background: linear-gradient(120deg, #1b362c, #234536);
+  color: #fff;
+}
+.cg-intro h2 {
+  max-width: 560px;
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1.3;
+}
+.cg-intro h2 em {
+  color: #e1c18e;
+  font-family: Georgia, serif;
+  font-style: normal;
+  font-weight: 400;
+}
+:root[data-theme] .cg-intro p {
+  max-width: 520px;
+  margin: 0 0 16px;
+  color: #c3d3c8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.cg-intro-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid #ffffff2e;
+  border-radius: 999px;
+  color: #e1c18e;
+  font-size: 12px;
+  font-weight: 600;
+}
+.cg-section-title {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 650;
+}
+.cg-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cg-steps li {
+  display: flex;
+}
+.cg-step {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  text-align: left;
+  box-shadow: var(--shadow);
+  transition:
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease),
+    background-color var(--duration) var(--ease);
+}
+.cg-step:hover {
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px #1c322d14;
+}
+.cg-step:active {
+  background: var(--surface-subtle);
+}
+.cg-step:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.cg-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.cg-step-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.cg-step-number {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cg-step-title {
+  font-size: 15px;
+  font-weight: 650;
+}
+.cg-step-detail {
+  flex: 1 1 auto;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.cg-step-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 650;
+}
+@media (max-width: 750px) {
+  .cg-intro {
+    padding: 22px 20px;
+  }
+  .cg-intro h2 {
+    font-size: 20px;
+  }
+  .cg-steps {
+    grid-template-columns: 1fr;
+  }
+}

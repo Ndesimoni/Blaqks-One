@@ -6,10 +6,10 @@ import { useNavigation, useWorkspaceActions } from '../../../hooks/useWorkspace.
 import { viewingClock } from './upcomingModel.js';
 import './upcoming-viewings.css';
 
-function DateChip({ value }) {
+function DateChip({ value, held = false }) {
   const date = new Date(value);
   return (
-    <span className="date-chip">
+    <span className={held ? 'date-chip date-chip-held' : 'date-chip'}>
       <b>{date.getDate()}</b>
       <small>{date.toLocaleDateString('en-AE', { month: 'short' })}</small>
     </span>
@@ -21,13 +21,14 @@ function HeldViewing({ entry, propertyName }) {
   const agent = entry.agentName ? `Booked by ${entry.agentName}` : 'Unassigned';
   return (
     <div className="viewing-mini viewing-mini-held">
-      <DateChip value={entry.at} />
+      <DateChip value={entry.at} held />
       <div>
         <strong>{propertyName(entry.propertyId)}</strong>
         <span>
           {viewingClock(entry.at)} · {agent}
         </span>
       </div>
+      <Icon name="lock" size={15} className="viewing-held-lock" />
     </div>
   );
 }
@@ -72,7 +73,10 @@ export function ConnectedUpcomingViewings({ entries, clientName, propertyName })
         {!entries.length && <div className="mini-quiet">No upcoming viewings yet.</div>}
       </div>
       {held && (
-        <small className="viewing-held-note">Client details stay with the responsible agent.</small>
+        <small className="viewing-held-note">
+          <Icon name="lock" size={13} />
+          Client details stay with the responsible agent.
+        </small>
       )}
       <button className="panel-link" onClick={() => navigate('Viewings')}>
         Manage viewings <Icon name="arrow" size={16} />

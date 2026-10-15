@@ -2,17 +2,42 @@ import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Empty } from '../../../components/ui/Empty.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
-import { OverflowList } from '../../../components/ui/OverflowList.jsx';
 import { TitleSection } from '../../../components/ui/TitleSection.jsx';
 import { readableDate } from '../../../lib/dates.js';
+import { DateResultGroups } from './DateResultGroups.jsx';
+import { countText, typeIcon } from './resultGroups.js';
 
-export function DateSearchResults({ type, filter, rows, onOpen, finance }) {
-  if (finance?.loading && !finance.overview)
-    return (
-      <p role="status" className="panel">
-        Loading finance records…
-      </p>
-    );
+function Loading() {
+  return (
+    <section className="panel ds-results" aria-label="Matching records">
+      <div className="ds-skeleton" role="status">
+        <span className="sr-only">Loading finance records…</span>
+        {[0, 1, 2].map((row) => (
+          <span key={row} aria-hidden="true" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function emptyState(invalidRange) {
+  return invalidRange ? (
+    <Empty
+      title="Check the date range"
+      detail="Choose a To date on or after the From date to see results."
+      icon="calendar"
+    />
+  ) : (
+    <Empty
+      title="No records in this range"
+      detail="Change the record type or expand the dates to explore more results."
+      icon="calendar"
+    />
+  );
+}
+
+export function DateSearchResults({ type, filter, rows, onOpen, finance, invalidRange }) {
+  if (finance?.loading && !finance.overview) return <Loading />;
   if (finance && !finance.overview)
     return (
       <section className="panel recovery-panel">
@@ -22,50 +47,34 @@ export function DateSearchResults({ type, filter, rows, onOpen, finance }) {
         <Button onClick={finance.retry}>Retry</Button>
       </section>
     );
+  const range = `${readableDate(filter.start)} to ${readableDate(filter.end)}`;
   return (
-    <div className="panel">
+    <section className="panel ds-results" aria-label="Matching records">
       <TitleSection
         heading="Matching records"
-        caption={`${type?.title || 'No record types'} · ${readableDate(filter.start)} to ${readableDate(filter.end)}`}
-      />
-      <OverflowList
-        mode="scroll"
-        className="record-results-list"
-        key={JSON.stringify(filter)}
-        items={rows}
-        getKey={(row) => row.key}
-        label="Date search matches"
-        listClassName="date-result-list"
-        renderItem={(row, _index, { close }) => (
-          <button
-            type="button"
-            className="result-row"
-            onClick={() => {
-              close();
-              onOpen(row);
-            }}
-          >
-            <span className="result-icon">
-              <Icon name="calendar" size={18} />
+        caption={`${range} · oldest first`}
+        action={
+          <div className="ds-summary">
+            <span className="ds-type-badge">
+              <Icon name={typeIcon(type)} size={14} />
+              {type?.title || 'No record types'}
             </span>
-            <div>
-              <strong>{row.title}</strong>
-              <small>{row.subtitle}</small>
-            </div>
-            <div className="result-date">{readableDate(row.date)}</div>
-            <Icon name="arrow" size={17} />
-          </button>
-        )}
-        after={
-          !rows.length && (
-            <Empty
-              title="No records in this range"
-              detail="Change the record type or expand the dates to explore more results."
-              icon="calendar"
-            />
-          )
+            <span className="ds-count" role="status">
+              {countText(rows.length)}
+            </span>
+          </div>
         }
       />
-    </div>
+      {rows.length ? (
+        <DateResultGroups
+          key={JSON.stringify(filter)}
+          rows={rows}
+          icon={typeIcon(type)}
+          onOpen={onOpen}
+        />
+      ) : (
+        emptyState(invalidRange)
+      )}
+    </section>
   );
 }

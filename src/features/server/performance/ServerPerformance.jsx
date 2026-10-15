@@ -59,18 +59,16 @@ export function ServerPerformance({ owner }) {
         scope={scope}
         workload={workload}
       />
-      <div className="performance-grid">
-        <PerformanceGoals
-          metrics={metrics}
-          current={rows.at(-1)}
-          targets={{ ...targets, forSelection }}
-          selection={selection}
-          finance={financeState}
-          hidden={hidden}
-          onSave={targets.save}
-        />
-        <PerformanceChart rows={rows} feesShown={financeReady} selection={selection} />
-      </div>
+      <PerformanceGoals
+        metrics={metrics}
+        current={rows.at(-1)}
+        targets={{ ...targets, forSelection }}
+        selection={selection}
+        finance={financeState}
+        hidden={hidden}
+        onSave={targets.save}
+      />
+      <PerformanceChart rows={rows} feesShown={financeReady} selection={selection} />
       <PerformanceHistory rows={rows} metrics={metrics} financeReady={financeReady} />
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { useDealLinkOptions } from './useDealLinkOptions.js';
 import { storedDealLabel } from './dealLinkModel.js';
 import './deal-link.css';
@@ -15,6 +16,14 @@ function dealHint({ access, options, loading, error }, value) {
   return 'Only deals in your view can be linked.';
 }
 
+const hintIcons = { locked: 'lock', error: 'info', loading: 'clock', info: 'info' };
+
+function hintKind({ access, loading, error }) {
+  if (access.scope === 'none') return 'locked';
+  if (error) return 'error';
+  return loading ? 'loading' : 'info';
+}
+
 /**
  * Connected Interaction log "Deal ID optional" (finance-design §6.3, §17). Members with finance
  * access choose from the deals they can see; others keep the stored value read-only or clear
@@ -25,9 +34,11 @@ export function DealLinkField({ field, value, inputProps, change }) {
   const { access, options, loading } = state;
   const hintId = `${field.key}-deal-hint`;
   const describedBy = [inputProps['aria-describedby'], hintId].filter(Boolean).join(' ');
+  const kind = hintKind(state);
   const hint = (
-    <small id={hintId} className="field-hint">
-      {dealHint(state, value)}
+    <small id={hintId} className={`field-hint deal-link-hint is-${kind}`}>
+      <Icon name={hintIcons[kind]} size={14} />
+      <span>{dealHint(state, value)}</span>
     </small>
   );
   if (access.scope === 'none')
@@ -44,6 +55,7 @@ export function DealLinkField({ field, value, inputProps, change }) {
           {value && (
             <Button
               variant="light"
+              icon="close"
               aria-label="Clear deal link"
               onClick={() => change(field.key, '')}
             >

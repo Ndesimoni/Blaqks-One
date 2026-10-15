@@ -1,0 +1,54 @@
+/* Performance history: a compact read-only figures table with right-aligned tabular numbers. */
+:root[data-theme] .perf-history .data-table {
+  min-width: 560px;
+}
+:root[data-theme] .perf-history .data-table :is(th, td) {
+  height: 44px;
+  padding: 10px 16px;
+}
+:root[data-theme] .perf-history .data-table thead th {
+  text-transform: none;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+:root[data-theme] .perf-history .data-table tbody th {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  border-bottom: 1px solid var(--line);
+}
+:root[data-theme] .perf-history .data-table :is(thead th:first-child, tbody th) {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+:root[data-theme] .perf-history .data-table tbody th {
+  background: var(--panel);
+}
+:root[data-theme] .perf-history .data-table tbody tr.is-current th {
+  background: var(--surface-subtle);
+}
+:root[data-theme] .perf-history .data-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-theme] .perf-history .data-table td.is-zero {
+  color: var(--muted);
+}
+:root[data-theme] .perf-history .data-table tbody tr {
+  cursor: default;
+}
+:root[data-theme] .perf-history .data-table tbody tr:hover {
+  background: var(--panel);
+}
+:root[data-theme] .perf-history .data-table tbody tr.is-current {
+  background: var(--surface-subtle);
+}
+:root[data-theme] .perf-history .data-table tbody tr.is-current th {
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+:root[data-theme] .perf-history .data-table tbody tr:last-child th {
+  border-bottom: 0;
+}

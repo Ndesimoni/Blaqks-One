@@ -33,20 +33,22 @@ export function TargetForm({ metric, target, onSave }) {
   };
   return (
     <form className="target-form" onSubmit={submit} noValidate>
-      <label htmlFor={id}>{metric.money ? 'Target (AED)' : 'Target'}</label>
-      <input
-        id={id}
-        inputMode={metric.money ? 'decimal' : 'numeric'}
-        aria-label={`Target for ${metric.label}`}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? `${id}-error` : undefined}
-        placeholder="No target"
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-      />
-      <Button type="submit" variant="light" disabled={saving || draft.trim() === saved}>
-        {saving ? 'Saving…' : 'Save target'}
-      </Button>
+      <label htmlFor={id}>{metric.money ? 'Monthly target (AED)' : 'Monthly target'}</label>
+      <div className="target-form-row">
+        <input
+          id={id}
+          inputMode={metric.money ? 'decimal' : 'numeric'}
+          aria-label={`Target for ${metric.label}`}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
+          placeholder="No target"
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+        />
+        <Button type="submit" variant="light" disabled={saving || draft.trim() === saved}>
+          {saving ? 'Saving…' : 'Save target'}
+        </Button>
+      </div>
       {error && (
         <p id={`${id}-error`} className="field-error" role="alert">
           {error}

@@ -1,0 +1,50 @@
+/* Connected Guide notes: short reference cards with an icon heading and checked points. */
+.cg-notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.cg-note h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+.cg-note-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--surface-subtle);
+  color: var(--accent);
+}
+.cg-note ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cg-note li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.cg-note li > svg {
+  margin-top: 3px;
+  color: var(--primary);
+}
+@media (max-width: 750px) {
+  .cg-notes {
+    grid-template-columns: 1fr;
+  }
+}

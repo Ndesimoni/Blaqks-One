@@ -1,7 +1,10 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { TitleSection } from '../../../components/ui/TitleSection.jsx';
 import { GoalRow } from './GoalRow.jsx';
+import './performance-goals.css';
+import './performance-goal-status.css';
 
 function caption(selection, editable, hidden) {
   if (selection.kind === 'queue') return 'Unassigned records have no targets';
@@ -11,6 +14,22 @@ function caption(selection, editable, hidden) {
       ? 'Team targets · automatic actuals'
       : 'Member targets · automatic actuals';
   return 'Targets set by your Admin · automatic actuals';
+}
+
+function Mode({ editable, loading, queue }) {
+  if (loading)
+    return (
+      <span className="goals-mode is-loading" role="status">
+        Loading targets…
+      </span>
+    );
+  if (queue) return null;
+  return (
+    <span className="goals-mode">
+      <Icon name={editable ? 'edit' : 'lock'} size={14} />
+      {editable ? 'You set these targets' : 'Read only'}
+    </span>
+  );
 }
 
 /**
@@ -34,8 +53,13 @@ export function PerformanceGoals({
       : '';
   return (
     <section className="panel connected-goals" aria-label="Monthly goals">
-      <TitleSection heading="Monthly goals" caption={caption(selection, editable, hidden)} />
-      {targets.loading && <p role="status">Loading targets…</p>}
+      <TitleSection
+        heading="Monthly goals"
+        caption={caption(selection, editable, hidden)}
+        action={
+          <Mode editable={editable} loading={targets.loading} queue={selection.kind === 'queue'} />
+        }
+      />
       {targets.error && (
         <div className="goal-error">
           <p className="field-error" role="alert">
@@ -46,7 +70,7 @@ export function PerformanceGoals({
           </Button>
         </div>
       )}
-      <div className="goals">
+      <div className="goals kpi-grid">
         {metrics.map((metric) => (
           <GoalRow
             key={metric.key}
@@ -61,9 +85,11 @@ export function PerformanceGoals({
         ))}
       </div>
       {finance.error && (
-        <Button variant="light" onClick={finance.retry}>
-          Retry finance
-        </Button>
+        <div className="goal-error">
+          <Button variant="light" onClick={finance.retry}>
+            Retry finance
+          </Button>
+        </div>
       )}
     </section>
   );

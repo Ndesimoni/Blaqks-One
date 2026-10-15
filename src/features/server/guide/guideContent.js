@@ -44,6 +44,7 @@ export const guideSteps = [
 export const guideNotes = [
   {
     title: 'Signing in and workspaces',
+    icon: 'lock',
     points: [
       'Sign in with the account your Admin created for you; your session is kept on the server.',
       'Admins work in their own team workspace. Staff use the workspace of the Admin who invited them.',
@@ -52,6 +53,7 @@ export const guideNotes = [
   },
   {
     title: 'Who sees which records',
+    icon: 'users',
     points: [
       'Staff see only the clients and properties assigned to them, and the activity linked to those.',
       'New records are assigned to their creator. Hand a record on and you lose sight of it unless you hold whole-team access.',
@@ -60,6 +62,7 @@ export const guideNotes = [
   },
   {
     title: 'Deals, payments and expenses',
+    icon: 'wallet',
     points: [
       'Agents record and submit; the Admin, or someone the Admin trusts with approvals, approves. Only approved records count.',
       'Agents see their own deals and commission statement, never company totals or colleagues’ earnings.',
@@ -68,6 +71,7 @@ export const guideNotes = [
   },
   {
     title: 'Targets, team and messages',
+    icon: 'target',
     points: [
       'Performance shows monthly targets set by your Admin against actuals worked out from your records.',
       'Admins manage staff, positions and permissions in Team & access.',
