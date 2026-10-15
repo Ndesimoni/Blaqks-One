@@ -12,6 +12,8 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
     baseURL: 'http://localhost:5175',
     channel: process.env.PLAYWRIGHT_CHANNEL || undefined,
+    // UAE users browse in Dubai time; CI runners default to UTC.
+    timezoneId: 'Asia/Dubai',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
