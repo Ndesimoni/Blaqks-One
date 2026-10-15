@@ -1,5 +1,5 @@
 //! The deal columns and the finance-predicate query behind every deal read.
-use crate::records::visibility::{finance_predicate, FinanceTable};
+use crate::finance::visibility::{finance_predicate, FinanceTable};
 
 const COLUMNS: &str = "d.id,d.version,d.legacy_id,d.assignee_id,a.name AS assignee_name, \
     COALESCE(a.role='staff',false) AS assignee_staff,d.client_ref,d.property_ref,d.deal_type, \

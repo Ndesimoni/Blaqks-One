@@ -17,12 +17,10 @@ use crate::{
         entry::Kind,
         entry_view, entry_wire,
         events::{self, Action, Changes, Entity},
+        ids::{self, FinanceIds},
         wire,
     },
-    records::{
-        audit,
-        ids::{self, FinanceIds},
-    },
+    records::audit,
     state::AppState,
 };
 use axum::{
@@ -52,7 +50,7 @@ pub async fn create(
     ensure_owner(&mut tx, &workspace, &live, owner, None).await?;
     let property = expense.property_ref.as_deref();
     links::ensure_property(&mut tx, &workspace, &live, property, None).await?;
-    let legacy = ids::issue_finance(&mut tx, &workspace, FinanceIds::Expenses).await?;
+    let legacy = ids::issue(&mut tx, &workspace, FinanceIds::Expenses).await?;
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_expenses (id,workspace_id,legacy_id,incurred_by,date_paid,category, \

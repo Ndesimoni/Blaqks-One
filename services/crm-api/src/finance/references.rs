@@ -28,4 +28,12 @@ mod tests {
             assert!(!referenced(other), "{other}");
         }
     }
+
+    #[test]
+    fn the_auth_policy_copy_matches_the_finance_references() {
+        use crate::auth::policy::{finance_referenced, COLLECTIONS};
+        for collection in COLLECTIONS.iter().chain(&["Deals"]) {
+            assert_eq!(finance_referenced(collection), referenced(collection));
+        }
+    }
 }

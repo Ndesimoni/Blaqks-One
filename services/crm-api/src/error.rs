@@ -1,5 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde_json::json;
+use std::sync::OnceLock;
 
 #[derive(Debug)]
 pub struct ApiError(pub StatusCode, pub &'static str, pub &'static str);
@@ -45,12 +46,28 @@ impl ApiError {
     }
 }
 
+/// Maps one domain's own database error codes (for example finance SQLSTATEs), or `None`.
+pub type CodeMapper = fn(&str) -> Option<ApiError>;
+
+static DOMAIN_CODES: OnceLock<&'static [CodeMapper]> = OnceLock::new();
+
+/// Registers the domains' mappers once, from the composition root (`routes`), so this
+/// module imports no domain (service-boundaries rule 5). They run before the generic
+/// mapping below; later calls are ignored.
+pub fn register_codes(mappers: &'static [CodeMapper]) {
+    let _ = DOMAIN_CODES.set(mappers);
+}
+
+fn domain_code(code: &str) -> Option<ApiError> {
+    DOMAIN_CODES.get()?.iter().find_map(|mapper| mapper(code))
+}
+
 impl From<sqlx::Error> for ApiError {
     fn from(error: sqlx::Error) -> Self {
         if let Some(database) = error.as_database_error() {
             let code = database.code();
-            if let Some(finance) = code.as_deref().and_then(crate::finance::errors::mapped) {
-                return finance;
+            if let Some(domain) = code.as_deref().and_then(domain_code) {
+                return domain;
             }
             match code.as_deref() {
                 Some("23505") => return Self::conflict("That record ID is already in use."),

@@ -39,7 +39,8 @@ jobs:
         run: npm run build
       - name: File size (shrink-only baseline)
         run: npm run check:lines:ci
-      # Module boundary check: add `npm run check:boundaries` here once it exists.
+      - name: Backend module boundaries
+        run: npm run check:boundaries
 
   rust:
     name: Rust checks

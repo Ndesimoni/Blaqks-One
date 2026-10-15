@@ -8,7 +8,7 @@ pub enum Slot {
     Property,
     Referral,
     /// An Interaction log's deal (`deal_ref`, finance-design §6.3, §13 L-F7). It targets
-    /// `crm_deals`, not a connected collection, and imports always leave it NULL.
+    /// finance's deals table, not a connected collection, and imports always leave it NULL.
     Deal,
 }
 

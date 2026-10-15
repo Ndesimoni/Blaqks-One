@@ -35,3 +35,4 @@ pub mod totals;
 pub mod unearn;
 pub mod update;
 pub mod views;
+pub mod visible;

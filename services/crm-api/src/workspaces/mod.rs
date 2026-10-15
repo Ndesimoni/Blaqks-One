@@ -19,6 +19,21 @@ pub async fn lock(
     Ok(())
 }
 
+/// Creates workspace `id` owned by `owner` inside the caller's transaction; workspaces
+/// owns `crm_workspaces` (service-boundaries C5).
+pub async fn create(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    id: &str,
+    owner: uuid::Uuid,
+) -> ApiResult<()> {
+    sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
+        .bind(id)
+        .bind(owner)
+        .execute(&mut **transaction)
+        .await?;
+    Ok(())
+}
+
 pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str) -> ApiResult<()> {
     if session.user.role != "super-admin" && workspace != session.user.workspace_id {
         return Err(ApiError::forbidden());

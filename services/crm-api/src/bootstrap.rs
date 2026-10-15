@@ -1,7 +1,7 @@
 use crate::{
     auth::password,
     error::{ApiError, ApiResult},
-    workspaces::ORGANISATION,
+    workspaces::{self, ORGANISATION},
 };
 use sqlx::PgPool;
 use std::{
@@ -98,17 +98,9 @@ pub async fn create_user(pool: &PgPool) -> ApiResult<Uuid> {
     .bind(&role)
     .execute(&mut *transaction)
     .await?;
-    sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
-        .bind(id.to_string())
-        .bind(id)
-        .execute(&mut *transaction)
-        .await?;
+    workspaces::create(&mut transaction, &id.to_string(), id).await?;
     if role == "super-admin" {
-        sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
-            .bind(ORGANISATION)
-            .bind(id)
-            .execute(&mut *transaction)
-            .await?;
+        workspaces::create(&mut transaction, ORGANISATION, id).await?;
     }
     transaction.commit().await?;
     Ok(id)

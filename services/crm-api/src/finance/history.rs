@@ -2,11 +2,15 @@
 //! append-only finance events of one visible row, oldest first. Team finance sees actors,
 //! changes and reasons; the own view sees the timeline and the reasons of rejections.
 //! Hidden, unknown and other-workspace IDs give the identical 404.
-use super::{access, deals::gate, events::Entity};
+use super::{
+    access,
+    deals::gate,
+    events::Entity,
+    visibility::{finance_predicate, FinanceTable},
+};
 use crate::{
     auth::{finance_access::FinanceScope, session::Session},
     error::{ApiError, ApiResult},
-    records::visibility::{finance_predicate, FinanceTable},
     state::AppState,
 };
 use axum::{

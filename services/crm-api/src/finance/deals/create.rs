@@ -11,12 +11,12 @@ use crate::{
     error::{ApiError, ApiResult},
     finance::{
         events::{self, Action, Entity},
+        ids::{self, FinanceIds},
         wire,
     },
     records::{
         audit,
         history::{self, Change},
-        ids::{self, FinanceIds},
     },
     state::AppState,
 };
@@ -45,7 +45,7 @@ pub async fn create(
     let property = deal.property_ref.as_deref();
     links::ensure_property(&mut tx, &workspace, &live, property, None).await?;
     let holder = links::initial_holder(&mut tx, &workspace, &live, &deal.client_ref).await?;
-    let legacy = ids::issue_finance(&mut tx, &workspace, FinanceIds::Deals).await?;
+    let legacy = ids::issue(&mut tx, &workspace, FinanceIds::Deals).await?;
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_deals (id,workspace_id,legacy_id,assignee_id,client_ref,property_ref, \

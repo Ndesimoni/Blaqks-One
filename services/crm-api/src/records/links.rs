@@ -39,7 +39,7 @@ pub fn missing_message(slot: Slot) -> &'static str {
             "The linked contact is missing from this workspace. \
              Choose another contact or clear it."
         }
-        Slot::Deal => crate::finance::payments::create::DEAL_MISSING,
+        Slot::Deal => crate::finance::deals::visible::DEAL_MISSING,
     }
 }
 

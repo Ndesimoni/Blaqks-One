@@ -46,11 +46,7 @@ pub async fn create(
         .bind(actions.filter(|_| staff).map(sqlx::types::Json))
         .execute(&mut *transaction).await?;
     if !staff {
-        sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
-            .bind(id.to_string())
-            .bind(id)
-            .execute(&mut *transaction)
-            .await?;
+        workspaces::create(&mut transaction, &id.to_string(), id).await?;
     }
     let expires_at: String = sqlx::query_scalar(
         "INSERT INTO crm_team_invitations (token_hash,user_id,owner_id,workspace_id,created_by) \

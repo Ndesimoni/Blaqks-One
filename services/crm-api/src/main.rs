@@ -19,6 +19,8 @@ async fn main() {
 }
 
 async fn run() -> Result<(), String> {
+    // Before any command: domain database errors keep their own messages.
+    routes::register_domain_errors();
     let config = Config::from_env()?;
     let command = std::env::args().nth(1);
     let sample_options = match command.as_deref() {

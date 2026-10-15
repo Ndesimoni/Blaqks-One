@@ -7,17 +7,17 @@ use crate::{
     error::{ApiError, ApiResult},
     finance::{
         access, approval_rules,
-        deals::gate::{self, Need},
+        deals::{
+            gate::{self, Need},
+            visible::{self, DEAL_MISSING},
+        },
         entry::Kind,
         entry_view, entry_wire,
         events::{self, Action, Changes, Entity},
+        ids::{self, FinanceIds},
         wire,
     },
-    records::{
-        audit,
-        ids::{self, FinanceIds},
-        visibility::{finance_predicate, FinanceTable},
-    },
+    records::audit,
     state::AppState,
 };
 use axum::{
@@ -27,9 +27,6 @@ use axum::{
 };
 use serde_json::{json, Value};
 use uuid::Uuid;
-
-pub const DEAL_MISSING: &str =
-    "The linked deal is missing from this workspace. Choose another deal or clear it.";
 
 pub async fn create(
     State(state): State<AppState>,
@@ -46,18 +43,7 @@ pub async fn create(
     let mut tx = state.pool.begin().await?;
     entry_wire::not_future(&payment.receipt_date, &access::today(&mut tx).await?)?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Create).await?;
-    let sql = format!(
-        "SELECT EXISTS(SELECT 1 FROM crm_deals d WHERE d.workspace_id=$1 AND d.legacy_id=$2 \
-         AND {})",
-        finance_predicate(FinanceTable::Deals, "d", "$1", "$3")
-    );
-    let visible: bool = sqlx::query_scalar(&sql)
-        .bind(&workspace)
-        .bind(&deal_ref)
-        .bind(gate::caller(&live))
-        .fetch_one(&mut *tx)
-        .await?;
-    if !visible {
+    if !visible::exists(&mut tx, &workspace, &deal_ref, gate::caller(&live)).await? {
         return Err(ApiError::link_missing(DEAL_MISSING));
     }
     let funds = approval_rules::funds(&mut tx, &workspace, &deal_ref, None).await?;
@@ -65,7 +51,7 @@ pub async fn create(
         return Err(ApiError::conflict(approval_rules::NOT_EARNED));
     }
     let vat = funds.vat(payment.amount_fils, false)?;
-    let legacy = ids::issue_finance(&mut tx, &workspace, FinanceIds::Payments).await?;
+    let legacy = ids::issue(&mut tx, &workspace, FinanceIds::Payments).await?;
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_payments (id,workspace_id,legacy_id,deal_ref,receipt_date,amount_fils, \

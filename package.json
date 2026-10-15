@@ -30,6 +30,7 @@
     "test:e2e": "playwright test",
     "check:lines": "node scripts/check-file-size.mjs",
     "check:lines:ci": "node scripts/check-file-size.mjs --baseline scripts/file-size-baseline.json",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

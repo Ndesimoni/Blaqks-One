@@ -1,14 +1,14 @@
 //! What one profile may do with each connected collection (action-permissions §3, §12).
 //! The frontend reads `recordActions` and never re-derives these rules.
-use super::{actions::Actions, actions_wire::Wire, permissions::Module, profile::UserRow};
-use crate::{
-    error::{ApiError, ApiResult},
-    finance::references,
-    records::{
-        collections::COLLECTIONS,
-        visibility::{ASSIGNABLE, PARENTS},
-    },
+//! Collection facts come from `policy`, so auth imports no business domain.
+use super::{
+    actions::Actions,
+    actions_wire::Wire,
+    permissions::Module,
+    policy::{self, ASSIGNABLE, COLLECTIONS, PARENTS},
+    profile::UserRow,
 };
+use crate::error::{ApiError, ApiResult};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
@@ -76,12 +76,11 @@ impl UserRow {
     /// Finance references (L-F2, owner Q9) also need team finance.
     pub fn covers_references(&self, collection: &str) -> bool {
         let permissions = self.effective_permissions();
-        let finance = !references::referenced(collection) || self.finance_access().team_view;
+        let finance = !policy::finance_referenced(collection) || self.finance_access().team_view;
         finance
-            && COLLECTIONS
+            && policy::linked_from(collection)
                 .iter()
-                .filter(|linking| linking.links.iter().any(|link| link.target == collection))
-                .all(|linking| permissions.collection(linking.name))
+                .all(|linking| permissions.collection(linking))
     }
 
     /// `can(collection, action)`: false without the module; parents need team scope,
@@ -121,8 +120,7 @@ impl UserRow {
     pub fn record_actions(&self) -> BTreeMap<&'static str, RecordActions> {
         COLLECTIONS
             .iter()
-            .map(|collection| {
-                let name = collection.name;
+            .map(|&name| {
                 let actions = RecordActions {
                     create: self.can(name, Action::Create),
                     edit: self.can(name, Action::Edit),

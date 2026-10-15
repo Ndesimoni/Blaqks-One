@@ -2,8 +2,8 @@
 //! pending → approved | rejected, rejected → pending on resubmission and approved → void
 //! on the Admin path. `Kind` is a closed enum, so table names never come from a request,
 //! and every read goes through one finance-predicate query (identical 404s).
-use super::events::Entity;
-use crate::records::{
+use super::{
+    events::Entity,
     ids::FinanceIds,
     visibility::{finance_predicate, FinanceTable},
 };

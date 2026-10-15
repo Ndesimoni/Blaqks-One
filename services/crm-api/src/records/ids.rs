@@ -28,60 +28,15 @@ pub fn format(collection: &str, number: i64) -> ApiResult<String> {
     numbered(prefix(collection)?, number)
 }
 
-fn numbered(prefix: &str, number: i64) -> ApiResult<String> {
+/// `PREFIX-NNN`, or the exhaustion conflict outside `1..=MAX_NUMBER` (also used by
+/// `finance::ids`).
+pub fn numbered(prefix: &str, number: i64) -> ApiResult<String> {
     if !(1..=MAX_NUMBER).contains(&number) {
         return Err(ApiError::conflict(
             "No record IDs are left for this collection. Ask your Admin.",
         ));
     }
     Ok(format!("{prefix}-{number:03}"))
-}
-
-/// Finance tables with server-issued IDs (finance-design §6.2, §13 Info): a closed enum,
-/// so the table name never comes from a request.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FinanceIds {
-    Deals,
-    Payments,
-    Expenses,
-}
-
-impl FinanceIds {
-    fn table(self) -> &'static str {
-        match self {
-            Self::Deals => "crm_deals",
-            Self::Payments => "crm_payments",
-            Self::Expenses => "crm_expenses",
-        }
-    }
-
-    pub fn prefix(self) -> &'static str {
-        match self {
-            Self::Deals => "DL",
-            Self::Payments => "PM",
-            Self::Expenses => "EX",
-        }
-    }
-}
-
-/// Issues the next finance ID under the workspace lock, across every row of the table
-/// in the workspace (hidden rows included), ignoring IDs that do not parse.
-pub async fn issue_finance(
-    transaction: &mut Transaction<'_, Postgres>,
-    workspace: &str,
-    kind: FinanceIds,
-) -> ApiResult<String> {
-    let sql = format!(
-        "SELECT COALESCE(max(substring(legacy_id FROM $2)::bigint),0)+1 FROM {} \
-         WHERE workspace_id=$1",
-        kind.table()
-    );
-    let next: i64 = sqlx::query_scalar(&sql)
-        .bind(workspace)
-        .bind(format!("^{}-([0-9]{{1,9}})$", kind.prefix()))
-        .fetch_one(&mut **transaction)
-        .await?;
-    numbered(kind.prefix(), next)
 }
 
 /// Issues the next ID for `collection`. Call under the workspace lock: the maximum is
@@ -123,12 +78,5 @@ mod tests {
             .map(|collection| prefix(collection.name).unwrap())
             .collect();
         assert_eq!(prefixes.len(), 8);
-        let finance = [
-            FinanceIds::Deals,
-            FinanceIds::Payments,
-            FinanceIds::Expenses,
-        ];
-        assert_eq!(finance.map(FinanceIds::prefix), ["DL", "PM", "EX"]);
-        assert_eq!(numbered("DL", 7).unwrap(), "DL-007");
     }
 }

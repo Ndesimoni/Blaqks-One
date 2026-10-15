@@ -1,7 +1,7 @@
 use crate::{
     assignments,
     auth::handlers as auth,
-    error::{ApiError, ApiResult},
+    error::{self, ApiError, ApiResult, CodeMapper},
     imports,
     records::handlers as records,
     state::AppState,
@@ -16,6 +16,15 @@ use axum::{
     Json, Router,
 };
 use serde_json::{json, Value};
+
+/// Domains that map their own database error codes, ahead of the generic mapping.
+const DOMAIN_CODES: &[CodeMapper] = &[crate::finance::errors::mapped];
+
+/// Registers every domain's database error mapping. `app` calls it; command-line paths
+/// that convert database errors call it before running.
+pub fn register_domain_errors() {
+    error::register_codes(DOMAIN_CODES);
+}
 
 async fn health(State(state): State<AppState>) -> ApiResult<Json<Value>> {
     sqlx::query_scalar::<_, i32>("SELECT 1")
@@ -49,6 +58,7 @@ async fn unsupported_method() -> ApiError {
 }
 
 pub fn app(state: AppState) -> Router {
+    register_domain_errors();
     Router::new()
         .route("/api/crm/health", get(health))
         .route(

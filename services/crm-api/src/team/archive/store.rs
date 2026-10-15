@@ -4,6 +4,7 @@ use super::{
     snapshot,
 };
 use crate::assignments::departure;
+use crate::auth::sessions;
 use crate::error::{ApiError, ApiResult};
 use crate::team::{audit, members};
 use serde_json::{json, Value};
@@ -54,10 +55,7 @@ pub async fn archive(
     .bind(&ids)
     .execute(&mut *transaction)
     .await?;
-    sqlx::query("DELETE FROM crm_sessions WHERE user_id=ANY($1)")
-        .bind(&ids)
-        .execute(&mut *transaction)
-        .await?;
+    sessions::revoke_all(&mut transaction, &ids).await?;
     sqlx::query(
         "UPDATE crm_team_invitations SET revoked_at=COALESCE(revoked_at,now()) \
          WHERE user_id=ANY($1) OR owner_id=ANY($1)",

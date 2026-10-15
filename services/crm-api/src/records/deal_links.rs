@@ -1,15 +1,16 @@
 //! Interaction log deal links (finance-design §6.3, §13 L-F7). A link resolves only
 //! through the `deal_ref` column, never by matching payload text, and a deal is linkable
-//! or reported only when the finance predicate shows it to the caller.
+//! or reported only when the finance predicate shows it to the caller. The deal queries
+//! belong to finance (`finance::deals::visible`).
 use super::{
     collections::{Links, Slot},
     links::missing_message,
     list::Row,
-    visibility::{finance_predicate, FinanceTable},
 };
 use crate::{
     auth::{finance_access::FinanceScope, profile::UserRow},
     error::{ApiError, ApiResult},
+    finance::deals::visible,
 };
 use serde_json::{json, Value};
 use sqlx::{Postgres, Transaction};
@@ -48,17 +49,7 @@ pub async fn ensure(
     }
     let missing = || ApiError::link_missing(missing_message(Slot::Deal));
     let caller = finance_caller(user).ok_or_else(missing)?;
-    let sql = format!(
-        "SELECT EXISTS(SELECT 1 FROM crm_deals d WHERE d.workspace_id=$1 AND d.legacy_id=$2 \
-         AND {})",
-        finance_predicate(FinanceTable::Deals, "d", "$1", "$3")
-    );
-    let present: bool = sqlx::query_scalar(&sql)
-        .bind(workspace)
-        .bind(deal)
-        .bind(caller)
-        .fetch_one(&mut **tx)
-        .await?;
+    let present = visible::exists(tx, workspace, deal, caller).await?;
     present.then_some(()).ok_or_else(missing)
 }
 
@@ -81,20 +72,10 @@ pub async fn projection(
         return Ok(json!([]));
     };
     let wanted: Vec<&str> = linked.iter().map(|(_, deal)| *deal).collect();
-    let sql = format!(
-        "SELECT d.legacy_id FROM crm_deals d WHERE d.workspace_id=$1 AND d.legacy_id=ANY($2) \
-         AND {}",
-        finance_predicate(FinanceTable::Deals, "d", "$1", "$3")
-    );
-    let visible: Vec<String> = sqlx::query_scalar(&sql)
-        .bind(workspace)
-        .bind(&wanted)
-        .bind(caller)
-        .fetch_all(&mut **tx)
-        .await?;
+    let shown = visible::among(tx, workspace, &wanted, caller).await?;
     let entries = linked
         .into_iter()
-        .filter(|(_, deal)| visible.iter().any(|id| id == deal))
+        .filter(|(_, deal)| shown.iter().any(|id| id == deal))
         .map(|(log, deal)| json!({"log_id": log, "deal_id": deal}));
     Ok(Value::Array(entries.collect()))
 }

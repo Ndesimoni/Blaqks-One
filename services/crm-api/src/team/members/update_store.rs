@@ -6,7 +6,7 @@ use super::{
 use crate::team::{access, audit};
 use crate::{
     assignments::departure,
-    auth::actions::Actions,
+    auth::{actions::Actions, sessions},
     error::{ApiError, ApiResult},
     finance, workspaces,
 };
@@ -92,8 +92,7 @@ pub async fn update(
         sqlx::query("UPDATE crm_team_invitations SET revoked_at=now() WHERE user_id=$1 AND consumed_at IS NULL")
             .bind(id).execute(&mut *transaction).await?;
     }
-    sqlx::query("DELETE FROM crm_sessions WHERE user_id=$1 OR user_id IN (SELECT id FROM crm_users WHERE owner_id=$1)")
-        .bind(id).execute(&mut *transaction).await?;
+    sessions::revoke_member(&mut transaction, id).await?;
     audit::append(
         &mut transaction,
         actor,
