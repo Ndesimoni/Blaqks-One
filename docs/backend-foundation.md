@@ -55,19 +55,21 @@ Running the seed again adds nothing new. Sample records are tracked by server ID
 
 `services/crm-api/src/` is grouped by domain. Shared infrastructure stays at the crate root.
 
-| Path                                                                        | Responsibility                                                                                  |
-| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `main.rs`, `bootstrap.rs`, `config.rs`, `state.rs`, `error.rs`, `routes.rs` | Startup, account CLI, configuration, shared state, API errors and the route table               |
-| `auth/`                                                                     | Passwords, sessions, login throttling, Origin/CSRF protection, profiles and module permissions  |
-| `workspaces/`                                                               | Workspace locks and access guards (`mod.rs`); directory and activity endpoints (`handlers.rs`)  |
-| `records/`                                                                  | Connected collection definitions, CRUD handlers, transactional mutation/deletion and activity   |
-| `records/` (scope)                                                          | Assigned-only visibility, server-issued IDs, `references`/`taskClients`/`listingViewings` views |
-| `assignments/`                                                              | Reassign, hand-off rules, bulk reassign, history, assignee lists and departure release          |
-| `records/validation/`                                                       | Record shape, reserved fields, numeric ranges, scalar workbook fields and media checks          |
-| `imports/`                                                                  | Super Admin import preview, planning, credential rejection and atomic commit                    |
-| `team/`                                                                     | Role catalogue, team access and validation; `invitations/`, `members/` and `archive/` workflows |
+| Path                                                                        | Responsibility                                                                                                                  |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `main.rs`, `bootstrap.rs`, `config.rs`, `state.rs`, `error.rs`, `routes.rs` | Startup, account CLI, configuration, shared state, API errors and the route table                                               |
+| `auth/`                                                                     | Passwords, sessions, login throttling, Origin/CSRF protection, profiles and module permissions                                  |
+| `workspaces/`                                                               | Workspace locks and access guards (`mod.rs`); directory and activity endpoints (`handlers.rs`)                                  |
+| `records/`                                                                  | Connected collection definitions, CRUD handlers, transactional mutation/deletion and activity                                   |
+| `records/` (scope)                                                          | Assigned-only visibility, server-issued IDs, `references`/`taskClients`/`listingViewings` views                                 |
+| `assignments/`                                                              | Reassign, hand-off rules, bulk reassign, history, assignee lists and departure release                                          |
+| `records/validation/`                                                       | Record shape, reserved fields, numeric ranges, scalar workbook fields and media checks                                          |
+| `imports/`                                                                  | Super Admin import preview, planning, credential rejection and atomic commit                                                    |
+| `team/`                                                                     | Role catalogue, team access and validation; `invitations/`, `members/` and `archive/` workflows                                 |
+| `finance/`                                                                  | Settings, agreements, deals (snapshots, splits, hand-overs), payments, expenses, finance history and routes (`routes.rs` merge) |
+| `sample/`                                                                   | Local-only operator sample-data seed/clear command and its marker tables                                                        |
 
-New domains from the [roadmap](claude-implementation-roadmap.md#suggested-future-module-locations) become sibling folders under `src/`. Within a group, modules import each other through `super::`; cross-group imports use `crate::` paths.
+Table ownership, cross-module access rules and the future service-split plan are in [Service boundaries](service-boundaries.md). New domains from the [roadmap](claude-implementation-roadmap.md#suggested-future-module-locations) become sibling folders under `src/`. Within a group, modules import each other through `super::`; cross-group imports use `crate::` paths.
 
 ## Docker database
 

@@ -69,6 +69,7 @@ Professional real estate CRM focused on the UAE market.
 - services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI; see [module map](docs/backend-foundation.md#module-map). Add new backend domains as sibling modules under `src/`; group a module into subfolders once it holds several workflows
 - compose.yaml / compose.test.yaml — Persistent development PostgreSQL and disposable test PostgreSQL
 - docs/google-calendar.md — Account setup, syncing behavior, and integration verification
+- docs/service-boundaries.md — Backend table ownership, coupling inventory, boundary rules and the future service-split plan
 
 ## Engineering Standards
 
@@ -89,6 +90,7 @@ Act as a senior software engineer and UI/UX designer.
 - Normal account deletion archives identity and data without removing saved records. Only the Super Admin can archive accounts; archiving an Admin archives their whole team and freezes that workspace. Keep archived accounts out of current lists and expose their data only through Super Admin read-only views. Revoke sessions/invitations transactionally, check live membership after workspace locks, and never allow an edit/renewal to restore an archive. Hard deletion is a separate future feature requiring explicit permanent-loss review.
 - Browser/backup imports require the live Super Admin, explicit source/destination review and an atomic add-only commit. Organisation sources stay in the organisation workspace; personal sources require an explicitly selected server member UUID. Preserve every source collection in full backups; only the eight connected collections currently migrate. See [Data migration](docs/data-migration.md).
 - Demo listing photos must stay labelled. Display fallbacks never alter stored browser records; imports may embed deterministic sample assets only for empty galleries. Preserve actual photos and floor plans. See [Demo property photos](docs/demo-property-photos.md).
+- Follow [Service boundaries](docs/service-boundaries.md): each table has one owning backend module and other modules use its functions, not its tables; new cross-domain foreign keys, triggers or shared-table writes need a decision-log entry; build new large features (agreements, messaging/integrations, public catalogue, lead agents) as separately owned modules with their own tables, routes and `src/services/crm/` client file.
 - Prefer reusable components and custom hooks.
 - Separate UI, business logic and data access.
 - Use consistent typography and spacing.
