@@ -34,9 +34,11 @@ test('Admins can reach the familiar sections while only implemented screens are 
     'Expenses',
     'Performance',
     'CRM insights',
+    'Date search',
+    'Guide',
   ])
     assert.equal(isConnectedSection(name), true, name);
-  for (const name of ['Messages', 'Date search', 'My profile', 'Workspaces', 'Anything'])
+  for (const name of ['Messages', 'My profile', 'Workspaces', 'Anything'])
     assert.equal(isConnectedSection(name), false, name);
 });
 
