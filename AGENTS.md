@@ -45,7 +45,7 @@ Professional real estate CRM focused on the UAE market.
 - Private member workspaces, Super Admin workspace directory and scoped activity history; see docs/private-workspaces.md
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
 - Responsive desktop/mobile interface
-- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
+- Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log, Client care, Deals, Payments and Expenses with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
 
 ## Current Project Structure
 
@@ -113,7 +113,7 @@ Use the eight project specialists in `.codex/agents/` through the [Development a
 
 ## Roadmap
 
-The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients); Deals, Payments and Expenses remain demo-only until they are connected. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
+The user has authorised backend development. The first local CRM backend slice is implemented in `services/crm-api/` with Docker PostgreSQL and opt-in `VITE_CRM_MODE=server`; see [Backend foundation](docs/backend-foundation.md). Connected mode includes Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log and Client care (Leads is a view over Clients), plus Deals, Payments and Expenses on dedicated typed finance tables with action permissions and approvals; see [Finance design](docs/finance-design.md). Finance data is not yet part of browser/backup imports. Run CRM Rust tests, formatting and Clippy plus `npm run test:api` or `npm run test:server:e2e` for API changes.
 
 **Connected-only development (owner decision 2026-10-14).** The connected version is the product. The browser-local demo is **frozen**: do not add demo-specific features, demo data or demo browser tests, and do not run `npm run test:e2e` as a routine check. Keep demo code in place (shared components still serve both modes) and do not delete or deliberately break it without a separate owner decision. Verify work with `npm test`, `npm run build`, `npm run test:api`, `npm run test:server:e2e` and `npm run check:lines`. Where real data is missing, use clearly fictional synthetic data: tests seed their own records in the disposable Docker database, and developers may fill a local workspace with the sample-data command; never use real client data for testing.
 
