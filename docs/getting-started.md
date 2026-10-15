@@ -85,6 +85,20 @@ PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e
 
 `test:api` and `test:server:e2e` use their own disposable Docker database and a test API on port 8790; they never touch your development data. `PLAYWRIGHT_CHANNEL=chrome` uses your installed Google Chrome (or run `npx playwright install chromium` once). Do not run the frozen demo suite (`npm run test:e2e`) as a routine check.
 
+## Continuous integration
+
+GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on every push, every pull request and on demand. A newer run on the same branch cancels the older one. Three jobs run in parallel on `ubuntu-latest`:
+
+| Job                             | What it runs                                                                                                                                                                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Frontend checks                 | Node 22: `npm ci`, `npm run format:check`, `npm test`, `npm run build`, `npm run check:lines:ci`                                                                                                                                                 |
+| Rust checks                     | Rust 1.89 (the `rust-version` in both `Cargo.toml` files): `cargo fmt --check`, `cargo clippy --all-targets --locked -- -D warnings` and `cargo test --locked` for `services/crm-api`; formatting and Clippy for the retained Calendar companion |
+| API and connected browser tests | `PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e`: the API suites, the restart check and the connected browser suite, against a disposable Docker PostgreSQL project and a test API on port 8790                                               |
+
+The workflow only reads the repository and needs no secrets: the test runner generates the database and fixture passwords for each run. When the browser job fails, its traces and screenshots are uploaded as the `connected-browser-results` artifact for seven days. The frozen demo suite is not part of CI.
+
+**File-size baseline.** `npm run check:lines` stays strict and still lists every file over 150 lines. CI runs `npm run check:lines:ci` instead, which compares against [`scripts/file-size-baseline.json`](../scripts/file-size-baseline.json), the known oversized files and their line counts when CI was introduced. It fails when a file not in the baseline exceeds the limit or when a baselined file grows. The baseline is **shrink-only**: when you split or shorten a listed file, lower its count or remove it (the check prints which entries to change). Never add a file or raise a count to make CI pass; split the file instead.
+
 ## Existing records and backups
 
 The previous shared records remain under the existing storage key in the Super Admin organisation workspace. Each member has separate record/target keys; Aidah's personal records are fresh fictional examples, and other profiles start empty. The backup format stays compatible. Browser records remain local to the browser and origin where they were entered. Changing browser, hostname, or port creates a separate storage workspace. See [Private workspaces and team activity](private-workspaces.md).

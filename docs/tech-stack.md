@@ -64,6 +64,6 @@ Private CRM data is never cached by the CDN or proxy; only public files, photos 
 | Playwright                            | In use    | Real-browser tests of complete user journeys                        | Proves screens work end to end, on phone and desktop sizes |
 | Prettier, rustfmt, Clippy, size check | In use    | Automatic formatting, code-quality checks and a 150-line file limit | Consistent, readable code that stays easy to change        |
 | Git and GitHub                        | In use    | Version history and code hosting                                    | Every change is tracked and recoverable                    |
-| GitHub Actions                        | At launch | Runs all checks automatically on every change                       | Nothing is released without passing tests                  |
+| GitHub Actions                        | In use    | Runs all checks automatically on every change                       | Nothing is released without passing tests                  |
 | Error tracking and uptime monitoring  | At launch | For example Sentry plus an uptime checker                           | We learn about problems before customers report them       |
 | Encrypted backups and restore drills  | At launch | Regular, tested database and media backups                          | Data can be recovered after mistakes or outages            |

@@ -1,0 +1,114 @@
+# Connected-mode CI (see docs/getting-started.md#continuous-integration).
+# The frozen browser-local demo suite (npm run test:e2e) is deliberately not run.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # Matches rust-version in both Cargo.toml files; raise deliberately with them.
+  RUST_TOOLCHAIN: '1.89'
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Formatting
+        run: npm run format:check
+      - name: Unit and smoke tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: File size (shrink-only baseline)
+        run: npm run check:lines:ci
+      # Module boundary check: add `npm run check:boundaries` here once it exists.
+
+  rust:
+    name: Rust checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            services/crm-api -> target
+            backend -> target
+      - name: CRM API formatting
+        run: cargo fmt --manifest-path services/crm-api/Cargo.toml --check
+      - name: CRM API Clippy
+        run: >-
+          cargo clippy --manifest-path services/crm-api/Cargo.toml
+          --all-targets --locked -- -D warnings
+      - name: CRM API tests
+        run: cargo test --manifest-path services/crm-api/Cargo.toml --locked
+      - name: Calendar companion formatting
+        run: cargo fmt --manifest-path backend/Cargo.toml --check
+      - name: Calendar companion Clippy
+        run: >-
+          cargo clippy --manifest-path backend/Cargo.toml
+          --all-targets --locked -- -D warnings
+
+  api-and-browser:
+    name: API and connected browser tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: services/crm-api -> target
+      - run: npm ci
+      # scripts/test-crm-api.mjs builds with --offline, so fetch crates first.
+      - name: Fetch Rust dependencies
+        run: cargo fetch --locked --manifest-path services/crm-api/Cargo.toml
+      - name: Tool versions
+        run: |
+          docker compose version
+          google-chrome --version
+      # Runs the API suites, the restart check, then the connected browser suite against
+      # a disposable Docker PostgreSQL project and a test API on 127.0.0.1:8790.
+      # All credentials are generated per run; no repository secrets are used.
+      - name: API and connected browser tests
+        run: npm run test:server:e2e
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
+      - name: Upload browser test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: connected-browser-results
+          path: |
+            test-results-server/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
