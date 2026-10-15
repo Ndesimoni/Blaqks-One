@@ -20,6 +20,7 @@ const payload = () => ({
   references: { Clients: [], Properties: [], Contacts: [] },
   taskClients: [],
   listingViewings: [],
+  dealLinks: [],
   records: {
     ...Object.fromEntries(connectedCollections.map((name) => [name, []])),
     Clients: [client('uuid-a', 1, 'CL-001', 'Own client')],

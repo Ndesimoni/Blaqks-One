@@ -15,6 +15,10 @@ const collectionOf = {
  */
 export function LinkSelect({ field, module, relation, value, inputProps, change }) {
   const records = useContext(RecordsContext);
+  // Connected mode supplies its own pickers for links outside the records list (e.g. deals).
+  const Connected = records?.linkFields?.[relation.id];
+  if (Connected)
+    return <Connected field={field} value={value} inputProps={inputProps} change={change} />;
   const known = relation.data.some((row) => get(row, relation.id) === value);
   const reference =
     value && !known ? records?.referenceFor?.(collectionOf[relation.id], value) : null;

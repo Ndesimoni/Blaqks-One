@@ -1,5 +1,10 @@
 import { blank, schema } from '../../lib/schema.js';
-import { readListingViewings, readReferences, readTaskClients } from './projections.js';
+import {
+  readDealLinks,
+  readListingViewings,
+  readReferences,
+  readTaskClients,
+} from './projections.js';
 
 export const connectedCollections = [
   'Clients',
@@ -24,6 +29,7 @@ const reservedKeys = new Set([
   'references',
   'taskClients',
   'listingViewings',
+  'dealLinks',
 ]);
 const incomplete = () => Error('The CRM server returned incomplete records.');
 const invalid = () => Error('The CRM server returned invalid record information.');
@@ -63,7 +69,7 @@ export function readServerRecords(payload) {
       return entry;
     });
   }
-  for (const key of ['scope', 'references', 'taskClients', 'listingViewings'])
+  for (const key of ['scope', 'references', 'taskClients', 'listingViewings', 'dealLinks'])
     if (payload[key] === undefined) throw incomplete();
   if (!['team', 'assigned'].includes(payload.scope)) throw invalid();
   return {
@@ -72,6 +78,7 @@ export function readServerRecords(payload) {
     references: readReferences(payload.references),
     taskClients: readTaskClients(payload.taskClients),
     listingViewings: readListingViewings(payload.listingViewings),
+    dealLinks: readDealLinks(payload.dealLinks),
   };
 }
 

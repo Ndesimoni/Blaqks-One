@@ -40,6 +40,7 @@ const payload = () => ({
     },
     { property_id: 'PR-001', appointment_date_time: null, agent: null },
   ],
+  dealLinks: [],
 });
 
 test('the scoped list keeps scope and projections, limited to the allowed fields', () => {

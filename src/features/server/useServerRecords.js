@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { readServerRecords, serverWorkspaceData } from './records.js';
-import { emptyProjections, linkReference } from './projections.js';
+import { emptyProjections, linkedDeal, linkReference } from './projections.js';
 
 /**
  * Connected records context: visible entries plus the read-only projections (`scope`,
- * `references`, `taskClients`, `listingViewings`). Nothing here is written to browser storage.
+ * `references`, `taskClients`, `listingViewings`, `dealLinks`). Nothing here is written to
+ * browser storage.
  */
 export function useServerRecords(api, workspaceId) {
   const [entries, setEntries] = useState({});
@@ -47,12 +48,18 @@ export function useServerRecords(api, workspaceId) {
     (collection, id) => linkReference(projections, collection, id),
     [projections],
   );
+  /** Deal ID a log visibly links to; null means "Linked deal unavailable" for stored text. */
+  const dealLinkFor = useCallback(
+    (logId, value) => linkedDeal(projections, logId, value),
+    [projections],
+  );
   return {
     entries,
     setEntries,
     data,
     ...projections,
     referenceFor,
+    dealLinkFor,
     install,
     refresh,
     loading,

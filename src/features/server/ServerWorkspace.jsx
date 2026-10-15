@@ -12,12 +12,16 @@ import { useWorkspaceViewState } from '../../hooks/useWorkspaceViewState.js';
 import { useServerRecords } from './useServerRecords.js';
 import { useServerRecordActions } from './useServerRecordActions.js';
 import { ServerShell } from './ServerShell.jsx';
+import { DealLinkField } from './dealLinks/DealLinkField.jsx';
+
+/** Connected pickers for link fields whose targets are not workspace records. */
+const linkFields = Object.freeze({ 'Deal ID': DealLinkField });
 
 export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
   const { api, user } = useSession();
   const navigation = useWorkspaceNavigation('/dashboard');
   const view = useWorkspaceViewState(navigation.route, navigation.initialQuery);
-  const records = useServerRecords(api, owner.id);
+  const records = { ...useServerRecords(api, owner.id), linkFields };
   const readOnly = owner.status === 'archived';
   const actions = useServerRecordActions({
     api,

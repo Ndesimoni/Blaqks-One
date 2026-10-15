@@ -69,11 +69,36 @@ export function readListingViewings(value) {
   });
 }
 
+/**
+ * `dealLinks` (finance-design §17.7): visible Interaction logs whose stored link names a deal
+ * the caller can see. A log appears at most once; no other deal data travels with it.
+ */
+export function readDealLinks(value) {
+  const logs = new Set();
+  return list(value).map((row) => {
+    const link = {
+      log_id: text(object(row).log_id, { required: true, max: 128 }),
+      deal_id: text(row.deal_id, { required: true, max: 128 }),
+    };
+    if (logs.has(link.log_id)) throw invalid();
+    logs.add(link.log_id);
+    return link;
+  });
+}
+
+/** The visible deal a log links to, or null ("Linked deal unavailable" when text is stored). */
+export function linkedDeal(projections, logId, value) {
+  if (!logId || !value) return null;
+  const found = projections.dealLinks?.find((row) => row.log_id === logId);
+  return found?.deal_id === value ? found.deal_id : null;
+}
+
 export const emptyProjections = Object.freeze({
   scope: null,
   references: Object.freeze({ Clients: [], Properties: [], Contacts: [] }),
   taskClients: Object.freeze([]),
   listingViewings: Object.freeze([]),
+  dealLinks: Object.freeze([]),
 });
 
 /**

@@ -10,7 +10,7 @@ import {
   serverRecordMetadata,
 } from './records.js';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
-import { serverMutationFailure } from './errors.js';
+import { serverSaveFailure } from './errors.js';
 
 export function useServerMutations({ api, workspaceId, records, view }) {
   const [busy, setBusy] = useState(false);
@@ -51,11 +51,13 @@ export function useServerMutations({ api, workspaceId, records, view }) {
       if (!alive.current) return {};
       readServerEntry(module, saved);
       records.setEntries((entries) => installServerRecord(entries, module, saved));
+      // Only the server knows whether a saved deal link is visible (`dealLinks`, §17.7).
+      if (module === 'Interaction log') records.refresh().catch(() => {});
       view.setDrawer(null);
       view.setToast(original ? 'Record saved' : 'Record created');
       return { workspace: true };
     } catch (error) {
-      if (!unavailable(error, module, metadata)) return serverMutationFailure(error, original);
+      if (!unavailable(error, module, metadata)) return serverSaveFailure(error, original);
       return { message: recordUnavailableMessage };
     } finally {
       pending.current = false;
