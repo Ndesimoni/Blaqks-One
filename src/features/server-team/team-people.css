@@ -1,0 +1,119 @@
+/* Team directory people: identity, status chips, role chips, phone cards and loading/empty
+   states. Loads after directory-results.css; status tones come from the shared badges. */
+.team-member-identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+.team-member-identity-text {
+  min-width: 0;
+}
+.team-member-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.team-member-avatar[data-tone='0'] {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.team-member-avatar[data-tone='1'] {
+  background: color-mix(in srgb, var(--primary) 14%, var(--panel));
+  color: var(--primary);
+}
+.team-member-avatar[data-tone='2'] {
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+.team-member-avatar[data-tone='3'] {
+  background: color-mix(in srgb, var(--gold) 24%, var(--panel));
+  color: var(--ink);
+}
+.connected-team .team-member-identity h2 {
+  margin: 2px 0 2px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+:root[data-theme] .team-directory-status {
+  gap: 5px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: normal;
+}
+.team-directory-table .team-directory-status {
+  white-space: nowrap;
+}
+.team-directory-status svg {
+  flex-shrink: 0;
+}
+.team-member-positions .overflow-list-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.connected-team-position {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.connected-team-position-admin {
+  border-color: transparent;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.team-directory-table td:first-child {
+  min-width: 220px;
+}
+.team-directory-card-status {
+  margin: 12px 0 0 52px;
+}
+.team-directory-card-details {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.team-directory-card-details dt {
+  margin-bottom: 6px;
+  color: var(--muted-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.team-directory-card-details dd {
+  margin: 0;
+}
+.team-directory-card-actions {
+  margin-top: 16px;
+}
+.team-directory-card-actions > .btn {
+  width: 100%;
+  min-height: 44px;
+}
+.team-directory-empty .empty {
+  padding: 24px 12px;
+}
+.team-directory-error {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}

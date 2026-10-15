@@ -65,6 +65,10 @@ export function TeamAccessFields({ form, change, roles, member, busy }) {
       </fieldset>
       <fieldset className="connected-team-options">
         <legend>CRM access</legend>
+        <p>
+          Choose the sections this person can open. The ticks under each section set what they can
+          do there.
+        </p>
         {accessFields.map(([key, label, guidance]) => (
           <React.Fragment key={key}>
             <label>

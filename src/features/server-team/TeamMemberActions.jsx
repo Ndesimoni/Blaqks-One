@@ -2,6 +2,7 @@ import React, { useId, useState } from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 import { Drawer } from '../../components/ui/Drawer.jsx';
 import { TeamAccountActions } from './TeamAccountActions.jsx';
+import { TeamMemberPositions } from './TeamMemberPositions.jsx';
 
 export function TeamMemberActions({ member, roles, actions, onEdit, onDelete, archived }) {
   const [open, setOpen] = useState(false);
@@ -45,25 +46,20 @@ export function TeamMemberActions({ member, roles, actions, onEdit, onDelete, ar
             </Button>
           </div>
           <div className="drawer-body">
-            <p>
-              {member.roleId === 'admin'
-                ? 'Admin · Own workspace'
-                : member.positions
-                    .map((id) => roles.find((role) => role.id === id)?.label || id)
-                    .join(', ')}
-            </p>
-            <p>
-              {member.channelAccess?.email ? 'Email access allowed' : 'Email access restricted'} ·{' '}
-              {member.channelAccess?.whatsapp
-                ? 'WhatsApp access allowed'
-                : 'WhatsApp access restricted'}
-            </p>
+            <div className="team-actions-summary">
+              <TeamMemberPositions member={member} roles={roles} />
+              <p>
+                {member.roleId === 'admin' && 'Own workspace · '}
+                {member.channelAccess?.email
+                  ? 'Email access allowed'
+                  : 'Email access restricted'} ·{' '}
+                {member.channelAccess?.whatsapp
+                  ? 'WhatsApp access allowed'
+                  : 'WhatsApp access restricted'}
+              </p>
+            </div>
             <div className="team-directory-action-list">
-              <Button
-                variant="light"
-                onClick={() => choose(onEdit)}
-                aria-label={`Edit ${member.name}`}
-              >
+              <Button icon="edit" onClick={() => choose(onEdit)} aria-label={`Edit ${member.name}`}>
                 Edit
               </Button>
               {member.invitationPending ? (

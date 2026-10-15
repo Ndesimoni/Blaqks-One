@@ -3,6 +3,8 @@ import { TeamMemberStatus } from './TeamMemberStatus.jsx';
 import { TeamMemberWorkspace } from './TeamMemberWorkspace.jsx';
 import { TeamMemberActions } from './TeamMemberActions.jsx';
 import { TeamMemberActionNote } from './TeamMemberActionNote.jsx';
+import { TeamMemberIdentity } from './TeamMemberIdentity.jsx';
+import { TeamMemberPositions } from './TeamMemberPositions.jsx';
 
 export function TeamDirectoryTable({ members, roles, owner, archived, actions, onEdit, onDelete }) {
   return (
@@ -22,20 +24,10 @@ export function TeamDirectoryTable({ members, roles, owner, archived, actions, o
             {members.map((member) => (
               <tr key={member.id} data-member-id={member.id}>
                 <td>
-                  <h2>{member.name}</h2>
-                  <span className="team-directory-contact">{member.email}</span>
-                  <span className="team-directory-contact">{member.phone}</span>
+                  <TeamMemberIdentity member={member} />
                 </td>
                 <td>
-                  {member.roleId === 'admin' ? (
-                    'Admin'
-                  ) : (
-                    <span className="team-directory-roles">
-                      {member.positions
-                        .map((id) => roles.find((role) => role.id === id)?.label || id)
-                        .join(', ')}
-                    </span>
-                  )}
+                  <TeamMemberPositions member={member} roles={roles} />
                   {archived && <TeamMemberActionNote member={member} />}
                 </td>
                 <td>
@@ -44,7 +36,7 @@ export function TeamDirectoryTable({ members, roles, owner, archived, actions, o
                 <td>
                   <TeamMemberWorkspace member={member} owner={owner} archived={archived} />
                 </td>
-                <td>
+                <td className="team-directory-actions-cell">
                   <TeamMemberActions
                     member={member}
                     roles={roles}

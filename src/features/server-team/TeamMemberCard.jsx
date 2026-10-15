@@ -1,19 +1,39 @@
 import React from 'react';
-import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { TeamMemberStatus } from './TeamMemberStatus.jsx';
 import { TeamMemberWorkspace } from './TeamMemberWorkspace.jsx';
 import { TeamMemberActions } from './TeamMemberActions.jsx';
 import { TeamMemberActionNote } from './TeamMemberActionNote.jsx';
+import { TeamMemberIdentity } from './TeamMemberIdentity.jsx';
+import { TeamMemberPositions } from './TeamMemberPositions.jsx';
 
+/** Phone-width directory entry: identity and status first, then labelled role and workspace. */
 export function TeamMemberCard({ member, roles, owner, archived, onEdit, actions, onDelete }) {
-  const names = member.positions.map((id) => roles.find((role) => role.id === id)?.label || id);
   return (
     <article
       className="panel connected-team-card team-directory-mobile-card"
       data-member-id={member.id}
     >
-      <div className="connected-team-card-heading">
-        <h2>{member.name}</h2>
+      <TeamMemberIdentity member={member} />
+      <div className="team-directory-card-status">
+        <TeamMemberStatus member={member} />
+      </div>
+      <dl className="team-directory-card-details">
+        <div>
+          <dt>Role</dt>
+          <dd>
+            <TeamMemberPositions member={member} roles={roles} />
+          </dd>
+        </div>
+        <div>
+          <dt>Workspace</dt>
+          <dd>
+            <TeamMemberWorkspace member={member} owner={owner} archived={archived} />
+          </dd>
+        </div>
+      </dl>
+      {archived && <TeamMemberActionNote member={member} />}
+      {archived && <p className="muted">Records are retained. This account cannot be changed.</p>}
+      <div className="team-directory-card-actions">
         <TeamMemberActions
           member={member}
           roles={roles}
@@ -23,25 +43,6 @@ export function TeamMemberCard({ member, roles, owner, archived, onEdit, actions
           archived={archived}
         />
       </div>
-      <TeamMemberStatus member={member} />
-      <p>
-        {member.email}
-        <br />
-        {member.phone}
-      </p>
-      {member.roleId === 'admin' ? (
-        <p>Admin</p>
-      ) : (
-        <OverflowList
-          items={names}
-          getKey={(name) => name}
-          label={`${member.name} positions`}
-          renderItem={(name) => <span className="connected-team-position">{name}</span>}
-        />
-      )}
-      <TeamMemberWorkspace member={member} owner={owner} archived={archived} />
-      {archived && <TeamMemberActionNote member={member} />}
-      {archived && <p className="muted">Records are retained. This account cannot be changed.</p>}
     </article>
   );
 }

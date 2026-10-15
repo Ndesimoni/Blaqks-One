@@ -11,6 +11,7 @@ import { canOpenSection } from '../access.js';
 import { linkedName } from '../dashboard/dashboardModel.js';
 import { TaskClientsPanel } from './TaskClientsPanel.jsx';
 import { selectTaskClients } from './clientDeskModel.js';
+import './client-desk-layout.css';
 
 /**
  * Connected Client desk over the session's scoped Clients and Properties. Clients reached only
@@ -27,7 +28,7 @@ export function ServerClientDesk() {
   );
   const contacts = selectTaskClients(taskClients, data.Clients, query);
   return (
-    <div className="desk-layout">
+    <div className="desk-layout connected-desk">
       <ClientPicker clients={clients} client={client} />
       <div className="desk-body">
         {client ? (

@@ -16,28 +16,10 @@
 }
 .team-directory-contact {
   display: block;
-  color: var(--muted);
+  color: var(--muted-dark);
   font-size: 12px;
   line-height: 1.6;
   overflow-wrap: anywhere;
-}
-.team-directory-roles {
-  display: block;
-  max-width: 200px;
-  line-height: 1.6;
-}
-.team-directory-status {
-  display: inline-block;
-  font-size: 12px;
-  line-height: 1.6;
-  font-weight: 500;
-}
-.team-directory-status-suspended,
-.team-directory-status-cancelled {
-  color: var(--danger);
-}
-.team-directory-status-archived {
-  color: var(--muted);
 }
 .team-directory-workspace {
   display: flex;
@@ -71,12 +53,34 @@
   --dialog-width: 620px;
   --dialog-height: 620px;
 }
-.team-directory-mobile-card .connected-team-card-heading {
-  align-items: center;
+/* Account actions dialog: sized to its content on wider screens, a summary card first,
+   then Edit as the main action. Phones keep the shared full-screen layout. */
+.team-actions-summary {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
 }
-.team-directory-mobile-card > .team-directory-status {
-  margin-bottom: 12px;
+.connected-team .team-actions-summary p,
+.team-actions-summary p {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
 }
-.team-directory-mobile-card .team-directory-workspace {
-  margin-top: 16px;
+.team-directory-actions .drawer-top .btn {
+  flex: none;
+}
+@media (min-width: 751px) {
+  .modal-centered > .drawer.team-directory-actions {
+    height: auto;
+  }
+}
+@media (max-width: 750px) {
+  .team-directory-action-list,
+  .team-directory-action-list > div {
+    justify-items: stretch;
+  }
 }

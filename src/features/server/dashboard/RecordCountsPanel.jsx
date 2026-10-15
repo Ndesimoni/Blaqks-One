@@ -8,7 +8,10 @@ import './dashboard.css';
 
 const icons = Object.fromEntries(nav.flatMap((group) => group.items));
 
-/** Record totals for each connected collection the member may open, with a link to each list. */
+/**
+ * Record totals for each connected collection the member may open, with a link to each list.
+ * The figure sits right-aligned so totals scan as a column; empty lists are quieter.
+ */
 export function RecordCountsPanel({ collections, counts, caption }) {
   const { navigate } = useNavigation();
   return (
@@ -18,20 +21,17 @@ export function RecordCountsPanel({ collections, counts, caption }) {
         {collections.map((name) => (
           <button
             type="button"
-            className="todo-row"
+            className="todo-row record-count-row"
             key={name}
+            data-empty={counts[name] ? undefined : true}
             aria-label={`${name}: ${counts[name]} ${counts[name] === 1 ? 'record' : 'records'}`}
             onClick={() => navigate(name)}
           >
             <span className="todo-indicator">
               <Icon name={icons[name] || 'note'} size={16} />
             </span>
-            <div>
-              <strong>{name}</strong>
-              <span>
-                {N(counts[name])} {counts[name] === 1 ? 'record' : 'records'}
-              </span>
-            </div>
+            <strong>{name}</strong>
+            <span className="record-count-value">{N(counts[name])}</span>
             <Icon name="chevron" size={16} />
           </button>
         ))}

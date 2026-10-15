@@ -16,6 +16,7 @@ import { TeamFinanceSection } from './TeamFinanceSection.jsx';
 import { readFinanceAccess } from '../server/finance/financeAccess.js';
 import './team.css';
 import './team-actions.css';
+import './team-form.css';
 import './team-finance.css';
 import './team-agreements.css';
 
