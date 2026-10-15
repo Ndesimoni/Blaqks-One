@@ -80,10 +80,10 @@ npm test
 npm run build
 npm run check:lines
 npm run test:api
-PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e
+PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only
 ```
 
-`test:api` and `test:server:e2e` use their own disposable Docker database and a test API on port 8790; they never touch your development data. `PLAYWRIGHT_CHANNEL=chrome` uses your installed Google Chrome (or run `npx playwright install chromium` once). Do not run the frozen demo suite (`npm run test:e2e`) as a routine check.
+`test:api` and `test:server:e2e` use their own disposable Docker database and a test API on port 8790; they never touch your development data. Run the browser suite with `--browser-only` so it starts on a fresh database; without it the API suites run first and their fixtures share the browser suite's database. `PLAYWRIGHT_CHANNEL=chrome` uses your installed Google Chrome (or run `npx playwright install chromium` once). Do not run the frozen demo suite (`npm run test:e2e`) as a routine check.
 
 ## Continuous integration
 
@@ -93,7 +93,7 @@ GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Frontend checks                 | Node 22: `npm ci`, `npm run format:check`, `npm test`, `npm run build`, `npm run check:lines:ci`                                                                                                                                                 |
 | Rust checks                     | Rust 1.89 (the `rust-version` in both `Cargo.toml` files): `cargo fmt --check`, `cargo clippy --all-targets --locked -- -D warnings` and `cargo test --locked` for `services/crm-api`; formatting and Clippy for the retained Calendar companion |
-| API and connected browser tests | `PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e`: the API suites, the restart check and the connected browser suite, against a disposable Docker PostgreSQL project and a test API on port 8790                                               |
+| API and connected browser tests | `npm run test:api` (API suites and restart check), then `PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only`, each against its own disposable Docker PostgreSQL project and a test API on port 8790                             |
 
 The workflow only reads the repository and needs no secrets: the test runner generates the database and fixture passwords for each run. When the browser job fails, its traces and screenshots are uploaded as the `connected-browser-results` artifact for seven days. The frozen demo suite is not part of CI.
 

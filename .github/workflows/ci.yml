@@ -96,11 +96,13 @@ jobs:
         run: |
           docker compose version
           google-chrome --version
-      # Runs the API suites, the restart check, then the connected browser suite against
-      # a disposable Docker PostgreSQL project and a test API on 127.0.0.1:8790.
+      # Each suite gets its own disposable Docker PostgreSQL project and a test API on
+      # 127.0.0.1:8790, so API fixtures never leak into the browser suite's data.
       # All credentials are generated per run; no repository secrets are used.
-      - name: API and connected browser tests
-        run: npm run test:server:e2e
+      - name: API tests and restart check
+        run: npm run test:api
+      - name: Connected browser tests
+        run: npm run test:server:e2e -- --browser-only
         env:
           PLAYWRIGHT_CHANNEL: chrome
       - name: Upload browser test results
