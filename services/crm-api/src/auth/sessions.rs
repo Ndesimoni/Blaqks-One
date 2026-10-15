@@ -1,9 +1,40 @@
-//! Session revocation for other modules (service-boundaries C5): auth owns `crm_sessions`,
-//! so team suspensions and archives sign members out through these functions, inside the
-//! caller's transaction.
+//! Session storage. Auth owns `crm_sessions`: sign-in and password change issue sessions
+//! here, and team suspensions and archives sign members out through these functions
+//! (service-boundaries C5), inside the caller's transaction.
+use super::session;
 use crate::error::ApiResult;
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
+
+/// A newly issued session: the cookie token and its anti-forgery token. Only the token's
+/// digest is stored.
+pub struct Issued {
+    pub token: String,
+    pub csrf_token: String,
+}
+
+/// Stores a fresh 8-hour session for `user` with new random session and CSRF tokens.
+pub async fn issue(
+    transaction: &mut Transaction<'_, Postgres>,
+    user: Uuid,
+    device: Option<&str>,
+) -> ApiResult<Issued> {
+    let issued = Issued {
+        token: session::random_token(),
+        csrf_token: session::random_token(),
+    };
+    sqlx::query(
+        "INSERT INTO crm_sessions (token_hash,user_id,csrf_token,expires_at,device) \
+         VALUES ($1,$2,$3,now()+interval '8 hours',$4)",
+    )
+    .bind(session::digest(&issued.token))
+    .bind(user)
+    .bind(&issued.csrf_token)
+    .bind(device)
+    .execute(&mut **transaction)
+    .await?;
+    Ok(issued)
+}
 
 /// Signs out `member` and every account they own (an Admin's staff).
 pub async fn revoke_member(

@@ -82,6 +82,7 @@ export function InvitationActivation({ api, signedIn }) {
               </dl>
               <p>Expires {new Date(invitation.expiresAt).toLocaleString()}.</p>
               <InvitationPasswordForm
+                email={invitation.email}
                 onAccept={(password) => api.acceptInvitation(token, password)}
                 onComplete={() => setComplete(true)}
               />

@@ -1,8 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
+import { meetsPasswordPolicy, weakPasswordMessage } from '../../lib/passwordPolicy.js';
+import { PasswordRules } from '../server/profile/PasswordRules.jsx';
 
-export function InvitationPasswordForm({ onAccept, onComplete }) {
+export function InvitationPasswordForm({ email, onAccept, onComplete }) {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [error, setError] = useState('');
@@ -13,8 +15,12 @@ export function InvitationPasswordForm({ onAccept, onComplete }) {
   const submit = async (event) => {
     event.preventDefault();
     if (pending.current) return;
-    if ([...password].length < 8 || password !== confirmation) {
-      setError('Use at least 8 characters and enter the same password twice.');
+    if (!meetsPasswordPolicy(password, { email })) {
+      setError(weakPasswordMessage);
+      return;
+    }
+    if (password !== confirmation) {
+      setError('Enter the same password twice.');
       return;
     }
     pending.current = true;
@@ -44,9 +50,10 @@ export function InvitationPasswordForm({ onAccept, onComplete }) {
           required
           disabled={busy}
           value={password}
+          aria-describedby="activation-password-rules"
           onChange={(event) => setPassword(event.target.value)}
         />
-        <small>At least 8 characters.</small>
+        <PasswordRules id="activation-password-rules" password={password} email={email} />
       </div>
       <div className="field">
         <label htmlFor="activation-confirm">Confirm password *</label>

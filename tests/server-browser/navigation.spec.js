@@ -61,7 +61,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
   // Finance is connected (F2 Deals, F3 Payments and Expenses), then Performance and insights.
   const live = [
     ...['Dashboard', 'Client desk', 'Deals', 'Payments', 'Expenses', 'Performance'],
-    ...['Date search', 'Guide'],
+    ...['Date search', 'Guide', 'My profile'],
   ];
   for (const name of [...live, 'CRM insights'])
     await expect(

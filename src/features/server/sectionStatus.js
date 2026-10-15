@@ -17,6 +17,8 @@ const connectedSections = new Set([
   'CRM insights',
   'Date search',
   'Guide',
+  // The member's own account under `/auth/account` and `/auth/sessions`.
+  'My profile',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
@@ -28,6 +30,7 @@ const purposes = {
   'Date search': 'Find workspace records by their dates.',
   Performance: 'Review targets and business performance.',
   Guide: 'Learn how to use your CRM workspace.',
+  'My profile': 'Review your account, update your details and manage sign-in security.',
   Workspaces: 'Review the workspaces this account is permitted to open.',
   'Team activity': 'Review changes recorded in the selected workspace.',
 };

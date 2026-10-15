@@ -111,6 +111,16 @@ Many agent-to-agent and broker-to-broker deals in the UAE rest on verbal promise
 | Company members  | Anyone who works under a company is still **invited by that company's Admin** and joins its team.                                                                                                                                                                                |
 | Proposed details | A self sign-up creates a new company with the person as its Admin (a solo agent is a one-person company); verified email; bot protection; rate limits. Guests who accept a cross-company agreement use the same sign-up. Needs design and security review before implementation. |
 
+## My profile (decided 2026-10-15)
+
+| Topic            | Decision                                                                                                                                                                    |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Password policy  | New passwords need **at least 8 characters with an uppercase letter, a lowercase letter, a number and a special character**. Existing passwords keep working until changed. |
+| Self-editing     | Every member may edit their own **name and phone**. Email, role, positions and permissions stay Admin-controlled; email change waits for verified email.                    |
+| Sign-in sessions | Members see their active sign-ins with a coarse device label (for example "Chrome · macOS"), never an IP address, and can sign out other devices.                           |
+
+See [Account self-service](account-self-service.md).
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |

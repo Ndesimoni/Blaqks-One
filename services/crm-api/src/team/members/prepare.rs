@@ -3,9 +3,9 @@ use super::{
     directory::MemberRow,
     update::{RecordScopeGrant, UpdateRequest},
 };
-use crate::team::{catalogue, validation};
+use crate::team::catalogue;
 use crate::{
-    auth::{actions::Actions, finance_access, permissions::Permissions},
+    auth::{actions::Actions, finance_access, identity_rules, permissions::Permissions},
     error::{ApiError, ApiResult},
 };
 
@@ -26,7 +26,7 @@ pub fn prepare(request: &mut UpdateRequest, current: &MemberRow) -> ApiResult<()
     }
     request.name = Some(trimmed(request.name.as_deref(), &current.user.name));
     request.phone = Some(trimmed(request.phone.as_deref(), &current.user.phone));
-    validation::identity(
+    identity_rules::identity(
         request.name.as_deref().unwrap(),
         &current.user.email,
         request.phone.as_deref().unwrap(),

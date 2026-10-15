@@ -1,9 +1,10 @@
 use super::store;
-use crate::team::{access, catalogue, members, members::prepare, validation};
+use crate::team::{access, catalogue, members, members::prepare};
 use crate::{
     auth::{
         actions::Actions,
         finance_access::{self, FinanceActions},
+        identity_rules,
         permissions::{ChannelAccess, Permissions},
         protection,
         session::Session,
@@ -48,7 +49,7 @@ pub async fn create(
     request.name = request.name.trim().into();
     request.email = request.email.trim().to_lowercase();
     request.phone = request.phone.trim().into();
-    validation::identity(&request.name, &request.email, &request.phone)?;
+    identity_rules::identity(&request.name, &request.email, &request.phone)?;
     let role = request.account_role.as_deref().unwrap_or("staff");
     let (permissions, actions) = match role {
         "staff" => {

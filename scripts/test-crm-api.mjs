@@ -15,7 +15,8 @@ const env = {
   CRM_BIND_ADDRESS: '127.0.0.1:8790',
   CRM_ALLOW_INSECURE_LOCAL: 'true',
   CRM_TEST_API: 'http://127.0.0.1:8790/api/crm',
-  CRM_FIXTURE_PASSWORD: randomBytes(24).toString('hex'),
+  // Random, and meets the new-password policy that the account CLI enforces.
+  CRM_FIXTURE_PASSWORD: `Fx1!${randomBytes(24).toString('hex')}`,
   VITE_CRM_MODE: 'server',
   CRM_API_PROXY: 'http://127.0.0.1:8790',
 };

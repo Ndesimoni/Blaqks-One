@@ -54,7 +54,12 @@ export function ServerSession({ children }) {
     await api.logout();
     setUser(null);
   }, [api]);
-  const value = useMemo(() => ({ user, api, signIn, signOut }), [user, api, signIn, signOut]);
+  // My profile installs the saved profile after a name or phone change.
+  const replaceUser = useCallback((profile) => setUser(profile), []);
+  const value = useMemo(
+    () => ({ user, api, signIn, signOut, replaceUser }),
+    [user, api, signIn, signOut, replaceUser],
+  );
   if (loading) return <ServerStatus title="Opening your CRM" message="Checking your account…" />;
   if (error)
     return (

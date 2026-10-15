@@ -1,9 +1,9 @@
 use super::{
-    password,
+    device, password,
     profile::{Profile, UserRow},
     protection,
     session::{self, Session},
-    throttle,
+    sessions, throttle,
 };
 use crate::{
     error::{ApiError, ApiResult},
@@ -67,8 +67,6 @@ pub async fn login(
         "Email or password is incorrect.",
         "invalid_credentials",
     ))?;
-    let token = session::random_token();
-    let csrf_token = session::random_token();
     let mut transaction = state.pool.begin().await?;
     crate::workspaces::lock(&mut transaction, &user.user.workspace_id).await?;
     let live_user = sqlx::query_as::<_, UserRow>(
@@ -81,27 +79,23 @@ pub async fn login(
     sqlx::query("DELETE FROM crm_sessions WHERE expires_at<=now()")
         .execute(&mut *transaction)
         .await?;
-    sqlx::query(
-        "INSERT INTO crm_sessions (token_hash,user_id,csrf_token,expires_at) \
-         VALUES ($1,$2,$3,now()+interval '8 hours')",
-    )
-    .bind(session::digest(&token))
-    .bind(user.user.id)
-    .bind(&csrf_token)
-    .execute(&mut *transaction)
-    .await?;
+    let agent = headers
+        .get(header::USER_AGENT)
+        .and_then(|value| value.to_str().ok());
+    let label = device::label(agent);
+    let issued = sessions::issue(&mut transaction, user.user.id, label.as_deref()).await?;
     transaction.commit().await?;
     let profile = Profile::from(live_user);
     let mut response_headers = HeaderMap::new();
     response_headers.insert(
         header::SET_COOKIE,
-        session::cookie(&token, state.config.secure_cookie, false)
+        session::cookie(&issued.token, state.config.secure_cookie, false)
             .parse()
             .unwrap(),
     );
     Ok((
         response_headers,
-        Json(json!({"user": profile, "csrfToken": csrf_token})),
+        Json(json!({"user": profile, "csrfToken": issued.csrf_token})),
     ))
 }
 

@@ -11,6 +11,7 @@ use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use rand::RngCore;
 use sha2::{Digest, Sha256};
 use sqlx::FromRow;
+use uuid::Uuid;
 
 pub const COOKIE_NAME: &str = "kws_crm_session";
 
@@ -18,6 +19,10 @@ pub struct Session {
     pub user: UserRow,
     pub csrf_token: String,
     pub token_hash: String,
+    /// The session's public ID (`crm_sessions.id`), never its token hash.
+    pub id: Uuid,
+    /// The coarse "Browser · OS" label stored at sign-in.
+    pub device: Option<String>,
 }
 
 #[derive(FromRow)]
@@ -25,6 +30,9 @@ struct SessionRow {
     #[sqlx(flatten)]
     user: UserRow,
     csrf_token: String,
+    session_id: Uuid,
+    device: Option<String>,
+    stale: bool,
 }
 
 pub fn random_token() -> String {
@@ -62,7 +70,8 @@ impl FromRequestParts<AppState> for Session {
         }
         let token_hash = digest(tokens[0]);
         let row = sqlx::query_as::<_, SessionRow>(
-            "SELECT u.*,s.csrf_token FROM crm_sessions s \
+            "SELECT u.*,s.csrf_token,s.id AS session_id,s.device, \
+             s.last_seen_at<now()-interval '5 minutes' AS stale FROM crm_sessions s \
              JOIN crm_user_profiles u ON u.id=s.user_id \
              WHERE s.token_hash=$1 AND s.expires_at>now() AND u.active AND u.owner_active",
         )
@@ -70,10 +79,19 @@ impl FromRequestParts<AppState> for Session {
         .fetch_optional(&state.pool)
         .await?
         .ok_or_else(ApiError::unauthorized)?;
+        // Last seen is refreshed at most every 5 minutes, so most requests only read.
+        if row.stale {
+            sqlx::query("UPDATE crm_sessions SET last_seen_at=now() WHERE token_hash=$1")
+                .bind(&token_hash)
+                .execute(&state.pool)
+                .await?;
+        }
         Ok(Self {
             user: row.user,
             csrf_token: row.csrf_token,
             token_hash,
+            id: row.session_id,
+            device: row.device,
         })
     }
 }

@@ -1,7 +1,7 @@
 use super::inspect;
-use crate::team::{access, audit, validation};
+use crate::team::{access, audit};
 use crate::{
-    auth::{password, protection, session, throttle},
+    auth::{identity_rules, password, password_policy, protection, session, throttle},
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces,
@@ -31,21 +31,21 @@ pub async fn accept(
     let Json(request) =
         body.map_err(|_| ApiError::invalid("Provide an invitation and password."))?;
     throttle::invitation(&state.pool, &request.token).await?;
-    if !password::valid_length(&request.password) {
-        return Err(ApiError::invalid(
-            "Use a password of at least 8 characters and at most 1024 bytes.",
-        ));
+    // The new-password policy (account-self-service.md): rules first, the email once known.
+    if !password_policy::strong(&request.password) {
+        return Err(password_policy::weak());
     }
     if request
         .phone
         .as_ref()
-        .is_some_and(|phone| !validation::phone(phone))
+        .is_some_and(|phone| !identity_rules::phone(phone))
     {
         return Err(ApiError::invalid(
             "Provide a phone number including country code.",
         ));
     }
     let invitation = inspect::find(&state.pool, &request.token).await?;
+    password_policy::check(&request.password, None, &invitation.email)?;
     let permit = state
         .password_workers
         .acquire()

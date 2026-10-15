@@ -1,10 +1,14 @@
+pub mod account;
 pub mod actions;
 pub mod actions_request;
 mod actions_wire;
+pub mod device;
 pub mod finance_access;
 pub mod grants;
 pub mod handlers;
+pub mod identity_rules;
 pub mod password;
+pub mod password_policy;
 pub mod permissions;
 pub mod policy;
 pub mod profile;

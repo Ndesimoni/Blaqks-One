@@ -1,0 +1,133 @@
+/* Connected My profile: builds on the shared panel, field and button styles. */
+.profile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.profile-column {
+  display: grid;
+  gap: 8px;
+}
+.profile-panel h2 {
+  margin: 0 0 12px;
+}
+.profile-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.profile-panel-head h2 {
+  margin: 0;
+}
+.profile-facts dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.profile-note {
+  margin: 12px 0 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.profile-note + .profile-form {
+  margin-top: 16px;
+}
+.profile-form {
+  display: grid;
+  gap: 14px;
+  max-width: 520px;
+}
+.profile-form .field small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.profile-form .field input {
+  min-height: 44px;
+}
+.profile-actions,
+.profile-confirm,
+.profile-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.profile-alert .field-error {
+  margin: 0;
+}
+.profile-confirm {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.profile-success {
+  margin: 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+.profile-status:empty {
+  display: none;
+}
+.profile-sessions {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.profile-session {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: border-color var(--duration) var(--ease);
+}
+.profile-session strong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.profile-session small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.profile-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (max-width: 900px) {
+  .profile-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 650px) {
+  .profile-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .profile-facts dd {
+    margin-bottom: 8px;
+  }
+  .profile-actions .btn,
+  .profile-confirm .btn {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+}

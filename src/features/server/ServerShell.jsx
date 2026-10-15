@@ -13,6 +13,9 @@ import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
 import { ViewOnlyChip } from './ViewOnlyChip.jsx';
 import { isRecordSection, sectionDescription } from './sectionStatus.js';
 
+/** Connected headings that differ from the shared labels (messaging is not part of My profile). */
+const headings = { 'My profile': 'My profile' };
+
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();
   const { route } = useNavigation();
@@ -70,7 +73,7 @@ export function ServerShell({ owner, workspaces }) {
           <div className="page-heading">
             <div className="heading-left">
               <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>
-              <h1>{team ? 'Team' : labels[route] || 'Your CRM workspace'}</h1>
+              <h1>{team ? 'Team' : headings[route] || labels[route] || 'Your CRM workspace'}</h1>
               <p>
                 {team
                   ? owner.status === 'archived'

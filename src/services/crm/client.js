@@ -1,3 +1,4 @@
+import { accountRoutes } from './account.js';
 import { assignmentRoutes } from './assignments.js';
 import { financeRoutes } from './finance.js';
 import { performanceRoutes } from './performance.js';
@@ -55,6 +56,10 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     csrfToken = session.csrfToken;
     return session.user;
   };
+  /** Swaps the in-memory anti-forgery token after the server rotates the session. */
+  const setCsrfToken = (token) => {
+    csrfToken = token;
+  };
   const scope = (workspace) => `/workspaces/${encodeURIComponent(workspace)}`;
   const recordPath = (workspace, collection, id) =>
     `${scope(workspace)}/records/${encodeURIComponent(collection)}${id ? `/${encodeURIComponent(id)}` : ''}`;
@@ -105,6 +110,7 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         method: 'DELETE',
         body: { version: metadata.version },
       }),
+    ...accountRoutes({ request, setCsrfToken }),
     ...assignmentRoutes({ request, scope, recordPath }),
     ...financeRoutes({ request, scope }),
     ...performanceRoutes({ request, scope }),

@@ -4,6 +4,8 @@
       "crm_users",
       "crm_sessions",
       "crm_login_limits",
+      "crm_account_events",
+      "crm_account_events_immutable",
       "crm_user_profiles",
       "crm_all_user_profiles",
       "crm_member_profiles"

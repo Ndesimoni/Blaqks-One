@@ -18,6 +18,7 @@ import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { ServerInsights } from './insights/ServerInsights.jsx';
 import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
+import { ServerProfile } from './profile/ServerProfile.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -35,6 +36,8 @@ export function ServerContent({ owner }) {
       </section>
     );
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
+  // The member's own account: independent of the selected workspace's records.
+  if (route === 'My profile') return <ServerProfile />;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
   if (loading) return <p role="status">Loading workspace records…</p>;
   if (error)

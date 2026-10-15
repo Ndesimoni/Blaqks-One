@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { readSecret } from './terminal-secret.mjs';
+import { meetsPasswordPolicy, weakPasswordMessage } from '../src/lib/passwordPolicy.js';
 
 if (!process.stdin.isTTY) {
   console.error('Run this account setup command in an interactive terminal.');
@@ -21,14 +22,19 @@ try {
 let password;
 let confirmation;
 try {
-  password = await readSecret('Password (at least 8 characters): ');
+  console.log(weakPasswordMessage);
+  password = await readSecret('Password: ');
   confirmation = await readSecret('Confirm password: ');
 } catch (error) {
   console.error(error.message);
   process.exit(1);
 }
-if (password !== confirmation || [...password].length < 8) {
-  console.error('Passwords must match and contain at least 8 characters. No account was created.');
+if (password !== confirmation) {
+  console.error('Passwords must match. No account was created.');
+  process.exit(1);
+}
+if (!meetsPasswordPolicy(password, { email: answers.CRM_BOOTSTRAP_EMAIL })) {
+  console.error(`${weakPasswordMessage} No account was created.`);
   process.exit(1);
 }
 
