@@ -419,6 +419,15 @@ Split any packet further if it crosses too many contracts. Do not ship empty con
 - **Scalability:** move large collections, team directories, inbox and activity to indexed server filters/cursor pagination; avoid loading all future messages/media in the current bundled-record response. Test realistic team/record volumes using disposable fixtures.
 - **Operational foundations:** restricted runtime DB role, migration ownership, encrypted backups, restore drills, asset recovery, dependency checks, request/job metrics, error redaction and alerting.
 - **Cross-company deal agreements (Blaqks One):** recorded, tamper-evident hand-overs, co-broking and commission shares between companies and with outside agents, accepted only by the named recipient, with verification levels and an evidence certificate. Owner decisions are in [Product decisions](product-decisions.md#cross-company-deal-agreements-decided-2026-10-15-planned). Phases: (1) evidence certificate and payment tracking for in-company hand-overs; (2) agreements between Blaqks One companies; (3) outside agents by recipient-locked link; (4) UAE PASS signing, RERA Form I reference and dispute export. Starts after the core CRM, with architecture and security review first.
+- **Next: connect the remaining "Not connected" sections (owner decided 2026-10-15), in this order:**
+  1. Performance & targets and CRM insights: scoped server totals, never exposing private team totals.
+  2. Date search.
+  3. Guide, rewritten for connected mode.
+  4. My profile: self-service password change and profile details. This is sensitive, so security review first.
+  5. Team activity.
+
+  Then comes the **Blaqks One platform admin (Super Admin) dashboard**: companies, plans, limits, platform health and the Workspaces directory, with no default access to company business data. Messages stays not connected until the messaging and integrations phase.
+
 - **Queued architecture follow-ups (owner approved 2026-10-15):** (1) automated boundary check for [Service boundaries](service-boundaries.md) rule 12; (2) own PostgreSQL schema for each new large module; (3) phase 1 boundary cleanups when files are touched anyway; (4) set hosting region (UAE or nearby) and launch traffic targets before deployment.
 - **Queued hosting and infrastructure plan (owner approved 2026-10-15):** see [Tech stack](tech-stack.md). At launch: Cloudflare CDN, Nginx reverse proxy (HTTPS, prefix routing to `/api/crm`, `/api/public`, `/api/calendar`, limits, headers), managed PostgreSQL in a UAE region with backups, UAE-region object storage for media, no CDN/proxy caching of private CRM data. Later: Valkey/Redis for public caching or real-time features, an outbound forward proxy with the messaging phase, and a dedicated API gateway only for a partner API.
 - **Queued public sign-up (owner decided 2026-10-15):** self sign-up creating a company account, company members still invited by their Admin; verified email, bot protection and rate limits; design and security review first. See [Product decisions](product-decisions.md#sign-up-decided-2026-10-15-planned).
