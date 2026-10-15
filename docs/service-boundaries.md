@@ -134,8 +134,8 @@ Core CRM (records, assignments, imports and finance) stays together. Splitting i
 
 New entries state the coupling, the reason, the alternative considered and the removal path.
 
-## Open questions
+## Owner decisions (2026-10-15)
 
-- Should new extraction-candidate modules use their own PostgreSQL schema from their first migration? It is cheap at creation and gives role-level enforcement later; it needs a `backend_database` review.
-- Should rule 12 become an automated CI check (a small Node script with an allowlist, no new dependency)?
-- Hosting and traffic targets are undecided, so the phase 3 triggers cannot yet be quantified.
+- **Own PostgreSQL schema for new large modules.** Agreements, messaging/integrations, public catalogue/enquiries and lead agents each get their own schema from their first migration, in the same database. Existing tables stay where they are.
+- **Automated boundary check.** Rule 12 becomes a small Node script (no new dependency, within 150 lines) run with the standard checks, with an allowlist matching the coupling inventory. Queued.
+- **Hosting.** Host in the UAE or a nearby region for data-protection reasons. Start with one API instance, managed PostgreSQL with automatic backups and the frontend on a CDN. Year-one company count, public traffic and acceptable downtime are set before launch and become the phase 3 split triggers.
