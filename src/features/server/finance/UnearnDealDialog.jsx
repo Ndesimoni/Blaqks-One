@@ -3,6 +3,7 @@ import { readableDate } from '../../../lib/dates.js';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText, FinanceDialog, ReasonField } from './FinanceDialog.jsx';
 import { reasonError } from './financeRules.js';
+import { DealRecord } from './DealRecord.jsx';
 
 /**
  * Admin unearn (finance-design §4, §13 M-F4): returns an earned deal to "not earned" with a
@@ -32,6 +33,7 @@ export function UnearnDealDialog({ deal, onClose, onDone }) {
       submitDisabled={Boolean(reasonError(reason))}
       danger
     >
+      <DealRecord deal={deal} />
       <ReasonField id={`${id}-reason`} value={reason} onChange={setReason} />
     </FinanceDialog>
   );

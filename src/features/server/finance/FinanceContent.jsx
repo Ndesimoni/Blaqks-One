@@ -17,6 +17,9 @@ import './finance-entry-table.css';
 import './finance-details.css';
 import './finance-decisions.css';
 import './finance-skeleton.css';
+import './deal-list.css';
+import './deal-details.css';
+import './deal-dialogs.css';
 
 /** Connected finance sections and their pages (finance-design §7). */
 const pages = { Deals: DealsPage, Payments: PaymentsPage, Expenses: ExpensesPage };

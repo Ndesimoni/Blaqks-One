@@ -3,6 +3,7 @@ import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText, FinanceDialog, ReasonField } from './FinanceDialog.jsx';
 import { reasonError } from './financeRules.js';
 import { holderName } from './dealFilters.js';
+import { DealRecord } from './DealRecord.jsx';
 
 /**
  * Admin move (finance-design §13 H-F1): a deal goes to another member or the team queue with
@@ -34,6 +35,7 @@ export function MoveDealDialog({ deal, onClose, onDone }) {
       submitLabel="Move deal"
       submitDisabled={!choice || unchanged || Boolean(reasonError(reason))}
     >
+      <DealRecord deal={deal} />
       {assignees.error && (
         <p className="field-error" role="alert">
           {assignees.error}

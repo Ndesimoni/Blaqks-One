@@ -4,7 +4,8 @@ import { useFinanceContext } from './useFinanceRequests.js';
 import { dealBodyFromDraft } from './dealDraft.js';
 import { dealEstimate } from './dealEstimate.js';
 import { lineLabel } from './dealFilters.js';
-import { DealCalculationPanel, estimateLabel } from './DealCalculationPanel.jsx';
+import { DealCalculationPanel, estimateLabel, FeeRows, Row } from './DealCalculationPanel.jsx';
+import { DealChip } from './DealChips.jsx';
 
 /**
  * The editor's live preview (finance-design §7), clearly labelled as an estimate. An earned
@@ -37,34 +38,35 @@ export function DealEstimatePanel({ form, deal }) {
       </>
     );
   return (
-    <section className="finance-calc finance-estimate" aria-label="Estimate" aria-live="polite">
-      <div className="finance-calc-head">
+    <section
+      className="finance-calc deal-calc finance-estimate"
+      aria-label="Estimate"
+      aria-live="polite"
+    >
+      <div className="finance-calc-head deal-calc-head">
         <h3>Estimate</h3>
-        <span className="finance-chip estimate">Estimate</span>
+        <DealChip tone="amber" glyph="estimate">
+          Estimate
+        </DealChip>
       </div>
-      <p className="finance-hint">{estimateLabel}</p>
+      <p className="finance-hint deal-calc-hint">{estimateLabel}</p>
       {!estimate ? (
         <p className="finance-hint">Enter the agreed value and fee to see an estimate.</p>
       ) : (
-        <dl className="finance-rows">
-          {[
-            ['Gross fee (ex VAT)', estimate.grossFils],
-            ['Partner share', estimate.partnerFils],
-            ['Net fee', estimate.netFils],
-            ['VAT on net fee', estimate.vatFils],
-          ].map(([label, value]) => (
-            <div className={'finance-row' + (label === 'Net fee' ? ' strong' : '')} key={label}>
-              <dt>{label}</dt>
-              <dd className="finance-money">{formatAed(value)}</dd>
-            </div>
-          ))}
-          {(estimate.lines ?? []).map((line) => (
-            <div className="finance-row" key={line.role}>
-              <dt>{lineLabel(line, team)}</dt>
-              <dd className="finance-money">{formatAed(line.amountFils)}</dd>
-            </div>
-          ))}
-        </dl>
+        <>
+          <FeeRows calc={estimate} />
+          {estimate.lines && (
+            <dl className="finance-rows deal-rows deal-split">
+              {estimate.lines.map((line) => (
+                <Row
+                  key={line.role}
+                  label={lineLabel(line, team)}
+                  value={formatAed(line.amountFils)}
+                />
+              ))}
+            </dl>
+          )}
+        </>
       )}
       {estimate && !estimate.lines && (
         <p className="finance-hint">

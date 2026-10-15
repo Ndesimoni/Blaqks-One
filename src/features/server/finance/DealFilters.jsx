@@ -12,7 +12,7 @@ export function DealFilters({ filters, onChange, count }) {
   const set = (key) => (event) => onChange({ ...filters, [key]: event.target.value });
   const active = filtersActive(filters);
   return (
-    <div className="filters-toolbar finance-filters">
+    <div className="filters-toolbar finance-filters deal-filters">
       <div className="search-small">
         <Icon name="search" size={16} />
         <input
@@ -44,7 +44,7 @@ export function DealFilters({ filters, onChange, count }) {
         </select>
       </div>
       {team && (
-        <div className="finance-filter">
+        <div className="finance-filter deal-filter-wide">
           <label htmlFor={`${id}-holder`}>Assigned to</label>
           <select id={`${id}-holder`} value={filters.holder} onChange={set('holder')}>
             <option value="">Everyone</option>

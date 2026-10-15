@@ -1,7 +1,9 @@
 import React, { useId, useState } from 'react';
-import { formatPercent, parsePercent } from '../../../lib/finance/money.js';
+import { parsePercent } from '../../../lib/finance/money.js';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText, FinanceDialog } from './FinanceDialog.jsx';
+import { DealRecord } from './DealRecord.jsx';
+import { HandoverShareFields } from './HandoverShareFields.jsx';
 
 /**
  * The holder offers their deal to a teammate (finance-design §13 H-F1): fully, or keeping a
@@ -44,6 +46,7 @@ export function DealHandoverDialog({ deal, onClose, onDone }) {
       submitLabel="Send hand-over request"
       submitDisabled={!toId || Boolean(shareError) || overCap}
     >
+      <DealRecord deal={deal} />
       {assignees.error && (
         <p className="field-error" role="alert">
           {assignees.error}
@@ -72,66 +75,21 @@ export function DealHandoverDialog({ deal, onClose, onDone }) {
           ))}
         </select>
       </div>
-      <fieldset className="finance-choice">
-        <legend>What you keep</legend>
-        <label>
-          <input
-            type="radio"
-            name={`${id}-mode`}
-            value="full"
-            checked={!keep}
-            onChange={() => setMode('full')}
-          />
-          <span>Hand over fully</span>
-        </label>
-        <label>
-          <input
-            type="radio"
-            name={`${id}-mode`}
-            value="referral"
-            checked={keep}
-            disabled={!referralAllowed}
-            onChange={() => setMode('referral')}
-          />
-          <span>Keep a referral share</span>
-        </label>
-        {!referralAllowed && (
-          <small className="finance-hint">
-            A referral share is possible only on deals that are not earned and have no second agent.
-          </small>
-        )}
-      </fieldset>
-      {keep && (
-        <div className="field">
-          <label htmlFor={`${id}-share`}>
-            Referral share %<span className="required"> *</span>
-          </label>
-          <input
-            id={`${id}-share`}
-            inputMode="decimal"
-            value={share}
-            aria-invalid={Boolean(shareError || overCap)}
-            aria-describedby={`${id}-share-hint`}
-            onChange={(event) => {
-              setShare(event.target.value);
-              setMessage('');
-            }}
-          />
-          <small id={`${id}-share-hint`} className="finance-hint">
-            Taken from the receiving agent's share.{' '}
-            {cap !== null && cap !== undefined
-              ? `Your team's limit is ${formatPercent(cap)}.`
-              : "Your team's limit applies."}
-          </small>
-          {(shareError || overCap) && (
-            <p className="field-error">
-              {shareError || "The referral share is above your team's limit."}
-            </p>
-          )}
-        </div>
-      )}
+      <HandoverShareFields
+        id={id}
+        keep={keep}
+        setMode={setMode}
+        share={share}
+        setShare={(value) => {
+          setShare(value);
+          setMessage('');
+        }}
+        allowed={referralAllowed}
+        cap={cap}
+        error={shareError || (overCap ? "The referral share is above your team's limit." : '')}
+      />
       {receiver && (
-        <p className="finance-note" role="note">
+        <p className="finance-note deal-handover-outcome" role="note">
           After {receiver.name} accepts, they hold the deal
           {team ? '' : ' and it leaves your list'}
           {keep ? '. Your referral share appears in your commission statement once earned.' : '.'}

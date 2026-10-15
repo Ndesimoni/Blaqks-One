@@ -4,6 +4,7 @@ import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText, FinanceDialog, ReasonField } from './FinanceDialog.jsx';
 import { readSplitDraft, splitAfter, splitChanged, splitDraftFromDeal } from './splitDraft.js';
 import { reasonError } from './financeRules.js';
+import { DealRecord } from './DealRecord.jsx';
 
 function Compare({ label, before, after }) {
   return (
@@ -59,6 +60,7 @@ export function DealSplitDialog({ deal, onClose, onDone }) {
       submitLabel="Save split"
       submitDisabled={!value || !changed || Boolean(reasonError(draft.reason))}
     >
+      <DealRecord deal={deal} />
       <div className="form-grid">
         <div className="field">
           <label htmlFor={`${id}-agent`}>Second agent</label>
@@ -108,7 +110,7 @@ export function DealSplitDialog({ deal, onClose, onDone }) {
           hint={changed ? 'Required for any change.' : 'Change the split to save.'}
         />
       </div>
-      <dl className="finance-compare" aria-label="Split before and after">
+      <dl className="finance-compare deal-compare" aria-label="Split before and after">
         <div className="finance-compare-row head">
           <dt>Estimate</dt>
           <dd>Before</dd>

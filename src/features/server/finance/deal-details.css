@@ -1,0 +1,145 @@
+/* Deal details: headline summary, commission split panel and footer actions.
+   Loaded after deal-list.css. */
+.deal-details-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+.deal-summary {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+/* A dashed edge is a second cue (after the text) that these figures are still estimates. */
+.deal-summary[data-estimate='true'] {
+  border-style: dashed;
+  border-color: var(--muted);
+}
+.deal-summary dl {
+  margin: 0;
+}
+.deal-summary-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 20px;
+}
+.deal-summary dl > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.deal-summary dt {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.deal-summary dd {
+  margin: 0;
+  color: var(--ink);
+  text-align: left;
+}
+.deal-summary-figures dd {
+  font-size: 16px;
+  font-weight: 600;
+}
+.deal-summary-figures .deal-summary-key dt {
+  color: var(--ink);
+  font-weight: 600;
+}
+.deal-summary-figures .deal-summary-key dd {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.deal-summary-state {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.deal-summary-payments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.deal-summary-payments dd {
+  font-size: 14px;
+  font-weight: 600;
+}
+.finance-details-body .deal-calc,
+.finance-dialog-body .deal-calc {
+  margin: 0;
+}
+.deal-calc {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  background: var(--panel);
+}
+.deal-calc-hint {
+  margin: 0;
+}
+.deal-calc .deal-rows {
+  gap: 0;
+  margin: 0;
+}
+.deal-row {
+  padding: 6px 0;
+  font-size: 13px;
+}
+.deal-row dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.deal-row dd {
+  color: var(--ink);
+}
+.deal-row.strong {
+  margin-top: 2px;
+  padding-top: 9px;
+}
+.deal-row[data-tone='total'] dd {
+  font-size: 16px;
+}
+.finance-row dt .deal-row-share {
+  margin-left: 0;
+  padding: 0 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted-dark);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.deal-calc-sub {
+  margin: 8px 0 0;
+  color: var(--muted-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.deal-calc-notes {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  list-style: none;
+}
+.deal-details-footer {
+  align-items: center;
+}
+.deal-actions-main {
+  justify-content: flex-end;
+}

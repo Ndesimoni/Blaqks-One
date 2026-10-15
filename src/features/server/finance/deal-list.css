@@ -1,0 +1,148 @@
+/* Deals list: filters, table, money, chips, hand-over requests and phone cards.
+   Loaded after finance-skeleton.css; deal-only classes, so Payments/Expenses keep theirs. */
+.finance-status-chip.deal-chip {
+  white-space: nowrap;
+}
+.deal-table {
+  white-space: normal;
+}
+:root[data-theme] .deal-table :is(th, td) {
+  padding-inline: 14px;
+}
+.deal-table td {
+  overflow-wrap: break-word;
+}
+.deal-table td:first-child {
+  white-space: nowrap;
+}
+.deal-table tbody tr {
+  cursor: pointer;
+}
+.deal-table td.finance-num {
+  color: var(--ink);
+  font-weight: 600;
+}
+.deal-payment-cell .finance-sub {
+  margin-top: 6px;
+  white-space: nowrap;
+}
+.deal-money {
+  display: inline-grid;
+  justify-items: end;
+  gap: 3px;
+}
+.deal-money.is-estimate {
+  color: var(--muted-dark);
+  font-weight: 500;
+}
+.deal-money .finance-estimate-tag {
+  padding: 0 6px;
+  border: 1px dashed currentColor;
+  border-radius: 999px;
+  color: var(--muted-dark);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.finance-page .finance-filters.deal-filters {
+  grid-template-columns: minmax(240px, 2fr) repeat(auto-fit, minmax(150px, 1fr));
+}
+.deal-filters .search-small {
+  grid-column: auto;
+}
+.deal-card-list {
+  gap: 10px;
+}
+.deal-card > button {
+  gap: 8px;
+  padding: 14px 16px;
+}
+.deal-card-code {
+  font-size: 14px;
+}
+.deal-card-client {
+  font-size: 15px;
+}
+.deal-card-money {
+  align-items: baseline;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.deal-card-money .deal-money {
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+.deal-card-money .deal-money.is-estimate {
+  color: var(--muted-dark);
+  font-weight: 600;
+}
+.deal-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 10px;
+}
+.deal-handovers .finance-calc-head h2 {
+  font-size: 16px;
+}
+.deal-handover {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.deal-handover-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.deal-handover .finance-handover-text {
+  gap: 4px;
+}
+.deal-handover .finance-handover-text strong {
+  display: block;
+}
+.deal-handover-terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 2px;
+}
+.deal-handover-terms small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.deal-handover-actions {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+@media (max-width: 750px) {
+  .finance-page .finance-filters.deal-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .deal-filters :is(.search-small, .finance-filter-summary, .deal-filter-wide) {
+    grid-column: 1 / -1;
+  }
+  .deal-handover {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+  .deal-handover-actions {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}

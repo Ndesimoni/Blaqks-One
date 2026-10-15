@@ -6,6 +6,7 @@ import { failureText, FinanceDialog } from './FinanceDialog.jsx';
 import { DealCalculationPanel } from './DealCalculationPanel.jsx';
 import { splitSourceLabels } from './financeLabels.js';
 import { dubaiToday, earnDateLimits } from './dealEstimate.js';
+import { DealRecord } from './DealRecord.jsx';
 
 /**
  * Mark a deal earned (finance-design §13 M-F2). The confirmation shows what the server would
@@ -40,6 +41,7 @@ export function EarnDealDialog({ deal, onClose, onDone }) {
       submitDisabled={!inRange || !details}
       wide
     >
+      <DealRecord deal={deal} />
       {!overview.settings && (
         <p className="finance-note" role="note">
           Set up your team's commission split before marking deals earned.

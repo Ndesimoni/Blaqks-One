@@ -4,11 +4,13 @@ import { Icon } from '../../../components/ui/Icon.jsx';
 import { formatPercent } from '../../../lib/finance/money.js';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText } from './FinanceDialog.jsx';
+import { DealChip } from './DealChips.jsx';
 
+/** Secondary responses first, so the positive response sits last (right, or full width). */
 const decisions = [
-  { decision: 'accept', label: 'Accept', variant: 'primary' },
   { decision: 'decline', label: 'Decline', variant: 'light' },
   { decision: 'cancel', label: 'Cancel request', variant: 'light' },
+  { decision: 'accept', label: 'Accept', variant: 'primary', icon: 'check' },
 ];
 
 /** Who the request is for, from the caller's side. */
@@ -34,10 +36,15 @@ export function HandoverRequests({ onApprove }) {
     if (!result.ok) setMessage(failureText(result));
   };
   return (
-    <section className="panel finance-handovers" aria-labelledby="finance-handovers-title">
+    <section
+      className="panel finance-handovers deal-handovers"
+      aria-labelledby="finance-handovers-title"
+    >
       <div className="finance-calc-head">
         <h2 id="finance-handovers-title">Hand-over requests</h2>
-        <span className="finance-chip estimate">{pending.length} awaiting response</span>
+        <DealChip tone="amber" glyph="wait">
+          {pending.length} awaiting response
+        </DealChip>
       </div>
       {message && (
         <p className="field-error" role="alert">
@@ -46,22 +53,30 @@ export function HandoverRequests({ onApprove }) {
       )}
       <ul className="finance-handover-list">
         {pending.map((handover) => (
-          <li key={handover.id} className="finance-handover">
+          <li key={handover.id} className="finance-handover deal-handover">
+            <span className="deal-handover-icon" aria-hidden="true">
+              <Icon name="users" size={18} />
+            </span>
             <div className="finance-handover-text">
               <strong>
-                <Icon name="users" size={16} /> {handover.dealId} · {handover.dealType} ·{' '}
-                {handover.stage}
+                {handover.dealId} · {handover.dealType} · {handover.stage}
                 {handover.earned ? ' · Earned' : ''}
               </strong>
               <span>{summary(handover, user.id)}</span>
-              <small>
-                {handover.referralShareBp
-                  ? `${handover.from.name} keeps a ${formatPercent(handover.referralShareBp)} referral share`
-                  : 'Full hand-over'}
-              </small>
+              <span className="deal-handover-terms">
+                <DealChip tone="slate" glyph={handover.referralShareBp ? 'move' : 'done'}>
+                  {handover.referralShareBp ? 'Referral share' : 'Full hand-over'}
+                </DealChip>
+                {handover.referralShareBp ? (
+                  <small>
+                    {handover.from.name} keeps a {formatPercent(handover.referralShareBp)} referral
+                    share
+                  </small>
+                ) : null}
+              </span>
             </div>
             <div
-              className="finance-action-group"
+              className="finance-action-group deal-handover-actions"
               role="group"
               aria-label={`Hand-over of ${handover.dealId}`}
             >
@@ -71,6 +86,7 @@ export function HandoverRequests({ onApprove }) {
                   <Button
                     key={item.decision}
                     variant={item.variant}
+                    icon={item.icon}
                     disabled={actions.busy}
                     aria-label={`${item.label} hand-over of ${handover.dealId}`}
                     onClick={() => decide(handover, item.decision)}
@@ -80,6 +96,7 @@ export function HandoverRequests({ onApprove }) {
                 ))}
               {actions.can('approveHandover', handover) && (
                 <Button
+                  icon="check"
                   disabled={actions.busy}
                   aria-label={`Approve hand-over of ${handover.dealId}`}
                   onClick={() => onApprove(handover)}

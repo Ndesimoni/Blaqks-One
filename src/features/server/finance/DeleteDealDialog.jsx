@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText, FinanceDialog } from './FinanceDialog.jsx';
+import { DealRecord } from './DealRecord.jsx';
 
 /** Admin delete of a deal that was never earned (finance-design §6.2), confirmed first. */
 export function DeleteDealDialog({ deal, onClose, onDone }) {
@@ -23,6 +24,8 @@ export function DeleteDealDialog({ deal, onClose, onDone }) {
       onSubmit={submit}
       submitLabel="Delete deal"
       danger
-    />
+    >
+      <DealRecord deal={deal} />
+    </FinanceDialog>
   );
 }

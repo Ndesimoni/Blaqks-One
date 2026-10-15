@@ -1,16 +1,18 @@
 import React from 'react';
-import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Empty } from '../../../components/ui/Empty.jsx';
 import { Pagination } from '../../../components/ui/Pagination.jsx';
 import { readableDate } from '../../../lib/dates.js';
 import { useFinanceContext } from './useFinanceRequests.js';
-import { paymentStatusLabels } from './financeLabels.js';
+import { PaymentChip, StageChip } from './DealChips.jsx';
 import { clampPage, DEALS_PER_PAGE, holderName, referenceName } from './dealFilters.js';
 import { Money, rowFigures } from './DealMoney.jsx';
 import { DealCards } from './DealCards.jsx';
 
-/** Paginated deals: a table at desktop, cards at phone width (§7). */
+/**
+ * Paginated deals: a table at desktop, cards at phone width (§7). Money is right-aligned in
+ * tabular figures; stage and payment state are text chips with glyphs, never colour alone.
+ */
 export function DealTable({ deals, total, page, onPage, onOpen, onAdd, onReset }) {
   const { team, overview, user } = useFinanceContext();
   const current = clampPage(page, deals.length);
@@ -37,7 +39,7 @@ export function DealTable({ deals, total, page, onPage, onOpen, onAdd, onReset }
   return (
     <div className="table-shell finance-table-shell">
       <div className="table-scroll deal-table-scroll">
-        <table className="data-table deal-table" aria-label="Deals">
+        <table className="data-table deal-table" aria-label="Deals" data-team={team || undefined}>
           <thead>
             <tr>
               <th scope="col">Deal</th>
@@ -50,14 +52,18 @@ export function DealTable({ deals, total, page, onPage, onOpen, onAdd, onReset }
               <th scope="col" className="finance-num">
                 {shareLabel}
               </th>
-              <th scope="col">Status</th>
+              <th scope="col">Payment</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((deal) => {
               const figures = rowFigures(deal, team);
               return (
-                <tr key={deal.id} onClick={() => onOpen(deal)}>
+                <tr
+                  key={deal.id}
+                  data-earned={deal.earnedOn ? 'true' : 'false'}
+                  onClick={() => onOpen(deal)}
+                >
                   <td>
                     <button
                       type="button"
@@ -74,7 +80,7 @@ export function DealTable({ deals, total, page, onPage, onOpen, onAdd, onReset }
                   </td>
                   <td className="cell-strong">{client(deal)}</td>
                   <td>
-                    <Badge>{deal.stage}</Badge>
+                    <StageChip stage={deal.stage} />
                   </td>
                   {team && <td>{holderName(deal.assignee, user.id)}</td>}
                   <td className="finance-num">
@@ -83,8 +89,8 @@ export function DealTable({ deals, total, page, onPage, onOpen, onAdd, onReset }
                   <td className="finance-num">
                     <Money value={figures.share} estimate={figures.estimate} />
                   </td>
-                  <td>
-                    <Badge>{paymentStatusLabels[deal.paymentStatus]}</Badge>
+                  <td className="deal-payment-cell">
+                    <PaymentChip status={deal.paymentStatus} />
                     {deal.earnedOn && (
                       <small className="finance-sub">Earned {readableDate(deal.earnedOn)}</small>
                     )}

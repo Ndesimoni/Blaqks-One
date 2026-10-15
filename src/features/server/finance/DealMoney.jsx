@@ -12,10 +12,13 @@ export function rowFigures(deal, team) {
   };
 }
 
-/** Right-aligned AED text, tagged when it is an unearned deal's estimate. */
+/**
+ * Right-aligned tabular AED text. An unearned deal's figure is an estimate: quieter text with
+ * an "Estimate" tag, so fixed earned figures stand out when scanning a column.
+ */
 export function Money({ value, estimate }) {
   return (
-    <span className="finance-money">
+    <span className={'finance-money deal-money' + (estimate ? ' is-estimate' : '')}>
       {value}
       {estimate && <small className="finance-estimate-tag">Estimate</small>}
     </span>

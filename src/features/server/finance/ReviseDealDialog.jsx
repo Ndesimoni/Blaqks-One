@@ -6,6 +6,7 @@ import { readSplitDraft, splitDraftFromDeal } from './splitDraft.js';
 import { reasonError } from './financeRules.js';
 import { readRevised } from './dealResponses.js';
 import { lineLabel } from './dealFilters.js';
+import { DealRecord } from './DealRecord.jsx';
 
 /** Only the fields the Admin changed travel (§15.5); everything else keeps the snapshot's. */
 function reviseChanges(deal, value) {
@@ -93,6 +94,7 @@ export function ReviseDealDialog({ deal, onClose, onDone }) {
       submitLabel="Save revision"
       submitDisabled={!value || Boolean(reasonError(draft.reason))}
     >
+      <DealRecord deal={deal} />
       <div className="form-grid">
         <div className="field">
           <label htmlFor={`${id}-agent`}>Second agent</label>
