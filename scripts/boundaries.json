@@ -31,11 +31,12 @@
       "crm_agreement_applies_to_earned"
     ],
     "imports": ["crm_import_plans"],
+    "performance": ["crm_targets", "crm_targets_identity_fixed"],
     "sample": ["crm_sample_records", "crm_sample_accounts", "crm_environment"]
   },
   "domainFree": {
     "paths": ["auth/", "workspaces/", "error.rs", "error_tests.rs", "state.rs", "config.rs"],
-    "domains": ["records", "finance", "team", "assignments", "imports", "sample"]
+    "domains": ["records", "finance", "team", "assignments", "imports", "performance", "sample"]
   },
   "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],
   "unrestricted": {

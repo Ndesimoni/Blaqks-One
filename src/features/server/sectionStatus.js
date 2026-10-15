@@ -12,6 +12,9 @@ const connectedSections = new Set([
   'Deals',
   'Payments',
   'Expenses',
+  // Targets are served by `/performance/targets`; actuals come from scoped records and finance.
+  'Performance',
+  'CRM insights',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);

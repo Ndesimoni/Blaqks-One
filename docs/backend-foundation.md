@@ -67,6 +67,7 @@ Running the seed again adds nothing new. Sample records are tracked by server ID
 | `imports/`                                                                  | Super Admin import preview, planning, credential rejection and atomic commit                                                                                                                                |
 | `team/`                                                                     | Role catalogue, team access and validation; `invitations/`, `members/` and `archive/` workflows                                                                                                             |
 | `finance/`                                                                  | Settings, agreements, deals (snapshots, splits, hand-overs), payments, expenses, finance visibility and IDs, deal lookups for records, finance history, database error codes and routes (`routes.rs` merge) |
+| `performance/`                                                              | Monthly team and member targets (`crm_targets`): strict inputs, visibility, Admin-only versioned writes with redacted activity, database error codes and routes (`routes.rs` merge)                         |
 | `sample/`                                                                   | Local-only operator sample-data seed/clear command and its marker tables                                                                                                                                    |
 
 Table ownership, cross-module access rules and the future service-split plan are in [Service boundaries](service-boundaries.md). New domains from the [roadmap](claude-implementation-roadmap.md#suggested-future-module-locations) become sibling folders under `src/`. Within a group, modules import each other through `super::`; cross-group imports use `crate::` paths.
@@ -110,20 +111,24 @@ The shared photo/floor-plan editor works in connected mode. Small inline assets 
 
 All routes are under `/api/crm`. Private responses use `Cache-Control: no-store`.
 
-| Route                                                   | Behaviour                                                                                       |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `GET /health`                                           | Database readiness                                                                              |
-| `POST /auth/login`                                      | Email/password; sets session cookie; returns profile and CSRF token                             |
-| `GET /auth/session`                                     | Active profile and session CSRF token                                                           |
-| `POST /auth/logout`                                     | Revokes current session and clears cookie                                                       |
-| `GET /workspaces`                                       | Authorised workspace directory                                                                  |
-| `GET /workspaces/:workspace/records`                    | Scoped arrays for every connected collection the user may access                                |
-| `POST /workspaces/:workspace/records/:collection`       | Create `{ record }`; returns HTTP 201                                                           |
-| `PATCH /workspaces/:workspace/records/:collection/:id`  | Replace `{ record, version }`; returns updated version                                          |
-| `DELETE /workspaces/:workspace/records/:collection/:id` | Delete with `{ version }`                                                                       |
-| `GET /workspaces/:workspace/activity`                   | Latest 100 redacted actions in that workspace                                                   |
-| `POST /workspaces/:workspace/imports/preview`           | Super Admin validates `{ sourceWorkspaceId, records }` and receives scoped preview token/counts |
-| `POST /workspaces/:workspace/imports/commit`            | Super Admin commits `{ token }` atomically; same-token retries return saved result              |
+| Route                                                          | Behaviour                                                                                       |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `GET /health`                                                  | Database readiness                                                                              |
+| `POST /auth/login`                                             | Email/password; sets session cookie; returns profile and CSRF token                             |
+| `GET /auth/session`                                            | Active profile and session CSRF token                                                           |
+| `POST /auth/logout`                                            | Revokes current session and clears cookie                                                       |
+| `GET /workspaces`                                              | Authorised workspace directory                                                                  |
+| `GET /workspaces/:workspace/records`                           | Scoped arrays for every connected collection the user may access                                |
+| `POST /workspaces/:workspace/records/:collection`              | Create `{ record }`; returns HTTP 201                                                           |
+| `PATCH /workspaces/:workspace/records/:collection/:id`         | Replace `{ record, version }`; returns updated version                                          |
+| `DELETE /workspaces/:workspace/records/:collection/:id`        | Delete with `{ version }`                                                                       |
+| `GET /workspaces/:workspace/activity`                          | Latest 100 redacted actions in that workspace                                                   |
+| `POST /workspaces/:workspace/imports/preview`                  | Super Admin validates `{ sourceWorkspaceId, records }` and receives scoped preview token/counts |
+| `POST /workspaces/:workspace/imports/commit`                   | Super Admin commits `{ token }` atomically; same-token retries return saved result              |
+| `GET /workspaces/:workspace/performance/targets?month=YYYY-MM` | Targets the caller may see for that month, plus `canEdit` (reports module required)             |
+| `PUT /workspaces/:workspace/performance/targets`               | Admin sets or clears `{ month, memberId, metric, value, version }`; fees in fils                |
+
+Performance targets: staff read their own member targets and, with whole-team scope, the team targets; fees targets need finance access (team fees need team finance). Actuals are never served: the Performance and CRM insights screens derive them from `GET records` and `GET /finance` in the browser.
 
 Record responses have `{ id, version, record }`. The first slice loads a workspace's permitted collections together; database pagination, incremental fetching and live change notifications are future scalability work. Activity has an API endpoint but no connected activity screen yet. Team and invitation routes are documented in [Admin-owned teams](admin-owned-teams.md).
 

@@ -5,6 +5,7 @@ pub mod config;
 pub mod error;
 pub mod finance;
 pub mod imports;
+pub mod performance;
 pub mod records;
 pub mod routes;
 pub mod sample;

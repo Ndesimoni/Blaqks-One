@@ -77,4 +77,6 @@ export const apiTestFiles = [
   'tests/api/finance-deal-links-migration.test.mjs',
   'tests/api/finance-deal-links.test.mjs',
   'tests/api/finance-deal-links-legacy.test.mjs',
+  'tests/api/performance-h1.test.mjs',
+  'tests/api/performance-targets.test.mjs',
 ];

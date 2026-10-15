@@ -14,6 +14,8 @@ import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
 import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
 import { FinanceContent } from './finance/FinanceContent.jsx';
+import { ServerPerformance } from './performance/ServerPerformance.jsx';
+import { ServerInsights } from './insights/ServerInsights.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -44,6 +46,8 @@ export function ServerContent({ owner }) {
     );
   if (route === 'Dashboard') return <ServerDashboard owner={owner} />;
   if (route === 'Client desk') return <ServerClientDesk />;
+  if (route === 'Performance') return <ServerPerformance owner={owner} />;
+  if (route === 'CRM insights') return <ServerInsights owner={owner} />;
   if (['Deals', 'Payments', 'Expenses'].includes(route))
     return <FinanceContent key={route} route={route} owner={owner} />;
   const page = (toolbarExtras) => {
