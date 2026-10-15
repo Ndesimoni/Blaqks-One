@@ -3,14 +3,15 @@ import { useSession } from '../../../hooks/useSession.js';
 import { useRecords } from '../../../hooks/useWorkspace.js';
 import { DashboardWelcome } from '../../dashboard/DashboardWelcome.jsx';
 import { PrioritiesPanel } from '../../dashboard/PrioritiesPanel.jsx';
-import { UpcomingViewings } from '../../dashboard/UpcomingViewings.jsx';
 import { BarListPanel } from '../../dashboard/BarListPanel.jsx';
 import { AssignedToFilter } from '../assignment/AssignedToFilter.jsx';
 import { ConnectedMetrics } from './ConnectedMetrics.jsx';
 import { RecordCountsPanel } from './RecordCountsPanel.jsx';
 import { FinanceWidgets } from './FinanceWidgets.jsx';
+import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
 import { useDashboardWorkload } from './useDashboardWorkload.js';
 import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
+import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
 import '../assignment/assigned-filter.css';
 
 /**
@@ -20,11 +21,16 @@ import '../assignment/assigned-filter.css';
 export function ServerDashboard({ owner }) {
   const { user } = useSession();
   // Names use every record the viewer can see; only the figures follow the workload filter.
-  const { data: visible, scope, referenceFor } = useRecords();
+  const { data: visible, scope, referenceFor, listingViewings } = useRecords();
   const workload = useDashboardWorkload();
   const { data } = workload;
   const widgets = dashboardWidgets(user);
   const figures = useMemo(() => selectConnectedDashboard(data), [data]);
+  const ownView = showsListingViewings(workload.filter, workload.me);
+  const upcoming = useMemo(
+    () => upcomingEntries(figures.upcoming, listingViewings, ownView),
+    [figures.upcoming, listingViewings, ownView],
+  );
   const clientName = (id) => linkedName(visible, referenceFor, 'Clients', id);
   const propertyName = (id) => linkedName(visible, referenceFor, 'Properties', id);
   const caption =
@@ -91,9 +97,8 @@ export function ServerDashboard({ owner }) {
           </>
         )}
         {widgets.schedule && (
-          <UpcomingViewings
-            data={data}
-            summary={{ upcoming: figures.upcoming }}
+          <ConnectedUpcomingViewings
+            entries={upcoming}
             clientName={clientName}
             propertyName={propertyName}
           />

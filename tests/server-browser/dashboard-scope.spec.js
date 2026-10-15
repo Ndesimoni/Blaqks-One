@@ -108,10 +108,15 @@ test('assigned-only dashboard figures equal the scoped /records payload and requ
     await expect(viewings).toContainText(
       `${other.record.property_id} · Scope other listing (not assigned to you)`,
     );
-    await expect(viewings.locator('.viewing-mini')).toHaveCount(2);
+    await expect(viewings.locator('button.viewing-mini')).toHaveCount(2);
+    // Two's viewing on one's listing appears only as the permitted time and agent.
+    const heldRow = viewings.locator('.viewing-mini-held');
+    await expect(heldRow).toHaveCount(1);
+    await expect(heldRow).toContainText(`11:00 · Booked by ${two.name}`);
+    await expect(heldRow).not.toContainText('Dash hidden client');
     await expect(page.getByText('Linked record unavailable')).toHaveCount(0);
     await expect(page.getByLabel('Assigned to', { exact: true })).toHaveCount(0);
-    await expect(page.getByText(two.name)).toHaveCount(0);
+    await expect(page.getByText(two.name)).toHaveCount(1);
     expect(assigneeCalls).toEqual([]);
   } finally {
     await context.close();

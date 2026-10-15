@@ -1,0 +1,13 @@
+/* Other agents' viewings on a held listing: read-only rows with no hover or pointer affordance. */
+:root[data-theme] .next-viewings .viewing-mini-held,
+:root[data-theme] .next-viewings .viewing-mini-held:hover {
+  background: transparent;
+  cursor: default;
+}
+.next-viewings .viewing-held-note {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
