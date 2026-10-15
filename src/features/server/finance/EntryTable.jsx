@@ -1,10 +1,10 @@
 import React from 'react';
 import { Pagination } from '../../../components/ui/Pagination.jsx';
-import { formatAed } from '../../../lib/finance/money.js';
 import { clampPage } from './dealFilters.js';
 import { ENTRIES_PER_PAGE, entryCode, entryKinds } from './entryFilters.js';
 import { StatusChip } from './StatusChip.jsx';
 import { ApprovalActions } from './ApprovalActions.jsx';
+import { EntryCards } from './EntryCards.jsx';
 
 /** The record ID cell: a link-styled button that opens the row's details. */
 function CodeCell({ entry, date, onOpen }) {
@@ -27,7 +27,8 @@ function CodeCell({ entry, date, onOpen }) {
 /**
  * Paginated payments or expenses (finance-design §7): a table at desktop and cards at phone
  * width. `columns` are `[{ label, num?, cell(entry) }]` between the ID and the status; money
- * is right-aligned and status is always text. Decisions appear per row only when allowed.
+ * is right-aligned and status is always text. Decisions sit in their own right-hand column
+ * (inside each card on phones) and appear only when allowed.
  */
 export function EntryTable({ kind, entries, page, onPage, onOpen, onDialog, onMessage, view }) {
   const current = clampPage(page, entries.length, ENTRIES_PER_PAGE);
@@ -50,11 +51,14 @@ export function EntryTable({ kind, entries, page, onPage, onOpen, onDialog, onMe
                 </th>
               ))}
               <th scope="col">Status</th>
+              <th scope="col" className="entry-actions-head">
+                <span className="sr-only">Decisions</span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((entry) => (
-              <tr key={entry.id}>
+              <tr key={entry.id} data-status={entry.status}>
                 <CodeCell entry={entry} date={view.date} onOpen={onOpen} />
                 {view.columns.map((column) => (
                   <td key={column.label} className={column.num ? 'finance-num' : ''}>
@@ -64,41 +68,18 @@ export function EntryTable({ kind, entries, page, onPage, onOpen, onDialog, onMe
                 <td className="entry-status-cell">
                   <StatusChip status={entry.status} />
                   {entry.reason && entry.status !== 'pending' && (
-                    <small className="finance-sub finance-reason">{entry.reason}</small>
+                    <small className="finance-sub finance-reason" title={entry.reason}>
+                      {entry.reason}
+                    </small>
                   )}
-                  {decide(entry)}
                 </td>
+                <td className="entry-actions-cell">{decide(entry)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <ul className="deal-cards" aria-label={label}>
-        {rows.map((entry) => (
-          <li key={entry.id} className="deal-card">
-            <button
-              type="button"
-              aria-label={`Open ${entryCode(entry)}`}
-              onClick={() => onOpen(entry)}
-            >
-              <span className="deal-card-top">
-                <strong className="mono">{entryCode(entry)}</strong>
-                <StatusChip status={entry.status} />
-              </span>
-              <span className="deal-card-client">{view.title(entry)}</span>
-              <span className="deal-card-meta">{view.date(entry)}</span>
-              {entry.reason && entry.status !== 'pending' && (
-                <span className="deal-card-meta finance-reason">Reason: {entry.reason}</span>
-              )}
-              <span className="deal-card-money">
-                <span>Amount</span>
-                <span className="finance-money">{formatAed(entry.amountFils)}</span>
-              </span>
-            </button>
-            <div className="entry-card-decisions">{decide(entry)}</div>
-          </li>
-        ))}
-      </ul>
+      <EntryCards rows={rows} label={label} view={view} onOpen={onOpen} decide={decide} />
       <Pagination
         variant="table"
         total={entries.length}

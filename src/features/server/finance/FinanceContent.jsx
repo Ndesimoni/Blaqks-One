@@ -8,10 +8,15 @@ import { FinanceContext, useFinanceAssignees } from './useFinanceRequests.js';
 import { DealsPage } from './DealsPage.jsx';
 import { PaymentsPage } from './PaymentsPage.jsx';
 import { ExpensesPage } from './ExpensesPage.jsx';
+import { FinanceSkeleton } from './FinanceSkeleton.jsx';
 import './finance.css';
 import './finance-dialogs.css';
 import './finance-forms.css';
 import './finance-entries.css';
+import './finance-entry-table.css';
+import './finance-details.css';
+import './finance-decisions.css';
+import './finance-skeleton.css';
 
 /** Connected finance sections and their pages (finance-design §7). */
 const pages = { Deals: DealsPage, Payments: PaymentsPage, Expenses: ExpensesPage };
@@ -48,12 +53,7 @@ export function FinanceContent({ route, owner }) {
   const Page = pages[route];
   if (!Page) return <ServerUnavailableSection route={route} owner={owner} />;
   const noun = nouns[route];
-  if (finance.loading && !finance.overview)
-    return (
-      <p className="finance-status" role="status">
-        Loading {noun}…
-      </p>
-    );
+  if (finance.loading && !finance.overview) return <FinanceSkeleton noun={noun} />;
   if (finance.error || !finance.overview)
     return (
       <section className="panel recovery-panel" aria-label={`${route} unavailable`}>

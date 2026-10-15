@@ -112,3 +112,26 @@ export function changeLines(changes) {
     return `${label}: ${valueText(key, value)}`;
   });
 }
+
+/**
+ * The same team-view changes as display parts: `{ label, before, after }` for a pair (before
+ * is null when the field was empty, so a first value reads as set rather than "— →"), or
+ * `{ label, value }` for a single value. `changeLines` stays the plain-text form.
+ */
+export function changeItems(changes) {
+  if (!changes || typeof changes !== 'object' || Array.isArray(changes)) return [];
+  return Object.entries(changes).map(([key, value]) => {
+    const label = fieldLabels[key] ?? humanise(key);
+    if (Array.isArray(value) && value.length === 2) {
+      const before = valueText(key, value[0]);
+      return {
+        key,
+        label,
+        before: before === '—' ? null : before,
+        after: valueText(key, value[1]),
+      };
+    }
+    if (key === 'selfDecided' && value === true) return { key, label, value: '' };
+    return { key, label, value: valueText(key, value) };
+  });
+}

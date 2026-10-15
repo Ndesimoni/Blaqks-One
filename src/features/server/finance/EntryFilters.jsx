@@ -56,7 +56,7 @@ export function EntryFilters({ kind, filters, onChange, count, waiting }) {
           >
             <Icon name="check" size={15} />
             Awaiting approval
-            <span className="finance-queue-count">{waiting}</span>
+            <span className={`finance-queue-count${waiting ? ' has-items' : ''}`}>{waiting}</span>
           </button>
         </div>
       )}

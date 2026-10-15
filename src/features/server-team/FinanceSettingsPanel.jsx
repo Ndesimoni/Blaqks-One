@@ -59,7 +59,7 @@ export function FinanceSettingsPanel({ settings, actions }) {
             {percentInput('maxReferralShare')}
           </FinanceField>
         </div>
-        <fieldset className="team-finance-choice" disabled={busy}>
+        <fieldset className="team-finance-choice is-options" disabled={busy}>
           <legend>A second agent&apos;s share comes from</legend>
           {secondSourceOptions.map(([value, label]) => (
             <label key={value}>

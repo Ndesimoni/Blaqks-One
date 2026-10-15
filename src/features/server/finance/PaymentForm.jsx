@@ -7,7 +7,7 @@ import { dubaiToday } from './dealEstimate.js';
 import { emptyPaymentDraft, entryAmount, paymentDraft, validatePayment } from './entryDraft.js';
 import { earnedDealOptions, entryKinds, paymentPreview } from './entryFilters.js';
 import { entryFormText, useEntryForm } from './useEntryForm.js';
-import { EntryRejection, EntryTextFields } from './EntryFormParts.jsx';
+import { EntryRejection, EntryTextFields, MoneyInput } from './EntryFormParts.jsx';
 
 /**
  * Record or correct a commission receipt (finance-design §4, §7, §16). The deal picker lists
@@ -90,9 +90,7 @@ export function PaymentForm({ payment, onClose, onDone }) {
           required
           error={errors.amount}
         >
-          {(props) => (
-            <input {...props} inputMode="decimal" autoComplete="off" {...bind('amount')} />
-          )}
+          {(props) => <MoneyInput field={props} bind={bind} />}
         </Field>
         <EntryTextFields
           bind={bind}

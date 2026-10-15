@@ -13,9 +13,12 @@ import { EntriesPage } from './EntriesPage.jsx';
 export function PaymentsPage() {
   const { overview } = useFinanceContext();
   const view = useMemo(() => {
-    const deal = (entry) => {
+    const dealClient = (entry) => {
       const found = overview.deals.find((row) => row.dealId === entry.dealId);
-      const client = found && referenceName(overview.references, 'Clients', found.clientId);
+      return found ? referenceName(overview.references, 'Clients', found.clientId) : null;
+    };
+    const deal = (entry) => {
+      const client = dealClient(entry);
       return client ? `${entry.dealId} · ${client}` : entry.dealId;
     };
     return {
@@ -28,7 +31,15 @@ export function PaymentsPage() {
       date: (entry) => `Received ${readableDate(entry.receiptDate)}`,
       title: deal,
       columns: [
-        { label: 'Deal', cell: deal },
+        {
+          label: 'Deal',
+          cell: (entry) => (
+            <>
+              <span className="cell-strong">{entry.dealId}</span>
+              <small className="finance-sub">{dealClient(entry)}</small>
+            </>
+          ),
+        },
         { label: 'Submitted by', cell: (entry) => entry.submittedBy.name },
         { label: 'Amount', num: true, cell: (entry) => formatAed(entry.amountFils) },
         { label: 'Total with VAT', num: true, cell: (entry) => formatAed(entry.totalFils) },

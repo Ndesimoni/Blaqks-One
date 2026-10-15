@@ -8,7 +8,7 @@ import { propertyOptions } from './dealOptions.js';
 import { emptyExpenseDraft, expenseDraft, validateExpense } from './expenseDraft.js';
 import { entryKinds } from './entryFilters.js';
 import { entryFormText, useEntryForm } from './useEntryForm.js';
-import { EntryRejection, EntryTextFields } from './EntryFormParts.jsx';
+import { EntryRejection, EntryTextFields, MoneyInput } from './EntryFormParts.jsx';
 
 /** Owner choices besides the Admin: active team members with finance, plus the current one. */
 function ownerOptions(people, me, current) {
@@ -86,9 +86,7 @@ export function ExpenseForm({ expense, onClose, onDone }) {
           {(props) => <input {...props} type="date" max={today} {...bind('datePaid')} />}
         </Field>
         <Field name="amount" label="Amount (AED)" required error={errors.amount}>
-          {(props) => (
-            <input {...props} inputMode="decimal" autoComplete="off" {...bind('amount')} />
-          )}
+          {(props) => <MoneyInput field={props} bind={bind} />}
         </Field>
         <EntryTextFields
           bind={bind}

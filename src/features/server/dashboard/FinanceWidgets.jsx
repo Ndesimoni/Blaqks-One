@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { TitleSection } from '../../../components/ui/TitleSection.jsx';
 import { N } from '../../../lib/format.js';
 import { useFinance } from '../finance/useFinance.js';
@@ -13,8 +14,11 @@ import './finance-widgets.css';
 function PendingRow({ pending, approver, navigate }) {
   const query = approver ? QUEUE_QUERY : '';
   return (
-    <div className="finance-widget-pending">
-      <div>
+    <div className={`finance-widget-pending${pending.count ? ' has-items' : ''}`}>
+      <div className="finance-widget-pending-text">
+        <span className="finance-widget-pending-icon" aria-hidden="true">
+          <Icon name="clock" size={18} />
+        </span>
         <strong className="finance-widget-count">{N(pending.count)}</strong>
         <span>{pending.label}</span>
       </div>
@@ -59,7 +63,14 @@ export function FinanceWidgets({ owner }) {
           </Button>
         }
       />
-      {finance.loading && !figures && <p role="status">Loading finance…</p>}
+      {finance.loading && !figures && (
+        <div className="finance-widget-grid finance-widget-skeleton" role="status">
+          <span className="sr-only">Loading finance…</span>
+          {[0, 1, 2, 3].map((item) => (
+            <span key={item} className="finance-widget" aria-hidden="true" />
+          ))}
+        </div>
+      )}
       {finance.error && !figures && (
         <div className="finance-widget-error">
           <p className="field-error" role="alert">

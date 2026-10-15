@@ -45,3 +45,13 @@ export function EntryTextFields({ bind, errors, fields }) {
     </Field>
   ));
 }
+
+/** An amount input with a fixed "AED" prefix and right-aligned tabular figures. */
+export function MoneyInput({ field, bind, name = 'amount' }) {
+  return (
+    <div className="finance-money-input">
+      <span aria-hidden="true">AED</span>
+      <input {...field} inputMode="decimal" autoComplete="off" {...bind(name)} />
+    </div>
+  );
+}

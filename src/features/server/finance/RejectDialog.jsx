@@ -4,6 +4,7 @@ import { failureText, FinanceDialog, ReasonField } from './FinanceDialog.jsx';
 import { reasonError } from './financeRules.js';
 import { entryCode, entryKinds } from './entryFilters.js';
 import { StatusChip } from './StatusChip.jsx';
+import { formatAed } from '../../../lib/finance/money.js';
 
 /**
  * A decision that needs a reason (reject or void, finance-design §4). The reason is shown to
@@ -45,11 +46,18 @@ export function ReasonDecisionDialog({
       onSubmit={submit}
       submitLabel={submitLabel}
       submitDisabled={Boolean(reasonError(reason))}
-      danger={decision === 'void'}
+      danger
     >
-      <p className="finance-dialog-status">
-        Current status <StatusChip status={entry.status} />
-      </p>
+      <div className="finance-dialog-record" role="group" aria-label="Record being decided">
+        <div>
+          <strong className="mono">{entryCode(entry)}</strong>
+          <span className="finance-sub">Submitted by {entry.submittedBy.name}</span>
+        </div>
+        <div className="finance-dialog-record-side">
+          <span className="finance-money">{formatAed(entry.amountFils)}</span>
+          <StatusChip status={entry.status} />
+        </div>
+      </div>
       <ReasonField
         id={`${id}-reason`}
         value={reason}

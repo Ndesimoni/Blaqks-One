@@ -48,13 +48,6 @@
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
-.entry-status-cell .finance-approval,
-.entry-status-cell .finance-duty {
-  margin-top: 8px;
-}
-.entry-status-cell .finance-action-group .btn {
-  min-height: 36px;
-}
 .finance-reason,
 .finance-duty {
   max-width: 280px;
@@ -65,9 +58,6 @@
 }
 .entry-card-decisions:empty {
   display: none;
-}
-.entry-card-decisions {
-  padding: 8px 0 0;
 }
 .entry-card-decisions .finance-action-group .btn {
   flex: 1 1 auto;
@@ -131,13 +121,22 @@
   overflow-wrap: anywhere;
 }
 .finance-history-changes {
-  padding-left: 18px;
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  list-style: none;
   color: var(--muted-dark);
 }
-@media (max-width: 750px) {
-  .finance-queue-filter {
-    grid-column: 1 / -1;
-  }
+.finance-change-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+.finance-change-before {
+  text-decoration: line-through;
+}
+.finance-change-after {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 @media (prefers-reduced-motion: reduce) {
   .finance-queue-chip {
