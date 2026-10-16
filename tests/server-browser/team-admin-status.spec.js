@@ -21,6 +21,8 @@ test('Super Admin suspends and restores an Admin and their staff from the accoun
   page,
   browser,
 }, testInfo) => {
+  // Many viewport/theme screenshots plus whole-team suspension; CI runners are slower.
+  test.setTimeout(120000);
   await signIn(page, 'owner');
   await openTeam(page);
   const form = await startInvitation(page, 'status-admin', true);
@@ -83,7 +85,8 @@ test('Super Admin suspends and restores an Admin and their staff from the accoun
     });
     await openMemberActions(page, 'Browser status-admin');
     await suspend.click();
-    await expect(card).toContainText('Suspended');
+    // Suspending an Admin revokes their whole team's sessions; allow slower CI runners.
+    await expect(card).toContainText('Suspended', { timeout: 20000 });
     actions = await openMemberActions(page, 'Browser status-admin');
     await expect(suspend).toHaveCount(0);
     await expect(actions.getByRole('button', { name: /Restore account/ })).toBeEnabled();

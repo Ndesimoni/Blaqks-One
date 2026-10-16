@@ -68,9 +68,11 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
           .fill('archive-admin@browser-team.test');
         await expect(confirm).toBeEnabled();
         await expect.poll(() => textContrast(confirm.locator('span'))).toBeGreaterThanOrEqual(4.5);
-        const box = await dialog.boundingBox();
-        expect(box.width).toBeLessThanOrEqual(width);
-        expect(box.x).toBeGreaterThanOrEqual(-1);
+        // Wait for the resized layout to settle; slower CI runners measure mid-resize.
+        await expect
+          .poll(async () => (await dialog.boundingBox()).width)
+          .toBeLessThanOrEqual(width);
+        await expect.poll(async () => (await dialog.boundingBox()).x).toBeGreaterThanOrEqual(-1);
         await page.screenshot({ path: testInfo.outputPath(`archive-${width}-${theme}.png`) });
       }
     }

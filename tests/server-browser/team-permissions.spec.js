@@ -90,10 +90,12 @@ test('staff with only future finance access get a clear workspace state and no c
     await expect(staff.page.getByRole('button', { name: 'Add client', exact: true })).toHaveCount(
       0,
     );
-    for (const route of ['/workspaces', '/team-activity']) {
-      await staff.page.goto(`/#${route}`);
-      await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
-    }
+    await staff.page.goto('/#/workspaces');
+    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+    // Staff get their own "My activity" feed (docs/team-activity-design.md), never team events.
+    await staff.page.goto('/#/team-activity');
+    await expect(staff.page.getByRole('heading', { name: 'My activity' })).toBeVisible();
+    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toHaveCount(0);
   } finally {
     await staff.context.close();
   }
