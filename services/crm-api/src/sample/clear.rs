@@ -2,9 +2,10 @@
 //! parents, in one transaction under the workspace lock, with a `deleted` activity row
 //! (source `sample`) for each. Records people created are never removed; when one links
 //! to a sample record the clear is refused. Sample records changed in the app are kept
-//! unless `--include-edited` is passed. Sample staff are suspended, not archived.
+//! unless `--include-edited` is passed. Sample staff are suspended, not archived. Sample
+//! finance goes after the child records and before the clients and properties it links.
 use super::{
-    failed, mark_source,
+    failed, finance, mark_source,
     safety::{self, EDITED, LINKED},
     target::Target,
     target::UNCHANGED,
@@ -19,9 +20,13 @@ use crate::{
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
+/// Records sample finance links to; it is removed before the first of them.
+const PARENTS: [&str; 3] = ["Contacts", "Clients", "Properties"];
+
 pub struct Cleared {
     /// `(collection, removed)` in deletion order.
     pub counts: Vec<(&'static str, i64)>,
+    pub finance: Option<finance::clear::Cleared>,
     pub suspended: u64,
 }
 
@@ -33,16 +38,21 @@ pub async fn clear(pool: &PgPool, target: &Target, include_edited: bool) -> Outc
         .await
         .map_err(|_| format!("The Admin or workspace is no longer active.{UNCHANGED}"))?;
     mark_source(&mut tx).await?;
-    let linked = safety::find(&mut tx, LINKED, workspace).await?;
+    let mut linked = safety::find(&mut tx, LINKED, workspace).await?;
+    linked.extend(safety::find(&mut tx, finance::safety::LINKED, workspace).await?);
     if !linked.is_empty() {
         return Err(safety::linked_message(&linked));
     }
-    let edited = safety::find(&mut tx, EDITED, workspace).await?;
+    let mut edited = safety::find(&mut tx, EDITED, workspace).await?;
+    edited.extend(safety::find(&mut tx, finance::safety::EDITED, workspace).await?);
     if !edited.is_empty() && !include_edited {
         return Err(safety::edited_message(&edited));
     }
-    let mut counts = Vec::new();
+    let (mut counts, mut finance) = (Vec::new(), None);
     for collection in COLLECTIONS.iter().rev().map(|collection| collection.name) {
+        if finance.is_none() && PARENTS.contains(&collection) {
+            finance = Some(finance::clear::clear(&mut tx, target).await?);
+        }
         let removed: i64 = sqlx::query_scalar(
             "WITH gone AS (DELETE FROM crm_records r USING crm_sample_records m \
              WHERE m.record_id=r.id AND m.workspace_id=$1 AND r.workspace_id=$1 \
@@ -61,7 +71,11 @@ pub async fn clear(pool: &PgPool, target: &Target, include_edited: bool) -> Outc
     }
     let suspended = suspend(&mut tx, target).await?;
     tx.commit().await.map_err(failed)?;
-    Ok(Cleared { counts, suspended })
+    Ok(Cleared {
+        counts,
+        finance,
+        suspended,
+    })
 }
 
 /// Suspends this team's active sample members as the team page does: sessions end,

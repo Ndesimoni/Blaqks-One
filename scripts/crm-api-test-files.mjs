@@ -56,6 +56,7 @@ export const apiTestFiles = [
   'tests/api/sample-seed.test.mjs',
   'tests/api/sample-clear.test.mjs',
   'tests/api/sample-safety.test.mjs',
+  'tests/api/sample-finance.test.mjs',
   'tests/api/finance-permissions-migration.test.mjs',
   'tests/api/finance-permissions-team.test.mjs',
   'tests/api/finance-permissions-invite.test.mjs',

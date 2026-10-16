@@ -3,6 +3,7 @@
 //! run outside the local configuration (`guard`) or on an unmarked database (`marker`),
 //! confirm the destination, write through the import insertion path under the
 //! workspace lock, and attribute activity to the workspace owner with source `sample`.
+//! Finance samples go through the finance owners' writes (`finance`).
 pub mod accounts;
 pub mod clear;
 pub mod confirm;
@@ -11,6 +12,7 @@ pub mod data;
 pub mod dates;
 pub mod enrol;
 pub mod existing;
+pub mod finance;
 pub mod guard;
 pub mod marker;
 pub mod options;

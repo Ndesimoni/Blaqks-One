@@ -39,10 +39,11 @@ test('seed-sample fills one Admin workspace with linked, assigned and labelled r
     0,
   );
   // Activity names the Admin as actor, never a sample member, and holds no payloads.
+  // Finance adds 6 deals, 5 payments and 3 expenses, 2 deal moves and their decisions.
   const activity = query(`SELECT string_agg(action||':'||count, ',' ORDER BY action) FROM
     (SELECT action, count(*) FROM crm_activity WHERE workspace_id='${workspace}'
      AND actor_id='${admin.user.id}' GROUP BY action) a`);
-  assert.equal(activity, 'assigned:16,created:52');
+  assert.equal(activity, 'approved:4,assigned:18,created:66,earned:3,rejected:2,voided:1');
   assert.equal(
     Number(
       query(`SELECT count(*) FROM crm_activity WHERE workspace_id='${workspace}'
@@ -52,7 +53,7 @@ test('seed-sample fills one Admin workspace with linked, assigned and labelled r
   );
   const history = query(`SELECT string_agg(DISTINCT reason, ',') FROM crm_assignments
     WHERE workspace_id='${workspace}'`);
-  assert.equal(history, 'import,reassigned');
+  assert.equal(history, 'created,handover,import,reassigned');
 
   const everything = await visible(admin, workspace);
   assert.equal(everything.scope, 'team');

@@ -60,8 +60,9 @@ test('sample history is marked as such and app-suspended staff stay suspended', 
   assert.equal(
     query(`SELECT string_agg(DISTINCT reason, ',') FROM crm_assignments
       WHERE workspace_id='${workspace}'`),
-    'import,reassigned',
+    'created,handover,import,reassigned',
   );
+  assert.equal(sources('crm_finance_events'), 'sample');
   const created = await admin.request(`/workspaces/${workspace}/records/Clients`, {
     method: 'POST',
     body: { record: { full_name: 'Added in the app' } },

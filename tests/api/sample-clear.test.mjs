@@ -68,7 +68,7 @@ test('clear-sample removes exactly the sample records and suspends sample staff'
   assert.equal(
     count(`crm_activity WHERE workspace_id='${workspace}' AND action='deleted'
     AND actor_id='${admin.user.id}'`),
-    53,
+    53 + 6 + 5 + 3, // records, one person's follow-up, then deals, payments and expenses
   );
   const members = query(`SELECT string_agg(u.active::text, ',') FROM crm_users u
     JOIN crm_sample_accounts m ON m.user_id=u.id WHERE m.workspace_id='${workspace}'`);

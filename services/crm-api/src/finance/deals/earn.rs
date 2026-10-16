@@ -4,10 +4,12 @@
 use super::{
     compute, earn_rules,
     gate::{self, Need, STALE},
-    list, row, snapshot,
+    list,
+    row::{self, DealRow},
+    snapshot,
 };
 use crate::{
-    auth::session::Session,
+    auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     finance::{
         access,
@@ -23,6 +25,7 @@ use axum::{
     Json,
 };
 use serde_json::{json, Value};
+use sqlx::{Postgres, Transaction};
 
 const INVALID: &str = "Provide a version and an earned date.";
 
@@ -47,27 +50,40 @@ pub async fn earn(
     if deal.version != version {
         return Err(ApiError::stale(STALE));
     }
-    earn_rules::ensure_earnable(&mut tx, &live, &deal, &earned_on, &today).await?;
-    earn_rules::ensure_second_agent(&mut tx, &workspace, &deal).await?;
-    let basis = compute::current_basis(&mut tx, &workspace, &deal, &earned_on).await?;
-    let outcome = compute::compute(&deal, basis)?;
+    let warnings = apply(&mut tx, &workspace, &live, &deal, &earned_on, &today).await?;
+    let entry = list::entry(&mut tx, &workspace, &live, id).await?;
+    tx.commit().await?;
+    Ok(Json(json!({ "deal": entry, "warnings": warnings })))
+}
+
+/// Steps 7–10 on the locked deal (`row::locked`) with the live approver: the earn rules,
+/// a snapshot from today's settings and agreements, the earned row, event and activity.
+pub async fn apply(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    live: &UserRow,
+    deal: &DealRow,
+    earned_on: &str,
+    today: &str,
+) -> ApiResult<Vec<&'static str>> {
+    earn_rules::ensure_earnable(tx, live, deal, earned_on, today).await?;
+    earn_rules::ensure_second_agent(tx, workspace, deal).await?;
+    let basis = compute::current_basis(tx, workspace, deal, earned_on).await?;
+    let outcome = compute::compute(deal, basis)?;
     let actor = live.id;
-    let revision = snapshot::insert(
-        &mut tx, &workspace, &deal, &earned_on, &outcome, actor, None,
-    )
-    .await?;
+    let revision = snapshot::insert(tx, workspace, deal, earned_on, &outcome, actor, None).await?;
     sqlx::query(
         "UPDATE crm_deals SET earned_on=$2::date,stage='Completed',version=version+1, \
          updated_at=now() WHERE id=$1",
     )
     .bind(deal.id)
-    .bind(&earned_on)
-    .execute(&mut *tx)
+    .bind(earned_on)
+    .execute(&mut **tx)
     .await?;
-    let warnings = earn_rules::warnings(&mut tx, &workspace, &deal).await?;
+    let warnings = earn_rules::warnings(tx, workspace, deal).await?;
     let agreement = outcome.basis.agreement.map(|(id, _)| id.to_string());
     let changes = Changes::default()
-        .pair("earnedOn", Value::Null, earned_on.clone())
+        .pair("earnedOn", Value::Null, earned_on)
         .pair("stage", deal.stage.clone(), "Completed")
         .pair("revision", Value::Null, revision)
         .pair("agreementId", Value::Null, agreement)
@@ -77,10 +93,9 @@ pub async fn earn(
             super::names::source_name(outcome.source),
         )
         .pair("netFils", Value::Null, outcome.calculation.net_fils);
-    let ws = workspace.as_str();
     events::append(
-        &mut tx,
-        ws,
+        tx,
+        workspace,
         Entity::Deal,
         deal.id,
         Action::Earned,
@@ -89,8 +104,6 @@ pub async fn earn(
         None,
     )
     .await?;
-    audit::append(&mut tx, actor, ws, "earned", "Deals", deal.id).await?;
-    let entry = list::entry(&mut tx, &workspace, &live, id).await?;
-    tx.commit().await?;
-    Ok(Json(json!({ "deal": entry, "warnings": warnings })))
+    audit::append(tx, actor, workspace, "earned", "Deals", deal.id).await?;
+    Ok(warnings)
 }

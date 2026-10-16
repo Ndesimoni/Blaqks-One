@@ -11,7 +11,7 @@ use super::{
     views::Viewer,
 };
 use crate::{
-    auth::session::Session,
+    auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     finance::{errors::INELIGIBLE, wire},
     state::AppState,
@@ -74,16 +74,33 @@ pub async fn request(
     if deal.version != version {
         return Err(ApiError::stale(STALE));
     }
+    let handover = offer(&mut tx, &workspace, &live, &deal, to, referral).await?;
+    let row = handover_rows::find(&mut tx, handover).await?;
+    tx.commit().await?;
+    let view = row.view(&Viewer::of(&live));
+    Ok((StatusCode::CREATED, Json(json!({ "handover": view }))))
+}
+
+/// Steps 7–10 on the locked deal with the live holder: holder-only, one pending request,
+/// an eligible receiver and the move rules, then the pending request. Returns its ID.
+pub async fn offer(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    live: &UserRow,
+    deal: &DealRow,
+    to: Uuid,
+    referral: Option<i32>,
+) -> ApiResult<Uuid> {
     if deal.assignee_id != Some(live.id) {
         return Err(ApiError::denied(HOLDER_ONLY));
     }
     if deal.pending_handover.is_some() {
         return Err(ApiError::conflict(PENDING));
     }
-    if to == live.id || !links::finance_member(&mut tx, &workspace, to, true).await? {
+    if to == live.id || !links::finance_member(tx, workspace, to, true).await? {
         return Err(ApiError::invalid(INELIGIBLE));
     }
-    ensure_move(&mut tx, &workspace, &deal, to, referral).await?;
+    ensure_move(tx, workspace, deal, to, referral).await?;
     let handover = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_deal_handovers \
@@ -91,15 +108,12 @@ pub async fn request(
          VALUES ($1,$2,$3,$4,$5,$6,$4)",
     )
     .bind(handover)
-    .bind(&workspace)
+    .bind(workspace)
     .bind(deal.id)
     .bind(live.id)
     .bind(to)
     .bind(referral)
-    .execute(&mut *tx)
+    .execute(&mut **tx)
     .await?;
-    let row = handover_rows::find(&mut tx, handover).await?;
-    tx.commit().await?;
-    let view = row.view(&Viewer::of(&live));
-    Ok((StatusCode::CREATED, Json(json!({ "handover": view }))))
+    Ok(handover)
 }

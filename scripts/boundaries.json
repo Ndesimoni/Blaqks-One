@@ -34,7 +34,7 @@
     ],
     "imports": ["crm_import_plans"],
     "performance": ["crm_targets", "crm_targets_identity_fixed"],
-    "sample": ["crm_sample_records", "crm_sample_accounts", "crm_environment"]
+    "sample": ["crm_sample_records", "crm_sample_accounts", "crm_sample_finance", "crm_environment"]
   },
   "domainFree": {
     "paths": ["auth/", "workspaces/", "error.rs", "error_tests.rs", "state.rs", "config.rs"],

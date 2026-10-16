@@ -13,7 +13,8 @@ pub struct Spec {
     /// Email local part before the team suffix, for example `sample.layla`.
     pub handle: &'static str,
     pub phone: &'static str,
-    pub position: &'static str,
+    /// Positions set module defaults; Karim adds Property Agent for own-view finance.
+    pub positions: &'static [&'static str],
     pub team_scope: bool,
     /// Module views only: every create, edit, assign and delete action is off.
     pub view_only: bool,
@@ -28,29 +29,29 @@ pub const SPECS: [Spec; 3] = [
         person: "Layla Nasser",
         handle: "sample.layla",
         phone: "+971500000901",
-        position: "property-agent",
+        positions: &["property-agent"],
         team_scope: false,
         view_only: false,
         channels: ChannelAccess {
             email: false,
             whatsapp: true,
         },
-        summary: "assigned records only, standard actions, WhatsApp",
+        summary: "assigned records only, standard actions, own deals, WhatsApp",
         holds: &["CL-S02", "CL-S04", "CL-S09", "PR-S02", "PR-S03", "CT-S07"],
     },
     Spec {
         person: "Karim Aziz",
         handle: "sample.karim",
         phone: "+971500000902",
-        position: "team-supervisor",
+        positions: &["team-supervisor", "property-agent"],
         team_scope: true,
         view_only: false,
         channels: ChannelAccess {
             email: true,
             whatsapp: true,
         },
-        summary:
-            "whole team, can delete contacts (clients also need team finance), email and WhatsApp",
+        summary: "whole team, own deals, can delete contacts (clients also need team finance), \
+                  email and WhatsApp",
         holds: &[
             "CL-S01", "CL-S06", "PR-S05", "PR-S07", "PR-S08", "CT-S03", "CT-S04",
         ],
@@ -59,7 +60,7 @@ pub const SPECS: [Spec; 3] = [
         person: "Noura Saleh",
         handle: "sample.noura",
         phone: "+971500000903",
-        position: "lead-manager",
+        positions: &["lead-manager"],
         team_scope: false,
         view_only: true,
         channels: ChannelAccess {
@@ -90,7 +91,7 @@ impl Spec {
     }
 
     pub fn positions(&self) -> Vec<String> {
-        vec![self.position.to_owned()]
+        self.positions.iter().map(|id| (*id).to_owned()).collect()
     }
 
     pub fn permissions(&self) -> Permissions {

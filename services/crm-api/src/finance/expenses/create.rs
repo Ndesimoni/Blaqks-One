@@ -2,11 +2,11 @@
 //! staff record their own expenses, an Admin may name an active member with finance as
 //! `incurredBy`. The expense starts pending with a server-issued `EX-` ID.
 use super::{
-    input::{self, INVALID},
+    input::{self, ExpenseInput, INVALID},
     update::ensure_owner,
 };
 use crate::{
-    auth::session::Session,
+    auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     finance::{
         access,
@@ -29,6 +29,7 @@ use axum::{
     Json,
 };
 use serde_json::{json, Value};
+use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
 pub async fn create(
@@ -46,11 +47,28 @@ pub async fn create(
     let mut tx = state.pool.begin().await?;
     entry_wire::not_future(&expense.date_paid, &access::today(&mut tx).await?)?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Create).await?;
-    let owner = expense.incurred_by.unwrap_or(live.id);
-    ensure_owner(&mut tx, &workspace, &live, owner, None).await?;
-    let property = expense.property_ref.as_deref();
-    links::ensure_property(&mut tx, &workspace, &live, property, None).await?;
     let legacy = ids::issue(&mut tx, &workspace, FinanceIds::Expenses).await?;
+    let id = insert(&mut tx, &workspace, &live, &expense, &legacy).await?;
+    let ws = workspace.as_str();
+    let entry = entry_view::entry(&mut tx, ws, &live, Kind::Expense, id).await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(json!({ "expense": entry }))))
+}
+
+/// Steps 5–10 under the workspace lock with the live creator: the owner and property
+/// links, the pending row, a `submitted` event and activity. `legacy` is the issued ID
+/// (the local sample-data command passes its own `-S` IDs).
+pub async fn insert(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    live: &UserRow,
+    expense: &ExpenseInput,
+    legacy: &str,
+) -> ApiResult<Uuid> {
+    let owner = expense.incurred_by.unwrap_or(live.id);
+    ensure_owner(tx, workspace, live, owner, None).await?;
+    let property = expense.property_ref.as_deref();
+    links::ensure_property(tx, workspace, live, property, None).await?;
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_expenses (id,workspace_id,legacy_id,incurred_by,date_paid,category, \
@@ -58,8 +76,8 @@ pub async fn create(
          last_edited_by) VALUES ($1,$2,$3,$4,$5::date,$6,$7,$8,$9,$10,$11,$12,$13,$13)",
     )
     .bind(id)
-    .bind(&workspace)
-    .bind(&legacy)
+    .bind(workspace)
+    .bind(legacy)
     .bind(owner)
     .bind(&expense.date_paid)
     .bind(&expense.category)
@@ -70,7 +88,7 @@ pub async fn create(
     .bind(&expense.receipt_url)
     .bind(&expense.notes)
     .bind(live.id)
-    .execute(&mut *tx)
+    .execute(&mut **tx)
     .await?;
     let changes = Changes::default()
         .pair("expenseId", Value::Null, legacy)
@@ -84,21 +102,9 @@ pub async fn create(
         .text("campaignReference", expense.campaign_reference.is_some())
         .text("receiptUrl", expense.receipt_url.is_some())
         .text("notes", expense.notes.is_some());
-    let (ws, actor) = (workspace.as_str(), live.id);
+    let (ws, actor) = (workspace, live.id);
     let submitted = Action::Submitted;
-    events::append(
-        &mut tx,
-        ws,
-        Entity::Expense,
-        id,
-        submitted,
-        actor,
-        changes,
-        None,
-    )
-    .await?;
-    audit::append(&mut tx, actor, ws, "created", "Expenses", id).await?;
-    let entry = entry_view::entry(&mut tx, ws, &live, Kind::Expense, id).await?;
-    tx.commit().await?;
-    Ok((StatusCode::CREATED, Json(json!({ "expense": entry }))))
+    events::append(tx, ws, Entity::Expense, id, submitted, actor, changes, None).await?;
+    audit::append(tx, actor, ws, "created", "Expenses", id).await?;
+    Ok(id)
 }

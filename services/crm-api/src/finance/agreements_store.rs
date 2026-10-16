@@ -8,7 +8,7 @@ use super::{
 };
 use crate::error::{ApiError, ApiResult};
 use serde_json::Value;
-use sqlx::PgPool;
+use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
 pub const EARNED: &str = "This agreement would apply to deals already earned.";
@@ -42,13 +42,26 @@ pub async fn create(
 ) -> ApiResult<(AgreementRow, Option<(Uuid, String)>)> {
     let mut transaction = pool.begin().await?;
     access::lock_manager(&mut transaction, workspace, actor).await?;
+    let created = create_in(&mut transaction, actor, workspace, input).await?;
+    transaction.commit().await?;
+    Ok(created)
+}
+
+/// The checks, auto-close and insert with their events, under `access::lock_manager` in
+/// the caller's transaction (also used by the local sample-data command).
+pub async fn create_in(
+    transaction: &mut Transaction<'_, Postgres>,
+    actor: Uuid,
+    workspace: &str,
+    input: NewAgreement,
+) -> ApiResult<(AgreementRow, Option<(Uuid, String)>)> {
     let staff: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM crm_users WHERE id=$1 AND role='staff' \
          AND workspace_id=$2 AND deleted_at IS NULL)",
     )
     .bind(input.agent_id)
     .bind(workspace)
-    .fetch_one(&mut *transaction)
+    .fetch_one(&mut **transaction)
     .await?;
     if !staff {
         return Err(ApiError::invalid(NOT_STAFF));
@@ -58,7 +71,7 @@ pub async fn create(
         .bind(workspace)
         .bind(input.agent_id)
         .bind(&input.effective_from)
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut **transaction)
         .await?;
     if earned {
         return Err(ApiError::conflict(EARNED));
@@ -70,7 +83,7 @@ pub async fn create(
     .bind(workspace)
     .bind(input.agent_id)
     .bind(&input.effective_from)
-    .fetch_one(&mut *transaction)
+    .fetch_one(&mut **transaction)
     .await?;
     if later {
         return Err(ApiError::conflict(OVERLAP));
@@ -85,7 +98,7 @@ pub async fn create(
     .bind(workspace)
     .bind(input.agent_id)
     .bind(&input.effective_from)
-    .fetch_optional(&mut *transaction)
+    .fetch_optional(&mut **transaction)
     .await?;
     let id = Uuid::new_v4();
     sqlx::query(
@@ -99,42 +112,23 @@ pub async fn create(
     .bind(input.agent_share_bp)
     .bind(&input.effective_from)
     .bind(actor)
-    .execute(&mut *transaction)
+    .execute(&mut **transaction)
     .await?;
     let created = Changes::default()
         .pair("agentId", Value::Null, input.agent_id.to_string())
         .pair("agentShareBp", Value::Null, input.agent_share_bp)
         .pair("effectiveFrom", Value::Null, input.effective_from.clone());
-    events::append(
-        &mut transaction,
-        workspace,
-        Entity::Agreement,
-        id,
-        Action::Created,
-        actor,
-        created,
-        None,
-    )
-    .await?;
+    let (tx, ws, entity) = (&mut *transaction, workspace, Entity::Agreement);
+    events::append(tx, ws, entity, id, Action::Created, actor, created, None).await?;
     if let Some((old, before)) = &closed {
         let changes =
             Changes::default().pair("effectiveTo", before.clone(), input.effective_from.clone());
-        events::append(
-            &mut transaction,
-            workspace,
-            Entity::Agreement,
-            *old,
-            Action::Closed,
-            actor,
-            changes,
-            None,
-        )
-        .await?;
+        let closing = Action::Closed;
+        events::append(tx, ws, entity, *old, closing, actor, changes, None).await?;
     }
     let row = sqlx::query_as::<_, AgreementRow>(&format!("{SELECT} WHERE a.id=$1"))
         .bind(id)
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut **tx)
         .await?;
-    transaction.commit().await?;
     Ok((row, closed.map(|(old, _)| (old, input.effective_from))))
 }

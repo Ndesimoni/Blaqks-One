@@ -2,12 +2,12 @@
 //! clients they hold and hold the deal; Admin-created deals go to the client's holder.
 use super::{
     gate::{self, Need},
-    input::{self, INVALID},
+    input::{self, DealInput, INVALID},
     links, list,
     terms::terms,
 };
 use crate::{
-    auth::session::Session,
+    auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     finance::{
         events::{self, Action, Entity},
@@ -26,6 +26,7 @@ use axum::{
     Json,
 };
 use serde_json::{json, Value};
+use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
 pub async fn create(
@@ -41,11 +42,27 @@ pub async fn create(
     let deal = input::parse(&body["deal"], true)?;
     let mut tx = state.pool.begin().await?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Create).await?;
-    links::ensure_client(&mut tx, &workspace, &live, &deal.client_ref, None).await?;
-    let property = deal.property_ref.as_deref();
-    links::ensure_property(&mut tx, &workspace, &live, property, None).await?;
-    let holder = links::initial_holder(&mut tx, &workspace, &live, &deal.client_ref).await?;
     let legacy = ids::issue(&mut tx, &workspace, FinanceIds::Deals).await?;
+    let id = insert(&mut tx, &workspace, &live, &deal, &legacy).await?;
+    let entry = list::entry(&mut tx, &workspace, &live, id).await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(json!({ "deal": entry }))))
+}
+
+/// Steps 5–10 under the workspace lock with the live creator: links, the initial holder,
+/// the row, a `created` event, activity and assignment history. `legacy` is the issued
+/// ID (the local sample-data command passes its own `-S` IDs).
+pub async fn insert(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    live: &UserRow,
+    deal: &DealInput,
+    legacy: &str,
+) -> ApiResult<Uuid> {
+    links::ensure_client(tx, workspace, live, &deal.client_ref, None).await?;
+    let property = deal.property_ref.as_deref();
+    links::ensure_property(tx, workspace, live, property, None).await?;
+    let holder = links::initial_holder(tx, workspace, live, &deal.client_ref).await?;
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_deals (id,workspace_id,legacy_id,assignee_id,client_ref,property_ref, \
@@ -54,8 +71,8 @@ pub async fn create(
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)",
     )
     .bind(id)
-    .bind(&workspace)
-    .bind(&legacy)
+    .bind(workspace)
+    .bind(legacy)
     .bind(holder)
     .bind(&deal.client_ref)
     .bind(&deal.property_ref)
@@ -69,25 +86,15 @@ pub async fn create(
     .bind(&deal.partner_name)
     .bind(sqlx::types::Json(&deal.details))
     .bind(live.id)
-    .execute(&mut *tx)
+    .execute(&mut **tx)
     .await?;
-    let changes = terms(None, &deal).pair("dealId", Value::Null, legacy);
-    let actor = live.id;
-    events::append(
-        &mut tx,
-        &workspace,
-        Entity::Deal,
-        id,
-        Action::Created,
-        actor,
-        changes,
-        None,
-    )
-    .await?;
-    audit::append(&mut tx, actor, &workspace, "created", "Deals", id).await?;
+    let changes = terms(None, deal).pair("dealId", Value::Null, legacy);
+    let (actor, entity, action) = (live.id, Entity::Deal, Action::Created);
+    events::append(tx, workspace, entity, id, action, actor, changes, None).await?;
+    audit::append(tx, actor, workspace, "created", "Deals", id).await?;
     if holder.is_some() {
         let change = Change {
-            workspace: &workspace,
+            workspace,
             record: id,
             collection: "Deals",
             from: None,
@@ -95,9 +102,7 @@ pub async fn create(
             actor,
             reason: "created",
         };
-        history::append(&mut tx, &change).await?;
+        history::append(tx, &change).await?;
     }
-    let entry = list::entry(&mut tx, &workspace, &live, id).await?;
-    tx.commit().await?;
-    Ok((StatusCode::CREATED, Json(json!({ "deal": entry }))))
+    Ok(id)
 }

@@ -59,7 +59,20 @@ pub async fn save(
 ) -> ApiResult<SettingsRow> {
     let mut transaction = pool.begin().await?;
     access::lock_manager(&mut transaction, workspace, actor).await?;
-    let current = load(&mut transaction, workspace, true).await?;
+    let saved = write(&mut transaction, actor, workspace, input).await?;
+    transaction.commit().await?;
+    Ok(saved)
+}
+
+/// The versioned write and its event, under `access::lock_manager` in the caller's
+/// transaction (also used by the local sample-data command).
+pub async fn write(
+    transaction: &mut Transaction<'_, Postgres>,
+    actor: Uuid,
+    workspace: &str,
+    input: SettingsInput,
+) -> ApiResult<SettingsRow> {
+    let current = load(transaction, workspace, true).await?;
     let (action, id) = match (&current, input.version) {
         (None, None) => (Action::Created, Uuid::new_v4()),
         (Some(row), Some(version)) if row.version == version => (Action::Updated, row.id),
@@ -87,10 +100,10 @@ pub async fn save(
     .bind(input.vat_registered)
     .bind(&input.trn)
     .bind(actor)
-    .execute(&mut *transaction)
+    .execute(&mut **transaction)
     .await?;
     events::append(
-        &mut transaction,
+        transaction,
         workspace,
         Entity::Settings,
         id,
@@ -100,7 +113,6 @@ pub async fn save(
         None,
     )
     .await?;
-    let saved = load(&mut transaction, workspace, false).await?;
-    transaction.commit().await?;
+    let saved = load(transaction, workspace, false).await?;
     saved.ok_or(ApiError::stale(STALE))
 }
