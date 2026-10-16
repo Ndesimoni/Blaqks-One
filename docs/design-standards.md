@@ -13,6 +13,17 @@ The user-approved [CRM design refresh](design-refresh.md) is the visual baseline
 - Use the shared brief transitions for colour, border and shadow changes, with clear hover, focus and pressed states. Keep controls stable under the pointer and honour reduced-motion preferences for animations and programmatic scrolling.
 - Carry the same hierarchy and colours across mobile, tablet and desktop, in both themes. Verify readable contrast, keyboard focus, comfortable touch targets and page reflow against the accessibility rules below.
 
+### Premium polish for new work (owner, 2026-10-16)
+
+**Keep the colours; raise the design.** Every new screen, component and redesigned section keeps the palette above unchanged and must look clean, orderly, smooth and premium. Existing screens are not restyled for its own sake; they adopt these rules when they are next changed.
+
+- **Hierarchy through type and space, not boxes:** larger, confident figures with tabular numerals; clear label, value and caption levels; generous, consistent spacing on the 4px scale; fewer nested panels; group with alignment and thin rules.
+- **Restrained depth:** hairline borders and soft, layered shadows; no heavy outlines, gradient washes or decorative banners.
+- **Purposeful data visuals:** small charts beside key figures, and hand-built SVG charts using the existing palette tokens, with text alternatives, both themes and right-to-left mirroring. The chart forms, motion and right-to-left rules in the parked [Design system v2](design-system-v2.md) may be reused **with the current colours only**.
+- **Smooth, calm motion:** brief transitions, skeleton loading in place of spinners or layout jumps, gentle entrance of content; all honour reduced motion.
+- **Consistency:** reuse shared components; one primary action per area; aligned controls; the same states (hover, focus, loading, empty, error) everywhere.
+- Review new work with screenshots at 390px and 1280px in both themes before it is accepted.
+
 When an intentional redesign changes this baseline, update the shared rules and reference previews together. Feature additions should build on the approved appearance through the existing tokens and components.
 
 ## Design around the task

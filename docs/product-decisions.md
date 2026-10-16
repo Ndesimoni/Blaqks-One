@@ -148,6 +148,14 @@ See [Team activity design](team-activity-design.md).
 | Explored | Three Dashboard previews; a Limestone variant (commit `d8d5e3e`) and then a Midnight Dashboard (commit `673ddd3`) were built, then reverted. |
 | Kept     | The Midnight spec is parked in [Design system v2](design-system-v2.md) for possible later use.                                               |
 
+## Design and language going forward (decided 2026-10-16)
+
+| Topic    | Decision                                                                                                                                                                                                                                              |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Colours  | The current forest-green and gold theme **stays**, in both themes, with dark as the default.                                                                                                                                                          |
+| Design   | All new work gets a cleaner, more orderly, smooth and premium design within those colours; see [Premium polish for new work](design-standards.md#premium-polish-for-new-work-owner-2026-10-16). Existing screens adopt it when they are next changed. |
+| Language | Build the **language foundation first** (English and Arabic, right-to-left ready). Every feature built after it uses translation catalogues from the start. Existing screens are translated later, in a separate pass once the foundation is done.    |
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |

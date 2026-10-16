@@ -430,7 +430,7 @@ Split any packet further if it crosses too many contracts. Do not ship empty con
 
 - **Product vision queue (owner, 2026-10-16):** see [Product vision](product-vision.md). Planned in this order:
   1. Premium redesign direction and design system v2, right-to-left ready, with a chart-rich Dashboard first. **Paused (2026-10-16):** the owner kept the original design after trying Limestone and Midnight; see [Product decisions](product-decisions.md#premium-redesign-direction-decided-2026-10-16).
-  2. Language preference: English and Arabic, then more languages, with message translation.
+  2. Language preference: English and Arabic, then more languages, with message translation. **Decided 2026-10-16:** build the foundation next (translation catalogues, language choice in My profile, right-to-left layout, date/number/AED formatting per language); new features use it from the start, existing screens are translated in a later pass. New work keeps the current colours with [premium polish](design-standards.md#premium-polish-for-new-work-owner-2026-10-16).
   3. Blaqks One platform foundation.
   4. Field hints and calculators.
   5. Deal rooms: cross-company agreements with chat.
