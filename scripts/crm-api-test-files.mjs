@@ -83,4 +83,7 @@ export const apiTestFiles = [
   'tests/api/finance-deal-links-legacy.test.mjs',
   'tests/api/performance-h1.test.mjs',
   'tests/api/performance-targets.test.mjs',
+  'tests/api/activity-feed.test.mjs',
+  'tests/api/activity-scope.test.mjs',
+  'tests/api/activity-h1.test.mjs',
 ];

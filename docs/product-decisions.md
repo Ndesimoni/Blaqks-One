@@ -121,6 +121,18 @@ Many agent-to-agent and broker-to-broker deals in the UAE rest on verbal promise
 
 See [Account self-service](account-self-service.md).
 
+## Team activity (decided 2026-10-16)
+
+| Topic               | Decision                                                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Super Admin         | Sees only the activity of workspaces they can already open (parity, no new power). The SaaS phase replaces this with consented, time-limited, logged support access. |
+| Whole-team staff    | See all record activity for the sections they are granted; finance rows need "See team finance"; team events (invitations, roles, suspensions) stay Admin-only.      |
+| Assigned-only staff | See **My activity**: their own actions only.                                                                                                                         |
+| Security events     | Password changes and signed-out devices are private to each person (a later Security history on My profile); Admins do not see them.                                 |
+| Never shown         | Amounts, reasons, notes, message contents, contact details, passwords; records the viewer cannot see show as "Record unavailable".                                   |
+
+See [Team activity design](team-activity-design.md).
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |

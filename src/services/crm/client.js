@@ -1,4 +1,5 @@
 import { accountRoutes } from './account.js';
+import { activityRoutes } from './activity.js';
 import { assignmentRoutes } from './assignments.js';
 import { financeRoutes } from './finance.js';
 import { performanceRoutes } from './performance.js';
@@ -111,6 +112,7 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         body: { version: metadata.version },
       }),
     ...accountRoutes({ request, setCsrfToken }),
+    ...activityRoutes({ request, scope }),
     ...assignmentRoutes({ request, scope, recordPath }),
     ...financeRoutes({ request, scope }),
     ...performanceRoutes({ request, scope }),

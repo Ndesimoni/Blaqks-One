@@ -5,10 +5,13 @@ export function canManageTeam(user) {
   return user?.roleId === 'admin' || user?.roleId === 'super-admin';
 }
 
+/** Managers read the whole workspace's Team activity; staff read My activity (their own). */
+export const activityLabel = (user) => (canManageTeam(user) ? 'Team activity' : 'My activity');
+
 export function canOpenSection(user, route) {
   if (!['admin', 'super-admin', 'staff'].includes(user?.roleId)) return false;
-  if (['Team & access', 'Team activity', 'Workspaces'].includes(route)) return canManageTeam(user);
-  if (['Dashboard', 'Guide', 'My profile'].includes(route)) return true;
+  if (['Team & access', 'Workspaces'].includes(route)) return canManageTeam(user);
+  if (['Dashboard', 'Guide', 'My profile', 'Team activity'].includes(route)) return true;
   if (route === 'Messages')
     return (
       canManageTeam(user) ||

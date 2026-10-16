@@ -38,7 +38,16 @@
   },
   "domainFree": {
     "paths": ["auth/", "workspaces/", "error.rs", "error_tests.rs", "state.rs", "config.rs"],
-    "domains": ["records", "finance", "team", "assignments", "imports", "performance", "sample"]
+    "domains": [
+      "activity",
+      "records",
+      "finance",
+      "team",
+      "assignments",
+      "imports",
+      "performance",
+      "sample"
+    ]
   },
   "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],
   "unrestricted": {
@@ -50,8 +59,7 @@
       "crm_records_assignable": "error_tests.rs: a named CHECK constraint stays a generic 503"
     },
     "workspaces": {
-      "crm_users": "C2/C8: live membership, owner archive and directory checks",
-      "crm_activity": "C4: the workspace activity feed reads crm_activity"
+      "crm_users": "C2/C8: live membership, owner archive and directory checks"
     },
     "team": {
       "crm_workspaces": "C5: team access reads the workspace owner",

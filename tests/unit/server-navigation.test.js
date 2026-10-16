@@ -37,6 +37,7 @@ test('Admins can reach the familiar sections while only implemented screens are 
     'Date search',
     'Guide',
     'My profile',
+    'Team activity',
   ])
     assert.equal(isConnectedSection(name), true, name);
   for (const name of ['Messages', 'Workspaces', 'Anything'])
@@ -45,7 +46,16 @@ test('Admins can reach the familiar sections while only implemented screens are 
 
 test('future navigation respects staff module and messaging grants without exposing team authority', () => {
   const staff = { roleId: 'staff', permissions: { finance: true } };
-  for (const name of ['Deals', 'Payments', 'Expenses', 'Dashboard', 'Guide', 'My profile'])
+  // Staff open "Team activity" as My activity: the server limits it to their own actions.
+  for (const name of [
+    'Deals',
+    'Payments',
+    'Expenses',
+    'Dashboard',
+    'Guide',
+    'My profile',
+    'Team activity',
+  ])
     assert.equal(canOpenSection(staff, name), true, name);
   for (const name of [
     'Clients',
@@ -55,7 +65,6 @@ test('future navigation respects staff module and messaging grants without expos
     'Performance',
     'Messages',
     'Workspaces',
-    'Team activity',
     'Team & access',
   ])
     assert.equal(canOpenSection(staff, name), false, name);

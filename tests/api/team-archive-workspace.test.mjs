@@ -107,10 +107,11 @@ test('Admin archival freezes the entire team and workspace without losing compan
       })
     ).status >= 400,
   );
-  assert.equal(
-    (await owner.request(`/workspaces/${admin.user.id}/activity`)).value.activity.length,
-    3,
-  );
+  // The archived feed stays readable by the Super Admin only (team-activity-design.md).
+  const feed = (kind) => owner.request(`/workspaces/${admin.user.id}/activity?kind=${kind}`);
+  assert.equal((await feed('record')).value.activity.length, 3);
+  const team = (await feed('team')).value.activity;
+  assert.equal(team.filter((item) => item.action === 'archived').length, 3);
   assert.equal(
     query(
       `SELECT count(*) FROM crm_users WHERE (id='${admin.user.id}' OR owner_id='${admin.user.id}') AND deleted_at IS NOT NULL AND NOT active`,

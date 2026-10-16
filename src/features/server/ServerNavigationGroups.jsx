@@ -4,8 +4,8 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { canOpenSection } from './access.js';
 import { isConnectedSection } from './sectionStatus.js';
 
-export function ServerNavigationItem({ name, icon, route, onSelect }) {
-  const label = name === 'Team & access' ? 'Team' : name;
+export function ServerNavigationItem({ name, icon, route, onSelect, label: shown }) {
+  const label = shown || (name === 'Team & access' ? 'Team' : name);
   const connected = isConnectedSection(name);
   return (
     <button

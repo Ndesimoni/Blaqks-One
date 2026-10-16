@@ -1,5 +1,5 @@
 use crate::{
-    assignments,
+    activity, assignments,
     auth::handlers as auth,
     error::{self, ApiError, ApiResult, CodeMapper},
     finance, imports, performance,
@@ -111,10 +111,6 @@ pub fn app(state: AppState) -> Router {
             get(records::list),
         )
         .route(
-            "/api/crm/workspaces/{workspace}/activity",
-            get(workspaces::handlers::activity),
-        )
-        .route(
             "/api/crm/workspaces/{workspace}/records/{collection}",
             post(records::create),
         )
@@ -142,6 +138,7 @@ pub fn app(state: AppState) -> Router {
         .merge(crate::auth::account::router())
         .merge(finance::routes::router())
         .merge(performance::routes::router())
+        .merge(activity::routes::router())
         .fallback(unknown_route)
         .method_not_allowed_fallback(unsupported_method)
         .layer(DefaultBodyLimit::max(12 * 1024 * 1024 + 1024))

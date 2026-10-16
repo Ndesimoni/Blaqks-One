@@ -19,6 +19,8 @@ const connectedSections = new Set([
   'Guide',
   // The member's own account under `/auth/account` and `/auth/sessions`.
   'My profile',
+  // `GET /activity`: the whole workspace for managers, the member's own actions for staff.
+  'Team activity',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
@@ -32,7 +34,8 @@ const purposes = {
   Guide: 'Learn how to use your CRM workspace.',
   'My profile': 'Review your account, update your details and manage sign-in security.',
   Workspaces: 'Review the workspaces this account is permitted to open.',
-  'Team activity': 'Review changes recorded in the selected workspace.',
+  'Team activity': 'Review who changed what in this workspace, and when.',
+  'My activity': 'Review the changes you have made in this workspace.',
 };
 
 export function sectionDescription(name) {

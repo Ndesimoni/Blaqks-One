@@ -12,6 +12,7 @@ import { ServerContent } from './ServerContent.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
 import { ViewOnlyChip } from './ViewOnlyChip.jsx';
 import { isRecordSection, sectionDescription } from './sectionStatus.js';
+import { activityLabel } from './access.js';
 
 /** Connected headings that differ from the shared labels (messaging is not part of My profile). */
 const headings = { 'My profile': 'My profile' };
@@ -21,6 +22,7 @@ export function ServerShell({ owner, workspaces }) {
   const { route } = useNavigation();
   const supported = isRecordSection(route);
   const team = route === 'Team & access';
+  const title = route === 'Team activity' ? activityLabel(user) : route;
   const { toast, setToast } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
   const location = useLocation();
@@ -73,13 +75,15 @@ export function ServerShell({ owner, workspaces }) {
           <div className="page-heading">
             <div className="heading-left">
               <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>
-              <h1>{team ? 'Team' : headings[route] || labels[route] || 'Your CRM workspace'}</h1>
+              <h1>
+                {team ? 'Team' : headings[title] || labels[title] || title || 'Your CRM workspace'}
+              </h1>
               <p>
                 {team
                   ? owner.status === 'archived'
                     ? 'Review saved accounts and access history.'
                     : 'Manage people and access within this workspace.'
-                  : sectionDescription(route)}
+                  : sectionDescription(title)}
               </p>
             </div>
             <div className="heading-actions">

@@ -40,7 +40,15 @@ test('staff share their owner workspace without exposing other Admin teams or co
   assert.equal((await adminB.request(teamPath(adminA))).status, 403);
   assert.equal((await staff.request(teamPath(adminA))).status, 403);
   assert.equal((await staff.request(`/workspaces/${adminB.user.id}/records`)).status, 403);
-  assert.equal((await staff.request(`/workspaces/${adminA.user.id}/activity`)).status, 403);
+  // Staff read only their own actions (My activity) and never team events.
+  const own = await staff.request(`/workspaces/${adminA.user.id}/activity`);
+  assert.equal(own.status, 200);
+  assert.ok(own.value.activity.every((item) => item.actor.id === staff.user.id));
+  assert.equal(
+    (await staff.request(`/workspaces/${adminA.user.id}/activity?kind=team`)).status,
+    403,
+  );
+  assert.equal((await staff.request(`/workspaces/${adminB.user.id}/activity`)).status, 403);
   assert.equal(
     (
       await staff.request(`/workspaces/${adminA.user.id}/records/Properties/${property.id}`, {

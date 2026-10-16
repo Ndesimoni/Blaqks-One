@@ -1,3 +1,4 @@
+pub mod activity;
 pub mod audit;
 pub mod collections;
 pub mod creation;

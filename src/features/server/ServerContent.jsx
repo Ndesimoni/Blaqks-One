@@ -19,6 +19,7 @@ import { ServerInsights } from './insights/ServerInsights.jsx';
 import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
 import { ServerProfile } from './profile/ServerProfile.jsx';
+import { ServerActivity } from './activity/ServerActivity.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -55,6 +56,7 @@ export function ServerContent({ owner }) {
   if (route === 'CRM insights') return <ServerInsights owner={owner} />;
   if (route === 'Date search') return <ServerDateSearch owner={owner} />;
   if (route === 'Guide') return <ServerGuide />;
+  if (route === 'Team activity') return <ServerActivity owner={owner} />;
   if (['Deals', 'Payments', 'Expenses'].includes(route))
     return <FinanceContent key={route} route={route} owner={owner} />;
   const page = (toolbarExtras) => {

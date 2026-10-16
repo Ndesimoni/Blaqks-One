@@ -67,10 +67,11 @@ test('sample history is marked as such and app-suspended staff stay suspended', 
     body: { record: { full_name: 'Added in the app' } },
   });
   assert.equal(created.status, 201);
-  const feed = (await admin.request(`/workspaces/${workspace}/activity`)).value.activity;
-  assert.equal(feed.find((row) => row.recordId === created.value.id).source, 'app');
-  assert.ok(feed.filter((row) => row.source === 'sample').length > 0);
-  assert.ok(feed.every((row) => row.actorId === admin.user.id));
+  const feed = (await admin.request(`/workspaces/${workspace}/activity?kind=record&limit=100`))
+    .value.activity;
+  assert.equal(feed.find((row) => row.record?.id === created.value.id).sample, false);
+  assert.ok(feed.filter((row) => row.sample).length > 0);
+  assert.ok(feed.every((row) => row.actor.id === admin.user.id));
 
   // An Admin suspends Noura in the app; reseeding must not undo that.
   const noura = staffEmail('sample.noura', email);

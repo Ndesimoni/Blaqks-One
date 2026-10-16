@@ -31,6 +31,29 @@ pub fn can_edit(viewer: &UserRow, workspace: &str) -> bool {
     viewer.role == "admin" && viewer.workspace_id == workspace
 }
 
+/// SQL scalar for the activity feed: the ID of the target that the `crm_activity` row
+/// aliased `activity` names, when it still exists in `workspace` and [`visible`] would
+/// show it to `viewer` now; otherwise NULL. `caller` is bound to the viewer's ID. The
+/// flags come from the live profile, never from the request.
+pub fn activity_target(activity: &str, workspace: &str, caller: &str, viewer: &UserRow) -> String {
+    let finance = viewer.finance_access().scope;
+    let condition = match viewer.role.as_str() {
+        "admin" | "super-admin" => format!("({caller}::uuid IS NOT NULL)"),
+        "staff" => format!(
+            "((t.member_id={caller} AND (t.metric<>'fees' OR {own_fees})) \
+             OR (t.member_id IS NULL AND {team} AND (t.metric<>'fees' OR {team_fees})))",
+            own_fees = finance != FinanceScope::None,
+            team = viewer.has_team_scope(),
+            team_fees = finance == FinanceScope::Team,
+        ),
+        _ => format!("({caller}::uuid IS NULL AND false)"),
+    };
+    format!(
+        "CASE WHEN {activity}.collection='Targets' THEN (SELECT t.id FROM crm_targets t \
+         WHERE t.id={activity}.record_id AND t.workspace_id={workspace} AND {condition}) END"
+    )
+}
+
 #[cfg(test)]
 #[path = "visibility_tests.rs"]
 mod tests;

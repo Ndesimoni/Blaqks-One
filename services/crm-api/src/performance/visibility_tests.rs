@@ -81,3 +81,17 @@ fn only_the_workspace_admin_edits() {
     ));
     assert!(!can_edit(&user("staff", "team", true, true), "workspace"));
 }
+
+#[test]
+fn feed_targets_follow_the_same_rules_as_the_list() {
+    let admin = activity_target("a", "$1", "$9", &user("admin", "assigned", true, false));
+    assert!(admin.contains("t.workspace_id=$1 AND ($9::uuid IS NOT NULL)"));
+    let own = activity_target("a", "$1", "$9", &user("staff", "assigned", false, false));
+    assert!(own.contains("(t.metric<>'fees' OR false)) OR (t.member_id IS NULL AND false"));
+    let team = activity_target("a", "$1", "$9", &user("staff", "team", true, true));
+    assert!(
+        team.contains("OR true)) OR (t.member_id IS NULL AND true AND (t.metric<>'fees' OR true")
+    );
+    let unknown = activity_target("a", "$1", "$9", &user("guest", "team", true, true));
+    assert!(unknown.contains("AND false"));
+}

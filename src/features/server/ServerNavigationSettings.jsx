@@ -1,5 +1,5 @@
 import React from 'react';
-import { canOpenSection } from './access.js';
+import { activityLabel, canOpenSection } from './access.js';
 import { ServerNavigationItem } from './ServerNavigationGroups.jsx';
 
 const settings = [
@@ -20,6 +20,7 @@ export function ServerNavigationSettings({ user, route, onSelect }) {
           key={name}
           name={name}
           icon={icon}
+          label={name === 'Team activity' ? activityLabel(user) : undefined}
           route={route}
           onSelect={onSelect}
         />

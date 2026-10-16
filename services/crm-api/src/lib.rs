@@ -1,3 +1,4 @@
+pub mod activity;
 pub mod assignments;
 pub mod auth;
 pub mod bootstrap;
