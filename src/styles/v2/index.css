@@ -1,0 +1,7 @@
+/* v2 · Midnight entry: self-hosted Plus Jakarta Sans, scoped tokens, then shared v2 primitives.
+   Imported only by migrated screens, after the legacy stylesheet, and scoped to `.v2`. */
+@import '@fontsource-variable/plus-jakarta-sans/index.css';
+@import './tokens.css';
+@import './base.css';
+@import './controls.css';
+@import './states.css';

@@ -57,7 +57,14 @@ function tally(records, label, names) {
     .filter((row) => row.count > 0);
 }
 
-const sourceNames = ['Instagram', 'Referral', 'Property Finder', 'Bayut', 'Website', 'TikTok'];
+export const sourceNames = [
+  'Instagram',
+  'Referral',
+  'Property Finder',
+  'Bayut',
+  'Website',
+  'TikTok',
+];
 
 /** Lead sources including any unlisted values under Other, so the bars always sum to the total. */
 function leadSources(clients) {

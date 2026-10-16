@@ -66,9 +66,16 @@ export async function dashboardTeam(prefix) {
   return { team, one, two, mine, hidden, listing };
 }
 
-/** A metric tile's value by its label. */
+/** A key figure's value by its label. */
 export const metric = (page, name) =>
-  page.locator('.metric').filter({ hasText: name }).locator('.metric-value');
+  page.locator('.key-figure').filter({ hasText: name }).locator('.key-figure-value');
+
+/** The Dashboard agenda's follow-up ("priorities") and upcoming-viewing groups. */
+export const priorities = (page) => page.locator('[data-agenda="follow-ups"]');
+export const viewingsPanel = (page) => page.locator('[data-agenda="viewings"]');
+
+/** A Dashboard section by its label (the section's heading). */
+export const dashSection = (page, name) => page.getByRole('region', { name, exact: true });
 
 /** Expected totals in the Records in view panel. */
 export async function expectCounts(page, counts) {

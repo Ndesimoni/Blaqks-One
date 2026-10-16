@@ -1,0 +1,127 @@
+/* v2 · Midnight agenda lists below the timeline: time, title, person and a type chip. */
+.agenda-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+.agenda-group {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+.agenda-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+.agenda-group-head h3 {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+.agenda-group-head .v2-caption {
+  flex-basis: 100%;
+  font-size: 12px;
+}
+.agenda-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.agenda-row,
+.records-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  min-block-size: 56px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  transition: background-color var(--v2-fast) ease;
+}
+button.agenda-row:hover,
+.records-row:hover {
+  background: var(--panel2);
+}
+.agenda-row-held,
+.agenda-row-held:hover {
+  grid-template-columns: 64px minmax(0, 1fr) auto auto;
+  background: transparent;
+  cursor: default;
+}
+.agenda-when {
+  display: grid;
+  font-size: 12px;
+}
+.agenda-when b {
+  color: var(--ink);
+  font-weight: 700;
+}
+.agenda-when small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.agenda-when-alert b {
+  color: var(--amber);
+}
+.agenda-main {
+  display: grid;
+  min-width: 0;
+}
+.agenda-main strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agenda-main span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agenda-lock,
+.agenda-note svg {
+  color: var(--muted);
+}
+.agenda-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-start: 6px;
+  font-size: 12px;
+}
+.agenda-add {
+  justify-self: start;
+  min-block-size: 44px;
+}
+@media (max-width: 1180px) {
+  .agenda-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .agenda-row {
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding-inline: 8px;
+  }
+  .agenda-row-held {
+    grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  }
+  .agenda-main :is(strong, span) {
+    white-space: normal;
+  }
+}

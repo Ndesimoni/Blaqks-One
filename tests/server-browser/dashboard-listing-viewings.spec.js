@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, setTheme, workspaceRecords } from './assign-helpers.js';
-import { metric } from './dashboard-fixtures.js';
+import { metric, viewingsPanel } from './dashboard-fixtures.js';
 
 /**
  * Agent one holds a listing and one client. Agent two's client and a queued client have viewings
@@ -39,20 +39,24 @@ test('a listing holder sees other agents’ viewings on it as time, property and
   const { page, context } = await memberPage(browser, one.email);
   try {
     await page.goto('/#/dashboard');
-    const panel = page.locator('.next-viewings');
-    const rows = panel.locator('.viewing-mini');
+    const panel = viewingsPanel(page);
+    const rows = panel.locator('.agenda-row');
     await expect(rows).toHaveCount(3);
-    await expect(rows.nth(0)).toHaveText(/^15\s*Jan\s*Dash held listing\s*14:30 · Booked by /);
+    await expect(rows.nth(0)).toHaveText(/^15 Jan\s*14:30\s*Dash held listing\s*Booked by /);
     await expect(rows.nth(0)).toContainText(`Booked by ${two.name}`);
-    await expect(rows.nth(1)).toHaveText(/^1\s*Feb\s*Dash held listing\s*Dash own buyer$/);
-    await expect(rows.nth(2)).toHaveText(/^1\s*Mar\s*Dash held listing\s*16:00 · Unassigned$/);
+    await expect(rows.nth(1)).toHaveText(
+      /^1 Feb\s*09:00\s*Dash held listing\s*Dash own buyer\s*Viewing$/,
+    );
+    await expect(rows.nth(2)).toHaveText(
+      /^1 Mar\s*16:00\s*Dash held listing\s*Unassigned\s*Viewing$/,
+    );
     await expect(panel).toContainText('Client details stay with the responsible agent.');
     await expect(panel).toContainText('Your next appointments and others booked on your listings');
     // Only the caller's own viewing can be opened; held-listing rows contain no control.
-    const heldRows = panel.locator('.viewing-mini-held');
+    const heldRows = panel.locator('.agenda-row-held');
     await expect(heldRows).toHaveCount(2);
     await expect(heldRows.locator('button, a, [role="button"], [tabindex]')).toHaveCount(0);
-    await expect(panel.locator('button.viewing-mini')).toHaveCount(1);
+    await expect(panel.locator('button.agenda-row')).toHaveCount(1);
     for (const secret of [...secrets, 'VW-', 'Scheduled'])
       await expect(panel).not.toContainText(secret);
     await heldRows.first().click();
@@ -62,7 +66,7 @@ test('a listing holder sees other agents’ viewings on it as time, property and
     const { body } = await workspaceRecords(page);
     expect(body.scope).toBe('assigned');
     expect(body.listingViewings).toHaveLength(2);
-    await panel.locator('button.viewing-mini').click();
+    await panel.locator('button.agenda-row').click();
     await expect(page.getByRole('dialog')).toContainText('Dash own buyer');
   } finally {
     await context.close();
@@ -76,18 +80,18 @@ test('a team-scope Admin sees each viewing once, openable, with no held-listing 
   const { page, context } = await memberPage(browser, team.people.admin.email);
   try {
     await page.goto('/#/dashboard');
-    const panel = page.locator('.next-viewings');
-    await expect(panel.locator('button.viewing-mini')).toHaveCount(3);
-    await expect(panel.locator('.viewing-mini-held')).toHaveCount(0);
-    await expect(panel.locator('button.viewing-mini').first()).toContainText('Secret buyer');
+    const panel = viewingsPanel(page);
+    await expect(panel.locator('button.agenda-row')).toHaveCount(3);
+    await expect(panel.locator('.agenda-row-held')).toHaveCount(0);
+    await expect(panel.locator('button.agenda-row').first()).toContainText('Secret buyer');
     await expect(panel).not.toContainText('Client details stay with the responsible agent.');
     const { body } = await workspaceRecords(page);
     expect(body.scope).toBe('team');
     expect(body.listingViewings).toEqual([]);
     await page.getByLabel('Assigned to', { exact: true }).selectOption({ label: one.name });
     await expect(page.getByText('Figures for the selected workload')).toBeVisible();
-    await expect(panel.locator('.viewing-mini-held')).toHaveCount(0);
-    await expect(panel.locator('button.viewing-mini')).toHaveCount(1);
+    await expect(panel.locator('.agenda-row-held')).toHaveCount(0);
+    await expect(panel.locator('button.agenda-row')).toHaveCount(1);
   } finally {
     await context.close();
   }
@@ -102,12 +106,12 @@ test('held-listing rows reflow at 390px and stay quiet on hover in both themes',
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/#/dashboard');
-    const panel = page.locator('.next-viewings');
+    const panel = viewingsPanel(page);
     for (const theme of ['dark', 'light']) {
       await setTheme(page, theme);
-      await expect(panel.locator('.viewing-mini-held')).toHaveCount(2);
+      await expect(panel.locator('.agenda-row-held')).toHaveCount(2);
       await noPageOverflow(page);
-      const row = panel.locator('.viewing-mini-held').first();
+      const row = panel.locator('.agenda-row-held').first();
       await row.hover();
       await expect(row).toHaveCSS('cursor', 'default');
       await expect(row).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');

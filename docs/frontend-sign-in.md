@@ -20,7 +20,7 @@ The email addresses are placeholders until the real addresses are supplied. The 
 - Only `{ version: 1, adminId }` is stored in the tab's `sessionStorage`, under `kws-crm-demo-session`. Entered passwords are never saved, logged or sent to a server.
 - Signing out clears this identity. It preserves records, property media, backups, targets and theme preferences. It uses a router transition so the record editor can block navigation when a draft or media upload is unfinished. File operations must finish first; failed record saves prompt before discarding in-memory work.
 - Invalid sessions return to sign-in. Session write/clear failures show errors; a failed sign-out can be retried without falsely reporting success.
-- Dark mode remains the default until the design system v2 foundation lands; v2 makes light the default (owner, 2026-10-16). The sign-in theme switch honors and updates the same preference as the dashboard. Mobile layouts fit the viewport in both themes.
+- Dark mode remains the default (confirmed for design system v2 on 2026-10-16). The sign-in theme switch honors and updates the same preference as the dashboard. Mobile layouts fit the viewport in both themes.
 
 ## Frontend boundary
 

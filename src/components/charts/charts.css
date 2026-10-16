@@ -1,0 +1,125 @@
+/* v2 · Midnight chart tones, grow-in motion, columns, stage and target bars (logical props). */
+.chart-tone-accent {
+  background: var(--accent);
+}
+.chart-tone-blue {
+  background: var(--blue);
+}
+.chart-tone-amber {
+  background: var(--amber);
+}
+.chart-tone-muted {
+  background: var(--muted);
+}
+.chart-tone-ink {
+  background: var(--ink);
+}
+.chart-tone-bar {
+  background: var(--panel2);
+}
+.chart-grow-x {
+  transform-origin: left center;
+  animation: chart-grow-x var(--v2-grow) var(--v2-ease) both;
+}
+.chart-grow-x:dir(rtl) {
+  transform-origin: right center;
+}
+.chart-grow-y {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: chart-grow-y var(--v2-grow) var(--v2-ease) both;
+}
+@keyframes chart-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes chart-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+.chart-columns {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  block-size: 36px;
+}
+.chart-column {
+  flex: 1;
+  border-radius: 4px;
+  transform-origin: center bottom;
+  animation: chart-grow-y var(--v2-grow) var(--v2-ease) both;
+}
+.chart-stage {
+  display: grid;
+  gap: 10px;
+}
+.chart-stage-bar {
+  display: flex;
+  gap: 4px;
+  block-size: 8px;
+}
+.chart-stage-segment {
+  min-inline-size: 8px;
+  border-radius: 99px;
+}
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 12px;
+}
+.chart-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.chart-legend b {
+  color: var(--ink);
+  font-weight: 700;
+}
+.chart-swatch {
+  display: inline-block;
+  flex: none;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+}
+.chart-target {
+  display: grid;
+  gap: 8px;
+}
+.chart-target-track {
+  position: relative;
+  block-size: 8px;
+  border-radius: 99px;
+  background: var(--panel2);
+  overflow: hidden;
+}
+.chart-target-thin .chart-target-track {
+  block-size: 4px;
+}
+.chart-target-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 99px;
+  background: var(--accent);
+}
+.chart-target-marker {
+  display: none;
+}
+.chart-target-text {
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart-grow-x,
+  .chart-grow-y,
+  .chart-column {
+    animation: none;
+  }
+}

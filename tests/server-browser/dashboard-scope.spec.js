@@ -1,6 +1,13 @@
 import { test, expect } from './fixtures.js';
 import { memberPage, workspaceRecords } from './assign-helpers.js';
-import { dashboardTeam, held, metric } from './dashboard-fixtures.js';
+import {
+  dashSection,
+  dashboardTeam,
+  held,
+  metric,
+  priorities as prioritiesOf,
+  viewingsPanel,
+} from './dashboard-fixtures.js';
 
 /**
  * Cross-linked records around the dashboard team: one's client viewing two's listing, two's client
@@ -87,32 +94,28 @@ test('assigned-only dashboard figures equal the scoped /records payload and requ
     await expect(metric(page, 'PROPERTIES')).toHaveText(String(records.Properties.length));
     await expect(metric(page, 'FOLLOW-UPS DUE')).toHaveText(String(records['Follow-ups'].length));
     await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText(String(upcoming.length));
-    const sum = async (heading) =>
-      (
-        await page
-          .locator('.panel')
-          .filter({ hasText: heading })
-          .locator('.bar-label strong')
-          .allTextContents()
-      )
+    const sum = async (heading, cell) =>
+      (await dashSection(page, heading).locator(cell).allTextContents())
         .map(Number)
         .reduce((a, b) => a + b, 0);
-    expect(await sum('Lead pipeline')).toBe(records.Clients.length);
-    expect(await sum('Where leads come from')).toBe(records.Clients.length);
+    expect(await sum('Lead pipeline', '.chart-pipeline-count')).toBe(records.Clients.length);
+    expect(await sum('Lead sources', '.source-count')).toBe(records.Clients.length);
     // Hidden records appear only as the server's permitted labels, never with other details.
-    const priorities = page.locator('.activity-panel').filter({ hasText: 'Your priorities' });
+    const priorities = prioritiesOf(page);
     await expect(priorities).toContainText(
       `${hidden.record.client_id} · Dash hidden client (not assigned to you)`,
     );
-    const viewings = page.locator('.next-viewings');
+    const viewings = viewingsPanel(page);
     await expect(viewings).toContainText(
       `${other.record.property_id} · Scope other listing (not assigned to you)`,
     );
-    await expect(viewings.locator('button.viewing-mini')).toHaveCount(2);
+    await expect(viewings.locator('button.agenda-row')).toHaveCount(2);
     // Two's viewing on one's listing appears only as the permitted time and agent.
-    const heldRow = viewings.locator('.viewing-mini-held');
+    const heldRow = viewings.locator('.agenda-row-held');
     await expect(heldRow).toHaveCount(1);
-    await expect(heldRow).toContainText(`11:00 · Booked by ${two.name}`);
+    await expect(heldRow).toHaveText(
+      new RegExp(`^4 Mar\\s*11:00\\s*.+Booked by ${two.name}\\s*Viewing$`),
+    );
     await expect(heldRow).not.toContainText('Dash hidden client');
     await expect(page.getByText('Linked record unavailable')).toHaveCount(0);
     await expect(page.getByLabel('Assigned to', { exact: true })).toHaveCount(0);
@@ -130,7 +133,7 @@ test('an Admin narrowed to one workload still names linked records held by other
   const { page, context } = await memberPage(browser, team.people.admin.email);
   try {
     await page.goto('/#/dashboard');
-    const viewings = page.locator('.next-viewings');
+    const viewings = viewingsPanel(page);
     await page.getByLabel('Assigned to', { exact: true }).selectOption({ label: one.name });
     await expect(page.getByText('Figures for the selected workload')).toBeVisible();
     await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText('2');

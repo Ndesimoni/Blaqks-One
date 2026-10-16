@@ -1,109 +1,40 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useSession } from '../../../hooks/useSession.js';
-import { useRecords } from '../../../hooks/useWorkspace.js';
-import { DashboardWelcome } from '../../dashboard/DashboardWelcome.jsx';
-import { PrioritiesPanel } from '../../dashboard/PrioritiesPanel.jsx';
-import { BarListPanel } from '../../dashboard/BarListPanel.jsx';
-import { AssignedToFilter } from '../assignment/AssignedToFilter.jsx';
-import { ConnectedMetrics } from './ConnectedMetrics.jsx';
-import { RecordCountsPanel } from './RecordCountsPanel.jsx';
-import { FinanceWidgets } from './FinanceWidgets.jsx';
-import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
-import { useDashboardWorkload } from './useDashboardWorkload.js';
-import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
-import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
+import { useFinance } from '../finance/useFinance.js';
+import { DashboardHeader } from './DashboardHeader.jsx';
+import { DashboardBento } from './DashboardBento.jsx';
+import { useDashboardData } from './useDashboardData.js';
+import { dashboardWidgets } from './dashboardModel.js';
+import '../../../styles/v2/index.css';
 import '../assignment/assigned-filter.css';
+import './dashboard-v2.css';
+import './dashboard-sections.css';
+import './dashboard-agenda.css';
 
 /**
- * Connected Dashboard: figures from this session's scoped records only, never demo data.
- * Finance figures come from the workspace's scoped finance overview.
+ * Connected Dashboard (design system v2 · Midnight): figures from this session's scoped
+ * records only, never demo data. Finance figures come from the workspace's scoped finance
+ * overview, requested only when the member may use finance.
  */
 export function ServerDashboard({ owner }) {
   const { user } = useSession();
-  // Names use every record the viewer can see; only the figures follow the workload filter.
-  const { data: visible, scope, referenceFor, listingViewings } = useRecords();
-  const workload = useDashboardWorkload();
-  const { data } = workload;
   const widgets = dashboardWidgets(user);
-  const figures = useMemo(() => selectConnectedDashboard(data), [data]);
-  const ownView = showsListingViewings(workload.filter, workload.me);
-  const upcoming = useMemo(
-    () => upcomingEntries(figures.upcoming, listingViewings, ownView),
-    [figures.upcoming, listingViewings, ownView],
-  );
-  const clientName = (id) => linkedName(visible, referenceFor, 'Clients', id);
-  const propertyName = (id) => linkedName(visible, referenceFor, 'Properties', id);
-  const caption =
-    scope === 'team'
-      ? workload.filter
-        ? 'Figures for the selected workload'
-        : 'Figures from your whole team’s records'
-      : 'Figures from the records assigned to you';
+  if (widgets.finance && owner) return <FinanceDashboard owner={owner} widgets={widgets} />;
+  return <DashboardBody owner={owner} widgets={widgets} finance={null} />;
+}
+
+function FinanceDashboard({ owner, widgets }) {
+  const { api, user } = useSession();
+  const finance = useFinance(api, owner.id, user);
+  return <DashboardBody owner={owner} widgets={widgets} finance={finance} />;
+}
+
+function DashboardBody({ owner, widgets, finance }) {
+  const dashboard = useDashboardData(owner, finance);
   return (
-    <div className="page-stack dashboard-page connected-dashboard">
-      <DashboardWelcome />
-      <div className="subhead-row">
-        <div>
-          <h2>Your business, at a glance</h2>
-          <p>{caption}</p>
-        </div>
-        {workload.module && (
-          <AssignedToFilter
-            module={workload.module}
-            filter={workload.filter}
-            onChange={workload.setFilter}
-            assignees={workload.assignees}
-            me={workload.me}
-            count={workload.count}
-          />
-        )}
-      </div>
-      <ConnectedMetrics figures={figures} widgets={widgets} />
-      {widgets.finance && owner && <FinanceWidgets owner={owner} />}
-      <div className="split-main">
-        <RecordCountsPanel
-          collections={widgets.collections}
-          counts={figures.counts}
-          caption="Open a list to review or update these records"
-        />
-        {widgets.schedule && (
-          <PrioritiesPanel
-            data={data}
-            summary={{ tasks: figures.tasks, dueTasks: figures.dueTasks }}
-            clientName={clientName}
-          />
-        )}
-      </div>
-      <div className="triple-grid">
-        {widgets.leads && (
-          <>
-            <BarListPanel
-              heading="Lead pipeline"
-              caption="Where your clients stand today"
-              rows={figures.stages}
-              max={figures.maxStage}
-              empty="No lead stages recorded."
-              link={{ label: 'Manage leads', route: 'Leads' }}
-            />
-            <BarListPanel
-              heading="Where leads come from"
-              caption="Top channels bringing clients in"
-              rows={figures.sources.slice(0, 5)}
-              max={figures.maxSource}
-              colorOffset={1}
-              empty="No lead sources recorded."
-              link={{ label: 'Review sources', route: 'Leads' }}
-            />
-          </>
-        )}
-        {widgets.schedule && (
-          <ConnectedUpcomingViewings
-            entries={upcoming}
-            clientName={clientName}
-            propertyName={propertyName}
-          />
-        )}
-      </div>
+    <div className="v2 dash-v2">
+      <DashboardHeader caption={dashboard.caption} workload={dashboard.workload} />
+      <DashboardBento dashboard={dashboard} widgets={widgets} finance={finance} />
     </div>
   );
 }

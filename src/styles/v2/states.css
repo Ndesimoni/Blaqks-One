@@ -1,0 +1,49 @@
+/* v2 tile states: skeleton blocks while loading, quiet empty text and an in-tile error. */
+.v2-skeleton {
+  display: grid;
+  gap: 12px;
+}
+.v2-skeleton span {
+  display: block;
+  height: 14px;
+  border-radius: 8px;
+  background: var(--panel2);
+  animation: v2-pulse 1.4s ease-in-out infinite;
+}
+.v2-skeleton span:nth-child(2) {
+  height: 120px;
+  border-radius: 14px;
+}
+.v2-skeleton span:nth-child(4) {
+  inline-size: 60%;
+}
+@keyframes v2-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+.v2-empty {
+  padding-block: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.v2-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel2);
+}
+.v2-error-text {
+  flex: 1 1 220px;
+  color: var(--ink);
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v2-skeleton span {
+    animation: none;
+  }
+}

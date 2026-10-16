@@ -4,7 +4,7 @@ These are required working rules for every agent and contributor to Keys with Si
 
 ## Approved visual direction
 
-**New baseline (owner, 2026-10-16): [Design system v2 · Limestone](design-system-v2.md).** It replaces the refresh below screen by screen, starting with the Dashboard: warm stone surfaces, near-black text, one forest-green accent, hairline sections, Geist type, hand-built SVG charts, a collapsible sidebar and **light mode as the default**. Every redesigned screen follows v2 completely. A screen that has not yet been migrated keeps the refresh look below, and a single screen never mixes the two. Once v2 replaces a pattern, remove the matching refresh rule here.
+**New baseline (owner, 2026-10-16): [Design system v2 · Midnight](design-system-v2.md).** It replaces the refresh below screen by screen, starting with the Dashboard: graphite surfaces, a jade accent with blue and amber, rounded bento tiles with soft depth, Plus Jakarta Sans, hand-built SVG charts and a collapsible sidebar. **Dark mode stays the default.** Every redesigned screen follows v2 completely. A screen that has not yet been migrated keeps the refresh look below, and a single screen never mixes the two. Once v2 replaces a pattern, remove the matching refresh rule here.
 
 ### Current refresh (until each screen is migrated)
 
@@ -31,7 +31,7 @@ When an intentional redesign changes this baseline, update the shared rules and 
 
 - Use shared primitives in `src/components/ui` and layout components before introducing another button, modal, filter or pagination pattern.
 - Use semantic theme tokens for surfaces, text, borders, focus and interaction states. Extend the shared palette when needed; avoid feature-specific hard-coded replacements.
-- Light mode becomes the default with the v2 foundation (owner, 2026-10-16); until that lands, the code still opens in dark. Honour the saved preference and verify every changed screen in both themes.
+- Dark mode remains the default (owner, 2026-10-16, confirmed for Midnight). Honour the saved preference and verify every changed screen in both themes.
 - Use a consistent spacing scale based on 4px increments, existing typography, border radii and icon styles. Give headings, labels, supporting text and values a clear hierarchy.
 - Keep form controls and buttons aligned. Use restrained borders and shadows; give hover, focus, selected, disabled and error states distinct treatments.
 - Display money, dates, times and phone numbers consistently with the existing UAE formatting helpers. Keep property titles, prices, location and status easy to scan.

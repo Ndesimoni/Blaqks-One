@@ -1,0 +1,88 @@
+/* v2 · Midnight controls: 44px buttons with 14px radius (primary in the accent), chips and the
+   Assigned-to select. */
+.v2-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--v2-fast) ease,
+    border-color var(--v2-fast) ease,
+    transform var(--v2-fast) ease;
+}
+.v2-btn:hover {
+  border-color: var(--muted);
+}
+.v2-btn:active {
+  transform: translateY(1px);
+}
+.v2-btn-primary {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.v2-btn-primary:hover {
+  border-color: transparent;
+  opacity: 0.92;
+}
+.v2-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  background: var(--panel2);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.v2-chip-accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.v2-chip-blue {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+/* Amber text keeps its contrast on panel2 in both themes (4.58:1 light). */
+.v2-chip-amber {
+  color: var(--amber);
+}
+.v2 .assigned-filter label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.v2 .assigned-filter select {
+  min-height: 44px;
+  padding-inline: 14px 36px;
+  border-color: var(--line);
+  border-radius: 14px;
+  background-color: var(--panel);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+}
+.v2 .assigned-filter :is(.assigned-filter-count, .assignment-hint) {
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .v2-btn:active {
+    transform: none;
+  }
+}

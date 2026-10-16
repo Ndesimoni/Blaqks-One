@@ -1,6 +1,13 @@
 import { test, expect } from './fixtures.js';
 import { memberPage } from './assign-helpers.js';
-import { dashboardTeam, expectCounts, metric } from './dashboard-fixtures.js';
+import {
+  dashSection,
+  dashboardTeam,
+  expectCounts,
+  metric,
+  priorities as prioritiesOf,
+  viewingsPanel,
+} from './dashboard-fixtures.js';
 
 const team = (counts) => ({
   Clients: counts,
@@ -27,7 +34,7 @@ test('an Admin dashboard counts the whole team and narrows to one member’s wor
     await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText('2');
     for (const hidden of ['OPEN DEALS', 'FEES RECEIVED', 'Commission performance', 'Deal pipeline'])
       await expect(page.getByText(hidden, { exact: true })).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Lead pipeline' })).toBeVisible();
+    await expect(dashSection(page, 'Lead pipeline')).toBeVisible();
     const filter = page.getByLabel('Assigned to', { exact: true });
     await expect(filter.locator('option', { hasText: one.name })).toHaveCount(1);
     await filter.selectOption({ label: one.name });
@@ -56,17 +63,17 @@ test('an assigned-only member counts only their own records and never a hidden o
     await expect(metric(page, 'FOLLOW-UPS DUE')).toHaveText('1');
     await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText('1');
     await expect(page.getByLabel('Assigned to', { exact: true })).toHaveCount(0);
-    const priorities = page.locator('.activity-panel').filter({ hasText: 'Your priorities' });
+    const priorities = prioritiesOf(page);
     await expect(priorities).toContainText('Call Dash client one');
     await expect(priorities).toContainText('Dash client one');
-    const viewings = page.locator('.next-viewings');
+    const viewings = viewingsPanel(page);
     await expect(viewings).toContainText('Dash Marina listing');
     for (const secret of ['Dash hidden client', 'Call Dash hidden client', 'Dash hidden listing'])
       await expect(page.getByText(secret)).toHaveCount(0);
-    const pipeline = page.locator('.panel').filter({ hasText: 'Lead pipeline' });
+    const pipeline = dashSection(page, 'Lead pipeline');
     await expect(pipeline).toContainText('Qualified');
     await expect(pipeline).not.toContainText('New');
-    const sources = page.locator('.panel').filter({ hasText: 'Where leads come from' });
+    const sources = dashSection(page, 'Lead sources');
     await expect(sources).toContainText('Bayut');
     await expect(sources).not.toContainText('Referral');
     await page.getByRole('button', { name: 'Clients: 1 record', exact: true }).click();

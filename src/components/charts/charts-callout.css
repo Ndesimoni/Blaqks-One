@@ -1,0 +1,27 @@
+/* v2 comparison-area callout: the latest month, on the half of the plot away from its point. */
+.chart-area-callout {
+  position: absolute;
+  z-index: 1;
+  inset-inline-end: 24px;
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel2);
+  box-shadow: var(--shadow);
+  color: var(--muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+.chart-area-callout[data-place='high'] {
+  inset-block-start: 8px;
+}
+.chart-area-callout[data-place='low'] {
+  inset-block-end: 12px;
+}
+.chart-area-callout b {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}

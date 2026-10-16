@@ -1,0 +1,117 @@
+/* v2 · Midnight "Today" timeline, 09:00–19:00 Dubai time; scrolls sideways on narrow screens. */
+.today-scroll {
+  overflow-x: auto;
+}
+.today-track {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-inline-size: 640px;
+  padding-block: 26px 20px;
+}
+.today-hours {
+  position: absolute;
+  inset: 0 0 auto;
+  block-size: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 11px;
+}
+.today-hours li {
+  position: absolute;
+  translate: -50% 0;
+}
+.today-hours li:first-child {
+  translate: 0 0;
+}
+.today-hours li:last-child {
+  translate: -100% 0;
+}
+.today-now {
+  position: absolute;
+  z-index: 1;
+  inset-block: 22px 18px;
+  border-inline-start: 2px solid var(--amber);
+  pointer-events: none;
+}
+.today-now b {
+  position: absolute;
+  inset-block-end: -18px;
+  inset-inline-start: -18px;
+  color: var(--amber);
+  font-size: 11px;
+  font-weight: 700;
+}
+.today-lane {
+  position: relative;
+  min-block-size: 52px;
+  border-radius: 14px;
+  background: var(--panel2);
+}
+.today-untimed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.today-untimed > *,
+.today-block {
+  z-index: 2;
+}
+.today-untimed > * {
+  position: relative;
+}
+.today-untimed .v2-chip {
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.today-block {
+  position: absolute;
+  inset-block: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  inline-size: 10%;
+  min-inline-size: 200px;
+  max-inline-size: 100%;
+  padding: 0 12px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+}
+button.today-block {
+  cursor: pointer;
+}
+.today-viewing {
+  background: var(--accent-soft);
+}
+.today-follow-up {
+  background: var(--blue-soft);
+}
+.today-held {
+  background: var(--panel);
+  cursor: default;
+}
+.today-block strong {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.today-block span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
