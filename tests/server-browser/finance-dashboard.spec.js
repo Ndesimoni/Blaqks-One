@@ -53,9 +53,9 @@ test('Dashboard finance equals the API totals; the own view never shows company 
   await expect(figure(agentPage.page, 'outstanding')).toHaveText(
     aed(own.statement.totals.outstandingFils),
   );
-  await expect(panel.locator('[data-figure]')).toHaveCount(3);
+  await expect(panel.locator('.finance-widget')).toHaveCount(3);
   await expect(panel.getByText('Your submissions awaiting approval')).toBeVisible();
-  await expect(panel.locator('.finance-pending-count')).toHaveText('2');
+  await expect(panel.locator('.finance-widget-count')).toHaveText('2');
   const html = await agentPage.page.content();
   // The company share equals the agent's own 50% here, so team-only sums are checked instead.
   const { grossFils, receivedFils, expensesApprovedFils } = teamView.teamTotals;
@@ -85,7 +85,7 @@ test('Dashboard finance equals the API totals; the own view never shows company 
   ])
     await expect(figure(adminPage.page, id)).toHaveText(aed(fils));
   expect([totals.receivedFils, totals.expensesApprovedFils]).toEqual([1_000_000, 300_000]);
-  await expect(panelOf(adminPage.page).locator('.finance-pending-count')).toHaveText('2');
+  await expect(panelOf(adminPage.page).locator('.finance-widget-count')).toHaveText('2');
   for (const layout of layouts) await checkLayout(adminPage.page, layout, 'dashboard-finance-team');
   await adminPage.page.setViewportSize({ width: 1280, height: 900 });
   await panelOf(adminPage.page).getByRole('button', { name: 'Review expenses' }).click();

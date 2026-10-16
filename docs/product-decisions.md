@@ -135,16 +135,11 @@ See [Team activity design](team-activity-design.md).
 
 ## Premium redesign direction (decided 2026-10-16)
 
-| Topic       | Decision                                                                                                                                                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Direction   | **C · Midnight** (owner switched from the first-approved Limestone variant the same day, after seeing it built).                                              |
-| Key figures | Each key-figure card carries a small chart suited to its meaning (weekly columns, stage bar, trend line, target bar).                                         |
-| Sidebar     | Collapsible: icons only when closed, icons and text when open; the choice is remembered; closed by default on tablets, a drawer on phones.                    |
-| Theme       | **Dark is the default** (confirmed for Midnight; light had been chosen for Limestone). Light stays a full alternative and each person's choice is remembered. |
-| Charts      | Hand-built SVG components, no chart library.                                                                                                                  |
-| Rollout     | Dashboard first, then screen by screen with behaviour unchanged.                                                                                              |
-
-See [Design system v2](design-system-v2.md).
+| Topic    | Decision                                                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Outcome  | **Keep the original design** (the forest-green and gold [CRM design refresh](design-refresh.md)), with dark as the default theme.            |
+| Explored | Three Dashboard previews; a Limestone variant (commit `d8d5e3e`) and then a Midnight Dashboard (commit `673ddd3`) were built, then reverted. |
+| Kept     | The Midnight spec is parked in [Design system v2](design-system-v2.md) for possible later use.                                               |
 
 ## Public listings (decided 2026-10-12)
 

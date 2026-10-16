@@ -1,6 +1,6 @@
 # Design system v2: Midnight
 
-Status: **approved by the owner on 2026-10-16**, in progress (Dashboard first). This is the new visual baseline for the premium redesign (feature 1 in [Product vision](product-vision.md)). It replaces the forest-green and gold refresh screen by screen. Until a screen has been migrated, it keeps the [current refresh](design-refresh.md) look; never mix the two styles on one screen.
+Status: **parked (owner, 2026-10-16).** The owner returned to the original [CRM design refresh](design-refresh.md), which stays the approved baseline in [Design standards](design-standards.md). Do not build to this spec unless the owner revives it. The Midnight Dashboard built from it is preserved in commit `673ddd3` and was reverted in the following commit; the Limestone variant is in `d8d5e3e`.
 
 The owner compared three previews (A · Emerald Atelier, B · Limestone, C · Midnight) and first approved a Limestone variant, then on the same day switched to **C · Midnight** after seeing the built Limestone Dashboard. Midnight keeps the additions the owner asked for during review: a small, meaning-specific chart in each key figure and a collapsible sidebar. Interactive previews are on the owner's private design canvas: https://claude.ai/artifact/JHoU8Zf49vRWNV5X3CnLbK. This document is the source of truth when building, because agents cannot open that canvas.
 

@@ -702,7 +702,7 @@ Session, login and team member responses gain:
   - `TeamActionFields` gains a Finance row: Add · Edit · Hand on · **See team finance** (needs whole-team visibility) · **Approve** (needs See team finance).
   - Both new ticks are flagged sensitive in `TeamActionReview`. Logic goes in a new `server-team/financeActionModel.js`, because `actionModel.js` is at 121 lines.
 - **Dashboard**
-  - `dashboard/FinanceSummary.jsx` (with `FeesSection.jsx`, `TeamSection.jsx` and the finance key figures), fed only from `GET /finance`.
+  - `dashboard/FinanceWidgets.jsx`, fed only from `GET /finance`.
   - Own view: "Your commission earned (YTD)", "Received share", "Outstanding", "Your submissions awaiting approval".
   - Team view: fees earned, company share, received, outstanding, VAT, approved expenses, and "Awaiting your approval" linking to the filtered queue.
   - `dashboardWidgets()` gains `finance: canOpenSection(user,'Deals')`.

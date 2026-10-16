@@ -46,30 +46,3 @@ export function financeFigures(overview, me) {
     },
   };
 }
-
-/**
- * Ring parts and centre figure. Team: received, outstanding and approved expenses, with net
- * received (received less approved expenses) in the centre. Own: the caller's received share
- * and outstanding commission around their commission earned; never a company figure.
- */
-export function financeRing(overview) {
-  if (overview.scope === 'team' && overview.teamTotals) {
-    const totals = overview.teamTotals;
-    return {
-      segments: [
-        { name: 'Received', value: totals.receivedFils, tone: 'accent' },
-        { name: 'Outstanding', value: totals.outstandingFils, tone: 'blue' },
-        { name: 'Approved expenses', value: totals.expensesApprovedFils, tone: 'amber' },
-      ],
-      centre: { label: 'Net received', value: totals.receivedFils - totals.expensesApprovedFils },
-    };
-  }
-  const totals = overview.statement.totals;
-  return {
-    segments: [
-      { name: 'Received share', value: totals.receivedShareFils, tone: 'accent' },
-      { name: 'Outstanding', value: totals.outstandingFils, tone: 'blue' },
-    ],
-    centre: { label: 'Commission earned', value: totals.earnedFils },
-  };
-}

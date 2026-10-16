@@ -429,7 +429,7 @@ Split any packet further if it crosses too many contracts. Do not ship empty con
   Then comes the **Blaqks One platform admin (Super Admin) dashboard**: companies, plans, limits, platform health and the Workspaces directory, with no default access to company business data. Messages stays not connected until the messaging and integrations phase.
 
 - **Product vision queue (owner, 2026-10-16):** see [Product vision](product-vision.md). Planned in this order:
-  1. Premium redesign direction and design system v2, right-to-left ready, with a chart-rich Dashboard first. **Direction chosen (2026-10-16):** [Midnight](design-system-v2.md). In progress: the Dashboard content. Next: the shell (collapsible sidebar, top bar, dark stays the default), then the remaining screens.
+  1. Premium redesign direction and design system v2, right-to-left ready, with a chart-rich Dashboard first. **Paused (2026-10-16):** the owner kept the original design after trying Limestone and Midnight; see [Product decisions](product-decisions.md#premium-redesign-direction-decided-2026-10-16).
   2. Language preference: English and Arabic, then more languages, with message translation.
   3. Blaqks One platform foundation.
   4. Field hints and calculators.

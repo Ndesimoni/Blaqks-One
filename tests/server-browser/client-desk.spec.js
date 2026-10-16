@@ -105,7 +105,7 @@ test('a client reached only through an assigned follow-up shows name, phone and 
       await expect(page.locator('.desk-layout')).not.toContainText(secret);
     await expect(page.getByText('Curated property matches')).toHaveCount(0);
     await page.goto('/#/dashboard');
-    const priorities = page.locator('[data-agenda="follow-ups"]');
+    const priorities = page.locator('.activity-panel').filter({ hasText: 'Your priorities' });
     await expect(priorities).toContainText(
       `${client.record.client_id} · Desk task client (not assigned to you)`,
     );
