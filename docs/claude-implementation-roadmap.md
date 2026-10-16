@@ -428,6 +428,16 @@ Split any packet further if it crosses too many contracts. Do not ship empty con
 
   Then comes the **Blaqks One platform admin (Super Admin) dashboard**: companies, plans, limits, platform health and the Workspaces directory, with no default access to company business data. Messages stays not connected until the messaging and integrations phase.
 
+- **Product vision queue (owner, 2026-10-16):** see [Product vision](product-vision.md). Planned in this order:
+  1. Premium redesign direction and design system v2, right-to-left ready, with a chart-rich Dashboard first.
+  2. Language preference: English and Arabic, then more languages, with message translation.
+  3. Blaqks One platform foundation.
+  4. Field hints and calculators.
+  5. Deal rooms: cross-company agreements with chat.
+  6. Internal messaging, then provider integrations.
+  7. AI assistant, in three levels.
+  8. Video calls with live translation, in stages.
+  9. Mobile app, AI lead agents and the developers module.
 - **Queued architecture follow-ups (owner approved 2026-10-15):** (1) automated boundary check for [Service boundaries](service-boundaries.md) rule 12; (2) own PostgreSQL schema for each new large module; (3) phase 1 boundary cleanups when files are touched anyway; (4) set hosting region (UAE or nearby) and launch traffic targets before deployment.
 - **Queued hosting and infrastructure plan (owner approved 2026-10-15):** see [Tech stack](tech-stack.md). At launch: Cloudflare CDN, Nginx reverse proxy (HTTPS, prefix routing to `/api/crm`, `/api/public`, `/api/calendar`, limits, headers), managed PostgreSQL in a UAE region with backups, UAE-region object storage for media, no CDN/proxy caching of private CRM data. Later: Valkey/Redis for public caching or real-time features, an outbound forward proxy with the messaging phase, and a dedicated API gateway only for a partner API.
 - **Queued public sign-up (owner decided 2026-10-15):** self sign-up creating a company account, company members still invited by their Admin; verified email, bot protection and rate limits; design and security review first. See [Product decisions](product-decisions.md#sign-up-decided-2026-10-15-planned).
