@@ -20,6 +20,7 @@ import {
 import './activity.css';
 import './activity-filters.css';
 import './activity-list.css';
+import './activity-repeat.css';
 import './activity-states.css';
 
 /**

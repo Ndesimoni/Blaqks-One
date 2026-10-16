@@ -5,9 +5,9 @@ import {
   upcomingEntries,
   viewingClock,
 } from '../../src/features/server/dashboard/upcomingModel.js';
-import { dateShift } from '../../src/lib/dates.js';
+import { dubaiDayFromToday } from '../../src/lib/dubaiDate.js';
 
-const at = (days, time) => `${dateShift(days)} ${time}`;
+const at = (days, time) => `${dubaiDayFromToday(days)} ${time}`;
 const own = (id, when) => ({
   viewing_id: id,
   client_id: 'CL-1',

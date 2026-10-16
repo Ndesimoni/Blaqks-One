@@ -7,11 +7,10 @@
  */
 import { agreementOn, calculate } from '../../../lib/finance/commission.js';
 import { dealFee } from '../../../lib/finance/preview.js';
+import { dubaiToday } from '../../../lib/dubaiDate.js';
 
 /** Asia/Dubai calendar date (YYYY-MM-DD), the business day the server uses. */
-export function dubaiToday(now = new Date()) {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dubai' }).format(now);
-}
+export { dubaiToday };
 
 /** An ISO date moved by whole days (UTC arithmetic, so no daylight-saving drift). */
 export function shiftDate(iso, days) {

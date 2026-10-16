@@ -3,13 +3,18 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { ActivityRow } from './ActivityRow.jsx';
 import { ActivityMessage, ActivitySkeleton } from './ActivityStates.jsx';
 import { groupByDay } from './activityModel.js';
+import { groupRepeats } from './activityGrouping.js';
 
 /**
- * The feed grouped by Dubai day, newest first, with Load more driven by the server cursor.
+ * The feed grouped by Dubai day, newest first, with repeats of one action collapsed into a row
+ * and Load more driven by the server cursor.
  * There is deliberately no total count: the server never reports one.
  */
 export function ActivityResults({ feed, entries, userId, today, manager, filtered, onClear }) {
-  const groups = useMemo(() => groupByDay(feed.items, today), [feed.items, today]);
+  const groups = useMemo(
+    () => groupByDay(feed.items, today).map((day) => ({ ...day, rows: groupRepeats(day.items) })),
+    [feed.items, today],
+  );
   const clear = filtered && (
     <Button variant="light" icon="close" onClick={onClear}>
       Clear filters
@@ -64,8 +69,8 @@ export function ActivityResults({ feed, entries, userId, today, manager, filtere
             {group.date && <span className="activity-day-date">{group.date}</span>}
           </h3>
           <ul className="activity-feed-list">
-            {group.items.map((item) => (
-              <ActivityRow key={item.id} item={item} userId={userId} entries={entries} />
+            {group.rows.map((row) => (
+              <ActivityRow key={row.id} row={row} userId={userId} entries={entries} />
             ))}
           </ul>
         </section>

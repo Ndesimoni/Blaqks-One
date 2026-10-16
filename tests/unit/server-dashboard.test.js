@@ -9,7 +9,7 @@ import {
   workloadModule,
 } from '../../src/features/server/dashboard/dashboardModel.js';
 import { serverWorkspaceData } from '../../src/features/server/records.js';
-import { today } from '../../src/lib/dates.js';
+import { dubaiToday as today } from '../../src/lib/dubaiDate.js';
 
 const row = (id, record, assignee = null) => ({ id, version: 1, record, assignee });
 const entries = () => ({

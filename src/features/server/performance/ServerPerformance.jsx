@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords } from '../../../hooks/useWorkspace.js';
-import { today } from '../../../lib/dates.js';
+import { dubaiMonth } from '../../../lib/dubaiDate.js';
 import { useDashboardWorkload } from '../dashboard/useDashboardWorkload.js';
 import { useFinance } from '../finance/useFinance.js';
 import { canManageTeam } from '../access.js';
@@ -29,7 +29,7 @@ export function ServerPerformance({ owner }) {
   const { api, user } = useSession();
   const { scope } = useRecords();
   const workload = useDashboardWorkload();
-  const [month, setMonth] = useState(() => today().slice(0, 7));
+  const [month, setMonth] = useState(() => dubaiMonth());
   const finance = useFinance(api, owner.id, user);
   const targets = usePerformanceTargets(api, owner.id, month);
   const { kind, memberId } = performanceSelection(scope, workload.filter, user.id);

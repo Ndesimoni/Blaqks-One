@@ -10,6 +10,7 @@ import { canOpenSection } from '../access.js';
 import { canUseFinance } from '../finance/financeAccess.js';
 import { connectedCollections } from '../records.js';
 import { assignmentCollections, filterAssignedEntries } from '../assignment/assignmentModel.js';
+import { upcomingViewings } from './upcomingModel.js';
 
 /** Widgets backed by connected collections the member may open; unconnected ones never show. */
 export function dashboardWidgets(user) {
@@ -78,7 +79,7 @@ export function selectConnectedDashboard(data) {
     hot: summary.hot,
     tasks: summary.tasks,
     dueTasks: summary.dueTasks,
-    upcoming: summary.upcoming,
+    upcoming: upcomingViewings(data.Viewings),
     properties: data.Properties.length,
     available: data.Properties.filter((row) => /^available$/i.test(get(row, 'Listing status')))
       .length,

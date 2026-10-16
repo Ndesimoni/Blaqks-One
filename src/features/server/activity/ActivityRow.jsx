@@ -1,14 +1,53 @@
-import React from 'react';
+import React, { useId, useState } from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { avatarTone } from '../profile/profileModel.js';
 import { describe, initials, timeLabel, UNAVAILABLE } from './activityModel.js';
+import { repeatCount } from './activityGrouping.js';
 
-/** One entry: who, what, which record (or Record unavailable), section, time and Sample. */
-export function ActivityRow({ item, userId, entries }) {
+/** The row's time: one entry's time, or the oldest–newest range of a repeated action. */
+function RowTime({ row }) {
+  const newest = row.items[0].at;
+  const oldest = row.items.at(-1).at;
+  if (timeLabel(oldest) === timeLabel(newest))
+    return (
+      <time className="activity-time" dateTime={newest}>
+        {timeLabel(newest)}
+      </time>
+    );
+  return (
+    <span className="activity-time">
+      <time dateTime={oldest}>{timeLabel(oldest)}</time>–
+      <time dateTime={newest}>{timeLabel(newest)}</time>
+    </span>
+  );
+}
+
+/** Each time a repeated action was recorded, newest first. */
+function RepeatTimes({ id, row, open }) {
+  return (
+    <ul id={id} className="activity-repeat-times" aria-label="Times recorded" hidden={!open}>
+      {row.items.map((entry) => (
+        <li key={entry.id}>
+          <time dateTime={entry.at}>{timeLabel(entry.at)}</time>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * One row: who, what, which record (or Record unavailable), section, time and Sample. Repeats
+ * of the same action read "· 7 times" with a disclosure listing each time.
+ */
+export function ActivityRow({ row, userId, entries }) {
+  const { item } = row;
+  const id = useId();
+  const [open, setOpen] = useState(false);
   const text = describe(item, { userId, entries });
   const unavailable = item.kind === 'record' && text.object === null;
+  const repeated = row.items.length > 1;
   return (
-    <li className="activity-row">
+    <li className={'activity-row' + (repeated ? ' is-repeated' : '')}>
       <span className="activity-avatar" data-tone={avatarTone(item.actor.id)} aria-hidden="true">
         {initials(item.actor.name)}
         <span className={`activity-action-badge is-${text.tone}`}>
@@ -31,6 +70,9 @@ export function ActivityRow({ item, userId, entries }) {
               {UNAVAILABLE}
             </span>
           )}
+          {repeated && (
+            <span className="activity-repeat-count"> · {repeatCount(row.items.length)}</span>
+          )}
         </p>
         <p className="activity-meta">
           <span className="activity-section">
@@ -38,10 +80,21 @@ export function ActivityRow({ item, userId, entries }) {
             {text.section}
           </span>
           {item.sample && <span className="activity-sample">Sample</span>}
-          <time className="activity-time" dateTime={item.at}>
-            {timeLabel(item.at)}
-          </time>
+          {repeated && (
+            <button
+              type="button"
+              className="activity-repeat-toggle"
+              aria-expanded={open}
+              aria-controls={`${id}-times`}
+              onClick={() => setOpen((value) => !value)}
+            >
+              {open ? 'Hide times' : 'Show times'}
+              <Icon name="down" size={13} />
+            </button>
+          )}
+          <RowTime row={row} />
         </p>
+        {repeated && <RepeatTimes id={`${id}-times`} row={row} open={open} />}
       </div>
     </li>
   );

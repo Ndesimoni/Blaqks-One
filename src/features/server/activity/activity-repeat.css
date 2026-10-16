@@ -1,0 +1,64 @@
+/* Repeated actions collapsed into one activity row: count, Show times disclosure, time list. */
+.activity-repeat-count {
+  color: var(--muted-dark);
+  font-weight: 600;
+  white-space: nowrap;
+}
+:root[data-theme] .activity-repeat-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+:root[data-theme] .activity-repeat-toggle:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: var(--accent-subtle);
+}
+:root[data-theme] .activity-repeat-toggle:active {
+  background: color-mix(in srgb, var(--accent) 18%, var(--panel));
+}
+.activity-repeat-toggle svg {
+  transition: transform var(--duration) var(--ease);
+}
+.activity-repeat-toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+:root[data-theme] .activity-repeat-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px dashed var(--line);
+  list-style: none;
+}
+:root[data-theme] .activity-repeat-times[hidden] {
+  display: none;
+}
+.activity-repeat-times li {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-repeat-toggle svg {
+    transition: none;
+  }
+}

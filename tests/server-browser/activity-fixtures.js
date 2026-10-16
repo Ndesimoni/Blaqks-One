@@ -21,14 +21,17 @@ export async function activityTeam(prefix) {
   return { ...team, kept, moved, deal };
 }
 
-/** Adds `count` same-day "updated" entries by the Admin so the feed needs Load more. */
+/**
+ * Adds `count` "updated" entries by the Admin on one client, six seconds apart from now, so the
+ * feed needs Load more and the entries collapse into one repeated row across both pages.
+ */
 export function busyDay(team, count) {
   const { admin, kept } = team;
   const workspace = admin.user.workspaceId;
   query(
-    'INSERT INTO crm_activity (id,actor_id,workspace_id,action,collection,record_id) ' +
+    'INSERT INTO crm_activity (id,actor_id,workspace_id,action,collection,record_id,created_at) ' +
       `SELECT gen_random_uuid(),'${admin.user.id}','${workspace}','updated','Clients',` +
-      `'${kept.id}' FROM generate_series(1,${count})`,
+      `'${kept.id}', now() + g * interval '6 seconds' FROM generate_series(1,${count}) AS g`,
   );
 }
 

@@ -1,17 +1,17 @@
 import { schema } from '../../../lib/schema.js';
 import { actionOf, sections } from './activityVocabulary.js';
 import { shiftDay } from './activityFilters.js';
+import { dubaiClock, dubaiToday } from '../../../lib/dubaiDate.js';
 
 export { initials } from '../profile/profileModel.js';
 
-const DUBAI = 4 * 3_600_000;
 export const UNAVAILABLE = 'Record unavailable';
 
 /** The Dubai calendar day (`YYYY-MM-DD`) of a UTC ISO timestamp. */
-export const dubaiDay = (at) => new Date(Date.parse(at) + DUBAI).toISOString().slice(0, 10);
+export const dubaiDay = (at) => dubaiToday(at);
 
 /** "14:05", Dubai time, 24-hour as elsewhere in the CRM. */
-export const timeLabel = (at) => new Date(Date.parse(at) + DUBAI).toISOString().slice(11, 16);
+export const timeLabel = (at) => dubaiClock(at);
 
 const dayFormat = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',

@@ -1,11 +1,24 @@
+import { dubaiDayFromToday, dubaiToday } from './dubaiDate.js';
+
 const pad = (n) => String(n).padStart(2, '0');
 
+/**
+ * Connected mode switches "today" to the Asia/Dubai business day (see ServerApp.jsx); the frozen
+ * browser demo keeps the computer's own calendar.
+ */
+let businessDays = false;
+const adoptDubaiCalendar = () => {
+  businessDays = true;
+};
+
 const today = () => {
+  if (businessDays) return dubaiToday();
   const d = new Date();
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
 
 const dateShift = (delta) => {
+  if (businessDays) return dubaiDayFromToday(delta);
   const d = new Date();
   d.setDate(d.getDate() + delta);
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -34,4 +47,4 @@ function dateNum(v) {
   return Number.isNaN(n) ? 0 : n;
 }
 
-export { pad, today, dateShift, readableDate, compactDate, monthOf, dateNum };
+export { pad, today, dateShift, adoptDubaiCalendar, readableDate, compactDate, monthOf, dateNum };

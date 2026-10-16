@@ -3,15 +3,20 @@ import { get } from '../../../lib/records.js';
 import { TitleSection } from '../../../components/ui/TitleSection.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useNavigation, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
+import { dayOf } from '../../../lib/dubaiDate.js';
 import { viewingClock } from './upcomingModel.js';
 import './upcoming-viewings.css';
 
+const monthFormat = new Intl.DateTimeFormat('en-AE', { month: 'short', timeZone: 'UTC' });
+
+/** Day and month read from the stored Dubai wall-clock text, whatever the computer's zone. */
 function DateChip({ value, held = false }) {
-  const date = new Date(value);
+  const day = dayOf(value);
+  const date = new Date(`${day}T12:00:00Z`);
   return (
     <span className={held ? 'date-chip date-chip-held' : 'date-chip'}>
-      <b>{date.getDate()}</b>
-      <small>{date.toLocaleDateString('en-AE', { month: 'short' })}</small>
+      <b>{day ? date.getUTCDate() : '—'}</b>
+      <small>{day ? monthFormat.format(date) : ''}</small>
     </span>
   );
 }

@@ -4,6 +4,7 @@
  */
 import { clName, get, prName } from '../../../lib/records.js';
 import { schema } from '../../../lib/schema.js';
+import { dubaiToday, shiftDay } from '../../../lib/dubaiDate.js';
 import { referenceName } from '../finance/dealFilters.js';
 
 export const recordSearchTypes = [
@@ -23,6 +24,13 @@ export function availableSearchTypes({ canOpen, financeAllowed }) {
   const records = recordSearchTypes.filter((type) => canOpen(type.module));
   return financeAllowed ? [...records, ...financeSearchTypes] : records;
 }
+
+/** The opening filter: every type over the last 30 Asia/Dubai days up to today. */
+export const defaultDateFilter = (today = dubaiToday()) => ({
+  type: '',
+  start: shiftDay(today, -30),
+  end: today,
+});
 
 export const invalidDateRange = (filter) =>
   Boolean(filter.start && filter.end && filter.start > filter.end);

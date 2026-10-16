@@ -4,7 +4,7 @@ import { savedImportSources, readSavedImport, readBackupImport } from './importS
 import { importDestination } from './importModel.js';
 import { createFullBackup } from '../../services/files/backup.js';
 import { downloadJson } from '../../services/files/download.js';
-import { today } from '../../lib/dates.js';
+import { dubaiToday } from '../../lib/dubaiDate.js';
 
 export function useImportDraft(user) {
   const [sources] = useState(() => {
@@ -79,7 +79,7 @@ export function useImportDraft(user) {
     const name = source.sourceWorkspaceId.replace(/[^a-z0-9_-]/gi, '-');
     downloadJson(
       createFullBackup(source.fullData),
-      `Keys_with_Simoni_${name}_Full_Backup_${today()}.json`,
+      `Keys_with_Simoni_${name}_Full_Backup_${dubaiToday()}.json`,
     );
   };
   return {

@@ -24,9 +24,31 @@ test('an Admin reviews team activity with filters in the URL and Load more', asy
   await expect(nav.getByRole('button', { name: 'Team activity', exact: true })).toBeVisible();
   const feed = await openActivity(page, 'Team activity');
   await expect(feed.getByRole('heading', { name: /^Today/ })).toBeVisible();
-  await expect(feed.locator('.activity-row')).toHaveCount(50);
+  // The first page holds 50 of the Admin's repeated edits, shown as one row.
+  const repeated = feed.locator('.activity-row.is-repeated');
+  await expect(feed.locator('.activity-row')).toHaveCount(1);
+  await expect(repeated.locator('.activity-phrase')).toHaveText(
+    /^You updated client .+ · 50 times$/,
+  );
   await feed.getByRole('button', { name: 'Load more activity' }).click();
   await expect(feed.getByText("You've reached the start of this date range.")).toBeVisible();
+  await expect(repeated).toHaveCount(1);
+  await expect(repeated.locator('.activity-phrase')).toContainText('· 55 times');
+  await expect(repeated.locator('.activity-time')).toHaveText(/^\d{2}:\d{2}–\d{2}:\d{2}$/);
+  const times = repeated.getByRole('list', { name: 'Times recorded' });
+  await expect(times).toBeHidden();
+  await repeated.getByRole('button', { name: 'Show times' }).click();
+  await expect(repeated.getByRole('button', { name: 'Hide times' })).toHaveAttribute(
+    'aria-expanded',
+    'true',
+  );
+  await expect(times.getByRole('listitem')).toHaveCount(55);
+  for (const layout of [layouts[1], layouts[2]]) {
+    await page.setViewportSize({ width: layout[1], height: layout[2] });
+    await repeated.scrollIntoViewIfNeeded();
+    await checkLayout(page, layout, 'activity-repeats');
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
   const all = await phrases(feed);
   const agent = team.people.agent.name;
   expect(all).toContain(`${agent} added client Synthetic ${prefix} kept client`);
@@ -45,7 +67,7 @@ test('an Admin reviews team activity with filters in the URL and Load more', asy
   await expect(page.getByText('No matching activity')).toBeVisible();
   await page.getByRole('button', { name: 'Clear filters' }).first().click();
   await expect(page).not.toHaveURL(/type=|action=/);
-  await expect(feed.locator('.activity-row')).toHaveCount(50);
+  await expect(repeated.locator('.activity-phrase')).toContainText('· 50 times');
   await page.getByLabel('Member', { exact: true }).selectOption({ label: agent });
   await expect(page).toHaveURL(/member=/);
   await expect(feed.locator('.activity-row').first()).toBeVisible();

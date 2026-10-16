@@ -1,3 +1,5 @@
+import { dubaiToday, shiftDay } from '../../../lib/dubaiDate.js';
+
 /**
  * Activity filters (docs/team-activity-design.md): they live in the URL, use Dubai calendar days
  * and map onto the API's query. Any filter change starts again from the first page.
@@ -8,22 +10,17 @@ export const DEFAULT_DAYS = 90;
 export const MAX_DAYS = 366;
 export const PAGE_SIZE = 50;
 
+/** Today's Dubai calendar day as `YYYY-MM-DD`, and whole-day moves between such days. */
+export { dubaiToday, shiftDay };
+
 const dayPattern = /^\d{4}-\d{2}-\d{2}$/;
 const DAY = 86_400_000;
-
-/** Today's Dubai calendar day as `YYYY-MM-DD` (fixed UTC+4). */
-export function dubaiToday(now = Date.now()) {
-  return new Date(now + 4 * 3_600_000).toISOString().slice(0, 10);
-}
 
 export function isDay(value) {
   if (!dayPattern.test(value || '')) return false;
   const date = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
-
-export const shiftDay = (day, days) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + days * DAY).toISOString().slice(0, 10);
 
 const daysBetween = (from, to) => Math.round((Date.parse(to) - Date.parse(from)) / DAY);
 

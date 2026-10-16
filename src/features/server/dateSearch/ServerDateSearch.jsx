@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords, useNavigation, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
-import { dateShift, today } from '../../../lib/dates.js';
 import { canOpenSection } from '../access.js';
 import { useFinance } from '../finance/useFinance.js';
-import { availableSearchTypes, selectConnectedDateRows } from './dateSearchModel.js';
+import {
+  availableSearchTypes,
+  defaultDateFilter,
+  selectConnectedDateRows,
+} from './dateSearchModel.js';
 import { DateSearchControls } from './DateSearchControls.jsx';
 import { DateSearchResults } from './DateSearchResults.jsx';
 import './date-search.css';
@@ -22,7 +25,7 @@ export function ServerDateSearch({ owner }) {
     () => availableSearchTypes({ canOpen: (m) => canOpenSection(user, m), financeAllowed }),
     [user, financeAllowed],
   );
-  const [filter, setFilter] = useState({ type: '', start: dateShift(-30), end: today() });
+  const [filter, setFilter] = useState(defaultDateFilter);
   const { type, rows, invalidRange } = selectConnectedDateRows(
     data,
     finance.overview,
