@@ -15,7 +15,7 @@ Status: owner brainstorm, 2026-10-16. **Goal: make Blaqks One the number one sof
 
 The owner wants the CRM to look orderly, premium, clean, smooth and "expensive", especially the Dashboard, with charts and diagrams.
 
-- **Approach:** the senior product designer proposes two or three visual directions (colour, typography, depth, motion and chart style) as preview pages. The owner picks one, and it becomes the new approved baseline in `docs/design-standards.md`, replacing the current one only with the owner's approval.
+- **Approach:** the senior product designer proposes two or three visual directions (colour, typography, depth, motion and chart style) as preview pages. The owner picks one, and it becomes the new approved baseline in `docs/design-standards.md`, replacing the current one only with the owner's approval. **Chosen 2026-10-16:** [Design system v2 · Limestone](design-system-v2.md), light by default.
 - **Design system v2:** tokens, components and chart components shared by every screen, and ready for right-to-left layout (see feature 2).
 - **Dashboard:** KPI cards with trends, a pipeline funnel, lead sources, deals and fees over time, team performance, a schedule overview and a finance summary. Each view respects permissions, with skeleton loading and both themes.
 - **Charts:** choose either light hand-built SVG charts (as in Performance today) or one small, well-maintained chart library. This is justified in the design phase; avoid heavy dependencies.

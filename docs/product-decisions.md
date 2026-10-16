@@ -133,6 +133,19 @@ See [Account self-service](account-self-service.md).
 
 See [Team activity design](team-activity-design.md).
 
+## Premium redesign direction (decided 2026-10-16)
+
+| Topic       | Decision                                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Direction   | **B+ · Limestone**, chosen from three previews: Limestone plus Midnight's 12-month fees comparison chart and ring-chart finance card.      |
+| Key figures | Each key-figure card carries a small chart suited to its meaning (weekly columns, stage bar, trend line, target bar).                      |
+| Sidebar     | Collapsible: icons only when closed, icons and text when open; the choice is remembered; closed by default on tablets, a drawer on phones. |
+| Theme       | **Light is the default**; dark mode stays a full alternative.                                                                              |
+| Charts      | Hand-built SVG components, no chart library.                                                                                               |
+| Rollout     | Dashboard first, then screen by screen with behaviour unchanged.                                                                           |
+
+See [Design system v2](design-system-v2.md).
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |
