@@ -3,7 +3,9 @@
 name: CI
 
 on:
+  # Branch work is checked through its pull request; main is checked on every push.
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

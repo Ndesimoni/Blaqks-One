@@ -87,7 +87,7 @@ PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only
 
 ## Continuous integration
 
-GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on every push, every pull request and on demand. A newer run on the same branch cancels the older one. Three jobs run in parallel on `ubuntu-latest`:
+GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on every pull request, every push to `main` and on demand; work on other branches is checked through its pull request, so open one to get CI. A newer run on the same branch cancels the older one. Three jobs run in parallel on `ubuntu-latest`:
 
 | Job                             | What it runs                                                                                                                                                                                                                                     |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
