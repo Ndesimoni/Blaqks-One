@@ -68,3 +68,22 @@ pub async fn lock_owner(
     }
     Ok(())
 }
+
+/// Re-reads exact owner authority after the caller has taken the workspace lock.
+pub async fn lock_exact_owner(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspace: &str,
+    actor: Uuid,
+) -> ApiResult<()> {
+    let owner: Uuid = sqlx::query_scalar("SELECT owner_id FROM crm_workspaces WHERE id=$1")
+        .bind(workspace)
+        .fetch_optional(&mut **transaction)
+        .await?
+        .ok_or_else(ApiError::forbidden)?;
+    lock_owner(transaction, owner).await?;
+    let user = workspaces::member(transaction, workspace, actor).await?;
+    if owner != actor || user.role != "admin" || user.workspace_id != workspace {
+        return Err(ApiError::forbidden());
+    }
+    Ok(())
+}

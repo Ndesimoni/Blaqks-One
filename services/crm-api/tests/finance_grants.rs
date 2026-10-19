@@ -30,6 +30,8 @@ fn agent(scope: &str, finance: Value) -> MemberRow {
             positions: Json(vec!["property-agent".into()]),
             permissions: Json(permissions),
             channel_access: Json(Default::default()),
+            language: None,
+            guidance_enabled: None,
             record_scope: scope.into(),
             actions: Json(actions),
         },

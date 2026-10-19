@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
-import { WORKBOOK_SCHEMAS } from '../../src/data/schemas.js';
-import { columnLetter } from '../../src/data/schemas/columns.js';
 import * as fields from '../../src/config/fields.js';
 import { descriptions, labels, nav, preferredCols } from '../../src/config/navigation.js';
+import { WORKBOOK_SCHEMAS } from '../../src/data/schemas.js';
+import { columnLetter } from '../../src/data/schemas/columns.js';
 import { recordDetailFields, recordFormSections } from '../../src/features/records/formSections.js';
 import { schema } from '../../src/lib/schema.js';
 
@@ -92,11 +92,11 @@ test('split field options keep their order and values apart from the two new con
 test('split navigation and form layouts keep every other module unchanged', () => {
   assert.equal(
     digest([nav, labels]),
-    'b2eaeb23d83545ae3962928b78bc7ce888aa7e1ed2aa3bf2a243a1e03feee6b3',
+    '5a7a6eed2cfd96ef1056e279c5dd6b6592239c7c4c2b39e1e56786292850f0da',
   );
   assert.equal(
     digest(without(descriptions, 'Contacts')),
-    '8cf830340af3528f219d5bca76edf766cd6e5d8f6e8a36d2a9077a17ef4d6203',
+    'ecb6dc9d92ad489bcd6dfc68e06292679a95e2c1a0cb187b42c09fb670420132',
   );
   assert.equal(
     digest(without(preferredCols, 'Contacts')),

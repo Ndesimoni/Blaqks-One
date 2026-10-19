@@ -14,6 +14,7 @@ import { TeamDirectoryFilters } from './TeamDirectoryFilters.jsx';
 import { TeamTabs } from './TeamTabs.jsx';
 import { TeamFinanceSection } from './TeamFinanceSection.jsx';
 import { readFinanceAccess } from '../server/finance/financeAccess.js';
+import { SeatLimitDialog } from './SeatLimitDialog.jsx';
 import './team.css';
 import './team-actions.css';
 import './team-form.css';
@@ -32,6 +33,7 @@ export function ServerTeamPage({ owner }) {
   const [editing, setEditing] = useState(null);
   const [invitation, setInvitation] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [limitOpen, setLimitOpen] = useState(false);
   // Finance settings are the Admin's (finance-design §7); the tab stays mounted once opened
   // so an unsaved settings or agreement draft survives switching back to People.
   const financeTab = readFinanceAccess(user).manage && !frozen;
@@ -55,7 +57,10 @@ export function ServerTeamPage({ owner }) {
       <TeamDirectoryToolbar
         owner={owner}
         archived={archived}
+        seats={team.seats}
+        canChangeLimit={user.roleId === 'super-admin' && owner.id !== 'super-admin-workspace'}
         busy={team.loading || !!team.error || !!memberActions.pendingId}
+        onChangeLimit={() => setLimitOpen(true)}
         onInvite={() => setEditing({ member: null })}
       />
       {financeTab && <TeamTabs tab={tab} onChange={showTab} />}
@@ -121,6 +126,17 @@ export function ServerTeamPage({ owner }) {
             setDeleting(null);
             completed({});
             setToast('Account archived. Saved data is available in the read-only archive.');
+          }}
+        />
+      )}
+      {limitOpen && team.seats && (
+        <SeatLimitDialog
+          workspaceId={owner.id}
+          seats={team.seats}
+          onClose={() => setLimitOpen(false)}
+          onSaved={() => {
+            setLimitOpen(false);
+            team.retry();
           }}
         />
       )}

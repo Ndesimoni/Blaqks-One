@@ -39,6 +39,8 @@ fn user(role: &str, scope: &str, permissions: Permissions, actions: Value) -> Us
         channel_access: Json(Default::default()),
         record_scope: scope.into(),
         actions: Json(actions),
+        language: None,
+        guidance_enabled: None,
     }
 }
 

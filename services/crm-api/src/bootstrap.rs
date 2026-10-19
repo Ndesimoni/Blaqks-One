@@ -1,5 +1,5 @@
 use crate::{
-    auth::{identity_rules, password, password_policy},
+    auth::{accounts, identity_rules, password, password_policy},
     error::{ApiError, ApiResult},
     workspaces::{self, ORGANISATION},
 };
@@ -71,22 +71,40 @@ pub async fn create_user(pool: &PgPool) -> ApiResult<Uuid> {
     // The new-password policy (account-self-service.md) applies to the command line too.
     password_policy::check(&password, None, &email)?;
     let hash = password::hash(password).await?;
-    let id = Uuid::new_v4();
     let mut transaction = pool.begin().await?;
-    sqlx::query(
-        "INSERT INTO crm_users (id,name,email,phone,password_hash,role) VALUES ($1,$2,$3,$4,$5,$6)",
-    )
-    .bind(id)
-    .bind(name)
-    .bind(email)
-    .bind(phone)
-    .bind(hash)
-    .bind(&role)
-    .execute(&mut *transaction)
-    .await?;
-    workspaces::create(&mut transaction, &id.to_string(), id).await?;
+    let id = if role == "admin" {
+        accounts::create_admin(
+            &mut transaction,
+            accounts::NewAdmin {
+                name: &name,
+                email: &email,
+                phone: &phone,
+                password_hash: &hash,
+                language: "en",
+                email_verified: false,
+            },
+        )
+        .await?
+    } else {
+        // The trusted CLI alone retains the explicit initial Super Admin path.
+        let id = Uuid::new_v4();
+        sqlx::query(
+            "INSERT INTO crm_users (id,name,email,phone,password_hash,role) \
+             VALUES ($1,$2,$3,$4,$5,'super-admin')",
+        )
+        .bind(id)
+        .bind(name)
+        .bind(email)
+        .bind(phone)
+        .bind(hash)
+        .execute(&mut *transaction)
+        .await?;
+        id
+    };
+    let company = workspaces::company::NewCompany::OPERATOR_BROKERAGE;
+    workspaces::create(&mut transaction, &id.to_string(), id, id, company).await?;
     if role == "super-admin" {
-        workspaces::create(&mut transaction, ORGANISATION, id).await?;
+        workspaces::create(&mut transaction, ORGANISATION, id, id, company).await?;
     }
     transaction.commit().await?;
     Ok(id)

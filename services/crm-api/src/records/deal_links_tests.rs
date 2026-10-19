@@ -17,6 +17,8 @@ fn user(role: &str, scope: &str, permissions: Permissions, finance: Value) -> Us
         channel_access: Json(Default::default()),
         record_scope: scope.into(),
         actions: Json(json!({ "finance": finance })),
+        language: None,
+        guidance_enabled: None,
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::team::{access, audit, members};
+use crate::team::{access, account_type::seats, audit, members};
 use crate::{
     auth::{
         protection,
@@ -59,6 +59,7 @@ pub async fn renew(
             "This account is already activated. Use account recovery instead.",
         ));
     }
+    seats::ensure(&mut transaction, &workspace, Some(id)).await?;
     let token = session::random_token();
     let expires_at: String = sqlx::query_scalar(
         "UPDATE crm_team_invitations SET token_hash=$2,expires_at=now()+interval '48 hours', \

@@ -1,0 +1,53 @@
+.signup-step {
+  --step-shift: 8px;
+  animation: signup-step-in var(--duration) var(--ease);
+}
+[dir='rtl'] .signup-step {
+  --step-shift: -8px;
+}
+@keyframes signup-step-in {
+  from {
+    opacity: 0;
+    translate: var(--step-shift) 0;
+  }
+}
+.signup-state {
+  margin-block: auto;
+}
+.signup-state.loading p {
+  inline-size: 72%;
+  border-radius: 5px;
+  color: transparent;
+  background: var(--hover);
+}
+@media (max-width: 720px) {
+  .signup-page {
+    padding: 0;
+  }
+  .signup-shell {
+    display: block;
+    min-block-size: 100svh;
+    border: 0;
+    border-radius: 0;
+  }
+  .signup-story {
+    padding-block: 18px;
+    padding-inline: 16px;
+  }
+  .signup-story .sign-in-story-body {
+    display: none;
+  }
+  .signup-panel {
+    min-block-size: calc(100svh - 74px);
+    padding-block: 76px 20px;
+    padding-inline: 16px;
+  }
+  .signup-utilities {
+    inset-inline-end: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .signup-step {
+    animation: none;
+  }
+}

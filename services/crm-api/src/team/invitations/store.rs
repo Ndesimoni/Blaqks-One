@@ -1,5 +1,5 @@
 use super::create::InviteRequest;
-use crate::team::{access, audit};
+use crate::team::{access, account_type::seats, audit};
 use crate::{
     auth::{actions::Actions, permissions::Permissions, session},
     error::{ApiError, ApiResult},
@@ -35,18 +35,36 @@ pub async fn create(
     let mut transaction = pool.begin().await?;
     workspaces::lock(&mut transaction, workspace).await?;
     access::lock_owner(&mut transaction, owner).await?;
-    sqlx::query(
+    if staff {
+        seats::ensure(&mut transaction, workspace, None).await?;
+    }
+    let inserted: Option<Uuid> = sqlx::query_scalar(
         "INSERT INTO crm_users (id,name,email,phone,password_hash,role,active,owner_id,workspace_id, \
          positions,permissions,channel_access,accepted_at,actions) \
-         VALUES ($1,$2,$3,$4,'',$5,false,$6,$7,$8,$9,$10,NULL,COALESCE($11,'{}'::jsonb))",
+         VALUES ($1,$2,$3,$4,'',$5,false,$6,$7,$8,$9,$10,NULL,COALESCE($11,'{}'::jsonb)) \
+         ON CONFLICT (email) DO NOTHING RETURNING id",
     ).bind(id).bind(&request.name).bind(&request.email).bind(&request.phone).bind(role)
         .bind(staff.then_some(owner)).bind(staff.then_some(workspace))
         .bind(sqlx::types::Json(&request.positions)).bind(sqlx::types::Json(permissions))
         .bind(sqlx::types::Json(request.channel_access.clone().unwrap_or_default()))
         .bind(actions.filter(|_| staff).map(sqlx::types::Json))
-        .execute(&mut *transaction).await?;
+        .fetch_optional(&mut *transaction).await?;
+    if inserted.is_none() {
+        return Err(ApiError(
+            axum::http::StatusCode::CONFLICT,
+            "The invitation could not be created.",
+            "invitation_unavailable",
+        ));
+    }
     if !staff {
-        workspaces::create(&mut transaction, &id.to_string(), id).await?;
+        workspaces::create(
+            &mut transaction,
+            &id.to_string(),
+            id,
+            actor,
+            workspaces::company::NewCompany::OPERATOR_BROKERAGE,
+        )
+        .await?;
     }
     let expires_at: String = sqlx::query_scalar(
         "INSERT INTO crm_team_invitations (token_hash,user_id,owner_id,workspace_id,created_by) \

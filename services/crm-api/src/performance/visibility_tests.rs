@@ -21,6 +21,8 @@ fn user(role: &str, scope: &str, finance: bool, team_view: bool) -> UserRow {
         channel_access: Json(ChannelAccess::default()),
         record_scope: scope.into(),
         actions: Json(json!({"finance": {"teamView": team_view}})),
+        language: None,
+        guidance_enabled: None,
     }
 }
 

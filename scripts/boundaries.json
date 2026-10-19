@@ -6,11 +6,20 @@
       "crm_login_limits",
       "crm_account_events",
       "crm_account_events_immutable",
+      "crm_account_consents",
+      "crm_account_consents_immutable",
       "crm_user_profiles",
       "crm_all_user_profiles",
       "crm_member_profiles"
     ],
-    "workspaces": ["crm_workspaces"],
+    "workspaces": [
+      "crm_workspaces",
+      "crm_company_profiles",
+      "crm_company_events",
+      "crm_company_events_immutable",
+      "crm_company_limit_events"
+    ],
+    "signup": ["crm_signup_requests", "crm_signup_outbox"],
     "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
     "records": ["crm_records", "crm_activity"],
     "assignments": [

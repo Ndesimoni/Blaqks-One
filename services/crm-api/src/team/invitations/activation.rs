@@ -1,5 +1,5 @@
 use super::inspect;
-use crate::team::{access, audit};
+use crate::team::{access, account_type::seats, audit};
 use crate::{
     auth::{identity_rules, password, password_policy, protection, session, throttle},
     error::{ApiError, ApiResult},
@@ -64,6 +64,15 @@ pub async fn accept(
     .fetch_one(&mut *transaction)
     .await?;
     if !pending {
+        return Err(inspect::unavailable());
+    }
+    if !seats::available(
+        &mut transaction,
+        &invitation.workspace_id,
+        Some(invitation.user_id),
+    )
+    .await?
+    {
         return Err(inspect::unavailable());
     }
     let consumed = sqlx::query(

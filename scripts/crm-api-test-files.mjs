@@ -1,6 +1,12 @@
 /** API suites run in order against one isolated database (see test-crm-api.mjs). */
 export const apiTestFiles = [
   'tests/api/auth.test.mjs',
+  'tests/api/auth-foundation.test.mjs',
+  'tests/api/company-profile.test.mjs',
+  'tests/api/company-access.test.mjs',
+  'tests/api/company-migration.test.mjs',
+  'tests/api/company-free-seats-migration.test.mjs',
+  'tests/api/company-races.test.mjs',
   'tests/api/records.test.mjs',
   'tests/api/workflow-records.test.mjs',
   'tests/api/referral-links.test.mjs',
@@ -18,6 +24,10 @@ export const apiTestFiles = [
   'tests/api/demo-backup.test.mjs',
   'tests/api/team-access.test.mjs',
   'tests/api/team-invitations.test.mjs',
+  'tests/api/team-limit-access.test.mjs',
+  'tests/api/team-limit-lifecycle.test.mjs',
+  'tests/api/team-limit-races.test.mjs',
+  'tests/api/team-limit-authority-races.test.mjs',
   'tests/api/team-invitation-lifecycle.test.mjs',
   'tests/api/team-permissions.test.mjs',
   'tests/api/team-renewal.test.mjs',
@@ -31,6 +41,8 @@ export const apiTestFiles = [
   'tests/api/account-password.test.mjs',
   'tests/api/account-sessions.test.mjs',
   'tests/api/account-races.test.mjs',
+  'tests/api/account-language.test.mjs',
+  'tests/api/account-guidance.test.mjs',
   'tests/api/assignment-scope.test.mjs',
   'tests/api/assignment-migration.test.mjs',
   'tests/api/assignment-triggers.test.mjs',
@@ -87,4 +99,27 @@ export const apiTestFiles = [
   'tests/api/activity-feed.test.mjs',
   'tests/api/activity-scope.test.mjs',
   'tests/api/activity-h1.test.mjs',
+  'tests/api/signup-start.test.mjs',
+  'tests/api/signup-verify.test.mjs',
+  'tests/api/signup-enumeration.test.mjs',
+  'tests/api/signup-limits.test.mjs',
+  'tests/api/signup-races.test.mjs',
+  'tests/api/signup-release-races.test.mjs',
+  'tests/api/signup-invitations.test.mjs',
 ];
+
+/**
+ * `API_TEST_FILES=a.test.mjs,b.test.mjs npm run test:api` runs only the listed suites, in
+ * their usual order, for faster diagnosis. Unset or empty runs every suite; an unknown
+ * name fails rather than silently running nothing.
+ */
+export function selectedApiTestFiles(filter = process.env.API_TEST_FILES) {
+  const wanted = (filter ?? '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean);
+  if (!wanted.length) return apiTestFiles;
+  const unknown = wanted.filter((name) => !apiTestFiles.includes(name));
+  if (unknown.length) throw Error(`Unknown API_TEST_FILES entries: ${unknown.join(', ')}`);
+  return apiTestFiles.filter((name) => wanted.includes(name));
+}

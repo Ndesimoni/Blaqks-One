@@ -1,25 +1,26 @@
 import React from 'react';
-import { useSession } from '../../hooks/useSession.js';
-import { useRecords, useNavigation } from '../../hooks/useWorkspace.js';
 import { Button } from '../../components/ui/Button.jsx';
-import { RecordsPage } from '../records/RecordsPage.jsx';
+import { useSession } from '../../hooks/useSession.js';
+import { useNavigation, useRecords } from '../../hooks/useWorkspace.js';
 import { ContactsPage } from '../contacts/ContactsPage.jsx';
 import { LeadsPage } from '../leads/LeadsPage.jsx';
 import { PropertyDirectory } from '../properties/PropertyDirectory.jsx';
+import { RecordsPage } from '../records/RecordsPage.jsx';
 import { ServerTeamPage } from '../server-team/ServerTeamPage.jsx';
 import { canOpenSection } from './access.js';
+import { ServerActivity } from './activity/ServerActivity.jsx';
+import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
+import { ServerCalculators } from './calculators/ServerCalculators.jsx';
+import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
+import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
+import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
+import { FinanceContent } from './finance/FinanceContent.jsx';
+import { ServerGuide } from './guide/ServerGuide.jsx';
+import { ServerInsights } from './insights/ServerInsights.jsx';
+import { ServerPerformance } from './performance/ServerPerformance.jsx';
+import { ServerProfile } from './profile/ServerProfile.jsx';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
-import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
-import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
-import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
-import { FinanceContent } from './finance/FinanceContent.jsx';
-import { ServerPerformance } from './performance/ServerPerformance.jsx';
-import { ServerInsights } from './insights/ServerInsights.jsx';
-import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
-import { ServerGuide } from './guide/ServerGuide.jsx';
-import { ServerProfile } from './profile/ServerProfile.jsx';
-import { ServerActivity } from './activity/ServerActivity.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -56,6 +57,7 @@ export function ServerContent({ owner }) {
   if (route === 'CRM insights') return <ServerInsights owner={owner} />;
   if (route === 'Date search') return <ServerDateSearch owner={owner} />;
   if (route === 'Guide') return <ServerGuide />;
+  if (route === 'Calculators') return <ServerCalculators />;
   if (route === 'Team activity') return <ServerActivity owner={owner} />;
   if (['Deals', 'Payments', 'Expenses'].includes(route))
     return <FinanceContent key={route} route={route} owner={owner} />;

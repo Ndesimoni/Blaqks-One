@@ -1,7 +1,11 @@
 //! Account self-service for every signed-in member (docs/account-self-service.md): view
 //! the account, edit their own name and phone, change their password and review or
-//! revoke their own sessions. Auth owns `crm_account_events` (migration 0018).
+//! revoke their own sessions, choose their interface language (migration 0021) and turn
+//! automatic field hints on or off (migration 0026). Auth owns `crm_account_events`
+//! (migration 0018).
 pub mod events;
+pub mod guidance;
+pub mod language;
 mod live;
 pub mod password;
 pub mod profile;
@@ -10,7 +14,7 @@ pub mod sessions;
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
-    routing::{delete, get, post},
+    routing::{delete, get, post, put},
     Router,
 };
 
@@ -21,6 +25,14 @@ pub fn router() -> Router<AppState> {
         .route(
             "/api/crm/auth/account",
             get(profile::account).patch(profile::update).layer(limit()),
+        )
+        .route(
+            "/api/crm/auth/account/language",
+            put(language::update).layer(limit()),
+        )
+        .route(
+            "/api/crm/auth/account/guidance",
+            put(guidance::update).layer(limit()),
         )
         .route(
             "/api/crm/auth/account/password",

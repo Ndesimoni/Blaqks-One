@@ -4,6 +4,7 @@ use kws_crm_api::{
     config::Config,
     routes,
     sample::{self, guard, marker, options::Options},
+    signup,
     state::AppState,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -38,6 +39,9 @@ async fn run() -> Result<(), String> {
         .connect(&config.database_url)
         .await
         .map_err(|_| "CRM database connection failed.")?;
+    if config.signup == kws_crm_api::config::SignupMode::Local {
+        marker::ensure(&pool).await?;
+    }
     if sample_options.is_some() {
         // Before migrations or writes: the database itself must be marked as local.
         marker::ensure(&pool).await?;
@@ -46,6 +50,12 @@ async fn run() -> Result<(), String> {
         .run(&pool)
         .await
         .map_err(|_| "CRM schema migration failed. Check database access and migration history.")?;
+    if config.signup == kws_crm_api::config::SignupMode::Local {
+        signup::cleanup::run(&pool)
+            .await
+            .map_err(|_| "CRM sign-up retention cleanup failed.")?;
+        signup::cleanup::schedule(pool.clone());
+    }
     if let Some(options) = sample_options {
         let database = guard::describe(&config.database_url);
         println!("{}", sample::run(&pool, options, &database).await?);
@@ -69,11 +79,13 @@ async fn run() -> Result<(), String> {
     let dummy_hash = password::hash(session::random_token())
         .await
         .map_err(|_| "CRM authentication initialization failed.")?;
+    let signup = Arc::new(signup::Services::new(config.signup, pool.clone()));
     let state = AppState {
         pool,
         config: Arc::new(config),
         dummy_hash: Arc::new(dummy_hash),
         password_workers: Arc::new(tokio::sync::Semaphore::new(4)),
+        signup,
     };
     let listener = tokio::net::TcpListener::bind(address)
         .await

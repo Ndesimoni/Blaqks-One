@@ -1,0 +1,114 @@
+.signup-content form {
+  display: grid;
+  gap: 16px;
+  margin-block-start: 22px;
+}
+.signup-hint {
+  margin-block: 7px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.signup-field {
+  display: grid;
+  gap: 7px;
+}
+.signup-field label {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+.signup-field input,
+.signup-field select {
+  inline-size: 100%;
+  min-block-size: 48px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding-inline: 13px;
+  color: var(--ink);
+  background: var(--panel);
+}
+.signup-field [aria-invalid='true'] {
+  border-color: var(--danger);
+}
+.signup-password {
+  position: relative;
+  display: block;
+}
+.signup-password input {
+  padding-inline-end: 78px;
+}
+.signup-password button {
+  position: absolute;
+  inset-block: 4px;
+  inset-inline-end: 5px;
+  min-inline-size: 66px;
+  border: 0;
+  color: var(--primary);
+  background: transparent;
+}
+.signup-consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  color: var(--ink);
+}
+.signup-consent input {
+  inline-size: 18px;
+  block-size: 18px;
+  margin-block-start: 2px;
+}
+.signup-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 12px;
+  color: var(--primary);
+}
+.signup-bot-note,
+.signup-local-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding-block: 10px;
+  padding-inline: 12px;
+  border-inline-start: 2px solid var(--gold);
+  background: var(--surface-subtle);
+  font-size: 12px;
+}
+.signup-primary {
+  inline-size: 100%;
+  min-block-size: 48px;
+  justify-content: center;
+}
+.signup-text-action,
+.signup-signin-link {
+  min-block-size: 40px;
+  border: 0;
+  color: var(--primary);
+  background: transparent;
+  text-align: center;
+  font-weight: 650;
+}
+.signup-signin-link {
+  display: block;
+  padding-block: 10px;
+}
+.signup-code-field input {
+  text-align: center;
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.22em;
+}
+.signup-verify-actions {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.signup-content .field-error {
+  margin: 0;
+  color: var(--danger);
+}

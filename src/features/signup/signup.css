@@ -1,0 +1,124 @@
+@import './signup-forms.css';
+@import './signup-responsive.css';
+
+.signup-page {
+  place-items: start center;
+  min-block-size: 100svh;
+  padding-block: 32px;
+  padding-inline: 24px;
+  background: var(--bg);
+}
+.signup-shell {
+  inline-size: min(1120px, 100%);
+  min-block-size: 730px;
+  overflow: visible;
+  background: var(--panel);
+}
+.signup-story {
+  position: relative;
+  background: var(--deep);
+}
+.signup-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #eff2e9;
+  letter-spacing: 0.08em;
+}
+.signup-brand > span {
+  display: grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  border: 1px solid color-mix(in srgb, var(--gold) 70%, transparent);
+  border-radius: 11px;
+  color: var(--gold-light);
+  font-weight: 750;
+  letter-spacing: -0.08em;
+}
+.signup-brand strong,
+.signup-brand small {
+  display: block;
+}
+.signup-brand small {
+  margin-block-start: 2px;
+  color: #afc0b4;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+.signup-benefits {
+  display: grid;
+  gap: 12px;
+  margin-block: 28px 0;
+  padding: 0;
+  list-style: none;
+  color: #dce8df;
+  font-size: 12px;
+}
+.signup-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.signup-benefits svg {
+  color: var(--gold-light);
+}
+.signup-panel {
+  align-items: stretch;
+  padding-block: 76px 24px;
+  padding-inline: 48px;
+  background: var(--panel);
+}
+.signup-utilities {
+  position: absolute;
+  inset-block-start: 20px;
+  inset-inline-end: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.signup-utilities select {
+  min-block-size: 36px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding-inline: 9px;
+  color: var(--ink);
+  background: var(--surface-subtle);
+}
+.signup-content {
+  inline-size: 100%;
+  max-inline-size: 440px;
+  margin: auto;
+}
+.signup-content h1 {
+  margin-block: 18px 8px;
+  font-size: 28px;
+  line-height: 1.15;
+}
+.signup-content h1:focus {
+  outline: none;
+}
+.signup-progress p {
+  margin-block-end: 8px;
+  font-size: 13px;
+}
+.signup-progress-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.signup-progress-bars span {
+  block-size: 3px;
+  border-radius: 99px;
+  background: var(--line);
+}
+.signup-progress-bars .active {
+  background: var(--primary);
+}
+.signup-back {
+  min-block-size: 40px;
+  padding: 0;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+}

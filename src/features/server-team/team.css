@@ -23,6 +23,30 @@
 .connected-team-toolbar p {
   margin: 0;
 }
+.team-seat-actions {
+  display: grid;
+  min-width: min(100%, 300px);
+  gap: 8px;
+  justify-items: end;
+}
+.team-seat-summary,
+.team-seat-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.team-seat-summary span,
+.team-seat-actions small {
+  color: var(--muted);
+}
+.team-seat-summary span {
+  font-variant-numeric: tabular-nums;
+}
+.team-seat-actions small {
+  max-width: 340px;
+  line-height: 1.5;
+  text-align: end;
+}
 .connected-team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
@@ -108,5 +132,19 @@
   .connected-team-toolbar {
     flex-direction: column;
     align-items: stretch;
+  }
+  .team-seat-actions {
+    width: 100%;
+    justify-items: stretch;
+  }
+  .team-seat-summary,
+  .team-seat-buttons {
+    justify-content: space-between;
+  }
+  .team-seat-buttons .btn {
+    flex: 1;
+  }
+  .team-seat-actions small {
+    text-align: start;
   }
 }

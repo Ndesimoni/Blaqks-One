@@ -1,0 +1,30 @@
+/* Field guidance (packet Q1): an information button beside the label and a logical hint. */
+:root[data-theme] .field-hint-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  margin-inline-start: 6px;
+  padding: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted-dark);
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+:root[data-theme] .field-hint-toggle:hover,
+:root[data-theme] .field-hint-toggle:focus-visible {
+  color: var(--ink);
+  background: var(--surface-subtle);
+}
+
+:root[data-theme] .field-hint-note {
+  display: block;
+  margin-block-start: 6px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}

@@ -1,0 +1,46 @@
+/* Language foundation (docs/i18n.md). Imported last so these rules sit after the screens.
+   New CSS uses logical properties (margin-inline-start, padding-inline, inset-inline-start,
+   border-inline-end, text-align: start) so it mirrors in right-to-left languages. Existing
+   CSS is converted in the translation pass. */
+
+/* Arabic uses the device's Arabic system fonts; nothing is downloaded. Cursive Arabic
+   letters must never be spaced apart, so letter spacing is reset. */
+html:lang(ar) body {
+  font-family:
+    'Geeza Pro', 'Segoe UI', 'Noto Sans Arabic', 'Noto Naskh Arabic', Tahoma, system-ui, sans-serif;
+  letter-spacing: 0;
+}
+html:lang(ar) :is(h1, h2, h3, h4, strong, b) {
+  letter-spacing: 0;
+}
+
+/* Shared logical-property utilities for new work. */
+.u-text-start {
+  text-align: start;
+}
+.u-text-end {
+  text-align: end;
+}
+.u-ms-auto {
+  margin-inline-start: auto;
+}
+.u-me-auto {
+  margin-inline-end: auto;
+}
+.u-inline-gap {
+  column-gap: 8px;
+}
+/* Directional icons (arrows, chevrons, back/next) and time axes flip in RTL. Do not flip
+   icons that mean the same thing in both directions (check, search, clock faces). */
+[dir='rtl'] .u-mirror-rtl {
+  transform: scaleX(-1);
+}
+/* Phone numbers, emails, IDs, unit numbers and prices keep left-to-right order inside
+   Arabic text. */
+.u-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.u-num {
+  font-variant-numeric: tabular-nums;
+}

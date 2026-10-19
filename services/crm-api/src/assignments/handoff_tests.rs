@@ -104,6 +104,8 @@ fn staff_without_assign() -> UserRow {
         channel_access: Json(Default::default()),
         record_scope: "team".into(),
         actions: Json(json!({"relationships": {"create": true}})),
+        language: None,
+        guidance_enabled: None,
     }
 }
 

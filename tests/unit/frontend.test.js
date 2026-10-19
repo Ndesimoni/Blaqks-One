@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { blank } from '../../src/lib/schema.js';
-import { normalizeEnvelope, safeExternalUrl } from '../../src/lib/validation.js';
-import { validateRecord } from '../../src/features/records/validation.js';
-import { saveWorkspaceRecord, removeWorkspaceRecord } from '../../src/features/records/commands.js';
-import { createFullBackup, parseFullBackup } from '../../src/services/files/backup.js';
+import {
+  crmRoutes,
+  routeName,
+  routePath,
+  routes,
+  settingsRoutes,
+} from '../../src/config/routes.js';
 import {
   selectClientDesk,
   selectClientMatches,
@@ -14,23 +16,20 @@ import {
   defaultPropertyFilters,
   selectProperties,
 } from '../../src/features/properties/selectors.js';
+import { removeWorkspaceRecord, saveWorkspaceRecord } from '../../src/features/records/commands.js';
+import { matchesRecordTab } from '../../src/features/records/selectors.js';
+import { validateRecord } from '../../src/features/records/validation.js';
 import {
   rollingMonths,
   selectDateRecords,
   selectMonthlyPerformance,
   selectPerformanceMonth,
 } from '../../src/features/reports/selectors.js';
-import {
-  routes,
-  crmRoutes,
-  settingsRoutes,
-  routeName,
-  routePath,
-} from '../../src/config/routes.js';
-import { createWorkspaceRepository } from '../../src/services/storage/workspaceRepository.js';
-import { schema } from '../../src/lib/schema.js';
 import { formatValue } from '../../src/lib/crm.js';
-import { matchesRecordTab } from '../../src/features/records/selectors.js';
+import { blank, schema } from '../../src/lib/schema.js';
+import { normalizeEnvelope, safeExternalUrl } from '../../src/lib/validation.js';
+import { createFullBackup, parseFullBackup } from '../../src/services/files/backup.js';
+import { createWorkspaceRepository } from '../../src/services/storage/workspaceRepository.js';
 
 test('validated storage reads preserve malformed data and report blocked storage without a demo replacement', () => {
   for (const raw of [
@@ -256,11 +255,11 @@ test('date search uses inclusive boundaries, chronological order and explicit in
   assert.equal(data.Clients[0].client_id, 'CL-2');
 });
 
-test('19 CRM sections and four account/workspace screens have unique stable routes and safe external links', () => {
-  assert.equal(crmRoutes.length, 19);
+test('20 CRM sections and four account/workspace screens have unique stable routes and safe external links', () => {
+  assert.equal(crmRoutes.length, 20);
   assert.equal(settingsRoutes.length, 4);
-  assert.equal(routes.length, 23);
-  assert.equal(new Set(routes.map((route) => route.path)).size, 23);
+  assert.equal(routes.length, 24);
+  assert.equal(new Set(routes.map((route) => route.path)).size, 24);
   assert.equal(routePath('Messages'), '/messages');
   assert.equal(
     routes.some((route) => route.name === 'Calendar'),

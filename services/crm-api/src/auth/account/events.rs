@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 #[derive(Clone, Copy)]
 pub enum Action {
+    SignedUp,
     ProfileUpdated,
     PasswordChanged,
     SessionsRevoked,
@@ -16,6 +17,7 @@ pub enum Action {
 impl Action {
     fn name(self) -> &'static str {
         match self {
+            Self::SignedUp => "signed_up",
             Self::ProfileUpdated => "profile_updated",
             Self::PasswordChanged => "password_changed",
             Self::SessionsRevoked => "sessions_revoked",

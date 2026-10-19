@@ -14,6 +14,8 @@ fn user(role: &str, record_scope: &str) -> UserRow {
         channel_access: Json(ChannelAccess::default()),
         record_scope: record_scope.into(),
         actions: Json(serde_json::json!({})),
+        language: None,
+        guidance_enabled: None,
     }
 }
 
@@ -43,4 +45,31 @@ fn assigned_staff_and_unknown_roles_are_assigned_only() {
         assert!(!member.has_team_scope(), "{role}/{scope}");
         assert_eq!(member.record_scope_label(), "assigned");
     }
+}
+
+#[test]
+fn profiles_expose_only_an_allowlisted_own_language() {
+    let shown = |language: Option<&str>| {
+        let mut member = user("staff", "assigned");
+        member.language = language.map(Into::into);
+        serde_json::to_value(Profile::from(member)).unwrap()
+    };
+    assert_eq!(shown(Some("ar"))["language"], "ar");
+    assert_eq!(shown(Some("en"))["language"], "en");
+    assert_eq!(shown(Some("fr"))["language"], "en");
+    // Team directory rows carry no language, so the field is left out entirely.
+    assert!(shown(None).get("language").is_none());
+}
+
+#[test]
+fn profiles_expose_guidance_only_on_own_account_payloads() {
+    let shown = |enabled: Option<bool>| {
+        let mut member = user("admin", "team");
+        member.guidance_enabled = enabled;
+        serde_json::to_value(Profile::from(member)).unwrap()
+    };
+    assert_eq!(shown(Some(true))["guidanceEnabled"], true);
+    assert_eq!(shown(Some(false))["guidanceEnabled"], false);
+    // Team directory rows omit the preference entirely.
+    assert!(shown(None).get("guidanceEnabled").is_none());
 }

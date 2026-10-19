@@ -10,6 +10,10 @@ pub mod performance;
 pub mod records;
 pub mod routes;
 pub mod sample;
+pub mod signup;
 pub mod state;
 pub mod team;
 pub mod workspaces;
+
+#[cfg(test)]
+mod test_database;

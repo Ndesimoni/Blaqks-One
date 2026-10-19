@@ -2,6 +2,8 @@ import React, { useId } from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { AssignedToFilter } from '../assignment/AssignedToFilter.jsx';
 import '../assignment/assigned-filter.css';
+import { useSession } from '../../../hooks/useSession.js';
+import { hasTeamFeatures } from '../access.js';
 
 const validMonth = (value) => /^(20\d\d|2100)-(0[1-9]|1[0-2])$/.test(value);
 
@@ -17,6 +19,7 @@ function context(scope, selection) {
 
 /** Filter bar: who the figures cover, the month picker and, for team scope, Assigned to. */
 export function PerformanceHeader({ month, onMonth, selection, scope, workload }) {
+  const { user } = useSession();
   const id = useId();
   const [title, detail] = context(scope, selection);
   return (
@@ -46,7 +49,7 @@ export function PerformanceHeader({ month, onMonth, selection, scope, workload }
             />
           </span>
         </div>
-        {workload.module && (
+        {workload.module && hasTeamFeatures(user) && (
           <AssignedToFilter
             module={workload.module}
             filter={workload.filter}

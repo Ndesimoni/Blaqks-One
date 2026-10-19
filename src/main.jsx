@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
+import { LanguageProvider } from './i18n/LanguageProvider.jsx';
 import './styles/index.css';
 
 const App = lazy(() =>
@@ -10,8 +11,10 @@ const App = lazy(() =>
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Suspense fallback={<main className="session-status">Opening Keys with Simoni…</main>}>
-      <App />
-    </Suspense>
+    <LanguageProvider>
+      <Suspense fallback={<main className="session-status">Opening Keys with Simoni…</main>}>
+        <App />
+      </Suspense>
+    </LanguageProvider>
   </React.StrictMode>,
 );

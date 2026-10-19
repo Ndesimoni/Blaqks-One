@@ -15,7 +15,7 @@ The user-approved [CRM design refresh](design-refresh.md) is the visual baseline
 
 ### Premium polish for new work (owner, 2026-10-16)
 
-**Keep the colours; raise the design.** Every new screen, component and redesigned section keeps the palette above unchanged and must look clean, orderly, smooth and premium. Existing screens are not restyled for its own sake; they adopt these rules when they are next changed.
+**Keep the colours; raise the design.** Every new screen, component and redesigned section keeps the palette above unchanged and must look clean, classic, orderly, smooth and premium. Existing screens are not restyled for its own sake; they adopt these rules when they are next changed.
 
 - **Hierarchy through type and space, not boxes:** larger, confident figures with tabular numerals; clear label, value and caption levels; generous, consistent spacing on the 4px scale; fewer nested panels; group with alignment and thin rules.
 - **Restrained depth:** hairline borders and soft, layered shadows; no heavy outlines, gradient washes or decorative banners.

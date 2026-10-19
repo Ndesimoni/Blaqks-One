@@ -1,11 +1,18 @@
 use std::{env, net::SocketAddr};
 use url::Url;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SignupMode {
+    Off,
+    Local,
+}
+
 pub struct Config {
     pub database_url: String,
     pub origin: String,
     pub address: SocketAddr,
     pub secure_cookie: bool,
+    pub signup: SignupMode,
 }
 
 impl Config {
@@ -19,12 +26,26 @@ impl Config {
             .parse()
             .map_err(|_| "CRM_BIND_ADDRESS is invalid.")?;
         let secure_cookie = cookie_policy(&origin, insecure, address)?;
+        let signup = signup_mode(env::var("CRM_SIGNUP").ok().as_deref(), secure_cookie)?;
         Ok(Self {
             database_url,
             origin,
             address,
             secure_cookie,
+            signup,
         })
+    }
+}
+
+fn signup_mode(value: Option<&str>, secure_cookie: bool) -> Result<SignupMode, String> {
+    match value.unwrap_or("off") {
+        "off" => Ok(SignupMode::Off),
+        "local" if !secure_cookie => Ok(SignupMode::Local),
+        "local" => Err("CRM_SIGNUP=local requires insecure loopback development mode.".into()),
+        "live" => {
+            Err("CRM_SIGNUP=live is unavailable until provider adapters are configured.".into())
+        }
+        _ => Err("CRM_SIGNUP must be off, local or live.".into()),
     }
 }
 

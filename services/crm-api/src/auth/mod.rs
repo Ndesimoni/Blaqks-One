@@ -1,12 +1,15 @@
 pub mod account;
+pub(crate) mod accounts;
 pub mod actions;
 pub mod actions_request;
 mod actions_wire;
+pub mod consents;
 pub mod device;
 pub mod finance_access;
 pub mod grants;
 pub mod handlers;
 pub mod identity_rules;
+pub(crate) mod invitation_identity;
 pub mod password;
 pub mod password_policy;
 pub mod permissions;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FinanceField as Field } from './FinanceField.jsx';
-import { dealStages, dealTypes } from './dealModel.js';
 import { detailFields } from './dealDraft.js';
+import { dealStages, dealTypes } from './dealModel.js';
 import { feeBasisLabels } from './financeLabels.js';
 
 const choices = (values, labels = {}) =>
@@ -63,9 +63,9 @@ export function DealEditorFields({ stepId, state, options, labelledBy }) {
           <>
             {text('agreedValue', 'Agreed value AED', {
               required: true,
-              hint: 'For example 2,450,000.',
+              hintKey: 'fieldHints.deals.agreedValue',
             })}
-            <Field name="feeBasis" label="Fee basis" required>
+            <Field name="feeBasis" label="Fee basis" required hintKey="fieldHints.deals.feeBasis">
               {(props) => (
                 <select {...props} {...bind('feeBasis')}>
                   {choices(['percentage', 'fixed'], feeBasisLabels)}
@@ -73,10 +73,16 @@ export function DealEditorFields({ stepId, state, options, labelledBy }) {
               )}
             </Field>
             {form.feeBasis === 'fixed'
-              ? text('fixedFee', 'Fixed fee AED (ex VAT)', { required: true })
-              : text('feeRate', 'Fee rate %', { required: true, hint: 'Up to two decimals.' })}
+              ? text('fixedFee', 'Fixed fee AED (ex VAT)', {
+                  required: true,
+                  hintKey: 'fieldHints.deals.fixedFee',
+                })
+              : text('feeRate', 'Fee rate %', {
+                  required: true,
+                  hintKey: 'fieldHints.deals.feeRate',
+                })}
             {text('partnerShare', 'Partner share %', {
-              hint: 'Leave blank when no partner shares the fee.',
+              hintKey: 'fieldHints.deals.partnerShare',
             })}
             <Field name="partnerName" label="Partner brokerage">
               {(props) => <input {...props} {...bind('partnerName')} maxLength={200} />}

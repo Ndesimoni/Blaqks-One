@@ -1,7 +1,9 @@
 pub mod access;
+pub mod account_type;
 pub mod archive;
 pub mod audit;
 pub mod catalogue;
 pub mod invitations;
 pub mod members;
 pub mod positions;
+pub mod routes;

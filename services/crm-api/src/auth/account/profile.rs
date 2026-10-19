@@ -6,12 +6,7 @@ use super::{
     live,
 };
 use crate::{
-    auth::{
-        identity_rules,
-        profile::{Profile, UserRow},
-        protection,
-        session::Session,
-    },
+    auth::{identity_rules, protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces,
@@ -22,9 +17,11 @@ use axum::{
     Json,
 };
 use serde::Deserialize;
-use serde_json::{json, Value};
-use sqlx::FromRow;
-use uuid::Uuid;
+use serde_json::Value;
+
+#[path = "response.rs"]
+mod response;
+pub(super) use response::load;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -32,15 +29,6 @@ pub struct UpdateRequest {
     version: i64,
     name: Option<String>,
     phone: Option<String>,
-}
-
-#[derive(FromRow)]
-struct AccountRow {
-    #[sqlx(flatten)]
-    user: UserRow,
-    version: i64,
-    password_changed_at: Option<String>,
-    owner_name: String,
 }
 
 /// The 409 for a concurrent change to the caller's own account.
@@ -52,29 +40,11 @@ pub fn stale() -> ApiError {
     )
 }
 
-async fn load<'e>(executor: impl sqlx::PgExecutor<'e>, user: Uuid) -> ApiResult<Value> {
-    let row = sqlx::query_as::<_, AccountRow>(
-        "SELECT u.*,to_char(c.password_changed_at AT TIME ZONE 'UTC', \
-         'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS password_changed_at,o.name AS owner_name \
-         FROM crm_user_profiles u JOIN crm_users c ON c.id=u.id \
-         JOIN crm_user_profiles o ON o.id=COALESCE(u.owner_id,u.id) \
-         WHERE u.id=$1 AND u.active AND u.owner_active",
-    )
-    .bind(user)
-    .fetch_optional(executor)
-    .await?
-    .ok_or_else(ApiError::unauthorized)?;
-    let workspace_id = row.user.workspace_id.clone();
-    Ok(json!({
-        "user": Profile::from(row.user),
-        "version": row.version,
-        "passwordChangedAt": row.password_changed_at,
-        "team": {"workspaceId": workspace_id, "ownerName": row.owner_name},
-    }))
-}
-
 pub async fn account(State(state): State<AppState>, session: Session) -> ApiResult<Json<Value>> {
-    Ok(Json(load(&state.pool, session.user.id).await?))
+    let mut transaction = state.pool.begin().await?;
+    let account = load(&mut transaction, session.user.id).await?;
+    transaction.commit().await?;
+    Ok(Json(account))
 }
 
 pub async fn update(
@@ -125,7 +95,7 @@ pub async fn update(
         Action::ProfileUpdated,
     )
     .await?;
-    let account = load(&mut *transaction, user).await?;
+    let account = load(&mut transaction, user).await?;
     transaction.commit().await?;
     Ok(Json(account))
 }

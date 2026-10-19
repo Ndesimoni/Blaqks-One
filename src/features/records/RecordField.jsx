@@ -1,4 +1,7 @@
 import React from 'react';
+import { FieldHintIcon, FieldHintText, useFieldHint } from '../../components/ui/FieldHint.jsx';
+import { fieldHintKey } from '../../i18n/fieldHintKeys.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import { LinkSelect } from './LinkSelect.jsx';
 
 /**
@@ -37,21 +40,31 @@ export function RecordField({
   const isId = f.key === idField.key;
   const issued = isId && Boolean(idPolicy?.issued);
   const idLocked = isId && Boolean(idPolicy?.readOnly);
-  const hint = issued || idLocked ? `${f.key}-hint` : undefined;
+  const idHint = issued || idLocked ? `${f.key}-hint` : undefined;
+  const { t } = useI18n();
+  const guidance = useFieldHint(f.key);
+  const hintKey = fieldHintKey(module, f.key);
+  const hintText = hintKey ? t(hintKey) : '';
   const inputProps = {
     'aria-invalid': Boolean(error),
     'aria-describedby':
-      [error ? `${f.key}-error` : '', hint].filter(Boolean).join(' ') || undefined,
+      [error ? `${f.key}-error` : '', idHint, guidance.describedBy].filter(Boolean).join(' ') ||
+      undefined,
     required: isId && !issued,
     'data-initial-focus': initialFocus || undefined,
   };
   return (
-    <div className={'field ' + (f.type === 'textarea' ? 'span-all' : '')} key={f.key}>
+    <div
+      className={'field ' + (f.type === 'textarea' ? 'span-all' : '')}
+      key={f.key}
+      {...guidance.scopeProps}
+    >
       <label htmlFor={f.key}>
         {module === 'Properties' && f.name === 'Price / annual rent AED'
           ? 'Asking price / rent AED'
           : f.name}
         {isId && !issued && <span className="required"> *</span>}
+        {hintText && <FieldHintIcon state={guidance} />}
       </label>
       {rel ? (
         <LinkSelect
@@ -101,8 +114,8 @@ export function RecordField({
           }
         />
       )}
-      {hint && (
-        <small id={hint} className="field-hint">
+      {idHint && (
+        <small id={idHint} className="field-hint">
           {!issued
             ? 'Record IDs cannot be changed.'
             : idLocked
@@ -110,6 +123,7 @@ export function RecordField({
               : 'Issued when saved. Leave blank for the next ID, or enter your own.'}
         </small>
       )}
+      <FieldHintText text={hintText} state={guidance} />
       {error && (
         <p id={`${f.key}-error`} className="field-error">
           {error}

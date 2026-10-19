@@ -24,6 +24,8 @@ fn member(role: &str, scope: &str, positions: &[&str], permissions: Permissions)
             positions: Json(positions.iter().map(|p| p.to_string()).collect()),
             permissions: Json(permissions),
             channel_access: Json(Default::default()),
+            language: None,
+            guidance_enabled: None,
             record_scope: scope.into(),
             actions: Json(actions),
         },

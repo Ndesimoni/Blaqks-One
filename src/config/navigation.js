@@ -34,7 +34,13 @@ const nav = [
       ['Performance', 'chart'],
     ],
   },
-  { header: 'RESOURCES', items: [['Guide', 'help']] },
+  {
+    header: 'RESOURCES',
+    items: [
+      ['Calculators', 'money'],
+      ['Guide', 'help'],
+    ],
+  },
 ];
 
 const labels = {
@@ -60,6 +66,7 @@ const labels = {
   'Interaction log': 'Communication history',
   'Client care': 'Client relationships',
   'CRM insights': 'CRM intelligence',
+  Calculators: 'Calculators',
   Guide: 'Getting started',
 };
 
@@ -82,6 +89,7 @@ const descriptions = {
   Expenses: 'Understand what you spend to grow your business.',
   'Interaction log': 'The full story behind every client conversation.',
   'Client care': 'Turn one successful transaction into a lasting relationship.',
+  Calculators: 'Estimate DLD, agency fees and VAT before a transaction.',
 };
 
-export { nav, labels, descriptions, preferredCols };
+export { descriptions, labels, nav, preferredCols };

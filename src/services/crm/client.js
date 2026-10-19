@@ -3,6 +3,8 @@ import { activityRoutes } from './activity.js';
 import { assignmentRoutes } from './assignments.js';
 import { financeRoutes } from './finance.js';
 import { performanceRoutes } from './performance.js';
+import { companyRoutes, readCompany } from './company.js';
+import { signupRoutes } from './signup.js';
 
 export class CrmApiError extends Error {
   constructor(message, status, details = {}) {
@@ -47,7 +49,7 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
       );
     return json;
   };
-  const identity = async (path, options) => {
+  const identityEnvelope = async (path, options) => {
     const session = await request(path, options);
     if (!session.user?.id || typeof session.csrfToken !== 'string' || !session.csrfToken)
       throw new CrmApiError(
@@ -55,7 +57,12 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         502,
       );
     csrfToken = session.csrfToken;
-    return session.user;
+    return session;
+  };
+  const identity = async (path, options) => (await identityEnvelope(path, options)).user;
+  const identityWithCompany = async (path, options) => {
+    const session = await identityEnvelope(path, options);
+    return { ...session, company: readCompany(session.company) };
   };
   /** Swaps the in-memory anti-forgery token after the server rotates the session. */
   const setCsrfToken = (token) => {
@@ -66,8 +73,11 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     `${scope(workspace)}/records/${encodeURIComponent(collection)}${id ? `/${encodeURIComponent(id)}` : ''}`;
   return {
     session: (signal) => identity('/auth/session', { signal }),
+    sessionWithCompany: (signal) => identityWithCompany('/auth/session', { signal }),
     login: (email, password) =>
       identity('/auth/login', { method: 'POST', body: { email, password } }),
+    loginWithCompany: (email, password) =>
+      identityWithCompany('/auth/login', { method: 'POST', body: { email, password } }),
     async logout() {
       try {
         await request('/auth/logout', { method: 'POST' });
@@ -116,5 +126,7 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     ...assignmentRoutes({ request, scope, recordPath }),
     ...financeRoutes({ request, scope }),
     ...performanceRoutes({ request, scope }),
+    ...companyRoutes({ request, scope }),
+    ...signupRoutes({ request, setCsrfToken }),
   };
 }

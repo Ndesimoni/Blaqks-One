@@ -3,7 +3,7 @@ use super::{
     prepare::prepare,
     update::{self, UpdateRequest},
 };
-use crate::team::{access, audit};
+use crate::team::{access, account_type::seats, audit};
 use crate::{
     assignments::departure,
     auth::{actions::Actions, sessions},
@@ -52,6 +52,9 @@ pub async fn update(
     let before = current.user.effective_permissions();
     prepare(&mut request, &current)?;
     let active = request.active.unwrap_or(current.active);
+    if !current.active && active {
+        seats::ensure(&mut transaction, workspace, Some(id)).await?;
+    }
     let access_changed = grants_changed(&current, &request);
     // Admin rows keep '{}' (L-2): their `actions` stays None and COALESCE keeps it.
     sqlx::query(

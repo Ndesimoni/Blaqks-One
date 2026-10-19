@@ -43,6 +43,8 @@ jobs:
         run: npm run check:lines:ci
       - name: Backend module boundaries
         run: npm run check:boundaries
+      - name: Translation catalogues
+        run: npm run check:i18n
 
   rust:
     name: Rust checks

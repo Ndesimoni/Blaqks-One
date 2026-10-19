@@ -31,6 +31,7 @@
     "check:lines": "node scripts/check-file-size.mjs",
     "check:lines:ci": "node scripts/check-file-size.mjs --baseline scripts/file-size-baseline.json",
     "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

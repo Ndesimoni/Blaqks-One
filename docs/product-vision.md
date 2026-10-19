@@ -13,6 +13,8 @@ Status: owner brainstorm, 2026-10-16. **Goal: make Blaqks One the number one sof
 
 ### 1. Premium redesign of the whole app
 
+**Paused by the owner on 2026-10-16.** Limestone and Midnight were tried and reverted. Keep the current forest-green/gold theme and apply premium polish as screens change; see [Design and language decisions](product-decisions.md#design-and-language-going-forward-decided-2026-10-16). The proposal below is retained as background, not current implementation direction.
+
 The owner wants the CRM to look orderly, premium, clean, smooth and "expensive", especially the Dashboard, with charts and diagrams.
 
 - **Approach:** the senior product designer proposes two or three visual directions (colour, typography, depth, motion and chart style) as preview pages. The owner picks one, and it becomes the new approved baseline in `docs/design-standards.md`, replacing the current one only with the owner's approval.
@@ -103,6 +105,8 @@ Other points:
 - **Developers module** for off-plan projects, inventory and payment plans (later).
 
 ## Suggested order
+
+The current execution order is in the [implementation roadmap](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations): the redesign is paused, the English/Arabic foundation is built in the working tree, and platform groundwork follows its acceptance. The original brainstorm order below is historical.
 
 1. **Premium redesign direction and design system v2** (right-to-left ready), with the Dashboard first.
 2. **Language foundation:** English and Arabic.

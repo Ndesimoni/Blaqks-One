@@ -85,6 +85,8 @@ PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only
 
 `test:api` and `test:server:e2e` use their own disposable Docker database and a test API on port 8790; they never touch your development data. Run the browser suite with `--browser-only` so it starts on a fresh database; without it the API suites run first and their fixtures share the browser suite's database. `PLAYWRIGHT_CHANNEL=chrome` uses your installed Google Chrome (or run `npx playwright install chromium` once). Do not run the frozen demo suite (`npm run test:e2e`) as a routine check.
 
+To diagnose a failure quickly, `API_TEST_FILES=tests/api/a.test.mjs,tests/api/b.test.mjs npm run test:api` runs only those suites, in their usual order (the restart check is skipped). On a Mac, a run whose tests suddenly take minutes and then fail with 503 `database_unavailable` usually means the Docker VM stalled under memory pressure: check swap (`sysctl vm.swapusage`), close heavy apps and avoid running suites, builds or browsers at the same time.
+
 ## Continuous integration
 
 GitHub Actions runs [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on every pull request, every push to `main` and on demand; work on other branches is checked through its pull request, so open one to get CI. A newer run on the same branch cancels the older one. Three jobs run in parallel on `ubuntu-latest`:

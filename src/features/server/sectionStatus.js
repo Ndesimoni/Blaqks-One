@@ -16,6 +16,7 @@ const connectedSections = new Set([
   'Performance',
   'CRM insights',
   'Date search',
+  'Calculators',
   'Guide',
   // The member's own account under `/auth/account` and `/auth/sessions`.
   'My profile',

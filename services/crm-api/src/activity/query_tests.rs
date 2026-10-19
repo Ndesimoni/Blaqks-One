@@ -17,6 +17,8 @@ fn user(role: &str, scope: &str) -> UserRow {
         channel_access: Json(ChannelAccess::default()),
         record_scope: scope.into(),
         actions: Json(json!({})),
+        language: None,
+        guidance_enabled: None,
     }
 }
 

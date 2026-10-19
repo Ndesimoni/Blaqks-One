@@ -9,6 +9,12 @@ export function accountRoutes({ request, setCsrfToken }) {
     account: (signal) => request('/auth/account', { signal }),
     updateAccount: ({ version, name, phone }) =>
       request('/auth/account', { method: 'PATCH', body: { version, name, phone } }),
+    // An allowlisted preference ('en' | 'ar'); returns the account like `updateAccount`.
+    updateLanguage: (language) =>
+      request('/auth/account/language', { method: 'PUT', body: { language } }),
+    // Automatic field hints on or off; returns the account like `updateLanguage`.
+    updateGuidance: (enabled) =>
+      request('/auth/account/guidance', { method: 'PUT', body: { enabled } }),
     async changePassword(currentPassword, newPassword) {
       const result = await request('/auth/account/password', {
         method: 'POST',

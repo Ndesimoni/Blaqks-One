@@ -23,6 +23,8 @@ fn staff(id: Uuid, scope: &str) -> UserRow {
         positions: Json(vec![]),
         permissions: Json(Permissions::full()),
         channel_access: Json(Default::default()),
+        language: None,
+        guidance_enabled: None,
         record_scope: scope.into(),
         actions: Json(json!({})),
     }

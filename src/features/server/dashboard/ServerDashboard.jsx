@@ -12,6 +12,8 @@ import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
 import { useDashboardWorkload } from './useDashboardWorkload.js';
 import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
 import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
+import { hasTeamFeatures } from '../access.js';
+import { GetStartedChecklist } from './GetStartedChecklist.jsx';
 import '../assignment/assigned-filter.css';
 
 /**
@@ -19,7 +21,7 @@ import '../assignment/assigned-filter.css';
  * Finance figures come from the workspace's scoped finance overview.
  */
 export function ServerDashboard({ owner }) {
-  const { user } = useSession();
+  const { user, company } = useSession();
   // Names use every record the viewer can see; only the figures follow the workload filter.
   const { data: visible, scope, referenceFor, listingViewings } = useRecords();
   const workload = useDashboardWorkload();
@@ -42,12 +44,20 @@ export function ServerDashboard({ owner }) {
   return (
     <div className="page-stack dashboard-page connected-dashboard">
       <DashboardWelcome />
+      {user.roleId === 'admin' && (
+        <GetStartedChecklist
+          workspaceId={owner.id}
+          data={visible}
+          company={company}
+          firstName={user.name.trim().split(/\s+/)[0]}
+        />
+      )}
       <div className="subhead-row">
         <div>
           <h2>Your business, at a glance</h2>
           <p>{caption}</p>
         </div>
-        {workload.module && (
+        {workload.module && hasTeamFeatures(user) && (
           <AssignedToFilter
             module={workload.module}
             filter={workload.filter}

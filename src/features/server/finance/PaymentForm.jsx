@@ -1,13 +1,13 @@
 import React, { useId, useMemo } from 'react';
 import { formatAed } from '../../../lib/finance/money.js';
-import { useFinanceContext } from './useFinanceRequests.js';
+import { EntryRejection, EntryTextFields, MoneyInput } from './EntryFormParts.jsx';
 import { FinanceDialog, ReasonField } from './FinanceDialog.jsx';
 import { FinanceField as Field } from './FinanceField.jsx';
 import { dubaiToday } from './dealEstimate.js';
 import { emptyPaymentDraft, entryAmount, paymentDraft, validatePayment } from './entryDraft.js';
 import { earnedDealOptions, entryKinds, paymentPreview } from './entryFilters.js';
 import { entryFormText, useEntryForm } from './useEntryForm.js';
-import { EntryRejection, EntryTextFields, MoneyInput } from './EntryFormParts.jsx';
+import { useFinanceContext } from './useFinanceRequests.js';
 
 /**
  * Record or correct a commission receipt (finance-design §4, §7, §16). The deal picker lists
@@ -67,7 +67,7 @@ export function PaymentForm({ payment, onClose, onDone }) {
             required
             wide
             error={errors.dealId}
-            hint="Only earned deals in your view can receive payments."
+            hintKey="fieldHints.payments.dealId"
           >
             {(props) => (
               <select {...props} {...bind('dealId')} disabled={noDeals} data-initial-focus>
@@ -81,7 +81,13 @@ export function PaymentForm({ payment, onClose, onDone }) {
             )}
           </Field>
         )}
-        <Field name="receiptDate" label="Receipt date" required error={errors.receiptDate}>
+        <Field
+          name="receiptDate"
+          label="Receipt date"
+          required
+          error={errors.receiptDate}
+          hintKey="fieldHints.payments.receiptDate"
+        >
           {(props) => <input {...props} type="date" max={today} {...bind('receiptDate')} />}
         </Field>
         <Field
@@ -89,6 +95,7 @@ export function PaymentForm({ payment, onClose, onDone }) {
           label="Amount received (AED, excluding VAT)"
           required
           error={errors.amount}
+          hintKey="fieldHints.payments.amount"
         >
           {(props) => <MoneyInput field={props} bind={bind} />}
         </Field>
@@ -96,7 +103,7 @@ export function PaymentForm({ payment, onClose, onDone }) {
           bind={bind}
           errors={errors}
           fields={[
-            ['reference', 'Reference', 'input'],
+            ['reference', 'Reference', 'input', null, 'fieldHints.payments.reference'],
             ['notes', 'Notes', 'textarea'],
           ]}
         />

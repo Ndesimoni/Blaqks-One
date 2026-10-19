@@ -1,17 +1,28 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button.jsx';
-import { BrandMark } from '../../components/layout/BrandMark.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { ServerTheme } from './ServerTheme.jsx';
+import { useI18n } from '../../i18n/useI18n.js';
 
-export function ServerSignIn({ signIn, notice }) {
+export function ServerSignIn({ api, signIn, notice }) {
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const busyRef = useRef(false);
+  const [signupEnabled, setSignupEnabled] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    api
+      .signupStatus(controller.signal)
+      .then((value) => setSignupEnabled(value.enabled))
+      .catch(() => {});
+    return () => controller.abort();
+  }, [api]);
   useUnsavedChanges(false, busy);
   const submit = async (event) => {
     event.preventDefault();
@@ -32,14 +43,12 @@ export function ServerSignIn({ signIn, notice }) {
   return (
     <main className="sign-in-page">
       <div className="sign-in-shell">
-        <section className="sign-in-story" aria-label="Keys with Simoni">
-          <div className="brand sign-in-brand">
-            <BrandMark />
+        <section className="sign-in-story" aria-label="Blaqks One">
+          <div className="signup-brand sign-in-brand u-ltr">
+            <span aria-hidden="true">B1</span>
             <div>
-              <strong>
-                KEYS <i>WITH</i> SIMONI
-              </strong>
-              <span>REAL ESTATE STUDIO</span>
+              <strong>BLAQKS ONE</strong>
+              <small>REAL ESTATE PLATFORM</small>
             </div>
           </div>
           <div className="sign-in-story-body">
@@ -117,6 +126,11 @@ export function ServerSignIn({ signIn, notice }) {
             <p className="sign-in-subtitle">
               Contact your Super Admin if you need an account or help signing in.
             </p>
+            {signupEnabled && (
+              <Link className="signup-signin-link" to="/sign-up">
+                {t('signup.signUpLink')}
+              </Link>
+            )}
           </div>
           <footer className="sign-in-footer">
             Connected CRM · Browser demo records are kept separately.

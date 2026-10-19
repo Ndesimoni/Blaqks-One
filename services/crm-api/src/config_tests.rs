@@ -1,4 +1,4 @@
-use super::cookie_policy;
+use super::{cookie_policy, signup_mode, SignupMode};
 
 #[test]
 fn requires_https_unless_insecure_loopback_is_explicitly_enabled() {
@@ -35,4 +35,14 @@ fn rejects_origins_with_paths_credentials_query_or_fragment() {
     ] {
         assert!(cookie_policy(origin, false, local).is_err());
     }
+}
+
+#[test]
+fn signup_is_off_by_default_and_local_needs_insecure_loopback() {
+    assert_eq!(signup_mode(None, true), Ok(SignupMode::Off));
+    assert_eq!(signup_mode(Some("off"), false), Ok(SignupMode::Off));
+    assert_eq!(signup_mode(Some("local"), false), Ok(SignupMode::Local));
+    assert!(signup_mode(Some("local"), true).is_err());
+    assert!(signup_mode(Some("live"), false).is_err());
+    assert!(signup_mode(Some("invalid"), false).is_err());
 }

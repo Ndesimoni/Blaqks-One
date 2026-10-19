@@ -84,6 +84,8 @@ pub async fn login(
         .and_then(|value| value.to_str().ok());
     let label = device::label(agent);
     let issued = sessions::issue(&mut transaction, user.user.id, label.as_deref()).await?;
+    let company =
+        crate::workspaces::company::get(&mut *transaction, &live_user.workspace_id).await?;
     transaction.commit().await?;
     let profile = Profile::from(live_user);
     let mut response_headers = HeaderMap::new();
@@ -95,12 +97,15 @@ pub async fn login(
     );
     Ok((
         response_headers,
-        Json(json!({"user": profile, "csrfToken": issued.csrf_token})),
+        Json(json!({"user": profile, "csrfToken": issued.csrf_token, "company": company})),
     ))
 }
 
-pub async fn current(session: Session) -> Json<Value> {
-    Json(json!({"user": Profile::from(session.user), "csrfToken": session.csrf_token}))
+pub async fn current(State(state): State<AppState>, session: Session) -> ApiResult<Json<Value>> {
+    let company = crate::workspaces::company::get(&state.pool, &session.user.workspace_id).await?;
+    Ok(Json(
+        json!({"user": Profile::from(session.user), "csrfToken": session.csrf_token, "company": company}),
+    ))
 }
 
 pub async fn logout(

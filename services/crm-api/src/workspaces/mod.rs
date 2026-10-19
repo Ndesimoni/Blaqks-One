@@ -1,4 +1,6 @@
+pub mod company;
 pub mod handlers;
+pub mod routes;
 
 use crate::{
     auth::{grants::Action, profile::UserRow, session::Session},
@@ -25,13 +27,15 @@ pub async fn create(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     id: &str,
     owner: uuid::Uuid,
+    actor: uuid::Uuid,
+    company: company::NewCompany,
 ) -> ApiResult<()> {
     sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
         .bind(id)
         .bind(owner)
         .execute(&mut **transaction)
         .await?;
-    Ok(())
+    company::create(transaction, id, actor, company).await
 }
 
 pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str) -> ApiResult<()> {

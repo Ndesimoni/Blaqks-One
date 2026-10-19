@@ -8,6 +8,7 @@ use crate::{
         permissions::{ChannelAccess, Permissions},
         protection,
         session::Session,
+        throttle,
     },
     error::{ApiError, ApiResult},
     state::AppState,
@@ -68,6 +69,15 @@ pub async fn create(
         }
         _ => return Err(ApiError::forbidden()),
     };
+    throttle::consume_window(
+        &state.pool,
+        &format!("team:invitation:day:{workspace}"),
+        20,
+        86_400,
+        "Too many invitations. Try again later.",
+        "rate_limited",
+    )
+    .await?;
     let created = store::create(
         &state.pool,
         session.user.id,

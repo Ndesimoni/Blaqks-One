@@ -4,6 +4,7 @@ use crate::{
     error::{self, ApiError, ApiResult, CodeMapper},
     finance, imports, performance,
     records::handlers as records,
+    signup,
     state::AppState,
     team, workspaces,
 };
@@ -17,7 +18,6 @@ use axum::{
 };
 use serde_json::{json, Value};
 
-/// Domains that map their own database error codes, ahead of the generic mapping.
 const DOMAIN_CODES: &[CodeMapper] = &[finance::errors::mapped, performance::errors::mapped];
 
 /// Registers every domain's database error mapping. `app` calls it; command-line paths
@@ -139,6 +139,9 @@ pub fn app(state: AppState) -> Router {
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(activity::routes::router())
+        .merge(team::routes::router())
+        .merge(workspaces::routes::router())
+        .merge(signup::routes::router(state.config.signup))
         .fallback(unknown_route)
         .method_not_allowed_fallback(unsupported_method)
         .layer(DefaultBodyLimit::max(12 * 1024 * 1024 + 1024))

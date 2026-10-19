@@ -16,16 +16,17 @@ export function EntryRejection({ entry }) {
 }
 
 /**
- * Optional free-text fields as `[key, label, 'input'|'textarea', hint?]`. Lengths are checked
- * before saving; the server trims and stores blanks as empty.
+ * Optional free-text fields as `[key, label, 'input'|'textarea', hint?, hintKey?]`.
+ * Lengths are checked before saving; the server trims and stores blanks as empty.
  */
 export function EntryTextFields({ bind, errors, fields }) {
-  return fields.map(([key, label, type, hint]) => (
+  return fields.map(([key, label, type, hint, hintKey]) => (
     <Field
       key={key}
       name={key}
       label={label}
       hint={hint}
+      hintKey={hintKey}
       error={errors[key]}
       wide={type === 'textarea'}
     >

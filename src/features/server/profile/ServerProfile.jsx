@@ -2,27 +2,33 @@ import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
+import { useI18n } from '../../../i18n/useI18n.js';
 import { AccountSummary } from './AccountSummary.jsx';
+import { CompanyProfileForm } from './CompanyProfileForm.jsx';
+import { GuidanceSetting } from './GuidanceSetting.jsx';
+import { LanguageSetting } from './LanguageSetting.jsx';
 import { PasswordForm } from './PasswordForm.jsx';
+import './profile-forms.css';
+import './profile-header.css';
+import './profile-language.css';
+import './profile-sessions.css';
+import './profile.css';
 import { ProfileDetailsForm } from './ProfileDetailsForm.jsx';
-import { ProfileSkeleton } from './ProfileSkeleton.jsx';
 import { ProfileHeader } from './ProfileHeader.jsx';
+import { ProfileSkeleton } from './ProfileSkeleton.jsx';
 import { SessionsPanel } from './SessionsPanel.jsx';
 import { SettingsSection } from './SettingsSection.jsx';
 import { useAccount } from './useAccount.js';
 import { useSessions } from './useSessions.js';
-import './profile.css';
-import './profile-header.css';
-import './profile-forms.css';
-import './profile-sessions.css';
-
 /**
  * Connected My profile (docs/account-self-service.md): the member's own account, name and phone,
- * password and sign-in sessions. It never reads workspace records and grants no extra powers.
+ * language, password and sign-in sessions. It never reads workspace records and grants no
+ * extra powers. Only the Language section uses translation catalogues so far (docs/i18n.md).
  */
 export function ServerProfile() {
-  const { api, replaceUser } = useSession();
+  const { api, user, company, replaceUser, replaceCompany } = useSession();
   const { refreshDirectory } = useWorkspaceScope();
+  const { t, languages } = useI18n();
   const { account, error, reload, replace } = useAccount(api);
   const sessions = useSessions(api);
   if (error)
@@ -37,6 +43,10 @@ export function ServerProfile() {
     replace(next);
     replaceUser(next.user);
     refreshDirectory();
+  };
+  const onPreferenceSaved = (next) => {
+    replace(next);
+    replaceUser(next.user);
   };
   const onPasswordChanged = () => {
     reload();
@@ -53,6 +63,20 @@ export function ServerProfile() {
         >
           <AccountSummary account={account} />
         </SettingsSection>
+        {user.roleId === 'admin' && (
+          <SettingsSection
+            id="company-profile"
+            title={t('signupSetup.companyProfileTitle')}
+            description={t('signupSetup.companyProfileDescription')}
+          >
+            <CompanyProfileForm
+              api={api}
+              workspaceId={user.workspaceId}
+              company={company}
+              onSaved={replaceCompany}
+            />
+          </SettingsSection>
+        )}
         <SettingsSection
           id="details"
           title="Edit details"
@@ -61,6 +85,22 @@ export function ServerProfile() {
           <div className="panel acct-card">
             <ProfileDetailsForm api={api} account={account} onSaved={onSaved} onReload={reload} />
           </div>
+        </SettingsSection>
+        {languages.length > 1 && (
+          <SettingsSection
+            id="language"
+            title={t('profile.language.title')}
+            description={t('profile.language.description')}
+          >
+            <LanguageSetting api={api} account={account} onSaved={onPreferenceSaved} />
+          </SettingsSection>
+        )}
+        <SettingsSection
+          id="guidance"
+          title={t('profile.guidance.title')}
+          description={t('profile.guidance.description')}
+        >
+          <GuidanceSetting api={api} account={account} onSaved={onPreferenceSaved} />
         </SettingsSection>
         <SettingsSection
           id="password"

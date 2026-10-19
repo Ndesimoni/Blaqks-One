@@ -90,6 +90,10 @@ All endpoints are under `/api/crm/auth`, with a 16 KiB body limit, `deny_unknown
 
 Suspended or archived accounts, and staff of a suspended Admin, already fail the session extractor (401). The archive trigger also blocks updates to an archived account.
 
+### 7. `PUT /account/language {language}`
+
+Added 2026-10-16 with migration 0021: the caller's own interface language, `en` or `ar` only. See [Language foundation](i18n.md#choosing-a-language).
+
 ## Database: migration 0018 (owner: auth)
 
 `crm_sessions` gains three columns:

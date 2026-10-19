@@ -1,10 +1,14 @@
 import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-import { apiTestFiles } from './crm-api-test-files.mjs';
+import { selectedApiTestFiles } from './crm-api-test-files.mjs';
+import { checkSignupOff } from './check-signup-off.mjs';
+import { checkExpiredSignupRemoved, seedExpiredSignup } from './check-signup-cleanup.mjs';
 import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
+// Optional API_TEST_FILES (comma-separated) narrows the API suites; see crm-api-test-files.mjs.
+const apiTestFiles = selectedApiTestFiles();
 const project = `kws-crm-test-${randomBytes(6).toString('hex')}`;
 const dbPassword = randomBytes(32).toString('hex');
 const env = {
@@ -14,10 +18,13 @@ const env = {
   CRM_APP_ORIGIN: 'http://localhost:5175',
   CRM_BIND_ADDRESS: '127.0.0.1:8790',
   CRM_ALLOW_INSECURE_LOCAL: 'true',
+  CRM_SIGNUP: 'local',
   CRM_TEST_API: 'http://127.0.0.1:8790/api/crm',
   // Random, and meets the new-password policy that the account CLI enforces.
   CRM_FIXTURE_PASSWORD: `Fx1!${randomBytes(24).toString('hex')}`,
   VITE_CRM_MODE: 'server',
+  // Offers Arabic in My profile for tests/server-browser/language.spec.js; English stays default.
+  VITE_I18N_PREVIEW: 'true',
   CRM_API_PROXY: 'http://127.0.0.1:8790',
 };
 const compose = ['compose', '-f', 'compose.test.yaml', '-p', project];
@@ -54,10 +61,34 @@ try {
     });
   }
   await ensurePortFree('127.0.0.1', 8790);
+  await checkSignupOff(binary, env);
+  seedExpiredSignup(compose);
   server = spawn(binary, [], { env, stdio: 'inherit' });
   await waitForApi(`${env.CRM_TEST_API}/health`, server);
+  checkExpiredSignupRemoved(compose);
   if (!process.argv.includes('--browser-only')) {
+    // Database-backed Rust contracts use this same disposable, migrated database.
+    await run(
+      'cargo',
+      [
+        'test',
+        '--locked',
+        '--offline',
+        '--manifest-path',
+        'services/crm-api/Cargo.toml',
+        '--lib',
+        '--',
+        '--ignored',
+        '--test-threads=1',
+      ],
+      env,
+    );
     await run('node', ['--test', '--test-concurrency=1', ...apiTestFiles], env);
+  }
+  // The restart check reads records the full suite saves, so a filtered run skips it.
+  const filtered = Boolean(process.env.API_TEST_FILES?.trim());
+  if (filtered) console.log('API_TEST_FILES is set: skipping the restart check.');
+  if (!process.argv.includes('--browser-only') && !filtered) {
     const identity = await fetch(`${env.CRM_TEST_API}/auth/login`, {
       method: 'POST',
       headers: { Origin: env.CRM_APP_ORIGIN, 'Content-Type': 'application/json' },
