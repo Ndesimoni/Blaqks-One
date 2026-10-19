@@ -21,7 +21,7 @@ export const initialDetails = Object.freeze({
 
 export const normalizePhone = (value) => String(value || '').replace(/\s+/g, '');
 
-export const startPayload = (details, status, language) => ({
+export const startPayload = (details, status, language, botToken = BOT_TOKEN) => ({
   name: details.name.trim(),
   email: details.email.trim().toLowerCase(),
   phone: normalizePhone(details.phone),
@@ -29,7 +29,7 @@ export const startPayload = (details, status, language) => ({
   termsVersion: status.terms.version,
   privacyVersion: status.privacy.version,
   language,
-  botToken: BOT_TOKEN,
+  botToken,
 });
 
 export const companyPayload = (company, setup) => ({

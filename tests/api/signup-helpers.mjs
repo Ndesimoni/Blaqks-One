@@ -24,8 +24,19 @@ export function details(overrides = {}) {
   };
 }
 
+// The API trusts the loopback proxy in tests, so a derived address gives each
+// synthetic case its own per-client budget without weakening production limits.
+function clientFor(seed) {
+  const bytes = createHash('sha256').update(seed).digest();
+  return `10.${bytes[0]}.${bytes[1]}.${bytes[2]}`;
+}
+
 export async function start(body = details()) {
-  return request('/signup/start', { method: 'POST', body });
+  return request('/signup/start', {
+    method: 'POST',
+    body,
+    headers: { 'x-test-client': clientFor(body.email) },
+  });
 }
 
 export async function started(body = details()) {
@@ -52,6 +63,7 @@ export async function verify(ticket, code = codeFor(ticket)) {
   return request('/signup/verify', {
     method: 'POST',
     body: { requestId: ticket, code },
+    headers: { 'x-test-client': clientFor(ticket) },
   });
 }
 

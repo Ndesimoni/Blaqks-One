@@ -13,6 +13,20 @@ pub struct Config {
     pub address: SocketAddr,
     pub secure_cookie: bool,
     pub signup: SignupMode,
+    /// Local delivery worker; API tests turn it off so they can inspect pending codes.
+    pub signup_worker: bool,
+    pub trusted_proxies: String,
+    pub client_header: String,
+    pub client_secret: String,
+    pub turnstile: Option<TurnstileConfig>,
+}
+
+#[derive(Clone)]
+pub struct TurnstileConfig {
+    pub secret: String,
+    pub site_key: String,
+    pub hostname: String,
+    pub endpoint: String,
 }
 
 impl Config {
@@ -27,13 +41,63 @@ impl Config {
             .map_err(|_| "CRM_BIND_ADDRESS is invalid.")?;
         let secure_cookie = cookie_policy(&origin, insecure, address)?;
         let signup = signup_mode(env::var("CRM_SIGNUP").ok().as_deref(), secure_cookie)?;
+        let signup_worker = worker_enabled(env::var("CRM_SIGNUP_WORKER").ok().as_deref())?;
+        let trusted_proxies = env::var("CRM_TRUSTED_PROXIES").unwrap_or_default();
+        let client_header =
+            env::var("CRM_TRUSTED_CLIENT_HEADER").unwrap_or_else(|_| "cf-connecting-ip".into());
+        let client_secret = env::var("CRM_CLIENT_DIGEST_SECRET")
+            .unwrap_or_else(|_| "local-development-digest-secret".into());
+        let turnstile = turnstile_config(
+            env::var("CRM_TURNSTILE_SECRET").ok(),
+            env::var("CRM_TURNSTILE_SITE_KEY").ok(),
+            env::var("CRM_TURNSTILE_HOSTNAME").ok(),
+            env::var("CRM_TURNSTILE_ENDPOINT").ok(),
+        )?;
         Ok(Self {
             database_url,
             origin,
             address,
             secure_cookie,
             signup,
+            signup_worker,
+            trusted_proxies,
+            client_header,
+            client_secret,
+            turnstile,
         })
+    }
+}
+
+fn turnstile_config(
+    secret: Option<String>,
+    site_key: Option<String>,
+    hostname: Option<String>,
+    endpoint: Option<String>,
+) -> Result<Option<TurnstileConfig>, String> {
+    let configured = [&secret, &site_key, &hostname]
+        .iter()
+        .filter(|value| value.as_deref().is_some_and(|text| !text.trim().is_empty()))
+        .count();
+    if configured == 0 {
+        return Ok(None);
+    }
+    if configured != 3 {
+        return Err("Turnstile requires a secret, site key and hostname.".into());
+    }
+    Ok(Some(TurnstileConfig {
+        secret: secret.unwrap(),
+        site_key: site_key.unwrap(),
+        hostname: hostname.unwrap(),
+        endpoint: endpoint
+            .unwrap_or_else(|| "https://challenges.cloudflare.com/turnstile/v0/siteverify".into()),
+    }))
+}
+
+fn worker_enabled(value: Option<&str>) -> Result<bool, String> {
+    match value.unwrap_or("on") {
+        "on" => Ok(true),
+        "off" => Ok(false),
+        _ => Err("CRM_SIGNUP_WORKER must be on or off.".into()),
     }
 }
 

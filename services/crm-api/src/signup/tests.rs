@@ -23,21 +23,22 @@ fn masking_keeps_only_the_first_character_and_domain() {
     assert_eq!(code::mask("synthetic@example.test"), "s•••@example.test");
 }
 
-#[test]
-fn local_bot_bypass_cannot_be_enabled_by_a_request() {
+#[tokio::test]
+async fn local_bot_bypass_cannot_be_enabled_by_a_request() {
     let local = LocalBypass::new(SignupMode::Local);
     assert_eq!(
-        local.verify("local-development", "signup_start"),
+        local.verify("local-development", "signup_start").await,
         Outcome::Pass
     );
-    assert_eq!(local.verify("bypass", "signup_start"), Outcome::Fail);
+    assert_eq!(local.verify("bypass", "signup_start").await, Outcome::Fail);
     let off = LocalBypass::new(SignupMode::Off);
     assert_eq!(
-        off.verify("local-development", "signup_start"),
+        off.verify("local-development", "signup_start").await,
         Outcome::Fail
     );
     assert_eq!(
         bot::require(&off, "local-development", "signup_start")
+            .await
             .unwrap_err()
             .2,
         "bot_check_failed"

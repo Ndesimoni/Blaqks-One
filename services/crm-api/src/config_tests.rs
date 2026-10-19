@@ -1,4 +1,4 @@
-use super::{cookie_policy, signup_mode, SignupMode};
+use super::{cookie_policy, signup_mode, turnstile_config, worker_enabled, SignupMode};
 
 #[test]
 fn requires_https_unless_insecure_loopback_is_explicitly_enabled() {
@@ -45,4 +45,34 @@ fn signup_is_off_by_default_and_local_needs_insecure_loopback() {
     assert!(signup_mode(Some("local"), true).is_err());
     assert!(signup_mode(Some("live"), false).is_err());
     assert!(signup_mode(Some("invalid"), false).is_err());
+}
+
+#[test]
+fn the_delivery_worker_defaults_on_and_refuses_unknown_values() {
+    assert_eq!(worker_enabled(None), Ok(true));
+    assert_eq!(worker_enabled(Some("on")), Ok(true));
+    assert_eq!(worker_enabled(Some("off")), Ok(false));
+    assert!(worker_enabled(Some("auto")).is_err());
+}
+
+#[test]
+fn turnstile_needs_all_three_public_and_secret_values() {
+    let none = turnstile_config(None, None, None, None).unwrap();
+    assert!(none.is_none());
+    let full = turnstile_config(
+        Some("secret".into()),
+        Some("site".into()),
+        Some("crm.example.test".into()),
+        None,
+    )
+    .unwrap()
+    .unwrap();
+    assert_eq!(full.site_key, "site");
+    assert_eq!(full.hostname, "crm.example.test");
+    assert!(full
+        .endpoint
+        .starts_with("https://challenges.cloudflare.com/"));
+    assert!(turnstile_config(Some("secret".into()), None, None, None).is_err());
+    assert!(turnstile_config(None, Some("site".into()), None, None).is_err());
+    assert!(turnstile_config(None, None, Some("host".into()), None).is_err());
 }

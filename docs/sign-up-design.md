@@ -309,6 +309,17 @@ This owner decision supersedes the individual/brokerage choice and switching flo
 
 Compilation, production build, translation parity, module boundaries and the shrink-only line check passed. Full API and browser suites remain for CI under the token-efficient delivery policy.
 
+## 19. R1 durable delivery worker (2026-10-19)
+
+Migration `0027_signup_delivery_jobs.sql` keeps jobs in `crm_signup_outbox`, because sign-up owns the message data; no generic jobs table is needed yet. It adds attempts, next-attempt time, lease owner/expiry, supersession, terminal time and a bounded redacted error.
+
+- Start and resend commit the pending request and outbox job, then return **202** without calling a transport in the request path.
+- Two worker loops run in local mode (`CRM_SIGNUP_WORKER=off` disables them for API tests). Each has a random owner identity and claims one due job with `FOR UPDATE SKIP LOCKED` and a 30-second expiring lease. An expired lease is claimable, so a restart or crash resumes the job.
+- Retryable transport errors, `429` and `5xx` wait 5s, 10s, 20s and so on, capped at five minutes, with under one second of jitter. `Retry-After` wins up to the same cap. Permanent `4xx` is terminal immediately; eight attempts is the maximum.
+- Resend and the worker share a per-request advisory lock. Resend marks the previous code job `superseded_at` and `terminal_at`, clears its code, then inserts the new job. The worker re-reads the job under `FOR UPDATE` after taking the lock, so a superseded or replaced code is never sent.
+- Success, permanent failure, expiry, supersession and retention cleanup all clear the plaintext code. Logs and job rows contain no code, address, body or credential; `last_error` is fixed transport text only.
+- `CRM_SIGNUP=live` remains rejected. The development outbox now only prints the message; database state belongs to the worker.
+
 ## 18. B0 stabilization notes (2026-10-19)
 
 Packet B0 reconciles the uncommitted universal-company work with the reviewed plan. The obsolete individual-account choice, switch routes, navigation and seat-limit bypasses stay retired; every sign-up still creates a company on the three-seat Free plan.
@@ -320,3 +331,19 @@ Packet B0 reconciles the uncommitted universal-company work with the reviewed pl
 - `API_TEST_FILES` narrows the API runner to named suites for focused diagnosis; an unknown name fails instead of silently running nothing.
 
 **Verification:** `npm test` passed 336 checks; `npm run build`, `npm run check:i18n` (143 keys in each catalogue), `npm run check:boundaries`, `cargo fmt --check` and `cargo check --all-targets` passed. `npm run check:lines` reports the 37 known baseline files and no new violation. Connected API and browser suites remain CI checks.
+
+## 20. R2 trusted client limits and bot proof (2026-10-19)
+
+Packet R2 adds the caller-identity and bot-proof layer that the delivery worker already assumes.
+
+- `signup/client.rs` derives a keyed SHA-256 digest of the caller address. The digest, never the raw address, is the throttle key and never appears in responses or logs.
+- `CRM_TRUSTED_PROXIES` lists the proxy addresses allowed to speak for the client. Only those peers may set the header named by `CRM_TRUSTED_CLIENT_HEADER` (default `cf-connecting-ip`). Duplicated, comma-joined or malformed values are rejected instead of guessed, so a spoofed header from an untrusted peer is ignored.
+- `CRM_CLIENT_DIGEST_SECRET` keys the digest. Rotating it invalidates in-flight throttle budgets, which is acceptable because budgets are short-lived.
+- New per-caller budgets: 10 starts per hour, 20 resends per hour, 30 verifies per hour and 5 company writes per day. They sit beside the existing global and per-address budgets, so neither can be exhausted alone.
+- `signup/bot.rs` exposes an async `BotCheck` trait. `local` mode keeps the development bypass; `live` mode builds the Turnstile client only when `CRM_TURNSTILE_SECRET`, `CRM_TURNSTILE_SITE_KEY` and `CRM_TURNSTILE_HOSTNAME` are all present.
+- `signup/turnstile.rs` posts to the fixed Siteverify endpoint with a 5-second timeout, 2-second connect timeout, 64 KiB response cap and four permits. It requires success, the expected action, the exact hostname and a challenge no older than 300 seconds. Network, HTTP and malformed responses return `Unavailable` (fail closed); a JSON refusal returns `Fail`.
+- `GET /signup/status` reports `botCheck: { provider, siteKey }`. The form renders the widget only for `turnstile` and resets it after each submit, because a token is single-use.
+- Live mode still requires HTTPS, secure cookies and the site key; `CRM_SIGNUP=live` remains rejected until the deployment supplies a real secret and hostname. Any reverse proxy in front of the API must strip client-supplied copies of the trusted header and set it itself.
+- The API test runner trusts loopback and gives each synthetic case its own client address, so the new per-caller budgets stay enforced without weakening production values.
+
+**Verification:** all 21 sign-up API tests and 150 Rust library tests pass, including the four worker delivery tests, `cargo clippy --all-targets -- -D warnings`, `npm test` (360 checks), `npm run build` and `npm run check:i18n`. Browser checks still need the local Playwright Chromium download.

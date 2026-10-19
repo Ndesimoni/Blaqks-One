@@ -37,6 +37,7 @@ pub async fn verify(
     ticket: &str,
     supplied_code: &str,
     device: Option<&str>,
+    client: &str,
 ) -> ApiResult<Created> {
     let ticket_hash = crate::auth::session::digest(ticket);
     let email: Option<String> = sqlx::query_scalar(
@@ -79,6 +80,7 @@ pub async fn verify(
         return Err(identity::consume_conflict(transaction, &pending.email).await?);
     }
     limits::company(&mut transaction).await?;
+    limits::client_company(&mut transaction, client).await?;
     let account_type = AccountType::Brokerage;
     let user = accounts::create_signup_admin(
         &mut transaction,

@@ -1,16 +1,15 @@
 import { useCallback, useState } from 'react';
+import { finishSetup } from './finishSetup.js';
 import {
-  BOT_TOKEN,
-  companyPayload,
   detailsError,
   errorKey,
   initialDetails,
   isDirty,
-  setupError,
   startPayload,
   validCode,
 } from './signupModel.js';
 import { clearSignupResume, loadSignupResume, saveSignupResume } from './signupResume.js';
+import { useSignupBot } from './useSignupBot.js';
 import { useSignupCountdown } from './useSignupCountdown.js';
 
 export function useSignUpFlow({ api, status, language, onVerified }) {
@@ -26,6 +25,7 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
   const [busy, setBusy] = useState('');
   const [finished, setFinished] = useState(false);
   const [seconds, setSeconds] = useSignupCountdown(0);
+  const bot = useSignupBot(status);
   const setDetail = useCallback((field, value) => {
     setDetails((current) => ({ ...current, [field]: value }));
     setError((current) => (current?.field === field ? null : current));
@@ -36,14 +36,16 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
     setBusy('start');
     setError(null);
     try {
-      const value = await api.signupStart(startPayload(details, status, language));
+      const value = await api.signupStart(startPayload(details, status, language, bot.token));
       const next = { ...value, sends: 1 };
       setRequest(next);
       saveSignupResume(next);
       setSeconds(value.resendAfterSeconds);
       setCode('');
+      bot.reset();
       setStep(2);
     } catch (failure) {
+      bot.reset();
       setError({ key: errorKey(failure) });
     } finally {
       setBusy('');
@@ -83,7 +85,7 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
     setBusy('resend');
     setError(null);
     try {
-      const value = await api.signupResend(request.requestId, BOT_TOKEN);
+      const value = await api.signupResend(request.requestId, bot.token);
       setRequest((current) => {
         const next = { ...current, ...value, sends: current.sends + 1 };
         saveSignupResume(next);
@@ -91,30 +93,25 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
       });
       setSeconds(value.resendAfterSeconds);
       setCode('');
+      bot.reset();
     } catch (failure) {
+      bot.reset();
       setError({ key: errorKey(failure) });
     } finally {
       setBusy('');
     }
   };
-  const saveSetup = async () => {
-    const invalid = setupError(setup);
-    if (invalid) return setError({ field: invalid[0], key: invalid[1] });
-    setBusy('setup');
-    setError(null);
-    try {
-      const saved = await api.updateCompany(
-        createdUser.workspaceId,
-        companyPayload(company, setup),
-      );
-      setCompany(saved);
-      setFinished(true);
-    } catch (failure) {
-      setError({ key: errorKey(failure) });
-    } finally {
-      setBusy('');
-    }
-  };
+  const saveSetup = () =>
+    finishSetup({
+      api,
+      user: createdUser,
+      company,
+      setup,
+      setCompany,
+      setFinished,
+      setBusy,
+      setError,
+    });
   return {
     step,
     details,
@@ -124,6 +121,9 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
     setup,
     error,
     busy,
+    botToken: bot.token,
+    setBotToken: bot.setToken,
+    botReset: bot.resetKey,
     seconds,
     finished,
     dirty: isDirty({ step, finished, details, setup }),

@@ -1,7 +1,5 @@
 use super::{
-    bot, cleanup, code,
-    delivery::Message,
-    identity, limits,
+    bot, cleanup, code, identity, limits,
     model::{StartRequest, StartResponse},
     validation,
 };
@@ -12,19 +10,23 @@ use crate::{
     workspaces::company::AccountType,
 };
 use axum::{
-    extract::{rejection::JsonRejection, State},
+    extract::{rejection::JsonRejection, ConnectInfo, State},
     http::{HeaderMap, StatusCode},
     Json,
 };
+use std::net::SocketAddr;
 use std::time::Duration;
 use uuid::Uuid;
 
 pub async fn start(
     State(state): State<AppState>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
     headers: HeaderMap,
     body: Result<Json<StartRequest>, JsonRejection>,
 ) -> ApiResult<(StatusCode, Json<StartResponse>)> {
     protection::origin(&state, &headers)?;
+    let client = state.signup.clients.digest(peer, &headers)?;
+    limits::client_start(&state.pool, &client).await?;
     cleanup::run(&state.pool).await?;
     let Json(request) = body.map_err(|_| ApiError::invalid("Provide valid sign-up details."))?;
     let request = validation::start(request)?;
@@ -32,7 +34,8 @@ pub async fn start(
         state.signup.bot.as_ref(),
         &request.bot_token,
         "signup_start",
-    )?;
+    )
+    .await?;
     limits::start(&state.pool, &request.email).await?;
     let signup_workers = state.signup.password_workers.clone();
     let password_workers = state.password_workers.clone();
@@ -83,30 +86,18 @@ pub async fn start(
     .await?;
     let kind = classification.notice.unwrap_or("code");
     let delivered_code = (!classification.existing).then_some(verification);
-    let outbox: Uuid = sqlx::query_scalar(
-        "INSERT INTO crm_signup_outbox (request_id,kind,code,delivered_at) \
-         VALUES ($1,$2,$3,CASE WHEN $4 THEN NULL ELSE now() END) RETURNING id",
+    sqlx::query(
+        "INSERT INTO crm_signup_outbox (request_id,kind,code,terminal_at) \
+         VALUES ($1,$2,$3,CASE WHEN $4 THEN NULL ELSE now() END)",
     )
     .bind(id)
     .bind(kind)
     .bind(&delivered_code)
     .bind(deliver)
-    .fetch_one(&mut *transaction)
+    .execute(&mut *transaction)
     .await?;
     transaction.commit().await?;
     let masked_email = code::mask(&request.email);
-    if deliver {
-        state
-            .signup
-            .delivery
-            .deliver(Message {
-                id: outbox,
-                code: delivered_code,
-                masked_email: masked_email.clone(),
-                expires_at: expires_at.clone(),
-            })
-            .await?;
-    }
     Ok((
         StatusCode::ACCEPTED,
         Json(StartResponse {

@@ -144,6 +144,10 @@ This packet adds reliability but does not enable live sign-up or contact a real 
 - Logs, activity and generic job rows contain no code, email address, body, token or credential.
 - `CRM_SIGNUP=live` remains rejected.
 
+### Status (2026-10-19)
+
+Built: migrations 0027 and 0028, `signup/jobs/{claim,deliver}.rs`, `worker.rs`, `retry.rs`, lease-aware cleanup, and the start/resend `202` contract. The worker tests prove lease exclusivity, restart resumption, retry backoff, the attempt cap and terminal/permanent handling; the delivery tests prove success clears the code, supersession never sends, and a permanent failure stores no code. `CRM_SIGNUP_WORKER=off` keeps API suites inspecting pending codes. See `docs/sign-up-design.md` §19.
+
 ## 7. Packet R2 — trusted client limits and Cloudflare Turnstile
 
 ### DeepSeek implementation steps
@@ -169,6 +173,10 @@ This packet adds reliability but does not enable live sign-up or contact a real 
 - CSP requirements are documented; live mode stays locked.
 
 Cloudflare documents that Turnstile tokens are single use, expire after five minutes and require server-side Siteverify validation.
+
+### Status (2026-10-19)
+
+Built: `signup/client.rs` (trusted-proxy digest), `signup/limits.rs` per-client budgets, async `signup/bot.rs`, `signup/turnstile.rs` with local stub tests, status `botCheck`, and the frontend `useTurnstile` widget with reset-on-submit. CSP: the widget loads `https://challenges.cloudflare.com` as a script and frame source, so live mode must allow both and must let the proxy set the trusted client header while stripping client copies of it. `CRM_SIGNUP=live` stays locked. See `docs/sign-up-design.md` §20.
 
 ## 8. Packets R3–R6 — production account security
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 import { useI18n } from '../../i18n/useI18n.js';
+import { BotCheck } from './BotCheck.jsx';
 import { bidiIsolate } from './signupModel.js';
 
 export function VerifyStep({
@@ -14,6 +15,7 @@ export function VerifyStep({
   onResend,
   onDifferent,
   mode,
+  bot,
 }) {
   const { t } = useI18n();
   const input = useRef(null);
@@ -66,6 +68,7 @@ export function VerifyStep({
       <Button className="signup-primary" type="submit" disabled={Boolean(busy)}>
         {t(busy === 'verify' ? 'signup.verifying' : 'signup.verifyCreate')}
       </Button>
+      <BotCheck {...bot} />
       <div className="signup-verify-actions">
         {request.sends >= 5 ? (
           <button type="button" className="signup-text-action" onClick={onDifferent}>

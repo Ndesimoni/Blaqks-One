@@ -43,6 +43,8 @@ export default {
   readTerms: 'Read Terms of Service (draft)',
   readPrivacy: 'Read Privacy Notice (draft)',
   botLocal: 'Bot check skipped in local development.',
+  turnstileLoading: 'Loading human verification…',
+  turnstileError: 'Human verification could not load. Reload the page and try again.',
   sendCode: 'Send code',
   sendingCode: 'Sending code…',
   haveAccount: 'Already have an account? Sign in',

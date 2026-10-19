@@ -76,26 +76,55 @@ async fn run() -> Result<(), String> {
         return Err("Supported commands: create-user, migrate, seed-sample, clear-sample.".into());
     }
     let address = config.address;
+    let signup_worker = config.signup_worker;
+    let local_signup = config.signup == kws_crm_api::config::SignupMode::Local;
     let dummy_hash = password::hash(session::random_token())
         .await
         .map_err(|_| "CRM authentication initialization failed.")?;
-    let signup = Arc::new(signup::Services::new(config.signup, pool.clone()));
+    let signup = Arc::new(signup::Services::new(
+        config.signup,
+        signup::client::ClientKeys::new(
+            &config.trusted_proxies,
+            &config.client_header,
+            &config.client_secret,
+        )?,
+        match &config.turnstile {
+            Some(turnstile) => signup::bot::turnstile(turnstile)
+                .map_err(|error| format!("Turnstile configuration failed: {error}"))?,
+            None => Arc::new(signup::bot::LocalBypass::new(config.signup)),
+        },
+    ));
     let state = AppState {
-        pool,
+        pool: pool.clone(),
         config: Arc::new(config),
         dummy_hash: Arc::new(dummy_hash),
         password_workers: Arc::new(tokio::sync::Semaphore::new(4)),
-        signup,
+        signup: signup.clone(),
+    };
+    let (shutdown_tx, shutdown_rx) = tokio::sync::watch::channel(false);
+    let workers = if local_signup && signup_worker {
+        signup::worker::spawn(pool, signup.delivery.clone(), shutdown_rx)
+    } else {
+        Vec::new()
     };
     let listener = tokio::net::TcpListener::bind(address)
         .await
         .map_err(|_| "CRM listener could not bind. Check CRM_BIND_ADDRESS.")?;
     println!("CRM API listening on {address}");
-    axum::serve(listener, routes::app(state))
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
-        })
-        .await
-        .map_err(|_| "CRM HTTP service failed.")?;
+    let signal_tx = shutdown_tx.clone();
+    let served = axum::serve(
+        listener,
+        routes::app(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .with_graceful_shutdown(async move {
+        let _ = tokio::signal::ctrl_c().await;
+        let _ = signal_tx.send(true);
+    })
+    .await;
+    let _ = shutdown_tx.send(true);
+    for worker in workers {
+        let _ = worker.await;
+    }
+    served.map_err(|_| "CRM HTTP service failed.")?;
     Ok(())
 }

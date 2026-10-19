@@ -5,7 +5,7 @@ import { BotCheck } from './BotCheck.jsx';
 import { SignupField } from './SignupField.jsx';
 import { SignupPasswordRules } from './SignupPasswordRules.jsx';
 
-export function DetailsStep({ values, status, error, busy, onChange, onSubmit, onSignIn }) {
+export function DetailsStep({ values, status, bot, error, busy, onChange, onSubmit, onSignIn }) {
   const { t } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
   const refs = {
@@ -122,7 +122,7 @@ export function DetailsStep({ values, status, error, busy, onChange, onSubmit, o
           {t('signup.readPrivacy')}
         </a>
       </div>
-      <BotCheck mode={status.mode} />
+      <BotCheck {...bot} />
       {!error?.field && error && (
         <p className="field-error" role="alert">
           {t(error.key)}

@@ -13,7 +13,10 @@ async fn status(State(state): State<AppState>) -> ApiResult<Json<Value>> {
         "enabled": enabled,
         "mode": if enabled { "local" } else { "off" },
         "botCheck": if enabled {
-            Some(json!({"provider": state.signup.bot.provider()}))
+            Some(json!({
+                "provider": state.signup.bot.provider(),
+                "siteKey": state.signup.bot.site_key(),
+            }))
         } else {
             None
         },

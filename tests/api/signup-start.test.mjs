@@ -5,11 +5,11 @@ import {
   codeFor,
   details,
   digest,
+  privacy,
   resetSignup,
   start,
   started,
   terms,
-  privacy,
 } from './signup-helpers.mjs';
 
 before(resetSignup);
@@ -22,7 +22,7 @@ test('status exposes only local public configuration', async () => {
   assert.deepEqual(response.value, {
     enabled: true,
     mode: 'local',
-    botCheck: { provider: 'local' },
+    botCheck: { provider: 'local', siteKey: null },
     terms: { version: terms, url: '/terms' },
     privacy: { version: privacy, url: '/privacy' },
   });

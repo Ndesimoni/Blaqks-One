@@ -1,6 +1,5 @@
-use crate::{config::SignupMode, error::ApiResult};
-use sqlx::PgPool;
-use std::{future::Future, pin::Pin};
+use crate::config::SignupMode;
+use std::{future::Future, pin::Pin, time::Duration};
 use uuid::Uuid;
 
 pub struct Message {
@@ -10,21 +9,35 @@ pub struct Message {
     pub expires_at: String,
 }
 
+/// A transport failure. Messages are fixed text, never provider responses, so no code,
+/// address or credential can reach the job row or the log.
+#[derive(Debug)]
+pub enum DeliveryError {
+    Retry {
+        after: Option<Duration>,
+        message: &'static str,
+    },
+    Permanent {
+        message: &'static str,
+    },
+}
+
 pub trait Delivery: Send + Sync {
     fn deliver<'a>(
         &'a self,
         message: Message,
-    ) -> Pin<Box<dyn Future<Output = ApiResult<()>> + Send + 'a>>;
+    ) -> Pin<Box<dyn Future<Output = Result<(), DeliveryError>> + Send + 'a>>;
 }
 
+/// Local-development transport: prints the code and reports success. Database state is the
+/// worker's responsibility, so a retry cannot mark a failed attempt as delivered.
 pub struct DevOutbox {
     mode: SignupMode,
-    pool: PgPool,
 }
 
 impl DevOutbox {
-    pub fn new(mode: SignupMode, pool: PgPool) -> Self {
-        Self { mode, pool }
+    pub fn new(mode: SignupMode) -> Self {
+        Self { mode }
     }
 }
 
@@ -32,7 +45,7 @@ impl Delivery for DevOutbox {
     fn deliver<'a>(
         &'a self,
         message: Message,
-    ) -> Pin<Box<dyn Future<Output = ApiResult<()>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<(), DeliveryError>> + Send + 'a>> {
         Box::pin(async move {
             if self.mode == SignupMode::Local {
                 if let Some(code) = &message.code {
@@ -46,11 +59,8 @@ impl Delivery for DevOutbox {
                         message.masked_email
                     );
                 }
-                sqlx::query("UPDATE crm_signup_outbox SET delivered_at=now() WHERE id=$1")
-                    .bind(message.id)
-                    .execute(&self.pool)
-                    .await?;
             }
+            let _ = message.id;
             Ok(())
         })
     }

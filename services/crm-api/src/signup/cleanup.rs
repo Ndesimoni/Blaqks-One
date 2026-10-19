@@ -2,15 +2,19 @@ use crate::error::ApiResult;
 use sqlx::PgPool;
 use std::time::Duration;
 
-/// Bounded, lock-skipping retention work is safe beside start, resend and verify.
+/// Bounded, lock-skipping retention work is safe beside start, resend, verify and delivery.
 pub async fn run(pool: &PgPool) -> ApiResult<()> {
     sqlx::query(
-        "DELETE FROM crm_signup_outbox WHERE id IN (SELECT o.id FROM crm_signup_outbox o \
-         JOIN crm_signup_requests r ON r.id=o.request_id WHERE o.kind='code' \
-         AND r.code_expires_at<=now() ORDER BY o.created_at LIMIT 1000 FOR UPDATE SKIP LOCKED)",
+        "UPDATE crm_signup_outbox o SET code=NULL,terminal_at=COALESCE(o.terminal_at,now()), \
+         last_error=COALESCE(o.last_error,'expired'),lease_owner=NULL,lease_expires_at=NULL \
+         FROM crm_signup_requests r WHERE r.id=o.request_id AND o.kind='code' \
+         AND o.code IS NOT NULL AND r.code_expires_at<=now()",
     )
     .execute(pool)
     .await?;
+    sqlx::query("DELETE FROM crm_signup_outbox WHERE terminal_at<=now()-interval '24 hours'")
+        .execute(pool)
+        .await?;
     sqlx::query(
         "DELETE FROM crm_signup_requests WHERE id IN (SELECT id FROM crm_signup_requests \
          WHERE expires_at<=now() OR created_at<=now()-interval '24 hours' \

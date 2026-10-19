@@ -4,14 +4,14 @@ import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { DetailsStep } from './DetailsStep.jsx';
 import { SetupStep } from './SetupStep.jsx';
+import './signup.css';
+import { bidiIsolate } from './signupModel.js';
 import { SignupProgress } from './SignupProgress.jsx';
 import { SignupShell } from './SignupShell.jsx';
 import { SignupState } from './SignupState.jsx';
 import { useSignUpFlow } from './useSignUpFlow.js';
 import { useSignupStatus } from './useSignupStatus.js';
 import { VerifyStep } from './VerifyStep.jsx';
-import { bidiIsolate } from './signupModel.js';
-import './signup.css';
 
 const STEP_TITLES = ['detailsTitle', 'verifyTitle'];
 
@@ -69,6 +69,12 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
     );
   const title =
     flow.step === 3 ? t('signupSetup.brokerageTitle') : t(`signup.${STEP_TITLES[flow.step - 1]}`);
+  const bot = {
+    provider: status.value.botCheck?.provider,
+    siteKey: status.value.botCheck?.siteKey,
+    onToken: flow.setBotToken,
+    resetKey: flow.botReset,
+  };
   return (
     <SignupShell>
       {flow.step > 1 && flow.step < 3 && (
@@ -88,6 +94,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
           <DetailsStep
             values={flow.details}
             status={status.value}
+            bot={{ ...bot, action: 'signup_start' }}
             error={flow.error}
             busy={flow.busy === 'start'}
             onChange={flow.setDetail}
@@ -109,6 +116,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
             onVerify={flow.verify}
             onResend={flow.resend}
             onDifferent={flow.differentEmail}
+            bot={{ ...bot, action: 'signup_resend' }}
             mode={status.value.mode}
           />
         )}

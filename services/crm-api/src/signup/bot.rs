@@ -1,6 +1,12 @@
 use crate::config::SignupMode;
 use crate::error::{ApiError, ApiResult};
 use axum::http::StatusCode;
+use std::{future::Future, pin::Pin, sync::Arc};
+
+/// Builds the Turnstile adapter without exposing the module outside sign-up.
+pub fn turnstile(config: &crate::config::TurnstileConfig) -> Result<Arc<dyn BotCheck>, String> {
+    Ok(Arc::new(super::turnstile::Turnstile::new(config)?))
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Outcome {
@@ -11,11 +17,19 @@ pub enum Outcome {
 
 pub trait BotCheck: Send + Sync {
     fn provider(&self) -> &'static str;
-    fn verify(&self, token: &str, action: &str) -> Outcome;
+    /// The public widget key; `None` for providers that render no widget.
+    fn site_key(&self) -> Option<&str> {
+        None
+    }
+    fn verify<'a>(
+        &'a self,
+        token: &'a str,
+        action: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Outcome> + Send + 'a>>;
 }
 
-pub fn require(check: &dyn BotCheck, token: &str, action: &str) -> ApiResult<()> {
-    match check.verify(token, action) {
+pub async fn require(check: &dyn BotCheck, token: &str, action: &str) -> ApiResult<()> {
+    match check.verify(token, action).await {
         Outcome::Pass => Ok(()),
         Outcome::Fail => Err(ApiError(
             StatusCode::BAD_REQUEST,
@@ -45,14 +59,20 @@ impl BotCheck for LocalBypass {
         "local"
     }
 
-    fn verify(&self, token: &str, action: &str) -> Outcome {
-        if self.mode == SignupMode::Local
-            && token == "local-development"
-            && matches!(action, "signup_start" | "signup_resend")
-        {
-            Outcome::Pass
-        } else {
-            Outcome::Fail
-        }
+    fn verify<'a>(
+        &'a self,
+        token: &'a str,
+        action: &'a str,
+    ) -> Pin<Box<dyn Future<Output = Outcome> + Send + 'a>> {
+        Box::pin(async move {
+            if self.mode == SignupMode::Local
+                && token == "local-development"
+                && matches!(action, "signup_start" | "signup_resend")
+            {
+                Outcome::Pass
+            } else {
+                Outcome::Fail
+            }
+        })
     }
 }

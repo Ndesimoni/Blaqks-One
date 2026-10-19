@@ -86,3 +86,49 @@ pub async fn company(transaction: &mut Transaction<'_, Postgres>) -> ApiResult<(
     )
     .await
 }
+
+/// Per-caller budgets use the keyed client digest, never a raw address.
+pub async fn client_start(pool: &PgPool, client: &str) -> ApiResult<()> {
+    client_window(pool, "signup:client:start:hour", client, 10, 3_600).await
+}
+
+pub async fn client_resend(pool: &PgPool, client: &str) -> ApiResult<()> {
+    client_window(pool, "signup:client:resend:hour", client, 20, 3_600).await
+}
+
+pub async fn client_verify(pool: &PgPool, client: &str) -> ApiResult<()> {
+    client_window(pool, "signup:client:verify:hour", client, 30, 3_600).await
+}
+
+pub async fn client_company(
+    transaction: &mut Transaction<'_, Postgres>,
+    client: &str,
+) -> ApiResult<()> {
+    throttle::consume_window(
+        &mut **transaction,
+        &format!("signup:client:company:day:{client}"),
+        5,
+        86_400,
+        BUSY,
+        "rate_limited",
+    )
+    .await
+}
+
+async fn client_window(
+    pool: &PgPool,
+    budget: &str,
+    client: &str,
+    limit: i32,
+    seconds: i32,
+) -> ApiResult<()> {
+    throttle::consume_window(
+        pool,
+        &format!("{budget}:{client}"),
+        limit,
+        seconds,
+        BUSY,
+        "rate_limited",
+    )
+    .await
+}
