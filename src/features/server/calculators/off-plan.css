@@ -1,0 +1,78 @@
+/* Off-plan milestone editor and schedule (packet Q6). */
+:root[data-theme] .milestone-list {
+  margin-block: 16px 10px;
+}
+
+:root[data-theme] .milestone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px 170px 44px;
+  gap: 8px;
+  margin-block-end: 8px;
+}
+
+:root[data-theme] .milestone-row input {
+  inline-size: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+:root[data-theme] .milestone-row input:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  outline: none;
+}
+
+:root[data-theme] .milestone-row input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+:root[data-theme] .milestone-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-block-end: 8px;
+}
+
+:root[data-theme] .calc-schedule {
+  inline-size: 100%;
+  border-collapse: collapse;
+  margin-block-end: 14px;
+  font-size: 13px;
+}
+
+:root[data-theme] .calc-schedule th,
+:root[data-theme] .calc-schedule td {
+  padding: 8px 6px;
+  border-block-end: 1px solid var(--line);
+  text-align: start;
+}
+
+:root[data-theme] .calc-schedule th:last-child,
+:root[data-theme] .calc-schedule td:last-child {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+:root[data-theme] .calc-schedule tfoot th,
+:root[data-theme] .calc-schedule tfoot td {
+  border-block-end: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  :root[data-theme] .milestone-row {
+    grid-template-columns: minmax(0, 1fr) 96px 44px;
+  }
+
+  :root[data-theme] .milestone-row label:first-child {
+    grid-column: 1 / -1;
+  }
+}

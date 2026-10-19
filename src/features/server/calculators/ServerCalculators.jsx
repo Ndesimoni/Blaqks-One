@@ -1,6 +1,7 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MortgageCalculator } from './MortgageCalculator.jsx';
+import { OffPlanCalculator } from './OffPlanCalculator.jsx';
 import { PurchaseCalculator } from './PurchaseCalculator.jsx';
 import { YieldCalculator } from './YieldCalculator.jsx';
 import './calculators.css';
@@ -19,6 +20,7 @@ export function ServerCalculators() {
       <PurchaseCalculator />
       <MortgageCalculator />
       <YieldCalculator />
+      <OffPlanCalculator />
     </div>
   );
 }
