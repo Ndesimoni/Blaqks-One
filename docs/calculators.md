@@ -1,6 +1,6 @@
 # UAE calculators
 
-Status: packets Q3 purchase costs and Q4 mortgage repayment implemented 2026-10-19. They are client-side only and save no records.
+Status: packets Q3 purchase costs, Q4 mortgage repayment and Q5 rental yield/ROI implemented 2026-10-19. They are client-side only and save no records.
 
 ## Purchase costs
 
@@ -27,12 +27,25 @@ months, then rounds the monthly payment half-up to the fils.
 - The screen shows loan amount, monthly payment, total interest and total repaid. Bank fees
   and insurance are explicitly outside the estimate, and nothing is saved.
 
+## Rental yield and ROI
+
+`src/lib/finance/yield.js` reports the measurements separately:
+
+- **Gross yield:** annual rent ÷ property value.
+- **Net yield:** (annual rent − annual costs) ÷ property value.
+- **ROI:** annual net income ÷ cash invested.
+
+Percentages are signed and rounded half-up to one basis point. A zero property value leaves
+both yields blank and a zero cash investment leaves ROI blank, instead of dividing by zero.
+Negative net income is shown as a loss. The screen labels every figure an estimate and states
+that returns are not guaranteed.
+
 ## Screen and access
 
 - **Calculators** sits under Resources in the connected navigation and is available to every signed-in role. It needs no API call, workspace record or finance grant, and performs no database write.
-- `PurchaseCalculator` and `MortgageCalculator` use `useI18n()` for every label and format money with the selected locale (`format.money`). They use logical CSS properties, visible focus states and `aria-live` result regions.
+- `PurchaseCalculator`, `MortgageCalculator` and `YieldCalculator` use `useI18n()` for every label and format money and percentages with the selected locale (`format.money`, `format.percent`). They use logical CSS properties, visible focus states and `aria-live` result regions.
 - English and Arabic catalogues live in `src/i18n/catalogs/{en,ar}/calculators.js`; `npm run check:i18n` enforces parity.
 
 ## Tests
 
-`tests/unit/calculators.test.js` covers zero and maximum prices, 0% and 100% rates, half-up rounding to fils, and invalid prices or rates. `tests/unit/mortgage.test.js` covers the standard annuity case, zero-rate repayment, a full down payment, and invalid amounts, rates and terms. The production build, translation parity, boundaries and the unit suite pass. Browser checks for mobile, keyboard, dark mode, English and Arabic remain part of CI; they were not run locally because the Playwright browser binary is not installed on this machine.
+`tests/unit/calculators.test.js` covers zero and maximum prices, 0% and 100% rates, half-up rounding to fils, and invalid prices or rates. `tests/unit/mortgage.test.js` covers the standard annuity case, zero-rate repayment, a full down payment, and invalid amounts, rates and terms. `tests/unit/yield.test.js` covers gross and net yield, ROI, zero denominators, negative income, rounding and invalid amounts. The production build, translation parity, boundaries and the unit suite pass. Browser checks for mobile, keyboard, dark mode, English and Arabic remain part of CI; they were not run locally because the Playwright browser binary is not installed on this machine.

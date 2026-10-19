@@ -2,6 +2,7 @@ import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MortgageCalculator } from './MortgageCalculator.jsx';
 import { PurchaseCalculator } from './PurchaseCalculator.jsx';
+import { YieldCalculator } from './YieldCalculator.jsx';
 import './calculators.css';
 
 /** Connected calculators (packet Q3): client-side estimates only; nothing is saved. */
@@ -17,6 +18,7 @@ export function ServerCalculators() {
       </div>
       <PurchaseCalculator />
       <MortgageCalculator />
+      <YieldCalculator />
     </div>
   );
 }
