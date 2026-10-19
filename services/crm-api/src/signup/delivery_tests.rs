@@ -53,11 +53,13 @@ async fn retryable_failure_schedules_again_then_terminates_at_the_cap() {
          lease_owner=NULL,lease_expires_at=NULL WHERE id=$1",
     )
     .bind(job)
-    .bind(MAX_ATTEMPTS)
+    .bind(MAX_ATTEMPTS - 1)
     .execute(&pool)
     .await
     .unwrap();
+    // The final allowed claim reaches MAX_ATTEMPTS; a retryable failure then ends the job.
     let claimed = claim(&pool, Uuid::new_v4(), 30).await.unwrap().unwrap();
+    assert_eq!(claimed.attempts, MAX_ATTEMPTS);
     run(&pool, &RetryOnce, claimed, 0).await.unwrap();
     let terminal: (Option<String>, bool) =
         sqlx::query_as("SELECT code,terminal_at IS NOT NULL FROM crm_signup_outbox WHERE id=$1")

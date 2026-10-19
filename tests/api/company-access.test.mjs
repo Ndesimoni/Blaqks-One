@@ -8,6 +8,7 @@ import {
   companyBody,
   companyPath,
   emptyCompany,
+  systemCompany,
   newCompany,
   putCompany,
   readCompany,
@@ -23,7 +24,7 @@ test('company access follows live effective workspace, including staff with no m
   const staff = await activate(person);
   assert.ok(Object.values(staff.user.permissions).every((grant) => grant === false));
   for (const caller of [admin, staff]) assert.deepEqual(await readCompany(caller), emptyCompany);
-  assert.deepEqual(await readCompany(owner), emptyCompany);
+  assert.deepEqual(await readCompany(owner), systemCompany);
   for (const [caller, workspace] of [
     [admin, other.user.workspaceId],
     [staff, other.user.workspaceId],

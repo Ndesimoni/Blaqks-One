@@ -38,6 +38,18 @@ pub async fn create(
     company::create(transaction, id, actor, company).await
 }
 
+/// The owning account of workspace `id`; a missing workspace is refused.
+pub async fn owner_of(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    id: &str,
+) -> ApiResult<uuid::Uuid> {
+    sqlx::query_scalar("SELECT owner_id FROM crm_workspaces WHERE id=$1")
+        .bind(id)
+        .fetch_optional(&mut **transaction)
+        .await?
+        .ok_or_else(ApiError::forbidden)
+}
+
 pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str) -> ApiResult<()> {
     if session.user.role != "super-admin" && workspace != session.user.workspace_id {
         return Err(ApiError::forbidden());

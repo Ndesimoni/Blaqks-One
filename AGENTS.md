@@ -70,6 +70,7 @@ Professional real estate CRM focused on the UAE market.
 - compose.yaml / compose.test.yaml — Persistent development PostgreSQL and disposable test PostgreSQL
 - docs/google-calendar.md — Account setup, syncing behavior, and integration verification
 - docs/service-boundaries.md — Backend table ownership, coupling inventory, boundary rules and the future service-split plan
+- docs/agreements-design.md — Agreement types, revision lifecycle, verification levels and the authorization matrix for cross-company deals
 
 ## Engineering Standards
 

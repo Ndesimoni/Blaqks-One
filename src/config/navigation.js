@@ -89,7 +89,7 @@ const descriptions = {
   Expenses: 'Understand what you spend to grow your business.',
   'Interaction log': 'The full story behind every client conversation.',
   'Client care': 'Turn one successful transaction into a lasting relationship.',
-  Calculators: 'Estimate DLD, agency fees and VAT before a transaction.',
+  Calculators: 'Estimate purchase costs, mortgages, rental yield and off-plan payment plans.',
 };
 
 export { descriptions, labels, nav, preferredCols };

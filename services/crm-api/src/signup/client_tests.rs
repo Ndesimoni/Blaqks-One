@@ -70,3 +70,34 @@ fn the_digest_depends_on_the_secret() {
     assert_ne!(first, second);
     assert_eq!(first.len(), 64);
 }
+
+#[test]
+fn mapped_ipv4_matches_trusted_proxies_and_plain_ipv4() {
+    let mut headers = HeaderMap::new();
+    headers.insert("cf-connecting-ip", HeaderValue::from_static("203.0.113.9"));
+    let mapped = keys("127.0.0.1")
+        .digest(peer("::ffff:127.0.0.1"), &headers)
+        .unwrap();
+    let plain = keys("127.0.0.1")
+        .digest(peer("127.0.0.1"), &headers)
+        .unwrap();
+    assert_eq!(mapped, plain);
+    assert_eq!(
+        keys("")
+            .digest(peer("::ffff:198.51.100.4"), &headers)
+            .unwrap(),
+        keys("").digest(peer("198.51.100.4"), &headers).unwrap()
+    );
+}
+
+#[test]
+fn an_ipv6_network_shares_one_budget() {
+    let none = HeaderMap::new();
+    let first = keys("").digest(peer("2001:db8:1:2::1"), &none).unwrap();
+    let rotated = keys("")
+        .digest(peer("2001:db8:1:2:ffff::9"), &none)
+        .unwrap();
+    let other = keys("").digest(peer("2001:db8:1:3::1"), &none).unwrap();
+    assert_eq!(first, rotated);
+    assert_ne!(first, other);
+}

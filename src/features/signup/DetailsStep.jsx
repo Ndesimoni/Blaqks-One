@@ -128,7 +128,7 @@ export function DetailsStep({ values, status, bot, error, busy, onChange, onSubm
           {t(error.key)}
         </p>
       )}
-      <Button className="signup-primary" type="submit" disabled={busy}>
+      <Button className="signup-primary" type="submit" disabled={busy || !bot.ready}>
         {t(busy ? 'signup.sendingCode' : 'signup.sendCode')}
       </Button>
       <button className="signup-text-action" type="button" onClick={onSignIn}>

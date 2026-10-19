@@ -51,6 +51,7 @@ export default {
   addMilestone: 'إضافة دفعة',
   removeMilestone: 'حذف الدفعة',
   totalShare: 'إجمالي النسب',
+  scheduleTotal: 'الإجمالي',
   schedule: 'جدول السداد',
   exportSchedule: 'تنزيل الجدول',
   offPlanPrompt: 'أدخل سعر العقار وأكمل كل دفعة.',

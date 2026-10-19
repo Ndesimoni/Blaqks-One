@@ -2,14 +2,18 @@ import assert from 'node:assert/strict';
 import { login, query } from './helpers.mjs';
 import { activate, invite } from './team-helpers.mjs';
 
+/** A new customer company: every one starts on the three-seat Free plan. */
 export const emptyCompany = {
   accountType: 'brokerage',
-  memberLimit: null,
+  memberLimit: 3,
   displayName: null,
   emirate: null,
   setupComplete: false,
   version: 1,
 };
+
+/** The Super Admin's system workspace, which has no seat limit. */
+export const systemCompany = { ...emptyCompany, memberLimit: null };
 
 export const companyPath = (session, workspace = session.user.workspaceId) =>
   `/workspaces/${workspace}/company`;

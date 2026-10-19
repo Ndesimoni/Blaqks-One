@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { after, before, test } from 'node:test';
 import { seededDatabase } from './assignment-db.mjs';
 import { login, query } from './helpers.mjs';
-import { emptyCompany, events, readCompany } from './company-helpers.mjs';
+import { FIXTURE_SEATS } from '../../scripts/crm-test-fixtures.mjs';
+import { emptyCompany, events, readCompany, systemCompany } from './company-helpers.mjs';
 
 const db = seededDatabase('kws_company_0022', '0023');
 const people = ['super', 'active', 'suspended', 'pending', 'archived'];
@@ -96,7 +97,10 @@ test('trusted CLI creates both Super Admin workspaces and Admin companies with t
     ON p.workspace_id=w.id WHERE p.workspace_id IS NULL`),
     '0',
   );
-  for (const caller of [owner, admin]) assert.deepEqual(await readCompany(caller), emptyCompany);
+  assert.deepEqual(await readCompany(owner), systemCompany);
+  // The test runner raised the shared fixture's seats once through the Super Admin route.
+  const fixture = { ...emptyCompany, memberLimit: FIXTURE_SEATS, version: 2 };
+  assert.deepEqual(await readCompany(admin), fixture);
   for (const [workspace, actor] of [
     [owner.user.workspaceId, owner.user.id],
     [owner.user.id, owner.user.id],

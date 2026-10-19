@@ -52,6 +52,7 @@ export default {
   addMilestone: 'Add milestone',
   removeMilestone: 'Remove milestone',
   totalShare: 'Total share',
+  scheduleTotal: 'Total',
   schedule: 'Payment schedule',
   exportSchedule: 'Download schedule',
   offPlanPrompt: 'Enter a property price and complete every milestone.',

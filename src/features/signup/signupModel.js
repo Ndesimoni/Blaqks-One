@@ -92,6 +92,8 @@ const ERROR_KEYS = {
   account_exists: 'accountExists',
   invalid_company: 'invalidCompany',
   version_conflict: 'versionConflict',
+  // Company details report a concurrent change as `stale`, like My profile.
+  stale: 'versionConflict',
 };
 
 export const errorKey = (failure) => {

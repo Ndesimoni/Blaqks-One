@@ -45,11 +45,16 @@ export function offPlanSchedule({ priceFils, milestones }) {
 }
 
 const HEADERS = ['Milestone', 'Date', 'Share %', 'Amount (AED)'];
-const cell = (value) => `"${String(value).replaceAll('"', '""')}"`;
+// A leading = + - @ or control character would run as a spreadsheet formula.
+const inert = (text) => (/^[=+\-@\t\r]/.test(text) ? `'${text}` : text);
+const cell = (value) => `"${inert(String(value)).replaceAll('"', '""')}"`;
 const line = (values) => values.map(cell).join(',');
 
-/** A readable CSV schedule; `headers` lets the screen export translated column names. */
-export function scheduleCsv(milestones, headers = HEADERS) {
+/**
+ * A readable CSV schedule. `headers` and `totalLabel` let the screen export translated
+ * text; labels that look like spreadsheet formulas are exported as plain text.
+ */
+export function scheduleCsv(milestones, headers = HEADERS, totalLabel = 'Total') {
   const rows = milestones.map((milestone) =>
     line([
       milestone.label,
@@ -59,5 +64,5 @@ export function scheduleCsv(milestones, headers = HEADERS) {
     ]),
   );
   const total = milestones.reduce((sum, milestone) => sum + milestone.amountFils, 0);
-  return [line(headers), ...rows, line(['Total', '', '100', filsToAed(total)])].join('\n');
+  return [line(headers), ...rows, line([totalLabel, '', '100', filsToAed(total)])].join('\n');
 }

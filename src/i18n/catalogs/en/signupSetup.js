@@ -30,4 +30,6 @@ export default {
   companySave: 'Save company profile',
   companySaving: 'Saving…',
   companyReloaded: 'Company details changed elsewhere. Review your entries and save again.',
+  openingTitle: 'Opening company setup',
+  openingBody: 'Loading your company details…',
 };

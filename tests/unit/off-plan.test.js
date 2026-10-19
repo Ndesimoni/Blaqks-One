@@ -116,3 +116,12 @@ test('dates and CSV export are readable', () => {
   assert.equal(lines[1], '"Booking","2026-11-01","10","100000.00"');
   assert.equal(lines.at(-1), '"Total","","100","1000000.00"');
 });
+
+test('CSV export translates the total row and keeps formula-like labels inert', () => {
+  const milestones = offPlanSchedule(base()).milestones.map((milestone, index) =>
+    index === 0 ? { ...milestone, label: '=HYPERLINK("x")' } : milestone,
+  );
+  const lines = scheduleCsv(milestones, ['م', 'ت', 'ن', 'م'], 'الإجمالي').split('\n');
+  assert.equal(lines[1].split(',')[0], `"'=HYPERLINK(""x"")"`);
+  assert.equal(lines.at(-1), '"الإجمالي","","100","1000000.00"');
+});

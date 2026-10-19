@@ -30,4 +30,6 @@ export default {
   companySave: 'حفظ ملف الشركة',
   companySaving: 'جارٍ الحفظ…',
   companyReloaded: 'تغيرت تفاصيل الشركة في مكان آخر. راجع مدخلاتك واحفظ مرة أخرى.',
+  openingTitle: 'جارٍ فتح إعداد الشركة',
+  openingBody: 'جارٍ تحميل تفاصيل شركتك…',
 };

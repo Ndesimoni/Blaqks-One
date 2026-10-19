@@ -68,6 +68,7 @@ test('verification, setup and server errors map to bounded UI states', () => {
     emirate: '',
   });
   assert.equal(errorKey({ details: { code: 'code_locked' } }), 'signupErrors.codeLocked');
+  assert.equal(errorKey({ details: { code: 'stale' } }), 'signupErrors.versionConflict');
   assert.equal(
     errorKey({ details: { code: 'private_server_detail' } }),
     'signupErrors.unavailable',

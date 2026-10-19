@@ -80,7 +80,7 @@ export function VerifyStep({
           <button
             type="button"
             className="signup-text-action"
-            disabled={Boolean(busy)}
+            disabled={Boolean(busy) || !bot.ready}
             onClick={resend}
           >
             {t(busy === 'resend' ? 'signup.resending' : 'signup.resend')}

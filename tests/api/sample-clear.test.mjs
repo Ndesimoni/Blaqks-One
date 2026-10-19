@@ -120,7 +120,11 @@ test('sample commands refuse other targets and non-local configurations', async 
   for (const env of [
     { CRM_DATABASE_URL: 'postgres://kws:secret@db.example.invalid:5432/kws_crm' },
     { CRM_DATABASE_URL: `${url}?host=db.example.invalid` },
-    { CRM_ALLOW_INSECURE_LOCAL: 'false', CRM_APP_ORIGIN: 'https://crm.example.com' },
+    {
+      CRM_ALLOW_INSECURE_LOCAL: 'false',
+      CRM_APP_ORIGIN: 'https://crm.example.com',
+      CRM_SIGNUP: 'off',
+    },
   ]) {
     for (const command of ['seed-sample', 'clear-sample']) {
       const result = runSample(command, { email: 'admin-a@crm-fixture.test', env });

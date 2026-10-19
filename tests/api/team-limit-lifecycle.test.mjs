@@ -2,7 +2,13 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { query } from './helpers.mjs';
 import { newCompany } from './company-helpers.mjs';
-import { activate, findMember, invite, memberUpdate, teamPath } from './team-helpers.mjs';
+import {
+  activate,
+  findMember,
+  inviteExact as invite,
+  memberUpdate,
+  teamPath,
+} from './team-helpers.mjs';
 import {
   changeLimit,
   changeLimitOk,

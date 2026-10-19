@@ -1,7 +1,10 @@
+#[path = "routes_support.rs"]
+mod support;
+
 use crate::{
-    activity, assignments,
+    activity, agreements, assignments,
     auth::handlers as auth,
-    error::{self, ApiError, ApiResult, CodeMapper},
+    error::{self, CodeMapper},
     finance, imports, performance,
     records::handlers as records,
     signup,
@@ -9,52 +12,23 @@ use crate::{
     team, workspaces,
 };
 use axum::{
-    extract::{DefaultBodyLimit, Request, State},
-    http::{header, HeaderValue, StatusCode},
-    middleware::{self, Next},
-    response::Response,
+    extract::DefaultBodyLimit,
+    middleware,
     routing::{get, post, put},
-    Json, Router,
+    Router,
 };
-use serde_json::{json, Value};
+use support::{health, response_policy, unknown_route, unsupported_method};
 
-const DOMAIN_CODES: &[CodeMapper] = &[finance::errors::mapped, performance::errors::mapped];
+const DOMAIN_CODES: &[CodeMapper] = &[
+    finance::errors::mapped,
+    performance::errors::mapped,
+    agreements::errors::mapped,
+];
 
 /// Registers every domain's database error mapping. `app` calls it; command-line paths
 /// that convert database errors call it before running.
 pub fn register_domain_errors() {
     error::register_codes(DOMAIN_CODES);
-}
-
-async fn health(State(state): State<AppState>) -> ApiResult<Json<Value>> {
-    sqlx::query_scalar::<_, i32>("SELECT 1")
-        .fetch_one(&state.pool)
-        .await?;
-    Ok(Json(json!({"status": "ok", "service": "kws-crm-api"})))
-}
-
-async fn response_policy(request: Request, next: Next) -> Response {
-    let mut response = next.run(request).await;
-    let headers = response.headers_mut();
-    headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
-    headers.insert(header::PRAGMA, HeaderValue::from_static("no-cache"));
-    headers.insert(
-        "x-content-type-options",
-        HeaderValue::from_static("nosniff"),
-    );
-    response
-}
-
-async fn unknown_route() -> ApiError {
-    ApiError(StatusCode::NOT_FOUND, "API route not found.", "not_found")
-}
-
-async fn unsupported_method() -> ApiError {
-    ApiError(
-        StatusCode::METHOD_NOT_ALLOWED,
-        "HTTP method not allowed.",
-        "method_not_allowed",
-    )
 }
 
 pub fn app(state: AppState) -> Router {
@@ -136,6 +110,7 @@ pub fn app(state: AppState) -> Router {
                 .layer(DefaultBodyLimit::max(assignments::requests::MAX_BULK_BYTES)),
         )
         .merge(crate::auth::account::router())
+        .merge(agreements::routes::router())
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(activity::routes::router())

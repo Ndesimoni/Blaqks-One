@@ -1,13 +1,16 @@
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
-import { query } from './helpers.mjs';
+import { login, query } from './helpers.mjs';
 import { teamPath } from './team-helpers.mjs';
 import { FINANCE } from './permission-helpers.mjs';
 import { FINANCE_MESSAGES as M, financeTeams } from './finance-helpers.mjs';
+import { changeLimitOk } from './team-limit-helpers.mjs';
 
 let teams;
 before(async () => {
   teams = await financeTeams('fin-invite');
+  // These cases send raw invitations past the three-seat Free plan.
+  await changeLimitOk(await login('owner'), teams.admin, 50);
 });
 
 const storedFinance = (id) =>

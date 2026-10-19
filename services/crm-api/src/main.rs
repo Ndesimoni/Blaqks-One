@@ -4,7 +4,7 @@ use kws_crm_api::{
     config::Config,
     routes,
     sample::{self, guard, marker, options::Options},
-    signup,
+    shutdown, signup,
     state::AppState,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -117,7 +117,7 @@ async fn run() -> Result<(), String> {
         routes::app(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
     )
     .with_graceful_shutdown(async move {
-        let _ = tokio::signal::ctrl_c().await;
+        shutdown::signal().await;
         let _ = signal_tx.send(true);
     })
     .await;

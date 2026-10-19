@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { query } from './helpers.mjs';
 import { newCompany, snapshot } from './company-helpers.mjs';
-import { findMember, invite, memberUpdate, teamPath } from './team-helpers.mjs';
+import { findMember, inviteExact as invite, memberUpdate, teamPath } from './team-helpers.mjs';
 import { changeLimit, seatUsage } from './team-limit-helpers.mjs';
 import { holdWorkspaceLock, waitForWorkspaceQueue } from './workspace-lock.mjs';
 
@@ -40,19 +40,18 @@ test('a queued limit write rechecks the company owner after suspension', async (
   const before = snapshot(workspace);
   const member = await findMember(owner, admin.user.id);
   const release = await holdWorkspaceLock(workspace);
-  let suspending, changing;
+  let changing;
   try {
-    suspending = owner.request(teamPath(owner, member.id), {
+    changing = changeLimit(owner, workspace, 4, 1);
+    await waitForWorkspaceQueue(1);
+    const suspended = await owner.request(teamPath(owner, member.id), {
       method: 'PATCH',
       body: memberUpdate(member, { active: false }),
     });
-    await waitForWorkspaceQueue(1);
-    changing = changeLimit(owner, workspace, 4, 1);
-    await waitForWorkspaceQueue(2);
+    assert.equal(suspended.status, 200, JSON.stringify(suspended.value));
   } finally {
     await release();
   }
-  assert.equal((await suspending).status, 200);
   assert.equal((await changing).status, 403);
   assert.equal(snapshot(workspace), before);
 });

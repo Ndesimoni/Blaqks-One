@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { login, query, request } from './helpers.mjs';
 import { activate, invite, staffLogin } from './team-helpers.mjs';
+import { changeLimitOk } from './team-limit-helpers.mjs';
 
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 
@@ -55,12 +56,17 @@ export function staffFrom(stdout) {
   return staff;
 }
 
-/** A fresh, active Admin team for one suite, so shared fixtures stay untouched. */
+/**
+ * A fresh, active Admin team for one suite, so shared fixtures stay untouched. The
+ * seed adds three sample staff, so the Super Admin first raises the Free plan's three
+ * seats, as a developer must on a local Free company (docs/backend-foundation.md).
+ */
 export async function sampleAdmin(prefix) {
   query('TRUNCATE crm_login_limits');
   const owner = await login('owner');
   const invited = await invite(owner, prefix, { accountRole: 'admin', positions: [] });
   const admin = await activate(invited);
+  await changeLimitOk(owner, admin, 10);
   return { owner, admin, email: invited.email, workspace: admin.user.workspaceId };
 }
 

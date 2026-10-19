@@ -96,7 +96,7 @@ test('split navigation and form layouts keep every other module unchanged', () =
   );
   assert.equal(
     digest(without(descriptions, 'Contacts')),
-    'ecb6dc9d92ad489bcd6dfc68e06292679a95e2c1a0cb187b42c09fb670420132',
+    '5f8730fd84beb227a378bc5a85cb71c104d9a07c827cbaf75b0309afe534b032',
   );
   assert.equal(
     digest(without(preferredCols, 'Contacts')),

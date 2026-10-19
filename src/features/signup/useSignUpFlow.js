@@ -122,6 +122,7 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
     error,
     busy,
     botToken: bot.token,
+    botReady: bot.ready,
     setBotToken: bot.setToken,
     botReset: bot.resetKey,
     seconds,

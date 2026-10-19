@@ -3,19 +3,37 @@ import { useI18n } from '../../i18n/useI18n.js';
 
 const SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 
+const readTheme = () => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+
+/** The page theme, updated when the theme switch changes `data-theme`. */
+function useDocumentTheme() {
+  const [theme, setTheme] = useState(readTheme);
+  useEffect(() => {
+    const observer = new MutationObserver(() => setTheme(readTheme()));
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, []);
+  return theme;
+}
+
+/** An explicit widget, re-rendered with a cleared token on reset, theme or language change. */
 export function useTurnstile({ siteKey, action, onToken, resetKey }) {
   const { language } = useI18n();
+  const theme = useDocumentTheme();
   const container = useRef(null);
   const widget = useRef(null);
   const [status, setStatus] = useState('loading');
   useEffect(() => {
     let cancelled = false;
-    const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
     const token = (value) => {
       if (!cancelled) onToken(value || '');
     };
     const render = () => {
       if (cancelled || !container.current || !window.turnstile) return;
+      token('');
       window.turnstile.remove?.(widget.current);
       widget.current = window.turnstile.render(container.current, {
         sitekey: siteKey,
@@ -51,6 +69,6 @@ export function useTurnstile({ siteKey, action, onToken, resetKey }) {
       script.removeEventListener('load', render);
       window.turnstile?.remove?.(widget.current);
     };
-  }, [siteKey, action, language, resetKey, onToken]);
+  }, [siteKey, action, language, theme, resetKey, onToken]);
   return { container, status };
 }

@@ -1,3 +1,7 @@
+#[path = "config_signup.rs"]
+mod signup_settings;
+
+use signup_settings::{client_secret, turnstile_config, worker_enabled};
 use std::{env, net::SocketAddr};
 use url::Url;
 
@@ -45,13 +49,14 @@ impl Config {
         let trusted_proxies = env::var("CRM_TRUSTED_PROXIES").unwrap_or_default();
         let client_header =
             env::var("CRM_TRUSTED_CLIENT_HEADER").unwrap_or_else(|_| "cf-connecting-ip".into());
-        let client_secret = env::var("CRM_CLIENT_DIGEST_SECRET")
-            .unwrap_or_else(|_| "local-development-digest-secret".into());
+        let client_secret =
+            client_secret(env::var("CRM_CLIENT_DIGEST_SECRET").ok(), !secure_cookie)?;
         let turnstile = turnstile_config(
             env::var("CRM_TURNSTILE_SECRET").ok(),
             env::var("CRM_TURNSTILE_SITE_KEY").ok(),
             env::var("CRM_TURNSTILE_HOSTNAME").ok(),
             env::var("CRM_TURNSTILE_ENDPOINT").ok(),
+            !secure_cookie,
         )?;
         Ok(Self {
             database_url,
@@ -65,39 +70,6 @@ impl Config {
             client_secret,
             turnstile,
         })
-    }
-}
-
-fn turnstile_config(
-    secret: Option<String>,
-    site_key: Option<String>,
-    hostname: Option<String>,
-    endpoint: Option<String>,
-) -> Result<Option<TurnstileConfig>, String> {
-    let configured = [&secret, &site_key, &hostname]
-        .iter()
-        .filter(|value| value.as_deref().is_some_and(|text| !text.trim().is_empty()))
-        .count();
-    if configured == 0 {
-        return Ok(None);
-    }
-    if configured != 3 {
-        return Err("Turnstile requires a secret, site key and hostname.".into());
-    }
-    Ok(Some(TurnstileConfig {
-        secret: secret.unwrap(),
-        site_key: site_key.unwrap(),
-        hostname: hostname.unwrap(),
-        endpoint: endpoint
-            .unwrap_or_else(|| "https://challenges.cloudflare.com/turnstile/v0/siteverify".into()),
-    }))
-}
-
-fn worker_enabled(value: Option<&str>) -> Result<bool, String> {
-    match value.unwrap_or("on") {
-        "on" => Ok(true),
-        "off" => Ok(false),
-        _ => Err("CRM_SIGNUP_WORKER must be on or off.".into()),
     }
 }
 

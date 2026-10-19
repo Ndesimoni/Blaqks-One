@@ -1,24 +1,65 @@
 import assert from 'node:assert/strict';
-import { request } from './helpers.mjs';
+import { login, query, request } from './helpers.mjs';
 
 export const teamPath = (owner, id) =>
   `/workspaces/${owner.user.workspaceId || owner.user.id}/team${id ? `/${id}` : ''}`;
 
-export async function invite(owner, suffix, overrides = {}) {
-  const body = {
-    name: `Synthetic ${suffix}`,
-    email: `${suffix}@team-fixture.test`,
-    phone: '+971501234567',
-    positions: ['receptionist'],
-    ...overrides,
-  };
-  const result = await owner.request(`${teamPath(owner)}/invitations`, {
-    method: 'POST',
-    body,
-  });
+const inviteBody = (suffix, overrides) => ({
+  name: `Synthetic ${suffix}`,
+  email: `${suffix}@team-fixture.test`,
+  phone: '+971501234567',
+  positions: ['receptionist'],
+  ...overrides,
+});
+
+const sendInvite = (owner, body) =>
+  owner.request(`${teamPath(owner)}/invitations`, { method: 'POST', body });
+
+function invited(result, body) {
   assert.equal(result.status, 201, JSON.stringify(result.value));
   assert.ok(result.value.member.id && result.value.invitation.token);
   return { ...result.value, email: body.email };
+}
+
+/** An invitation that never changes seats; seat-limit suites use this one. */
+export async function inviteExact(owner, suffix, overrides = {}) {
+  const body = inviteBody(suffix, overrides);
+  return invited(await sendInvite(owner, body), body);
+}
+
+let superAdmin;
+
+/** Ten more seats for a full company, through the real Super Admin route. */
+async function addSeats(workspace) {
+  const [limit, version] = query(
+    `SELECT member_limit||'|'||version FROM crm_company_profiles WHERE workspace_id='${workspace}'`,
+  ).split('|');
+  const change = () =>
+    superAdmin.request(`/workspaces/${workspace}/company/seat-limit`, {
+      method: 'PUT',
+      body: { memberLimit: Number(limit) + 10, version: Number(version) },
+    });
+  superAdmin ??= await login('owner');
+  let result = await change();
+  if (result.status === 401) {
+    superAdmin = await login('owner');
+    result = await change();
+  }
+  assert.equal(result.status, 200, JSON.stringify(result.value));
+}
+
+/**
+ * Most suites need more staff than the three-seat Free plan allows. When the company is
+ * full, the Super Admin adds seats and the invitation is retried once.
+ */
+export async function invite(owner, suffix, overrides = {}) {
+  const body = inviteBody(suffix, overrides);
+  let result = await sendInvite(owner, body);
+  if (result.status === 409 && result.value?.code === 'team_limit_reached') {
+    await addSeats(owner.user.workspaceId || owner.user.id);
+    result = await sendInvite(owner, body);
+  }
+  return invited(result, body);
 }
 
 export async function staffLogin(email, password = 'Team123!') {

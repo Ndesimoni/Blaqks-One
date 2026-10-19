@@ -106,6 +106,8 @@ export const apiTestFiles = [
   'tests/api/signup-races.test.mjs',
   'tests/api/signup-release-races.test.mjs',
   'tests/api/signup-invitations.test.mjs',
+  'tests/api/agreements.test.mjs',
+  'tests/api/agreements-guards.test.mjs',
 ];
 
 /**

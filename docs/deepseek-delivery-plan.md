@@ -268,6 +268,10 @@ Create a separately owned `agreements` backend module and client service. Do not
 5. Attach prior guest agreements to a later account only after the same contact is verified.
 6. Add UAE PASS and RERA Form I references in later dedicated packets.
 
+### Status (2026-10-20)
+
+A1 is written (`docs/agreements-design.md`); its §11 decisions await the owner. The A2 core is built: migrations 0029–0030, `services/crm-api/src/agreements/` and two API suites. A review fixed cross-company ID probing, expired-agreement revival by counter-offer, unsendable expired drafts, same-company recipients causing a 503, the cross-workspace version race, evidence digests that did not name the parties, and unregistered API tests. See the design's §12 for what remains.
+
 ### Agreement acceptance gates
 
 - Workspace A cannot read any private identifier or record from workspace B through forged IDs.

@@ -1,4 +1,4 @@
-use crate::error::ApiResult;
+use crate::{error::ApiResult, signup::retry::MAX_ATTEMPTS};
 use sqlx::{FromRow, PgPool};
 use uuid::Uuid;
 
@@ -16,14 +16,15 @@ pub struct Claimed {
 }
 
 /// Claims one due job with `FOR UPDATE SKIP LOCKED`, so two workers can never own it. An
-/// expired lease is claimable, which recovers work after a restart or crash.
+/// expired lease is claimable, which recovers work after a restart or crash. A job is
+/// claimed at most `MAX_ATTEMPTS` times; cleanup ends one that crashes on every claim.
 pub async fn claim(pool: &PgPool, owner: Uuid, lease_secs: i64) -> ApiResult<Option<Claimed>> {
     sqlx::query_as(
         "WITH candidate AS ( \
             SELECT id FROM crm_signup_outbox \
             WHERE delivered_at IS NULL AND terminal_at IS NULL AND superseded_at IS NULL \
               AND next_attempt_at<=now() \
-              AND (lease_expires_at IS NULL OR lease_expires_at<=now()) \
+              AND (lease_expires_at IS NULL OR lease_expires_at<=now()) AND attempts<$3 \
             ORDER BY next_attempt_at,created_at LIMIT 1 FOR UPDATE SKIP LOCKED), \
          claimed AS ( \
             UPDATE crm_signup_outbox o SET lease_owner=$1, \
@@ -37,6 +38,7 @@ pub async fn claim(pool: &PgPool, owner: Uuid, lease_secs: i64) -> ApiResult<Opt
     )
     .bind(owner)
     .bind(lease_secs as f64)
+    .bind(MAX_ATTEMPTS)
     .fetch_optional(pool)
     .await
     .map_err(Into::into)

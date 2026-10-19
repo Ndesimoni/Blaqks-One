@@ -8,9 +8,11 @@ import { useLocation } from 'react-router-dom';
 import { InvitationActivation } from '../server-team/InvitationActivation.jsx';
 import { useAccountLanguage } from './useAccountLanguage.js';
 import { SignupPage } from '../signup/SignupPage.jsx';
+import { useI18n } from '../../i18n/useI18n.js';
 
 export function ServerSession({ children }) {
   const location = useLocation();
+  const { t } = useI18n();
   const [user, setUser] = useState(null);
   const [company, setCompany] = useState(null);
   const [notice, setNotice] = useState('');
@@ -111,8 +113,8 @@ export function ServerSession({ children }) {
   if (!company)
     return (
       <ServerStatus
-        title="Opening company setup"
-        message="Loading your company details…"
+        title={t('signupSetup.openingTitle')}
+        message={t('signupSetup.openingBody')}
         retry={() => setAttempt((value) => value + 1)}
         signIn={signOut}
       />

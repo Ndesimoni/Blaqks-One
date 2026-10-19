@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { login, query } from './helpers.mjs';
 import { newCompany } from './company-helpers.mjs';
-import { activate, invite } from './team-helpers.mjs';
+import { activate, inviteExact as invite } from './team-helpers.mjs';
 import { changeLimit, limitEvents, seatLimitPath, seatUsage } from './team-limit-helpers.mjs';
 
 before(() => query('TRUNCATE crm_login_limits'));

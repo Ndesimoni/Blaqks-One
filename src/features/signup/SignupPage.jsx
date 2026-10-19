@@ -74,6 +74,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
     siteKey: status.value.botCheck?.siteKey,
     onToken: flow.setBotToken,
     resetKey: flow.botReset,
+    ready: flow.botReady,
   };
   return (
     <SignupShell>

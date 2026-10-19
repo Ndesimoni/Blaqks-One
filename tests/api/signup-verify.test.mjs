@@ -13,47 +13,47 @@ import {
 before(resetSignup);
 
 test('verification creates one universal Free-company Admin', async () => {
-    const pending = await started(details({ email: email('universal-company') }));
-    const consentedAt = query(
-      `SELECT consented_at::text FROM crm_signup_requests WHERE email='${pending.body.email}'`,
-    );
-    const response = await verify(pending.ticket);
-    assert.equal(response.status, 201, JSON.stringify(response.value));
-    assert.equal(response.value.user.roleId, 'admin');
-    assert.equal(response.value.user.email, pending.body.email);
-    assert.equal(response.value.user.phoneVerified, false);
-    assert.equal(response.value.company.accountType, 'brokerage');
-    assert.equal(response.value.company.memberLimit, 3);
-    assert.ok(response.value.csrfToken);
-    const cookie = response.headers.get('set-cookie');
-    assert.match(cookie, /HttpOnly; SameSite=Strict; Max-Age=28800/);
-    const current = await request('/auth/session', {
-      cookie: cookie.split(';')[0],
-    });
-    assert.equal(current.status, 200);
-    assert.equal(current.value.user.id, response.value.user.id);
-    const user = response.value.user.id;
-    assert.equal(
-      query(
-        `SELECT (email_verified_at IS NOT NULL)::int||'|'||` +
-          `(phone_verified_at IS NULL)::int||'|'||role||'|'||` +
-          `(owner_id IS NULL)::int FROM crm_users WHERE id='${user}'`,
-      ),
-      '1|1|admin|1',
-    );
-    assert.equal(query(`SELECT count(*) FROM crm_account_consents WHERE user_id='${user}'`), '2');
-    assert.equal(
-      query(
-        `SELECT count(*) FROM crm_account_consents WHERE user_id='${user}' ` +
-          `AND accepted_at='${consentedAt}'::timestamptz`,
-      ),
-      '2',
-    );
-    assert.equal(query(`SELECT count(*) FROM crm_account_events WHERE user_id='${user}'`), '1');
-    assert.equal(
-      query(`SELECT origin FROM crm_company_profiles WHERE workspace_id='${user}'`),
-      'signup',
-    );
+  const pending = await started(details({ email: email('universal-company') }));
+  const consentedAt = query(
+    `SELECT consented_at::text FROM crm_signup_requests WHERE email='${pending.body.email}'`,
+  );
+  const response = await verify(pending.ticket);
+  assert.equal(response.status, 201, JSON.stringify(response.value));
+  assert.equal(response.value.user.roleId, 'admin');
+  assert.equal(response.value.user.email, pending.body.email);
+  assert.equal(response.value.user.phoneVerified, false);
+  assert.equal(response.value.company.accountType, 'brokerage');
+  assert.equal(response.value.company.memberLimit, 3);
+  assert.ok(response.value.csrfToken);
+  const cookie = response.headers.get('set-cookie');
+  assert.match(cookie, /HttpOnly; SameSite=Strict; Max-Age=28800/);
+  const current = await request('/auth/session', {
+    cookie: cookie.split(';')[0],
+  });
+  assert.equal(current.status, 200);
+  assert.equal(current.value.user.id, response.value.user.id);
+  const user = response.value.user.id;
+  assert.equal(
+    query(
+      `SELECT (email_verified_at IS NOT NULL)::int||'|'||` +
+        `(phone_verified_at IS NULL)::int||'|'||role||'|'||` +
+        `(owner_id IS NULL)::int FROM crm_users WHERE id='${user}'`,
+    ),
+    '1|1|admin|1',
+  );
+  assert.equal(query(`SELECT count(*) FROM crm_account_consents WHERE user_id='${user}'`), '2');
+  assert.equal(
+    query(
+      `SELECT count(*) FROM crm_account_consents WHERE user_id='${user}' ` +
+        `AND accepted_at='${consentedAt}'::timestamptz`,
+    ),
+    '2',
+  );
+  assert.equal(query(`SELECT count(*) FROM crm_account_events WHERE user_id='${user}'`), '1');
+  assert.equal(
+    query(`SELECT origin FROM crm_company_profiles WHERE workspace_id='${user}'`),
+    'signup',
+  );
 });
 
 test('verified signup releases only an abandoned invitation and preserves its audit UUID', async () => {

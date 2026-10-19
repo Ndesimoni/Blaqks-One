@@ -126,4 +126,3 @@ test('invalid and stale details cannot change company state or append history', 
     JSON.parse(committed).profile.setup_completed_at,
   );
 });
-

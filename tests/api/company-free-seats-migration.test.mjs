@@ -38,7 +38,8 @@ before(() => {
   const pending = addStaff('pending', false, false);
   const expired = addStaff('expired', false, false);
   addStaff('suspended', false, true);
-  addStaff('archived', true, true, true);
+  // Archived accounts are always inactive (crm_archived_accounts_inactive).
+  addStaff('archived', false, true, true);
   db.query(`INSERT INTO crm_team_invitations
     (token_hash,user_id,owner_id,workspace_id,created_by,expires_at) VALUES
     ('live-${pending}','${pending}','${owner}','${workspace}','${owner}',now()+interval '1 hour'),

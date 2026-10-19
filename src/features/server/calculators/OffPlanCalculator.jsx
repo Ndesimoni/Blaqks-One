@@ -73,7 +73,7 @@ export function OffPlanCalculator() {
     const headers = ['milestone', 'date', 'percent', 'amount'].map((key) =>
       t(`calculators.${key}`),
     );
-    const csv = scheduleCsv(schedule.milestones, headers);
+    const csv = scheduleCsv(schedule.milestones, headers, t('calculators.scheduleTotal'));
     downloadBlob(
       new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }),
       'off-plan-schedule.csv',

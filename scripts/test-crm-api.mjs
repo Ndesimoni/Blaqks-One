@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { checkExpiredSignupRemoved, seedExpiredSignup } from './check-signup-cleanup.mjs';
 import { checkSignupOff } from './check-signup-off.mjs';
 import { selectedApiTestFiles } from './crm-api-test-files.mjs';
+import { createFixtures, raiseFixtureSeats } from './crm-test-fixtures.mjs';
 import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
@@ -53,26 +54,14 @@ try {
   const port = address.split(':').at(-1);
   if (!/^\d+$/.test(port)) throw Error('Docker did not report a PostgreSQL port.');
   env.CRM_DATABASE_URL = `postgres://kws_crm_test:${dbPassword}@127.0.0.1:${port}/kws_crm_test`;
-  for (const [name, email, role] of [
-    ['Fixture Owner', 'owner@crm-fixture.test', 'super-admin'],
-    ['Fixture Admin A', 'admin-a@crm-fixture.test', 'admin'],
-    ['Fixture Admin B', 'admin-b@crm-fixture.test', 'admin'],
-  ]) {
-    await run(binary, ['create-user'], {
-      ...env,
-      CRM_BOOTSTRAP_NAME: name,
-      CRM_BOOTSTRAP_EMAIL: email,
-      CRM_BOOTSTRAP_PHONE: '+971501234567',
-      CRM_BOOTSTRAP_ROLE: role,
-      CRM_BOOTSTRAP_PASSWORD: env.CRM_FIXTURE_PASSWORD,
-    });
-  }
+  await createFixtures(binary, env);
   await ensurePortFree('127.0.0.1', 8790);
   await checkSignupOff(binary, env);
   seedExpiredSignup(compose);
   server = spawn(binary, [], { env, stdio: 'inherit' });
   await waitForApi(`${env.CRM_TEST_API}/health`, server);
   checkExpiredSignupRemoved(compose);
+  await raiseFixtureSeats(compose, env);
   if (!process.argv.includes('--browser-only')) {
     // Database-backed Rust contracts use this same disposable, migrated database.
     await run(

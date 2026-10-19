@@ -1,4 +1,6 @@
-use super::{cookie_policy, signup_mode, turnstile_config, worker_enabled, SignupMode};
+use super::{
+    client_secret, cookie_policy, signup_mode, turnstile_config, worker_enabled, SignupMode,
+};
 
 #[test]
 fn requires_https_unless_insecure_loopback_is_explicitly_enabled() {
@@ -57,13 +59,14 @@ fn the_delivery_worker_defaults_on_and_refuses_unknown_values() {
 
 #[test]
 fn turnstile_needs_all_three_public_and_secret_values() {
-    let none = turnstile_config(None, None, None, None).unwrap();
+    let none = turnstile_config(None, None, None, None, true).unwrap();
     assert!(none.is_none());
     let full = turnstile_config(
         Some("secret".into()),
         Some("site".into()),
         Some("crm.example.test".into()),
         None,
+        true,
     )
     .unwrap()
     .unwrap();
@@ -72,7 +75,34 @@ fn turnstile_needs_all_three_public_and_secret_values() {
     assert!(full
         .endpoint
         .starts_with("https://challenges.cloudflare.com/"));
-    assert!(turnstile_config(Some("secret".into()), None, None, None).is_err());
-    assert!(turnstile_config(None, Some("site".into()), None, None).is_err());
-    assert!(turnstile_config(None, None, Some("host".into()), None).is_err());
+    assert!(turnstile_config(Some("secret".into()), None, None, None, true).is_err());
+    assert!(turnstile_config(None, Some("site".into()), None, None, true).is_err());
+    assert!(turnstile_config(None, None, Some("host".into()), None, true).is_err());
+}
+
+#[test]
+fn hosted_mode_needs_a_digest_secret_and_the_fixed_siteverify_address() {
+    assert_eq!(
+        client_secret(None, true).unwrap(),
+        "local-development-digest-secret"
+    );
+    assert!(client_secret(None, false).is_err());
+    assert!(client_secret(Some("short".into()), false).is_err());
+    assert!(client_secret(Some("x".repeat(32)), false).is_ok());
+    let values = || (Some("s".into()), Some("k".into()), Some("h".into()));
+    let (secret, key, host) = values();
+    let stub = Some("http://127.0.0.1:9/verify".into());
+    assert!(turnstile_config(secret, key, host, stub.clone(), false).is_err());
+    let (secret, key, host) = values();
+    let local = turnstile_config(secret, key, host, stub, true)
+        .unwrap()
+        .unwrap();
+    assert_eq!(local.endpoint, "http://127.0.0.1:9/verify");
+    let (secret, key, host) = values();
+    let hosted = turnstile_config(secret, key, host, None, false)
+        .unwrap()
+        .unwrap();
+    assert!(hosted
+        .endpoint
+        .starts_with("https://challenges.cloudflare.com/"));
 }

@@ -1,5 +1,7 @@
 use super::{
+    cleanup,
     jobs::claim,
+    retry::MAX_ATTEMPTS,
     test_support::{fixture, reset},
 };
 use crate::test_database;
@@ -64,4 +66,28 @@ async fn an_expired_request_is_claimed_only_to_be_finished() {
     let claimed = claim(&pool, Uuid::new_v4(), 30).await.unwrap().unwrap();
     assert!(claimed.expired);
     assert!(claimed.code_expired);
+}
+
+#[tokio::test]
+#[ignore = "requires disposable Docker API harness"]
+async fn an_exhausted_job_is_never_claimed_and_cleanup_ends_it() {
+    let pool = test_database::pool().await;
+    reset(&pool).await;
+    let job = fixture(&pool).await;
+    sqlx::query("UPDATE crm_signup_outbox SET attempts=$2 WHERE id=$1")
+        .bind(job)
+        .bind(MAX_ATTEMPTS)
+        .execute(&pool)
+        .await
+        .unwrap();
+    assert!(claim(&pool, Uuid::new_v4(), 30).await.unwrap().is_none());
+    cleanup::run(&pool).await.unwrap();
+    let row: (bool, Option<String>, Option<String>) = sqlx::query_as(
+        "SELECT terminal_at IS NOT NULL,last_error,code FROM crm_signup_outbox WHERE id=$1",
+    )
+    .bind(job)
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(row, (true, Some("attempts exhausted".into()), None));
 }

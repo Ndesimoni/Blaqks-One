@@ -20,6 +20,13 @@
       "crm_company_limit_events"
     ],
     "signup": ["crm_signup_requests", "crm_signup_outbox"],
+    "agreements": [
+      "crm_agreements",
+      "crm_agreement_participants",
+      "crm_agreement_revisions",
+      "crm_agreement_events",
+      "crm_agreement_actions"
+    ],
     "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
     "records": ["crm_records", "crm_activity"],
     "assignments": [
@@ -55,6 +62,7 @@
       "assignments",
       "imports",
       "performance",
+      "agreements",
       "sample"
     ]
   },

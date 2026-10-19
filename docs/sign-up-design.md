@@ -347,3 +347,11 @@ Packet R2 adds the caller-identity and bot-proof layer that the delivery worker 
 - The API test runner trusts loopback and gives each synthetic case its own client address, so the new per-caller budgets stay enforced without weakening production values.
 
 **Verification:** all 21 sign-up API tests and 150 Rust library tests pass, including the four worker delivery tests, `cargo clippy --all-targets -- -D warnings`, `npm test` (360 checks), `npm run build` and `npm run check:i18n`. Browser checks still need the local Playwright Chromium download.
+
+## 21. Review fixes to R1 and R2 (2026-10-20)
+
+- **Client identity:** IPv4-mapped IPv6 addresses count as IPv4, so a dual-stack listener still recognises trusted proxies. An IPv6 caller is budgeted by its /64 network, so rotating addresses inside one subscriber block gains nothing.
+- **Hosted configuration:** outside local development, `CRM_CLIENT_DIGEST_SECRET` is required (at least 32 characters) and `CRM_TURNSTILE_ENDPOINT` is refused, so Siteverify is always Cloudflare's.
+- **Worker:** the server stops gracefully on SIGTERM as well as Ctrl-C, so in-flight deliveries finish when a container stops. A job is claimed at most `MAX_ATTEMPTS` times; cleanup ends one left unfinished by repeated crashes, so it cannot block the queue.
+- **Cleanup:** every retention statement skips locked rows and touches at most 1000, so start, resend and verify never wait behind a delivery in progress.
+- **Form:** with Turnstile, start and resend stay disabled until the widget is solved, and the widget re-renders with a cleared token when the theme or language changes.
