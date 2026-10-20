@@ -9,6 +9,7 @@ pub mod history;
 pub mod ids;
 pub mod links;
 pub mod list;
+pub mod lookup;
 pub mod mutation;
 pub mod projections;
 pub mod requests;

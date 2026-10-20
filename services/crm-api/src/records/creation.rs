@@ -11,7 +11,7 @@ use crate::{
     auth::grants::Action,
     error::{ApiError, ApiResult},
 };
-use sqlx::PgPool;
+use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
 pub const ISSUED_IDS: &str = "Record IDs are issued by the server.";
@@ -30,13 +30,28 @@ pub async fn create(
     actor: Uuid,
     workspace: &str,
     collection: &str,
+    record: ValidatedRecord,
+) -> ApiResult<Entry> {
+    let mut transaction = pool.begin().await?;
+    crate::workspaces::lock(&mut transaction, workspace).await?;
+    let saved = create_in(&mut transaction, actor, workspace, collection, record).await?;
+    transaction.commit().await?;
+    Ok(saved)
+}
+
+/// The same create inside the caller's transaction, which must already hold the
+/// workspace lock. Other modules (the Inbox's Create lead) use it so the new record and
+/// their own change commit together.
+pub async fn create_in(
+    transaction: &mut Transaction<'_, Postgres>,
+    actor: Uuid,
+    workspace: &str,
+    collection: &str,
     mut record: ValidatedRecord,
 ) -> ApiResult<Entry> {
     let id = Uuid::new_v4();
-    let mut transaction = pool.begin().await?;
-    crate::workspaces::lock(&mut transaction, workspace).await?;
     let user = crate::workspaces::ensure_writable(
-        &mut transaction,
+        transaction,
         workspace,
         actor,
         Some(collection),
@@ -46,21 +61,13 @@ pub async fn create(
     let scope = RecordScope::of(&user);
     ensure_id_allowed(scope, &record)?;
     if record.legacy_id.is_empty() {
-        let issued = ids::issue(&mut transaction, workspace, collection).await?;
+        let issued = ids::issue(transaction, workspace, collection).await?;
         record.issue_id(collection, issued)?;
     }
-    links::ensure_linkable(
-        &mut transaction,
-        workspace,
-        scope,
-        &record.links,
-        None,
-        None,
-    )
-    .await?;
-    deal_links::ensure(&mut transaction, workspace, &user, &record.links, None).await?;
+    links::ensure_linkable(transaction, workspace, scope, &record.links, None, None).await?;
+    deal_links::ensure(transaction, workspace, &user, &record.links, None).await?;
     target::ensure_client(scope, collection, &record.links)?;
-    let holder = history::default_holder(&mut transaction, workspace, &user).await?;
+    let holder = history::default_holder(transaction, workspace, &user).await?;
     let assignee = history::initial(collection, holder, &record.links);
     let sql = format!(
         "INSERT INTO crm_records \
@@ -80,17 +87,9 @@ pub async fn create(
         .bind(record.links.referral)
         .bind(record.links.deal)
         .bind(assignee)
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut **transaction)
         .await?;
-    audit::append(
-        &mut transaction,
-        actor,
-        workspace,
-        "created",
-        collection,
-        id,
-    )
-    .await?;
+    audit::append(transaction, actor, workspace, "created", collection, id).await?;
     if assignee.is_some() {
         let change = Change {
             workspace,
@@ -101,8 +100,7 @@ pub async fn create(
             actor,
             reason: "created",
         };
-        history::append(&mut transaction, &change).await?;
+        history::append(transaction, &change).await?;
     }
-    transaction.commit().await?;
     Ok(saved)
 }

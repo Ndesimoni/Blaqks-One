@@ -6,6 +6,7 @@
 pub mod cleanup;
 pub mod inbound;
 mod inbound_store;
+pub mod message;
 mod receipt;
 pub mod signature;
 mod store;

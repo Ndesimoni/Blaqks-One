@@ -14,24 +14,24 @@ pub const KEY: MessagingKey = MessagingKey {
     version: 1,
 };
 
-/// A sink that answers with scripted results and keeps the bodies it accepted.
+/// A sink that answers with scripted results and keeps the texts it accepted.
 pub struct Recorder {
     answers: Mutex<Vec<Result<(), SinkError>>>,
-    pub bodies: Mutex<Vec<Vec<u8>>>,
+    pub texts: Mutex<Vec<String>>,
 }
 
 impl Recorder {
     pub fn new(answers: Vec<Result<(), SinkError>>) -> Self {
         Self {
             answers: Mutex::new(answers),
-            bodies: Mutex::new(Vec::new()),
+            texts: Mutex::new(Vec::new()),
         }
     }
 }
 
 impl Sink for Recorder {
     fn accept<'a>(&'a self, event: &'a Event) -> SinkFuture<'a> {
-        self.bodies.lock().unwrap().push(event.body.clone());
+        self.texts.lock().unwrap().push(event.message.text.clone());
         let answer = self.answers.lock().unwrap().remove(0);
         Box::pin(async move { answer })
     }
@@ -95,4 +95,11 @@ pub async fn outcome(pool: &PgPool, receipt: Uuid) -> (String, Option<String>, i
     .fetch_one(pool)
     .await
     .unwrap()
+}
+
+/// A valid stub message body with this text.
+pub fn stub_body(text: &str) -> Vec<u8> {
+    serde_json::json!({"thread": "t-1", "message": "m-1", "from": "+971500000001", "text": text})
+        .to_string()
+        .into_bytes()
 }

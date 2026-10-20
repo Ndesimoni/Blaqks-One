@@ -7,6 +7,7 @@ pub mod config;
 pub mod error;
 pub mod finance;
 pub mod imports;
+pub mod inbox;
 pub mod integrations;
 pub mod outbox;
 pub mod performance;

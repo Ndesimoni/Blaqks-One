@@ -10,6 +10,7 @@ pub struct Claimed {
     pub workspace_id: String,
     pub connection_id: Uuid,
     pub provider: String,
+    pub channel: String,
     pub attempts: i32,
     pub disconnected: bool,
     pub sealed: Vec<u8>,
@@ -34,7 +35,7 @@ pub async fn claim(
             UPDATE integrations.crm_webhook_receipts r SET lease_owner=$1, \
               lease_expires_at=now()+make_interval(secs=>$2),attempts=r.attempts+1 \
             FROM candidate c WHERE r.id=c.id RETURNING r.*) \
-         SELECT c.id,c.workspace_id,c.connection_id,c.provider,c.attempts, \
+         SELECT c.id,c.workspace_id,c.connection_id,c.provider,k.channel,c.attempts, \
            k.state='disconnected' AS disconnected,s.payload_sealed AS sealed,s.key_version \
          FROM claimed c \
          JOIN integrations.crm_channel_connections k ON k.id=c.connection_id \

@@ -39,6 +39,23 @@
       "crm_webhook_receipts_purge",
       "crm_webhook_staging"
     ],
+    "inbox": [
+      "crm_inbox_conversations",
+      "crm_inbox_conversations_thread",
+      "crm_inbox_conversations_feed",
+      "crm_inbox_conversations_assignee",
+      "crm_inbox_messages",
+      "crm_inbox_messages_provider",
+      "crm_inbox_messages_thread",
+      "crm_inbox_notes",
+      "crm_inbox_notes_thread",
+      "crm_inbox_reads",
+      "crm_inbox_blocks",
+      "crm_inbox_rules",
+      "crm_inbox_events",
+      "crm_inbox_events_feed",
+      "crm_inbox_events_immutable"
+    ],
     "outbox": [
       "crm_outbox_jobs",
       "crm_outbox_jobs_live",
@@ -84,6 +101,7 @@
       "imports",
       "performance",
       "agreements",
+      "inbox",
       "integrations",
       "outbox",
       "sample"

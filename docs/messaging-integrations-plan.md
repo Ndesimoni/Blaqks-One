@@ -2,7 +2,7 @@
 
 Owner request, 20 October 2026. Client messages from WhatsApp, email, Facebook and Instagram arrive in one shared Inbox, go to the right lead or client, and staff send and reply from the CRM. Sending to clients is the main goal; unrelated messages must not become leads.
 
-Status 2026-10-20: **X0 is approved** — the [messaging design](messaging-design.md) passed its separate [security review](messaging-security.md) and the owner decided O1–O6. **X1, X1a and X2 are built and reviewed** (X1a: channel events in Team activity, decision O4; X2: verified webhook intake, sealed staging, the outbox and the messaging worker). Next: X3. D2 and D4–D7 still block their packets.
+Status 2026-10-20: **X0 is approved** — the [messaging design](messaging-design.md) passed its separate [security review](messaging-security.md) and the owner decided O1–O6. **X1, X1a and X2 are built and reviewed** (X1a: channel events in Team activity, decision O4; X2: verified webhook intake, sealed staging, the outbox and the messaging worker). **X3a is built** (Inbox tables, sender normalisation, matching, lead rules, routing and intake from the worker). Next: X3b (staff API) and X3c (lead actions and rules API). D2 and D4–D7 still block their packets.
 
 **Owner decision 2026-10-20: Claude implements every packet directly; no packets are assigned to DeepSeek.** The packet order, rules, tests and acceptance below still apply, with Claude as implementer and a separate security review for sensitive packets. The owner approves commits and pushes.
 

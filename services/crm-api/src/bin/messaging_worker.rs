@@ -1,8 +1,13 @@
 //! The messaging worker process (docs/messaging-design.md §2): runs the outbox delivery
-//! loops, lease sweeps and retention purges, and processes verified webhook events once
-//! the Inbox (X3) provides a sink. The API process never claims jobs. Stop it with Ctrl-C
+//! loops, lease sweeps and retention purges, and hands verified webhook events to the
+//! Inbox. The API process never claims jobs. Stop it with Ctrl-C
 //! or SIGTERM; in-flight sends finish first.
-use kws_crm_api::{config::Config, integrations::webhooks::inbound, outbox, routes, shutdown};
+use kws_crm_api::{
+    config::Config,
+    inbox::intake::InboxSink,
+    integrations::webhooks::inbound::{self, Sink},
+    outbox, routes, shutdown,
+};
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 
@@ -32,10 +37,11 @@ async fn run() -> Result<(), String> {
         .await
         .map_err(|_| "CRM schema migration failed. Check database access and migration history.")?;
     let (shutdown_tx, shutdown_rx) = tokio::sync::watch::channel(false);
-    // No sending domain or inbound sink exists until the Inbox (X3).
+    // Sending domains arrive with the provider adapters (E1, W1).
     let domains: outbox::worker::Domains = Arc::new(Vec::new());
     let mut handles = outbox::worker::spawn(pool.clone(), domains, shutdown_rx.clone());
-    handles.extend(inbound::spawn(pool, key, None, shutdown_rx));
+    let sink: Arc<dyn Sink> = Arc::new(InboxSink { pool: pool.clone() });
+    handles.extend(inbound::spawn(pool, key, Some(sink), shutdown_rx));
     println!("CRM messaging worker running.");
     shutdown::signal().await;
     let _ = shutdown_tx.send(true);

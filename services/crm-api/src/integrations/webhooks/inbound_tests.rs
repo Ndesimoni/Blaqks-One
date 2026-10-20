@@ -2,7 +2,7 @@
 use super::{
     cleanup::purge,
     inbound::{process_one, SinkError},
-    inbound_fixtures::{fresh, outcome, stored_event, Recorder, KEY},
+    inbound_fixtures::{fresh, outcome, stored_event, stub_body, Recorder, KEY},
 };
 use crate::config::messaging_settings::MessagingKey;
 use uuid::Uuid;
@@ -11,7 +11,7 @@ use uuid::Uuid;
 #[ignore = "requires disposable Docker API harness"]
 async fn a_replayed_event_is_stored_and_processed_once() {
     let pool = fresh().await;
-    let receipt = stored_event(&pool, br#"{"text":"synthetic"}"#).await;
+    let receipt = stored_event(&pool, &stub_body("synthetic")).await;
     let sink = Recorder::new(vec![Err(SinkError::Retry), Ok(())]);
     let owner = Uuid::new_v4();
     assert!(process_one(&pool, &KEY, &sink, owner).await);
@@ -19,18 +19,22 @@ async fn a_replayed_event_is_stored_and_processed_once() {
     assert!(process_one(&pool, &KEY, &sink, owner).await);
     assert_eq!(outcome(&pool, receipt).await, ("processed".into(), None, 0));
     assert!(!process_one(&pool, &KEY, &sink, owner).await);
-    assert_eq!(sink.bodies.lock().unwrap()[1], br#"{"text":"synthetic"}"#);
+    assert_eq!(sink.texts.lock().unwrap()[1], "synthetic");
 }
 
 #[tokio::test]
 #[ignore = "requires disposable Docker API harness"]
 async fn refused_unreadable_and_disconnected_events_end_without_their_body() {
     let pool = fresh().await;
-    let refused = stored_event(&pool, b"{}").await;
+    let refused = stored_event(&pool, &stub_body("refused")).await;
     let sink = Recorder::new(vec![Err(SinkError::Permanent("unsupported_event"))]);
     process_one(&pool, &KEY, &sink, Uuid::new_v4()).await;
     let code = Some("unsupported_event".to_owned());
     assert_eq!(outcome(&pool, refused).await, ("failed".into(), code, 0));
+    let garbled = stored_event(&pool, b"{}").await;
+    process_one(&pool, &KEY, &sink, Uuid::new_v4()).await;
+    let code = Some("unparseable".to_owned());
+    assert_eq!(outcome(&pool, garbled).await, ("failed".into(), code, 0));
     let unreadable = stored_event(&pool, b"{}").await;
     let rotated = MessagingKey {
         bytes: [6u8; 32],
@@ -52,14 +56,14 @@ async fn refused_unreadable_and_disconnected_events_end_without_their_body() {
     process_one(&pool, &KEY, &sink, Uuid::new_v4()).await;
     let code = Some("disconnected".to_owned());
     assert_eq!(outcome(&pool, gone).await, ("rejected".into(), code, 0));
-    assert_eq!(sink.bodies.lock().unwrap().len(), 1);
+    assert_eq!(sink.texts.lock().unwrap().len(), 1);
     sqlx::query(
         "UPDATE integrations.crm_webhook_receipts SET received_at=now()-interval '31 days'",
     )
     .execute(&pool)
     .await
     .unwrap();
-    assert_eq!(purge(&pool).await.unwrap(), 3);
+    assert_eq!(purge(&pool).await.unwrap(), 4);
 }
 
 #[tokio::test]

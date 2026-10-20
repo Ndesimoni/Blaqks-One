@@ -1,7 +1,12 @@
 //! The worker's inbound loop: claims a received event, opens its sealed body and hands it
-//! to the [`Sink`] (the Inbox from X3), then deletes the body. Until a sink exists the loop
-//! is not started and events wait, sealed, for at most the 30-day receipt retention.
-use super::{cleanup, inbound_store as stored};
+//! to the [`Sink`] (the Inbox), then deletes the body. Without a sink the loop is not
+//! started and events wait, sealed, for at most the 30-day receipt retention.
+use super::{
+    cleanup,
+    inbound_store::{self as stored, Claimed},
+    message::{parse_stub, Inbound},
+    receipt::STUB,
+};
 use crate::{
     config::messaging_settings::MessagingKey, integrations::crypto, outbox::worker::pause,
 };
@@ -17,13 +22,14 @@ const CLEANUP_EVERY: Duration = Duration::from_secs(3600);
 /// A sink call ends well inside the lease, so a live worker never loses it (X2-S4).
 pub const SINK_TIMEOUT: Duration = Duration::from_secs(30);
 
-/// A verified provider event. `body` is the exact signed bytes; it lives only in memory.
+/// A verified provider event, parsed into the provider-neutral message. It lives only in
+/// memory; the sealed body is deleted once the event is settled.
 pub struct Event {
     pub receipt_id: Uuid,
     pub workspace_id: String,
     pub connection_id: Uuid,
-    pub provider: String,
-    pub body: Vec<u8>,
+    pub channel: String,
+    pub message: Inbound,
 }
 
 #[derive(Debug, PartialEq)]
@@ -41,6 +47,31 @@ pub trait Sink: Send + Sync {
     fn accept<'a>(&'a self, event: &'a Event) -> SinkFuture<'a>;
 }
 
+/// Opens the sealed body and parses it with the receipt's provider format.
+fn decode(claimed: &Claimed, key: &MessagingKey) -> Result<Event, &'static str> {
+    let aad = crypto::staging_aad(
+        &claimed.workspace_id,
+        &claimed.id.to_string(),
+        &claimed.provider,
+        claimed.key_version,
+    );
+    let body = (claimed.key_version == key.version)
+        .then(|| crypto::open(&key.bytes, &aad, &claimed.sealed).ok())
+        .flatten()
+        .ok_or("unreadable")?;
+    let message = match claimed.provider.as_str() {
+        STUB => parse_stub(&body)?,
+        _ => return Err("unsupported_provider"),
+    };
+    Ok(Event {
+        receipt_id: claimed.id,
+        workspace_id: claimed.workspace_id.clone(),
+        connection_id: claimed.connection_id,
+        channel: claimed.channel.clone(),
+        message,
+    })
+}
+
 /// Processes at most one event; `true` when one was claimed.
 pub async fn process_one(pool: &PgPool, key: &MessagingKey, sink: &dyn Sink, owner: Uuid) -> bool {
     if stored::exhaust(pool, MAX_ATTEMPTS).await.is_err() {
@@ -55,25 +86,9 @@ pub async fn process_one(pool: &PgPool, key: &MessagingKey, sink: &dyn Sink, own
     let result = if claimed.disconnected {
         settle("rejected", Some("disconnected")).await
     } else {
-        let aad = crypto::staging_aad(
-            &claimed.workspace_id,
-            &claimed.id.to_string(),
-            &claimed.provider,
-            claimed.key_version,
-        );
-        let opened = (claimed.key_version == key.version)
-            .then(|| crypto::open(&key.bytes, &aad, &claimed.sealed).ok())
-            .flatten();
-        match opened {
-            None => settle("failed", Some("unreadable")).await,
-            Some(body) => {
-                let event = Event {
-                    receipt_id: claimed.id,
-                    workspace_id: claimed.workspace_id.clone(),
-                    connection_id: claimed.connection_id,
-                    provider: claimed.provider.clone(),
-                    body,
-                };
+        match decode(&claimed, key) {
+            Err(code) => settle("failed", Some(code)).await,
+            Ok(event) => {
                 let answer = tokio::time::timeout(SINK_TIMEOUT, sink.accept(&event))
                     .await
                     .unwrap_or(Err(SinkError::Retry));
