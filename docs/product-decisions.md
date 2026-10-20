@@ -192,6 +192,7 @@ The owner approved the [messaging design](messaging-design.md) (packet X0) after
 - **Activity:** channel and Inbox events appear in Team activity, redacted.
 - **Media:** shown as "Media received" until private media storage exists.
 - **Phone region:** UAE for every company for now; a per-company setting when a company outside the UAE needs it.
+- **Inbox design:** the 8-screen CRM Inbox design canvas is approved as the build reference for the Inbox, Channels and lead-rules screens, with TikTok as its own Channels card.
 - **Email system (D4):** Google Workspace. The Gmail adapter is built first in packet E1; Google's verification for restricted Gmail scopes is an outside step to start early.
 - **TikTok:** added as a fifth channel on the Channels screen (owner, 2026-10-20). Real TikTok messages come in packet T1, after TikTok approves Business Messaging access and UAE eligibility is confirmed.
 - **Account ownership:** real providers prove which number, mailbox or Page a credential controls; Admins never type it. Each member connects their own mailbox, with Admin approval.

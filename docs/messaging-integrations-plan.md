@@ -6,7 +6,7 @@ Status 2026-10-20: **X0 is approved** — the [messaging design](messaging-desig
 
 This plan follows the [DeepSeek delivery workflow](deepseek-delivery-plan.md): DeepSeek implements **one packet at a time** with its tests; the reviewer (Claude or Codex) checks the diff, security and workspace boundaries and runs the checks; the owner approves each commit. All rules in §1 of that plan apply to every packet here (150-line files, connected mode only, English and Arabic catalogues, logical CSS, synthetic test data, one owner per table, no commits by DeepSeek).
 
-Design reference: the **CRM Inbox design** canvas (8 screens, owner review). It uses the current forest-green and gold theme and `docs/design-standards.md`. Build to it; any change to it needs owner approval first.
+Design reference: the **CRM Inbox design** canvas (8 screens, https://claude.ai/artifact/7gCey1sfjsATtoAw3P2hrY), **approved by the owner on 2026-10-20**. It uses the current forest-green and gold theme and `docs/design-standards.md`. Build to it; any change to it needs owner approval first. One approved change: on the Connections artboard, TikTok gets its own card (TikTok Business, "Connect TikTok", needs a TikTok Business Account and TikTok's Business Messaging approval) in place of the "TikTok, LinkedIn and others · Later" card, with LinkedIn and others noted as later. The canvas itself still shows the old card and must be updated in the canvas editor. The X1 Channels screen is an interim form; it is rebuilt to the Connections artboard as each real provider lands (E1, W1, S1, T1).
 
 ## 1. Decisions
 
@@ -58,7 +58,7 @@ Nothing in this plan sends to real clients during development. Every provider is
 | 3     | X3 Conversation kernel and contact match | Conversations, messages, notes, exact matching, routing and lead rules (API) | None             |
 | 4     | E1 Email sending and client replies      | Send from the CRM through the connected mailbox; replies thread back         | D4 decided       |
 | 5     | W1 WhatsApp sending through Twilio       | Free-form within window, templates outside it, consent, statuses             | D1, D2, D6       |
-| 6     | U1 Inbox screens                         | The designed Inbox: list, conversation, client panel, mobile, states         | Design approval  |
+| 6     | U1 Inbox screens                         | The designed Inbox: list, conversation, client panel, mobile, states         | Design approved  |
 | 7     | U2 New-contact review and Inbox rules    | Create lead / link / not a lead / block, and the Inbox rules screen          | None             |
 | 8     | W2 WhatsApp inbound                      | Client WhatsApp messages arrive, match and route                             | D7               |
 | 9     | S1 Facebook Page and Instagram           | Page and Instagram messages and lead forms into the Inbox                    | D5, D6           |
@@ -143,7 +143,7 @@ Specialists: senior architect and security engineer, reviewed separately. No cod
 
 **Tests:** window open → free text allowed; closed → only templates; no consent → send refused with a clear message; opt-out stops further sends; status callback signature verified; Twilio sandbox proof recorded (not in CI).
 
-### U1 — Inbox screens (after design approval)
+### U1 — Inbox screens (design approved 2026-10-20)
 
 Specialists: product designer plus frontend engineer (owner rule: every UI change involves the designer).
 
