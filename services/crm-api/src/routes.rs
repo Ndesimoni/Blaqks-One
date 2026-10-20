@@ -5,7 +5,7 @@ use crate::{
     activity, agreements, assignments,
     auth::handlers as auth,
     error::{self, CodeMapper},
-    finance, imports, integrations, performance,
+    finance, imports, inbox, integrations, performance,
     records::handlers as records,
     signup,
     state::AppState,
@@ -113,6 +113,7 @@ pub fn app(state: AppState) -> Router {
         .merge(agreements::routes::router())
         .merge(integrations::routes::router())
         .merge(integrations::webhooks::router())
+        .merge(inbox::routes::router())
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(activity::routes::router())

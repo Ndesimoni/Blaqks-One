@@ -112,6 +112,8 @@ export const apiTestFiles = [
   'tests/api/channels-lifecycle.test.mjs',
   'tests/api/activity-channels.test.mjs',
   'tests/api/webhooks.test.mjs',
+  'tests/api/inbox.test.mjs',
+  'tests/api/inbox-assign.test.mjs',
 ];
 
 /**
