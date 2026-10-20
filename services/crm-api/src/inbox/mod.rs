@@ -18,6 +18,7 @@ pub mod read;
 pub mod routes;
 pub mod rules;
 pub mod rules_api;
+pub mod summary;
 pub mod triage;
 pub mod view;
 

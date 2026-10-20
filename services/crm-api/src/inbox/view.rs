@@ -85,3 +85,22 @@ pub async fn shown(
     };
     Ok(row.view(visible))
 }
+
+/// Linked record IDs on these rows that the viewer may see.
+pub async fn visible_records(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    user: &UserRow,
+    rows: &[Row],
+) -> ApiResult<Vec<uuid::Uuid>> {
+    let mut shown = Vec::new();
+    for collection in ["Clients", "Contacts"] {
+        let ids: Vec<uuid::Uuid> = rows
+            .iter()
+            .filter(|row| row.linked_collection.as_deref() == Some(collection))
+            .filter_map(|row| row.linked_record_id)
+            .collect();
+        shown.extend(lookup::visible(tx, workspace, user, collection, &ids).await?);
+    }
+    Ok(shown)
+}

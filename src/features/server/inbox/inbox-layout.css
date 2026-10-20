@@ -1,0 +1,88 @@
+/* Inbox page frame: heading, the three panes and their phone behaviour (design Main, MobileList). */
+.inbox-page {
+  display: grid;
+  gap: 16px;
+}
+.inbox-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  block-size: max(520px, calc(100dvh - 300px));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+/* The client panel gets its own column only where the conversation keeps enough room. */
+@media (min-width: 1440px) {
+  .inbox-layout.has-panel {
+    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) 300px;
+  }
+}
+.inbox-list-pane,
+.inbox-conversation,
+.inbox-panel {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+.inbox-list-pane {
+  border-inline-end: 1px solid var(--line);
+}
+.inbox-conversation {
+  background: var(--surface-subtle);
+}
+.inbox-panel {
+  border-inline-start: 1px solid var(--line);
+  overflow-y: auto;
+}
+.inbox-back,
+.inbox-details {
+  display: none;
+}
+/* Phones and narrow tablets: list → conversation → details as separate screens. */
+@media (max-width: 899px) {
+  .inbox-layout,
+  .inbox-layout.has-panel {
+    grid-template-columns: minmax(0, 1fr);
+    block-size: max(480px, calc(100dvh - 150px));
+  }
+  .inbox-layout.is-list .inbox-conversation,
+  .inbox-layout.is-list .inbox-panel,
+  .inbox-layout.is-thread .inbox-list-pane,
+  .inbox-layout.is-thread .inbox-panel,
+  .inbox-layout.is-details .inbox-list-pane,
+  .inbox-layout.is-details .inbox-conversation {
+    display: none;
+  }
+  .inbox-list-pane,
+  .inbox-panel {
+    border: 0;
+  }
+  .inbox-back,
+  .inbox-details {
+    display: inline-flex;
+  }
+}
+/* Between phone and wide desktop the panel opens over the conversation on request. */
+@media (min-width: 900px) and (max-width: 1439px) {
+  .inbox-layout.has-panel .inbox-panel {
+    display: none;
+  }
+  .inbox-layout.is-details .inbox-panel {
+    display: flex;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inline-size: 300px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+  }
+  .inbox-layout.is-details {
+    position: relative;
+  }
+  .inbox-details {
+    display: inline-flex;
+  }
+}

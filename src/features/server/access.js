@@ -18,6 +18,8 @@ export function canOpenSection(user, route) {
   if (['Team & access', 'Workspaces'].includes(route)) return canManageTeam(user);
   // Only the owning company Admin connects or disconnects channels (design §8).
   if (route === 'Channels') return user?.roleId === 'admin';
+  // Company members only: the Super Admin never reads a company's conversations (design §11).
+  if (route === 'Inbox') return user?.roleId !== 'super-admin';
   if (['Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'].includes(route))
     return true;
   if (route === 'Messages')

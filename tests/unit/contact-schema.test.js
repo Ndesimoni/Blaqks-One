@@ -91,11 +91,11 @@ test('split field options keep their order and values apart from the two new con
 
 test('split navigation and form layouts keep every other module unchanged', () => {
   assert.equal(
-    digest([nav, without(labels, 'Channels')]),
+    digest([nav, without(without(labels, 'Channels'), 'Inbox')]),
     '5a7a6eed2cfd96ef1056e279c5dd6b6592239c7c4c2b39e1e56786292850f0da',
   );
   assert.equal(
-    digest(without(without(descriptions, 'Contacts'), 'Channels')),
+    digest(without(without(without(descriptions, 'Contacts'), 'Channels'), 'Inbox')),
     '5f8730fd84beb227a378bc5a85cb71c104d9a07c827cbaf75b0309afe534b032',
   );
   assert.equal(

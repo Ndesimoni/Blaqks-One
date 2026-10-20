@@ -28,3 +28,15 @@
 .navigation-drawer .connected-nav-item {
   gap: 8px;
 }
+.connected-nav-badge {
+  margin-inline-start: auto;
+  min-inline-size: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--deep);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

@@ -34,6 +34,24 @@ test('each member sees the conversations their scope and reply grants allow', as
   );
 });
 
+test('the summary counts unread, Mine and Unassigned within each member’s view', async () => {
+  const { admin, agent } = teams;
+  const summary = async (session) => {
+    const result = await session.request(`/workspaces/${session.user.workspaceId}/inbox/summary`);
+    assert.equal(result.status, 200, JSON.stringify(result.value));
+    return result.value;
+  };
+  assert.deepEqual(await summary(admin), { unread: 3, mine: 0, unassigned: 2, channels: [] });
+  assert.deepEqual(await summary(agent), { unread: 2, mine: 1, unassigned: 1, channels: [] });
+  assert.deepEqual(
+    await listed(admin, '?state=active'),
+    [ids.whatsapp, ids.email, ids.held].sort(),
+  );
+  const owner = await login('owner');
+  const refused = await owner.request(`/workspaces/${admin.user.workspaceId}/inbox/summary`);
+  assert.equal(refused.status, 403);
+});
+
 test('other companies and the Super Admin are refused', async () => {
   const { admin, other } = teams;
   assert.equal((await other.request(inboxPath(admin))).status, 403);

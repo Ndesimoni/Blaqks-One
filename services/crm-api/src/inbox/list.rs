@@ -3,7 +3,7 @@
 //! `unassigned`) filters. Unknown parameters are refused.
 use super::{
     access::{self, predicate, Viewer},
-    view::{Row, COLUMNS},
+    view::{visible_records, Row, COLUMNS},
 };
 use crate::{
     activity::cursor,
@@ -19,7 +19,8 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 
 const KEYS: [&str; 5] = ["state", "channel", "assignee", "cursor", "limit"];
-const STATES: [&str; 5] = ["new", "open", "waiting", "resolved", "spam"];
+/// `active` is new, open and waiting together: the working tabs.
+const STATES: [&str; 6] = ["active", "new", "open", "waiting", "resolved", "spam"];
 const CHANNELS: [&str; 5] = ["whatsapp", "email", "facebook", "instagram", "tiktok"];
 pub const INVALID: &str = "Check the Inbox filters and try again.";
 
@@ -74,25 +75,6 @@ pub fn parse(raw: Option<&str>) -> ApiResult<Filters> {
     })
 }
 
-/// Linked record IDs on these rows that the viewer may see.
-async fn visible_records(
-    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    workspace: &str,
-    user: &crate::auth::profile::UserRow,
-    rows: &[Row],
-) -> ApiResult<Vec<uuid::Uuid>> {
-    let mut shown = Vec::new();
-    for collection in ["Clients", "Contacts"] {
-        let ids: Vec<uuid::Uuid> = rows
-            .iter()
-            .filter(|row| row.linked_collection.as_deref() == Some(collection))
-            .filter_map(|row| row.linked_record_id)
-            .collect();
-        shown.extend(crate::records::lookup::visible(tx, workspace, user, collection, &ids).await?);
-    }
-    Ok(shown)
-}
-
 pub async fn list(
     State(state): State<AppState>,
     session: Session,
@@ -109,7 +91,9 @@ pub async fn list(
          WHERE c.workspace_id=$1 AND {visible} \
            AND ($6::bigint IS NULL OR (c.last_activity_at,c.id) < \
              (timestamptz 'epoch'+$6::bigint*interval '1 microsecond',$7::uuid)) \
-           AND ($8::text IS NULL OR c.state=$8) AND ($9::text IS NULL OR c.channel=$9) \
+           AND ($8::text IS NULL OR c.state=$8 \
+             OR ($8='active' AND c.state IN ('new','open','waiting'))) \
+           AND ($9::text IS NULL OR c.channel=$9) \
            AND ($10::text IS NULL OR ($10='me' AND c.assignee_id=$5) \
              OR ($10='unassigned' AND c.assignee_id IS NULL)) \
          ORDER BY c.last_activity_at DESC,c.id DESC LIMIT $11",

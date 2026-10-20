@@ -13,7 +13,9 @@ export const settingsRoutes = [
   { name: 'Workspaces', path: '/workspaces' },
   { name: 'Team activity', path: '/team-activity' },
 ];
-export const routes = [...crmRoutes, ...settingsRoutes];
+/** Connected-only sections outside the shared navigation (the frozen demo never links here). */
+export const connectedRoutes = [{ name: 'Inbox', path: '/inbox' }];
+export const routes = [...crmRoutes, ...settingsRoutes, ...connectedRoutes];
 
 export const routePath = (name) => routes.find((route) => route.name === name)?.path || '/';
 export const routeName = (path) =>

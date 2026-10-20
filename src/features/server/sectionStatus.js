@@ -24,6 +24,8 @@ const connectedSections = new Set([
   'Team activity',
   // `/channels`: the Admin's connections registry (packet X1).
   'Channels',
+  // `/inbox`: the shared Inbox (packets X3, U1).
+  'Inbox',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);

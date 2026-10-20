@@ -14,5 +14,8 @@ mod vocabulary;
 pub mod webhooks;
 mod wire;
 
+/// The one connection read other modules may call: channel states, no credentials.
+pub use store::channel_states;
+
 #[cfg(test)]
 mod tests;

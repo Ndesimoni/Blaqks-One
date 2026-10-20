@@ -1,0 +1,68 @@
+/* Inbox conversation header: sender, holder, state and assignment controls. */
+.inbox-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 14px 20px;
+  border-block-end: 1px solid var(--line);
+  background: var(--panel);
+}
+.inbox-head-text {
+  flex: 1 1 160px;
+  min-inline-size: 0;
+}
+.inbox-head-text h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inbox-head-text p {
+  margin: 2px 0 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inbox-head-actions {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.inbox-head-actions select,
+.inbox-head-actions .btn {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  max-inline-size: 220px;
+  block-size: 36px;
+  min-block-size: 36px;
+  padding-inline: 10px 32px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+}
+.inbox-icon-button {
+  align-items: center;
+  justify-content: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+}
+.inbox-icon-button:hover {
+  background: var(--hover);
+}
+.inbox-back svg {
+  transform: scaleX(-1);
+}
+[dir='rtl'] .inbox-back svg {
+  transform: none;
+}

@@ -17,6 +17,7 @@ import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
 import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
 import { FinanceContent } from './finance/FinanceContent.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
+import { ServerInbox } from './inbox/ServerInbox.jsx';
 import { ServerInsights } from './insights/ServerInsights.jsx';
 import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { ServerProfile } from './profile/ServerProfile.jsx';
@@ -61,6 +62,7 @@ export function ServerContent({ owner }) {
   if (route === 'Guide') return <ServerGuide />;
   if (route === 'Calculators') return <ServerCalculators />;
   if (route === 'Team activity') return <ServerActivity owner={owner} />;
+  if (route === 'Inbox') return <ServerInbox owner={owner} />;
   if (['Deals', 'Payments', 'Expenses'].includes(route))
     return <FinanceContent key={route} route={route} owner={owner} />;
   const page = (toolbarExtras) => {

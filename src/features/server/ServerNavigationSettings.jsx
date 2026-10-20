@@ -1,6 +1,6 @@
 import React from 'react';
 import { activityLabel, canOpenSection } from './access.js';
-import { ServerNavigationItem } from './ServerNavigationGroups.jsx';
+import { ServerNavigationItem } from './ServerNavigationItem.jsx';
 
 const settings = [
   ['My profile', 'person'],

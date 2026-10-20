@@ -1,0 +1,130 @@
+/* Inbox list rows, avatars and channel chips. */
+.inbox-row {
+  display: flex;
+  gap: 12px;
+  inline-size: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-block-end: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+  transition: background var(--duration) var(--ease);
+}
+.inbox-row:hover {
+  background: var(--hover);
+}
+.inbox-row.is-selected {
+  padding-inline-start: 13px;
+  border-inline-start: 3px solid var(--gold);
+  background: var(--surface-subtle);
+}
+.inbox-row:focus-visible {
+  outline-offset: -2px;
+}
+.inbox-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+}
+.inbox-avatar.is-unknown {
+  border: 1px dashed var(--muted);
+  background: transparent;
+  color: var(--muted);
+}
+.inbox-row-body,
+.inbox-row-top,
+.inbox-row-line {
+  display: flex;
+  min-inline-size: 0;
+}
+.inbox-row-body {
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+.inbox-row-top,
+.inbox-row-line {
+  align-items: center;
+  gap: 8px;
+}
+.inbox-row-name {
+  flex: 1;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inbox-row.is-unread .inbox-row-name {
+  font-weight: 800;
+}
+.inbox-row-age {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.inbox-row.is-unread .inbox-row-age {
+  color: var(--accent);
+  font-weight: 700;
+}
+.inbox-chip {
+  flex: 0 0 auto;
+  padding: 1px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.inbox-chip.is-whatsapp {
+  background: var(--inbox-whatsapp-bg);
+  color: var(--inbox-whatsapp-ink);
+}
+.inbox-chip.is-email {
+  background: var(--inbox-email-bg);
+  color: var(--inbox-email-ink);
+}
+.inbox-chip.is-instagram {
+  background: var(--inbox-instagram-bg);
+  color: var(--inbox-instagram-ink);
+}
+.inbox-chip.is-facebook {
+  background: var(--inbox-facebook-bg);
+  color: var(--inbox-facebook-ink);
+}
+.inbox-chip.is-tiktok {
+  background: var(--inbox-tiktok-bg);
+  color: var(--inbox-tiktok-ink);
+}
+.inbox-row-preview {
+  flex: 1;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inbox-row.is-unread .inbox-row-preview {
+  color: var(--ink);
+}
+.inbox-unread-dot {
+  flex: 0 0 auto;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.inbox-row-status {
+  color: var(--muted);
+  font-size: 12px;
+}
+.inbox-row-status.is-suggested,
+.inbox-row-status.is-choice {
+  color: var(--accent);
+  font-weight: 600;
+}

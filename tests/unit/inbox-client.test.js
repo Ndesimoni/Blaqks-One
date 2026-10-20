@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createCrmClient } from '../../src/services/crm/client.js';
+import { routePath } from '../../src/config/routes.js';
 
 const response = (status, json) => ({
   status,
@@ -35,4 +36,8 @@ test('Inbox calls use scoped, encoded paths, filters and CSRF on every change', 
   for (const change of [patch, lead, block, rules]) {
     assert.equal(change.options.headers['X-CSRF-Token'], 'anti-forgery');
   }
+});
+
+test('the connected Inbox has its own stable route', () => {
+  assert.equal(routePath('Inbox'), '/inbox');
 });

@@ -7,6 +7,7 @@ import arCalculators from './ar/calculators.js';
 import arChannels from './ar/channels.js';
 import arCommon from './ar/common.js';
 import arFieldHints from './ar/fieldHints.js';
+import arInbox from './ar/inbox.js';
 import arProfile from './ar/profile.js';
 import arSignup from './ar/signup.js';
 import arSignupErrors from './ar/signupErrors.js';
@@ -16,6 +17,7 @@ import enCalculators from './en/calculators.js';
 import enChannels from './en/channels.js';
 import enCommon from './en/common.js';
 import enFieldHints from './en/fieldHints.js';
+import enInbox from './en/inbox.js';
 import enProfile from './en/profile.js';
 import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
@@ -29,6 +31,7 @@ export const catalogs = Object.freeze({
     common: enCommon,
     profile: enProfile,
     fieldHints: enFieldHints,
+    inbox: enInbox,
     signup: enSignup,
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,
@@ -40,6 +43,7 @@ export const catalogs = Object.freeze({
     common: arCommon,
     profile: arProfile,
     fieldHints: arFieldHints,
+    inbox: arInbox,
     signup: arSignup,
     signupErrors: arSignupErrors,
     signupSetup: arSignupSetup,

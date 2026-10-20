@@ -17,6 +17,7 @@ export function inboxRoutes({ request, scope }) {
     conversations: (workspace, params, signal) =>
       request(`${base(workspace)}${query(params)}`, { signal }),
     conversation: (workspace, id, signal) => request(item(workspace, id), { signal }),
+    inboxSummary: (workspace, signal) => request(`${scope(workspace)}/inbox/summary`, { signal }),
     updateConversation: (workspace, id, body) =>
       request(item(workspace, id), { method: 'PATCH', body }),
     markConversationRead: (workspace, id) =>

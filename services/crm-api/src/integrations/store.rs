@@ -92,3 +92,19 @@ fn write_error(error: sqlx::Error) -> ApiError {
     }
     error.into()
 }
+
+/// Each channel's live connection state in a company (`connected` or
+/// `reconnect_required`), for the Inbox's status banners. No labels or account IDs.
+pub async fn channel_states(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+) -> ApiResult<Vec<(String, String)>> {
+    sqlx::query_as(
+        "SELECT channel,state FROM integrations.crm_channel_connections \
+         WHERE workspace_id=$1 AND state<>'disconnected' ORDER BY channel",
+    )
+    .bind(workspace)
+    .fetch_all(&mut **tx)
+    .await
+    .map_err(Into::into)
+}
