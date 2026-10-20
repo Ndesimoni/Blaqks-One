@@ -1,6 +1,7 @@
 import { accountRoutes } from './account.js';
 import { activityRoutes } from './activity.js';
 import { assignmentRoutes } from './assignments.js';
+import { chatRoutes } from './chat.js';
 import { companyRoutes, readCompany } from './company.js';
 import { financeRoutes } from './finance.js';
 import { inboxRoutes } from './inbox.js';
@@ -131,6 +132,7 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     ...companyRoutes({ request, scope }),
     ...integrationRoutes({ request, scope }),
     ...inboxRoutes({ request, scope }),
+    ...chatRoutes({ request, scope }),
     ...signupRoutes({ request, setCsrfToken }),
   };
 }

@@ -26,6 +26,8 @@ const connectedSections = new Set([
   'Channels',
   // `/inbox`: the shared Inbox (packets X3, U1).
   'Inbox',
+  // `/chat`: team channels and private messages (packets C1, C2).
+  'Team chat',
   // `/inbox-rules`: the Admin's lead rules (packet U2).
   'Inbox rules',
   // `/mailbox`: each member's own Google mailbox (packets E1a, E1d).

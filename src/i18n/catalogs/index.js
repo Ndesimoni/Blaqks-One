@@ -5,6 +5,7 @@
  */
 import arCalculators from './ar/calculators.js';
 import arChannels from './ar/channels.js';
+import arChat from './ar/chat.js';
 import arCommon from './ar/common.js';
 import arFieldHints from './ar/fieldHints.js';
 import arInbox from './ar/inbox.js';
@@ -19,6 +20,7 @@ import arSignupSetup from './ar/signupSetup.js';
 import arTeamSeats from './ar/teamSeats.js';
 import enCalculators from './en/calculators.js';
 import enChannels from './en/channels.js';
+import enChat from './en/chat.js';
 import enCommon from './en/common.js';
 import enFieldHints from './en/fieldHints.js';
 import enInbox from './en/inbox.js';
@@ -36,6 +38,7 @@ export const catalogs = Object.freeze({
   en: {
     calculators: enCalculators,
     channels: enChannels,
+    chat: enChat,
     common: enCommon,
     profile: enProfile,
     fieldHints: enFieldHints,
@@ -52,6 +55,7 @@ export const catalogs = Object.freeze({
   ar: {
     calculators: arCalculators,
     channels: arChannels,
+    chat: arChat,
     common: arCommon,
     profile: arProfile,
     fieldHints: arFieldHints,

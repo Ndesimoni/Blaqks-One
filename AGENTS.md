@@ -44,6 +44,7 @@ Professional real estate CRM focused on the UAE market.
 - Super Admin/team/role preview, required phone numbers and separate WhatsApp/email permissions; see docs/team-access-preview.md
 - Private member workspaces, Super Admin workspace directory and scoped activity history; see docs/private-workspaces.md
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
+- Connected team chat: Admin-created channels (#general for every company) and private one-to-one messages the Admin cannot read; see docs/team-chat.md
 - Responsive desktop/mobile interface
 - Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log, Client care, Deals, Payments and Expenses with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
 

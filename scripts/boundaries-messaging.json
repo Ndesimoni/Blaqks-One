@@ -1,0 +1,55 @@
+{
+  "owners": {
+    "integrations": [
+      "crm_channel_connections",
+      "crm_channel_connections_external",
+      "crm_channel_connections_active",
+      "crm_integration_events",
+      "crm_integration_events_immutable",
+      "crm_webhook_receipts",
+      "crm_webhook_receipts_event",
+      "crm_webhook_receipts_pending",
+      "crm_webhook_receipts_purge",
+      "crm_webhook_staging",
+      "crm_oauth_requests",
+      "crm_pending_revocations"
+    ],
+    "chat": [
+      "crm_chat_rooms",
+      "crm_chat_rooms_channel",
+      "crm_chat_rooms_direct",
+      "crm_chat_participants",
+      "crm_chat_participants_member",
+      "crm_chat_messages",
+      "crm_chat_messages_room",
+      "crm_chat_reads",
+      "crm_chat_messages_author"
+    ],
+    "inbox": [
+      "crm_inbox_conversations",
+      "crm_inbox_conversations_thread",
+      "crm_inbox_conversations_feed",
+      "crm_inbox_conversations_assignee",
+      "crm_inbox_messages",
+      "crm_inbox_messages_provider",
+      "crm_inbox_messages_thread",
+      "crm_inbox_notes",
+      "crm_inbox_notes_thread",
+      "crm_inbox_reads",
+      "crm_inbox_blocks",
+      "crm_inbox_rules",
+      "crm_inbox_events",
+      "crm_inbox_events_feed",
+      "crm_inbox_events_immutable"
+    ],
+    "outbox": [
+      "crm_outbox_jobs",
+      "crm_outbox_jobs_live",
+      "crm_outbox_jobs_due",
+      "crm_outbox_jobs_leases",
+      "crm_outbox_jobs_purge",
+      "crm_outbox_attempts",
+      "crm_outbox_attempts_open"
+    ]
+  }
+}

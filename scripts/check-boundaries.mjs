@@ -12,6 +12,8 @@ import { checkBoundaries } from './boundary-rules.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = join(root, 'services/crm-api/src');
 const mapPath = join(root, 'scripts/boundaries.json');
+// Messaging modules' tables live in their own file to keep each map file small.
+const extraPaths = [join(root, 'scripts/boundaries-messaging.json')];
 
 async function rustFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -27,6 +29,10 @@ async function rustFiles(directory) {
 
 try {
   const map = JSON.parse(await readFile(mapPath, 'utf8'));
+  for (const path of extraPaths) {
+    const extra = JSON.parse(await readFile(path, 'utf8'));
+    Object.assign(map.owners, extra.owners);
+  }
   const paths = await rustFiles(source);
   const files = await Promise.all(
     paths.map(async (path) => ({

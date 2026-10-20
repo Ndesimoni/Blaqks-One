@@ -1,0 +1,46 @@
+/* Team chat on phones and narrow windows (C2): one pane at a time, larger targets. */
+/* The keyboard hint is for physical keyboards only. */
+@media (pointer: coarse) {
+  .chat-hint {
+    display: none;
+  }
+}
+[dir='ltr'] .chat-back svg {
+  transform: scaleX(-1);
+}
+@media (max-width: 899px) {
+  .chat-layout {
+    grid-template-columns: minmax(0, 1fr);
+    block-size: calc(100dvh - 100px);
+  }
+  .chat-layout.is-room .chat-list,
+  .chat-layout.is-list .chat-room-pane {
+    display: none;
+  }
+  .chat-list {
+    border-inline-end: 0;
+  }
+  .chat-back {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 44px;
+    min-block-size: 44px;
+    padding: 0;
+  }
+  .chat-room,
+  .chat-add,
+  .chat-actions > button {
+    min-block-size: 44px;
+  }
+  .chat-add {
+    inline-size: 44px;
+  }
+  .chat-room-head,
+  .chat-thread,
+  .chat-composer {
+    padding-inline: 12px;
+  }
+  .chat-composer-actions .btn {
+    min-block-size: 44px;
+  }
+}

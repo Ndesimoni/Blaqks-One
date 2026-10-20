@@ -4,6 +4,7 @@ mod support;
 use crate::{
     activity, agreements, assignments,
     auth::handlers as auth,
+    chat,
     error::{self, CodeMapper},
     finance, imports, inbox, integrations, performance,
     records::handlers as records,
@@ -114,6 +115,7 @@ pub fn app(state: AppState) -> Router {
         .merge(integrations::routes::router())
         .merge(integrations::webhooks::router())
         .merge(inbox::routes::router())
+        .merge(chat::routes::router())
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(activity::routes::router())

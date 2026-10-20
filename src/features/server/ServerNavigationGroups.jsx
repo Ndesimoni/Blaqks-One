@@ -3,6 +3,7 @@ import { nav } from '../../config/navigation.js';
 import { canOpenSection } from './access.js';
 import { ServerNavigationItem } from './ServerNavigationItem.jsx';
 import { InboxNavItem } from './inbox/InboxNavItem.jsx';
+import { TeamChatNavItem } from './chat/TeamChatNavItem.jsx';
 
 export { ServerNavigationItem };
 
@@ -21,7 +22,12 @@ export function ServerNavigationGroups({ user, route, onSelect }) {
           // Company members get the Inbox where the demo shows its Messages preview; the
           // Super Admin, who never reads company conversations, keeps the preview entry.
           name === 'Messages' && canOpenSection(user, 'Inbox') ? (
-            <InboxNavItem key="Inbox" route={route} onSelect={onSelect} />
+            <React.Fragment key="Inbox">
+              <InboxNavItem route={route} onSelect={onSelect} />
+              {canOpenSection(user, 'Team chat') && (
+                <TeamChatNavItem route={route} onSelect={onSelect} />
+              )}
+            </React.Fragment>
           ) : (
             <ServerNavigationItem
               key={name}

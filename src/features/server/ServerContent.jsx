@@ -19,6 +19,7 @@ import { FinanceContent } from './finance/FinanceContent.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
 import { ServerInbox } from './inbox/ServerInbox.jsx';
 import { ServerInboxRules } from './inboxRules/ServerInboxRules.jsx';
+import { ServerTeamChat } from './chat/ServerTeamChat.jsx';
 import { GoogleReturn } from './mailbox/GoogleReturn.jsx';
 import { ServerMailbox } from './mailbox/ServerMailbox.jsx';
 import { ServerInsights } from './insights/ServerInsights.jsx';
@@ -47,6 +48,7 @@ export function ServerContent({ owner }) {
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Channels') return <ServerChannels />;
   if (route === 'Inbox rules') return <ServerInboxRules />;
+  if (route === 'Team chat') return <ServerTeamChat />;
   if (route === 'My mailbox') return <ServerMailbox />;
   if (route === 'Google sign-in') return <GoogleReturn />;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;

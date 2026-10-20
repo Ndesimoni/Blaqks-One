@@ -3,6 +3,7 @@ pub mod agreements;
 pub mod assignments;
 pub mod auth;
 pub mod bootstrap;
+pub mod chat;
 pub mod config;
 pub mod error;
 pub mod finance;

@@ -16,6 +16,7 @@ export const settingsRoutes = [
 /** Connected-only sections outside the shared navigation (the frozen demo never links here). */
 export const connectedRoutes = [
   { name: 'Inbox', path: '/inbox' },
+  { name: 'Team chat', path: '/team-chat' },
   { name: 'Inbox rules', path: '/inbox-rules' },
   { name: 'My mailbox', path: '/my-mailbox' },
   // Google's sign-in returns here (E1a); the page finishes it and clears the address bar.

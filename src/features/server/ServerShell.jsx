@@ -20,6 +20,7 @@ const headings = { 'My profile': 'My profile' };
 /** Sections built on the language foundation take their heading from the catalogues. */
 const translated = {
   Inbox: 'inbox',
+  'Team chat': 'chat',
   Channels: 'channels',
   'Inbox rules': 'inboxRules',
   'My mailbox': 'mailbox',
@@ -88,7 +89,7 @@ export function ServerShell({ owner, workspaces }) {
           )}
           {/* The Inbox gives its full height to the conversation; it keeps an
               accessible heading of its own. */}
-          {route !== 'Inbox' && (
+          {!['Inbox', 'Team chat'].includes(route) && (
             <div className="page-heading">
               <div className="heading-left">
                 <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>

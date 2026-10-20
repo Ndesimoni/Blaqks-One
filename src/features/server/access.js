@@ -20,6 +20,8 @@ export function canOpenSection(user, route) {
   if (route === 'Channels') return user?.roleId === 'admin';
   // Company members only: the Super Admin never reads a company's conversations (design §11).
   if (route === 'Inbox') return user?.roleId !== 'super-admin';
+  // Team chat is company-only too; private messages stay between their two members.
+  if (route === 'Team chat') return user?.roleId !== 'super-admin';
   if (route === 'Inbox rules') return user?.roleId === 'admin';
   // Each member's own mailbox: the Admin, and staff the Admin gave email (decision O8).
   if (route === 'My mailbox' || route === 'Google sign-in')
