@@ -76,4 +76,43 @@ test('connect a Google mailbox, start an email and see it sent', async ({ page }
   await shots(page, testInfo, 'reply');
   await composer.getByRole('button', { name: 'Send', exact: true }).click();
   await expect(thread).toContainText('Following up on Saturday.');
+  // The client answers in the same Gmail thread; the worker brings it into the Inbox.
+  const threadId = query(
+    `SELECT external_thread_id FROM inbox.crm_inbox_conversations WHERE workspace_id='${workspace}'
+     AND contact_key='mail.client@example.test'`,
+  );
+  await fetch(`${process.env.CRM_TEST_GOOGLE}/test/deliver`, {
+    method: 'POST',
+    body: JSON.stringify({
+      to: 'aidah@keys-fixture.test',
+      from: 'Synthetic Email Client <mail.client@example.test>',
+      subject: 'Re: Your viewing in Dubai Marina',
+      text: 'Perfect, see you then.\n\nOn Tue, Aidah wrote:\n> Following up on Saturday.',
+      threadId,
+    }),
+  });
+  await expect(thread).toContainText('Perfect, see you then.', { timeout: 20000 });
+  await expect(thread.getByText('Earlier messages')).toBeVisible();
+  await shots(page, testInfo, 'client-reply');
+  await thread.getByText('Earlier messages').click();
+  await expect(thread).toContainText('> Following up on Saturday.');
+  await shots(page, testInfo, 'client-reply-open');
+  await fetch(`${process.env.CRM_TEST_GOOGLE}/test/deliver`, {
+    method: 'POST',
+    body: JSON.stringify({
+      to: 'aidah@keys-fixture.test',
+      from: 'mail.client@example.test',
+      text: 'Please send the deposit to my new account.',
+      threadId,
+      unverified: true,
+    }),
+  });
+  await expect(thread.getByText('Unverified sender: check before acting')).toBeVisible({
+    timeout: 20000,
+  });
+  // The newest message is fully in view, not under the composer.
+  await expect
+    .poll(() => thread.evaluate((box) => box.scrollTop + box.clientHeight >= box.scrollHeight - 1))
+    .toBe(true);
+  await shots(page, testInfo, 'unverified');
 });

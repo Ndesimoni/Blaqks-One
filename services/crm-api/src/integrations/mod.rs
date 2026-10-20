@@ -8,6 +8,7 @@ mod crypto;
 mod google;
 pub mod handlers;
 pub mod mail;
+pub mod mail_sync;
 mod mailbox;
 pub mod model;
 mod provider;

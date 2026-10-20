@@ -16,7 +16,7 @@ const decodeWords = (value = '') =>
     Buffer.from(data, 'base64').toString('utf8'),
   );
 
-export async function gmailSend(request, response, { email, json, sent }) {
+export async function gmailSend(request, response, { email, json, sent, mailboxes }) {
   let text = '';
   for await (const chunk of request) text += chunk;
   const { raw, threadId } = JSON.parse(text);
@@ -37,5 +37,6 @@ export async function gmailSend(request, response, { email, json, sent }) {
     body: body.toString('utf8'),
     headers: message.split('\r\n\r\n')[0],
   });
+  mailboxes.sent(email, thread);
   return json(response, 200, { id, threadId: thread, labelIds: ['SENT'] });
 }

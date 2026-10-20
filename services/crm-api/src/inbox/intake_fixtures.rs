@@ -89,6 +89,7 @@ impl Company {
                 has_media: false,
                 source: None,
                 listing: None,
+                email: None,
             },
         }
     }

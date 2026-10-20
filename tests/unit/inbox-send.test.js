@@ -4,6 +4,7 @@ import {
   canSendAgain,
   emailRecipients,
   replyState,
+  splitQuoted,
 } from '../../src/features/server/inbox/composerModel.js';
 import { returnedValues } from '../../src/features/server/mailbox/mailboxModel.js';
 
@@ -67,4 +68,15 @@ test('the Google return reads the fragment values once, without trusting extras'
     code: null,
     error: 'denied',
   });
+});
+
+test('quoted earlier mail folds below the client’s new text', () => {
+  const body =
+    'Yes, Saturday works.\n\nOn Tue, 20 Oct 2026 at 17:00, Aidah wrote:\n> Is Saturday ok?';
+  assert.deepEqual(splitQuoted(body), {
+    text: 'Yes, Saturday works.',
+    quoted: 'On Tue, 20 Oct 2026 at 17:00, Aidah wrote:\n> Is Saturday ok?',
+  });
+  assert.deepEqual(splitQuoted('Just text'), { text: 'Just text', quoted: '' });
+  assert.deepEqual(splitQuoted('> only quoted'), { text: '> only quoted', quoted: '' });
 });

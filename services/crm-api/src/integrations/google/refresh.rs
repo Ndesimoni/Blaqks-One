@@ -27,7 +27,7 @@ pub async fn refresh(config: &GoogleConfig, refresh_token: &str) -> Result<Strin
     // mailbox (security review E1b L2).
     let response = sent.map_err(|_| Failure::Unavailable)?;
     if response.status() == reqwest::StatusCode::BAD_REQUEST {
-        let body = bounded(response).await?;
+        let body = bounded(response, 4096).await?;
         let error = serde_json::from_slice::<TokenError>(&body).map(|value| value.error);
         return Err(match error.as_deref() {
             Ok("invalid_grant") => Failure::Refused,

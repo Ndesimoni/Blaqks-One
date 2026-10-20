@@ -9,7 +9,9 @@ use super::{
 };
 use crate::{
     error::{ApiError, ApiResult},
-    integrations::webhooks::inbound::{Event, Sink, SinkError, SinkFuture},
+    integrations::webhooks::inbound::{
+        Event, MailRef, RelevantFuture, Sink, SinkError, SinkFuture,
+    },
     workspaces,
 };
 use sqlx::{PgPool, Postgres, Transaction};
@@ -23,6 +25,14 @@ pub struct InboxSink {
 impl Sink for InboxSink {
     fn accept<'a>(&'a self, event: &'a Event) -> SinkFuture<'a> {
         Box::pin(receive(&self.pool, event))
+    }
+
+    fn email_relevant<'a>(&'a self, mail: &'a MailRef<'a>) -> RelevantFuture<'a> {
+        Box::pin(async move {
+            super::intake_email::relevant(&self.pool, mail)
+                .await
+                .map_err(|_| SinkError::Retry)
+        })
     }
 }
 
@@ -51,6 +61,13 @@ async fn store_event(pool: &PgPool, event: &Event, contact: &Contact) -> ApiResu
         return Ok(());
     }
     let message = &event.message;
+    let email = message.email.as_ref();
+    if email.is_some_and(|meta| meta.bounce) {
+        // A delivery failure notice is never a client message (E1c).
+        super::intake_email::bounced(&mut tx, event).await?;
+        tx.commit().await?;
+        return Ok(());
+    }
     let conversation = match store::thread(&mut tx, event.connection_id, &message.thread_id).await?
     {
         Some(id) => id,
@@ -60,9 +77,9 @@ async fn store_event(pool: &PgPool, event: &Event, contact: &Contact) -> ApiResu
         &mut tx,
         conversation,
         workspace,
-        &message.message_id,
-        &message.text,
-        message.has_media,
+        message,
+        // Who actually wrote it, and whether Gmail vouched for them (review E1c M1, M2).
+        email.map(|meta| (contact.key.as_str(), !meta.verified)),
     )
     .await?;
     if stored {
@@ -97,10 +114,19 @@ async fn open(
         linked: linked
             .as_ref()
             .map(|(collection, record, _)| (collection.as_str(), *record)),
-        assignee: found.listing_agent.or(holder),
+        // A mailbox's mail stays with its owner, never the record's holder (E1c H1).
+        assignee: message
+            .email
+            .as_ref()
+            .and_then(|meta| meta.owner)
+            .or(found.listing_agent.or(holder)),
         state: if linked.is_some() { "open" } else { "new" },
         suggested: decision == Decision::Suggest,
         source: message.source.map(|source| source.as_str()),
+        subject: message
+            .email
+            .as_ref()
+            .and_then(|meta| meta.subject.as_deref()),
     };
     store::open(tx, &new).await?;
     events::append(tx, workspace, id, None, "created").await?;

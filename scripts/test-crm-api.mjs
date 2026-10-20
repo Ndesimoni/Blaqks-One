@@ -67,10 +67,10 @@ try {
     );
   }
   // After the Rust contracts, which create and inspect outbox jobs themselves: the worker
-  // sends queued email through the Google stand-in (E1b). Webhook intake stays off so
-  // suites can inspect staged events.
+  // sends queued email and reads replies through the Google stand-in (E1b, E1c). Webhook
+  // intake stays off so suites can inspect staged events.
   worker = spawn(binary.replace('kws-crm-api', 'messaging_worker'), [], {
-    env: { ...env, CRM_WORKER_LOOPS: 'outbox,revocations' },
+    env: { ...env, CRM_WORKER_LOOPS: 'outbox,revocations,mailsync', CRM_MAIL_SYNC_SECONDS: '1' },
     stdio: 'inherit',
   });
   if (!process.argv.includes('--browser-only')) {

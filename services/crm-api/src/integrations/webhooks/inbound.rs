@@ -4,14 +4,14 @@
 use super::{
     cleanup,
     inbound_store::{self as stored, Claimed},
-    message::{parse_stub, Inbound},
+    message::parse_stub,
     receipt::STUB,
 };
 use crate::{
     config::messaging_settings::MessagingKey, integrations::crypto, outbox::worker::pause,
 };
 use sqlx::PgPool;
-use std::{future::Future, pin::Pin, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 use tokio::{sync::watch, task::JoinHandle};
 use uuid::Uuid;
 
@@ -22,30 +22,7 @@ const CLEANUP_EVERY: Duration = Duration::from_secs(3600);
 /// A sink call ends well inside the lease, so a live worker never loses it (X2-S4).
 pub const SINK_TIMEOUT: Duration = Duration::from_secs(30);
 
-/// A verified provider event, parsed into the provider-neutral message. It lives only in
-/// memory; the sealed body is deleted once the event is settled.
-pub struct Event {
-    pub receipt_id: Uuid,
-    pub workspace_id: String,
-    pub connection_id: Uuid,
-    pub channel: String,
-    pub message: Inbound,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum SinkError {
-    /// Try again later, up to [`MAX_ATTEMPTS`].
-    Retry,
-    /// Give up; the code is a fixed snake_case word.
-    Permanent(&'static str),
-}
-
-pub type SinkFuture<'a> = Pin<Box<dyn Future<Output = Result<(), SinkError>> + Send + 'a>>;
-
-/// Receives verified events. It must be idempotent per receipt.
-pub trait Sink: Send + Sync {
-    fn accept<'a>(&'a self, event: &'a Event) -> SinkFuture<'a>;
-}
+pub use super::sink::{Event, MailRef, RelevantFuture, Sink, SinkError, SinkFuture};
 
 /// Opens the sealed body and parses it with the receipt's provider format.
 fn decode(claimed: &Claimed, key: &MessagingKey) -> Result<Event, &'static str> {

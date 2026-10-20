@@ -14,12 +14,14 @@ const UNAVAILABLE: &str = "Google could not be reached. Try again in a moment.";
 pub struct Proven {
     pub address: String,
     pub refresh_token: String,
+    /// Gmail's history ID at sign-in, where reading replies starts (E1c).
+    pub cursor: Option<String>,
 }
 
 fn failed(failure: oauth::Failure) -> ApiError {
     match failure {
         oauth::Failure::Refused => ApiError::invalid(START_AGAIN),
-        oauth::Failure::Unavailable => ApiError(
+        oauth::Failure::Unavailable | oauth::Failure::Invalid => ApiError(
             StatusCode::SERVICE_UNAVAILABLE,
             UNAVAILABLE,
             "google_unavailable",
@@ -38,7 +40,7 @@ pub async fn prove(config: &GoogleConfig, code: &str, verifier: &str) -> Result<
         .refresh_token
         .filter(|token| !token.is_empty() && token.len() <= 2048)
         .ok_or(ApiError::invalid(START_AGAIN))?;
-    let address = oauth::mailbox(config, &grant.access_token)
+    let (address, cursor) = oauth::mailbox(config, &grant.access_token)
         .await
         .map_err(failed)?;
     if !oauth::on_domain(config, &address) {
@@ -47,6 +49,7 @@ pub async fn prove(config: &GoogleConfig, code: &str, verifier: &str) -> Result<
     Ok(Proven {
         address,
         refresh_token,
+        cursor,
     })
 }
 

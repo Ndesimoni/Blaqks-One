@@ -85,51 +85,53 @@
   flex-wrap: wrap;
   gap: 8px;
 }
-.inbox-start-body {
-  display: grid;
-  grid-auto-rows: max-content;
-  align-content: start;
-  gap: 6px;
-}
-.inbox-start-body label {
-  margin-block-start: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
-}
-.inbox-start-body input,
-.inbox-start-body textarea {
-  inline-size: 100%;
-  min-block-size: 42px;
-  padding: 8px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-subtle);
-  color: var(--ink);
-  font: inherit;
-}
-.inbox-start-chosen {
+.inbox-unverified {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  gap: 6px;
+  margin-block-end: 6px;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
 }
-.inbox-start-chosen span {
-  display: grid;
-  min-inline-size: 0;
-}
-.inbox-start-chosen small {
-  overflow-wrap: anywhere;
+.inbox-quoted {
+  margin-block-start: 6px;
   color: var(--muted);
+  font-size: 13px;
 }
-.inbox-start-actions {
+.inbox-quoted {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.inbox-quoted summary {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  min-block-size: 32px;
+  white-space: normal;
+  list-style: none;
+  cursor: pointer;
+}
+.inbox-quoted summary::-webkit-details-marker {
+  display: none;
+}
+.inbox-quoted summary svg {
+  margin-inline-end: 6px;
+  color: var(--ink);
+  transition: transform 150ms ease;
+}
+.inbox-quoted[open] summary svg {
+  transform: rotate(90deg);
+}
+[dir='rtl'] .inbox-quoted summary svg {
+  transform: scaleX(-1);
+}
+[dir='rtl'] .inbox-quoted[open] summary svg {
+  transform: rotate(90deg);
 }
 @media (max-width: 899px) {
+  .inbox-quoted summary {
+    min-block-size: 44px;
+  }
   .inbox-start-button {
     inline-size: 44px;
     block-size: 44px;

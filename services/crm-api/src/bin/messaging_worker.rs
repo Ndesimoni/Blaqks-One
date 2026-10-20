@@ -6,15 +6,15 @@ use kws_crm_api::{
     config::Config,
     inbox::{intake::InboxSink, send::domain::InboxSender},
     integrations::{
-        revocation,
+        mail_sync, revocation,
         webhooks::inbound::{self, Sink},
     },
     outbox, routes, shutdown,
 };
 use sqlx::postgres::PgPoolOptions;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
-const ALL: &str = "outbox,revocations,inbound";
+const ALL: &str = "outbox,revocations,inbound,mailsync";
 
 #[tokio::main]
 async fn main() {
@@ -79,6 +79,24 @@ async fn run() -> Result<(), String> {
             pool.clone(),
             key.clone(),
             google,
+            shutdown_rx.clone(),
+        ));
+    }
+    if let (true, Some(google)) = (wants("mailsync"), config.google.clone()) {
+        let every = std::env::var("CRM_MAIL_SYNC_SECONDS")
+            .ok()
+            .and_then(|value| value.parse::<u64>().ok())
+            .filter(|seconds| (1..=3600).contains(seconds))
+            .unwrap_or(30);
+        let sync = mail_sync::Sync {
+            pool: pool.clone(),
+            key: key.clone(),
+            google,
+            sink: Arc::new(InboxSink { pool: pool.clone() }),
+        };
+        handles.push(mail_sync::spawn(
+            sync,
+            Duration::from_secs(every),
             shutdown_rx.clone(),
         ));
     }

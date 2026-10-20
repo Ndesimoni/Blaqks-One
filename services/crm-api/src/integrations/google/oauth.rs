@@ -12,8 +12,10 @@ const MAX_RESPONSE_BYTES: usize = 64 * 1024;
 pub enum Failure {
     /// Google answered and said no: a bad code, a revoked grant or a refused token.
     Refused,
-    /// Timeout, network error or an unreadable answer; nothing is known.
+    /// Timeout, network error or a server error; nothing is known yet.
     Unavailable,
+    /// An answer too large or unreadable to use; asking again gives the same (E1c H2).
+    Invalid,
 }
 
 #[derive(Deserialize)]
@@ -28,6 +30,8 @@ pub struct Grant {
 struct Profile {
     #[serde(rename = "emailAddress")]
     email_address: String,
+    #[serde(rename = "historyId")]
+    history_id: Option<String>,
 }
 
 pub fn client() -> &'static reqwest::Client {
@@ -54,21 +58,25 @@ pub async fn read<T: DeserializeOwned>(
     if !status.is_success() {
         return Err(Failure::Unavailable);
     }
-    serde_json::from_slice(&bounded(response).await?).map_err(|_| Failure::Unavailable)
+    serde_json::from_slice(&bounded(response, MAX_RESPONSE_BYTES).await?)
+        .map_err(|_| Failure::Unavailable)
 }
 
 /// The body in chunks, so one without a length can never grow past the limit (L1).
-pub(super) async fn bounded(mut response: reqwest::Response) -> Result<Vec<u8>, Failure> {
+pub(super) async fn bounded(
+    mut response: reqwest::Response,
+    max: usize,
+) -> Result<Vec<u8>, Failure> {
     if response
         .content_length()
-        .is_some_and(|length| length > MAX_RESPONSE_BYTES as u64)
+        .is_some_and(|length| length > max as u64)
     {
-        return Err(Failure::Unavailable);
+        return Err(Failure::Invalid);
     }
     let mut body = Vec::new();
     while let Some(chunk) = response.chunk().await.map_err(|_| Failure::Unavailable)? {
-        if body.len() + chunk.len() > MAX_RESPONSE_BYTES {
-            return Err(Failure::Unavailable);
+        if body.len() + chunk.len() > max {
+            return Err(Failure::Invalid);
         }
         body.extend_from_slice(&chunk);
     }
@@ -92,8 +100,12 @@ pub async fn exchange(config: &GoogleConfig, code: &str, verifier: &str) -> Resu
     read(sent).await
 }
 
-/// The mailbox address Google says the token controls, lower-cased (SEC-1).
-pub async fn mailbox(config: &GoogleConfig, access_token: &str) -> Result<String, Failure> {
+/// The mailbox address Google says the token controls, lower-cased (SEC-1), and its
+/// current history ID: replies are read from this moment on (E1c).
+pub async fn mailbox(
+    config: &GoogleConfig,
+    access_token: &str,
+) -> Result<(String, Option<String>), Failure> {
     let sent = client()
         .get(format!("{}/gmail/v1/users/me/profile", config.gmail_url))
         .bearer_auth(access_token)
@@ -105,7 +117,12 @@ pub async fn mailbox(config: &GoogleConfig, access_token: &str) -> Result<String
         && address.split_once('@').is_some_and(|(local, host)| {
             !local.is_empty() && host.contains('.') && !address.contains(char::is_whitespace)
         });
-    valid.then_some(address).ok_or(Failure::Unavailable)
+    let cursor = profile
+        .history_id
+        .filter(|id| (1..=30).contains(&id.len()) && id.bytes().all(|b| b.is_ascii_digit()));
+    valid
+        .then_some((address, cursor))
+        .ok_or(Failure::Unavailable)
 }
 
 /// Whether Google no longer honours the token: revoked now, or already invalid (400).

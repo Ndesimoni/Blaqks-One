@@ -102,6 +102,15 @@ pub async fn finish(
         "connected"
     };
     store_write::event(&mut tx, &workspace, id, action, session.user.id).await?;
+    // Replies are read from the moment of sign-in, never before (E1c).
+    sqlx::query(
+        "UPDATE integrations.crm_channel_connections SET mail_history_id=$2 \
+         WHERE id=$1 AND mail_history_id IS NULL",
+    )
+    .bind(id)
+    .bind(&proven.cursor)
+    .execute(&mut *tx)
+    .await?;
     let row = store::load(&mut tx, &workspace, id)
         .await?
         .ok_or_else(ApiError::missing)?;

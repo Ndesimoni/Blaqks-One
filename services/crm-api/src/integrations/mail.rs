@@ -90,7 +90,7 @@ pub async fn send(
     let access = match refresh::refresh(google, &token).await {
         Ok(access) => access,
         Err(oauth::Failure::Refused) => return reconnect(pool, out).await,
-        Err(oauth::Failure::Unavailable) => {
+        Err(oauth::Failure::Unavailable | oauth::Failure::Invalid) => {
             return Ok(Delivery::Retry {
                 after: None,
                 code: "google_unavailable",

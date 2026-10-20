@@ -46,6 +46,20 @@ pub struct Inbound {
     pub source: Option<Source>,
     /// The CRM Property ID of the advertised listing, for routing to its agent.
     pub listing: Option<String>,
+    /// Email only (E1c): subject, RFC Message-ID for threading replies, and whether this
+    /// is a delivery failure notice about a message the CRM sent.
+    pub email: Option<EmailMeta>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct EmailMeta {
+    pub subject: Option<String>,
+    pub rfc_message_id: Option<String>,
+    pub bounce: bool,
+    /// The mailbox owner: email conversations are theirs (review E1c H1).
+    pub owner: Option<uuid::Uuid>,
+    /// Gmail authenticated the sender (DMARC pass, review E1c M2).
+    pub verified: bool,
 }
 
 const KEYS: [&str; 8] = [
@@ -95,6 +109,7 @@ pub fn parse_stub(body: &[u8]) -> Result<Inbound, &'static str> {
         has_media,
         source,
         listing: text(&map, "listing", 40)?,
+        email: None,
     })
 }
 

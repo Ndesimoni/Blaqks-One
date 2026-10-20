@@ -1,6 +1,6 @@
 //! SQL for intake. Every function runs in the caller's transaction, under the workspace
 //! lock.
-use crate::error::ApiResult;
+use crate::{error::ApiResult, integrations::webhooks::message::Inbound};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
@@ -47,14 +47,17 @@ pub struct NewConversation<'a> {
     pub state: &'a str,
     pub suggested: bool,
     pub source: Option<&'a str>,
+    /// Email only: the subject the client wrote (E1c).
+    pub subject: Option<&'a str>,
 }
 
 pub async fn open(tx: Tx<'_, '_>, new: &NewConversation<'_>) -> ApiResult<()> {
     sqlx::query(
         "INSERT INTO inbox.crm_inbox_conversations (id,workspace_id,channel,connection_id, \
            external_thread_id,contact_key,contact_display,contact_name,match_state, \
-           linked_collection,linked_record_id,assignee_id,state,suggested_lead,first_source) \
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)",
+           linked_collection,linked_record_id,assignee_id,state,suggested_lead,first_source, \
+           subject) \
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)",
     )
     .bind(new.id)
     .bind(new.workspace)
@@ -71,6 +74,7 @@ pub async fn open(tx: Tx<'_, '_>, new: &NewConversation<'_>) -> ApiResult<()> {
     .bind(new.state)
     .bind(new.suggested)
     .bind(new.source)
+    .bind(new.subject)
     .execute(&mut **tx)
     .await?;
     Ok(())
@@ -81,23 +85,30 @@ pub async fn message(
     tx: Tx<'_, '_>,
     conversation: Uuid,
     workspace: &str,
-    provider_id: &str,
-    body: &str,
-    has_media: bool,
+    message: &Inbound,
+    sender: Option<(&str, bool)>,
 ) -> ApiResult<bool> {
+    let rfc_message_id = message
+        .email
+        .as_ref()
+        .and_then(|meta| meta.rfc_message_id.as_deref());
     let stored = sqlx::query(
         "INSERT INTO inbox.crm_inbox_messages \
-           (id,conversation_id,workspace_id,direction,provider_message_id,status,body,has_media) \
-         VALUES ($1,$2,$3,'inbound',$4,'received',$5,$6) \
+           (id,conversation_id,workspace_id,direction,provider_message_id,status,body,has_media, \
+            rfc_message_id,sender,sender_unverified) \
+         VALUES ($1,$2,$3,'inbound',$4,'received',$5,$6,$7,$8,$9) \
          ON CONFLICT (conversation_id,provider_message_id) \
            WHERE provider_message_id IS NOT NULL DO NOTHING",
     )
     .bind(Uuid::new_v4())
     .bind(conversation)
     .bind(workspace)
-    .bind(provider_id)
-    .bind(body)
-    .bind(has_media)
+    .bind(&message.message_id)
+    .bind(&message.text)
+    .bind(message.has_media)
+    .bind(rfc_message_id)
+    .bind(sender.map(|(address, _)| address))
+    .bind(sender.is_some_and(|(_, unverified)| unverified))
     .execute(&mut **tx)
     .await?
     .rows_affected();

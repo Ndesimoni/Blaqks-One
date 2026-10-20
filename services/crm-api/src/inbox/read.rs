@@ -56,6 +56,8 @@ struct Message {
     has_media: bool,
     author_user_id: Option<Uuid>,
     repeat_of: Option<Uuid>,
+    sender: Option<String>,
+    sender_unverified: bool,
     failure_reason: Option<String>,
     at: String,
 }
@@ -82,7 +84,8 @@ pub async fn read(
         .await?
         .ok_or_else(ApiError::missing)?;
     let messages: Vec<Message> = sqlx::query_as(&format!(
-        "SELECT * FROM (SELECT id,direction,body,has_media,author_user_id,repeat_of, \
+        "SELECT * FROM (SELECT id,direction,body,has_media,author_user_id,repeat_of,sender, \
+           sender_unverified, \
            CASE WHEN status='sending' AND status_changed_at<now()-interval '2 minutes' \
              THEN 'unknown' ELSE status END AS status, \
            failure_reason,{STAMP} AS at,created_at FROM inbox.crm_inbox_messages \
@@ -119,7 +122,8 @@ pub async fn read(
             json!({
                 "id": m.id, "direction": m.direction, "status": m.status, "body": m.body,
                 "hasMedia": m.has_media, "authorId": m.author_user_id,
-                "failureReason": m.failure_reason, "repeatOf": m.repeat_of, "at": m.at,
+                "failureReason": m.failure_reason, "repeatOf": m.repeat_of, "sender": m.sender,
+                "senderUnverified": m.sender_unverified, "at": m.at,
             })
         })
         .collect();

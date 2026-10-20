@@ -9,6 +9,7 @@ mod inbound_store;
 pub mod message;
 mod receipt;
 pub mod signature;
+pub mod sink;
 mod store;
 mod stub;
 

@@ -21,6 +21,7 @@ import './inbox-thread.css';
 import './inbox-panel.css';
 import './inbox-triage.css';
 import './inbox-send.css';
+import './inbox-start.css';
 import './inbox-responsive.css';
 
 /**

@@ -179,6 +179,38 @@ No-duplicate rule:
 - status callbacks are deduplicated by `(provider, event_id)` and applied only when they
   move the status forward.
 
+### Reading client replies (E1c, built 2026-10-20)
+
+- The worker's `mailsync` loop (every `CRM_MAIL_SYNC_SECONDS`, default 30) reads each
+  connected Google mailbox's history of messages added to INBOX since its cursor
+  (`mail_history_id`, migration 0040). A new mailbox's cursor starts at the present, and an
+  expired cursor restarts there: no older mail is read.
+- For each message the worker reads headers only, skips the member's own mail, and asks the
+  Inbox through `Sink::email_relevant` whether it belongs: a thread the CRM already holds,
+  or a sender address matching a Client or Contact (`records::lookup::contact_matches`).
+  Only then is the body fetched (bounded to 2 MB) and stored as plain text up to 20,000
+  characters: HTML is reduced to text on the server, so no markup, script or remote image
+  reaches the browser; attachments are noted as media, not stored.
+- Bounces (mailer-daemon/postmaster or `multipart/report`) in a known thread fail the
+  latest sent message with `bounced`; they are never stored as client mail.
+- A refused token marks the mailbox `reconnect_required`; an unavailable Google or Inbox
+  keeps the cursor, and each provider message is stored once.
+- Security review (2026-10-21, accepted with fixes):
+  - **H1:** a mailbox's conversations are assigned to its owner, never the record's
+    holder, and a new thread matches only records the owner may see.
+  - **H2:** a message too large or unreadable to use is skipped, so it cannot hold the
+    cursor; only network and server errors wait for the next round.
+  - **M1:** each inbound email stores its real sender, shown when it is not the contact.
+  - **M2:** a new thread needs Gmail's `dmarc=pass` (top `Authentication-Results` from
+    `mx.google.com`); an unauthenticated sender may only join a known thread and is shown
+    as "Unverified sender: check before acting".
+  - **M3:** only an authenticated `report-type=delivery-status` report with a permanent
+    `Status: 5.x.x` fails a sent message; read receipts and delays change nothing.
+  - **L1, L3:** a 401 mid-round keeps the cursor; a frozen team or a member without the
+    email grant syncs nothing.
+  - Follow-ups: per-round budgets (L2), send-as aliases (L4), and matching a bounce's
+    `Original-Message-ID` once outbound Message-IDs are stored.
+
 ### Email sending (E1b, built 2026-10-20)
 
 - `POST /inbox/conversations/{id}/messages` replies, `POST /inbox/conversations` starts a

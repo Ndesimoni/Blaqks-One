@@ -111,6 +111,8 @@ export const apiTestFiles = [
   'tests/api/channels.test.mjs',
   'tests/api/mailbox-google.test.mjs',
   'tests/api/mailbox-departure.test.mjs',
+  'tests/api/mailbox-replies.test.mjs',
+  'tests/api/mailbox-replies-guards.test.mjs',
   'tests/api/mailbox-send.test.mjs',
   'tests/api/channels-lifecycle.test.mjs',
   'tests/api/activity-channels.test.mjs',

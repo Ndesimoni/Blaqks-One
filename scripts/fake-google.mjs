@@ -5,6 +5,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
 import { gmailSend } from './fake-google-gmail.mjs';
+import { createMailboxes } from './fake-google-mailbox.mjs';
 import { consentPage } from './fake-google-page.mjs';
 
 const SEND = 'https://www.googleapis.com/auth/gmail.send';
@@ -17,6 +18,7 @@ export async function startFakeGoogle({ port, clientId, clientSecret, redirectUr
   const refresh = new Map();
   const revoked = [];
   const sent = [];
+  const mailboxes = createMailboxes();
   const json = (response, status, value) => {
     response.writeHead(status, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify(value));
@@ -116,12 +118,22 @@ export async function startFakeGoogle({ port, clientId, clientSecret, redirectUr
         for (let index = 0; index < 20; index += 1) response.write(' '.repeat(8192));
         return response.end('{}');
       }
-      return json(response, 200, { emailAddress: email, historyId: '1' });
+      return json(response, 200, { emailAddress: email, historyId: mailboxes.current() });
     }
     if (request.method === 'POST' && url.pathname === '/gmail/v1/users/me/messages/send') {
       const email = access.get(bearer);
       if (!email) return json(response, 401, { error: 'unauthenticated' });
-      return gmailSend(request, response, { email, json, sent });
+      return gmailSend(request, response, { email, json, sent, mailboxes });
+    }
+    if (request.method === 'GET' && url.pathname.startsWith('/gmail/')) {
+      const email = access.get(bearer);
+      const answer = email ? mailboxes.route(url, email) : [401, { error: 'unauthenticated' }];
+      if (answer) return json(response, ...answer);
+    }
+    if (request.method === 'POST' && url.pathname === '/test/deliver') {
+      let text = '';
+      for await (const chunk of request) text += chunk;
+      return json(response, 200, mailboxes.deliver(JSON.parse(text)));
     }
     if (request.method === 'GET' && url.pathname === '/test/state') {
       return json(response, 200, { revoked, refreshTokens: [...refresh.keys()], sent });

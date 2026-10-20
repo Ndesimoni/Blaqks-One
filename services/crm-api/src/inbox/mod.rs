@@ -8,6 +8,7 @@ pub mod change;
 pub mod commands;
 pub mod events;
 pub mod intake;
+pub mod intake_email;
 mod intake_store;
 pub mod leads;
 pub mod list;

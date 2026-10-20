@@ -39,3 +39,16 @@ export function emailRecipients(entries, query) {
   };
   return linkCandidates(withEmail, query).slice(0, 12);
 }
+
+/** An email reply split into the new text and the quoted earlier mail, which folds. */
+export function splitQuoted(body = '') {
+  const lines = body.split('\n');
+  const index = lines.findIndex(
+    (line, at) => /^On .+wrote:\s*$/.test(line.trim()) || (line.startsWith('>') && at > 0),
+  );
+  if (index <= 0) return { text: body, quoted: '' };
+  return {
+    text: lines.slice(0, index).join('\n').trimEnd(),
+    quoted: lines.slice(index).join('\n'),
+  };
+}

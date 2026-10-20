@@ -30,7 +30,7 @@ pub fn plain_address(value: &str) -> bool {
 }
 
 /// A `<id@host>` Message-ID without spaces or control characters.
-fn message_id(value: &str) -> bool {
+pub fn message_id(value: &str) -> bool {
     value.len() <= 300
         && value.starts_with('<')
         && value.ends_with('>')
