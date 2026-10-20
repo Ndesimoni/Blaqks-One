@@ -9,6 +9,7 @@ use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     state::AppState,
+    workspaces,
 };
 use axum::{
     extract::{rejection::JsonRejection, Path, State},
@@ -29,6 +30,8 @@ pub async fn mark_read(
     access::ensure_writer(&state, &session, &headers, &workspace).await?;
     let id = access::id(&id)?;
     let mut tx = state.pool.begin().await?;
+    // Live membership is checked after the workspace lock, so an archive cannot race it.
+    workspaces::lock(&mut tx, &workspace).await?;
     let viewer = Viewer::of(&access::live(&mut tx, &workspace, session.user.id).await?);
     load(&mut tx, &workspace, &viewer, id, false)
         .await?
@@ -73,6 +76,8 @@ pub async fn add_note(
     let Json(body) = body.map_err(|_| ApiError::invalid(NOTE))?;
     let text = note_body(body)?;
     let mut tx = state.pool.begin().await?;
+    // Live membership is checked after the workspace lock, so an archive cannot race it.
+    workspaces::lock(&mut tx, &workspace).await?;
     let viewer = Viewer::of(&access::live(&mut tx, &workspace, session.user.id).await?);
     load(&mut tx, &workspace, &viewer, id, false)
         .await?

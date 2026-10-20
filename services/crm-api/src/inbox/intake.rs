@@ -3,14 +3,13 @@
 //! Clients and Contacts through the records module, run through the lead rules and
 //! routed: listing agent, then the matched record's holder, else Unassigned.
 use super::{
-    events, intake_store as store, leads,
+    events, intake_store as store, matching,
     normalize::{self, Contact},
-    rules::{self, Decision},
+    rules::Decision,
 };
 use crate::{
-    error::ApiResult,
+    error::{ApiError, ApiResult},
     integrations::webhooks::inbound::{Event, Sink, SinkError, SinkFuture},
-    records::lookup,
     workspaces,
 };
 use sqlx::{PgPool, Postgres, Transaction};
@@ -33,7 +32,14 @@ pub async fn receive(pool: &PgPool, event: &Event) -> Result<(), SinkError> {
         .ok_or(SinkError::Permanent("invalid_sender"))?;
     store_event(pool, event, &contact)
         .await
-        .map_err(|_| SinkError::Retry)
+        .map_err(|ApiError(status, ..)| {
+            // A refusal (archived team, invalid record) can never succeed on retry (X3-S6).
+            if status.is_client_error() {
+                SinkError::Permanent("intake_refused")
+            } else {
+                SinkError::Retry
+            }
+        })
 }
 
 async fn store_event(pool: &PgPool, event: &Event, contact: &Contact) -> ApiResult<()> {
@@ -74,35 +80,8 @@ async fn open(
 ) -> ApiResult<Uuid> {
     let workspace = event.workspace_id.as_str();
     let message = &event.message;
-    let candidates = match (&contact.phone_digits, &contact.email) {
-        (None, None) => Vec::new(),
-        (phone, email) => {
-            lookup::contact_matches(tx, workspace, phone.as_deref(), email.as_deref()).await?
-        }
-    };
-    let listing_agent = match &message.listing {
-        Some(listing) => lookup::property_holder(tx, workspace, listing).await?,
-        None => None,
-    };
-    let (mut match_state, mut linked) = match candidates.as_slice() {
-        [] => ("unknown", None),
-        [only] => (
-            "linked",
-            Some((only.collection.clone(), only.record_id, only.assignee_id)),
-        ),
-        _ => ("choice", None),
-    };
-    let mut decision = Decision::Nothing;
-    if match_state == "unknown" {
-        let rules = rules::load(tx, workspace).await?;
-        decision = rules::decide(&rules, message.source, &message.text);
-        if decision == Decision::Create {
-            let owner = workspaces::owner_of(tx, workspace).await?;
-            let name = message.name.as_deref();
-            let lead = leads::create(tx, owner, workspace, &event.channel, contact, name).await?;
-            (match_state, linked) = ("linked", Some(("Clients".into(), lead.id, lead.assignee)));
-        }
-    }
+    let found = matching::resolve(tx, event, contact).await?;
+    let (match_state, linked, decision) = (found.match_state, found.linked, found.decision);
     let id = Uuid::new_v4();
     let holder = linked.as_ref().and_then(|(_, _, assignee)| *assignee);
     let new = store::NewConversation {
@@ -118,7 +97,7 @@ async fn open(
         linked: linked
             .as_ref()
             .map(|(collection, record, _)| (collection.as_str(), *record)),
-        assignee: listing_agent.or(holder),
+        assignee: found.listing_agent.or(holder),
         state: if linked.is_some() { "open" } else { "new" },
         suggested: decision == Decision::Suggest,
         source: message.source.map(|source| source.as_str()),

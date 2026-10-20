@@ -114,6 +114,8 @@ export const apiTestFiles = [
   'tests/api/webhooks.test.mjs',
   'tests/api/inbox.test.mjs',
   'tests/api/inbox-assign.test.mjs',
+  'tests/api/inbox-triage.test.mjs',
+  'tests/api/inbox-guards.test.mjs',
 ];
 
 /**

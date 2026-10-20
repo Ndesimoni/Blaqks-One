@@ -96,9 +96,11 @@ pub async fn read(
     .bind(id)
     .fetch_all(&mut *tx)
     .await?;
+    let mut record_visible = false;
     let record = match (&row.linked_collection, row.linked_record_id) {
         (Some(collection), Some(record)) => {
             let seen = lookup::summary(&mut tx, &workspace, &user, collection, record).await?;
+            record_visible = seen.is_some();
             Some(match seen {
                 Some(summary) => json!({"collection": collection, "recordId": record,
                     "legacyId": summary.legacy_id, "name": summary.name}),
@@ -126,7 +128,7 @@ pub async fn read(
             })
         })
         .collect();
-    let mut conversation = row.view();
+    let mut conversation = row.view(record_visible);
     conversation["record"] = record.unwrap_or(Value::Null);
     Ok(Json(
         json!({"conversation": conversation, "messages": messages, "notes": notes}),

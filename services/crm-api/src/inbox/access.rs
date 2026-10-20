@@ -54,6 +54,15 @@ pub async fn ensure_member(state: &AppState, session: &Session, workspace: &str)
     Ok(())
 }
 
+/// Company members who are the Admin (lead rules).
+pub async fn ensure_admin(state: &AppState, session: &Session, workspace: &str) -> ApiResult<()> {
+    ensure_member(state, session, workspace).await?;
+    if session.user.role != "admin" {
+        return Err(ApiError::forbidden());
+    }
+    Ok(())
+}
+
 /// The same check for a write, plus Origin and CSRF.
 pub async fn ensure_writer(
     state: &AppState,

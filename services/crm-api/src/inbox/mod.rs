@@ -3,17 +3,22 @@
 //! It matches senders and creates leads only through records functions, and receives
 //! verified events from `integrations` as the worker's sink.
 pub mod access;
+pub mod blocks;
+pub mod change;
 pub mod commands;
 pub mod events;
 pub mod intake;
 mod intake_store;
 pub mod leads;
 pub mod list;
+pub mod matching;
 pub mod normalize;
 pub mod notes;
 pub mod read;
 pub mod routes;
 pub mod rules;
+pub mod rules_api;
+pub mod triage;
 pub mod view;
 
 #[cfg(test)]

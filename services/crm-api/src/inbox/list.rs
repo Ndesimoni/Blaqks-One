@@ -74,6 +74,25 @@ pub fn parse(raw: Option<&str>) -> ApiResult<Filters> {
     })
 }
 
+/// Linked record IDs on these rows that the viewer may see.
+async fn visible_records(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspace: &str,
+    user: &crate::auth::profile::UserRow,
+    rows: &[Row],
+) -> ApiResult<Vec<uuid::Uuid>> {
+    let mut shown = Vec::new();
+    for collection in ["Clients", "Contacts"] {
+        let ids: Vec<uuid::Uuid> = rows
+            .iter()
+            .filter(|row| row.linked_collection.as_deref() == Some(collection))
+            .filter_map(|row| row.linked_record_id)
+            .collect();
+        shown.extend(crate::records::lookup::visible(tx, workspace, user, collection, &ids).await?);
+    }
+    Ok(shown)
+}
+
 pub async fn list(
     State(state): State<AppState>,
     session: Session,
@@ -83,7 +102,8 @@ pub async fn list(
     access::ensure_member(&state, &session, &workspace).await?;
     let filters = parse(raw.as_deref())?;
     let mut tx = state.pool.begin().await?;
-    let viewer = Viewer::of(&access::live(&mut tx, &workspace, session.user.id).await?);
+    let user = access::live(&mut tx, &workspace, session.user.id).await?;
+    let viewer = Viewer::of(&user);
     let sql = format!(
         "SELECT {COLUMNS} FROM inbox.crm_inbox_conversations c \
          WHERE c.workspace_id=$1 AND {visible} \
@@ -109,10 +129,16 @@ pub async fn list(
         .bind(filters.limit + 1)
         .fetch_all(&mut *tx)
         .await?;
-    tx.commit().await?;
     let limit = usize::try_from(filters.limit).unwrap_or(50);
+    let rows: Vec<Row> = rows.into_iter().take(limit + 1).collect();
+    let shown = visible_records(&mut tx, &workspace, &user, &rows[..rows.len().min(limit)]).await?;
+    tx.commit().await?;
     let next = (rows.len() > limit).then(|| cursor::encode(rows[limit - 1].key()));
-    let conversations: Vec<Value> = rows.iter().take(limit).map(Row::view).collect();
+    let conversations: Vec<Value> = rows
+        .iter()
+        .take(limit)
+        .map(|row| row.view(row.linked_record_id.is_some_and(|id| shown.contains(&id))))
+        .collect();
     Ok(Json(
         json!({"conversations": conversations, "nextCursor": next}),
     ))

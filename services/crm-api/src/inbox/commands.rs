@@ -6,6 +6,7 @@ use super::{
     access::{self, Viewer},
     events,
     read::load,
+    view::shown,
 };
 use crate::{
     auth::session::Session,
@@ -87,12 +88,16 @@ pub async fn update(
     let change = parse(body)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
-    let viewer = Viewer::of(&access::live(&mut tx, &workspace, session.user.id).await?);
+    let user = access::live(&mut tx, &workspace, session.user.id).await?;
+    let viewer = Viewer::of(&user);
     let row = load(&mut tx, &workspace, &viewer, id, true)
         .await?
         .ok_or_else(ApiError::missing)?;
     if row.version != change.version {
         return Err(ApiError::stale(RELOAD));
+    }
+    if row.state == "spam" && change.state.is_some() {
+        return Err(ApiError::conflict(super::triage::BLOCKED));
     }
     let next_state = change.state.clone().unwrap_or_else(|| row.state.clone());
     let next_assignee = change.assignee.unwrap_or(row.assignee_id);
@@ -124,8 +129,12 @@ pub async fn update(
     .await?;
     // An assigned-only member who released it can no longer see it; answer with the change.
     let after = load(&mut tx, &workspace, &viewer, id, false).await?;
+    let view = match &after {
+        Some(row) => Some(shown(&mut tx, &workspace, &user, row).await?),
+        None => None,
+    };
     tx.commit().await?;
-    Ok(Json(json!({"conversation": after.map(|row| row.view())})))
+    Ok(Json(json!({"conversation": view})))
 }
 
 #[cfg(test)]

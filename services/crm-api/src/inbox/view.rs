@@ -1,7 +1,8 @@
 //! The conversation row the staff API returns. `preview` is the latest message's first
 //! 140 characters; `unread` compares inbound messages with the viewer's read mark.
+use crate::{auth::profile::UserRow, error::ApiResult, records::lookup};
 use serde_json::{json, Value};
-use sqlx::FromRow;
+use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
 /// Columns for alias `c`; `$5` is the viewer's ID for the unread flag.
@@ -39,9 +40,12 @@ pub struct Row {
 }
 
 impl Row {
-    pub fn view(&self) -> Value {
+    /// `record_visible` hides the linked record's ID from viewers who cannot see that
+    /// record (X3-S2); they still learn the conversation is linked.
+    pub fn view(&self, record_visible: bool) -> Value {
         let linked = match (&self.linked_collection, self.linked_record_id) {
-            (Some(collection), Some(id)) => json!({"collection": collection, "recordId": id}),
+            (Some(collection), Some(id)) => json!({"collection": collection,
+                "recordId": record_visible.then_some(id)}),
             _ => Value::Null,
         };
         json!({
@@ -64,4 +68,20 @@ impl Row {
     pub fn key(&self) -> (i64, Uuid) {
         (self.micros, self.id)
     }
+}
+
+/// The row's view for `user`, with the linked record's ID only if they may see it.
+pub async fn shown(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    user: &UserRow,
+    row: &Row,
+) -> ApiResult<Value> {
+    let visible = match (&row.linked_collection, row.linked_record_id) {
+        (Some(collection), Some(id)) => !lookup::visible(tx, workspace, user, collection, &[id])
+            .await?
+            .is_empty(),
+        _ => false,
+    };
+    Ok(row.view(visible))
 }

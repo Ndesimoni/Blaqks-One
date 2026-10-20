@@ -81,6 +81,32 @@ pub async fn summary(
         .map_err(Into::into)
 }
 
+/// Which of `ids` in `collection` the viewer may see (grant plus record scope).
+pub async fn visible(
+    transaction: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    viewer: &UserRow,
+    collection: &str,
+    ids: &[Uuid],
+) -> ApiResult<Vec<Uuid>> {
+    if ids.is_empty() || !viewer.can_collection(collection) {
+        return Ok(Vec::new());
+    }
+    let sql = format!(
+        "SELECT r.id FROM crm_records r \
+         WHERE r.workspace_id=$1 AND r.collection=$2 AND r.id=ANY($3) AND {}",
+        predicate("r", "$1", "$4")
+    );
+    sqlx::query_scalar(&sql)
+        .bind(workspace)
+        .bind(collection)
+        .bind(ids)
+        .bind(RecordScope::of(viewer).caller())
+        .fetch_all(&mut **transaction)
+        .await
+        .map_err(Into::into)
+}
+
 /// The agent holding the Property with this record ID, for routing a listing enquiry.
 pub async fn property_holder(
     transaction: &mut Transaction<'_, Postgres>,

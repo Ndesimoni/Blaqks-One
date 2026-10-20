@@ -56,7 +56,12 @@ fn text(map: &Map<String, Value>, key: &str, max: usize) -> Result<Option<String
     match map.get(key) {
         None | Some(Value::Null) => Ok(None),
         Some(Value::String(value)) if value.chars().count() <= max => {
-            Ok(Some(value.trim().to_owned()).filter(|value| !value.is_empty()))
+            // Control characters never reach names, records or exports (X3-S6).
+            let clean: String = value
+                .chars()
+                .filter(|c| !c.is_control() || *c == '\n' || *c == '\t')
+                .collect();
+            Ok(Some(clean.trim().to_owned()).filter(|value| !value.is_empty()))
         }
         Some(_) => Err("unparseable"),
     }

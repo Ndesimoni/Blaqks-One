@@ -23,15 +23,20 @@ export async function inboxTeams(prefix) {
 const literal = (value) => (value === null ? 'NULL' : `'${value}'`);
 
 /** Inserts a conversation with one inbound message; returns its ID. */
-export function seed(workspace, { channel = 'whatsapp', assignee = null, state = 'new' } = {}) {
+export function seed(
+  workspace,
+  { channel = 'whatsapp', assignee = null, state = 'new', match = 'unknown', record = null } = {},
+) {
   const id = randomUUID();
   const contact =
     channel === 'email' ? `c-${id.slice(0, 8)}@example.test` : `+97150${Date.now() % 10_000_000}`;
   query(
     `INSERT INTO inbox.crm_inbox_conversations (id,workspace_id,channel,connection_id,
-       external_thread_id,contact_key,contact_display,match_state,assignee_id,state)
+       external_thread_id,contact_key,contact_display,match_state,assignee_id,state,
+       linked_collection,linked_record_id)
      VALUES ('${id}','${workspace}','${channel}','${randomUUID()}','t-${id}','${contact}',
-       '${contact}','unknown',${literal(assignee)},'${state}');
+       '${contact}','${match}',${literal(assignee)},'${state}',
+       ${record ? "'Clients'" : 'NULL'},${literal(record)});
      INSERT INTO inbox.crm_inbox_messages (id,conversation_id,workspace_id,direction,
        provider_message_id,status,body)
      VALUES ('${randomUUID()}','${id}','${workspace}','inbound','m-${id}','received',
