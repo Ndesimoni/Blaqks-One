@@ -184,7 +184,7 @@ See [Team activity design](team-activity-design.md).
 
 ## Company websites (decided 2026-10-20)
 
-There is **one general Blaqks One website** with every company's approved listings. A company may also have its **own private website**, served by the same public website application and data. Each site reads only approved public listing versions, never private CRM records.
+There is **one general Blaqks One website** with every company's approved listings. A company may also have its **own private website**, served by the same public website application and data. Each site reads only approved public listing versions, never private CRM records. See the [public website plan](public-website-plan.md).
 
 | Topic         | Decision                                                                                                                                                                                                       |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -194,8 +194,8 @@ There is **one general Blaqks One website** with every company's approved listin
 | Own pages     | Proposed, pending review: built from structured content blocks (text, images, approved listings, contact form), never arbitrary HTML or scripts, and reviewed before going live like any other public content. |
 | Going live    | A company site **does not need a verified licence** to go live. The existing rule still applies to listings: a verified licence is required before a listing is published.                                     |
 | Language      | Public sites launch in **English**. They are built on the language foundation and right-to-left ready, so Arabic can be added later without a redesign.                                                        |
-| Approval      | Recommended default (owner takes recommendations, 2026-10-15): one Super Admin approval per listing version covers both sites; the company chooses per listing "general site + my site" or "my site only".     |
-| Limits        | Recommended default: "2 live listings per team" applies on company sites; "2 teams per property" applies only to the general site.                                                                             |
+| Approval      | Confirmed by the owner 2026-10-20: one Super Admin approval per listing version covers both sites; the company chooses per listing "general site + my site" or "my site only".                                 |
+| Limits        | Confirmed by the owner 2026-10-20: "2 live listings per team" applies on company sites; "2 teams per property" applies only to the general site.                                                               |
 | Themes        | The 4 themes are designed and reviewed with the owner before they are built.                                                                                                                                   |
 
 ## Messaging design (decided 2026-10-20)

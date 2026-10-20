@@ -408,6 +408,8 @@ P2 includes provider-independent intake and conversation contracts; P3 delivers 
 | L1     | Monitoring review workflow                 | Owned-source matching and evidence; conversion to Clients without fabricated contact identity                                                                                                               |
 | O1     | Hosted operational readiness               | Staging secrets/HTTPS, provider callbacks, worker monitoring, backups/restore and rollback                                                                                                                  |
 
+The [public website plan](public-website-plan.md) replaces W1–W4 with packets WEB1–WEB9, adding the design packet and company websites.
+
 Split any packet further if it crosses too many contracts. Do not ship empty connected screens as completed integrations. A mocked provider test proves application handling; it does not establish provider approval or live delivery.
 
 ## 15. Remaining connected CRM work outside the integrations
@@ -439,6 +441,7 @@ Split any packet further if it crosses too many contracts. Do not ship empty con
 - **Queued architecture follow-ups (owner approved 2026-10-15):** (1) automated boundary check for [Service boundaries](service-boundaries.md) rule 12; (2) own PostgreSQL schema for each new large module; (3) phase 1 boundary cleanups when files are touched anyway; (4) set hosting region (UAE or nearby) and launch traffic targets before deployment.
 - **Queued hosting and infrastructure plan (owner approved 2026-10-15):** see [Tech stack](tech-stack.md). At launch: Cloudflare CDN, Nginx reverse proxy (HTTPS, prefix routing to `/api/crm`, `/api/public`, `/api/calendar`, limits, headers), managed PostgreSQL in a UAE region with backups, UAE-region object storage for media, no CDN/proxy caching of private CRM data. Later: Valkey/Redis for public caching or real-time features, an outbound forward proxy with the messaging phase, and a dedicated API gateway only for a partner API.
 - **Queued public sign-up (owner decided 2026-10-15, flow decided 2026-10-16):** Brokerage firm or Independent agent as the first step, one company model with a one-person limit for independents and an in-account switch to brokerage; joining a firm by invitation with optional, Admin-accepted record transfer; verified email and mobile, licences checked only before public actions; all plans free for now. Company members still invited by their Admin; bot protection and rate limits; design and security review first. See [Product decisions](product-decisions.md#sign-up-decided-2026-10-15-planned).
+- **Queued public website (owner decided 2026-10-20):** one general website plus optional paid company websites on a subdomain or the company's own domain, 4 themes, logo, one brand colour, fixed pages and company-built pages; English first. Packets WEB1–WEB9 in the [public website plan](public-website-plan.md); start with WEB4 design and WEB1 when the owner says.
 - **Later:** customer mobile app, public self-booking, two-way calendar editing, sophisticated co-listing, automated campaigns, AI summaries/transcription and hard account deletion. Each needs its own reviewed scope; none is required to prove the first website/inbox release.
 
 ## 16. Acceptance scenarios and test rules
@@ -482,7 +485,7 @@ These can be discussed without stopping independent foundation work.
 | Marketing campaigns                  | Disabled initially; approved audience, consent/suppression and budget when enabled                   | Bulk email/WhatsApp, calls and policy              |
 | Calling                              | Phone/dialler shortcut first; provider-based calling only after UAE eligibility review               | Telephony provider and cost                        |
 | Hosting and retention                | Decide jurisdiction, backup/object-storage regions, retention and provider deletion procedures       | Operations, legal review and vendor contracts      |
-| Public languages/mobile              | Website mobile-responsive first; decide Arabic/English and native app targets                        | Public schema, content workflow and P11            |
+| Public languages/mobile              | English first, right-to-left ready (decided 2026-10-20); decide native app targets                   | Public schema, content workflow and P11            |
 
 Costs must include hosting/PostgreSQL, object storage/media traffic, mail delivery, WhatsApp/provider charges, X/data usage, possible security assessments, monitoring/backups and optional telephony. Do not bake today's prices or assumed free tiers into the business plan. Request actual quotes and set per-workspace budgets before activation.
 

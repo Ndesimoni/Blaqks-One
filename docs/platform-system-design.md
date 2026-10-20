@@ -8,6 +8,8 @@ Confirmed product decision: **Super Admin approval is required before a property
 
 Confirmed team model: one agency with Admin-owned workspaces; each Admin may create staff accounts and grant access inside their own workspace. The Super Admin oversees all teams and creates Admins. Staff can hold multiple positions with explicit module and messaging grants. The customer-facing mobile app remains a working assumption. External agencies, cross-Admin delegation and a dedicated staff mobile app would require additional product decisions. See [Admin-owned teams](admin-owned-teams.md).
 
+Company websites (decided 2026-10-20): besides the general website, a company may have its own site served by the same website application. See the [public website plan](public-website-plan.md).
+
 ## One platform, three applications
 
 Use one shared backend with focused modules, a PostgreSQL database, object storage/CDN and a durable worker. The CRM, public website and customer mobile app have different interfaces and permissions but share authoritative property and publication services.
