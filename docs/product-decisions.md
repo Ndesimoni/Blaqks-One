@@ -182,6 +182,18 @@ See [Team activity design](team-activity-design.md).
 | Routing                          | An enquiry goes to the listing's approved agent first, then to that team's Admin queue.                                                                                                                          |
 | Unassigned or orphaned enquiries | If the agent is unavailable, suspended or removed, their open enquiries move to their own team's Admin queue. Attribution history is preserved; enquiries are never moved to another Admin's team automatically. |
 
+## Company websites (decided 2026-10-20)
+
+There is **one general Blaqks One website** with every company's approved listings. A company may also have its **own private website**, served by the same public website application and data. Each site reads only approved public listing versions, never private CRM records.
+
+| Topic         | Decision                                                                                                                                                                                                       |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Commercial    | The company website is a **paid add-on or part of a higher plan**; exact plans and prices belong to the platform phase.                                                                                        |
+| Domains       | A company may **connect its own domain** (ownership verified, SSL issued and renewed automatically). Without one it gets a **Blaqks One subdomain**. Buying domains on a company's behalf is deferred.         |
+| Customisation | Each company chooses **one of 4 themes**, its **logo** and **one brand colour**, on **fixed pages** (Home, Listings, Listing detail, About, Contact). Companies may also **add their own pages**.              |
+| Own pages     | Proposed, pending review: built from structured content blocks (text, images, approved listings, contact form), never arbitrary HTML or scripts, and reviewed before going live like any other public content. |
+| Still open    | Super Admin approval on company sites, listing limits there, licence gate before go-live, public languages and the source of the 4 themes.                                                                     |
+
 ## Messaging design (decided 2026-10-20)
 
 The owner approved the [messaging design](messaging-design.md) (packet X0) after its [security review](messaging-security.md), taking the recommended answers:
