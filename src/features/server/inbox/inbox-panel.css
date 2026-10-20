@@ -24,10 +24,16 @@
   border-block-start: 1px solid var(--line);
   background: var(--panel);
 }
+.inbox-composer-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-block-end: 10px;
+}
 .inbox-composer-tabs {
   display: flex;
   gap: 6px;
-  margin-block-end: 10px;
 }
 .inbox-composer-tab {
   min-block-size: 32px;
@@ -57,6 +63,7 @@
 }
 .inbox-note-form textarea {
   inline-size: 100%;
+  min-block-size: 44px;
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -66,10 +73,10 @@
 }
 .inbox-note-actions {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
-  margin-block-start: 8px;
   color: var(--muted);
 }
 .inbox-panel-section {

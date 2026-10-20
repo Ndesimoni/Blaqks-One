@@ -9,7 +9,7 @@ use crate::{
     state::AppState,
 };
 use axum::{
-    extract::{rejection::JsonRejection, Path, State},
+    extract::{Path, State},
     http::HeaderMap,
     Json,
 };
@@ -20,12 +20,7 @@ pub const LINKED: &str = "This conversation is already linked to a record.";
 pub const CHOOSE: &str = "Several records match this sender. Link the right one instead.";
 pub const BLOCKED: &str = "Unblock the sender first.";
 
-type Body = Result<Json<Value>, JsonRejection>;
-
-fn json(body: Body) -> ApiResult<Value> {
-    body.map(|Json(value)| value)
-        .map_err(|_| ApiError::invalid(change::INVALID))
-}
+use change::{json, optional_text, Body};
 
 /// Links the conversation to a record and opens it if it was new.
 async fn link_to(
@@ -49,7 +44,7 @@ async fn link_to(
     Ok(())
 }
 
-/// `POST …/lead {expectedVersion, name?}`: creates a Client in stage New as the caller,
+/// `POST …/lead {expectedVersion, name?, notes?}`: creates a Client in stage New as the caller,
 /// who needs the Clients create grant (checked again by the records module).
 pub async fn lead(
     State(state): State<AppState>,
@@ -58,12 +53,9 @@ pub async fn lead(
     Path((workspace, id)): Path<(String, String)>,
     body: Body,
 ) -> ApiResult<Json<Value>> {
-    let (version, fields) = change::fields(json(body)?, &["name"])?;
-    let name = match fields.get("name") {
-        None | Some(Value::Null) => None,
-        Some(Value::String(name)) if name.chars().count() <= 120 => Some(name.trim().to_owned()),
-        Some(_) => return Err(ApiError::invalid(change::INVALID)),
-    };
+    let (version, fields) = change::fields(json(body)?, &["name", "notes"])?;
+    let name = optional_text(fields.get("name"), 120)?;
+    let notes = optional_text(fields.get("notes"), 2000)?;
     let mut lk = change::begin(&state, &session, &headers, workspace, &id, version).await?;
     if lk.row.linked_record_id.is_some() {
         return Err(ApiError::conflict(LINKED));
@@ -76,7 +68,16 @@ pub async fn lead(
         .ok_or(ApiError::invalid(change::INVALID))?;
     let name = name.or_else(|| lk.row.contact_name.clone());
     let (actor, ws, channel) = (lk.viewer.id, lk.workspace.clone(), lk.row.channel.clone());
-    let entry = leads::create(&mut lk.tx, actor, &ws, &channel, &contact, name.as_deref()).await?;
+    let entry = leads::create(
+        &mut lk.tx,
+        actor,
+        &ws,
+        &channel,
+        &contact,
+        name.as_deref(),
+        notes.as_deref(),
+    )
+    .await?;
     link_to(&mut lk, "Clients", entry.id, entry.assignee).await?;
     lk.event("lead_created").await?;
     lk.finish().await

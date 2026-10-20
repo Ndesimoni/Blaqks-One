@@ -119,7 +119,7 @@ pub async fn resolve(tx: Tx<'_, '_>, event: &Event, contact: &Contact) -> ApiRes
         // itself has no actor, which marks it as system-created.
         let owner = workspaces::owner_of(tx, workspace).await?;
         let name = message.name.as_deref();
-        let lead = leads::create(tx, owner, workspace, &event.channel, contact, name).await?;
+        let lead = leads::create(tx, owner, workspace, &event.channel, contact, name, None).await?;
         resolution.match_state = "linked";
         resolution.linked = Some(("Clients".into(), lead.id, lead.assignee));
     }

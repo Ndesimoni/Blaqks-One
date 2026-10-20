@@ -7,16 +7,17 @@ import { Composer } from './Composer.jsx';
 import { ConversationHeader } from './ConversationHeader.jsx';
 import { channelHealth } from './inboxModel.js';
 import { NoSelection } from './InboxStates.jsx';
+import { BlockedNotice, NewContactReview } from './NewContactReview.jsx';
 import { Thread } from './Thread.jsx';
 
 /** The channel's connection problem, if any, with the Admin's way to fix it. */
-function ChannelBanner({ health, channel, user }) {
+function ChannelBanner({ health, channel, user, compact }) {
   const { t } = useI18n();
   const { navigate } = useNavigation();
   if (health === 'connected') return null;
   const name = t(`inbox.channel.${channel}`);
   return (
-    <div className="inbox-banner" role="status">
+    <div className={'inbox-banner' + (compact ? ' is-compact' : '')} role="status">
       <Icon name="info" size={18} />
       <div>
         <strong>{t(`inbox.banner.${health}Title`, { channel: name })}</strong>
@@ -37,7 +38,7 @@ export function ConversationView({
   members,
   nameOf,
   onBack,
-  onDetails,
+  onPanel,
 }) {
   const { t } = useI18n();
   const [busy, setBusy] = useState(false);
@@ -62,12 +63,15 @@ export function ConversationView({
     );
   const { data } = conversation;
   const row = data.conversation;
-  const update = async (changes) => {
+  const perform = async (change) => {
     setBusy(true);
-    const failure = await conversation.update(changes);
+    const failure = await change();
     setBusy(false);
     setProblem(failure ? t('inbox.header.changeFailed') : '');
   };
+  const update = (changes) => perform(() => conversation.update(changes));
+  const act = (name) => perform(() => conversation[name]());
+  const review = row.state !== 'spam' && row.match !== 'linked';
   return (
     <>
       <ConversationHeader
@@ -78,17 +82,22 @@ export function ConversationView({
         busy={busy}
         onUpdate={update}
         onBack={onBack}
-        onDetails={onDetails}
+        onDetails={() => onPanel('details')}
       />
       {problem && (
         <p className="field-error inbox-problem" role="alert">
           {problem}
         </p>
       )}
+      {review && (
+        <NewContactReview row={row} user={user} busy={busy} onOpenPanel={onPanel} onAct={act} />
+      )}
+      {row.state === 'spam' && <BlockedNotice user={user} busy={busy} onAct={act} />}
       <ChannelBanner
         health={channelHealth(channels, row.channel)}
         channel={row.channel}
         user={user}
+        compact={review}
       />
       <Thread data={data} nameOf={nameOf} />
       {row.state !== 'spam' && (

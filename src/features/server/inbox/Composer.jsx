@@ -37,25 +37,36 @@ export function Composer({ conversation, user, channels, onNote }) {
   };
   return (
     <div className="inbox-composer">
-      <div role="tablist" aria-label={t('inbox.composer.mode')} className="inbox-composer-tabs">
-        {['reply', 'note'].map((name) => (
-          <button
-            key={name}
-            type="button"
-            role="tab"
-            id={`${id}-${name}`}
-            aria-selected={mode === name}
-            aria-controls={`${id}-panel`}
-            className={
-              'inbox-composer-tab' +
-              (mode === name ? ' is-active' : '') +
-              (name === 'note' ? ' is-note' : '')
-            }
-            onClick={() => setMode(name)}
-          >
-            {t(`inbox.composer.${name}`)}
-          </button>
-        ))}
+      <div className="inbox-composer-top">
+        <div role="tablist" aria-label={t('inbox.composer.mode')} className="inbox-composer-tabs">
+          {['reply', 'note'].map((name) => (
+            <button
+              key={name}
+              type="button"
+              role="tab"
+              id={`${id}-${name}`}
+              aria-selected={mode === name}
+              aria-controls={`${id}-panel`}
+              className={
+                'inbox-composer-tab' +
+                (mode === name ? ' is-active' : '') +
+                (name === 'note' ? ' is-note' : '')
+              }
+              onClick={() => setMode(name)}
+            >
+              {t(`inbox.composer.${name}`)}
+            </button>
+          ))}
+        </div>
+        {/* The note's action sits on the tab row so the thread keeps its height. */}
+        {mode === 'note' && (
+          <div className="inbox-note-actions">
+            <small>{t('inbox.note.hint')}</small>
+            <Button type="submit" form={`${id}-form`} disabled={saving || !text.trim()}>
+              {saving ? t('inbox.note.saving') : t('inbox.note.add')}
+            </Button>
+          </div>
+        )}
       </div>
       <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${mode}`}>
         {mode === 'reply' ? (
@@ -63,13 +74,13 @@ export function Composer({ conversation, user, channels, onNote }) {
             {replyNotice}
           </p>
         ) : (
-          <form className="inbox-note-form" onSubmit={save}>
+          <form id={`${id}-form`} className="inbox-note-form" onSubmit={save}>
             <label htmlFor={`${id}-text`} className="sr-only">
               {t('inbox.note.field')}
             </label>
             <textarea
               id={`${id}-text`}
-              rows={2}
+              rows={1}
               maxLength={4000}
               value={text}
               placeholder={t('inbox.note.placeholder')}
@@ -78,12 +89,6 @@ export function Composer({ conversation, user, channels, onNote }) {
                 if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) save(event);
               }}
             />
-            <div className="inbox-note-actions">
-              <small>{t('inbox.note.hint')}</small>
-              <Button type="submit" disabled={saving || !text.trim()}>
-                {saving ? t('inbox.note.saving') : t('inbox.note.add')}
-              </Button>
-            </div>
             {error && (
               <p className="field-error" role="alert">
                 {error}

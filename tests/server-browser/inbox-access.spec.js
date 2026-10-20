@@ -64,6 +64,8 @@ test('a staff member reads their Inbox in Arabic, right to left', async ({ page 
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await noPageOverflow(page);
+    // Playwright scrolled the page to click the tabs; capture it as a person first sees it.
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: testInfo.outputPath(`inbox-arabic-${width}.png`) });
   }
 });

@@ -93,3 +93,14 @@
   color: var(--muted);
   font-size: 11px;
 }
+.inbox-banner.is-compact {
+  align-items: center;
+  padding-block: 8px;
+}
+.inbox-banner.is-compact > div span {
+  display: none;
+}
+.inbox-banner.is-compact .btn {
+  min-block-size: 32px;
+  padding-block: 4px;
+}

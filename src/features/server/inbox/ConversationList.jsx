@@ -104,7 +104,12 @@ export function ConversationList({ view, list, summary, selectedId, onOpen }) {
       {list.status === 'loading' && <ListSkeleton />}
       {list.status === 'error' && <ListError onRetry={list.refresh} />}
       {list.status === 'ready' && !rows.length && (
-        <ListEmpty searching={Boolean(query)} channels={summary.channels} ready={summary.ready} />
+        <ListEmpty
+          searching={Boolean(query)}
+          channels={summary.channels}
+          ready={summary.ready}
+          hasAny={summary.mine + summary.unassigned + summary.unread > 0}
+        />
       )}
       {list.status === 'ready' && rows.length > 0 && (
         <ul className="inbox-rows" onKeyDown={moveFocus}>

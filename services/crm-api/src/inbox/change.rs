@@ -13,7 +13,7 @@ use crate::{
     state::AppState,
     workspaces,
 };
-use axum::{http::HeaderMap, Json};
+use axum::{extract::rejection::JsonRejection, http::HeaderMap, Json};
 use serde_json::{json, Map, Value};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
@@ -101,4 +101,22 @@ impl Locked {
         self.tx.commit().await?;
         Ok(Json(json!({"conversation": view})))
     }
+}
+
+pub type Body = Result<Json<Value>, JsonRejection>;
+
+/// An optional trimmed text of at most `max` characters.
+pub fn optional_text(value: Option<&Value>, max: usize) -> ApiResult<Option<String>> {
+    match value {
+        None | Some(Value::Null) => Ok(None),
+        Some(Value::String(text)) if text.chars().count() <= max => {
+            Ok(Some(text.trim().to_owned()))
+        }
+        Some(_) => Err(ApiError::invalid(INVALID)),
+    }
+}
+
+pub fn json(body: Body) -> ApiResult<Value> {
+    body.map(|Json(value)| value)
+        .map_err(|_| ApiError::invalid(INVALID))
 }

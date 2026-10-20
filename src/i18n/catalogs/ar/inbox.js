@@ -111,6 +111,7 @@ export default {
     'يمكنك قراءة هذه المحادثة. الرد عبر {channel} يحتاج صلاحية {channel} من المسؤول.',
   'reply.comingSoon':
     'يصبح الرد عبر {channel} من النظام متاحًا مع ربط إرسال {channel}. أضف ملاحظة داخلية لفريقك في الأثناء.',
+  'header.notClient': 'ليس ضمن عملائك',
   'header.you': 'أنت',
   'header.youNamed': '{name} (أنت)',
   'header.unassigned': 'غير مسندة',

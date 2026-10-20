@@ -43,7 +43,8 @@ test('the Inbox lists, opens and annotates conversations without claiming to sen
   page,
 }) => {
   await page.goto('/#/inbox');
-  await expect(page.locator('.page-heading h1')).toHaveText('Inbox');
+  await expect(page.getByRole('heading', { level: 1, name: 'Inbox' })).toBeAttached();
+  await expect(page.locator('.page-heading')).toHaveCount(0);
   await expect(page.getByRole('tab', { name: /Mine/ })).toHaveAttribute('aria-selected', 'true');
   await expect(row(page, 'Synthetic Client')).toBeVisible();
   await expect(row(page, '+971500000417')).toHaveCount(0);
@@ -52,7 +53,9 @@ test('the Inbox lists, opens and annotates conversations without claiming to sen
   await row(page, '+971500000417').click();
   const thread = page.getByRole('region', { name: 'Conversation', exact: true });
   await expect(thread).toContainText('Hi, is the 2BR in JVC still available?');
-  await expect(page.locator('.inbox-head')).toContainText('WhatsApp · +971500000417 · Unassigned');
+  await expect(page.locator('.inbox-head')).toContainText(
+    'WhatsApp · Not in your clients · Unassigned',
+  );
   await page.getByRole('textbox', { name: 'Internal note' }).fill('Synthetic note for the team');
   await page.getByRole('button', { name: 'Add note' }).click();
   const note = page.locator('.inbox-note', { hasText: 'Synthetic note for the team' });

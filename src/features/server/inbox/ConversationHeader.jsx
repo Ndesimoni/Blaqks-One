@@ -50,7 +50,9 @@ export function ConversationHeader({
           <bdi>{contactTitle(row)}</bdi>
         </h2>
         <p>
-          {t(`inbox.channel.${row.channel}`)} · <bdi>{row.contact.display}</bdi> · {holder}
+          {t(`inbox.channel.${row.channel}`)} ·{' '}
+          {row.contact.name ? <bdi>{row.contact.display}</bdi> : t('inbox.header.notClient')} ·{' '}
+          {holder}
         </p>
       </div>
       <button

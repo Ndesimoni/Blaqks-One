@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { ClientPanel } from './ClientPanel.jsx';
+import { SidePanel } from './SidePanel.jsx';
 import { ConversationList } from './ConversationList.jsx';
 import { ConversationView } from './ConversationView.jsx';
 import { POLL_MS, listParams } from './inboxModel.js';
@@ -17,6 +17,7 @@ import './inbox-states.css';
 import './inbox-head.css';
 import './inbox-thread.css';
 import './inbox-panel.css';
+import './inbox-triage.css';
 import './inbox-responsive.css';
 
 /**
@@ -32,14 +33,14 @@ export function ServerInbox({ owner }) {
   const [tab, setTab] = useState('mine');
   const [filters, setFilters] = useState({ channel: '', state: '' });
   const [query, setQuery] = useState('');
-  const [details, setDetails] = useState(false);
+  const [panel, setPanel] = useState(null);
   const selectedId = new URLSearchParams(location.search).get('conversation') || '';
   const select = useCallback(
     (id) => {
       const params = new URLSearchParams(location.search);
       if (id) params.set('conversation', id);
       else params.delete('conversation');
-      setDetails(false);
+      setPanel(null);
       go({ pathname: location.pathname, search: params.size ? `?${params}` : '' });
     },
     [go, location.pathname, location.search],
@@ -64,17 +65,20 @@ export function ServerInbox({ owner }) {
     },
     setFilter: (key, value) => setFilters((current) => ({ ...current, [key]: value })),
   };
-  const pane = !selectedId ? 'list' : details ? 'details' : 'thread';
-  // On a phone an open conversation takes the whole screen below the app header: the
-  // workspace notice and page intro step aside (inbox-responsive.css) and return on Back.
+  // The Inbox is a full-height view: it always starts at the top of the page, at once.
+  // A block body: newer browsers return a Promise from scrollTo, which must not reach React.
   useEffect(() => {
-    if (pane === 'list') return undefined;
-    document.documentElement.dataset.inboxFocus = 'true';
-    return () => delete document.documentElement.dataset.inboxFocus;
-  }, [pane]);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
+  // A different conversation (link, Back, reload) always opens without a side panel.
+  useEffect(() => {
+    setPanel(null);
+  }, [selectedId]);
+  const pane = !selectedId ? 'list' : panel ? 'details' : 'thread';
   const ready = conversation.status === 'ready';
   return (
     <div className="inbox-page">
+      <h1 className="sr-only">{t('inbox.title')}</h1>
       <section
         className={`inbox-layout is-${pane}${ready ? ' has-panel' : ''}`}
         aria-label={t('inbox.title')}
@@ -94,11 +98,16 @@ export function ServerInbox({ owner }) {
             members={members}
             nameOf={nameOf}
             onBack={() => select('')}
-            onDetails={() => setDetails(true)}
+            onPanel={setPanel}
           />
         </section>
         {ready && (
-          <ClientPanel conversation={conversation.data} onClose={() => setDetails(false)} />
+          <SidePanel
+            mode={panel}
+            conversation={conversation}
+            onClose={() => setPanel(null)}
+            onShow={setPanel}
+          />
         )}
       </section>
     </div>

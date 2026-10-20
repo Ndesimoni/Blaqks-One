@@ -84,6 +84,7 @@ export default {
     'You can read this conversation. Replying on {channel} needs the {channel} permission from your Admin.',
   'reply.comingSoon':
     'Replying on {channel} from the CRM arrives with the {channel} sending connection. Add an internal note for your team meanwhile.',
+  'header.notClient': 'Not in your clients',
   'header.you': 'You',
   'header.youNamed': '{name} (you)',
   'header.unassigned': 'Unassigned',

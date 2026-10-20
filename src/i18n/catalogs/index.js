@@ -8,6 +8,8 @@ import arChannels from './ar/channels.js';
 import arCommon from './ar/common.js';
 import arFieldHints from './ar/fieldHints.js';
 import arInbox from './ar/inbox.js';
+import arInboxRules from './ar/inboxRules.js';
+import arInboxTriage from './ar/inboxTriage.js';
 import arProfile from './ar/profile.js';
 import arSignup from './ar/signup.js';
 import arSignupErrors from './ar/signupErrors.js';
@@ -18,6 +20,8 @@ import enChannels from './en/channels.js';
 import enCommon from './en/common.js';
 import enFieldHints from './en/fieldHints.js';
 import enInbox from './en/inbox.js';
+import enInboxRules from './en/inboxRules.js';
+import enInboxTriage from './en/inboxTriage.js';
 import enProfile from './en/profile.js';
 import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
@@ -32,6 +36,8 @@ export const catalogs = Object.freeze({
     profile: enProfile,
     fieldHints: enFieldHints,
     inbox: enInbox,
+    inboxRules: enInboxRules,
+    inboxTriage: enInboxTriage,
     signup: enSignup,
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,
@@ -44,6 +50,8 @@ export const catalogs = Object.freeze({
     profile: arProfile,
     fieldHints: arFieldHints,
     inbox: arInbox,
+    inboxRules: arInboxRules,
+    inboxTriage: arInboxTriage,
     signup: arSignup,
     signupErrors: arSignupErrors,
     signupSetup: arSignupSetup,

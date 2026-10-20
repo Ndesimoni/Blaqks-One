@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
-import { create, login } from './helpers.mjs';
+import { create, login, query } from './helpers.mjs';
 import { inboxPath, inboxTeams, seed } from './inbox-helpers.mjs';
 import { actions, grant } from './permission-helpers.mjs';
 import { activate, invite } from './team-helpers.mjs';
@@ -74,4 +74,24 @@ test('a blocked conversation cannot be resolved or reopened until unblocked', as
   });
   assert.equal(reopen.status, 409);
   assert.equal((await act(admin, id, 'block', { expectedVersion: 1 })).status, 409);
+});
+
+test('a lead keeps the details a person checked', async () => {
+  const { admin, workspace } = teams;
+  const id = seed(workspace);
+  const created = await act(admin, id, 'lead', {
+    expectedVersion: 1,
+    name: 'Synthetic Checked Lead',
+    notes: 'Rent · 2BR · JVC · budget about 95,000 a year',
+  });
+  assert.equal(created.status, 200, JSON.stringify(created.value));
+  const notes = query(
+    `SELECT payload->>'notes' FROM crm_records WHERE id='${created.value.conversation.linked.recordId}'`,
+  );
+  assert.equal(notes, 'Rent · 2BR · JVC · budget about 95,000 a year');
+  const tooLong = await act(admin, seed(workspace), 'lead', {
+    expectedVersion: 1,
+    notes: 'x'.repeat(2001),
+  });
+  assert.equal(tooLong.status, 400);
 });

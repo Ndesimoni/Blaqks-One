@@ -1,0 +1,149 @@
+/* Inbox rules settings (design LeadRules): calm cards, chips and one primary action. */
+.rules-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  max-inline-size: 880px;
+}
+.rules-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.rules-card h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.rules-card p,
+.rules-card small,
+.rules-card ol {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.rules-card ol {
+  display: grid;
+  gap: 6px;
+  padding-inline-start: 20px;
+}
+.rules-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+.rules-row > div {
+  display: grid;
+  flex: 1 1 280px;
+  gap: 4px;
+}
+.rules-tag {
+  align-self: flex-start;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--inbox-whatsapp-bg, var(--hover));
+  color: var(--inbox-whatsapp-ink, var(--ink));
+  font-size: 12px;
+  font-weight: 700;
+}
+.rules-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.rules-check > span:last-child {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+  gap: 4px;
+}
+.rules-check input[type='checkbox'] {
+  flex: 0 0 20px;
+  block-size: 20px;
+  margin-block-start: 2px;
+  accent-color: var(--primary);
+}
+.rules-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.rules-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-block: 2px;
+  padding-inline: 10px 4px;
+  border-radius: 999px;
+  background: var(--hover);
+  font-size: 13px;
+}
+.rules-chips button {
+  inline-size: 24px;
+  block-size: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.rules-chips button:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+.rules-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 8px;
+}
+.rules-add input {
+  flex: 1 1 200px;
+  min-block-size: 40px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+.rules-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  padding-inline-start: 34px;
+  border: 0;
+}
+.rules-modes label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+}
+.rules-modes label.is-selected {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+.rules-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.rules-actions p {
+  margin: 0;
+  margin-inline-end: auto;
+  color: var(--muted);
+}

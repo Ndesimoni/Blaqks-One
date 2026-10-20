@@ -18,6 +18,7 @@ import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
 import { FinanceContent } from './finance/FinanceContent.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
 import { ServerInbox } from './inbox/ServerInbox.jsx';
+import { ServerInboxRules } from './inboxRules/ServerInboxRules.jsx';
 import { ServerInsights } from './insights/ServerInsights.jsx';
 import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { ServerProfile } from './profile/ServerProfile.jsx';
@@ -43,6 +44,7 @@ export function ServerContent({ owner }) {
   // The member's own account: independent of the selected workspace's records.
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Channels') return <ServerChannels />;
+  if (route === 'Inbox rules') return <ServerInboxRules />;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
   if (loading) return <p role="status">Loading workspace records…</p>;
   if (error)

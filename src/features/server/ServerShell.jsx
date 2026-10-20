@@ -18,7 +18,7 @@ import { useI18n } from '../../i18n/useI18n.js';
 /** Connected headings that differ from the shared labels (messaging is not part of My profile). */
 const headings = { 'My profile': 'My profile' };
 /** Sections built on the language foundation take their heading from the catalogues. */
-const translated = { Inbox: 'inbox', Channels: 'channels' };
+const translated = { Inbox: 'inbox', Channels: 'channels', 'Inbox rules': 'inboxRules' };
 
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();
@@ -80,31 +80,37 @@ export function ServerShell({ owner, workspaces }) {
               )}
             </section>
           )}
-          <div className="page-heading">
-            <div className="heading-left">
-              <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>
-              <h1>
-                {team
-                  ? 'Team'
-                  : translated[title]
-                    ? t(`${translated[title]}.title`)
-                    : headings[title] || labels[title] || title || 'Your CRM workspace'}
-              </h1>
-              <p>
-                {team
-                  ? owner.status === 'archived'
-                    ? 'Review saved accounts and access history.'
-                    : 'Manage people and access within this workspace.'
-                  : translated[title]
-                    ? t(`${translated[title]}.description`)
-                    : sectionDescription(title)}
-              </p>
+          {/* The Inbox gives its full height to the conversation; it keeps an
+              accessible heading of its own. */}
+          {route !== 'Inbox' && (
+            <div className="page-heading">
+              <div className="heading-left">
+                <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>
+                <h1>
+                  {team
+                    ? 'Team'
+                    : translated[title]
+                      ? t(`${translated[title]}.title`)
+                      : headings[title] || labels[title] || title || 'Your CRM workspace'}
+                </h1>
+                <p>
+                  {team
+                    ? owner.status === 'archived'
+                      ? 'Review saved accounts and access history.'
+                      : 'Manage people and access within this workspace.'
+                    : translated[title]
+                      ? t(`${translated[title]}.description`)
+                      : sectionDescription(title)}
+                </p>
+              </div>
+              <div className="heading-actions">
+                {supported && <ViewOnlyChip module={route} />}
+                {(supported || team) && (
+                  <ServerImportAction owner={owner} workspaces={workspaces} />
+                )}
+              </div>
             </div>
-            <div className="heading-actions">
-              {supported && <ViewOnlyChip module={route} />}
-              {(supported || team) && <ServerImportAction owner={owner} workspaces={workspaces} />}
-            </div>
-          </div>
+          )}
           <ServerContent owner={owner} />
           <footer className="main-footer">
             <span>© {new Date().getFullYear()} Keys with Simoni</span>

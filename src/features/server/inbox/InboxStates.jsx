@@ -37,7 +37,7 @@ export function ListError({ onRetry }) {
 }
 
 /** No channel yet (with the Admin's next step), no search results, or all caught up. */
-export function ListEmpty({ searching, channels, ready }) {
+export function ListEmpty({ searching, channels, ready, hasAny }) {
   const { t } = useI18n();
   const { user } = useSession();
   const { navigate } = useNavigation();
@@ -48,7 +48,8 @@ export function ListEmpty({ searching, channels, ready }) {
         <strong>{t('inbox.state.noMatches')}</strong>
       </div>
     );
-  if (ready && channels.length === 0)
+  // "Connect a channel" only when the company has no conversations at all.
+  if (ready && channels.length === 0 && !hasAny)
     return (
       <div className="inbox-state">
         <Icon name="chat" size={32} />

@@ -26,6 +26,8 @@ const connectedSections = new Set([
   'Channels',
   // `/inbox`: the shared Inbox (packets X3, U1).
   'Inbox',
+  // `/inbox-rules`: the Admin's lead rules (packet U2).
+  'Inbox rules',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);

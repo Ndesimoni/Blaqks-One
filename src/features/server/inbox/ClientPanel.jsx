@@ -1,10 +1,10 @@
 import React from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useNavigation, useRecords } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { get } from '../../../lib/records.js';
 import { comingUp, recordFacts } from './clientPanelModel.js';
+import { PanelHead } from './PanelHead.jsx';
 
 /** What staff need beside the conversation: who this is, what's next, and the record. */
 export function ClientPanel({ conversation, onClose }) {
@@ -12,7 +12,7 @@ export function ClientPanel({ conversation, onClose }) {
   const { entries, data } = useRecords();
   const { navigate } = useNavigation();
   const row = conversation.conversation;
-  const record = conversation.record;
+  const record = row.record;
   const entry = record?.recordId
     ? (entries?.[record.collection] || []).find((item) => item.id === record.recordId)
     : null;
@@ -24,17 +24,7 @@ export function ClientPanel({ conversation, onClose }) {
       aria-label={t('inbox.panel.label')}
       onKeyDown={(event) => event.key === 'Escape' && onClose()}
     >
-      <header className="inbox-panel-head">
-        <button
-          type="button"
-          className="inbox-icon-button inbox-back"
-          aria-label={t('inbox.panel.close')}
-          onClick={onClose}
-        >
-          <Icon name="arrow" size={18} />
-        </button>
-        <h2>{t('inbox.panel.title')}</h2>
-      </header>
+      <PanelHead title={t('inbox.panel.title')} onClose={onClose} />
       {!record && (
         <section className="inbox-panel-section">
           <span className="inbox-eyebrow">{t('inbox.panel.newContact')}</span>

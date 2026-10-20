@@ -38,7 +38,7 @@
 .inbox-head-actions .btn {
   flex: 0 1 auto;
   min-inline-size: 0;
-  max-inline-size: 220px;
+  max-inline-size: 180px;
   block-size: 36px;
   min-block-size: 36px;
   padding-inline: 10px 32px;

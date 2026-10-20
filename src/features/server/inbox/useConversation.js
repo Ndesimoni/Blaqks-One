@@ -69,5 +69,19 @@ export function useConversation(api, workspaceId, id, onChanged) {
     addNote: (body) => run(() => api.addConversationNote(workspaceId, id, { body })),
     update: (changes) =>
       run(() => api.updateConversation(workspaceId, id, { expectedVersion: version, ...changes })),
+    /** Triage (plan U2): each answers '' on success or the server's message. */
+    createLead: (fields) =>
+      run(() =>
+        api.createLeadFromConversation(workspaceId, id, { expectedVersion: version, ...fields }),
+      ),
+    link: (collection, recordId) =>
+      run(() =>
+        api.linkConversation(workspaceId, id, { expectedVersion: version, collection, recordId }),
+      ),
+    resolve: () =>
+      run(() => api.resolveConversation(workspaceId, id, { expectedVersion: version })),
+    block: () => run(() => api.blockConversation(workspaceId, id, { expectedVersion: version })),
+    unblock: () =>
+      run(() => api.unblockConversation(workspaceId, id, { expectedVersion: version })),
   };
 }
