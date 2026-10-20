@@ -29,11 +29,17 @@ export async function consent(url, headers = {}) {
   const handed = await fetch(`${apiOrigin}${callback.pathname}${callback.search}`, {
     redirect: 'manual',
   });
-  assert.equal(handed.status, 303);
+  assert.equal(handed.status, 200);
   assert.equal(handed.headers.get('cache-control'), 'no-store');
-  const location = handed.headers.get('location');
-  assert.ok(location.startsWith(`${process.env.CRM_APP_ORIGIN}/#/oauth/google?`), location);
-  return Object.fromEntries(new URLSearchParams(location.split('?')[1]));
+  return Object.fromEntries(new URLSearchParams((await handoff(handed)).split('?')[1]));
+}
+
+/** The same-origin page the callback answers with moves on to this app fragment. */
+export async function handoff(response) {
+  const page = await response.text();
+  const target = page.match(/content="0;url=([^"]+)"/)?.[1].replaceAll('&amp;', '&');
+  assert.ok(target?.startsWith('/#/oauth/google?'), page);
+  return target;
 }
 
 /** Start, consent as `email`, and return the fragment values without finishing. */

@@ -8,6 +8,7 @@ import {
   consent,
   fakeGoogleState,
   finish,
+  handoff,
   mailboxPath,
   revokedCount,
   signInAs,
@@ -115,9 +116,7 @@ test('the callback never echoes unexpected values', async () => {
     `${base}/api/crm/integrations/google/callback?state=<x>&code=a%20b&error=evil`,
     { redirect: 'manual' },
   );
-  assert.equal(junk.status, 303);
-  assert.equal(
-    junk.headers.get('location'),
-    `${process.env.CRM_APP_ORIGIN}/#/oauth/google?error=failed`,
-  );
+  assert.equal(junk.status, 200);
+  assert.equal(junk.headers.get('referrer-policy'), 'no-referrer');
+  assert.equal(await handoff(junk), '/#/oauth/google?error=failed');
 });
