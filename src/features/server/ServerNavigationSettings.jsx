@@ -5,12 +5,15 @@ import { useI18n } from '../../i18n/useI18n.js';
 
 const settings = [
   ['My profile', 'person'],
+  ['My mailbox', 'note'],
   ['Team activity', 'clock'],
   ['Workspaces', 'building'],
   ['Team & access', 'shield'],
   ['Channels', 'chat'],
   ['Inbox rules', 'sliders'],
 ];
+
+const translated = { 'Inbox rules': 'inboxRules', 'My mailbox': 'mailbox' };
 
 export function ServerNavigationSettings({ user, route, onSelect }) {
   const { t } = useI18n();
@@ -27,8 +30,8 @@ export function ServerNavigationSettings({ user, route, onSelect }) {
           label={
             name === 'Team activity'
               ? activityLabel(user)
-              : name === 'Inbox rules'
-                ? t('inboxRules.title')
+              : translated[name]
+                ? t(`${translated[name]}.title`)
                 : undefined
           }
           route={route}

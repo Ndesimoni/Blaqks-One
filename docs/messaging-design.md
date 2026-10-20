@@ -179,6 +179,26 @@ No-duplicate rule:
 - status callbacks are deduplicated by `(provider, event_id)` and applied only when they
   move the status forward.
 
+### Email sending (E1b, built 2026-10-20)
+
+- `POST /inbox/conversations/{id}/messages` replies, `POST /inbox/conversations` starts a
+  conversation with a Client or Contact the caller may see (Start message; the record's
+  address comes from `records::recipient`), and `POST …/messages/{message}/again` sends a
+  failed or unknown message again, once, as a new message with `repeatOf`.
+- Only the Admin and staff with the email grant send, and only through their own
+  connected mailbox; a reply goes only through the conversation's mailbox (O9). Spam and
+  blocked conversations refuse sending.
+- Each request queues the message and its outbox job in one transaction, under the
+  workspace lock after the live-membership check. The worker re-checks the author's live
+  membership, grant and mailbox ownership right before the call, marks the message
+  `sending` and commits, then sends: `sent` with Gmail's message and thread IDs (a new
+  conversation's `crm:` placeholder takes Gmail's thread ID); `failed` with a fixed code;
+  `unknown` for a timeout, 5xx or unclear answer. A message left `sending` for two
+  minutes reads as `unknown`. A refused token marks the mailbox `reconnect_required`.
+- Mail is plain UTF-8 text with an encoded subject; `From` is left to Gmail; every header
+  value is checked, so no input can add a header or recipient. Replies carry
+  `In-Reply-To`/`References` once E1c stores inbound Message-IDs.
+
 Email claims Sent, Bounced and Failed only. No read receipts, no tracking pixels and no
 remote images in rendered mail; HTML is sanitised on display.
 
@@ -456,6 +476,7 @@ Design decisions (decided by the owner 2026-10-20, following the review's recomm
 | O6  | Default phone region AE for every company now; a per-company region setting is added when the first company outside the UAE needs it.                                                                                                                                                                                                                                                      |
 | O7  | Google mail uses an **internal** Google app: only mailboxes on the company's own Google Workspace connect, with no Google review. Personal Gmail and other companies wait for Google's restricted-scope security assessment, without rebuilding. Recommended by Claude and accepted by the owner on 2026-10-20 (the owner asked for a recommendation); change it before go-live if needed. |
 | O8  | The Admin's per-person `channel_access.email` grant is the approval for that person's mailbox (replacing a separate approval step in §11). The Admin connects their own mailbox; staff with the grant connect theirs; the Admin can still see and disconnect every company mailbox. The Super Admin never holds a company mailbox.                                                         |
+| O9  | An email reply goes out only through the mailbox its conversation belongs to, and only its owner sends from it: no one sends as another person. Others see the conversation and add notes. Recorded 2026-10-20 with E1b.                                                                                                                                                                   |
 
 ## 14. Boundary decisions
 

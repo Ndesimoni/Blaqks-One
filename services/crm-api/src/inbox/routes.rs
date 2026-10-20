@@ -1,5 +1,5 @@
 //! Inbox routes under `/api/crm/workspaces/{workspace}/inbox`, merged by `routes.rs`.
-use super::{blocks, commands, list, notes, read, rules_api, summary, triage};
+use super::{blocks, commands, list, notes, read, rules_api, send, summary, triage};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
@@ -13,7 +13,7 @@ pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(32 * 1024);
     let item = format!("{BASE}/{{id}}");
     Router::new()
-        .route(BASE, get(list::list))
+        .route(BASE, get(list::list).post(send::start).layer(body()))
         .route(
             "/api/crm/workspaces/{workspace}/inbox/summary",
             get(summary::summary),
@@ -22,6 +22,11 @@ pub fn router() -> Router<AppState> {
         .route(
             &format!("{item}/read"),
             post(notes::mark_read).layer(body()),
+        )
+        .route(&format!("{item}/messages"), post(send::reply).layer(body()))
+        .route(
+            &format!("{item}/messages/{{message}}/again"),
+            post(send::again).layer(body()),
         )
         .route(
             &format!("{item}/notes"),

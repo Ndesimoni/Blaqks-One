@@ -12,6 +12,7 @@ pub mod list;
 pub mod lookup;
 pub mod mutation;
 pub mod projections;
+pub mod recipient;
 pub mod requests;
 pub mod target;
 pub mod validation;

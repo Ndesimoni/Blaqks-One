@@ -6,7 +6,6 @@ use sqlx::{Postgres, Row, Transaction};
 
 /// The plain credential of a live connection, or `None` when it is disconnected, sealed
 /// under a key version this process does not hold, or fails to open.
-#[allow(dead_code)] // The E1b sender and E1c reader open tokens through here.
 pub async fn open(
     tx: &mut Transaction<'_, Postgres>,
     key: &MessagingKey,

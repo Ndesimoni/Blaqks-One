@@ -1,0 +1,145 @@
+/* Email sending (E1d): reply form, Send again, and the New email dialog. */
+.inbox-search-row {
+  display: flex;
+  gap: 8px;
+}
+.inbox-search-row .inbox-search {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+.inbox-start-button {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  inline-size: 42px;
+  block-size: 42px;
+  padding: 0;
+}
+/* Send arrows point the way text runs. */
+[dir='rtl'] .inbox-reply-actions .btn svg,
+[dir='rtl'] .inbox-start-actions .btn svg {
+  transform: scaleX(-1);
+}
+.inbox-reply-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.inbox-reply-form {
+  display: grid;
+  gap: 8px;
+}
+.inbox-reply-form textarea {
+  inline-size: 100%;
+  min-block-size: 64px;
+  max-block-size: 40vh;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+.inbox-reply-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.inbox-reply-actions small {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+}
+.inbox-again {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  margin-block-start: 4px;
+}
+.inbox-again .btn {
+  min-block-size: 32px;
+  padding-block: 4px;
+}
+.inbox-again-confirm {
+  display: grid;
+  gap: 6px;
+  max-inline-size: 360px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--gold);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.inbox-again-confirm span {
+  color: var(--muted);
+}
+.inbox-again-confirm > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.inbox-start-body {
+  display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: 6px;
+}
+.inbox-start-body label {
+  margin-block-start: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.inbox-start-body input,
+.inbox-start-body textarea {
+  inline-size: 100%;
+  min-block-size: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+}
+.inbox-start-chosen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.inbox-start-chosen span {
+  display: grid;
+  min-inline-size: 0;
+}
+.inbox-start-chosen small {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+.inbox-start-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 899px) {
+  .inbox-start-button {
+    inline-size: 44px;
+    block-size: 44px;
+  }
+  .inbox-again .btn,
+  .inbox-reply-actions .btn,
+  .inbox-start-actions .btn {
+    min-block-size: 44px;
+  }
+  .inbox-start-actions .btn {
+    inline-size: 100%;
+  }
+}

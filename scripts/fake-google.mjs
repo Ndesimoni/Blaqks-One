@@ -4,6 +4,8 @@
 // way Google does, and records revocations so suites can assert on them. No real account.
 import { createHash, randomBytes } from 'node:crypto';
 import { createServer } from 'node:http';
+import { gmailSend } from './fake-google-gmail.mjs';
+import { consentPage } from './fake-google-page.mjs';
 
 const SEND = 'https://www.googleapis.com/auth/gmail.send';
 const READ = 'https://www.googleapis.com/auth/gmail.readonly';
@@ -14,6 +16,7 @@ export async function startFakeGoogle({ port, clientId, clientSecret, redirectUr
   const access = new Map();
   const refresh = new Map();
   const revoked = [];
+  const sent = [];
   const json = (response, status, value) => {
     response.writeHead(status, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify(value));
@@ -29,15 +32,24 @@ export async function startFakeGoogle({ port, clientId, clientSecret, redirectUr
     if (query.get('client_id') !== clientId || query.get('redirect_uri') !== redirectUri) {
       return json(response, 400, { error: 'redirect_uri_mismatch' });
     }
+    // A browser without the test headers gets the pretend sign-in page first.
+    const typed = query.get('email');
+    const asked =
+      request.headers['x-test-email'] ||
+      request.headers['x-test-deny'] ||
+      typed ||
+      query.get('deny');
+    if (!asked) return consentPage(response, query);
+    const deny = request.headers['x-test-deny'] || query.get('deny');
     const back = new URL(redirectUri);
     back.searchParams.set('state', query.get('state') ?? '');
-    if (request.headers['x-test-deny']) {
+    if (deny) {
       back.searchParams.set('error', 'access_denied');
     } else {
       const code = token('4/code');
       const scope = request.headers['x-test-scope'] ?? query.get('scope');
       codes.set(code, {
-        email: String(request.headers['x-test-email']),
+        email: String(request.headers['x-test-email'] ?? typed).toLowerCase(),
         scope,
         challenge: query.get('code_challenge'),
         noRefresh: Boolean(request.headers['x-test-no-refresh']),
@@ -106,8 +118,13 @@ export async function startFakeGoogle({ port, clientId, clientSecret, redirectUr
       }
       return json(response, 200, { emailAddress: email, historyId: '1' });
     }
+    if (request.method === 'POST' && url.pathname === '/gmail/v1/users/me/messages/send') {
+      const email = access.get(bearer);
+      if (!email) return json(response, 401, { error: 'unauthenticated' });
+      return gmailSend(request, response, { email, json, sent });
+    }
     if (request.method === 'GET' && url.pathname === '/test/state') {
-      return json(response, 200, { revoked, refreshTokens: [...refresh.keys()] });
+      return json(response, 200, { revoked, refreshTokens: [...refresh.keys()], sent });
     }
     json(response, 404, { error: 'not_found' });
   });

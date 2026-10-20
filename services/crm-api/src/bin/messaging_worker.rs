@@ -4,7 +4,7 @@
 //! or SIGTERM; in-flight sends finish first.
 use kws_crm_api::{
     config::Config,
-    inbox::intake::InboxSink,
+    inbox::{intake::InboxSink, send::domain::InboxSender},
     integrations::{
         revocation,
         webhooks::inbound::{self, Sink},
@@ -13,6 +13,8 @@ use kws_crm_api::{
 };
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
+
+const ALL: &str = "outbox,revocations,inbound";
 
 #[tokio::main]
 async fn main() {
@@ -40,10 +42,39 @@ async fn run() -> Result<(), String> {
         .await
         .map_err(|_| "CRM schema migration failed. Check database access and migration history.")?;
     let (shutdown_tx, shutdown_rx) = tokio::sync::watch::channel(false);
-    // Sending domains arrive with the provider adapters (E1, W1).
-    let domains: outbox::worker::Domains = Arc::new(Vec::new());
-    let mut handles = outbox::worker::spawn(pool.clone(), domains, shutdown_rx.clone());
+    // CRM_WORKER_LOOPS picks loops (default all); the API suites run outbox and
+    // revocations only, so webhook staging stays visible to their assertions.
+    let loops = std::env::var("CRM_WORKER_LOOPS").unwrap_or_else(|_| ALL.into());
+    let wants = |name: &str| loops.split(',').any(|item| item.trim() == name);
+    // A misspelt loop name would silently switch that loop off (review E1b L3).
+    if let Some(unknown) = loops
+        .split(',')
+        .find(|item| !ALL.split(',').any(|name| name == item.trim()))
+    {
+        return Err(format!(
+            "CRM_WORKER_LOOPS has an unknown loop: {}.",
+            unknown.trim()
+        ));
+    }
+    println!("CRM messaging worker loops: {loops}.");
+    let mut domains: Vec<Arc<dyn outbox::model::Domain>> = Vec::new();
     if let Some(google) = config.google.clone() {
+        domains.push(Arc::new(InboxSender {
+            pool: pool.clone(),
+            key: key.clone(),
+            google,
+        }));
+    }
+    let mut handles = Vec::new();
+    if wants("outbox") {
+        let domains: outbox::worker::Domains = Arc::new(domains);
+        handles.extend(outbox::worker::spawn(
+            pool.clone(),
+            domains,
+            shutdown_rx.clone(),
+        ));
+    }
+    if let (true, Some(google)) = (wants("revocations"), config.google.clone()) {
         handles.push(revocation::spawn(
             pool.clone(),
             key.clone(),
@@ -51,8 +82,10 @@ async fn run() -> Result<(), String> {
             shutdown_rx.clone(),
         ));
     }
-    let sink: Arc<dyn Sink> = Arc::new(InboxSink { pool: pool.clone() });
-    handles.extend(inbound::spawn(pool, key, Some(sink), shutdown_rx));
+    if wants("inbound") {
+        let sink: Arc<dyn Sink> = Arc::new(InboxSink { pool: pool.clone() });
+        handles.extend(inbound::spawn(pool, key, Some(sink), shutdown_rx));
+    }
     println!("CRM messaging worker running.");
     shutdown::signal().await;
     let _ = shutdown_tx.send(true);

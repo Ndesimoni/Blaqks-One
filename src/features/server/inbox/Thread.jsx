@@ -1,15 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { canSendAgain } from './composerModel.js';
 import { threadGroups } from './inboxModel.js';
+import { MessageAgain } from './MessageAgain.jsx';
 
 /** Status words a message may show; email never claims Read (design States artboard). */
 function statusText(t, message, channel) {
   if (message.direction === 'inbound') return '';
   if (message.status === 'read' && channel === 'email') return t('inbox.message.delivered');
+  if (message.status === 'sending') return t('inboxSend.message.sending');
   return t(`inbox.message.${message.status}`);
 }
 
-function Message({ message, channel, t, format }) {
+function Message({ message, channel, t, format, again, onAgain }) {
   const outbound = message.direction === 'outbound';
   const status = statusText(t, message, channel);
   return (
@@ -24,6 +27,7 @@ function Message({ message, channel, t, format }) {
         <time dateTime={message.at}>{format.time(message.at)}</time>
         {status && <span> · {status}</span>}
       </span>
+      {again && <MessageAgain message={message} onAgain={onAgain} />}
     </li>
   );
 }
@@ -45,7 +49,7 @@ function Note({ note, author, t, format }) {
  * Messages and internal notes by Dubai day, scrolled to the newest. New inbound messages
  * are announced politely to screen readers.
  */
-export function Thread({ data, nameOf }) {
+export function Thread({ data, nameOf, userId, onAgain }) {
   const { t, format } = useI18n();
   const box = useRef(null);
   const groups = threadGroups(data.messages, data.notes);
@@ -74,7 +78,15 @@ export function Thread({ data, nameOf }) {
                   format={format}
                 />
               ) : (
-                <Message key={item.id} message={item} channel={channel} t={t} format={format} />
+                <Message
+                  key={item.id}
+                  message={item}
+                  channel={channel}
+                  t={t}
+                  format={format}
+                  again={canSendAgain(item, data.messages, userId)}
+                  onAgain={onAgain}
+                />
               ),
             )}
           </ol>

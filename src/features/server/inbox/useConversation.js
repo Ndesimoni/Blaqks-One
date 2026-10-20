@@ -67,6 +67,9 @@ export function useConversation(api, workspaceId, id, onChanged) {
     ...state,
     refresh,
     addNote: (body) => run(() => api.addConversationNote(workspaceId, id, { body })),
+    /** Email sending (E1b): a reply, or one failed message sent again. */
+    reply: (body) => run(() => api.replyToConversation(workspaceId, id, { body })),
+    sendAgain: (message) => run(() => api.sendMessageAgain(workspaceId, id, message)),
     update: (changes) =>
       run(() => api.updateConversation(workspaceId, id, { expectedVersion: version, ...changes })),
     /** Triage (plan U2): each answers '' on success or the server's message. */

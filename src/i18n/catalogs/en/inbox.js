@@ -46,7 +46,7 @@ export default {
   'row.unread': 'Unread',
   'list.label': 'Conversations',
   'list.search': 'Search conversations',
-  'list.searchPlaceholder': 'Search name, phone or message',
+  'list.searchPlaceholder': 'Search conversations',
   'list.views': 'Conversation views',
   'list.channelFilter': 'Channel',
   'list.allChannels': 'All channels',

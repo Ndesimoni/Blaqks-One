@@ -18,7 +18,13 @@ import { useI18n } from '../../i18n/useI18n.js';
 /** Connected headings that differ from the shared labels (messaging is not part of My profile). */
 const headings = { 'My profile': 'My profile' };
 /** Sections built on the language foundation take their heading from the catalogues. */
-const translated = { Inbox: 'inbox', Channels: 'channels', 'Inbox rules': 'inboxRules' };
+const translated = {
+  Inbox: 'inbox',
+  Channels: 'channels',
+  'Inbox rules': 'inboxRules',
+  'My mailbox': 'mailbox',
+  'Google sign-in': 'mailbox',
+};
 
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();

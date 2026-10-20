@@ -21,6 +21,9 @@ export function canOpenSection(user, route) {
   // Company members only: the Super Admin never reads a company's conversations (design §11).
   if (route === 'Inbox') return user?.roleId !== 'super-admin';
   if (route === 'Inbox rules') return user?.roleId === 'admin';
+  // Each member's own mailbox: the Admin, and staff the Admin gave email (decision O8).
+  if (route === 'My mailbox' || route === 'Google sign-in')
+    return user?.roleId === 'admin' || (user?.roleId === 'staff' && user.channelAccess?.email);
   if (['Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'].includes(route))
     return true;
   if (route === 'Messages')

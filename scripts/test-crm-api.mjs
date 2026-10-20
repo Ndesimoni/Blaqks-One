@@ -16,6 +16,7 @@ const compose = ['compose', '-f', 'compose.test.yaml', '-p', project];
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 let server;
 let google;
+let worker;
 let containerStarted = false;
 try {
   await run(
@@ -64,6 +65,15 @@ try {
       ],
       env,
     );
+  }
+  // After the Rust contracts, which create and inspect outbox jobs themselves: the worker
+  // sends queued email through the Google stand-in (E1b). Webhook intake stays off so
+  // suites can inspect staged events.
+  worker = spawn(binary.replace('kws-crm-api', 'messaging_worker'), [], {
+    env: { ...env, CRM_WORKER_LOOPS: 'outbox,revocations' },
+    stdio: 'inherit',
+  });
+  if (!process.argv.includes('--browser-only')) {
     await run('node', ['--test', '--test-concurrency=1', ...apiTestFiles], env);
   }
   // The restart check reads records the full suite saves, so a filtered run skips it.
@@ -119,6 +129,7 @@ try {
   console.error(error.message);
   process.exitCode = 1;
 } finally {
+  await stop(worker);
   await stop(server);
   await google?.close();
   if (containerStarted) {

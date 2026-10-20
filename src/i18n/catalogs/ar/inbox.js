@@ -67,7 +67,7 @@ export default {
   'row.unread': 'غير مقروءة',
   'list.label': 'المحادثات',
   'list.search': 'البحث في المحادثات',
-  'list.searchPlaceholder': 'ابحث بالاسم أو الهاتف أو الرسالة',
+  'list.searchPlaceholder': 'ابحث في المحادثات',
   'list.views': 'عروض المحادثات',
   'list.channelFilter': 'القناة',
   'list.allChannels': 'كل القنوات',

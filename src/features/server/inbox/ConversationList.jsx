@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ConversationRow } from './ConversationRow.jsx';
@@ -26,7 +27,7 @@ function moveFocus(event) {
 }
 
 /** Search, tabs, filters and the bounded, scrolling list of conversations. */
-export function ConversationList({ view, list, summary, selectedId, onOpen }) {
+export function ConversationList({ view, list, summary, selectedId, onOpen, onStart }) {
   const { t } = useI18n();
   const id = useId();
   const { tab, filters, query } = view;
@@ -35,16 +36,27 @@ export function ConversationList({ view, list, summary, selectedId, onOpen }) {
   return (
     <section className="inbox-list-pane" aria-label={t('inbox.list.label')}>
       <div className="inbox-list-tools">
-        <label className="inbox-search">
-          <Icon name="search" size={16} />
-          <span className="sr-only">{t('inbox.list.search')}</span>
-          <input
-            type="search"
-            value={query}
-            placeholder={t('inbox.list.searchPlaceholder')}
-            onChange={(event) => view.setQuery(event.target.value)}
-          />
-        </label>
+        <div className="inbox-search-row">
+          <label className="inbox-search">
+            <Icon name="search" size={16} />
+            <span className="sr-only">{t('inbox.list.search')}</span>
+            <input
+              type="search"
+              value={query}
+              placeholder={t('inbox.list.searchPlaceholder')}
+              onChange={(event) => view.setQuery(event.target.value)}
+            />
+          </label>
+          {onStart && (
+            <Button
+              icon="plus"
+              className="inbox-start-button"
+              aria-label={t('inboxSend.start.button')}
+              title={t('inboxSend.start.button')}
+              onClick={onStart}
+            />
+          )}
+        </div>
         <div role="tablist" aria-label={t('inbox.list.views')} className="inbox-tabs">
           {TABS.map((name) => (
             <button

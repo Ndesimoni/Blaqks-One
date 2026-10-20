@@ -1,28 +1,24 @@
 import React, { useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { canReplyOn, channelHealth } from './inboxModel.js';
+import { replyState } from './composerModel.js';
+import { channelHealth } from './inboxModel.js';
+import { ReplyPanel } from './ReplyPanel.jsx';
 
 /**
- * Reply or Internal note. Notes save now. Replies are honest about why they cannot be sent
- * yet: the channel is off, the member lacks the reply permission, or sending for this
- * channel arrives with its provider packet (E1 email, W1 WhatsApp).
+ * Reply or Internal note. Notes save now. Email replies send from the member's own
+ * mailbox (E1d); otherwise the Reply tab says why not: the channel is off, the member lacks
+ * the permission or a mailbox, or sending for this channel arrives with its packet (W1).
  */
-export function Composer({ conversation, user, channels, onNote }) {
+export function Composer({ conversation, user, channels, mailbox, onNote, onReply }) {
   const { t } = useI18n();
   const id = useId();
-  const [mode, setMode] = useState('note');
+  const health = channelHealth(channels, conversation.channel);
+  const state = replyState({ conversation, user, mailbox, health });
+  const [mode, setMode] = useState(state === 'send' ? 'reply' : 'note');
   const [text, setText] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const channelName = t(`inbox.channel.${conversation.channel}`);
-  const health = channelHealth(channels, conversation.channel);
-  const replyNotice =
-    health === 'off'
-      ? t('inbox.reply.disconnected', { channel: channelName })
-      : !canReplyOn(user, conversation.channel)
-        ? t('inbox.reply.noPermission', { channel: channelName })
-        : t('inbox.reply.comingSoon', { channel: channelName });
   const save = async (event) => {
     event.preventDefault();
     if (!text.trim() || saving) return;
@@ -70,9 +66,13 @@ export function Composer({ conversation, user, channels, onNote }) {
       </div>
       <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${mode}`}>
         {mode === 'reply' ? (
-          <p className="inbox-reply-notice" role="status">
-            {replyNotice}
-          </p>
+          <ReplyPanel
+            id={id}
+            state={state}
+            conversation={conversation}
+            mailbox={mailbox}
+            onReply={onReply}
+          />
         ) : (
           <form id={`${id}-form`} className="inbox-note-form" onSubmit={save}>
             <label htmlFor={`${id}-text`} className="sr-only">

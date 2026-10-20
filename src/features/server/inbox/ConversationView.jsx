@@ -35,6 +35,7 @@ export function ConversationView({
   conversation,
   user,
   channels,
+  mailbox,
   members,
   nameOf,
   onBack,
@@ -99,13 +100,15 @@ export function ConversationView({
         user={user}
         compact={review}
       />
-      <Thread data={data} nameOf={nameOf} />
+      <Thread data={data} nameOf={nameOf} userId={user.id} onAgain={conversation.sendAgain} />
       {row.state !== 'spam' && (
         <Composer
           conversation={row}
           user={user}
           channels={channels}
+          mailbox={mailbox}
           onNote={conversation.addNote}
+          onReply={conversation.reply}
         />
       )}
     </>

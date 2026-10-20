@@ -2,10 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { useMailbox } from '../mailbox/useMailbox.js';
 import { SidePanel } from './SidePanel.jsx';
 import { ConversationList } from './ConversationList.jsx';
 import { ConversationView } from './ConversationView.jsx';
-import { POLL_MS, listParams } from './inboxModel.js';
+import { POLL_MS, canReplyOn, listParams } from './inboxModel.js';
+import { StartEmail } from './StartEmail.jsx';
 import { useConversation } from './useConversation.js';
 import { useInboxList } from './useInboxList.js';
 import { useInboxSummary } from './useInboxSummary.js';
@@ -18,6 +20,7 @@ import './inbox-head.css';
 import './inbox-thread.css';
 import './inbox-panel.css';
 import './inbox-triage.css';
+import './inbox-send.css';
 import './inbox-responsive.css';
 
 /**
@@ -54,6 +57,20 @@ export function ServerInbox({ owner }) {
   }, [list, summary]);
   const conversation = useConversation(api, owner.id, selectedId, refreshAll);
   const { members, nameOf } = useMembers(api, owner.id, user);
+  const mailbox = useMailbox(api, owner.id).data?.mailbox ?? null;
+  const [starting, setStarting] = useState(false);
+  /** New email: returns '' and opens the new conversation, or the server's message. */
+  const start = async (body) => {
+    try {
+      const { conversationId } = await api.startConversation(owner.id, body);
+      setStarting(false);
+      refreshAll();
+      select(conversationId);
+      return '';
+    } catch (failure) {
+      return failure.message || 'error';
+    }
+  };
   const view = {
     tab,
     filters,
@@ -89,12 +106,14 @@ export function ServerInbox({ owner }) {
           summary={summary}
           selectedId={selectedId}
           onOpen={select}
+          onStart={canReplyOn(user, 'email') ? () => setStarting(true) : null}
         />
         <section className="inbox-conversation" aria-label={t('inbox.thread.region')}>
           <ConversationView
             conversation={conversation}
             user={user}
             channels={summary.channels}
+            mailbox={mailbox}
             members={members}
             nameOf={nameOf}
             onBack={() => select('')}
@@ -110,6 +129,9 @@ export function ServerInbox({ owner }) {
           />
         )}
       </section>
+      {starting && (
+        <StartEmail mailbox={mailbox} onStart={start} onClose={() => setStarting(false)} />
+      )}
     </div>
   );
 }

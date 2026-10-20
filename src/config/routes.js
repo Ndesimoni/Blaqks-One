@@ -17,6 +17,9 @@ export const settingsRoutes = [
 export const connectedRoutes = [
   { name: 'Inbox', path: '/inbox' },
   { name: 'Inbox rules', path: '/inbox-rules' },
+  { name: 'My mailbox', path: '/my-mailbox' },
+  // Google's sign-in returns here (E1a); the page finishes it and clears the address bar.
+  { name: 'Google sign-in', path: '/oauth/google' },
 ];
 export const routes = [...crmRoutes, ...settingsRoutes, ...connectedRoutes];
 

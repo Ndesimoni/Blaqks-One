@@ -28,6 +28,13 @@ export function inboxRoutes({ request, scope }) {
     resolveConversation: action('resolve'),
     blockConversation: action('block'),
     unblockConversation: action('unblock'),
+    /** Email sending (E1b): reply, Start message and Send again. */
+    replyToConversation: action('messages'),
+    startConversation: (workspace, body) => request(base(workspace), { method: 'POST', body }),
+    sendMessageAgain: (workspace, id, message) =>
+      request(`${item(workspace, id)}/messages/${encodeURIComponent(message)}/again`, {
+        method: 'POST',
+      }),
     inboxRules: (workspace, signal) => request(`${scope(workspace)}/inbox/rules`, { signal }),
     saveInboxRules: (workspace, body) =>
       request(`${scope(workspace)}/inbox/rules`, { method: 'PUT', body }),

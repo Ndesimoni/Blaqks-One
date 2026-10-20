@@ -1,0 +1,92 @@
+/* My mailbox (E1d): one calm card with the mailbox, its state and one primary action. */
+.mailbox-page {
+  display: grid;
+  gap: 16px;
+  max-inline-size: 720px;
+}
+.mailbox-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.mailbox-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+.mailbox-head > div {
+  flex: 1 1 200px;
+  min-inline-size: 0;
+}
+.mailbox-head h2,
+.mailbox-return h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+}
+.mailbox-head p {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.mailbox-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  color: var(--primary);
+}
+.mailbox-muted,
+.mailbox-what,
+.mailbox-confirm p,
+.mailbox-return p {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.mailbox-what {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  font-size: 13px;
+}
+.mailbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.mailbox-confirm {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--danger);
+  border-radius: 12px;
+}
+.mailbox-notice {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+}
+.mailbox-return {
+  max-inline-size: 560px;
+}
+@media (max-width: 599px) {
+  .mailbox-actions .btn {
+    inline-size: 100%;
+    min-block-size: 44px;
+  }
+}

@@ -51,15 +51,20 @@ pub async fn read<T: DeserializeOwned>(
     if status.is_client_error() {
         return Err(Failure::Refused);
     }
-    if !status.is_success()
-        || response
-            .content_length()
-            .is_some_and(|length| length > MAX_RESPONSE_BYTES as u64)
+    if !status.is_success() {
+        return Err(Failure::Unavailable);
+    }
+    serde_json::from_slice(&bounded(response).await?).map_err(|_| Failure::Unavailable)
+}
+
+/// The body in chunks, so one without a length can never grow past the limit (L1).
+pub(super) async fn bounded(mut response: reqwest::Response) -> Result<Vec<u8>, Failure> {
+    if response
+        .content_length()
+        .is_some_and(|length| length > MAX_RESPONSE_BYTES as u64)
     {
         return Err(Failure::Unavailable);
     }
-    // Read in chunks so a body without a length can never grow past the limit (L1).
-    let mut response = response;
     let mut body = Vec::new();
     while let Some(chunk) = response.chunk().await.map_err(|_| Failure::Unavailable)? {
         if body.len() + chunk.len() > MAX_RESPONSE_BYTES {
@@ -67,7 +72,7 @@ pub async fn read<T: DeserializeOwned>(
         }
         body.extend_from_slice(&chunk);
     }
-    serde_json::from_slice(&body).map_err(|_| Failure::Unavailable)
+    Ok(body)
 }
 
 /// Exchanges a one-time code, proving the request with its PKCE verifier.
@@ -85,23 +90,6 @@ pub async fn exchange(config: &GoogleConfig, code: &str, verifier: &str) -> Resu
         .send()
         .await;
     read(sent).await
-}
-
-/// A short-lived access token from the sealed refresh token. `Refused` means the person
-/// or their Workspace revoked access, so the mailbox needs reconnecting.
-#[allow(dead_code)] // Called by the E1b sender, the next packet.
-pub async fn refresh(config: &GoogleConfig, refresh_token: &str) -> Result<String, Failure> {
-    let sent = client()
-        .post(&config.token_url)
-        .form(&[
-            ("grant_type", "refresh_token"),
-            ("refresh_token", refresh_token),
-            ("client_id", &config.client_id),
-            ("client_secret", &config.client_secret),
-        ])
-        .send()
-        .await;
-    read::<Grant>(sent).await.map(|grant| grant.access_token)
 }
 
 /// The mailbox address Google says the token controls, lower-cased (SEC-1).

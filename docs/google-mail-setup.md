@@ -39,6 +39,21 @@ the real Google. Nothing here is needed for development or the test suites.
 6. Restart the API (`npm run dev:api`). Each person then opens **My mailbox** in the CRM,
    chooses **Connect Google**, and signs in to their own company mailbox.
 
+## Trying it before the Google setup
+
+A local stand-in for Google lets you click through connecting and sending with pretend
+mailboxes. Nothing reaches Google or a real inbox.
+
+1. In `.env`, set `CRM_GOOGLE_CLIENT_ID` and `CRM_GOOGLE_CLIENT_SECRET` to any test values
+   and `CRM_GOOGLE_ENDPOINT=http://127.0.0.1:8792` (local development only; the API
+   refuses this setting anywhere else).
+2. Run `npm run dev:google`, `npm run dev:api`, `npm run dev:worker` and `npm run dev`.
+3. Open **My mailbox**, choose **Connect Google mailbox**, type any address on the pretend
+   sign-in page, then use **New email** or **Reply** in the Inbox.
+
+Remove `CRM_GOOGLE_ENDPOINT` and use the real values from the steps above when Google is set
+up.
+
 ## Who can connect
 
 - The Admin connects their own mailbox.

@@ -9,7 +9,9 @@ import arCommon from './ar/common.js';
 import arFieldHints from './ar/fieldHints.js';
 import arInbox from './ar/inbox.js';
 import arInboxRules from './ar/inboxRules.js';
+import arInboxSend from './ar/inboxSend.js';
 import arInboxTriage from './ar/inboxTriage.js';
+import arMailbox from './ar/mailbox.js';
 import arProfile from './ar/profile.js';
 import arSignup from './ar/signup.js';
 import arSignupErrors from './ar/signupErrors.js';
@@ -21,7 +23,9 @@ import enCommon from './en/common.js';
 import enFieldHints from './en/fieldHints.js';
 import enInbox from './en/inbox.js';
 import enInboxRules from './en/inboxRules.js';
+import enInboxSend from './en/inboxSend.js';
 import enInboxTriage from './en/inboxTriage.js';
+import enMailbox from './en/mailbox.js';
 import enProfile from './en/profile.js';
 import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
@@ -37,7 +41,9 @@ export const catalogs = Object.freeze({
     fieldHints: enFieldHints,
     inbox: enInbox,
     inboxRules: enInboxRules,
+    inboxSend: enInboxSend,
     inboxTriage: enInboxTriage,
+    mailbox: enMailbox,
     signup: enSignup,
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,
@@ -51,7 +57,9 @@ export const catalogs = Object.freeze({
     fieldHints: arFieldHints,
     inbox: arInbox,
     inboxRules: arInboxRules,
+    inboxSend: arInboxSend,
     inboxTriage: arInboxTriage,
+    mailbox: arMailbox,
     signup: arSignup,
     signupErrors: arSignupErrors,
     signupSetup: arSignupSetup,

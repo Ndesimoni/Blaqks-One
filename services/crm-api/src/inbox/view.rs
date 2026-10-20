@@ -6,7 +6,8 @@ use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
 /// Columns for alias `c`; `$5` is the viewer's ID for the unread flag.
-pub const COLUMNS: &str = "c.id,c.channel,c.state,c.contact_display,c.contact_name, \
+pub const COLUMNS: &str = "c.id,c.channel,c.connection_id,c.subject,c.state,c.contact_display, \
+    c.contact_name, \
     c.match_state,c.linked_collection,c.linked_record_id,c.assignee_id,c.suggested_lead, \
     c.first_source,c.version, \
     to_char(c.last_activity_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') \
@@ -23,6 +24,9 @@ pub const COLUMNS: &str = "c.id,c.channel,c.state,c.contact_display,c.contact_na
 pub struct Row {
     pub id: Uuid,
     pub channel: String,
+    /// Which mailbox or line it belongs to; email replies go only through its owner (O9).
+    pub connection_id: Uuid,
+    pub subject: Option<String>,
     pub state: String,
     pub contact_display: String,
     pub contact_name: Option<String>,
@@ -51,6 +55,8 @@ impl Row {
         json!({
             "id": self.id,
             "channel": self.channel,
+            "connectionId": self.connection_id,
+            "subject": self.subject,
             "state": self.state,
             "contact": {"display": self.contact_display, "name": self.contact_name},
             "match": self.match_state,

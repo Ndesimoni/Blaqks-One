@@ -7,6 +7,7 @@ mod credential;
 mod crypto;
 mod google;
 pub mod handlers;
+pub mod mail;
 mod mailbox;
 pub mod model;
 mod provider;

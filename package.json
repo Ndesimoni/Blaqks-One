@@ -12,6 +12,7 @@
     "db:stop": "docker compose stop postgres",
     "db:mark-dev": "node scripts/mark-dev-database.mjs",
     "dev:api": "cargo run --locked --manifest-path services/crm-api/Cargo.toml",
+    "dev:google": "node scripts/dev-fake-google.mjs",
     "dev:worker": "cargo run --locked --manifest-path services/crm-api/Cargo.toml --bin messaging_worker",
     "crm:create-user": "node scripts/create-crm-user.mjs",
     "crm:sample-data": "node scripts/crm-sample-data.mjs seed",

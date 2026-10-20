@@ -50,6 +50,26 @@ pub async fn set_disconnected(
     super::store::load(tx, workspace, id).await
 }
 
+/// Google refused the stored token: the mailbox stays, but needs its owner to sign in
+/// again. Returns whether this call changed the state.
+pub async fn set_reconnect_required(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    id: Uuid,
+) -> ApiResult<bool> {
+    let changed = sqlx::query(
+        "UPDATE integrations.crm_channel_connections
+         SET state='reconnect_required',updated_at=now(),version=version+1
+         WHERE workspace_id=$1 AND id=$2 AND state='connected'",
+    )
+    .bind(workspace)
+    .bind(id)
+    .execute(&mut **tx)
+    .await?
+    .rows_affected();
+    Ok(changed == 1)
+}
+
 pub async fn event(
     tx: &mut Transaction<'_, Postgres>,
     workspace: &str,
