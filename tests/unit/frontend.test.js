@@ -255,11 +255,11 @@ test('date search uses inclusive boundaries, chronological order and explicit in
   assert.equal(data.Clients[0].client_id, 'CL-2');
 });
 
-test('20 CRM sections and four account/workspace screens have unique stable routes and safe external links', () => {
+test('20 CRM sections and five account/workspace screens have unique stable routes and safe external links', () => {
   assert.equal(crmRoutes.length, 20);
-  assert.equal(settingsRoutes.length, 4);
-  assert.equal(routes.length, 24);
-  assert.equal(new Set(routes.map((route) => route.path)).size, 24);
+  assert.equal(settingsRoutes.length, 5);
+  assert.equal(routes.length, 25);
+  assert.equal(new Set(routes.map((route) => route.path)).size, 25);
   assert.equal(routePath('Messages'), '/messages');
   assert.equal(
     routes.some((route) => route.name === 'Calendar'),

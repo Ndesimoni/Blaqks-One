@@ -23,6 +23,9 @@ async fn run() -> Result<(), String> {
     // Before any command: domain database errors keep their own messages.
     routes::register_domain_errors();
     let config = Config::from_env()?;
+    if config.messaging.is_none() {
+        eprintln!("Channel connections are disabled: CRM_MESSAGING_KEY is not set.");
+    }
     let command = std::env::args().nth(1);
     let sample_options = match command.as_deref() {
         Some(name @ ("seed-sample" | "clear-sample")) => {

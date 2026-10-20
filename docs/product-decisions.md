@@ -182,6 +182,19 @@ See [Team activity design](team-activity-design.md).
 | Routing                          | An enquiry goes to the listing's approved agent first, then to that team's Admin queue.                                                                                                                          |
 | Unassigned or orphaned enquiries | If the agent is unavailable, suspended or removed, their open enquiries move to their own team's Admin queue. Attribution history is preserved; enquiries are never moved to another Admin's team automatically. |
 
+## Messaging design (decided 2026-10-20)
+
+The owner approved the [messaging design](messaging-design.md) (packet X0) after its [security review](messaging-security.md), taking the recommended answers:
+
+- **Key custody:** an environment key for local development only; a managed secret store or KMS before production.
+- **Retention:** messages and conversations 24 months after last activity (then text erased), notes 24 months, opt-out evidence 5 years, provider receipts and delivery jobs 30 days, change history 5 years; to be confirmed against UAE data protection advice before launch.
+- **Social replies:** a separate Facebook/Instagram reply permission, off by default.
+- **Activity:** channel and Inbox events appear in Team activity, redacted.
+- **Media:** shown as "Media received" until private media storage exists.
+- **Phone region:** UAE for every company for now; a per-company setting when a company outside the UAE needs it.
+- **TikTok:** added as a fifth channel on the Channels screen (owner, 2026-10-20). Real TikTok messages come in packet T1, after TikTok approves Business Messaging access and UAE eligibility is confirmed.
+- **Account ownership:** real providers prove which number, mailbox or Page a credential controls; Admins never type it. Each member connects their own mailbox, with Admin approval.
+
 ## Still open
 
 Business mail provider, WhatsApp number ownership, social account ownership, Super Admin communication visibility, marketing campaigns, calling, hosting/retention region and public languages remain open; see roadmap section 17. They do not block P1.

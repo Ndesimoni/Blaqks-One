@@ -1,6 +1,10 @@
 #[path = "config_signup.rs"]
 mod signup_settings;
 
+#[path = "config_messaging.rs"]
+pub mod messaging_settings;
+
+use messaging_settings::{messaging_key, MessagingKey};
 use signup_settings::{client_secret, turnstile_config, worker_enabled};
 use std::{env, net::SocketAddr};
 use url::Url;
@@ -23,6 +27,8 @@ pub struct Config {
     pub client_header: String,
     pub client_secret: String,
     pub turnstile: Option<TurnstileConfig>,
+    /// Channel credentials are sealed only when this key is configured.
+    pub messaging: Option<MessagingKey>,
 }
 
 #[derive(Clone)]
@@ -58,6 +64,11 @@ impl Config {
             env::var("CRM_TURNSTILE_ENDPOINT").ok(),
             !secure_cookie,
         )?;
+        let messaging = messaging_key(
+            env::var("CRM_MESSAGING_KEY").ok(),
+            env::var("CRM_MESSAGING_KEY_VERSION").ok(),
+            !secure_cookie,
+        )?;
         Ok(Self {
             database_url,
             origin,
@@ -69,6 +80,7 @@ impl Config {
             client_header,
             client_secret,
             turnstile,
+            messaging,
         })
     }
 }

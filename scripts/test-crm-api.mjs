@@ -27,6 +27,9 @@ const env = {
   CRM_TRUSTED_PROXIES: '127.0.0.1',
   CRM_TRUSTED_CLIENT_HEADER: 'x-test-client',
   CRM_CLIENT_DIGEST_SECRET: randomBytes(32).toString('hex'),
+  // Seals synthetic channel credentials; suites assert they never leave the database.
+  CRM_MESSAGING_KEY: randomBytes(32).toString('base64'),
+  CRM_MESSAGING_KEY_VERSION: '1',
   CRM_TEST_API: 'http://127.0.0.1:8790/api/crm',
   // Random, and meets the new-password policy that the account CLI enforces.
   CRM_FIXTURE_PASSWORD: `Fx1!${randomBytes(24).toString('hex')}`,

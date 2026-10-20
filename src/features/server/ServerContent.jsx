@@ -11,6 +11,7 @@ import { canOpenSection } from './access.js';
 import { ServerActivity } from './activity/ServerActivity.jsx';
 import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 import { ServerCalculators } from './calculators/ServerCalculators.jsx';
+import { ServerChannels } from './channels/ServerChannels.jsx';
 import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
 import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
 import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
@@ -40,6 +41,7 @@ export function ServerContent({ owner }) {
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
   // The member's own account: independent of the selected workspace's records.
   if (route === 'My profile') return <ServerProfile />;
+  if (route === 'Channels') return <ServerChannels />;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
   if (loading) return <p role="status">Loading workspace records…</p>;
   if (error)

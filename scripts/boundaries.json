@@ -27,6 +27,13 @@
       "crm_agreement_events",
       "crm_agreement_actions"
     ],
+    "integrations": [
+      "crm_channel_connections",
+      "crm_channel_connections_external",
+      "crm_channel_connections_active",
+      "crm_integration_events",
+      "crm_integration_events_immutable"
+    ],
     "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
     "records": ["crm_records", "crm_activity"],
     "assignments": [

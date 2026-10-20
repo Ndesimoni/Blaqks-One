@@ -1,9 +1,10 @@
 import { accountRoutes } from './account.js';
 import { activityRoutes } from './activity.js';
 import { assignmentRoutes } from './assignments.js';
-import { financeRoutes } from './finance.js';
-import { performanceRoutes } from './performance.js';
 import { companyRoutes, readCompany } from './company.js';
+import { financeRoutes } from './finance.js';
+import { integrationRoutes } from './integrations.js';
+import { performanceRoutes } from './performance.js';
 import { signupRoutes } from './signup.js';
 
 export class CrmApiError extends Error {
@@ -127,6 +128,7 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     ...financeRoutes({ request, scope }),
     ...performanceRoutes({ request, scope }),
     ...companyRoutes({ request, scope }),
+    ...integrationRoutes({ request, scope }),
     ...signupRoutes({ request, setCsrfToken }),
   };
 }

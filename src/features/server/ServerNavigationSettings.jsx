@@ -7,6 +7,7 @@ const settings = [
   ['Team activity', 'clock'],
   ['Workspaces', 'building'],
   ['Team & access', 'shield'],
+  ['Channels', 'chat'],
 ];
 
 export function ServerNavigationSettings({ user, route, onSelect }) {

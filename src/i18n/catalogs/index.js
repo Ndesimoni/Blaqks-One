@@ -4,6 +4,7 @@
  * `npm run check:i18n` fails when files, keys or placeholders differ.
  */
 import arCalculators from './ar/calculators.js';
+import arChannels from './ar/channels.js';
 import arCommon from './ar/common.js';
 import arFieldHints from './ar/fieldHints.js';
 import arProfile from './ar/profile.js';
@@ -12,6 +13,7 @@ import arSignupErrors from './ar/signupErrors.js';
 import arSignupSetup from './ar/signupSetup.js';
 import arTeamSeats from './ar/teamSeats.js';
 import enCalculators from './en/calculators.js';
+import enChannels from './en/channels.js';
 import enCommon from './en/common.js';
 import enFieldHints from './en/fieldHints.js';
 import enProfile from './en/profile.js';
@@ -23,6 +25,7 @@ import enTeamSeats from './en/teamSeats.js';
 export const catalogs = Object.freeze({
   en: {
     calculators: enCalculators,
+    channels: enChannels,
     common: enCommon,
     profile: enProfile,
     fieldHints: enFieldHints,
@@ -33,6 +36,7 @@ export const catalogs = Object.freeze({
   },
   ar: {
     calculators: arCalculators,
+    channels: arChannels,
     common: arCommon,
     profile: arProfile,
     fieldHints: arFieldHints,

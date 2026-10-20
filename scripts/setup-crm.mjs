@@ -12,6 +12,8 @@ const contents = [
   'CRM_APP_ORIGIN=http://localhost:5173',
   'CRM_BIND_ADDRESS=127.0.0.1:8788',
   'CRM_ALLOW_INSECURE_LOCAL=true',
+  `CRM_MESSAGING_KEY=${randomBytes(32).toString('base64')}`,
+  'CRM_MESSAGING_KEY_VERSION=1',
   'VITE_CRM_MODE=server',
   'CRM_API_PROXY=http://127.0.0.1:8788',
   '',

@@ -2,22 +2,25 @@
 
 Owner request, 20 October 2026. Client messages from WhatsApp, email, Facebook and Instagram arrive in one shared Inbox, go to the right lead or client, and staff send and reply from the CRM. Sending to clients is the main goal; unrelated messages must not become leads.
 
+Status 2026-10-20: **X0 is approved** — the [messaging design](messaging-design.md) passed its separate [security review](messaging-security.md) and the owner decided O1–O6. **X1 is built and reviewed, awaiting the owner's try-out and commit approval.** Next: X1a (channel events in Team activity, decision O4), then X2. D2 and D4–D7 still block their packets.
+
 This plan follows the [DeepSeek delivery workflow](deepseek-delivery-plan.md): DeepSeek implements **one packet at a time** with its tests; the reviewer (Claude or Codex) checks the diff, security and workspace boundaries and runs the checks; the owner approves each commit. All rules in §1 of that plan apply to every packet here (150-line files, connected mode only, English and Arabic catalogues, logical CSS, synthetic test data, one owner per table, no commits by DeepSeek).
 
 Design reference: the **CRM Inbox design** canvas (8 screens, owner review). It uses the current forest-green and gold theme and `docs/design-standards.md`. Build to it; any change to it needs owner approval first.
 
 ## 1. Decisions
 
-| #   | Decision                          | Status (20 Oct 2026)                                                                                               |
-| --- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.    |
-| D2  | WhatsApp number                   | Open: keep the current number (only if Twilio supports coexistence in the UAE) or a new dedicated number.          |
-| D3  | One number per company            | Recommended yes; each company connects its own number through its own Twilio subaccount.                           |
-| D4  | Business email system             | **Open: Google Workspace or Microsoft 365.** Blocks packet E1 only.                                                |
-| D5  | Social platforms first            | Facebook Page and Instagram (recommended); TikTok later.                                                           |
-| D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies. |
-| D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                         |
-| D8  | AI sorting of messages            | Not now. Needs an owner data-handling decision first; rules plus staff review are used until then.                 |
+| #   | Decision                          | Status (20 Oct 2026)                                                                                                       |
+| --- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.            |
+| D2  | WhatsApp number                   | Open: keep the current number (only if Twilio supports coexistence in the UAE) or a new dedicated number.                  |
+| D3  | One number per company            | Recommended yes; each company connects its own number through its own Twilio subaccount.                                   |
+| D4  | Business email system             | **Open: Google Workspace or Microsoft 365.** Blocks packet E1 only.                                                        |
+| D5  | Social platforms first            | Facebook Page and Instagram first; **TikTok added to the Channels registry by the owner on 2026-10-20** (messaging in T1). |
+| D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies.         |
+| D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                                 |
+| D9  | TikTok messaging access           | Open: TikTok Business Account plus Business Messaging API approval; confirm UAE eligibility. Blocks T1 only.               |
+| D8  | AI sorting of messages            | Not now. Needs an owner data-handling decision first; rules plus staff review are used until then.                         |
 
 Nothing in this plan sends to real clients during development. Every provider is proved first with a local stub, then the provider's sandbox or test number.
 
@@ -59,6 +62,7 @@ Nothing in this plan sends to real clients during development. Every provider is
 | 7     | U2 New-contact review and Inbox rules    | Create lead / link / not a lead / block, and the Inbox rules screen          | None             |
 | 8     | W2 WhatsApp inbound                      | Client WhatsApp messages arrive, match and route                             | D7               |
 | 9     | S1 Facebook Page and Instagram           | Page and Instagram messages and lead forms into the Inbox                    | D5, D6           |
+| 9b    | T1 TikTok business messages              | TikTok direct messages into the Inbox, with permitted replies                | D7, D9           |
 | 10    | E2 Portal enquiry emails                 | Property portal enquiry emails create leads automatically                    | Portal samples   |
 
 U1 can start in parallel with E1/W1 once X3's API contract is fixed, because U1 uses the API, not the providers.
@@ -159,10 +163,11 @@ Specialists: product designer plus frontend engineer (owner rule: every UI chang
 
 **Tests:** create lead links the conversation and keeps first source; link to existing client; not a lead moves to Resolved; block hides future messages; rules save with versions; staff cannot edit rules.
 
-### W2, S1, E2
+### W2, S1, T1, E2
 
 - **W2 — WhatsApp inbound:** Twilio inbound webhook → receipt → matching → routing; media messages shown as "Media received" until private storage exists.
 - **S1 — Facebook Page and Instagram:** Meta app with the needed messaging and lead permissions, Page selection during connect, the 24-hour/7-day messaging windows, lead-form entries → automatic leads. Development mode with the owner as app admin until Meta app review passes.
+- **T1 — TikTok business messages:** TikTok for Business app with Business Messaging access, account selection during connect (ownership proven from the token), webhook signature per TikTok's current documentation, the platform's reply-window rules, and replies under `channel_access.social`. Development with the owner's test account until TikTok approves the app.
 - **E2 — portal enquiry emails:** parsers for each portal's enquiry email format, built from real sample emails the owner provides, with names and numbers replaced by synthetic data; unknown formats fall back to the Inbox.
 
 Each follows the same test pattern: stub provider, signature checks, dedupe, matching, access and no secrets in logs, then a sandbox proof.

@@ -49,6 +49,7 @@ const labels = {
   Messages: 'Messages',
   'Team & access': 'Team & access',
   'My profile': 'My profile & messaging',
+  Channels: 'Channels',
   Dashboard: 'Overview',
   Leads: 'Leads & sources',
   Deals: 'Deals & commissions',
@@ -75,6 +76,8 @@ const descriptions = {
   'Team activity': 'See who changed CRM records and reviewed message previews, and when.',
   Messages: 'Start a message by email or WhatsApp for one or several recipients.',
   'Team & access': 'Invite your team, assign roles and control client messaging access.',
+  Channels:
+    'Connect the WhatsApp, email and social accounts that bring client messages into the CRM.',
   'My profile': 'Update your contact details and review account access and sender connections.',
   Leads: 'Track enquiries, contact details, and where every lead came from.',
   Clients: 'Manage relationships, qualification, budgets, and conversion.',
