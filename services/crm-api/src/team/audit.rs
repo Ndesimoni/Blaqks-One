@@ -82,6 +82,7 @@ pub async fn page(
                 id: row.member_id,
                 name: row.member_name,
             }),
+            channel: None,
             sample: row.sample,
             micros: row.micros,
         })

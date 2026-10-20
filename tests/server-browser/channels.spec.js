@@ -87,3 +87,40 @@ test('channels remain usable at 390px and 1280px in both themes', async ({ page 
     }
   }
 });
+
+test('Team activity lists redacted channel events for the Admin', async ({ page }, testInfo) => {
+  const identity = await session(page);
+  const base = `/api/crm/workspaces/${identity.user.workspaceId}/channels`;
+  const headers = { Origin: 'http://localhost:5175', 'X-CSRF-Token': identity.csrfToken };
+  const connection = {
+    channel: 'tiktok',
+    provider: 'tiktok',
+    label: 'Feed studio TikTok',
+    externalAccountId: 'tt-feed-synthetic-0909',
+    credential: 'synthetic-feed-secret',
+  };
+  const created = await page.request.post(base, { headers, data: { connection } });
+  expect(created.status()).toBe(201);
+  const id = (await created.json()).connection.id;
+  const removed = await page.request.delete(`${base}/${id}`, {
+    headers,
+    data: { expectedVersion: 1 },
+  });
+  expect(removed.status()).toBe(200);
+  await page.goto('/#/team-activity');
+  await page.getByLabel('Type').selectOption({ label: 'Channel changes' });
+  const feed = page.getByRole('region', { name: 'Activity', exact: true });
+  await expect(feed).toContainText('You connected TikTok');
+  await expect(feed).toContainText('You disconnected TikTok');
+  await expect(feed).not.toContainText('Feed studio TikTok');
+  await expect(feed).not.toContainText('0909');
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ['dark', 'light']) {
+      await setTheme(page, theme);
+      await expect(feed.locator('.activity-row').first()).toBeVisible();
+      await noPageOverflow(page);
+      await page.screenshot({ path: testInfo.outputPath(`activity-${width}-${theme}.png`) });
+    }
+  }
+});

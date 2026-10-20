@@ -32,7 +32,7 @@ export function readFilters(search) {
     from: isDay(value('from')) ? value('from') : '',
     to: isDay(value('to')) ? value('to') : '',
     member: /^[0-9a-f-]{36}$/i.test(value('member')) ? value('member') : '',
-    type: ['record', 'team'].includes(value('type')) ? value('type') : '',
+    type: ['record', 'team', 'channel'].includes(value('type')) ? value('type') : '',
     section: value('section').slice(0, 40),
     action: /^[a-z_]{1,20}$/.test(value('action')) ? value('action') : '',
   };
@@ -77,7 +77,7 @@ export function requestParams(filters, { manager }, today = dubaiToday()) {
     to,
     actor: manager ? filters.member : '',
     kind: manager ? filters.type : '',
-    collection: filters.type === 'team' ? '' : filters.section,
+    collection: ['team', 'channel'].includes(filters.type) ? '' : filters.section,
     action: filters.action,
     limit: PAGE_SIZE,
   };

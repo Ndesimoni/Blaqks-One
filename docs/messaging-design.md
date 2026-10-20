@@ -401,14 +401,14 @@ Blocking the named packet:
 
 Design decisions (decided by the owner 2026-10-20, following the review's recommendations):
 
-| ID  | Decision                                                                                                                                                                                                  |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| O1  | Environment key (with the §8 keyring) for local development only; a managed secret store or KMS is required before any production deployment.                                                             |
-| O2  | The §9 retention periods, with the §9 purge, anonymisation and backup rules; confirm against UAE data protection advice before launch.                                                                    |
-| O3  | A separate `channel_access.social` grant for Facebook, Instagram and TikTok replies, off by default and managed like the existing WhatsApp and email grants. Added in S1.                                 |
-| O4  | Yes: redacted connection and Inbox events appear in Team activity through an `integrations`/`inbox` page function merged by `activity/`, like `records::activity::page`. Queued as packet X1a, before X2. |
-| O5  | Yes: media messages show "Media received" until private media storage exists.                                                                                                                             |
-| O6  | Default phone region AE for every company now; a per-company region setting is added when the first company outside the UAE needs it.                                                                     |
+| ID  | Decision                                                                                                                                                                                                                                                      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| O1  | Environment key (with the §8 keyring) for local development only; a managed secret store or KMS is required before any production deployment.                                                                                                                 |
+| O2  | The §9 retention periods, with the §9 purge, anonymisation and backup rules; confirm against UAE data protection advice before launch.                                                                                                                        |
+| O3  | A separate `channel_access.social` grant for Facebook, Instagram and TikTok replies, off by default and managed like the existing WhatsApp and email grants. Added in S1.                                                                                     |
+| O4  | Yes: redacted connection and Inbox events appear in Team activity through an `integrations`/`inbox` page function merged by `activity/`, like `records::activity::page`. Built in packet X1a (2026-10-20) for connection events; Inbox events follow with X3. |
+| O5  | Yes: media messages show "Media received" until private media storage exists.                                                                                                                                                                                 |
+| O6  | Default phone region AE for every company now; a per-company region setting is added when the first company outside the UAE needs it.                                                                                                                         |
 
 ## 14. Boundary decisions
 

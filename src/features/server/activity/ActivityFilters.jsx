@@ -1,5 +1,6 @@
 import React, { useId, useState } from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
+import { useI18n } from '../../../i18n/useI18n.js';
 import { actionOptions } from './activityVocabulary.js';
 import { emptyFilters, filterKeys } from './activityFilters.js';
 import { rangeLabel } from './activityModel.js';
@@ -18,16 +19,17 @@ function Field({ id, label, children }) {
  * restarts the feed from its first page. On phones the fields fold behind a Filters button.
  */
 export function ActivityFilters(props) {
-  const { filters, range, problem, manager, people, sections, userId, onChange } = props;
+  const { filters, range, problem, manager, channels, people, sections, userId, onChange } = props;
+  const { t } = useI18n();
   const id = useId();
   const [open, setOpen] = useState(false);
   const set = (key) => (event) => {
     const next = { ...filters, [key]: event.target.value };
-    if (key === 'type' && next.type === 'team') next.section = '';
+    if (key === 'type' && ['team', 'channel'].includes(next.type)) next.section = '';
     if (
       key === 'type' &&
       next.action &&
-      !actionOptions(next.type, manager).some((option) => option.value === next.action)
+      !actionOptions(next.type, manager, channels).some((option) => option.value === next.action)
     )
       next.action = '';
     onChange(next);
@@ -94,6 +96,7 @@ export function ActivityFilters(props) {
               <option value="">Records and team</option>
               <option value="record">Record changes</option>
               <option value="team">Team changes</option>
+              {channels && <option value="channel">{t('channels.activity.type')}</option>}
             </select>
           </Field>
         )}
@@ -101,7 +104,7 @@ export function ActivityFilters(props) {
           <select
             id={`${id}-section`}
             value={filters.section}
-            disabled={filters.type === 'team'}
+            disabled={['team', 'channel'].includes(filters.type)}
             onChange={set('section')}
           >
             <option value="">All sections</option>
@@ -115,9 +118,9 @@ export function ActivityFilters(props) {
         <Field id={`${id}-action`} label="Action">
           <select id={`${id}-action`} value={filters.action} onChange={set('action')}>
             <option value="">All actions</option>
-            {actionOptions(filters.type, manager).map((option) => (
+            {actionOptions(filters.type, manager, channels).map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {option.labelKey ? t(option.labelKey) : option.label}
               </option>
             ))}
           </select>

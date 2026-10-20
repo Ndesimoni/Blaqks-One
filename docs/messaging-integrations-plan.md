@@ -2,7 +2,7 @@
 
 Owner request, 20 October 2026. Client messages from WhatsApp, email, Facebook and Instagram arrive in one shared Inbox, go to the right lead or client, and staff send and reply from the CRM. Sending to clients is the main goal; unrelated messages must not become leads.
 
-Status 2026-10-20: **X0 is approved** — the [messaging design](messaging-design.md) passed its separate [security review](messaging-security.md) and the owner decided O1–O6. **X1 is built and reviewed, awaiting the owner's try-out and commit approval.** Next: X1a (channel events in Team activity, decision O4), then X2. D2 and D4–D7 still block their packets.
+Status 2026-10-20: **X0 is approved** — the [messaging design](messaging-design.md) passed its separate [security review](messaging-security.md) and the owner decided O1–O6. **X1 and X1a are built and reviewed** (X1a: channel events in Team activity, decision O4). Next: X2. D2 and D4–D7 still block their packets.
 
 This plan follows the [DeepSeek delivery workflow](deepseek-delivery-plan.md): DeepSeek implements **one packet at a time** with its tests; the reviewer (Claude or Codex) checks the diff, security and workspace boundaries and runs the checks; the owner approves each commit. All rules in §1 of that plan apply to every packet here (150-line files, connected mode only, English and Arabic catalogues, logical CSS, synthetic test data, one owner per table, no commits by DeepSeek).
 

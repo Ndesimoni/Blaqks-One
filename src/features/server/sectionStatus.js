@@ -22,6 +22,8 @@ const connectedSections = new Set([
   'My profile',
   // `GET /activity`: the whole workspace for managers, the member's own actions for staff.
   'Team activity',
+  // `/channels`: the Admin's connections registry (packet X1).
+  'Channels',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);

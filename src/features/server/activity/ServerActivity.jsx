@@ -58,6 +58,7 @@ export function ServerActivity({ owner }) {
         range={effectiveRange(filters, today)}
         problem={problem}
         manager={manager}
+        channels={user.roleId === 'admin'}
         owner={owner}
         people={people}
         sections={sections}

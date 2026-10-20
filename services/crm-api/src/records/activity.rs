@@ -127,6 +127,7 @@ fn item(row: Row) -> Item {
         },
         record,
         member: None,
+        channel: None,
         sample: row.sample,
         micros: row.micros,
     }

@@ -54,4 +54,13 @@ export default {
   'channel.tiktokNote': 'Business account messages arrive in the shared Inbox.',
   'providerName.meta': 'Meta',
   'providerName.tiktok': 'TikTok for Business',
+  'activity.type': 'Channel changes',
+  'activity.action.connected': 'Connected',
+  'activity.action.reconnected': 'Reconnected',
+  'activity.action.reconnect_required': 'Reconnect needed',
+  'activity.action.disconnected': 'Disconnected',
+  'activity.verb.connected': 'connected',
+  'activity.verb.reconnected': 'reconnected',
+  'activity.verb.reconnect_required': 'flagged for reconnection:',
+  'activity.verb.disconnected': 'disconnected',
 };

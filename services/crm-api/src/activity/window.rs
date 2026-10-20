@@ -81,6 +81,9 @@ pub struct Item {
     pub actor: Person,
     pub record: Option<RecordRef>,
     pub member: Option<Person>,
+    /// Channel events only (`kind: "channel"`); absent from every other item.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<&'static str>,
     pub sample: bool,
     #[serde(skip)]
     pub micros: i64,
@@ -107,5 +110,29 @@ mod tests {
         }
         assert!(!sql.contains("$7"));
         assert!(Window::stamps("t").contains("t.created_at"));
+    }
+
+    #[test]
+    fn only_channel_items_carry_a_channel_key() {
+        let item = |channel| Item {
+            id: Uuid::nil(),
+            at: String::new(),
+            kind: "team",
+            action: "invited".into(),
+            collection: None,
+            actor: Person {
+                id: Uuid::nil(),
+                name: "Actor".into(),
+            },
+            record: None,
+            member: None,
+            channel,
+            sample: false,
+            micros: 0,
+        };
+        let team = serde_json::to_value(item(None)).unwrap();
+        assert!(team.get("channel").is_none());
+        let channel = serde_json::to_value(item(Some("tiktok"))).unwrap();
+        assert_eq!(channel["channel"], "tiktok");
     }
 }

@@ -3,15 +3,17 @@ export const REPEAT_WINDOW_MS = 10 * 60_000;
 
 /**
  * What a repeat must share with the row it joins: the actor, the action and its target — the
- * record, the collection when the record is unavailable, or the team member.
+ * record, the collection when the record is unavailable, the team member or the channel.
  */
 export function repeatKey(item) {
   const target =
     item.kind === 'team'
       ? `member:${item.member?.id || ''}`
-      : item.record
-        ? `record:${item.collection}:${item.record.id}`
-        : `collection:${item.collection}`;
+      : item.kind === 'channel'
+        ? `channel:${item.channel}`
+        : item.record
+          ? `record:${item.collection}:${item.record.id}`
+          : `collection:${item.collection}`;
   return `${item.actor.id}|${item.kind}|${item.action}|${target}`;
 }
 

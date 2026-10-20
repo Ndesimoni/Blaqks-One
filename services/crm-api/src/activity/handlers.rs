@@ -1,7 +1,7 @@
 //! `GET /api/crm/workspaces/{ws}/activity` (docs/team-activity-design.md). Check order:
 //! session (401), workspace access (one 403), permission parameters (403), syntax and
 //! ranges (400), then one REPEATABLE READ READ ONLY snapshot that re-reads the live
-//! member, repeats the permission checks on it and reads both owners' pages.
+//! member, repeats the permission checks on it and reads each owner's page.
 use super::{
     cursor, dates,
     query::Params,
@@ -10,6 +10,7 @@ use super::{
 use crate::{
     auth::{profile::UserRow, session::Session},
     error::ApiResult,
+    integrations::activity::page as channel_page,
     records::activity::{feed_collections, page as record_page},
     state::AppState,
     team::audit::page as team_page,
@@ -33,7 +34,7 @@ pub async fn list(
 ) -> ApiResult<Json<Value>> {
     ensure_access(&state, &session, &workspace).await?;
     let params = Params::parse(raw.as_deref());
-    params.authorise(&session.user, &feed_collections(&session.user))?;
+    params.authorise(&session.user, &workspace, &feed_collections(&session.user))?;
     let filters = params.validate(dates::today())?;
     let mut transaction = state.pool.begin().await?;
     sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
@@ -41,7 +42,7 @@ pub async fn list(
         .await?;
     let user = member(&mut transaction, &workspace, session.user.id).await?;
     let granted = feed_collections(&user);
-    params.authorise(&user, &granted)?;
+    params.authorise(&user, &workspace, &granted)?;
     let end = (dates::start_micros(filters.days.1 + 1), NEWEST);
     let window = Window {
         workspace,
@@ -56,13 +57,18 @@ pub async fn list(
         Some(collection) => vec![collection.as_str()],
         None => granted,
     };
-    let mut items = if kind == Some("team") {
+    let mut items = if matches!(kind, Some("team" | "channel")) {
         Vec::new()
     } else {
         record_page(&mut transaction, &window, &collections, &user).await?
     };
-    if kind != Some("record") && filters.collection.is_none() {
+    // A collection filter names records, so it excludes team and channel events.
+    let unfiltered = filters.collection.is_none();
+    if unfiltered && matches!(kind, None | Some("team")) {
         items.extend(team_page(&mut transaction, &window, &user).await?);
+    }
+    if unfiltered && matches!(kind, None | Some("channel")) {
+        items.extend(channel_page(&mut transaction, &window, &user).await?);
     }
     transaction.commit().await?;
     Ok(Json(respond(items, filters.limit)))
@@ -77,7 +83,7 @@ fn own_actor(user: &UserRow, requested: Option<Uuid>) -> Option<Uuid> {
     }
 }
 
-/// Merges both sources newest first, keeps `limit` items and, when more exist, the
+/// Merges every source newest first, keeps `limit` items and, when more exist, the
 /// cursor of the last item kept.
 fn respond(mut items: Vec<Item>, limit: i64) -> Value {
     items.sort_by_key(|item| std::cmp::Reverse(item.key()));
@@ -98,7 +104,7 @@ mod tests {
             name: "Actor".into(),
         };
         let (kind, action, collection) = ("team", "invited".into(), None);
-        let (at, record, member, sample) = (String::new(), None, None, false);
+        let (at, record, member, channel, sample) = (String::new(), None, None, None, false);
         let id = Uuid::from_u128(id);
         Item {
             id,
@@ -109,6 +115,7 @@ mod tests {
             actor,
             record,
             member,
+            channel,
             sample,
             micros,
         }

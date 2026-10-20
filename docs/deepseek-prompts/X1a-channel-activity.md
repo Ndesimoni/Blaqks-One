@@ -1,3 +1,5 @@
+**Status (2026-10-20): built by Claude at the owner's request instead of DeepSeek.** Kept for reference; do not hand this packet out again.
+
 Packet: X1a — channel events in Team activity
 
 Goal:

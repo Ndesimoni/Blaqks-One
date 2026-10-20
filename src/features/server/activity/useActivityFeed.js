@@ -12,7 +12,7 @@ export function readActivityPage(payload) {
     if (
       typeof row?.id !== 'string' ||
       typeof row.at !== 'string' ||
-      !['record', 'team'].includes(row.kind) ||
+      !['record', 'team', 'channel'].includes(row.kind) ||
       typeof row.actor?.id !== 'string'
     )
       throw Error('The CRM server returned invalid activity.');

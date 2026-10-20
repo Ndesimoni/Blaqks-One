@@ -59,9 +59,25 @@ export const teamActions = {
   archived: { label: 'Archived', verb: 'archived', icon: 'layers', tone: 'danger' },
 };
 
+/** Channel events (Admins only) name the channel; their words come from the catalogues. */
+export const channelActions = {
+  connected: { labelKey: 'channels.activity.action.connected', icon: 'link', tone: 'positive' },
+  reconnected: { labelKey: 'channels.activity.action.reconnected', icon: 'check', tone: 'accent' },
+  reconnect_required: {
+    labelKey: 'channels.activity.action.reconnect_required',
+    icon: 'info',
+    tone: 'gold',
+  },
+  disconnected: {
+    labelKey: 'channels.activity.action.disconnected',
+    icon: 'close',
+    tone: 'danger',
+  },
+};
+
 const fallback = { label: 'Changed', verb: 'changed', icon: 'info', tone: 'neutral' };
-export const actionOf = (item) =>
-  (item.kind === 'team' ? teamActions : recordActions)[item.action] || fallback;
+const byKind = { team: teamActions, channel: channelActions };
+export const actionOf = (item) => (byKind[item.kind] || recordActions)[item.action] || fallback;
 
 /**
  * Sections whose activity this member may filter by, mirroring the server's grants: record
@@ -78,11 +94,20 @@ export function sectionOptions(user, canOpen) {
   ];
 }
 
-/** Action choices for the selected type; staff only ever see record actions. */
-export function actionOptions(type, manager) {
+/**
+ * Action choices for the selected type; staff only ever see record actions, and channel actions
+ * appear only for the company Admin (`channels`). Channel options carry a catalogue `labelKey`.
+ */
+export function actionOptions(type, manager, channels = false) {
   const record = Object.entries(recordActions);
   const team = Object.entries(teamActions).filter(([key]) => key !== 'updated');
-  const entries = type === 'team' ? Object.entries(teamActions) : record;
-  const options = type || !manager ? entries : [...record, ...team];
-  return options.map(([value, action]) => ({ value, label: action.label }));
+  const channel = Object.entries(channelActions);
+  const typed = { team: Object.entries(teamActions), channel };
+  const entries = typed[type] || record;
+  const options = type || !manager ? entries : [...record, ...team, ...(channels ? channel : [])];
+  return options.map(([value, action]) => ({
+    value,
+    label: action.label,
+    labelKey: action.labelKey,
+  }));
 }

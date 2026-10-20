@@ -85,13 +85,19 @@ export function recordName(item, entries) {
 }
 
 /**
- * The readable parts of one entry: "Layla earned deal DL-004", "You invited Omar Haddad". The
+ * The readable parts of one entry: "Layla earned deal DL-004", "You invited Omar Haddad",
+ * "You connected WhatsApp" (channel words come from the catalogues through `t`). The
  * object is `null` when the target is unavailable, so the row can say so plainly.
  */
-export function describe(item, { userId, entries }) {
+export function describe(item, { userId, entries, t }) {
   const action = actionOf(item);
   const actor = item.actor.id === userId ? 'You' : item.actor.name;
   const base = { actor, verb: action.verb, icon: action.icon, tone: action.tone };
+  if (item.kind === 'channel') {
+    const verb = t(`channels.activity.verb.${item.action}`);
+    const object = t(`channels.channel.${item.channel}`);
+    return { ...base, verb, noun: '', object, section: t('channels.title'), sectionIcon: 'chat' };
+  }
   if (item.kind === 'team') {
     const member = item.member?.id === userId ? 'you' : item.member?.name || '';
     return { ...base, noun: '', object: action.self ? '' : member, section: 'Team' };

@@ -1,5 +1,6 @@
 import React, { useId, useState } from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
+import { useI18n } from '../../../i18n/useI18n.js';
 import { avatarTone } from '../profile/profileModel.js';
 import { describe, initials, timeLabel, UNAVAILABLE } from './activityModel.js';
 import { repeatCount } from './activityGrouping.js';
@@ -43,7 +44,8 @@ export function ActivityRow({ row, userId, entries }) {
   const { item } = row;
   const id = useId();
   const [open, setOpen] = useState(false);
-  const text = describe(item, { userId, entries });
+  const { t } = useI18n();
+  const text = describe(item, { userId, entries, t });
   const unavailable = item.kind === 'record' && text.object === null;
   const repeated = row.items.length > 1;
   return (

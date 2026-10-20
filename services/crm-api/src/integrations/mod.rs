@@ -1,6 +1,7 @@
 //! Channel connections (docs/messaging-design.md §3, packet X1): own schema,
 //! Admin-only registry, sealed credentials and insert-only redacted events.
 pub mod access;
+pub mod activity;
 mod commands;
 mod crypto;
 pub mod handlers;

@@ -25,18 +25,20 @@ Scope always comes from the live member re-read.
 - **Super Admin:** only the feed of a workspace they can already open, including archived workspaces, which are read-only.
   - There is no merged feed across companies and no new power.
   - The SaaS phase replaces this with consented, time-limited, logged support access.
+- **Channel events** (connected, reconnected, reconnect needed, disconnected) reach only the company's own Admin. Staff and the Super Admin never see them; `kind=channel` returns 403 for them. See [Channel events](#channel-events).
 - **Account events** (password changed, sessions revoked) are **not** in this feed. They belong to a later self-only Security history on My profile, and Admins do not see them.
 
 ## Sources and item shape
 
-- **Merge only** `crm_activity` and `crm_team_activity`. `crm_activity` already records finance actions (earned, approved, voided) and `assigned` by name only.
+- **Merge only** `crm_activity`, `crm_team_activity` and `integrations.crm_integration_events`. `crm_activity` already records finance actions (earned, approved, voided) and `assigned` by name only.
 - **Never merge** `crm_finance_events.changes` or `reason`, `crm_assignments` from/to/notes, or `crm_account_events`. Per-record history endpoints remain the place for detail, and they apply their own 404 rules.
 
 Each item has this shape:
 
 ```
-{id, at (UTC ISO), kind: 'record' | 'team', action, collection | null,
- actor: {id, name}, record: {id, legacyId} | null, member: {id, name} | null, sample: bool}
+{id, at (UTC ISO), kind: 'record' | 'team' | 'channel', action, collection | null,
+ actor: {id, name}, record: {id, legacyId} | null, member: {id, name} | null,
+ channel?: 'whatsapp' | 'email' | 'facebook' | 'instagram' | 'tiktok', sample: bool}
 ```
 
 - **`record`** is filled only when the row still exists **and** the caller can see it now.
@@ -45,6 +47,14 @@ Each item has this shape:
 - **No names from the server.** It returns no record names, labels or amounts. The UI resolves a display name only from records it has already loaded within the caller's scope.
 - **`member`** is returned only to the Admin and the Super Admin.
 - **Never appears:** message bodies, recipient addresses, record names or field values, amounts, reasons, hand-off notes, grant contents, credentials, tokens, IPs or User-Agents, another workspace's IDs, and totals or counts.
+
+## Channel events
+
+Added by packet X1a (2026-10-20, messaging design decision O4). `integrations::activity::page` reads `integrations.crm_integration_events` with the shared window and returns `kind: 'channel'` items. They carry `channel` (the only item kind that has the key), the actor and the time. `collection`, `record` and `member` are `null`, and `sample` is false. The account ID, label and credential never appear. Actions: `connected`, `reconnected`, `reconnect_required`, `disconnected`.
+
+- Unfiltered feeds and `kind=channel` include them; `kind=record`, `kind=team` and any `collection` filter exclude them.
+- The UI reads "You connected WhatsApp" under a Channels section. The Type filter offers **Channel changes** to the Admin only. Its words come from the `channels` language catalogue.
+- Tests: `tests/api/activity-channels.test.mjs`, `tests/unit/activity-channels.test.js` and the Team activity scenario in `tests/server-browser/channels.spec.js`.
 
 ## Endpoint
 

@@ -110,6 +110,7 @@ export const apiTestFiles = [
   'tests/api/agreements-guards.test.mjs',
   'tests/api/channels.test.mjs',
   'tests/api/channels-lifecycle.test.mjs',
+  'tests/api/activity-channels.test.mjs',
 ];
 
 /**

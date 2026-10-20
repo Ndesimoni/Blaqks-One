@@ -54,4 +54,13 @@ export default {
   'channel.tiktokNote': 'تصل رسائل حساب الأعمال إلى صندوق الوارد المشترك.',
   'providerName.meta': 'Meta',
   'providerName.tiktok': 'TikTok for Business',
+  'activity.type': 'تغييرات القنوات',
+  'activity.action.connected': 'تم الربط',
+  'activity.action.reconnected': 'أعيد الربط',
+  'activity.action.reconnect_required': 'يلزم إعادة الربط',
+  'activity.action.disconnected': 'تم الفصل',
+  'activity.verb.connected': 'ربط',
+  'activity.verb.reconnected': 'أعاد ربط',
+  'activity.verb.reconnect_required': 'طلب إعادة ربط',
+  'activity.verb.disconnected': 'فصل',
 };

@@ -1,41 +1,17 @@
 //! Query parameters of `GET activity`, checked in the contract's order: permission
 //! parameters first (403, from the caller alone), then syntax and ranges (400).
-use super::{cursor, dates};
+use super::{
+    cursor, dates,
+    vocabulary::{ACTIONS, KEYS},
+};
 use crate::{
     auth::profile::UserRow,
     error::{ApiError, ApiResult},
+    integrations::activity::{visible as sees_channels, ACTIONS as CHANNEL_ACTIONS},
 };
 use std::collections::BTreeMap;
 use uuid::Uuid;
 
-const KEYS: [&str; 8] = [
-    "from",
-    "to",
-    "actor",
-    "kind",
-    "collection",
-    "action",
-    "cursor",
-    "limit",
-];
-/// Every action either source records (migrations 0004–0012).
-const ACTIONS: [&str; 15] = [
-    "created",
-    "updated",
-    "deleted",
-    "assigned",
-    "earned",
-    "revised",
-    "unearned",
-    "approved",
-    "rejected",
-    "voided",
-    "invited",
-    "activated",
-    "suspended",
-    "archived",
-    "access_changed",
-];
 pub const INVALID: &str = "Check the activity filters and try again.";
 pub const RANGE: &str = "Choose a date range of up to 366 days, ending on or after its start.";
 pub const LIMIT: &str = "Choose between 1 and 100 activity entries.";
@@ -71,11 +47,13 @@ impl Params {
         self.0.get(key).map(Vec::as_slice).unwrap_or(&[])
     }
 
-    /// Step 3: `kind=team` needs a manager, assigned-only staff may name only themselves
-    /// as actor, and every collection must be granted (unknown names included).
-    pub fn authorise(&self, user: &UserRow, granted: &[&str]) -> ApiResult<()> {
+    /// Step 3: `kind=team` needs a manager, `kind=channel` the company's own Admin,
+    /// assigned-only staff may name only themselves as actor, and every collection must
+    /// be granted (unknown names included). `workspace` is the path's workspace.
+    pub fn authorise(&self, user: &UserRow, workspace: &str, granted: &[&str]) -> ApiResult<()> {
         let manager = matches!(user.role.as_str(), "admin" | "super-admin");
         let team = self.all("kind").iter().any(|kind| kind == "team");
+        let channel = self.all("kind").iter().any(|kind| kind == "channel");
         let foreign_actor = !user.has_team_scope()
             && self
                 .all("actor")
@@ -85,7 +63,8 @@ impl Params {
             .all("collection")
             .iter()
             .any(|collection| !granted.contains(&collection.as_str()));
-        if (team && !manager) || foreign_actor || ungranted {
+        let hidden = channel && !sees_channels(user, workspace);
+        if (team && !manager) || hidden || foreign_actor || ungranted {
             return Err(ApiError::forbidden());
         }
         Ok(())
@@ -104,10 +83,10 @@ impl Params {
         let actor = one("actor").map(Uuid::parse_str).transpose();
         let kind_ok = kind
             .as_deref()
-            .is_none_or(|kind| ["record", "team"].contains(&kind));
+            .is_none_or(|kind| ["record", "team", "channel"].contains(&kind));
         let action_ok = action
             .as_deref()
-            .is_none_or(|action| ACTIONS.contains(&action));
+            .is_none_or(|action| ACTIONS.contains(&action) || CHANNEL_ACTIONS.contains(&action));
         let Ok(actor) = actor else {
             return Err(ApiError::invalid(INVALID));
         };

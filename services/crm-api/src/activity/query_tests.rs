@@ -31,8 +31,9 @@ fn permission_parameters_are_refused_before_syntax() {
     let me = Uuid::from_u128(7).to_string();
     let staff = user("staff", "assigned");
     let granted = ["Clients"];
-    let check =
-        |raw: &str, user: &UserRow| status(Params::parse(Some(raw)).authorise(user, &granted));
+    let check = |raw: &str, user: &UserRow| {
+        status(Params::parse(Some(raw)).authorise(user, "workspace", &granted))
+    };
     assert_eq!(check("kind=team", &staff), 403);
     assert_eq!(check("kind=team", &user("admin", "assigned")), 200);
     assert_eq!(check("actor=not-a-uuid", &staff), 403);
@@ -42,6 +43,28 @@ fn permission_parameters_are_refused_before_syntax() {
     assert_eq!(check("collection=Nope", &user("admin", "team")), 403);
     assert_eq!(check("collection=Clients&collection=Deals", &staff), 403);
     assert_eq!(check("collection=Clients&from=bad", &staff), 200);
+}
+
+#[test]
+fn channel_events_are_for_the_company_admin_only() {
+    let granted = ["Clients"];
+    let check = |user: &UserRow, workspace: &str| {
+        status(Params::parse(Some("kind=channel")).authorise(user, workspace, &granted))
+    };
+    assert_eq!(check(&user("admin", "team"), "workspace"), 200);
+    assert_eq!(check(&user("admin", "team"), "other"), 403);
+    assert_eq!(check(&user("super-admin", "team"), "workspace"), 403);
+    assert_eq!(check(&user("staff", "team"), "workspace"), 403);
+    let today = dates::parse_day("2026-10-16").unwrap();
+    for action in [
+        "connected",
+        "reconnected",
+        "reconnect_required",
+        "disconnected",
+    ] {
+        let raw = format!("kind=channel&action={action}");
+        assert_eq!(status(Params::parse(Some(&raw)).validate(today)), 200);
+    }
 }
 
 #[test]
