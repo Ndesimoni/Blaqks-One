@@ -192,7 +192,11 @@ There is **one general Blaqks One website** with every company's approved listin
 | Domains       | A company may **connect its own domain** (ownership verified, SSL issued and renewed automatically). Without one it gets a **Blaqks One subdomain**. Buying domains on a company's behalf is deferred.         |
 | Customisation | Each company chooses **one of 4 themes**, its **logo** and **one brand colour**, on **fixed pages** (Home, Listings, Listing detail, About, Contact). Companies may also **add their own pages**.              |
 | Own pages     | Proposed, pending review: built from structured content blocks (text, images, approved listings, contact form), never arbitrary HTML or scripts, and reviewed before going live like any other public content. |
-| Still open    | Super Admin approval on company sites, listing limits there, licence gate before go-live, public languages and the source of the 4 themes.                                                                     |
+| Going live    | A company site **does not need a verified licence** to go live. The existing rule still applies to listings: a verified licence is required before a listing is published.                                     |
+| Language      | Public sites launch in **English**. They are built on the language foundation and right-to-left ready, so Arabic can be added later without a redesign.                                                        |
+| Approval      | Recommended default (owner takes recommendations, 2026-10-15): one Super Admin approval per listing version covers both sites; the company chooses per listing "general site + my site" or "my site only".     |
+| Limits        | Recommended default: "2 live listings per team" applies on company sites; "2 teams per property" applies only to the general site.                                                                             |
+| Themes        | The 4 themes are designed and reviewed with the owner before they are built.                                                                                                                                   |
 
 ## Messaging design (decided 2026-10-20)
 
