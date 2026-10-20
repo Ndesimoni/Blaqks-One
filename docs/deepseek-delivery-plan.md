@@ -1,5 +1,7 @@
 # Blaqks One implementation plan for DeepSeek delivery
 
+**Owner decision 2026-10-20: Claude implements every packet directly; no packets are assigned to DeepSeek.** The packet order, rules, tests and acceptance below still apply, with Claude as implementer and a separate security review for sensitive packets. The owner approves commits and pushes.
+
 Owner workflow, 19 October 2026. This plan turns the approved roadmap into small implementation packets. DeepSeek may implement one packet and its focused tests. Codex then reviews the diff, verifies the security and workspace boundaries, runs the agreed checks and approves or returns the packet for correction.
 
 ## 1. Rules for every packet
