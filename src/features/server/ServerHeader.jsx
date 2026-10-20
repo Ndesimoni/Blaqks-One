@@ -5,7 +5,8 @@ import { Button } from '../../components/ui/Button.jsx';
 import { ServerTheme } from './ServerTheme.jsx';
 import { useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 
-export function ServerHeader() {
+/** The top bar names the member's company, so no workspace panel is needed on each page. */
+export function ServerHeader({ owner }) {
   const go = useNavigate();
   const { mobileNav, setMobileNav } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
@@ -21,7 +22,7 @@ export function ServerHeader() {
         >
           <Icon name="menu" size={22} />
         </button>
-        <strong>Connected CRM</strong>
+        <strong className="topbar-workspace">{owner?.name || 'Connected CRM'}</strong>
       </div>
       <div className="top-actions">
         <ServerTheme />

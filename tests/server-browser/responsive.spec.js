@@ -21,9 +21,7 @@ test('connected navigation and shared screens reflow in both themes with keyboar
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
         ).toBe(true);
-        expect(await textContrast(page.locator('.workspace-banner strong'))).toBeGreaterThanOrEqual(
-          4.5,
-        );
+        expect(await textContrast(page.locator('.topbar-workspace'))).toBeGreaterThanOrEqual(4.5);
         expect(await textContrast(page.locator('.page-heading p'))).toBeGreaterThanOrEqual(4.5);
       }
       await page.screenshot({ path: testInfo.outputPath(`connected-${width}-${theme}.png`) });

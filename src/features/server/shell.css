@@ -18,3 +18,12 @@
     max-width: none;
   }
 }
+/* The member's company name in the top bar, shortened on narrow screens. */
+.connected-shell .top-left {
+  min-inline-size: 0;
+}
+.topbar-workspace {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
