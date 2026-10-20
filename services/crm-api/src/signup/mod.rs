@@ -11,7 +11,7 @@ mod limits;
 mod model;
 mod resend;
 mod resend_response;
-mod retry;
+pub(crate) mod retry;
 pub mod routes;
 mod start;
 mod turnstile;

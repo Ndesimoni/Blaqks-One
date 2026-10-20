@@ -8,6 +8,7 @@ pub mod error;
 pub mod finance;
 pub mod imports;
 pub mod integrations;
+pub mod outbox;
 pub mod performance;
 pub mod records;
 pub mod routes;

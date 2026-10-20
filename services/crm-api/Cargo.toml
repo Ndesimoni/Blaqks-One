@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.89"
 publish = false
+default-run = "kws-crm-api"
 
 [dependencies]
 aes-gcm = "0.10"
@@ -21,6 +22,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal
 time = { version = "0.3", features = ["parsing", "formatting"] }
 url = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
+hmac = "0.12"
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }

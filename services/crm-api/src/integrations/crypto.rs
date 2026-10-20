@@ -1,6 +1,7 @@
-//! Credential sealing (docs/messaging-design.md §8): AES-256-GCM with a random nonce
-//! and additional data that binds the ciphertext to one company, connection, provider,
-//! channel and key version. The key comes from the environment and is never stored in the database.
+//! Sealing (docs/messaging-design.md §8): AES-256-GCM with a random nonce and additional
+//! data that binds the ciphertext to one company, row, provider and key version
+//! (credentials also to their channel). The key comes from the environment and is never
+//! stored in the database.
 use aes_gcm::{
     aead::{Aead, KeyInit, Payload},
     Aes256Gcm, Nonce,
@@ -17,9 +18,26 @@ pub fn aad(
     channel: &str,
     key_version: i32,
 ) -> Vec<u8> {
-    // Each part is length-prefixed so no value can shift into its neighbour.
-    let mut out = b"integrations.crm_channel_connections".to_vec();
-    for part in [workspace, connection, provider, channel] {
+    bound(
+        "integrations.crm_channel_connections",
+        &[workspace, connection, provider, channel],
+        key_version,
+    )
+}
+
+/// Binds a staged webhook body to its receipt, so it cannot be replayed into another row.
+pub fn staging_aad(workspace: &str, receipt: &str, provider: &str, key_version: i32) -> Vec<u8> {
+    bound(
+        "integrations.crm_webhook_staging",
+        &[workspace, receipt, provider],
+        key_version,
+    )
+}
+
+/// Each part is length-prefixed so no value can shift into its neighbour.
+fn bound(table: &str, parts: &[&str], key_version: i32) -> Vec<u8> {
+    let mut out = table.as_bytes().to_vec();
+    for part in parts {
         out.extend_from_slice(format!(":{}:{part}", part.len()).as_bytes());
     }
     out.extend_from_slice(format!(":v{key_version}").as_bytes());
@@ -39,7 +57,6 @@ pub fn seal(key: &[u8; 32], aad: &[u8], plain: &[u8]) -> Result<Vec<u8>, &'stati
     Ok(sealed)
 }
 
-#[allow(dead_code)] // Provider adapters open sealed credentials in W1 and E1.
 pub fn open(key: &[u8; 32], aad: &[u8], sealed: &[u8]) -> Result<Vec<u8>, &'static str> {
     if sealed.len() < NONCE_BYTES + TAG_BYTES {
         return Err("sealed credential is invalid");

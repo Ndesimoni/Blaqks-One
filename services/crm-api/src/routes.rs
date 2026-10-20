@@ -112,6 +112,7 @@ pub fn app(state: AppState) -> Router {
         .merge(crate::auth::account::router())
         .merge(agreements::routes::router())
         .merge(integrations::routes::router())
+        .merge(integrations::webhooks::router())
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(activity::routes::router())

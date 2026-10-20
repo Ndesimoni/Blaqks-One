@@ -11,6 +11,7 @@ pub mod routes;
 mod store;
 mod store_write;
 mod vocabulary;
+pub mod webhooks;
 mod wire;
 
 #[cfg(test)]
