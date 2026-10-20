@@ -1,46 +1,21 @@
 import { spawn } from 'node:child_process';
-import { randomBytes } from 'node:crypto';
 import { resolve } from 'node:path';
 import { checkExpiredSignupRemoved, seedExpiredSignup } from './check-signup-cleanup.mjs';
 import { checkSignupOff } from './check-signup-off.mjs';
 import { selectedApiTestFiles } from './crm-api-test-files.mjs';
+import { FAKE_GOOGLE_PORT, testEnv } from './crm-test-env.mjs';
 import { createFixtures, raiseFixtureSeats } from './crm-test-fixtures.mjs';
+import { startFakeGoogle } from './fake-google.mjs';
 import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
 // Optional API_TEST_FILES (comma-separated) narrows the API suites; see crm-api-test-files.mjs.
 const apiTestFiles = selectedApiTestFiles();
-const project = `kws-crm-test-${randomBytes(6).toString('hex')}`;
-const dbPassword = randomBytes(32).toString('hex');
-const env = {
-  ...process.env,
-  CRM_TEST_DB_PASSWORD: dbPassword,
-  CRM_TEST_PROJECT: project,
-  CRM_APP_ORIGIN: 'http://localhost:5175',
-  CRM_BIND_ADDRESS: '127.0.0.1:8790',
-  CRM_ALLOW_INSECURE_LOCAL: 'true',
-  CRM_SIGNUP: 'local',
-  // Existing API suites inspect pending outbox codes, so keep the delivery worker stopped.
-  CRM_SIGNUP_WORKER: 'off',
-  // The suites send one synthetic sign-up per case; trust the loopback proxy and
-  // give each case its own client budget through this header.
-  CRM_TRUSTED_PROXIES: '127.0.0.1',
-  CRM_TRUSTED_CLIENT_HEADER: 'x-test-client',
-  CRM_CLIENT_DIGEST_SECRET: randomBytes(32).toString('hex'),
-  // Seals synthetic channel credentials; suites assert they never leave the database.
-  CRM_MESSAGING_KEY: randomBytes(32).toString('base64'),
-  CRM_MESSAGING_KEY_VERSION: '1',
-  CRM_TEST_API: 'http://127.0.0.1:8790/api/crm',
-  // Random, and meets the new-password policy that the account CLI enforces.
-  CRM_FIXTURE_PASSWORD: `Fx1!${randomBytes(24).toString('hex')}`,
-  VITE_CRM_MODE: 'server',
-  // Offers Arabic in My profile for tests/server-browser/language.spec.js; English stays default.
-  VITE_I18N_PREVIEW: 'true',
-  CRM_API_PROXY: 'http://127.0.0.1:8790',
-};
+const { project, env } = testEnv();
 const compose = ['compose', '-f', 'compose.test.yaml', '-p', project];
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 let server;
+let google;
 let containerStarted = false;
 try {
   await run(
@@ -56,9 +31,16 @@ try {
   });
   const port = address.split(':').at(-1);
   if (!/^\d+$/.test(port)) throw Error('Docker did not report a PostgreSQL port.');
-  env.CRM_DATABASE_URL = `postgres://kws_crm_test:${dbPassword}@127.0.0.1:${port}/kws_crm_test`;
+  env.CRM_DATABASE_URL = `postgres://kws_crm_test:${env.CRM_TEST_DB_PASSWORD}@127.0.0.1:${port}/kws_crm_test`;
   await createFixtures(binary, env);
   await ensurePortFree('127.0.0.1', 8790);
+  await ensurePortFree('127.0.0.1', FAKE_GOOGLE_PORT);
+  google = await startFakeGoogle({
+    port: FAKE_GOOGLE_PORT,
+    clientId: env.CRM_GOOGLE_CLIENT_ID,
+    clientSecret: env.CRM_GOOGLE_CLIENT_SECRET,
+    redirectUri: `${env.CRM_APP_ORIGIN}/api/crm/integrations/google/callback`,
+  });
   await checkSignupOff(binary, env);
   seedExpiredSignup(compose);
   server = spawn(binary, [], { env, stdio: 'inherit' });
@@ -138,6 +120,7 @@ try {
   process.exitCode = 1;
 } finally {
   await stop(server);
+  await google?.close();
   if (containerStarted) {
     try {
       await run('docker', [...compose, 'down'], env);

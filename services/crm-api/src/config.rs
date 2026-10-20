@@ -4,6 +4,10 @@ mod signup_settings;
 #[path = "config_messaging.rs"]
 pub mod messaging_settings;
 
+#[path = "config_google.rs"]
+pub mod google_settings;
+
+use google_settings::{google_config, GoogleConfig};
 use messaging_settings::{messaging_key, MessagingKey};
 use signup_settings::{client_secret, turnstile_config, worker_enabled};
 use std::{env, net::SocketAddr};
@@ -29,6 +33,8 @@ pub struct Config {
     pub turnstile: Option<TurnstileConfig>,
     /// Channel credentials are sealed only when this key is configured.
     pub messaging: Option<MessagingKey>,
+    /// Google Workspace mailboxes (E1); `None` hides the Google connection.
+    pub google: Option<GoogleConfig>,
 }
 
 #[derive(Clone)]
@@ -69,6 +75,14 @@ impl Config {
             env::var("CRM_MESSAGING_KEY_VERSION").ok(),
             !secure_cookie,
         )?;
+        let google = google_config(
+            env::var("CRM_GOOGLE_CLIENT_ID").ok(),
+            env::var("CRM_GOOGLE_CLIENT_SECRET").ok(),
+            env::var("CRM_GOOGLE_WORKSPACE_DOMAIN").ok(),
+            env::var("CRM_GOOGLE_ENDPOINT").ok(),
+            &origin,
+            !secure_cookie,
+        )?;
         Ok(Self {
             database_url,
             origin,
@@ -81,6 +95,7 @@ impl Config {
             client_secret,
             turnstile,
             messaging,
+            google,
         })
     }
 }

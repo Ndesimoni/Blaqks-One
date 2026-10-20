@@ -86,9 +86,16 @@ test('email is connected per member and rejects unrelated providers', async () =
     externalAccountId: 'studio@example.test',
   });
   assert.equal(wrong.status, 400);
-  const mail = await connect(adminA, {
+  const google = await connect(adminA, {
     channel: 'email',
     provider: 'google',
+    externalAccountId: 'studio@example.test',
+  });
+  assert.equal(google.status, 400);
+  assert.equal(google.value.message, 'Connect a Google mailbox with Google sign-in.');
+  const mail = await connect(adminA, {
+    channel: 'email',
+    provider: 'microsoft',
     label: 'Studio mailbox',
     externalAccountId: 'studio@example.test',
   });

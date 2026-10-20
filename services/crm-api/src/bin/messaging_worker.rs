@@ -5,7 +5,10 @@
 use kws_crm_api::{
     config::Config,
     inbox::intake::InboxSink,
-    integrations::webhooks::inbound::{self, Sink},
+    integrations::{
+        revocation,
+        webhooks::inbound::{self, Sink},
+    },
     outbox, routes, shutdown,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -40,6 +43,14 @@ async fn run() -> Result<(), String> {
     // Sending domains arrive with the provider adapters (E1, W1).
     let domains: outbox::worker::Domains = Arc::new(Vec::new());
     let mut handles = outbox::worker::spawn(pool.clone(), domains, shutdown_rx.clone());
+    if let Some(google) = config.google.clone() {
+        handles.push(revocation::spawn(
+            pool.clone(),
+            key.clone(),
+            google,
+            shutdown_rx.clone(),
+        ));
+    }
     let sink: Arc<dyn Sink> = Arc::new(InboxSink { pool: pool.clone() });
     handles.extend(inbound::spawn(pool, key, Some(sink), shutdown_rx));
     println!("CRM messaging worker running.");

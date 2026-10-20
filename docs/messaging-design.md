@@ -291,6 +291,47 @@ public HTTPS address; the development tunnel is configured outside the repositor
 - Provider secrets stay out of job rows. The outbox stores the message UUID only; the
   worker reads the sealed credential through `integrations` functions.
 
+### Google mailbox sign-in (E1a, built 2026-10-20)
+
+- Scopes: `gmail.send` and `gmail.readonly` only; both are required, because Google lets a
+  person untick one. The app is an **internal** Google app on the company's Workspace
+  (decision O7), so these restricted scopes need no Google verification for now.
+- `POST /mailbox/google/start` stores a request (migration 0038): a random 256-bit state
+  kept only as a SHA-256 digest, a sealed PKCE verifier, the workspace, member and session,
+  a ten-minute expiry and single use; at most five open requests per member.
+- The redirect URI is derived from `CRM_APP_ORIGIN`, so it is always the one registered
+  URI. The session cookie is `SameSite=Strict` and is absent on Google's redirect, so
+  `GET /api/crm/integrations/google/callback` proves nothing: it hands `state` and `code`
+  to the app in the URL fragment (never sent to a server) with `no-store` and
+  `no-referrer`, and echoes only plain, bounded values; Google's error text never appears.
+- The app posts both to `POST /mailbox/google/finish` with its session, Origin and CSRF.
+  The request is consumed only by the same member, workspace and session, and the
+  consumption commits before Google is called, so a code is tried once. The exchange uses
+  the PKCE verifier; the address comes from the Gmail profile for that token, lower-cased
+  and checked against `CRM_GOOGLE_WORKSPACE_DOMAIN` when set.
+- A refused finish never revokes the new token: revoking ends the person's whole grant,
+  which may serve a mailbox that is already connected. Disconnect (by the member or the
+  Admin) clears the sealed token in its transaction and then revokes it, best effort.
+- `CRM_GOOGLE_ENDPOINT` (a loopback stand-in for tests) is accepted only in local
+  development, like `CRM_TURNSTILE_ENDPOINT`.
+- Security review (2026-10-20, accepted with fixes, all applied):
+  - **M1:** archiving, suspending, or removing a member's email grant disconnects their
+    mailboxes in the same transaction (`integrations::departure`, called by `team`).
+  - **L3:** every disconnect queues the sealed token in `crm_pending_revocations`; the
+    API revokes after commit and the messaging worker retries up to eight times.
+  - **M2:** a member may start five sign-ins per ten minutes, used or not.
+  - **L1:** Google's answers are read in chunks and refused past 64 KiB.
+  - **L2:** outside local development, `CRM_GOOGLE_WORKSPACE_DOMAIN` is required.
+- Carried to later packets:
+  - **E1b/E1c** re-check live membership and the email grant before every send or sync.
+  - **E1c** keys mailboxes on Google's stable account ID (`sub`), so a renamed address
+    keeps its mailbox (L4).
+  - **E1d** reads the returned fragment once, removes it from the address bar and
+    history, and never logs or stores it.
+  - Other companies need their own Google settings before Google mail is offered to
+    them (I3).
+  - Hosted access logs must drop the callback's query string (I5).
+
 ## 9. Privacy, logging and retention
 
 - Message bodies exist only in `crm_inbox_messages`; internal notes only in
@@ -363,8 +404,8 @@ Reply permission is the existing `channel_access.whatsapp` for WhatsApp and
 records rule. No surface returns another company's data to the Super Admin; any later platform
 health view is a separate, reviewed feature.
 
-Email connections are made by the mailbox owner and approved by their Admin; in X1, an
-Admin can connect only their own mailbox. Facebook, Instagram and TikTok replies use the separate
+Email connections are made by the mailbox owner. The Admin's `channel_access.email` grant
+is the approval (O8); the Admin can see and disconnect every company mailbox. Facebook, Instagram and TikTok replies use the separate
 `channel_access.social` grant (O3), off by default.
 
 ## 12. Planned API surface
@@ -405,14 +446,16 @@ Blocking the named packet:
 
 Design decisions (decided by the owner 2026-10-20, following the review's recommendations):
 
-| ID  | Decision                                                                                                                                                                                                                                                      |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| O1  | Environment key (with the §8 keyring) for local development only; a managed secret store or KMS is required before any production deployment.                                                                                                                 |
-| O2  | The §9 retention periods, with the §9 purge, anonymisation and backup rules; confirm against UAE data protection advice before launch.                                                                                                                        |
-| O3  | A separate `channel_access.social` grant for Facebook, Instagram and TikTok replies, off by default and managed like the existing WhatsApp and email grants. Added in S1.                                                                                     |
-| O4  | Yes: redacted connection and Inbox events appear in Team activity through an `integrations`/`inbox` page function merged by `activity/`, like `records::activity::page`. Built in packet X1a (2026-10-20) for connection events; Inbox events follow with X3. |
-| O5  | Yes: media messages show "Media received" until private media storage exists.                                                                                                                                                                                 |
-| O6  | Default phone region AE for every company now; a per-company region setting is added when the first company outside the UAE needs it.                                                                                                                         |
+| ID  | Decision                                                                                                                                                                                                                                                                                                                                                                                   |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| O1  | Environment key (with the §8 keyring) for local development only; a managed secret store or KMS is required before any production deployment.                                                                                                                                                                                                                                              |
+| O2  | The §9 retention periods, with the §9 purge, anonymisation and backup rules; confirm against UAE data protection advice before launch.                                                                                                                                                                                                                                                     |
+| O3  | A separate `channel_access.social` grant for Facebook, Instagram and TikTok replies, off by default and managed like the existing WhatsApp and email grants. Added in S1.                                                                                                                                                                                                                  |
+| O4  | Yes: redacted connection and Inbox events appear in Team activity through an `integrations`/`inbox` page function merged by `activity/`, like `records::activity::page`. Built in packet X1a (2026-10-20) for connection events; Inbox events follow with X3.                                                                                                                              |
+| O5  | Yes: media messages show "Media received" until private media storage exists.                                                                                                                                                                                                                                                                                                              |
+| O6  | Default phone region AE for every company now; a per-company region setting is added when the first company outside the UAE needs it.                                                                                                                                                                                                                                                      |
+| O7  | Google mail uses an **internal** Google app: only mailboxes on the company's own Google Workspace connect, with no Google review. Personal Gmail and other companies wait for Google's restricted-scope security assessment, without rebuilding. Recommended by Claude and accepted by the owner on 2026-10-20 (the owner asked for a recommendation); change it before go-live if needed. |
+| O8  | The Admin's per-person `channel_access.email` grant is the approval for that person's mailbox (replacing a separate approval step in §11). The Admin connects their own mailbox; staff with the grant connect theirs; the Admin can still see and disconnect every company mailbox. The Super Admin never holds a company mailbox.                                                         |
 
 ## 14. Boundary decisions
 

@@ -7,4 +7,6 @@ export const CHANNELS = [
   { channel: 'tiktok', provider: 'tiktok', icon: 'smartphone' },
 ];
 
-export const EMAIL_PROVIDERS = ['google', 'microsoft'];
+// Google mailboxes connect only through Google sign-in (E1a); the typed form keeps the
+// Microsoft stub until its adapter lands.
+export const EMAIL_PROVIDERS = ['microsoft'];

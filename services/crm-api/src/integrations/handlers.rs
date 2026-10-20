@@ -76,6 +76,12 @@ pub async fn connect(
             "Choose a provider that supports this channel.",
         ));
     }
+    // A Google mailbox holds a real refresh token, so it connects only through sign-in.
+    if provider == Provider::Google {
+        return Err(ApiError::invalid(
+            "Connect a Google mailbox with Google sign-in.",
+        ));
+    }
     let label = wire::text(wire::node(&connection, "label")?, 80)?;
     let external = wire::text(wire::node(&connection, "externalAccountId")?, 160)?;
     let credential = wire::secret(wire::node(&connection, "credential")?, 4096)?;

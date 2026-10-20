@@ -1,8 +1,8 @@
-//! Channel routes under `/api/crm/workspaces/{workspace}/channels`, merged into the
-//! application router by `routes.rs`. Provider webhooks (X2) will use their own public
-//! prefix, never this one.
-use super::{commands, handlers};
-use crate::state::AppState;
+//! Channel routes under `/api/crm/workspaces/{workspace}/channels`, each member's own
+//! mailbox under `/mailbox`, and Google's sign-in redirect, merged into the application
+//! router by `routes.rs`. Provider webhooks (X2) use their own public prefix.
+use super::{commands, google, handlers, mailbox};
+use crate::{config::google_settings::CALLBACK_PATH, state::AppState};
 use axum::{
     extract::DefaultBodyLimit,
     routing::{delete, get, post},
@@ -10,6 +10,7 @@ use axum::{
 };
 
 const BASE: &str = "/api/crm/workspaces/{workspace}/channels";
+const MAILBOX: &str = "/api/crm/workspaces/{workspace}/mailbox";
 
 pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(16 * 1024);
@@ -24,4 +25,17 @@ pub fn router() -> Router<AppState> {
             &format!("{item}/reconnect"),
             post(commands::reconnect).layer(body()),
         )
+        .route(
+            MAILBOX,
+            get(mailbox::mine).delete(mailbox::disconnect).layer(body()),
+        )
+        .route(
+            &format!("{MAILBOX}/google/start"),
+            post(mailbox::start).layer(body()),
+        )
+        .route(
+            &format!("{MAILBOX}/google/finish"),
+            post(mailbox::finish).layer(body()),
+        )
+        .route(CALLBACK_PATH, get(google::callback::callback))
 }

@@ -37,7 +37,9 @@
       "crm_webhook_receipts_event",
       "crm_webhook_receipts_pending",
       "crm_webhook_receipts_purge",
-      "crm_webhook_staging"
+      "crm_webhook_staging",
+      "crm_oauth_requests",
+      "crm_pending_revocations"
     ],
     "inbox": [
       "crm_inbox_conversations",

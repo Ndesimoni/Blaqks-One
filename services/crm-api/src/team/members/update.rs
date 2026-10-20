@@ -74,6 +74,7 @@ pub async fn update(
         request,
     )
     .await?;
+    crate::integrations::revoke_soon(&state);
     Ok(Json(
         json!({"member":directory::find(&state.pool, id).await?}),
     ))

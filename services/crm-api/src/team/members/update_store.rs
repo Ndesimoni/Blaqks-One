@@ -95,6 +95,16 @@ pub async fn update(
         sqlx::query("UPDATE crm_team_invitations SET revoked_at=now() WHERE user_id=$1 AND consumed_at IS NULL")
             .bind(id).execute(&mut *transaction).await?;
     }
+    // A suspended member, or staff losing the email grant, loses their mailbox (M1).
+    let email_removed = current.user.role == "staff"
+        && current.user.channel_access.0.email
+        && !request
+            .channel_access
+            .as_ref()
+            .is_some_and(|access| access.email);
+    if (current.active && !active) || email_removed {
+        crate::integrations::departure(&mut transaction, workspace, &[id], actor).await?;
+    }
     sessions::revoke_member(&mut transaction, id).await?;
     audit::append(
         &mut transaction,

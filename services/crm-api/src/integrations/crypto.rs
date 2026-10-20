@@ -34,6 +34,15 @@ pub fn staging_aad(workspace: &str, receipt: &str, provider: &str, key_version: 
     )
 }
 
+/// Binds a sealed PKCE verifier to its one sign-in request (E1a).
+pub fn oauth_aad(workspace: &str, request: &str, provider: &str, key_version: i32) -> Vec<u8> {
+    bound(
+        "integrations.crm_oauth_requests",
+        &[workspace, request, provider],
+        key_version,
+    )
+}
+
 /// Each part is length-prefixed so no value can shift into its neighbour.
 fn bound(table: &str, parts: &[&str], key_version: i32) -> Vec<u8> {
     let mut out = table.as_bytes().to_vec();

@@ -49,6 +49,11 @@ pub async fn reconnect(
         return Err(ApiError::stale(RELOAD));
     }
     let channel = Channel::parse(&row.channel).ok_or_else(ApiError::missing)?;
+    if row.provider == "google" {
+        return Err(ApiError::invalid(
+            "Reconnect a Google mailbox with Google sign-in.",
+        ));
+    }
     provider::adapter(channel)
         .verify(&row.external_account_id, &credential)
         .map_err(ApiError::invalid)?;
@@ -101,11 +106,11 @@ pub async fn disconnect(
     if row.version != expected {
         return Err(ApiError::stale(RELOAD));
     }
-    let updated = store_write::set_disconnected(&mut tx, &workspace, id, session.user.id)
+    let updated = super::revocation::disconnect(&mut tx, &row, session.user.id)
         .await?
         .ok_or_else(ApiError::missing)?;
-    store_write::event(&mut tx, &workspace, id, "disconnected", session.user.id).await?;
     tx.commit().await?;
+    super::mailbox::revoke_soon(&state);
     Ok(Json(json!({ "connection": updated.view() })))
 }
 

@@ -44,6 +44,40 @@ pub async fn load(
         .map_err(Into::into)
 }
 
+/// The member's live (not disconnected) mailbox in this company.
+pub async fn own_mailbox(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    member: Uuid,
+) -> ApiResult<Option<ConnectionRow>> {
+    sqlx::query_as::<_, ConnectionRow>(&format!(
+        "{SELECT} WHERE workspace_id=$1 AND channel='email' AND owner_member_id=$2 \
+         AND state<>'disconnected'"
+    ))
+    .bind(workspace)
+    .bind(member)
+    .fetch_optional(&mut **tx)
+    .await
+    .map_err(Into::into)
+}
+
+/// The members' live connections, locked for a departure in the caller's transaction.
+pub async fn member_mailboxes(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    members: &[Uuid],
+) -> ApiResult<Vec<ConnectionRow>> {
+    sqlx::query_as::<_, ConnectionRow>(&format!(
+        "{SELECT} WHERE workspace_id=$1 AND owner_member_id=ANY($2) \
+         AND state<>'disconnected' ORDER BY id FOR UPDATE"
+    ))
+    .bind(workspace)
+    .bind(members)
+    .fetch_all(&mut **tx)
+    .await
+    .map_err(Into::into)
+}
+
 pub struct NewConnection<'a> {
     pub id: Uuid,
     pub workspace_id: &'a str,
