@@ -10,17 +10,17 @@ Design reference: the **CRM Inbox design** canvas (8 screens, owner review). It 
 
 ## 1. Decisions
 
-| #   | Decision                          | Status (20 Oct 2026)                                                                                                       |
-| --- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.            |
-| D2  | WhatsApp number                   | Open: keep the current number (only if Twilio supports coexistence in the UAE) or a new dedicated number.                  |
-| D3  | One number per company            | Recommended yes; each company connects its own number through its own Twilio subaccount.                                   |
-| D4  | Business email system             | **Open: Google Workspace or Microsoft 365.** Blocks packet E1 only.                                                        |
-| D5  | Social platforms first            | Facebook Page and Instagram first; **TikTok added to the Channels registry by the owner on 2026-10-20** (messaging in T1). |
-| D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies.         |
-| D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                                 |
-| D9  | TikTok messaging access           | Open: TikTok Business Account plus Business Messaging API approval; confirm UAE eligibility. Blocks T1 only.               |
-| D8  | AI sorting of messages            | Not now. Needs an owner data-handling decision first; rules plus staff review are used until then.                         |
+| #   | Decision                          | Status (20 Oct 2026)                                                                                                           |
+| --- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.                |
+| D2  | WhatsApp number                   | Open: keep the current number (only if Twilio supports coexistence in the UAE) or a new dedicated number.                      |
+| D3  | One number per company            | Recommended yes; each company connects its own number through its own Twilio subaccount.                                       |
+| D4  | Business email system             | **Google Workspace (owner, 2026-10-20).** E1 builds the Gmail adapter first; Microsoft 365 can follow behind the same adapter. |
+| D5  | Social platforms first            | Facebook Page and Instagram first; **TikTok added to the Channels registry by the owner on 2026-10-20** (messaging in T1).     |
+| D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies.             |
+| D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                                     |
+| D9  | TikTok messaging access           | Open: TikTok Business Account plus Business Messaging API approval; confirm UAE eligibility. Blocks T1 only.                   |
+| D8  | AI sorting of messages            | Not now. Needs an owner data-handling decision first; rules plus staff review are used until then.                             |
 
 Nothing in this plan sends to real clients during development. Every provider is proved first with a local stub, then the provider's sandbox or test number.
 
@@ -56,7 +56,7 @@ Nothing in this plan sends to real clients during development. Every provider is
 | 1     | X1 Channel connections registry          | Admin connects/disconnects accounts; encrypted tokens; Channels screen       | None (stubs)     |
 | 2     | X2 Inbound receipt and delivery worker   | Verified, deduplicated webhooks and outbound jobs with leases and retries    | None (stubs)     |
 | 3     | X3 Conversation kernel and contact match | Conversations, messages, notes, exact matching, routing and lead rules (API) | None             |
-| 4     | E1 Email sending and client replies      | Send from the CRM through the connected mailbox; replies thread back         | D4               |
+| 4     | E1 Email sending and client replies      | Send from the CRM through the connected mailbox; replies thread back         | D4 decided       |
 | 5     | W1 WhatsApp sending through Twilio       | Free-form within window, templates outside it, consent, statuses             | D1, D2, D6       |
 | 6     | U1 Inbox screens                         | The designed Inbox: list, conversation, client panel, mobile, states         | Design approval  |
 | 7     | U2 New-contact review and Inbox rules    | Create lead / link / not a lead / block, and the Inbox rules screen          | None             |
@@ -124,7 +124,7 @@ Specialists: senior architect and security engineer, reviewed separately. No cod
 - Access: assigned-only staff cannot list or open others' conversations; foreign IDs → not-found; notes never appear in client-facing payloads.
 - Concurrency: two staff creating a lead from the same conversation → one lead.
 
-### E1 — email sending and client replies (after D4)
+### E1 — email sending and client replies (Google Workspace, D4 decided 2026-10-20)
 
 1. Mailbox connection per person with the narrowest scopes: send, plus reading only threads the CRM started or that come from linked clients. Plan Google's restricted-scope verification (or Microsoft's admin consent) as an external gate.
 2. Send from the composer through the person's mailbox; keep the thread ID; status Sent / Bounced / Failed.

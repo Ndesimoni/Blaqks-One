@@ -393,7 +393,7 @@ Blocking the named packet:
 | ID  | Decision                                                                                        | Blocks |
 | --- | ----------------------------------------------------------------------------------------------- | ------ |
 | D2  | Keep the current WhatsApp number or buy a dedicated one                                         | W1     |
-| D4  | Google Workspace or Microsoft 365                                                               | E1     |
+| D4  | Decided 2026-10-20: Google Workspace (Gmail adapter first)                                      | E1     |
 | D5  | Facebook Page and Instagram first                                                               | S1     |
 | D6  | Meta Business Portfolio, Page and app verification                                              | S1     |
 | D7  | Public HTTPS address for webhooks                                                               | W2     |
