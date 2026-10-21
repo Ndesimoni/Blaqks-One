@@ -71,7 +71,8 @@ pub fn unconfigured() -> ApiError {
     )
 }
 
-/// `GET /mailbox`: the caller's own mailbox, if any, and whether they may connect one.
+/// `GET /mailbox`: the caller's own mailbox, if any, whether they may connect one, and
+/// their company email address when the company uses SendGrid.
 pub async fn mine(
     State(state): State<AppState>,
     session: Session,
@@ -80,8 +81,19 @@ pub async fn mine(
     ensure(&state, &session, None, &workspace).await?;
     let mut tx = state.pool.begin().await?;
     let row = store::own_mailbox(&mut tx, &workspace, session.user.id).await?;
+    let company =
+        super::sendgrid::sender::own_address(&mut tx, &workspace, session.user.id).await?;
     tx.commit().await?;
+    // A SendGrid company sends from each member's address on its domain (E3d).
+    let company_email = company.map(|(connected, address)| {
+        json!({
+            "connected": connected,
+            "address": address.as_ref().map(|(address, _)| address),
+            "displayName": address.as_ref().map(|(_, name)| name),
+        })
+    });
     Ok(Json(json!({
+        "companyEmail": company_email,
         "google": state.config.google.is_some() && state.config.messaging.is_some(),
         "mayConnect": may_connect(&session.user, &workspace),
         "mailbox": row.as_ref().map(ConnectionRow::view),

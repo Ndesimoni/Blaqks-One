@@ -1,5 +1,5 @@
-//! `GET /channels` and `POST /channels` (docs/messaging-integrations-plan.md §4 X1):
-//! list this company's connections and connect an account through the local stub.
+//! `POST /channels` (docs/messaging-integrations-plan.md §4 X1): connect an account
+//! through the local stub, or a SendGrid account (E3a); the list is in `listing.rs`.
 use super::{
     access, crypto,
     model::{Channel, Provider},
@@ -36,19 +36,6 @@ pub fn key(state: &AppState) -> ApiResult<&MessagingKey> {
         UNCONFIGURED,
         "messaging_unconfigured",
     ))
-}
-
-pub async fn list(
-    State(state): State<AppState>,
-    session: Session,
-    Path(workspace): Path<String>,
-) -> ApiResult<Json<Value>> {
-    access::ensure_reader(&state, &session, &workspace).await?;
-    let mut tx = state.pool.begin().await?;
-    let rows = store::list(&mut tx, &workspace).await?;
-    tx.commit().await?;
-    let channels: Vec<Value> = rows.iter().map(|row| row.view()).collect();
-    Ok(Json(json!({ "channels": channels })))
 }
 
 pub async fn connect(

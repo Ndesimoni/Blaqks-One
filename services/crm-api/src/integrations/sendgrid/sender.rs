@@ -29,3 +29,26 @@ pub async fn company_sender(
     let address = lookup::active(tx, workspace, &domain, member).await?;
     Ok(Some(address.map(|_| id)))
 }
+
+/// For My mailbox (E3d): the member's address on the company's SendGrid domain, if the
+/// company uses SendGrid: `(connected, Some((address, display name)))`.
+pub async fn own_address(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    member: Uuid,
+) -> ApiResult<Option<(bool, Option<(String, String)>)>> {
+    let live: Option<(String, String)> = sqlx::query_as(
+        "SELECT external_account_id,state FROM integrations.crm_channel_connections
+         WHERE workspace_id=$1 AND provider='sendgrid' AND state<>'disconnected'",
+    )
+    .bind(workspace)
+    .fetch_optional(&mut **tx)
+    .await?;
+    let Some((domain, state)) = live else {
+        return Ok(None);
+    };
+    let address = lookup::active(tx, workspace, &domain, member).await?;
+    let address =
+        address.map(|found| (format!("{}@{domain}", found.local_part), found.display_name));
+    Ok(Some((state == "connected", address)))
+}

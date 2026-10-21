@@ -15,6 +15,16 @@ test('replies join their thread once, and new mail is routed by its address', as
   const domain = 'e3c-mail.example.test';
   const { admin, agent } = await mailCompany('sendgrid-inbound-admin', domain);
   const workspace = admin.user.workspaceId;
+  // The Channels list and My mailbox report what is set up (E3d).
+  const listed = (await admin.request(channelPath(admin))).value.channels;
+  const company = listed.find((row) => row.provider === 'sendgrid');
+  assert.deepEqual([company.deliveryUpdates, company.incomingMail], [true, true]);
+  const mine = (await agent.request(`/workspaces/${workspace}/mailbox`)).value.companyEmail;
+  assert.deepEqual(mine, {
+    connected: true,
+    address: `agent@${domain}`,
+    displayName: 'Synthetic Agent',
+  });
   const started = await startMessage(admin, await clientWith(admin, 'reply.client@gmail.test'));
   const { conversationId, message } = started.value;
   assert.equal((await settled(admin, conversationId, message.id)).status, 'sent');

@@ -2,7 +2,7 @@
 //! mailbox under `/mailbox`, SendGrid sending addresses under `/email-addresses`, and
 //! Google's sign-in redirect, merged into the application
 //! router by `routes.rs`. Provider webhooks (X2) use their own public prefix.
-use super::{addresses, commands, google, handlers, mailbox};
+use super::{addresses, commands, google, handlers, listing, mailbox};
 use crate::{config::google_settings::CALLBACK_PATH, state::AppState};
 use axum::{
     extract::DefaultBodyLimit,
@@ -20,7 +20,7 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route(
             BASE,
-            get(handlers::list).post(handlers::connect).layer(body()),
+            get(listing::list).post(handlers::connect).layer(body()),
         )
         .route(&item, delete(commands::disconnect).layer(body()))
         .route(
