@@ -49,7 +49,7 @@ export async function storeAsset(api, workspaceId, file, kind, remember) {
   const base = file.name.replace(/\.[^.]+$/, '') || 'photo';
   if (!photo) {
     const { media } = await api.uploadMedia(workspaceId, file);
-    return { name: file.name, type: file.type, added: today(), file: media.id };
+    return { name: media.name, type: file.type, added: today(), file: media.id };
   }
   const [full, thumb] = await Promise.all([
     resized(file, FULL_EDGE, 0.85),
@@ -61,6 +61,11 @@ export async function storeAsset(api, workspaceId, file, kind, remember) {
   ]);
   remember(stored.media.id, full);
   remember(small.media.id, thumb);
-  const entry = { name: file.name, type: 'image/jpeg', added: today(), file: stored.media.id };
+  const entry = {
+    name: stored.media.name,
+    type: 'image/jpeg',
+    added: today(),
+    file: stored.media.id,
+  };
   return kind === 'photo' ? { ...entry, thumb: small.media.id } : entry;
 }

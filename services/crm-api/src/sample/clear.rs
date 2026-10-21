@@ -13,7 +13,8 @@ use super::{
 };
 use crate::{
     assignments::departure,
-    records::{collections::COLLECTIONS, visibility::ASSIGNABLE},
+    media,
+    records::{collections::COLLECTIONS, media_links, visibility::ASSIGNABLE},
     team::audit,
     workspaces,
 };
@@ -53,21 +54,25 @@ pub async fn clear(pool: &PgPool, target: &Target, include_edited: bool) -> Outc
         if finance.is_none() && PARENTS.contains(&collection) {
             finance = Some(finance::clear::clear(&mut tx, target).await?);
         }
-        let removed: i64 = sqlx::query_scalar(
+        let removed: Vec<Uuid> = sqlx::query_scalar(
             "WITH gone AS (DELETE FROM crm_records r USING crm_sample_records m \
              WHERE m.record_id=r.id AND m.workspace_id=$1 AND r.workspace_id=$1 \
              AND r.collection=$2 RETURNING r.id), \
              logged AS (INSERT INTO crm_activity (id,actor_id,workspace_id,action,collection,\
              record_id) SELECT gen_random_uuid(),$3,$1,'deleted',$2,id FROM gone) \
-             SELECT count(*) FROM gone",
+             SELECT id FROM gone",
         )
         .bind(workspace)
         .bind(collection)
         .bind(target.owner)
-        .fetch_one(&mut *tx)
+        .fetch_all(&mut *tx)
         .await
         .map_err(failed)?;
-        counts.push((collection, removed));
+        // Photos people added to sample properties go with them (packet F2).
+        media::owned::remove_owners(&mut tx, workspace, media_links::KIND, &removed)
+            .await
+            .map_err(failed)?;
+        counts.push((collection, removed.len() as i64));
     }
     let suspended = suspend(&mut tx, target).await?;
     tx.commit().await.map_err(failed)?;

@@ -112,6 +112,7 @@ export const apiTestFiles = [
   'tests/api/chat.test.mjs',
   'tests/api/media.test.mjs',
   'tests/api/property-media.test.mjs',
+  'tests/api/sample-media.test.mjs',
   'tests/api/mailbox-google.test.mjs',
   'tests/api/mailbox-departure.test.mjs',
   'tests/api/mailbox-replies.test.mjs',

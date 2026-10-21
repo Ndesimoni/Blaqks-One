@@ -118,3 +118,22 @@ pub async fn remove_ids(tx: &mut Tx<'_>, kind: &str, owner: Uuid, ids: &[Uuid]) 
     .await?;
     Ok(())
 }
+
+/// Hides one workspace's files for several deleted items (sample-data clearing).
+pub async fn remove_owners(
+    tx: &mut Tx<'_>,
+    workspace: &str,
+    kind: &str,
+    owners: &[Uuid],
+) -> ApiResult<()> {
+    sqlx::query(
+        "UPDATE media.crm_media_objects SET deleted_at=now() \
+         WHERE workspace_id=$1 AND owner_kind=$2 AND owner_id=ANY($3) AND deleted_at IS NULL",
+    )
+    .bind(workspace)
+    .bind(kind)
+    .bind(owners)
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}

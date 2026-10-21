@@ -1,8 +1,9 @@
 use crate::error::{ApiError, ApiResult};
 use serde_json::Value;
 
-/// Each entry is either inline (`name`, `src` data URL) or a stored file (packet F2):
-/// `name` and `file`, optionally `thumb` (photos), `type` and `added`, nothing else.
+/// Each entry is either inline (`name`, `src` data URL) or a stored file (packet F2).
+/// Stored entries use a nonempty `name` of at most 200 characters and `file`, optionally
+/// `thumb` (photos), `type` and `added`, with nothing else.
 pub fn validate(payload: &Value) -> ApiResult<()> {
     for field in ["media_photos", "media_floorplans"] {
         let Some(media) = payload.get(field) else {
@@ -17,7 +18,7 @@ pub fn validate(payload: &Value) -> ApiResult<()> {
             let name = asset.get("name").and_then(Value::as_str);
             let valid = match asset.get("src").and_then(Value::as_str) {
                 Some(src) => name.is_some() && valid_source(src, photo),
-                None => name.is_some() && stored(asset, photo),
+                None => name.is_some_and(valid_stored_name) && stored(asset, photo),
             };
             if !valid {
                 return Err(ApiError::invalid(
@@ -27,6 +28,21 @@ pub fn validate(payload: &Value) -> ApiResult<()> {
         }
     }
     Ok(())
+}
+
+fn valid_stored_name(name: &str) -> bool {
+    let hidden = |character: char| {
+        character.is_control()
+            || matches!(
+                character,
+                '\u{061c}'
+                    | '\u{200b}'..='\u{200f}'
+                    | '\u{202a}'..='\u{202e}'
+                    | '\u{2060}'..='\u{2069}'
+                    | '\u{feff}'
+            )
+    };
+    !name.trim().is_empty() && name.chars().count() <= 200 && !name.chars().any(hidden)
 }
 
 fn stored(asset: &Value, photo: bool) -> bool {
@@ -109,5 +125,21 @@ mod tests {
         assert!(validate(&plan).is_err(), "floor plans have no thumbnail");
         let many: Vec<_> = (0..21).map(|_| json!({"name":"p", "file":id})).collect();
         assert!(validate(&json!({ "media_photos": many })).is_err());
+        assert!(photo(json!({"name":"n".repeat(200), "file":id})).is_ok());
+        assert!(photo(json!({"name":"n".repeat(201), "file":id})).is_err());
+        assert!(photo(json!({"name":"واجهة.jpg", "file":id})).is_ok());
+        for name in [
+            "",
+            "  ",
+            "bad\nname",
+            "report\u{202e}fdp",
+            "note\u{2066}pdf",
+        ] {
+            assert!(photo(json!({"name":name, "file":id})).is_err());
+        }
+        assert!(photo(json!({
+            "name":"n".repeat(201), "src":"data:image/jpeg;base64,AAA="
+        }))
+        .is_ok());
     }
 }
