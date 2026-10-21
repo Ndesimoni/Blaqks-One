@@ -14,7 +14,8 @@
   align-items: center;
   gap: 6px;
   max-inline-size: 100%;
-  padding: 4px 4px 4px 10px;
+  padding-block: 4px;
+  padding-inline: 10px 4px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface-subtle);
@@ -39,8 +40,8 @@
   color: var(--danger);
 }
 .chat-file button {
-  inline-size: 28px;
-  block-size: 28px;
+  inline-size: 32px;
+  block-size: 32px;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -53,7 +54,10 @@
   display: block;
   max-inline-size: min(240px, 100%);
   max-block-size: 240px;
+  min-inline-size: 96px;
+  min-block-size: 72px;
   border: 1px solid var(--line);
+  background: var(--surface-subtle);
   border-radius: 10px;
   object-fit: cover;
 }

@@ -6,7 +6,7 @@ export function ChosenFiles({ files }) {
   const { t } = useI18n();
   if (!files.items.length) return null;
   return (
-    <ul className="chat-files" aria-label={t('chat.files.chosen')}>
+    <ul className="chat-files" aria-label={t('chat.files.chosen')} aria-live="polite">
       {files.items.map((item) => (
         <li key={item.key} className={'chat-file is-' + item.status}>
           <span>
