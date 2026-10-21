@@ -60,6 +60,12 @@ against the item the file belongs to.
   migration 0048, `media/contents.rs` and `naming.rs`, `inbox/send/files.rs` and
   `domain_files.rs`, Attach files in the reply box and New email, files on messages; suites
   `tests/api/sendgrid-attachments.test.mjs` and `tests/server-browser/inbox-attachments.spec.js`.
+  Code security review (2026-10-21): no High findings. Fixed: the file reads (8 s) and the
+  SendGrid call (at most 20 s) now fit the outbox's 30-second call budget, so slow storage
+  retries instead of turning Unknown (M1); a Send again chain too long to follow fails
+  rather than sending without files. Accepted: the Super Admin and other companies get the
+  Inbox's usual 403 (not 404) on the file route; an object larger than its record retries
+  before failing; a worker holds about 120 MiB at most for two large sends at once.
   **F3b (receiving)** is next.
 - **F4 — public photos:** approved, re-encoded copies for the public website through the
   CDN, only for listings the Super Admin has approved.

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { api, query } from './helpers.mjs';
-import { connectMailbox } from './mailbox-helpers.mjs';
+import { connectMailbox, staffMember } from './mailbox-helpers.mjs';
 import { clientWith, sendAgain, settled, startMessage } from './mailbox-send-helpers.mjs';
 import { jpegWithGps, pdf, upload } from './media-helpers.mjs';
 import { addAddress, connectSendgrid, freshAdmin } from './sendgrid-helpers.mjs';
@@ -90,4 +90,34 @@ test('Send again keeps the files, a removed file stops the send, Google refuses 
   });
   assert.equal(gstart.status, 409);
   assert.match(gstart.value.message, /company email/);
+});
+
+test('over 15 MB, a colleague’s upload or another message’s file is refused', async () => {
+  const admin = await freshAdmin('f3a-limits-admin');
+  const colleague = await staffMember(admin, 'f3a-limits-agent', true);
+  assert.equal((await connectSendgrid(admin, 'f3a-limits.example.test')).status, 201);
+  assert.equal((await addAddress(admin, admin.user.id, 'owner')).status, 201);
+  const client = await clientWith(admin, 'limits.client@example.test');
+  const big = () => Buffer.concat([pdf(), Buffer.alloc(8 * 1024 * 1024, 32)]);
+  const files = [await uploaded(admin, big(), 'a.pdf'), await uploaded(admin, big(), 'b.pdf')];
+  const tooBig = await startMessage(admin, client, { attachments: files });
+  assert.equal(tooBig.status, 400);
+  assert.match(tooBig.value.message, /15 MB/);
+  const left = query(`SELECT count(*) FROM media.crm_media_objects
+    WHERE id IN ('${files[0]}','${files[1]}') AND owner_id IS NULL`);
+  assert.equal(left, '2', 'nothing was queued or attached');
+  const theirs = await uploaded(colleague, pdf(), 'theirs.pdf');
+  assert.equal((await startMessage(admin, client, { attachments: [theirs] })).status, 400);
+  // A file opens only under the message that carries it.
+  const sent = await startMessage(admin, client, { attachments: [files[0]] });
+  assert.equal(sent.status, 201, JSON.stringify(sent.value));
+  const { conversationId, message } = sent.value;
+  const other = await startMessage(admin, await clientWith(admin, 'other.client@example.test'));
+  const wrong = fileUrl(admin, conversationId, other.value.message.id, files[0]);
+  const refused = await fetch(`${api}${wrong}`, { headers: { Cookie: admin.cookie } });
+  assert.equal(refused.status, 404);
+  assert.equal(
+    query(`SELECT count(*) FROM inbox.crm_inbox_messages WHERE id='${message.id}'`),
+    '1',
+  );
 });

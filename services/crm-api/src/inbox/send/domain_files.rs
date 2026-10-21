@@ -10,7 +10,12 @@ use crate::{
     outbox::model::Job,
 };
 use sqlx::PgPool;
+use std::time::Duration;
 use uuid::Uuid;
+
+/// Reading the files may take this long before the send retries. With the provider's
+/// longest call it stays inside the outbox's call budget (F3a review M1).
+pub const STORAGE_DEADLINE: Duration = Duration::from_secs(8);
 
 const ROOT: &str = "WITH RECURSIVE chain(id,repeat_of,depth) AS ( \
     SELECT id,repeat_of,0 FROM inbox.crm_inbox_messages WHERE id=$1 AND workspace_id=$2 \
@@ -36,12 +41,28 @@ pub async fn load(
             after: None,
             code: "database",
         })?;
-    let owner = root.unwrap_or(job.object_id);
-    match contents::of_owner(pool, media, &job.workspace_id, KIND, owner).await {
-        Ok(files) => Ok(files),
-        Err(Unreadable::Unavailable) => Err(unavailable),
-        Err(Unreadable::Missing) => Err(Delivery::Failed {
-            code: "attachment_missing",
-        }),
+    let missing = Delivery::Failed {
+        code: "attachment_missing",
+    };
+    // No original found (a chain too long to follow): never send without its files.
+    let Some(owner) = root else {
+        return Err(missing);
+    };
+    let read = contents::of_owner(pool, media, &job.workspace_id, KIND, owner);
+    match tokio::time::timeout(STORAGE_DEADLINE, read).await {
+        Ok(Ok(files)) => Ok(files),
+        Ok(Err(Unreadable::Missing)) => Err(missing),
+        Ok(Err(Unreadable::Unavailable)) | Err(_) => Err(unavailable),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::STORAGE_DEADLINE;
+    use crate::{integrations::mail::SEND_TIMEOUT_MAX, outbox::model::CALL_TIMEOUT};
+
+    #[test]
+    fn reading_files_and_the_largest_send_fit_the_outbox_call_budget() {
+        assert!(STORAGE_DEADLINE + SEND_TIMEOUT_MAX < CALL_TIMEOUT);
     }
 }

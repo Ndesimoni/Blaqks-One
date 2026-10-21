@@ -48,6 +48,9 @@ pub enum Delivery {
 }
 
 pub use super::sendgrid::sender::company_sender;
+
+/// The longest one provider call may take, however large the attachments (F3a review M1).
+pub const SEND_TIMEOUT_MAX: Duration = Duration::from_secs(20);
 pub use mime::{plain_address, subject_ok, Email};
 
 /// The member's connected Google mailbox, for the Inbox's reply and start rules.

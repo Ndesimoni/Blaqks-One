@@ -52,7 +52,9 @@ pub async fn send(
         .post(format!("{}/v3/mail/send", config.api_url))
         .bearer_auth(&api_key)
         // A larger message gets longer than the ordinary 10 seconds (F3 review L1).
-        .timeout(Duration::from_secs(10 + 2 * (attached(out) >> 20) as u64))
+        .timeout(
+            Duration::from_secs(10 + 2 * (attached(out) >> 20) as u64).min(mail::SEND_TIMEOUT_MAX),
+        )
         .json(&body)
         .send()
         .await;
