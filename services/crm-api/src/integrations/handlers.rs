@@ -85,13 +85,19 @@ pub async fn connect(
     let label = wire::text(wire::node(&connection, "label")?, 80)?;
     let external = wire::text(wire::node(&connection, "externalAccountId")?, 160)?;
     let credential = wire::secret(wire::node(&connection, "credential")?, 4096)?;
-    let account = provider::adapter(channel)
-        .connect(&ConnectInput {
-            label: &label,
-            external_account_id: &external,
-            credential: &credential,
-        })
-        .map_err(ApiError::invalid)?;
+    // A SendGrid account proves its key and domain with SendGrid (E3a); others use the stub.
+    let account = if provider == Provider::Sendgrid {
+        let config = &state.config.sendgrid;
+        super::sendgrid::connect::account(config, &label, &external, &credential).await?
+    } else {
+        provider::adapter(channel)
+            .connect(&ConnectInput {
+                label: &label,
+                external_account_id: &external,
+                credential: &credential,
+            })
+            .map_err(ApiError::invalid)?
+    };
     let id = Uuid::new_v4();
     let aad = crypto::aad(
         &workspace,
@@ -105,6 +111,9 @@ pub async fn connect(
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     access::live_admin(&mut tx, &workspace, session.user.id).await?;
+    if channel == Channel::Email {
+        super::sendgrid::connect::ensure_one_system(&mut tx, &workspace, provider.as_str()).await?;
+    }
     store::insert(
         &mut tx,
         &store::NewConnection {
@@ -114,7 +123,7 @@ pub async fn connect(
             provider: provider.as_str(),
             external_account_id: &account.external_account_id,
             display_label: &account.label,
-            owner_member_id: channel.owner_scoped().then_some(session.user.id),
+            owner_member_id: channel.owner_scoped(provider).then_some(session.user.id),
             sealed: &sealed,
             key_version: key.version,
             actor: session.user.id,

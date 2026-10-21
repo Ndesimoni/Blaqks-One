@@ -40,6 +40,10 @@ fn only_supported_channel_provider_pairs_are_accepted() {
     assert!(!Channel::Whatsapp.allows(Provider::Meta));
     assert!(Channel::Email.allows(Provider::Google));
     assert!(Channel::Email.allows(Provider::Microsoft));
+    assert!(Channel::Email.allows(Provider::Sendgrid));
+    assert!(!Channel::Whatsapp.allows(Provider::Sendgrid));
+    assert!(Channel::Email.owner_scoped(Provider::Google));
+    assert!(!Channel::Email.owner_scoped(Provider::Sendgrid));
     assert!(Channel::Facebook.allows(Provider::Meta));
     assert!(Channel::Instagram.allows(Provider::Meta));
     assert!(Channel::Tiktok.allows(Provider::Tiktok));

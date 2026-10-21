@@ -2,6 +2,7 @@
 //! Admin-only registry, sealed credentials and insert-only redacted events.
 pub mod access;
 pub mod activity;
+mod addresses;
 mod commands;
 mod credential;
 mod crypto;
@@ -14,6 +15,7 @@ pub mod model;
 mod provider;
 pub mod revocation;
 pub mod routes;
+mod sendgrid;
 mod store;
 mod store_write;
 mod vocabulary;

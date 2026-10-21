@@ -34,6 +34,8 @@ pub async fn start(
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     live(&mut tx, &workspace, session.user.id).await?;
+    // Refused before Google consent, so no grant is made only to be dropped (review L1).
+    super::super::sendgrid::connect::ensure_one_system(&mut tx, &workspace, "google").await?;
     let owner = requests::Owner {
         workspace: &workspace,
         member: session.user.id,

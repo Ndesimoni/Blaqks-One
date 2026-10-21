@@ -64,7 +64,7 @@ pub async fn departure(
     for row in &rows {
         disconnect(tx, row, actor).await?;
     }
-    Ok(())
+    super::addresses::write::reserve_members(tx, workspace, members, actor).await
 }
 
 /// Revokes what is due. A row that cannot be opened (an unknown key version) is dropped,

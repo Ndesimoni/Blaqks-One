@@ -47,6 +47,8 @@ pub async fn verify(
 ) -> ApiResult<Verified> {
     let provider = header(headers, "x-stub-provider")
         .and_then(Provider::parse)
+        // SendGrid is verified by its own signatures (E3c), never through the stub (L6).
+        .filter(|provider| *provider != Provider::Sendgrid)
         .ok_or_else(rejected)?;
     let account = header(headers, "x-stub-account")
         .filter(|value| (1..=160).contains(&value.len()))

@@ -10,9 +10,13 @@ pub mod google_settings;
 #[path = "config_media.rs"]
 pub mod media_settings;
 
+#[path = "config_sendgrid.rs"]
+pub mod sendgrid_settings;
+
 use google_settings::GoogleConfig;
 use media_settings::MediaConfig;
 use messaging_settings::{messaging_key, MessagingKey};
+use sendgrid_settings::SendgridConfig;
 use signup_settings::{client_secret, turnstile_config, worker_enabled};
 use std::{env, net::SocketAddr};
 use url::Url;
@@ -41,6 +45,8 @@ pub struct Config {
     pub google: Option<GoogleConfig>,
     /// Private file storage (F1); `None` turns uploads off.
     pub media: Option<MediaConfig>,
+    /// SendGrid's API address (E3); each company brings its own key.
+    pub sendgrid: SendgridConfig,
 }
 
 #[derive(Clone)]
@@ -83,6 +89,7 @@ impl Config {
         )?;
         let google = google_settings::from_env(&origin, !secure_cookie)?;
         let media = media_settings::from_env(!secure_cookie)?;
+        let sendgrid = sendgrid_settings::from_env(!secure_cookie)?;
         Ok(Self {
             database_url,
             origin,
@@ -97,6 +104,7 @@ impl Config {
             messaging,
             google,
             media,
+            sendgrid,
         })
     }
 }

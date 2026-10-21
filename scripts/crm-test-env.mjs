@@ -1,8 +1,9 @@
 // The isolated test run's environment (see test-crm-api.mjs). Every secret is random per
-// run; Google points at the loopback stand-in in scripts/fake-google.mjs.
+// run; Google and SendGrid point at the loopback stand-ins in scripts/fake-*.mjs.
 import { randomBytes } from 'node:crypto';
 
 export const FAKE_GOOGLE_PORT = 8791;
+export const FAKE_SENDGRID_PORT = 8792;
 export const TEST_ORIGIN = 'http://localhost:5175';
 
 export function testEnv() {
@@ -45,6 +46,8 @@ export function testEnv() {
     CRM_GOOGLE_WORKSPACE_DOMAIN: 'keys-fixture.test',
     CRM_GOOGLE_ENDPOINT: `http://127.0.0.1:${FAKE_GOOGLE_PORT}`,
     CRM_TEST_GOOGLE: `http://127.0.0.1:${FAKE_GOOGLE_PORT}`,
+    CRM_SENDGRID_ENDPOINT: `http://127.0.0.1:${FAKE_SENDGRID_PORT}`,
+    CRM_TEST_SENDGRID: `http://127.0.0.1:${FAKE_SENDGRID_PORT}`,
   });
   return { project, env };
 }

@@ -114,6 +114,8 @@ export const apiTestFiles = [
   'tests/api/property-media.test.mjs',
   'tests/api/sample-media.test.mjs',
   'tests/api/mailbox-google.test.mjs',
+  'tests/api/sendgrid.test.mjs',
+  'tests/api/sendgrid-addresses.test.mjs',
   'tests/api/mailbox-departure.test.mjs',
   'tests/api/mailbox-replies.test.mjs',
   'tests/api/mailbox-replies-guards.test.mjs',

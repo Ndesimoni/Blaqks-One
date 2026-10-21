@@ -3,9 +3,10 @@ import { resolve } from 'node:path';
 import { checkExpiredSignupRemoved, seedExpiredSignup } from './check-signup-cleanup.mjs';
 import { checkSignupOff } from './check-signup-off.mjs';
 import { selectedApiTestFiles } from './crm-api-test-files.mjs';
-import { FAKE_GOOGLE_PORT, testEnv } from './crm-test-env.mjs';
+import { FAKE_GOOGLE_PORT, FAKE_SENDGRID_PORT, testEnv } from './crm-test-env.mjs';
 import { createFixtures, raiseFixtureSeats } from './crm-test-fixtures.mjs';
 import { startFakeGoogle } from './fake-google.mjs';
+import { startFakeSendgrid } from './fake-sendgrid.mjs';
 import { ensurePortFree, run, startWorker, stop, waitForApi } from './crm-test-processes.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
@@ -16,6 +17,7 @@ const compose = ['compose', '-f', 'compose.test.yaml', '-p', project];
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 let server;
 let google;
+let sendgrid;
 let worker;
 let containerStarted = false;
 try {
@@ -40,6 +42,8 @@ try {
   await createFixtures(binary, env);
   await ensurePortFree('127.0.0.1', 8790);
   await ensurePortFree('127.0.0.1', FAKE_GOOGLE_PORT);
+  await ensurePortFree('127.0.0.1', FAKE_SENDGRID_PORT);
+  sendgrid = await startFakeSendgrid({ port: FAKE_SENDGRID_PORT });
   google = await startFakeGoogle({
     port: FAKE_GOOGLE_PORT,
     clientId: env.CRM_GOOGLE_CLIENT_ID,
@@ -131,6 +135,7 @@ try {
   await stop(worker);
   await stop(server);
   await google?.close();
+  await sendgrid?.close();
   if (containerStarted) {
     try {
       await run('docker', [...compose, 'down'], env);

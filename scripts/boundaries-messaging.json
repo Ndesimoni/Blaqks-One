@@ -12,7 +12,10 @@
       "crm_webhook_receipts_purge",
       "crm_webhook_staging",
       "crm_oauth_requests",
-      "crm_pending_revocations"
+      "crm_pending_revocations",
+      "crm_sendgrid_addresses",
+      "crm_sendgrid_addresses_local",
+      "crm_sendgrid_addresses_member"
     ],
     "chat": [
       "crm_chat_rooms",

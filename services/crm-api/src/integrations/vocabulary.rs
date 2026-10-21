@@ -32,16 +32,20 @@ impl Channel {
         }
     }
 
-    /// Email mailboxes belong to one member; other channels belong to the company.
-    pub fn owner_scoped(self) -> bool {
-        self == Self::Email
+    /// Google and Microsoft mailboxes belong to one member; other connections, including a
+    /// SendGrid account serving the whole company (E3), belong to the company.
+    pub fn owner_scoped(self, provider: Provider) -> bool {
+        self == Self::Email && provider != Provider::Sendgrid
     }
 
     pub fn allows(self, provider: Provider) -> bool {
         matches!(
             (self, provider),
             (Self::Whatsapp, Provider::Twilio)
-                | (Self::Email, Provider::Google | Provider::Microsoft)
+                | (
+                    Self::Email,
+                    Provider::Google | Provider::Microsoft | Provider::Sendgrid
+                )
                 | (Self::Facebook | Self::Instagram, Provider::Meta)
                 | (Self::Tiktok, Provider::Tiktok)
         )
@@ -55,6 +59,7 @@ pub enum Provider {
     Microsoft,
     Meta,
     Tiktok,
+    Sendgrid,
 }
 
 impl Provider {
@@ -65,6 +70,7 @@ impl Provider {
             "microsoft" => Self::Microsoft,
             "meta" => Self::Meta,
             "tiktok" => Self::Tiktok,
+            "sendgrid" => Self::Sendgrid,
             _ => return None,
         })
     }
@@ -76,6 +82,7 @@ impl Provider {
             Self::Microsoft => "microsoft",
             Self::Meta => "meta",
             Self::Tiktok => "tiktok",
+            Self::Sendgrid => "sendgrid",
         }
     }
 }

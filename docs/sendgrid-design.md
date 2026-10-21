@@ -1,7 +1,7 @@
 # Company email through SendGrid — design (packet E3)
 
 Status: **approved by the owner** (decisions E3a–E3d, 2026-10-21); security review done, no
-High findings. Nothing in E3 is built yet. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
+High findings. **E3a is built** (2026-10-21, §10); E3b–E3d follow. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
 each member writes and reads client email in the CRM from an address on the company's own
 domain, with no separate Gmail or Outlook mailbox. The Google Workspace adapter (E1) stays
 available. This document extends the [messaging design](messaging-design.md); every rule
@@ -34,11 +34,10 @@ privacy, sealed credentials, verified webhooks) applies unless this page says ot
 - One `crm_channel_connections` row per company: `channel = email`, `provider = sendgrid`,
   `owner_member_id = null`, `external_account_id` = the authenticated domain (lower case).
   The existing unique `(provider, external_account_id)` index stops two companies from
-  connecting the same domain. The sealed credential holds the API key, both SendGrid public
-  keys (incoming mail and events), the receiving host and the IDs of the Parse setting, Event
-  Webhook and security policies the CRM created (review L7).
-- New table `integrations.crm_sendgrid_addresses`: `workspace_id`, `domain`,
-  `connection_id`, `member_id`, `local_part` (lower case, `a-z 0-9 . _ -`), `display_name`,
+  connecting the same domain. The sealed credential is the API key alone. E3b and E3c keep
+  the SendGrid public keys (not secret), the receiving host and the IDs of the Parse setting,
+  Event Webhook and security policies the CRM creates in their own table (review L7).
+- New table `integrations.crm_sendgrid_addresses`: `workspace_id`, `domain`, `member_id`, `local_part` (lower case, `a-z 0-9 . _ -`), `display_name`,
   `state` (`active`, `reserved`), `version`, timestamps. Unique
   `(workspace_id, domain, local_part)` for ever, so a reserved address survives a reconnect
   (L2); one active address per member.
@@ -52,7 +51,8 @@ privacy, sealed credentials, verified webhooks) applies unless this page says ot
    authentication read, Inbound Parse settings, Event Webhook settings and security-policy
    create (exact names fixed in E3a). A full-access key is refused (review M4).
 2. The adapter reads the account's authenticated domains and accepts only a domain marked
-   valid. The browser never supplies the domain.
+   valid. The Admin names the domain, but it counts only when SendGrid lists it as
+   authenticated for that key's account, so the provider proves it.
 3. The adapter creates the Inbound Parse setting for the receiving host (with `send_raw`
    on, M3) and the signed Event Webhook, each pointing at a URL that names this connection
    (`/api/integrations/webhooks/sendgrid/{connection}/inbound` and `.../events`), attaches a
@@ -167,3 +167,42 @@ takes real mail:
 E3a and E3b need no owner setup (stand-in). Testing with real mail needs the owner steps in
 [Connecting platforms](connecting-platforms.md) and, for E3c and events, the public HTTPS
 address (D7) or a development tunnel.
+
+## 10. E3a as built (2026-10-21)
+
+- Migration 0045 adds the `sendgrid` provider (a company connection: email channel, no
+  owner member) and `crm_sendgrid_addresses`, unique for ever by
+  `(workspace_id, domain, local_part)` with one active address per member and domain.
+- Connect (`POST /channels`, `provider: sendgrid`, `externalAccountId` = the domain,
+  `credential` = the key) calls `GET /v3/scopes` and `GET /v3/whitelabel/domains` before
+  any lock: the key may hold only `mail.send`, `whitelabel.read`, create/read/delete of the
+  Inbound Parse and Event Webhook settings, security-policy create and SendGrid's account
+  flags, never an `update` (code review M1); the domain must be listed as valid. Reconnect proves the new key
+  on the same domain. Failures are fixed messages; no SendGrid text or key is returned.
+- One email system at a time: SendGrid refuses a company with a live Google mailbox, and
+  Google sign-in refuses a company with SendGrid, each under the workspace lock.
+- `GET/POST /workspaces/{ws}/email-addresses` and `PATCH` (display name) / `DELETE`
+  (reserve) on `/{id}`: Admin only, CSRF, live membership under the workspace lock,
+  versions on changes. An address goes only to a live member who may send email; role
+  addresses such as `postmaster` are refused; display names refuse quotes, angle brackets,
+  line breaks and hidden direction characters; a reserved address returns only to its own
+  member. A member who leaves or loses the email grant has their addresses reserved in the
+  same transaction.
+- Local stand-in `scripts/fake-sendgrid.mjs` (`npm run dev:sendgrid`, keys `SG.<kind>.<domain>`)
+  behind `CRM_SENDGRID_ENDPOINT`, refused outside local development. API suites:
+  `tests/api/sendgrid.test.mjs`, `tests/api/sendgrid-addresses.test.mjs`.
+- Google sign-in is refused at its start, before consent, when the company uses SendGrid.
+- Code security review (2026-10-21): no High findings. Fixed: exact scope allowlist (M1),
+  refusal before Google consent (L1), wider display-name and role-address checks (L3, L4),
+  the local stub webhook refuses SendGrid (L6), and tests for other companies' members, the
+  CSRF token and suspension (L7).
+- Follow-ups:
+  - **L1 rest:** a SendGrid connection made between a member's Google start and finish
+    still drops that Google grant unrevoked; queue its revocation when E3b touches finish.
+  - **L2 (owner decision):** archiving an Admin freezes the company but keeps its SendGrid
+    connection and domain held, as company Twilio channels already do. Decide whether an
+    archive disconnects company channels before E3c routes incoming mail.
+  - **L5:** the CRM cannot delete a SendGrid key (key management is refused by design), so
+    the E3d disconnect copy tells the Admin to delete the key in SendGrid.
+  - Confirm the exact scope names in the sandbox (§8); address history in Team activity
+    with E3d's labels; sending (E3b), incoming mail (E3c), screens (E3d).

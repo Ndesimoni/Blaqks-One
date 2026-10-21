@@ -58,6 +58,8 @@ pub async fn finish(
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     live(&mut tx, &workspace, session.user.id).await?;
+    // One email system per company (decision E3c): no Google mailbox beside SendGrid.
+    super::super::sendgrid::connect::ensure_one_system(&mut tx, &workspace, "google").await?;
     let existing = store::own_mailbox(&mut tx, &workspace, session.user.id).await?;
     if existing
         .as_ref()

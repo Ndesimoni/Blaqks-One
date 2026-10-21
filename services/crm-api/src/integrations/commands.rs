@@ -38,6 +38,9 @@ pub async fn reconnect(
     let expected = wire::version(&map)?;
     let credential = wire::secret(wire::node(&map, "credential")?, 4096)?;
     let id = access::id(&id)?;
+    // SendGrid proves a new key over the network, so before the workspace lock (E3a).
+    let proven =
+        super::sendgrid::connect::reconnect_proof(&state, &workspace, id, &credential).await?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     access::live_admin(&mut tx, &workspace, session.user.id).await?;
@@ -54,9 +57,15 @@ pub async fn reconnect(
             "Reconnect a Google mailbox with Google sign-in.",
         ));
     }
-    provider::adapter(channel)
-        .verify(&row.external_account_id, &credential)
-        .map_err(ApiError::invalid)?;
+    if row.provider == "sendgrid" {
+        if proven.as_deref() != Some(row.external_account_id.as_str()) {
+            return Err(ApiError::stale(RELOAD));
+        }
+    } else {
+        provider::adapter(channel)
+            .verify(&row.external_account_id, &credential)
+            .map_err(ApiError::invalid)?;
+    }
     let aad = crypto::aad(
         &workspace,
         &id.to_string(),

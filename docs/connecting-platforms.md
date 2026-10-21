@@ -8,13 +8,13 @@ document: type it into the CRM's Connections screen or the `.env` file yourself.
 
 ## Status (2026-10-21)
 
-| Channel                     | Provider            | CRM side                 | Owner setup                               |
-| --------------------------- | ------------------- | ------------------------ | ----------------------------------------- |
-| Email (company domain)      | Twilio SendGrid     | Designed (E3), not built | Domain and SendGrid account, below        |
-| Email (Google Workspace)    | Google              | Built (E1)               | [Google mail setup](google-mail-setup.md) |
-| WhatsApp                    | Twilio              | Planned (W1, W2)         | Decisions D2 and D6 first                 |
-| Facebook Page and Instagram | Meta                | Planned (S1)             | Meta business setup and app review        |
-| TikTok direct messages      | TikTok for Business | Planned (T1)             | Business Messaging access (D9)            |
+| Channel                     | Provider            | CRM side               | Owner setup                               |
+| --------------------------- | ------------------- | ---------------------- | ----------------------------------------- |
+| Email (company domain)      | Twilio SendGrid     | Connection built (E3a) | Domain and SendGrid account, below        |
+| Email (Google Workspace)    | Google              | Built (E1)             | [Google mail setup](google-mail-setup.md) |
+| WhatsApp                    | Twilio              | Planned (W1, W2)       | Decisions D2 and D6 first                 |
+| Facebook Page and Instagram | Meta                | Planned (S1)           | Meta business setup and app review        |
+| TikTok direct messages      | TikTok for Business | Planned (T1)           | Business Messaging access (D9)            |
 
 ## Needed by every channel: a public HTTPS address (D7)
 
