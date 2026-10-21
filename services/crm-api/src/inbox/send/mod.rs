@@ -3,6 +3,7 @@
 //! job in the same transaction, and the messaging worker sends it through the author's own
 //! mailbox (decision O9). Bodies never leave this module except to the provider.
 mod again;
+pub mod delivery;
 pub mod domain;
 mod domain_settle;
 mod reply;

@@ -77,9 +77,18 @@ pub async fn settle(
     provider_id: Option<&str>,
     code: &str,
 ) -> ApiResult<()> {
+    // A signed provider event that arrived during the call (Delivered, or Failed by a
+    // bounce) is never overwritten by the call's own late result, so a timeout cannot
+    // turn a delivered message into a repeatable `unknown` (E3b review M1). The provider
+    // ID is still kept, so later events pass their prefix check.
     sqlx::query(
-        "UPDATE inbox.crm_inbox_messages SET status=$3,status_changed_at=now(), \
-           provider_message_id=COALESCE($4,provider_message_id),failure_reason=NULLIF($5,'') \
+        "UPDATE inbox.crm_inbox_messages SET \
+           provider_message_id=COALESCE($4,provider_message_id), \
+           status=CASE WHEN status IN ('delivered','failed') THEN status ELSE $3 END, \
+           failure_reason=CASE WHEN status IN ('delivered','failed') THEN failure_reason \
+             ELSE NULLIF($5,'') END, \
+           status_changed_at=CASE WHEN status IN ('delivered','failed') THEN status_changed_at \
+             ELSE now() END \
          WHERE id=$1 AND workspace_id=$2",
     )
     .bind(job.object_id)

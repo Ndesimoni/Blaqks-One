@@ -4,6 +4,7 @@
 // can do, `SG.<kind>.<domain>`; `POST /test/revoke` with a domain makes its keys stop
 // working. No real account exists and nothing is ever sent.
 import { createServer } from 'node:http';
+import { createWebhooks } from './fake-sendgrid-events.mjs';
 import { mailSend } from './fake-sendgrid-mail.mjs';
 
 const SCOPES = [
@@ -31,21 +32,26 @@ export async function startFakeSendgrid({ port }) {
   const calls = [];
   const sent = [];
   const revoked = new Set();
+  const webhooks = createWebhooks();
   const json = (response, status, value) => {
     response.writeHead(status, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify(value));
   };
-  const server = createServer((request, response) => {
+  const server = createServer(async (request, response) => {
     const url = new URL(request.url, `http://127.0.0.1:${port}`);
     if (url.pathname === '/test/state') return json(response, 200, { calls, sent });
     if (url.pathname === '/test/revoke') {
       revoked.add(url.searchParams.get('domain'));
       return json(response, 200, {});
     }
+    if (url.pathname === '/test/events') return webhooks.deliver(request, response, url, json);
     calls.push(url.pathname);
     const key = parseKey(request.headers.authorization);
     if (!key) return json(response, 401, { errors: [{ message: 'authorization required' }] });
     if (key.kind === 'down') return json(response, 503, { errors: [] });
+    if (revoked.has(key.domain)) return json(response, 401, { errors: [{ message: 'revoked' }] });
+    const handled = await webhooks.settings(request, response, url, key, json);
+    if (handled !== null) return handled;
     if (request.method === 'GET' && url.pathname === '/v3/scopes') {
       return json(response, 200, { scopes: key.kind.scopes });
     }
@@ -56,7 +62,7 @@ export async function startFakeSendgrid({ port }) {
       ]);
     }
     if (request.method === 'POST' && url.pathname === '/v3/mail/send') {
-      return mailSend(request, response, key, { sent, revoked }, json);
+      return mailSend(request, response, { sent, domain: key.domain, post: webhooks.post }, json);
     }
     return json(response, 404, { errors: [{ message: 'not found' }] });
   });

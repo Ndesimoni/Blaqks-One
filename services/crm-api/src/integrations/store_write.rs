@@ -29,13 +29,21 @@ pub async fn set_connected(
     super::store::load(tx, workspace, id).await
 }
 
-/// Disconnect clears the credential in the same statement; history stays.
+/// Disconnect clears the credential in the same statement and forgets the SendGrid
+/// webhook keys (E3b), so no later event verifies; history stays.
 pub async fn set_disconnected(
     tx: &mut Transaction<'_, Postgres>,
     workspace: &str,
     id: Uuid,
     actor: Uuid,
 ) -> ApiResult<Option<ConnectionRow>> {
+    sqlx::query(
+        "DELETE FROM integrations.crm_sendgrid_webhooks WHERE connection_id=$1 AND workspace_id=$2",
+    )
+    .bind(id)
+    .bind(workspace)
+    .execute(&mut **tx)
+    .await?;
     sqlx::query(
         "UPDATE integrations.crm_channel_connections
          SET state='disconnected',credential_sealed=NULL,credential_key_version=NULL,

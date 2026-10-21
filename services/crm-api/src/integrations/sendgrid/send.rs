@@ -83,7 +83,8 @@ pub async fn send(
                 .map(|seconds| Duration::from_secs(seconds.min(3600)));
             retry(after, "rate_limited")
         }
-        401 | 403 => mail::reconnect(pool, out).await,
+        // Only 401 proves the key no longer works; 403 can be one sender's problem (L1).
+        401 => mail::reconnect(pool, out).await,
         400..=499 => failed("provider_refused"),
         _ => unknown(),
     }

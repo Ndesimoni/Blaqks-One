@@ -2,12 +2,14 @@
 //! `/api/integrations/webhooks/{provider}` (decision D10): no CRM cookie, CSRF token or
 //! workspace path. The signature is verified over the raw body before anything else; a
 //! verified event gets a receipt and a sealed staging row, and the worker processes it.
-//! X2 ships only the local `stub` provider; real providers arrive with W2, E1, S1 and T1.
+//! X2 ships the local `stub` provider; SendGrid's signed delivery events arrive on their
+//! own per-connection route (E3b, `sendgrid.rs`).
 pub mod cleanup;
 pub mod inbound;
 mod inbound_store;
 pub mod message;
 mod receipt;
+mod sendgrid;
 pub mod signature;
 pub mod sink;
 mod store;
@@ -31,10 +33,16 @@ use axum::{
 pub const MAX_BODY: usize = 1024 * 1024;
 
 pub fn router() -> Router<AppState> {
-    Router::new().route(
-        "/api/integrations/webhooks/{provider}",
-        post(receive).layer(DefaultBodyLimit::max(MAX_BODY)),
-    )
+    Router::new()
+        .route(
+            "/api/integrations/webhooks/{provider}",
+            post(receive).layer(DefaultBodyLimit::max(MAX_BODY)),
+        )
+        // SendGrid's signed delivery events, one URL per connection (E3b).
+        .route(
+            "/api/integrations/webhooks/sendgrid/{connection}/events",
+            post(sendgrid::events).layer(DefaultBodyLimit::max(MAX_BODY)),
+        )
 }
 
 /// Answers `202` with no body once the event is stored (or was already stored), `401` for

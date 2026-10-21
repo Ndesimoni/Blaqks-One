@@ -13,15 +13,17 @@ const FLAGS: [&str; 4] = [
     "sender_verification_exempt",
 ];
 /// Exactly what E3b and E3c need to create, read and remove their own incoming-mail and
-/// event settings (code review M1): no `update`, so a leaked key cannot repoint incoming
-/// mail elsewhere. The names are confirmed in the SendGrid sandbox before E3b (design §8).
-const WEBHOOKS: [&str; 7] = [
+/// event settings (code review M1). Incoming mail has no `update`, so a leaked key cannot
+/// repoint client mail; events need it once, to turn signing on, and unsigned events are
+/// refused anyway. The names are confirmed in the SendGrid sandbox (design §8).
+const WEBHOOKS: [&str; 8] = [
     "user.webhooks.parse.settings.create",
     "user.webhooks.parse.settings.read",
     "user.webhooks.parse.settings.delete",
     "user.webhooks.event.settings.create",
     "user.webhooks.event.settings.read",
     "user.webhooks.event.settings.delete",
+    "user.webhooks.event.settings.update",
     "user.webhooks.security.policies.create",
 ];
 

@@ -135,8 +135,10 @@ pub async fn connect(
         .await?
         .ok_or_else(ApiError::missing)?;
     tx.commit().await?;
-    Ok((
-        StatusCode::CREATED,
-        Json(json!({ "connection": row.view() })),
-    ))
+    let mut body = json!({ "connection": row.view() });
+    if provider == Provider::Sendgrid {
+        let ready = super::sendgrid::webhooks::ensure(&state, &workspace, id).await;
+        body["deliveryUpdates"] = json!(ready);
+    }
+    Ok((StatusCode::CREATED, Json(body)))
 }

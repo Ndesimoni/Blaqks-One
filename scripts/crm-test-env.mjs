@@ -48,6 +48,8 @@ export function testEnv() {
     CRM_TEST_GOOGLE: `http://127.0.0.1:${FAKE_GOOGLE_PORT}`,
     CRM_SENDGRID_ENDPOINT: `http://127.0.0.1:${FAKE_SENDGRID_PORT}`,
     CRM_TEST_SENDGRID: `http://127.0.0.1:${FAKE_SENDGRID_PORT}`,
+    // Where the SendGrid stand-in posts signed delivery events: the test API itself.
+    CRM_PUBLIC_URL: 'http://127.0.0.1:8790',
   });
   return { project, env };
 }

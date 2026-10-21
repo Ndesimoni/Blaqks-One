@@ -87,7 +87,12 @@ pub async fn reconnect(
     .ok_or_else(ApiError::missing)?;
     store_write::event(&mut tx, &workspace, id, "reconnected", session.user.id).await?;
     tx.commit().await?;
-    Ok(Json(json!({ "connection": updated.view() })))
+    let mut body = json!({ "connection": updated.view() });
+    if row.provider == "sendgrid" {
+        let ready = super::sendgrid::webhooks::ensure(&state, &workspace, id).await;
+        body["deliveryUpdates"] = json!(ready);
+    }
+    Ok(Json(body))
 }
 
 pub async fn disconnect(
@@ -115,10 +120,16 @@ pub async fn disconnect(
     if row.version != expected {
         return Err(ApiError::stale(RELOAD));
     }
+    // SendGrid's webhook is read while the key still opens and removed after the commit.
+    let messaging = state.config.messaging.as_ref();
+    let removal = super::sendgrid::webhooks::pending_removal(&mut tx, messaging, &row).await?;
     let updated = super::revocation::disconnect(&mut tx, &row, session.user.id)
         .await?
         .ok_or_else(ApiError::missing)?;
     tx.commit().await?;
+    if let Some(removal) = removal {
+        super::sendgrid::webhooks::remove(&state.config.sendgrid, removal).await;
+    }
     super::mailbox::revoke_soon(&state);
     Ok(Json(json!({ "connection": updated.view() })))
 }

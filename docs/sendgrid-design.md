@@ -1,7 +1,7 @@
 # Company email through SendGrid — design (packet E3)
 
 Status: **approved by the owner** (decisions E3a–E3d, 2026-10-21); security review done, no
-High findings. **E3a is built** (2026-10-21, §10); E3b–E3d follow. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
+High findings. **E3a and E3b are built** (2026-10-21, §10–§11); E3c and E3d follow. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
 each member writes and reads client email in the CRM from an address on the company's own
 domain, with no separate Gmail or Outlook mailbox. The Google Workspace adapter (E1) stays
 available. This document extends the [messaging design](messaging-design.md); every rule
@@ -56,7 +56,7 @@ privacy, sealed credentials, verified webhooks) applies unless this page says ot
 3. The adapter creates the Inbound Parse setting for the receiving host (with `send_raw`
    on, M3) and the signed Event Webhook, each pointing at a URL that names this connection
    (`/api/integrations/webhooks/sendgrid/{connection}/inbound` and `.../events`), attaches a
-   signature security policy, and stores both public keys sealed with the API key. An
+   signature security policy, and stores both public keys (not secret) beside the sealed API key. An
    existing Parse setting for that host is never adopted or overwritten without the Admin's
    confirmation (L7).
 4. Reconnect must open the same, still valid domain. Unsigned requests stay refused even if
@@ -206,3 +206,53 @@ address (D7) or a development tunnel.
     the E3d disconnect copy tells the Admin to delete the key in SendGrid.
   - Confirm the exact scope names in the sandbox (§8); address history in Team activity
     with E3d's labels; sending (E3b), incoming mail (E3c), screens (E3d).
+
+## 11. E3b as built (2026-10-21)
+
+- **Sending.** A company on SendGrid sends through its one connection. The Inbox lets a
+  member send only with an active address on the domain; any such member may reply in a
+  conversation they can see (company email, unlike personal Google mailboxes under O9),
+  always from their own address. The worker re-checks the author, the grant and the
+  address right before the call, builds the body from the allowlist (one recipient,
+  tracking off, `Message-ID` `<message UUID@domain>`, `In-Reply-To`/`References` to the
+  latest client message, `inbox_message` as the only custom argument) and maps answers:
+  2xx → Sent (SendGrid's `X-Message-Id` kept, the CRM's Message-ID stored and used as the
+  thread of a new conversation); 429 → retry with `Retry-After`; other 4xx → Failed;
+  401/403 → Failed and the connection needs reconnecting; a timeout or 5xx → Unknown,
+  never re-sent. The Google path moved unchanged to `google/deliver.rs`.
+- **Delivery events.** With `CRM_PUBLIC_URL` set (D7), connect and reconnect create one
+  Event Webhook for `/api/integrations/webhooks/sendgrid/{connection}/events` asking only
+  for delivered, bounce, dropped, spam report and unsubscribe events, turn signing on and
+  store its public key (migration 0046). Each request needs JSON, both signature headers
+  and a timestamp within five minutes either way; the ECDSA P-256 signature over the
+  timestamp and raw body is checked with that connection's key before parsing; every
+  failure is the same 401 and writes nothing. Verified events go to the Inbox, which moves
+  an outbound message of a conversation on the same connection forward only: Delivered
+  from sending, sent or unknown; Failed (`bounced`, `dropped`) from those or Delivered.
+  Replays change nothing, so no receipt row is kept. A `sent` from the worker never
+  overwrites an event that arrived first.
+- Signing needs `user.webhooks.event.settings.update` in the key allowlist; incoming mail
+  still has no `update`, so a leaked key cannot repoint client mail.
+- Disconnect removes the webhook at SendGrid (best effort, while the key still opens) and
+  forgets its key in the disconnect transaction; an archived company's webhook is left at
+  SendGrid but its events are refused.
+- Not yet: spam reports and unsubscribes recording an email opt-out (with the consents
+  table, W1), the Connections screen showing whether delivery updates are on (E3d).
+- Stand-in: `scripts/fake-sendgrid-mail.mjs` and `scripts/fake-sendgrid-events.mjs`; API
+  suites `tests/api/sendgrid-send.test.mjs` and `tests/api/sendgrid-events.test.mjs`.
+- Code security review (2026-10-21): no High findings, nothing cross-company or leaked.
+  Fixed: a late `unknown` or `failed` from the worker never overwrites a Delivered or
+  Failed set by a signed event, so a delivered message is never offered for Send again
+  (M1); disconnect reads the webhook inside its transaction after every check and removes
+  it at SendGrid only after the commit (M2); only 401 marks the connection for
+  reconnecting, a 403 fails that one message (L1); the events route refuses on headers,
+  timestamp and key before reading the body, without a transaction (L2); the webhook asks
+  only for delivered, bounce and dropped until opt-outs are recorded (L3).
+- Accepted: `user.webhooks.event.settings.update` lets a leaked key repoint or switch off
+  the CRM's webhook, silently stopping delivery updates; such a key could already create
+  its own webhook, and it still cannot touch incoming mail (L4). The public keys are stored
+  plainly, as they are not secret (L5). Once a company moves to SendGrid, replies in its
+  older Google conversations are refused, as one email system is used at a time (L6).
+- Follow-ups: rate or concurrency limits for the public route at the hosting edge (L2);
+  webhooks left at SendGrid by an archive or a failed delete are refused but may count
+  against an account limit, so E3d's disconnect copy names them (L5).
