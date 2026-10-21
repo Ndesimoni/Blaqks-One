@@ -91,3 +91,30 @@ pub async fn remove(tx: &mut Tx<'_>, kind: &str, owner: Uuid) -> ApiResult<()> {
     .await?;
     Ok(())
 }
+
+/// The IDs of an item's visible files.
+pub async fn ids(tx: &mut Tx<'_>, kind: &str, owner: Uuid) -> ApiResult<Vec<Uuid>> {
+    sqlx::query_scalar(
+        "SELECT id FROM media.crm_media_objects \
+         WHERE owner_kind=$1 AND owner_id=$2 AND deleted_at IS NULL",
+    )
+    .bind(kind)
+    .bind(owner)
+    .fetch_all(&mut **tx)
+    .await
+    .map_err(Into::into)
+}
+
+/// Hides some of an item's files at once; the sweep removes them from storage.
+pub async fn remove_ids(tx: &mut Tx<'_>, kind: &str, owner: Uuid, ids: &[Uuid]) -> ApiResult<()> {
+    sqlx::query(
+        "UPDATE media.crm_media_objects SET deleted_at=now() \
+         WHERE owner_kind=$1 AND owner_id=$2 AND id=ANY($3) AND deleted_at IS NULL",
+    )
+    .bind(kind)
+    .bind(owner)
+    .bind(ids)
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}

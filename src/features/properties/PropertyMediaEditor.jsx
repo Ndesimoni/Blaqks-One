@@ -4,6 +4,7 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 
+import { useMediaSource } from '../../lib/mediaSource.js';
 import { usePropertyMediaEditor } from './usePropertyMediaEditor.js';
 import { PropertyAmenityPicker } from './PropertyAmenityPicker.jsx';
 
@@ -14,6 +15,7 @@ export function PropertyMediaEditor({
   setUploading,
   storageMode = 'browser',
 }) {
+  const source = useMediaSource();
   const { mediaError, addMedia, removeMedia } = usePropertyMediaEditor({
     form,
     setForm,
@@ -36,7 +38,7 @@ export function PropertyMediaEditor({
         listClassName="editor-photo-grid"
         renderItem={(file, i) => (
           <div className="editor-photo">
-            <img src={file.src} alt={file.name} />
+            <img src={source.src(file, form)} alt={file.name} />
             {i === 0 && <span className="cover-marker">Cover photo</span>}
             <button
               type="button"

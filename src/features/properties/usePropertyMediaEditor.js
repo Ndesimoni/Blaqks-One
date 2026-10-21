@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { makeMediaAsset } from '../../lib/media.js';
+import { useMediaSource } from '../../lib/mediaSource.js';
 import { MAX_MEDIA_TOTAL } from '../../config/storage.js';
 
 export function usePropertyMediaEditor({ form, setForm, setUploading }) {
   const [mediaError, setMediaError] = useState('');
+  const source = useMediaSource();
   async function addMedia(e, kind) {
     const input = e.currentTarget;
     const selected = Array.from(input.files || []);
@@ -20,9 +21,13 @@ export function usePropertyMediaEditor({ form, setForm, setUploading }) {
     setMediaError('');
     try {
       const assets = [];
-      for (const file of selected) assets.push(await makeMediaAsset(file, kind));
+      for (const file of selected) assets.push(await source.makeAsset(file, kind));
       const updated = [...current, ...assets];
-      if (JSON.stringify({ ...form, [field]: updated }).length > MAX_MEDIA_TOTAL / 1.6)
+      // Inline browser media counts against the record size; stored files do not.
+      if (
+        !source.stored &&
+        JSON.stringify({ ...form, [field]: updated }).length > MAX_MEDIA_TOTAL / 1.6
+      )
         throw Error('Media exceeds the listing limit. Try fewer or smaller files.');
       setForm((p) => ({ ...p, [field]: updated }));
     } catch (err) {

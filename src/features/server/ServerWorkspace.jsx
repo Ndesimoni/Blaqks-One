@@ -13,6 +13,7 @@ import { useServerRecords } from './useServerRecords.js';
 import { useServerRecordActions } from './useServerRecordActions.js';
 import { ServerShell } from './ServerShell.jsx';
 import { DealLinkField } from './dealLinks/DealLinkField.jsx';
+import { ServerMediaProvider } from './media/ServerMediaProvider.jsx';
 
 /** Connected pickers for link fields whose targets are not workspace records. */
 const linkFields = Object.freeze({ 'Deal ID': DealLinkField });
@@ -37,7 +38,9 @@ export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
         <NavigationContext.Provider value={navigation}>
           <ViewContext.Provider value={view}>
             <ActionsContext.Provider value={actions}>
-              <ServerShell owner={owner} workspaces={workspaces} />
+              <ServerMediaProvider api={api} workspaceId={owner.id} entries={records.entries}>
+                <ServerShell owner={owner} workspaces={workspaces} />
+              </ServerMediaProvider>
             </ActionsContext.Provider>
           </ViewContext.Provider>
         </NavigationContext.Provider>

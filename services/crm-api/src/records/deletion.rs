@@ -31,6 +31,8 @@ pub async fn delete(
         "This record changed. Reload before deleting.",
     )?;
     target::ensure_delete_allowed(scope, collection, &found)?;
+    // Its photos and floor plans go with it (packet F2).
+    crate::media::owned::remove(&mut transaction, super::media_links::KIND, found.id).await?;
     sqlx::query("DELETE FROM crm_records WHERE id=$1")
         .bind(found.id)
         .execute(&mut *transaction)

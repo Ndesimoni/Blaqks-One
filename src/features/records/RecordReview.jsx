@@ -2,9 +2,11 @@ import React from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 import { formatValue } from '../../lib/crm.js';
 import { mediaPhotos, mediaPlans } from '../../lib/media.js';
+import { useMediaSource } from '../../lib/mediaSource.js';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 
 export function RecordReview({ module, form, data, sections, onEdit }) {
+  const source = useMediaSource();
   return (
     <div className="record-review">
       <p className="review-intro">
@@ -43,7 +45,7 @@ export function RecordReview({ module, form, data, sections, onEdit }) {
                     label="Reviewed property photos"
                     listClassName="review-photo-list"
                     renderItem={(photo, photoIndex) => (
-                      <img src={photo.src} alt={`Property photo ${photoIndex + 1}`} />
+                      <img src={source.src(photo, form)} alt={`Property photo ${photoIndex + 1}`} />
                     )}
                   />
                 )}

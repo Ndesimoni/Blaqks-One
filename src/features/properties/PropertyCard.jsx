@@ -1,3 +1,4 @@
+import { useMediaSource } from '../../lib/mediaSource.js';
 import React from 'react';
 import { isCommercialProperty, listingIntent, propertyPrice } from '../../lib/properties.js';
 import { get } from '../../lib/records.js';
@@ -9,13 +10,14 @@ import { Badge } from '../../components/ui/Badge.jsx';
 
 export function PropertyCard({ property: p, index: i, onSelect }) {
   const photos = mediaPhotos(p);
+  const source = useMediaSource();
   const cover = photos[0] || demoListingPhoto(p);
   return (
     <button className="property-card modern-property-card" type="button" onClick={onSelect}>
       <div className={'property-photo variant-' + (i % 4)}>
         <img
           className={photos.length ? 'property-cover-img' : 'property-demo-cover'}
-          src={cover.src}
+          src={cover.demo ? cover.src : source.src(cover, p)}
           alt={
             photos.length && !cover.demo
               ? `${get(p, 'Listing title') || 'Property'} cover`

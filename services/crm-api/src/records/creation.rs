@@ -67,6 +67,7 @@ pub async fn create_in(
     links::ensure_linkable(transaction, workspace, scope, &record.links, None, None).await?;
     deal_links::ensure(transaction, workspace, &user, &record.links, None).await?;
     target::ensure_client(scope, collection, &record.links)?;
+    let files = super::media_links::referenced(&record.payload);
     let holder = history::default_holder(transaction, workspace, &user).await?;
     let assignee = history::initial(collection, holder, &record.links);
     let sql = format!(
@@ -89,6 +90,7 @@ pub async fn create_in(
         .bind(assignee)
         .fetch_one(&mut **transaction)
         .await?;
+    super::media_links::sync(transaction, workspace, actor, id, &files).await?;
     audit::append(transaction, actor, workspace, "created", collection, id).await?;
     if assignee.is_some() {
         let change = Change {

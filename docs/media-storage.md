@@ -47,8 +47,15 @@ against the item the file belongs to.
   V4 S3 client, upload with type sniffing and metadata removal, quotas (60 uploads an hour per
   member, 5 GB per company), the unattached sweep in the worker, and photos and files in team
   chat (up to 10 per message, text optional).
-- **F2 — property photos and floor plans:** records refer to stored files instead of inline
-  data; existing inline photos move across; thumbnails.
+- **F2 — property photos and floor plans (built 2026-10-21):** in connected mode the browser
+  redraws each photo as a 2048px JPEG plus a 480px thumbnail and uploads both; PDF floor
+  plans upload as they are. A media entry is `{name, file, thumb?, type?, added?}`; the
+  record attaches the named files (only the saver's own pending uploads) in its own
+  transaction, hides files no longer named and removes them all when the record is deleted.
+  Files load through `GET …/records/{collection}/{id}/files/{file}` after the record's own
+  visibility check. Earlier inline photos (`{name, src}`) still display and save unchanged.
+  **Remaining:** a command that moves existing inline photos into storage; until then they
+  stay in the record JSON.
 - **F3 — email attachments:** received attachments stored for linked conversations; sending
   attachments with replies.
 - **F4 — public photos:** approved, re-encoded copies for the public website through the

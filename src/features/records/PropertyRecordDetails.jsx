@@ -3,12 +3,14 @@ import { get } from '../../lib/records.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { PropertyGallery } from '../properties/PropertyGallery.jsx';
 import { mediaPlans } from '../../lib/media.js';
+import { useMediaSource } from '../../lib/mediaSource.js';
 import { amenityList } from '../../lib/properties.js';
 import { safeExternalUrl } from '../../lib/validation.js';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { BuildingContacts } from './BuildingContacts.jsx';
 
 export function PropertyRecordDetails({ record: r, contacts, edit, close, readOnly = false }) {
+  const source = useMediaSource();
   return (
     <div className="property-detail-studio">
       <PropertyGallery
@@ -31,7 +33,7 @@ export function PropertyRecordDetails({ record: r, contacts, edit, close, readOn
           {mediaPlans(r).map((plan, i) => (
             <a
               key={i}
-              href={plan.src}
+              href={source.full(plan, r)}
               target="_blank"
               rel="noopener noreferrer"
               download={plan.name}

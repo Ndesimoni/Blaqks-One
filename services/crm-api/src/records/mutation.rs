@@ -76,6 +76,7 @@ pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
     .await?;
     target::ensure_client(scope, collection, &record.links)?;
     let clientless = record.links.client.is_none();
+    let files = super::media_links::referenced(&record.payload);
     // assignee_id is deliberately absent: plain edits never fire the eligibility trigger.
     let sql = format!(
         "UPDATE crm_records SET legacy_id=$1,payload=$2,contact_id=$3,client_ref=$4,\
@@ -94,6 +95,7 @@ pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
         .fetch_one(&mut *transaction)
         .await?;
     let actor = update.actor;
+    super::media_links::sync(&mut transaction, workspace, actor, found.id, &files).await?;
     audit::append(
         &mut transaction,
         actor,

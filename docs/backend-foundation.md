@@ -113,7 +113,7 @@ Connected team invitations and activation, eight staff positions, multiple posit
 
 ## Media boundary
 
-The shared photo/floor-plan editor works in connected mode. Small inline assets are currently saved in the private record JSON. The API caps record size at 12 MiB, validates asset shape and supported JPEG/PNG/WebP/PDF data URLs, and rejects executable schemes and SVG uploads. It does not decode, scan or re-encode uploaded files. Before production, replace inline media with private object storage, validated upload processing and approved public derivatives. Public publication is not available through these CRUD endpoints.
+The shared photo/floor-plan editor works in connected mode. New photos and floor plans are stored privately through the `media/` module and records keep only their file IDs ([media storage](media-storage.md), packet F2); `records/media_links.rs` attaches them in the record transaction and `records/files.rs` serves them after the record's visibility check. Earlier inline assets remain valid: the API caps record size at 12 MiB, validates asset shape and supported JPEG/PNG/WebP/PDF data URLs, and rejects executable schemes and SVG uploads. Moving existing inline assets into storage and approved public derivatives remain to do. Public publication is not available through these CRUD endpoints.
 
 ## API surface
 

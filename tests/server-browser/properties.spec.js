@@ -47,7 +47,10 @@ test('a linked contact and property photos persist through the real forms and da
   );
   expect(entry.record.contact_id).toBe('BROWSER-LANDLORD');
   expect(entry.record.media_photos).toHaveLength(1);
-  expect(entry.record.media_photos[0].src).toMatch(/^data:image\//);
+  // Packet F2: the photo is a private stored file with a thumbnail, not inline data.
+  expect(entry.record.media_photos[0].src).toBeUndefined();
+  expect(entry.record.media_photos[0].file).toMatch(/^[0-9a-f-]{36}$/);
+  expect(entry.record.media_photos[0].thumb).toMatch(/^[0-9a-f-]{36}$/);
   await page.getByRole('button', { name: 'Close record details' }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Switch to light mode' }).click();

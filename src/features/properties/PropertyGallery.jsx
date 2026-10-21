@@ -4,21 +4,23 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import React from 'react';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { PropertyDemoPreview } from './PropertyDemoPreview.jsx';
+import { useMediaSource } from '../../lib/mediaSource.js';
 
 function PropertyGallery({ record, onEdit }) {
   const photos = mediaPhotos(record);
+  const source = useMediaSource();
   return (
     <div className="media-gallery-strip">
       {photos.length ? (
         <div className="media-photo-hero">
           <a
-            href={photos[0].src}
+            href={source.full(photos[0], record)}
             target="_blank"
             rel="noopener noreferrer"
             title="Open cover photo"
           >
             <img
-              src={photos[0].src}
+              src={source.full(photos[0], record)}
               alt={
                 photos[0].demo
                   ? photos[0].name
@@ -45,12 +47,12 @@ function PropertyGallery({ record, onEdit }) {
           listClassName="media-photo-thumbs"
           renderItem={(p, i) => (
             <a
-              href={p.src}
+              href={source.full(p, record)}
               target="_blank"
               rel="noopener noreferrer"
               title={`Open property photo ${i + 2}`}
             >
-              <img src={p.src} alt={`Property photo ${i + 2}`} />
+              <img src={source.src(p, record)} alt={`Property photo ${i + 2}`} />
             </a>
           )}
         />

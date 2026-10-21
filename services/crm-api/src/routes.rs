@@ -94,6 +94,10 @@ pub fn app(state: AppState) -> Router {
             axum::routing::patch(records::update).delete(records::delete),
         )
         .route(
+            "/api/crm/workspaces/{workspace}/records/{collection}/{id}/files/{file}",
+            get(crate::records::files::file),
+        )
+        .route(
             "/api/crm/workspaces/{workspace}/records/{collection}/{id}/assignee",
             put(assignments::assign::assign).layer(DefaultBodyLimit::max(16 * 1024)),
         )
