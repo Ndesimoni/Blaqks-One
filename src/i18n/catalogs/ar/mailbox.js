@@ -31,4 +31,19 @@ export default {
   'return.denied': 'أُلغي تسجيل الدخول إلى Google. لم يُربط بريدك.',
   'return.failed': 'تعذّر إكمال تسجيل الدخول إلى Google. ابدأ من جديد من صفحة بريدي.',
   'return.open': 'فتح بريدي',
+  'company.title': 'بريد الشركة',
+  'company.provider': 'يُرسل عبر SendGrid من نطاق الشركة',
+  'company.badge.ready': 'جاهز',
+  'company.badge.attention': 'يلزم إعادة الربط',
+  'company.badge.none': 'لا يوجد عنوان بعد',
+  'company.label': 'عنوان بريد شركتك',
+  'company.shownAs': 'يرى العملاء الاسم «{name}».',
+  'company.none': 'اطلب من المسؤول عنوان إرسال. حتى ذلك الحين لا يمكنك مراسلة العملاء من النظام.',
+  'company.attention': 'البريد متوقف حتى يعيد المسؤول ربط SendGrid في صفحة القنوات.',
+  'company.what':
+    'يرى العملاء هذا العنوان عندما تراسلهم من صندوق الوارد، وتعود ردودهم إلى صندوق الوارد الخاص بك.',
+  'company.noGoogle':
+    'ترسل شركتك البريد من نطاقها الخاص عبر SendGrid، لذلك لا تُستخدم صناديق بريد Google.',
+  'company.googleLeft':
+    'صندوق بريد Google هذا من قبل انتقال شركتك إلى SendGrid ولم يعد مستخدمًا. يمكنك فصله.',
 };

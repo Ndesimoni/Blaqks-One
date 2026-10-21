@@ -81,6 +81,26 @@
   background: var(--panel);
   color: var(--ink);
 }
+.mailbox-address {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.mailbox-address span,
+.mailbox-address small {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.mailbox-address strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 17px;
+}
+.mailbox-note {
+  font-size: 13px;
+}
 .mailbox-return {
   max-inline-size: 560px;
 }

@@ -5,8 +5,10 @@ import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ChannelCard } from './ChannelCard.jsx';
 import { CHANNELS } from './channelModel.js';
+import { SendingAddresses } from './SendingAddresses.jsx';
 import { useChannels } from './useChannels.js';
 import './channels.css';
+import './sendgrid.css';
 
 /** Connected Channels settings: Admin-only connect, reconnect and disconnect. */
 export function ServerChannels() {
@@ -64,6 +66,9 @@ export function ServerChannels() {
         {t('channels.loading')}
       </p>
     );
+  const sendgrid = channels.find(
+    (row) => row.provider === 'sendgrid' && row.state !== 'disconnected',
+  );
   return (
     <div className="page-stack channels-page">
       <p className="channels-intro">{t('channels.intro')}</p>
@@ -95,6 +100,9 @@ export function ServerChannels() {
           />
         ))}
       </div>
+      {sendgrid && (
+        <SendingAddresses api={api} workspaceId={owner.id} connection={sendgrid} t={t} />
+      )}
     </div>
   );
 }

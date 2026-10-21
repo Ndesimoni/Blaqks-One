@@ -42,7 +42,8 @@ export default {
   'channel.whatsapp': 'WhatsApp',
   'channel.whatsappNote': 'Client WhatsApp messages, with templates outside the 24-hour window.',
   'channel.email': 'Email',
-  'channel.emailNote': 'Send from your own mailbox and reply in the same thread.',
+  'channel.emailNote':
+    'Client email in the Inbox, from your company domain or each member’s mailbox.',
   'channel.facebook': 'Facebook Page',
   'channel.facebookNote': 'Page messages and lead forms arrive in the shared Inbox.',
   'channel.instagram': 'Instagram',
@@ -63,4 +64,31 @@ export default {
   'activity.verb.reconnected': 'reconnected',
   'activity.verb.reconnect_required': 'flagged for reconnection:',
   'activity.verb.disconnected': 'disconnected',
+  'providerName.sendgrid': 'Twilio SendGrid',
+  'providerOption.sendgrid': 'Company email (SendGrid)',
+  'providerOption.microsoft': 'Microsoft 365',
+  'sendgrid.providerHint':
+    'A company uses one email system at a time. Google Workspace mailboxes are connected by each member on My mailbox.',
+  'sendgrid.before': 'Before you connect, in SendGrid:',
+  'sendgrid.step1': 'Authenticate your company domain (Settings → Sender Authentication).',
+  'sendgrid.step2':
+    "Point the domain's MX record at mx.sendgrid.net when you are ready to receive client mail in the CRM.",
+  'sendgrid.step3':
+    'Create a restricted API key with only the permissions in the setup guide. A full-access key is refused.',
+  'sendgrid.domain': 'Company domain',
+  'sendgrid.domainHint': 'The domain you authenticated in SendGrid, such as keyswithsimoni.com.',
+  'sendgrid.domainInvalid': 'Enter the domain only, such as keyswithsimoni.com, without www or @.',
+  'sendgrid.key': 'SendGrid API key',
+  'sendgrid.keyHint': 'Stored encrypted. It is never shown again.',
+  'sendgrid.domainShown': 'Domain {domain}',
+  'sendgrid.statusLabel': 'SendGrid status',
+  'sendgrid.delivery': 'Delivery updates',
+  'sendgrid.incoming': 'Incoming mail',
+  'sendgrid.on': 'On',
+  'sendgrid.off': 'Off',
+  'sendgrid.needsAddress': "Needs the CRM's public web address. Reconnect once it is set up.",
+  'sendgrid.incomingTaken':
+    "Another service already receives this domain's mail in SendGrid. Remove that Inbound Parse setting there, then reconnect.",
+  'sendgrid.disconnectBody':
+    "Client email stops at once; past conversations stay. In SendGrid, also delete the API key and any leftover webhook settings, and change the domain's MX record, or client mail keeps going to SendGrid and is lost.",
 };

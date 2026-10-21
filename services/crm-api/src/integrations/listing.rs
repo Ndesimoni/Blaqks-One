@@ -1,6 +1,6 @@
 //! `GET /channels`: this company's connections for the Channels screen, without
 //! credentials. A SendGrid connection also says whether delivery updates and incoming mail
-//! are set up (E3d), from the webhook keys the connection holds.
+//! are set up (E3d), from the webhook keys the connection holds, and its domain in full.
 use super::{access, store};
 use crate::{auth::session::Session, error::ApiResult, state::AppState};
 use axum::{
@@ -31,6 +31,8 @@ pub async fn list(
         .map(|row| {
             let mut view = row.view();
             if row.provider == "sendgrid" {
+                // A company domain is public, and only the Admin reads this list.
+                view["domain"] = json!(row.external_account_id);
                 view["deliveryUpdates"] = json!(has(row.id, "events"));
                 view["incomingMail"] = json!(has(row.id, "inbound"));
             }

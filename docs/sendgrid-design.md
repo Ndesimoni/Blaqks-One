@@ -1,7 +1,7 @@
 # Company email through SendGrid — design (packet E3)
 
 Status: **approved by the owner** (decisions E3a–E3d, 2026-10-21); security review done, no
-High findings. **E3a, E3b and E3c are built** (2026-10-21, §10–§12); E3d (screens) follows. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
+High findings. **E3 is built** (E3a–E3d, 2026-10-21, §10–§13); a sandbox check with the owner's real SendGrid account remains before live use (§8). Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
 each member writes and reads client email in the CRM from an address on the company's own
 domain, with no separate Gmail or Outlook mailbox. The Google Workspace adapter (E1) stays
 available. This document extends the [messaging design](messaging-design.md); every rule
@@ -311,3 +311,27 @@ address (D7) or a development tunnel.
   scope the key may not hold (L3); decode the `charsets` field, so mail in encodings such as
   windows-1256 (Arabic) is not stored garbled (L5); a reconnect with a key from another
   SendGrid account keeps the old webhook keys until disconnect.
+
+## 13. E3d as built (2026-10-21)
+
+Built by a combined product designer and frontend engineer within the current Channels
+screen (owner rule: function first, redesign later), checked at 390 px and 1280 px in both
+themes, with English and Arabic text and logical CSS.
+
+- **Channels, Email card:** "Company email (SendGrid)" with the label, company domain and
+  write-only API key, a short before-you-connect checklist (verified domain, MX record,
+  restricted key) and a note that one email system is used at a time. A connected account
+  shows its health, the domain, and whether delivery updates and incoming mail are on,
+  with a plain hint when off. The disconnect confirmation tells the Admin to delete the
+  key (and any webhook settings left) in SendGrid and to change the MX record.
+- **Sending addresses** (Admin): every address with the name clients see, its member and
+  Active or Kept for a former member; add (only members who may email and have no
+  address, a suggested local part, the full address previewed), rename, and keep for a
+  former member with a confirmation. The browser mirrors the server's rules
+  (`addressModel.js`, `tests/unit/sending-addresses.test.js`); the server still decides.
+- **My mailbox:** the member's company address, or "Ask your Admin for a sending address",
+  or a reconnect warning; Google sign-in is not offered while the company uses SendGrid.
+- API additions: the Channels list gives a SendGrid row's full `domain`,
+  `deliveryUpdates` and `incomingMail`; `GET /mailbox` gives `companyEmail`.
+- Browser suite `tests/server-browser/channels-sendgrid.spec.js`. Not yet: a right-to-left
+  screenshot pass, and address changes in Team activity.

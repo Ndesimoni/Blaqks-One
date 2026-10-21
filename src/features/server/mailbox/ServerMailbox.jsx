@@ -5,11 +5,16 @@ import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { CompanyEmail } from './CompanyEmail.jsx';
 import { MailboxConfirm } from './MailboxConfirm.jsx';
 import { useMailbox } from './useMailbox.js';
 import './mailbox.css';
 
-/** My mailbox (E1d): connect, sign in again or disconnect the member's own Google mailbox. */
+/**
+ * My mailbox (E1d): connect, sign in again or disconnect the member's own Google mailbox.
+ * A company on SendGrid (E3d) shows the member's company address; Google is not offered,
+ * and an earlier Google mailbox can only be disconnected.
+ */
 export function ServerMailbox() {
   const { api } = useSession();
   const { owner } = useWorkspaceScope();
@@ -28,7 +33,7 @@ export function ServerMailbox() {
         <Button onClick={reload}>{t('mailbox.retry')}</Button>
       </section>
     );
-  const { google, mayConnect, mailbox } = data;
+  const { google, mayConnect, mailbox, companyEmail: company } = data;
   const attention = mailbox?.state === 'reconnect_required';
   const act = async (action) => {
     setBusy(true);
@@ -52,60 +57,75 @@ export function ServerMailbox() {
           {notice}
         </p>
       )}
-      <article className="mailbox-card" aria-labelledby="mailbox-title">
-        <header className="mailbox-head">
-          <span className="mailbox-icon" aria-hidden="true">
-            <Icon name="note" size={20} />
-          </span>
-          <div>
-            <h2 id="mailbox-title">{t('mailbox.card.title')}</h2>
+      {company && <CompanyEmail company={company} mayConnect={mayConnect} />}
+      {(!company || mailbox) && (
+        <article className="mailbox-card" aria-labelledby="mailbox-title">
+          <header className="mailbox-head">
+            <span className="mailbox-icon" aria-hidden="true">
+              <Icon name="note" size={20} />
+            </span>
+            <div>
+              <h2 id="mailbox-title">{t('mailbox.card.title')}</h2>
+              {mailbox && (
+                <p>
+                  <bdi>{mailbox.label}</bdi>
+                </p>
+              )}
+            </div>
             {mailbox && (
-              <p>
-                <bdi>{mailbox.label}</bdi>
-              </p>
+              <Badge tone={attention ? 'amber' : 'green'}>
+                {t(attention ? 'mailbox.card.attention' : 'mailbox.card.connected')}
+              </Badge>
             )}
-          </div>
-          {mailbox && (
-            <Badge tone={attention ? 'amber' : 'green'}>
-              {t(attention ? 'mailbox.card.attention' : 'mailbox.card.connected')}
-            </Badge>
+          </header>
+          {company ? (
+            <p className="mailbox-muted">{t('mailbox.company.googleLeft')}</p>
+          ) : !google ? (
+            <p className="mailbox-muted">{t('mailbox.notSetUp')}</p>
+          ) : !mayConnect ? (
+            <p className="mailbox-muted">{t('mailbox.noAccess')}</p>
+          ) : (
+            <>
+              <p className="mailbox-muted">
+                {attention
+                  ? t('mailbox.card.attentionBody')
+                  : mailbox
+                    ? t('mailbox.card.since', { date: format.date(mailbox.credentialUpdatedAt) })
+                    : t('mailbox.card.none')}
+              </p>
+              <p className="mailbox-what">{t('mailbox.card.what')}</p>
+              {confirm ? (
+                <MailboxConfirm busy={busy} onConfirm={off} onCancel={() => setConfirm(false)} />
+              ) : (
+                <div className="mailbox-actions">
+                  {(!mailbox || attention) && (
+                    <Button icon="link" disabled={busy} onClick={() => act(connect)}>
+                      {busy
+                        ? t('mailbox.connecting')
+                        : t(mailbox ? 'mailbox.reconnect' : 'mailbox.connect')}
+                    </Button>
+                  )}
+                  {mailbox && (
+                    <Button variant="danger-light" disabled={busy} onClick={() => setConfirm(true)}>
+                      {t('mailbox.disconnect')}
+                    </Button>
+                  )}
+                </div>
+              )}
+            </>
           )}
-        </header>
-        {!google ? (
-          <p className="mailbox-muted">{t('mailbox.notSetUp')}</p>
-        ) : !mayConnect ? (
-          <p className="mailbox-muted">{t('mailbox.noAccess')}</p>
-        ) : (
-          <>
-            <p className="mailbox-muted">
-              {attention
-                ? t('mailbox.card.attentionBody')
-                : mailbox
-                  ? t('mailbox.card.since', { date: format.date(mailbox.credentialUpdatedAt) })
-                  : t('mailbox.card.none')}
-            </p>
-            <p className="mailbox-what">{t('mailbox.card.what')}</p>
-            {confirm ? (
+          {company &&
+            (confirm ? (
               <MailboxConfirm busy={busy} onConfirm={off} onCancel={() => setConfirm(false)} />
             ) : (
               <div className="mailbox-actions">
-                {(!mailbox || attention) && (
-                  <Button icon="link" disabled={busy} onClick={() => act(connect)}>
-                    {busy
-                      ? t('mailbox.connecting')
-                      : t(mailbox ? 'mailbox.reconnect' : 'mailbox.connect')}
-                  </Button>
-                )}
-                {mailbox && (
-                  <Button variant="danger-light" disabled={busy} onClick={() => setConfirm(true)}>
-                    {t('mailbox.disconnect')}
-                  </Button>
-                )}
+                <Button variant="danger-light" disabled={busy} onClick={() => setConfirm(true)}>
+                  {t('mailbox.disconnect')}
+                </Button>
               </div>
-            )}
-          </>
-        )}
-      </article>
+            ))}
+        </article>
+      )}
     </div>
   );
 }

@@ -42,7 +42,7 @@ export default {
   'channel.whatsapp': 'واتساب',
   'channel.whatsappNote': 'رسائل واتساب من العملاء، مع قوالب خارج نافذة 24 ساعة.',
   'channel.email': 'البريد الإلكتروني',
-  'channel.emailNote': 'أرسل من بريدك وأجب في المحادثة نفسها.',
+  'channel.emailNote': 'بريد العملاء في صندوق الوارد، من نطاق شركتك أو من بريد كل عضو.',
   'channel.facebook': 'صفحة فيسبوك',
   'channel.facebookNote': 'تصل رسائل الصفحة ونماذج العملاء إلى صندوق الوارد المشترك.',
   'channel.instagram': 'إنستغرام',
@@ -63,4 +63,31 @@ export default {
   'activity.verb.reconnected': 'أعاد ربط',
   'activity.verb.reconnect_required': 'طلب إعادة ربط',
   'activity.verb.disconnected': 'فصل',
+  'providerName.sendgrid': 'Twilio SendGrid',
+  'providerOption.sendgrid': 'بريد الشركة (SendGrid)',
+  'providerOption.microsoft': 'Microsoft 365',
+  'sendgrid.providerHint':
+    'تستخدم الشركة نظام بريد واحدًا في كل مرة. يربط كل عضو بريد Google Workspace الخاص به من صفحة بريدي.',
+  'sendgrid.before': 'قبل الربط، في SendGrid:',
+  'sendgrid.step1': 'وثّق نطاق شركتك (Settings ← Sender Authentication).',
+  'sendgrid.step2':
+    'وجّه سجل MX للنطاق إلى mx.sendgrid.net عندما تكون مستعدًا لاستقبال بريد العملاء في النظام.',
+  'sendgrid.step3':
+    'أنشئ مفتاح API مقيّدًا بالصلاحيات المذكورة في دليل الإعداد فقط. يُرفض المفتاح ذو الصلاحيات الكاملة.',
+  'sendgrid.domain': 'نطاق الشركة',
+  'sendgrid.domainHint': 'النطاق الذي وثّقته في SendGrid، مثل keyswithsimoni.com.',
+  'sendgrid.domainInvalid': 'أدخل النطاق فقط، مثل keyswithsimoni.com، بدون www أو @.',
+  'sendgrid.key': 'مفتاح SendGrid API',
+  'sendgrid.keyHint': 'يُخزَّن مشفّرًا ولا يُعرض مرة أخرى.',
+  'sendgrid.domainShown': 'النطاق {domain}',
+  'sendgrid.statusLabel': 'حالة SendGrid',
+  'sendgrid.delivery': 'تحديثات التسليم',
+  'sendgrid.incoming': 'البريد الوارد',
+  'sendgrid.on': 'مفعّل',
+  'sendgrid.off': 'متوقف',
+  'sendgrid.needsAddress': 'يحتاج إلى عنوان الويب العام للنظام. أعد الربط بعد إعداده.',
+  'sendgrid.incomingTaken':
+    'خدمة أخرى تستقبل بريد هذا النطاق في SendGrid بالفعل. احذف إعداد Inbound Parse ذلك هناك، ثم أعد الربط.',
+  'sendgrid.disconnectBody':
+    'يتوقف بريد العملاء فورًا وتبقى المحادثات السابقة. في SendGrid، احذف أيضًا مفتاح API وأي إعدادات webhook متبقية، وغيّر سجل MX للنطاق، وإلا سيستمر بريد العملاء في الذهاب إلى SendGrid ويضيع.',
 };

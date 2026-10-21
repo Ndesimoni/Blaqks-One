@@ -35,4 +35,20 @@ export default {
   'return.denied': 'The Google sign-in was cancelled. Your mailbox was not connected.',
   'return.failed': 'The Google sign-in could not be finished. Start again from My mailbox.',
   'return.open': 'Open My mailbox',
+  'company.title': 'Company email',
+  'company.provider': 'Sent through SendGrid from the company domain',
+  'company.badge.ready': 'Ready',
+  'company.badge.attention': 'Reconnect needed',
+  'company.badge.none': 'No address yet',
+  'company.label': 'Your company email address',
+  'company.shownAs': 'Clients see the name “{name}”.',
+  'company.none':
+    'Ask your Admin for a sending address. Until then you cannot email clients from the CRM.',
+  'company.attention': 'Email is paused until your Admin reconnects SendGrid on Channels.',
+  'company.what':
+    'Clients see this address when you email them from the Inbox, and their replies come back to your Inbox.',
+  'company.noGoogle':
+    'Your company sends email from its own domain through SendGrid, so Google mailboxes are not used.',
+  'company.googleLeft':
+    'This Google mailbox is from before your company moved to SendGrid and is no longer used. You can disconnect it.',
 };

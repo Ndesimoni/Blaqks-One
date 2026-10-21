@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { ChannelForm } from './ChannelForm.jsx';
-import { ConfirmDisconnect } from './ConfirmDisconnect.jsx';
-
-const tone = (health) => (health === 'attention' ? 'amber' : health === 'off' ? 'slate' : 'green');
+import { ConnectionRow } from './ConnectionRow.jsx';
 
 /**
  * One channel with its live connections, form and disconnect confirmation. A channel
@@ -25,6 +22,7 @@ export function ChannelCard({ entry, connections, t, busy, onConnect, onReconnec
       form === 'connect' ? await onConnect(entry.channel, body) : await onReconnect(form, body);
     if (done) close();
   };
+  const handlers = { setForm, setConfirm, submit, close, onDisconnect };
   return (
     <article className="channel-card" aria-labelledby={`channel-${entry.channel}`}>
       <header className="channel-head">
@@ -41,52 +39,16 @@ export function ChannelCard({ entry, connections, t, busy, onConnect, onReconnec
       ) : (
         <ul className="channel-connections">
           {connections.map((connection) => (
-            <li key={connection.id}>
-              <div className="channel-connection-head">
-                <strong>{connection.label}</strong>
-                <Badge tone={tone(connection.health)}>
-                  {t(`channels.status.${connection.state}`)}
-                </Badge>
-              </div>
-              <small>
-                {t(`channels.providerName.${connection.provider}`)} ·{' '}
-                {t('channels.accountEnding', {
-                  hint: String(connection.accountHint).replace(/^[^0-9a-zA-Z]*/, ''),
-                })}
-              </small>
-              {confirm === connection.id ? (
-                <ConfirmDisconnect
-                  label={connection.label}
-                  t={t}
-                  busy={busy}
-                  onCancel={() => setConfirm(null)}
-                  onConfirm={async () => {
-                    if (await onDisconnect(connection)) setConfirm(null);
-                  }}
-                />
-              ) : (
-                <div className="channel-actions">
-                  <Button variant="light" disabled={busy} onClick={() => setForm(connection)}>
-                    {t('channels.reconnect')}
-                  </Button>
-                  <Button variant="light" disabled={busy} onClick={() => setConfirm(connection.id)}>
-                    {t('channels.disconnect')}
-                  </Button>
-                </div>
-              )}
-              {form && form !== 'connect' && form.id === connection.id && (
-                <ChannelForm
-                  mode="reconnect"
-                  channel={entry.channel}
-                  provider={connection.provider}
-                  connection={connection}
-                  t={t}
-                  busy={busy}
-                  onSubmit={submit}
-                  onClose={close}
-                />
-              )}
-            </li>
+            <ConnectionRow
+              key={connection.id}
+              connection={connection}
+              channel={entry.channel}
+              t={t}
+              busy={busy}
+              form={form && form !== 'connect' && form.id === connection.id}
+              confirm={confirm === connection.id}
+              handlers={handlers}
+            />
           ))}
         </ul>
       )}
