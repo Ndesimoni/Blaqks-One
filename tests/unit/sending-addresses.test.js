@@ -5,6 +5,7 @@ import {
   eligibleMembers,
   localPartProblem,
   suggestLocalPart,
+  withAdmin,
 } from '../../src/features/server/channels/addressModel.js';
 
 // E3d: the browser mirrors the server's address rules (integrations/addresses/rules.rs).
@@ -46,4 +47,19 @@ test('only active members who may email and have no active address are offered',
   );
   assert.equal(suggestLocalPart('Aidah Noor'), 'aidah.noor');
   assert.equal(suggestLocalPart('  José  Ñ  '), 'jose.n');
+});
+
+test('the signed-in Admin can give themselves an address', () => {
+  const staff = [{ id: 's1', status: 'active', roleId: 'staff', channelAccess: { email: true } }];
+  const admin = { id: 'a1', name: 'Aidah', roleId: 'admin' };
+  const members = withAdmin(staff, admin);
+  assert.deepEqual(
+    members.map((member) => member.id),
+    ['a1', 's1'],
+  );
+  assert.deepEqual(
+    eligibleMembers(members, []).map((member) => member.id),
+    ['a1', 's1'],
+  );
+  assert.equal(withAdmin(members, admin).length, 2, 'never listed twice');
 });

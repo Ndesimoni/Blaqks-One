@@ -101,7 +101,13 @@ export function ServerChannels() {
         ))}
       </div>
       {sendgrid && (
-        <SendingAddresses api={api} workspaceId={owner.id} connection={sendgrid} t={t} />
+        <SendingAddresses
+          api={api}
+          workspaceId={owner.id}
+          connection={sendgrid}
+          admin={user}
+          t={t}
+        />
       )}
     </div>
   );

@@ -3,7 +3,7 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { OverflowList } from '../../../components/ui/OverflowList.jsx';
 import { AddressForm } from './AddressForm.jsx';
-import { eligibleMembers } from './addressModel.js';
+import { eligibleMembers, withAdmin } from './addressModel.js';
 import { AddressRow } from './AddressRow.jsx';
 import { useAddresses } from './useAddresses.js';
 import './addresses.css';
@@ -12,8 +12,10 @@ import './addresses.css';
  * Sending addresses on the company's SendGrid domain (E3d), Admin only. One small complete
  * section with actions on every row, so every address is listed (docs/option-overflow.md).
  */
-export function SendingAddresses({ api, workspaceId, connection, t }) {
-  const { data, members, error, reload } = useAddresses(api, workspaceId, connection.version);
+export function SendingAddresses({ api, workspaceId, connection, admin, t }) {
+  const loaded = useAddresses(api, workspaceId, connection.version);
+  const { data, error, reload } = loaded;
+  const members = withAdmin(loaded.members, admin);
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');

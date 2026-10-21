@@ -36,6 +36,15 @@ export function displayNameProblem(value) {
   return length < 1 || length > 80 || HIDDEN.test(name) ? 'emailAddresses.nameInvalid' : '';
 }
 
+/**
+ * The team list holds staff only, so the signed-in Admin is added first: the Admin also
+ * sends from an address and must be able to give themselves one (owner feedback).
+ */
+export function withAdmin(members, admin) {
+  if (!admin || members.some((member) => member.id === admin.id)) return members;
+  return [{ id: admin.id, name: admin.name, status: 'active', roleId: 'admin' }, ...members];
+}
+
 /** Members who may send email (Admin, or staff with the email grant) and have no address. */
 export function eligibleMembers(members, addresses) {
   const taken = new Set(
