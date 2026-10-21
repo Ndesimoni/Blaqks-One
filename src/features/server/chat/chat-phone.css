@@ -40,7 +40,4 @@
   .chat-composer {
     padding-inline: 12px;
   }
-  .chat-composer-actions .btn {
-    min-block-size: 44px;
-  }
 }

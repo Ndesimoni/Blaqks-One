@@ -5,7 +5,7 @@ import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useAttachments } from '../chat/useAttachments.js';
-import { AttachFiles } from './AttachFiles.jsx';
+import { ComposerBox } from '../composer/ComposerBox.jsx';
 
 /** Why this member cannot reply here, with the way to fix it when there is one. */
 function ReplyNotice({ state, channel }) {
@@ -72,28 +72,35 @@ export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
       <label htmlFor={`${id}-reply-text`} className="sr-only">
         {t('inboxSend.reply.field')}
       </label>
-      <textarea
-        id={`${id}-reply-text`}
-        rows={2}
-        maxLength={20000}
-        value={text}
-        placeholder={t('inboxSend.reply.placeholder')}
-        onChange={(event) => setText(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) send(event);
-        }}
-      />
       {/* Attachments go through company email only (F3a). */}
-      {mailbox.company && <AttachFiles files={files} disabled={busy} />}
-      <div className="inbox-reply-actions">
-        <small>
-          {t('inboxSend.reply.hint', { mailbox: '' })}
-          <bdi>{mailbox.label}</bdi>
-        </small>
-        <Button type="submit" icon="arrow" disabled={busy || files.busy || !text.trim()}>
-          {busy ? t('inboxSend.reply.sending') : t('inboxSend.reply.send')}
-        </Button>
-      </div>
+      <ComposerBox
+        files={mailbox.company ? files : null}
+        attachDisabled={busy}
+        meta={
+          <small>
+            {t('inboxSend.reply.hint', { mailbox: '' })}
+            <bdi>{mailbox.label}</bdi>
+          </small>
+        }
+        action={
+          <Button type="submit" icon="arrow" disabled={busy || files.busy || !text.trim()}>
+            {busy ? t('inboxSend.reply.sending') : t('inboxSend.reply.send')}
+          </Button>
+        }
+      >
+        <textarea
+          id={`${id}-reply-text`}
+          className="composer-input"
+          rows={2}
+          maxLength={20000}
+          value={text}
+          placeholder={t('inboxSend.reply.placeholder')}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) send(event);
+          }}
+        />
+      </ComposerBox>
       {error && (
         <p className="field-error" role="alert">
           {error}

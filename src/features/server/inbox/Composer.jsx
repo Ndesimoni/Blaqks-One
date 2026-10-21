@@ -1,6 +1,7 @@
 import React, { useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { ComposerBox } from '../composer/ComposerBox.jsx';
 import { replyState } from './composerModel.js';
 import { channelHealth } from './inboxModel.js';
 import { ReplyPanel } from './ReplyPanel.jsx';
@@ -78,17 +79,20 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
             <label htmlFor={`${id}-text`} className="sr-only">
               {t('inbox.note.field')}
             </label>
-            <textarea
-              id={`${id}-text`}
-              rows={1}
-              maxLength={4000}
-              value={text}
-              placeholder={t('inbox.note.placeholder')}
-              onChange={(event) => setText(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) save(event);
-              }}
-            />
+            <ComposerBox className="is-note">
+              <textarea
+                id={`${id}-text`}
+                className="composer-input"
+                rows={1}
+                maxLength={4000}
+                value={text}
+                placeholder={t('inbox.note.placeholder')}
+                onChange={(event) => setText(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) save(event);
+                }}
+              />
+            </ComposerBox>
             {error && (
               <p className="field-error" role="alert">
                 {error}

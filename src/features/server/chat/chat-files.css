@@ -1,54 +1,12 @@
-/* Photos and files in team chat (F1): chosen files above the composer, attachments below
-   a message. */
-.chat-files,
+/* Photos and files on sent messages (F1); files chosen for a new message sit inside the
+   shared message box (src/features/server/composer/). */
 .chat-attachments {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0;
+  margin: 6px 0 0;
   padding: 0;
   list-style: none;
-}
-.chat-file {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  max-inline-size: 100%;
-  padding-block: 4px;
-  padding-inline: 10px 4px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface-subtle);
-  font-size: 13px;
-}
-.chat-file span {
-  display: grid;
-  min-inline-size: 0;
-}
-.chat-file bdi {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.chat-file small {
-  color: var(--muted);
-}
-.chat-file.is-failed {
-  border-color: var(--danger);
-}
-.chat-file.is-failed small {
-  color: var(--danger);
-}
-.chat-file button {
-  inline-size: 32px;
-  block-size: 32px;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--muted);
-}
-.chat-attachments {
-  margin-block-start: 6px;
 }
 .chat-attachments .is-photo img {
   display: block;
@@ -72,10 +30,6 @@
   color: var(--ink);
 }
 @media (max-width: 899px) {
-  .chat-file button {
-    inline-size: 44px;
-    block-size: 44px;
-  }
   .chat-attachments .is-file a {
     min-block-size: 44px;
   }

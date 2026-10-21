@@ -1,9 +1,4 @@
 /* Email sending (E1d): reply form, Send again, and the New email dialog. */
-/* Send arrows point the way text runs. */
-[dir='rtl'] .inbox-reply-actions .btn svg,
-[dir='rtl'] .inbox-start-actions .btn svg {
-  transform: scaleX(-1);
-}
 .inbox-reply-notice {
   display: flex;
   flex-wrap: wrap;
@@ -14,31 +9,6 @@
 .inbox-reply-form {
   display: grid;
   gap: 8px;
-}
-.inbox-reply-form textarea {
-  inline-size: 100%;
-  min-block-size: 64px;
-  max-block-size: 40vh;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-subtle);
-  color: var(--ink);
-  font: inherit;
-  resize: vertical;
-}
-.inbox-reply-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 12px;
-}
-.inbox-reply-actions small {
-  min-inline-size: 0;
-  overflow-wrap: anywhere;
-  color: var(--muted);
-  font-size: 12px;
 }
 .inbox-again {
   display: grid;
@@ -116,12 +86,7 @@
   .inbox-quoted summary {
     min-block-size: 44px;
   }
-  .inbox-again .btn,
-  .inbox-reply-actions .btn,
-  .inbox-start-actions .btn {
+  .inbox-again .btn {
     min-block-size: 44px;
-  }
-  .inbox-start-actions .btn {
-    inline-size: 100%;
   }
 }

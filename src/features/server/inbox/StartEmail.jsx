@@ -6,7 +6,7 @@ import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useAttachments } from '../chat/useAttachments.js';
-import { AttachFiles } from './AttachFiles.jsx';
+import { ComposerBox } from '../composer/ComposerBox.jsx';
 import { RecipientPicker } from './RecipientPicker.jsx';
 
 /**
@@ -84,32 +84,40 @@ export function StartEmail({ mailbox, onStart, onClose }) {
             onChange={(event) => setSubject(event.target.value)}
           />
           <label htmlFor={`${id}-body`}>{t('inboxSend.start.body')}</label>
-          <textarea
-            id={`${id}-body`}
-            rows={6}
-            maxLength={20000}
-            value={body}
-            onChange={(event) => setBody(event.target.value)}
-          />
-          {mailbox.company && <AttachFiles files={files} disabled={busy} />}
-          <p className="inbox-panel-hint">
-            {t('inboxSend.start.from', { mailbox: '' })}
-            <bdi>{mailbox.label}</bdi>
-          </p>
+          {/* Attachments go through company email only (F3a). */}
+          <ComposerBox
+            files={mailbox.company ? files : null}
+            attachDisabled={busy}
+            meta={
+              <small>
+                {t('inboxSend.start.from', { mailbox: '' })}
+                <bdi>{mailbox.label}</bdi>
+              </small>
+            }
+            action={
+              <Button
+                type="submit"
+                icon="arrow"
+                disabled={busy || files.busy || !to || !subject.trim() || !body.trim()}
+              >
+                {busy ? t('inboxSend.start.sending') : t('inboxSend.start.send')}
+              </Button>
+            }
+          >
+            <textarea
+              id={`${id}-body`}
+              className="composer-input"
+              rows={6}
+              maxLength={20000}
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+            />
+          </ComposerBox>
           {error && (
             <p className="field-error" role="alert">
               {error}
             </p>
           )}
-          <div className="inbox-start-actions">
-            <Button
-              type="submit"
-              icon="arrow"
-              disabled={busy || files.busy || !to || !subject.trim() || !body.trim()}
-            >
-              {busy ? t('inboxSend.start.sending') : t('inboxSend.start.send')}
-            </Button>
-          </div>
         </form>
       )}
     </Drawer>

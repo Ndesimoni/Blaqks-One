@@ -61,15 +61,9 @@
   color: var(--muted);
   font-size: 13px;
 }
-.inbox-note-form textarea {
-  inline-size: 100%;
-  min-block-size: 44px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-subtle);
-  color: var(--ink);
-  resize: vertical;
+/* Internal notes use the shared message box, tinted like the Internal note tab. */
+.composer-box.is-note {
+  background: var(--accent-subtle);
 }
 .inbox-note-actions {
   display: flex;

@@ -1,17 +1,5 @@
-/* Email attachments (F3a): the chosen files and the Attach files button in the reply box
-   and the New email dialog; the file pills and photo previews come from chat-files.css. */
-.inbox-attach {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.inbox-attach .chat-files {
-  flex: 1 1 100%;
-}
-.inbox-attach-hint {
-  color: var(--muted);
-}
+/* Email attachments (F3a): files on sent emails in the thread. The chosen files and the
+   "+" sit inside the shared message box (src/features/server/composer/). */
 .inbox-bubble .chat-attachments {
   margin-block-start: 8px;
 }

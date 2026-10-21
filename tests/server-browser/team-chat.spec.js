@@ -38,7 +38,7 @@ test('a team talks in #general and privately', async ({ page, browser }, testInf
     mimeType: 'image/png',
     buffer: Buffer.from(PNG, 'base64'),
   });
-  await expect(page.locator('.chat-file.is-ready')).toBeVisible();
+  await expect(page.locator('.composer-file.is-ready')).toBeVisible();
   await composer.fill('Front of the villa');
   await composer.press('Enter');
   const photo = thread.getByRole('img', { name: 'Villa front.png' });

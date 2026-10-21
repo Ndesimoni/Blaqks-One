@@ -11,8 +11,7 @@
   font-size: 12px;
   font-weight: 600;
 }
-.inbox-start-body input,
-.inbox-start-body textarea {
+.inbox-start-body input {
   inline-size: 100%;
   min-block-size: 42px;
   padding: 8px 12px;
@@ -39,7 +38,7 @@
   overflow-wrap: anywhere;
   color: var(--muted);
 }
-.inbox-start-actions {
-  display: flex;
-  justify-content: flex-end;
+/* The message box grows to fill the dialog so the email reads like a page. */
+.inbox-start-body .composer-input {
+  min-block-size: 160px;
 }

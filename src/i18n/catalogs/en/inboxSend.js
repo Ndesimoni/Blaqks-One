@@ -52,6 +52,4 @@ export default {
     'Company email needs your Admin’s attention on Channels before you can send.',
   'start.failed': 'The email could not be sent: {reason}',
   'start.close': 'Close new email',
-  'files.attach': 'Attach files',
-  'files.hint': 'Photos and PDFs, up to 10 files and 15 MB in all.',
 };
