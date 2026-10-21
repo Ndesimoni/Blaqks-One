@@ -47,7 +47,8 @@ pub async fn list(tx: &mut Tx<'_>, kind: &str, owners: &[Uuid]) -> ApiResult<Vec
     }
     let rows: Vec<Row> = sqlx::query_as(&format!(
         "SELECT owner_id,{ITEM} FROM media.crm_media_objects \
-         WHERE owner_kind=$1 AND owner_id=ANY($2) AND deleted_at IS NULL ORDER BY attached_at,id"
+         WHERE owner_kind=$1 AND owner_id=ANY($2) AND deleted_at IS NULL \
+           AND NOT storage_pending ORDER BY attached_at,id"
     ))
     .bind(kind)
     .bind(owners)
@@ -69,7 +70,8 @@ pub async fn find(
 ) -> ApiResult<Option<Stored>> {
     sqlx::query_as(
         "SELECT storage_key,file_name,content_type FROM media.crm_media_objects \
-         WHERE id=$1 AND workspace_id=$2 AND owner_kind=$3 AND owner_id=$4 AND deleted_at IS NULL",
+         WHERE id=$1 AND workspace_id=$2 AND owner_kind=$3 AND owner_id=$4 AND deleted_at IS NULL \
+           AND NOT storage_pending",
     )
     .bind(id)
     .bind(workspace)

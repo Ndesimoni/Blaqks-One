@@ -1,16 +1,26 @@
 //! A strict `multipart/form-data` reader for verified Inbound Parse posts (E3c, review
 //! M3). It runs only after the signature check, never panics, and refuses rather than
 //! guesses: at most 64 parts, part headers of at most 8 KiB, and no repeated field name.
-//! File parts (attachments) are counted, never kept.
-use std::collections::HashMap;
+//! File parts (attachments) are kept as ranges of the verified body, never copied (F3b,
+//! review M4); a part whose headers cannot be read is skipped and counted, never the mail.
+use std::{collections::HashMap, ops::Range};
 
 const MAX_PARTS: usize = 64;
 const MAX_HEADER: usize = 8 * 1024;
 
+#[derive(Debug)]
+pub struct FilePart {
+    /// The form field (`attachment1` …), which `attachment-info` names.
+    pub field: String,
+    pub range: Range<usize>,
+}
+
 #[derive(Debug, Default)]
 pub struct Form {
     pub fields: HashMap<String, Vec<u8>>,
-    pub files: usize,
+    pub files: Vec<FilePart>,
+    /// Parts skipped because their headers could not be read (review L2).
+    pub unreadable: usize,
 }
 
 /// The boundary from a `multipart/form-data; boundary=…` content type.
@@ -69,12 +79,19 @@ pub fn parse(body: &[u8], boundary: &str) -> Option<Form> {
         if split - start > MAX_HEADER {
             return None;
         }
-        let headers = std::str::from_utf8(&body[start..split]).ok()?;
         let content = split + 4;
         let end = find(body, format!("\r\n{delimiter}").as_bytes(), content)?;
-        let (name, file) = disposition(headers)?;
+        let headers = std::str::from_utf8(&body[start..split]).ok();
+        let Some((name, file)) = headers.and_then(disposition) else {
+            form.unreadable += 1;
+            at = end + 2 + delimiter.len();
+            continue;
+        };
         if file {
-            form.files += 1;
+            form.files.push(FilePart {
+                field: name,
+                range: content..end,
+            });
         } else if form
             .fields
             .insert(name, body[content..end].to_vec())

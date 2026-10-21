@@ -26,6 +26,9 @@ pub struct Mail {
     /// A delivery report or mailer-daemon notice: never client mail (review L4).
     pub report: bool,
     pub recipients: Vec<String>,
+    /// Attachments (F3b), as named ranges of the request body, and parts that were unreadable.
+    pub files: Vec<super::inbound_files::Part>,
+    pub unreadable_files: usize,
 }
 
 fn field(form: &Form, name: &str) -> String {
@@ -122,15 +125,18 @@ pub fn read(form: &Form) -> Option<Mail> {
             &field(form, "SPF"),
             envelope_from,
         ),
+        // No score means the mail was never checked: treated as spam (F3b review L2).
         spam: field(form, "spam_score")
             .trim()
             .parse::<f64>()
-            .is_ok_and(|s| s > SPAM_SCORE),
+            .map_or(true, |s| s > SPAM_SCORE),
         report: is_report(header(&headers, "Content-Type").as_deref())
             || matches!(local, "mailer-daemon" | "postmaster"),
         message_id: header(&headers, "Message-ID").filter(|id| message_id(id)),
         subject: Some(subject.trim().to_owned()).filter(|s| !s.is_empty()),
-        has_media: form.files > 0 || attachments > 0,
+        has_media: !form.files.is_empty() || form.unreadable > 0 || attachments > 0,
+        files: super::inbound_files::parts(form),
+        unreadable_files: form.unreadable,
         text: text.trim().to_owned(),
         from,
         name,

@@ -66,7 +66,20 @@ against the item the file belongs to.
   rather than sending without files. Accepted: the Super Admin and other companies get the
   Inbox's usual 403 (not 404) on the file route; an object larger than its record retries
   before failing; a worker holds about 120 MiB at most for two large sends at once.
-  **F3b (receiving)** is next.
+  **F3b (receiving) is built** (2026-10-22): migrations 0049 (`storage_pending`,
+  `quota_group`, `quota_key` on `crm_media_objects`) and 0050 (`files_not_kept` on inbox
+  messages), `media/inbound.rs` (prepare and reserve under the budgets) and
+  `inbound_store.rs` (store after the commit), `inbox/intake_files.rs`,
+  `integrations/sendgrid/inbound_files.rs`; the thread shows kept files with a "Files from
+  outside the company" note and counts the rest. Suites
+  `tests/api/sendgrid-inbound-files.test.mjs` and `sendgrid-inbound-files-guards.test.mjs`.
+  Code security review (2026-10-22): no High findings. Fixed: storing runs apart from the
+  request and holds the connection's slot, so SendGrid hanging up cannot lose files (L1);
+  mail without a spam score counts as spam (L2); the sender budget key is tied to the
+  company (L3); files are only looked at for verified, unspammy mail (L4); more tests (L5).
+  Accepted: the files are labelled, not yet scanned (M1); **scanning (ClamAV or the storage
+  provider) is required before hosting**. Not covered by an automated test: a put that
+  fails is hidden and counted (storage would have to fail on cue).
 - **F4 — public photos:** approved, re-encoded copies for the public website through the
   CDN, only for listings the Super Admin has approved.
 

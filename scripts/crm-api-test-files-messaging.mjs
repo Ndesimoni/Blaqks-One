@@ -12,6 +12,8 @@ export const messagingTestFiles = [
   'tests/api/sendgrid-send.test.mjs',
   'tests/api/sendgrid-events.test.mjs',
   'tests/api/sendgrid-inbound.test.mjs',
+  'tests/api/sendgrid-inbound-files.test.mjs',
+  'tests/api/sendgrid-inbound-files-guards.test.mjs',
   'tests/api/sendgrid-attachments.test.mjs',
   'tests/api/channels-archive.test.mjs',
   'tests/api/mailbox-departure.test.mjs',

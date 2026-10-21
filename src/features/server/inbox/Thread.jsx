@@ -37,8 +37,21 @@ function Message({ message, channel, contact, t, format, again, onAgain, fileUrl
         )}
         <MessageBody message={message} channel={channel} t={t} />
         <MessageFiles files={message.attachments} urlOf={(file) => fileUrl(message.id, file)} />
-        {message.body && message.hasMedia && !message.attachments?.length && (
-          <em className="inbox-media">{t('inbox.message.media')}</em>
+        {/* Files from clients are not scanned yet: say where they came from (F3b review M1). */}
+        {!outbound && message.attachments?.length > 0 && (
+          <em className="inbox-media">{t('inboxSend.message.outsideFiles')}</em>
+        )}
+        {message.filesNotKept > 0 ? (
+          // F3b: only photos and PDFs from verified senders, within the daily limits, are kept.
+          <em className="inbox-media">
+            {t('inboxSend.message.filesNotKept', { count: message.filesNotKept })}
+          </em>
+        ) : (
+          message.body &&
+          message.hasMedia &&
+          !message.attachments?.length && (
+            <em className="inbox-media">{t('inbox.message.media')}</em>
+          )
         )}
       </div>
       <span className="inbox-message-meta">

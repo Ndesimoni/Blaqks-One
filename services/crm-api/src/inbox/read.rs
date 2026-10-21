@@ -54,6 +54,7 @@ struct Message {
     status: String,
     body: String,
     has_media: bool,
+    files_not_kept: i16,
     author_user_id: Option<Uuid>,
     repeat_of: Option<Uuid>,
     sender: Option<String>,
@@ -84,7 +85,7 @@ pub async fn read(
         .await?
         .ok_or_else(ApiError::missing)?;
     let messages: Vec<Message> = sqlx::query_as(&format!(
-        "SELECT * FROM (SELECT id,direction,body,has_media,author_user_id,repeat_of,sender, \
+        "SELECT * FROM (SELECT id,direction,body,has_media,files_not_kept,author_user_id,repeat_of,sender, \
            sender_unverified, \
            CASE WHEN status='sending' AND status_changed_at<now()-interval '2 minutes' \
              THEN 'unknown' ELSE status END AS status, \
@@ -121,7 +122,7 @@ pub async fn read(
         .map(|m| {
             json!({
                 "id": m.id, "direction": m.direction, "status": m.status, "body": m.body,
-                "hasMedia": m.has_media, "authorId": m.author_user_id,
+                "hasMedia": m.has_media, "filesNotKept": m.files_not_kept, "authorId": m.author_user_id,
                 "failureReason": m.failure_reason, "repeatOf": m.repeat_of, "sender": m.sender,
                 "senderUnverified": m.sender_unverified, "at": m.at,
             })

@@ -11,6 +11,8 @@ pub mod events;
 pub mod intake;
 mod intake_company;
 pub mod intake_email;
+pub mod intake_files;
+mod intake_open;
 mod intake_store;
 pub mod leads;
 pub mod list;

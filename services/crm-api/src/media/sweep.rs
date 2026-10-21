@@ -1,5 +1,5 @@
-//! The worker's media sweep (packet F1): uploads never attached within 24 hours are hidden,
-//! and hidden files are removed from storage. A storage failure is retried next round.
+//! The worker's media sweep (packet F1): uploads never attached within 24 hours, and inbound
+//! files still not stored after an hour (F3b), are hidden; hidden files leave storage. A storage failure is retried next round.
 use super::s3;
 use crate::{config::media_settings::MediaConfig, error::ApiResult};
 use sqlx::PgPool;
@@ -11,7 +11,8 @@ const BATCH: i64 = 100;
 pub async fn round(pool: &PgPool, config: &MediaConfig) -> ApiResult<()> {
     sqlx::query(
         "UPDATE media.crm_media_objects SET deleted_at=now() \
-         WHERE owner_id IS NULL AND deleted_at IS NULL AND created_at<now()-interval '24 hours'",
+         WHERE deleted_at IS NULL AND ((owner_id IS NULL AND created_at<now()-interval '24 hours') \
+           OR (storage_pending AND created_at<now()-interval '1 hour'))",
     )
     .execute(pool)
     .await?;

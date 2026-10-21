@@ -22,6 +22,12 @@ export default {
   'message.quoted': 'Earlier messages',
   'message.from': 'from {sender}',
   'message.unverified': 'Unverified sender: check before acting',
+  'message.outsideFiles': 'Files from outside the company: open only what you expect.',
+  'message.filesNotKept': {
+    one: '1 attachment was not kept: only photos and PDFs from verified senders are kept.',
+    other:
+      '{count} attachments were not kept: only photos and PDFs from verified senders are kept.',
+  },
   'message.repeated': 'Sent again below',
   'again.button': 'Send again',
   'again.unknownTitle': 'This may already have been sent.',

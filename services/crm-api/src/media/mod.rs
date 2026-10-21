@@ -2,6 +2,8 @@
 //! the API. This module stores, serves and removes files; owning modules attach them to
 //! their own items and check access before serving (service boundaries rule 9).
 pub mod contents;
+pub mod inbound;
+pub mod inbound_store;
 mod jpeg;
 pub mod naming;
 pub mod owned;

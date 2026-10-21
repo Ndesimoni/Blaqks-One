@@ -87,18 +87,18 @@ pub async fn message(
     workspace: &str,
     message: &Inbound,
     sender: Option<(&str, bool)>,
-) -> ApiResult<bool> {
+) -> ApiResult<Option<Uuid>> {
     let rfc_message_id = message
         .email
         .as_ref()
         .and_then(|meta| meta.rfc_message_id.as_deref());
-    let stored = sqlx::query(
+    let stored = sqlx::query_scalar(
         "INSERT INTO inbox.crm_inbox_messages \
            (id,conversation_id,workspace_id,direction,provider_message_id,status,body,has_media, \
             rfc_message_id,sender,sender_unverified) \
          VALUES ($1,$2,$3,'inbound',$4,'received',$5,$6,$7,$8,$9) \
          ON CONFLICT (conversation_id,provider_message_id) \
-           WHERE provider_message_id IS NOT NULL DO NOTHING",
+           WHERE provider_message_id IS NOT NULL DO NOTHING RETURNING id",
     )
     .bind(Uuid::new_v4())
     .bind(conversation)
@@ -109,10 +109,9 @@ pub async fn message(
     .bind(rfc_message_id)
     .bind(sender.map(|(address, _)| address))
     .bind(sender.is_some_and(|(_, unverified)| unverified))
-    .execute(&mut **tx)
-    .await?
-    .rows_affected();
-    Ok(stored == 1)
+    .fetch_optional(&mut **tx)
+    .await?;
+    Ok(stored)
 }
 
 /// A new inbound message reopens a waiting or resolved conversation (design §4).

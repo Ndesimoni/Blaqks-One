@@ -19,7 +19,7 @@ fn form(parts: &[(&str, Option<&str>, &str)]) -> Vec<u8> {
 }
 
 #[test]
-fn fields_are_read_and_files_only_counted() {
+fn fields_are_read_and_files_kept_as_ranges() {
     let body = form(&[
         ("from", None, "Client <c@x.test>"),
         ("text", None, "Hello\r\nthere"),
@@ -28,7 +28,9 @@ fn fields_are_read_and_files_only_counted() {
     let parsed = parse(&body, "XyZ").unwrap();
     assert_eq!(parsed.fields["from"], b"Client <c@x.test>");
     assert_eq!(parsed.fields["text"], b"Hello\r\nthere");
-    assert_eq!(parsed.files, 1);
+    assert_eq!(parsed.files.len(), 1);
+    assert_eq!(parsed.files[0].field, "attachment1");
+    assert_eq!(&body[parsed.files[0].range.clone()], b"%PDF");
     assert!(!parsed.fields.contains_key("attachment1"));
 }
 
@@ -36,11 +38,13 @@ fn fields_are_read_and_files_only_counted() {
 fn malformed_repeated_or_oversized_forms_are_refused() {
     assert!(parse(&form(&[("dkim", None, "a"), ("dkim", None, "b")]), "XyZ").is_none());
     assert!(parse(b"no boundary here", "XyZ").is_none());
-    assert!(parse(
+    // A part without a name is skipped and counted, never the whole mail (review L2).
+    let nameless = parse(
         b"--XyZ\r\nContent-Disposition: form-data\r\n\r\nx\r\n--XyZ--",
-        "XyZ"
+        "XyZ",
     )
-    .is_none());
+    .unwrap();
+    assert_eq!((nameless.fields.len(), nameless.unreadable), (0, 1));
     let many: Vec<(String, Option<&str>, &str)> =
         (0..65).map(|n| (format!("f{n}"), None, "v")).collect();
     let refs: Vec<(&str, Option<&str>, &str)> =

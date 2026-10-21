@@ -62,7 +62,9 @@
       "crm_media_objects_pending",
       "crm_media_objects_sweep",
       "crm_media_objects_uploader",
-      "crm_media_objects_usage"
+      "crm_media_objects_usage",
+      "crm_media_objects_inbound",
+      "crm_media_objects_inbound_keys"
     ]
   }
 }

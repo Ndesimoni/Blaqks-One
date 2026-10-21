@@ -57,3 +57,28 @@ export const conversationsOf = (workspace, sender) =>
     `SELECT count(*)||'|'||coalesce(max(assignee_id::text),'-')||'|'||coalesce(max(state),'-')
      FROM inbox.crm_inbox_conversations WHERE workspace_id='${workspace}' AND contact_key='${sender}'`,
   );
+
+/** Files clients email in (F3b). */
+export const mailFile = (name, type, bytes) => ({
+  name,
+  type,
+  base64: Buffer.from(bytes).toString('base64'),
+});
+export const conversationOf = (workspace, sender) =>
+  query(`SELECT id FROM inbox.crm_inbox_conversations
+    WHERE workspace_id='${workspace}' AND contact_key='${sender}'`);
+export const lastMessage = async (admin, id) =>
+  (
+    await admin.request(`/workspaces/${admin.user.workspaceId}/inbox/conversations/${id}`)
+  ).value.messages.at(-1);
+
+/** Files are stored after the CRM answers SendGrid: waits until none is still pending. */
+export async function filesStored(workspace) {
+  for (let tries = 0; tries < 100; tries += 1) {
+    const pending = query(`SELECT count(*) FROM media.crm_media_objects
+      WHERE workspace_id='${workspace}' AND storage_pending AND deleted_at IS NULL`);
+    if (pending === '0') return;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  assert.fail('the files were never stored');
+}

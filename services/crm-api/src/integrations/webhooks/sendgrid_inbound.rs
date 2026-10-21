@@ -8,11 +8,15 @@
 use super::rejected;
 use crate::{
     error::ApiError,
-    inbox::intake,
+    inbox::{
+        intake,
+        intake_files::{self, Incoming},
+    },
     integrations::{
-        sendgrid::{events, inbound, inbound_event, multipart, webhooks},
+        sendgrid::{events, inbound_event, inbound_files::Part, multipart, webhooks},
         webhooks::inbound::SinkError,
     },
+    media::{inbound, inbound_store},
     state::AppState,
 };
 use axum::{
@@ -62,7 +66,7 @@ pub async fn inbound(
     let Some((workspace, public_key, domain)) = stored else {
         return Err(rejected());
     };
-    let Some(_slot) = super::inbound_slots::take(connection) else {
+    let Some(slot) = super::inbound_slots::take(connection) else {
         return Err(status(StatusCode::SERVICE_UNAVAILABLE, "Busy. Try again."));
     };
     let read = tokio::time::timeout(READ_DEADLINE, to_bytes(body, MAX_MAIL)).await;
@@ -72,18 +76,60 @@ pub async fn inbound(
     if !events::verified(&public_key, timestamp, signature, &body) {
         return Err(rejected());
     }
-    let Some(mail) = multipart::parse(&body, &boundary).and_then(|form| inbound::read(&form))
+    let parsed = multipart::parse(&body, &boundary);
+    let Some(mut mail) =
+        parsed.and_then(|form| crate::integrations::sendgrid::inbound::read(&form))
     else {
         return Ok(StatusCode::OK);
+    };
+    let parts = std::mem::take(&mut mail.files);
+    // Only a verified, spam-checked sender's files are ever looked at (F3b review L4).
+    let incoming = match mail.verified && !mail.spam {
+        true => prepare(&state, &body, parts, mail.unreadable_files),
+        false => Incoming {
+            files: Vec::new(),
+            unkeepable: parts.len() + mail.unreadable_files,
+        },
     };
     let Some(event) =
         inbound_event::event(&state.pool, &workspace, connection, &domain, mail).await?
     else {
         return Ok(StatusCode::OK);
     };
-    match intake::receive(&state.pool, &event).await {
+    let reserved = match intake::receive_mail(&state.pool, &event, incoming).await {
         // SendGrid posts it again later.
-        Err(SinkError::Retry) => Err(status(StatusCode::SERVICE_UNAVAILABLE, "Try again.")),
-        Ok(()) | Err(SinkError::Permanent(_)) => Ok(StatusCode::OK),
+        Err(SinkError::Retry) => return Err(status(StatusCode::SERVICE_UNAVAILABLE, "Try again.")),
+        Err(SinkError::Permanent(_)) => return Ok(StatusCode::OK),
+        Ok(reserved) => reserved,
+    };
+    // After the commit, apart from this request, so a caller hanging up cannot lose the
+    // files (F3b review L1); the connection's slot is held until they are stored.
+    if let (Some(config), Some(first)) = (state.config.media.clone(), reserved.first()) {
+        let (pool, owner) = (state.pool.clone(), first.owner);
+        tokio::spawn(async move {
+            let _slot = slot;
+            let failed = inbound_store::store_all(&pool, &config, &body, &reserved).await;
+            let _ = intake_files::stored_failed(&pool, owner, failed).await;
+        });
     }
+    Ok(StatusCode::OK)
+}
+
+/// Checks each attachment's real type and size and fingerprints it, at most 10 per mail;
+/// without file storage none can be kept, and each is counted.
+fn prepare(state: &AppState, body: &[u8], parts: Vec<Part>, unreadable: usize) -> Incoming {
+    let mut incoming = Incoming {
+        files: Vec::new(),
+        unkeepable: unreadable,
+    };
+    for (index, part) in parts.into_iter().enumerate() {
+        let prepared = (state.config.media.is_some() && index < 10)
+            .then(|| inbound::prepare(&part.name, body, part.range))
+            .flatten();
+        match prepared {
+            Some(file) => incoming.files.push(file),
+            None => incoming.unkeepable += 1,
+        }
+    }
+    incoming
 }

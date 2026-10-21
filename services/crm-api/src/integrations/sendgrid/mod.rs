@@ -7,6 +7,7 @@ pub mod connect;
 pub mod events;
 pub mod inbound;
 pub mod inbound_event;
+pub mod inbound_files;
 pub mod multipart;
 pub mod parse_api;
 pub mod payload;

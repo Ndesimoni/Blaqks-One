@@ -2,6 +2,21 @@
 //! so a PDF whose first bytes hide HTML can never be saved or opened as `invoice.html`. Used
 //! when storing, when serving and when a file leaves the CRM as an email attachment.
 
+/// A name without paths, control or text-direction characters (which could disguise a type,
+/// `report\u{202e}fdp.exe`), at most 200 characters; `file` when nothing is left.
+pub fn plain_name(raw: &str) -> String {
+    let base = raw.rsplit(['/', '\\']).next().unwrap_or_default();
+    let hidden = |c: char| {
+        c.is_control()
+            || matches!(c, '\u{200b}'..='\u{200f}' | '\u{202a}'..='\u{202e}' | '\u{2060}'..='\u{2069}' | '\u{feff}' | '\u{061c}')
+    };
+    let clean: String = base.chars().filter(|c| !hidden(*c)).take(200).collect();
+    match clean.trim() {
+        "" => "file".into(),
+        name => name.to_owned(),
+    }
+}
+
 fn extension(content_type: &str) -> &'static str {
     match content_type {
         "image/jpeg" => "jpg",

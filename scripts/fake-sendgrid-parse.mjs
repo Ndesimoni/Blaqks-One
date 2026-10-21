@@ -9,19 +9,38 @@ const POLICIES = '/v3/user/webhooks/security/policies';
 const PARSE = '/v3/user/webhooks/parse/settings';
 const pair = () => generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
 
-function multipart(fields, attachments) {
+/**
+ * The form SendGrid posts: text fields, then each file as `attachment1…N` with its names in
+ * `attachment-info`. `files` are `{ name, type, base64 }`; `attachments` adds that many
+ * small PDFs (earlier suites); `broken` adds that many parts with no field name.
+ */
+function multipart(fields, attachments, files = [], broken = 0) {
   const boundary = `xYz${randomBytes(8).toString('hex')}`;
-  const parts = Object.entries(fields).map(
-    ([name, value]) =>
-      `--${boundary}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`,
-  );
+  const all = [...files];
   for (let n = 1; n <= attachments; n += 1) {
-    parts.push(
-      `--${boundary}\r\nContent-Disposition: form-data; name="attachment${n}"; ` +
-        `filename="plan${n}.pdf"\r\nContent-Type: application/pdf\r\n\r\n%PDF-1.4\r\n`,
-    );
+    all.push({ name: `plan${n}.pdf`, type: 'application/pdf', base64: btoa('%PDF-1.4') });
   }
-  return { boundary, raw: Buffer.from(`${parts.join('')}--${boundary}--\r\n`) };
+  const info = Object.fromEntries(
+    all.map((file, n) => [`attachment${n + 1}`, { filename: file.name, type: file.type }]),
+  );
+  const text = { ...fields, ...(all.length ? { 'attachment-info': JSON.stringify(info) } : {}) };
+  const parts = Object.entries(text).map(([name, value]) =>
+    Buffer.from(
+      `--${boundary}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`,
+    ),
+  );
+  all.forEach((file, n) => {
+    const head =
+      `--${boundary}\r\nContent-Disposition: form-data; name="attachment${n + 1}"; ` +
+      `filename="${file.name}"\r\nContent-Type: ${file.type}\r\n\r\n`;
+    parts.push(Buffer.from(head), Buffer.from(file.base64, 'base64'), Buffer.from('\r\n'));
+  });
+  for (let n = 0; n < broken; n += 1) {
+    const head = `--${boundary}\r\nContent-Disposition: form-data; filename="lost.pdf"\r\n\r\n`;
+    parts.push(Buffer.from(`${head}%PDF-1.4\r\n`));
+  }
+  parts.push(Buffer.from(`--${boundary}--\r\n`));
+  return { boundary, raw: Buffer.concat(parts) };
 }
 
 export function createParse(body) {
@@ -57,8 +76,8 @@ export function createParse(body) {
     }
     const setting = settings.get(hostname);
     if (!setting) return json(response, 404, { error: 'no parse setting' });
-    const { fields, attachments = 0, timestamp, signWith } = await body(request);
-    const { boundary, raw } = multipart(fields, attachments);
+    const { fields, attachments = 0, files, broken, timestamp, signWith } = await body(request);
+    const { boundary, raw } = multipart(fields, attachments, files, broken);
     const at = String(timestamp ?? Math.floor(Date.now() / 1000));
     const keys = signWith === 'other' ? pair() : setting.keys;
     const signed = Buffer.concat([Buffer.from(at), raw]);

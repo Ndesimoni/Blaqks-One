@@ -25,7 +25,7 @@ const TYPE: &str = "Upload a JPEG, PNG or WebP photo, or a PDF.";
 const LARGE: &str = "The file is too large: photos up to 10 MB, PDFs up to 20 MB.";
 /// Uploads per member per hour, and stored bytes per company.
 const PER_HOUR: i64 = 60;
-const COMPANY_BYTES: i64 = 5 * 1024 * 1024 * 1024;
+pub const COMPANY_BYTES: i64 = 5 * 1024 * 1024 * 1024;
 /// Unsent uploads one member may hold, so nobody can fill the company's space (review M2).
 const PENDING_BYTES: i64 = 200 * 1024 * 1024;
 
@@ -44,19 +44,7 @@ pub fn display_name(header: Option<&str>) -> String {
         .next()
         .map(|(_, value)| value.into_owned())
         .unwrap_or_default();
-    let base = decoded.rsplit(['/', '\\']).next().unwrap_or_default();
-    // Control and direction characters could disguise a type (`report\u{202e}fdp.exe`).
-    let hidden = |c: char| {
-        c.is_control()
-            || matches!(c, '\u{200b}'..='\u{200f}' | '\u{202a}'..='\u{202e}' | '\u{2060}'..='\u{2069}' | '\u{feff}' | '\u{061c}')
-    };
-    let clean: String = base.chars().filter(|c| !hidden(*c)).take(200).collect();
-    let clean = clean.trim();
-    if clean.is_empty() {
-        "file".into()
-    } else {
-        clean.to_owned()
-    }
+    super::naming::plain_name(&decoded)
 }
 
 pub async fn upload(
