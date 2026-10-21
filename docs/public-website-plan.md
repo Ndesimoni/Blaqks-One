@@ -10,7 +10,7 @@ Status: **planned, not started** (owner, 2026-10-20). This plan builds the publi
 - **No licence check** for a site to go live. Publishing a listing still needs a verified licence and Super Admin approval of the exact version.
 - **One approval covers both sites.** Per listing, the company chooses "general site + my site" or "my site only".
 - Limits: **2 live listings per team** applies everywhere. **2 teams per property** applies only to the general site.
-- Public sites launch in **English**, built on the [language foundation](i18n.md) and right-to-left ready.
+- Public sites launch in **English**, built on the [language foundation](i18n.md); right-to-left readiness is no longer required ([English only](product-decisions.md#english-only-decided-2026-10-22)).
 - The 4 themes are designed and reviewed with the owner before they are built.
 
 ## Architecture: one website application, many sites

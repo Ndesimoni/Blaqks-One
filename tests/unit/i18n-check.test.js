@@ -1,11 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { catalogs } from '../../src/i18n/catalogs/index.js';
-import { checkCatalogs, checkRegistry } from '../../scripts/i18n-rules.mjs';
+import { checkCatalogs, checkLanguage, checkRegistry } from '../../scripts/i18n-rules.mjs';
 
-test('the shipped catalogues match', () => {
-  assert.deepEqual(checkCatalogs(catalogs), []);
+// Arabic is frozen (owner, 2026-10-22): only the English catalogue must be complete.
+test('the shipped English catalogue is complete and every file registered', () => {
+  assert.deepEqual(checkLanguage(catalogs, 'en'), []);
   assert.deepEqual(checkRegistry(catalogs, catalogs), []);
+});
+
+test('one language alone: empty values and unused plural forms are reported', () => {
+  const problems = checkLanguage({
+    en: { a: { gone: ' ', n: { one: '1', few: '2', other: 'n' } } },
+  });
+  assert.deepEqual(problems, [
+    'en a.gone is empty or not text.',
+    'en a.n has "few", which en does not use.',
+  ]);
 });
 
 test('missing namespaces, keys, empty values and placeholder drift are reported', () => {

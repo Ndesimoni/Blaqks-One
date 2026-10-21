@@ -161,6 +161,14 @@ See [Team activity design](team-activity-design.md).
 | Design   | All new work gets a clean, classic, orderly, smooth and premium design within those colours, reviewed by the product designer and built by the relevant specialist; see [Premium polish for new work](design-standards.md#premium-polish-for-new-work-owner-2026-10-16). Existing screens adopt it when they are next changed. |
 | Language | Build the **language foundation first** (English and Arabic, right-to-left ready). Every feature built after it uses translation catalogues from the start. Existing screens are translated later, in a separate pass once the foundation is done.                                                                             |
 
+## English only (decided 2026-10-22)
+
+| Topic           | Decision                                                                                                                                                                                                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Language        | **Everything is built in English.** No Arabic text, Arabic translation pass, right-to-left layout or Arabic email decoding until the owner reopens it. This replaces the 2026-10-16 language decision above and "right-to-left ready" in the company website decisions below. |
+| Existing Arabic | The Arabic catalogue and the `VITE_I18N_PREVIEW` preview stay in place, frozen and off, like the browser demo: not updated and not deleted without a separate owner decision. A missing Arabic key shows English.                                                             |
+| Checks          | New text still goes through the English catalogue and `useI18n()`; `npm run check:i18n` checks English only. Logical CSS properties are no longer required.                                                                                                                   |
+
 ## Public listings (decided 2026-10-12)
 
 | Topic                           | Decision                                                                                                                                                                                                                                                               |

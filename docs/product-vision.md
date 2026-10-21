@@ -26,7 +26,7 @@ The owner wants the CRM to look orderly, premium, clean, smooth and "expensive",
 ### 2. Language preference for every user
 
 - **Choice:** each user picks their language in My profile, and the whole interface appears in that language.
-- **Languages:** start with **English and Arabic**, including full right-to-left layout. Then add French, Russian and others by demand (Hindi, Urdu, Chinese and Persian are common in UAE real estate).
+- **Languages (paused 2026-10-22: [English only](product-decisions.md#english-only-decided-2026-10-22)):** start with **English and Arabic**, including full right-to-left layout. Then add French, Russian and others by demand (Hindi, Urdu, Chinese and Persian are common in UAE real estate).
 - **Messages:** a colleague's message in English appears **translated into the reader's language**, with a "Show original" option. AI translation is labelled as such.
 - **Record content:** client notes and property descriptions are translated on request, not automatically. Legal and contract texts always keep the original.
 - **Foundation:** move every interface text into translation catalogs, use layout rules that work in both directions, and format dates, numbers and AED for each language.

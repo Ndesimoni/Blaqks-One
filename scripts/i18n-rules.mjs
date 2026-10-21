@@ -1,6 +1,7 @@
 /**
  * Catalogue rules for `npm run check:i18n` (docs/i18n.md). Pure, so unit tests can feed in
- * small catalogues. `checkCatalogs({ en: { ns: {...} }, ar: {...} })` returns messages.
+ * small catalogues. `checkCatalogs({ en: { ns: {...} }, ar: {...} })` returns messages;
+ * `checkLanguage(catalogs, 'en')` checks one language alone.
  */
 const PLACEHOLDER = /\{(\w+)\}/g;
 const isPlural = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -48,6 +49,15 @@ function compareNamespace(base, other, namespace, catalogs) {
     for (const [key, value] of Object.entries(catalogs[language][namespace]))
       problems.push(...valueProblems(language, `${namespace}.${key}`, value));
   return problems;
+}
+
+/** Problems inside one language alone: empty values and plural forms it does not use. */
+export function checkLanguage(catalogs, language = 'en') {
+  return Object.entries(catalogs[language] ?? {}).flatMap(([namespace, entries]) =>
+    Object.entries(entries).flatMap(([key, value]) =>
+      valueProblems(language, `${namespace}.${key}`, value),
+    ),
+  );
 }
 
 /** Every difference between `base` (English) and each other language. */

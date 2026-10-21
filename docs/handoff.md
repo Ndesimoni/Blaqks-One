@@ -45,8 +45,8 @@ Proves E3 and F3 with the owner's real account before more is built on them.
 ### N2 — Inbox time-savers: templates, quick replies, drafts
 
 Needs nothing from outside. Write a short design first and ask the owner: templates per
-company (Admin-managed) and/or per member; placeholders such as the client's name; English
-and Arabic versions. Drafts are already planned as `status = draft` messages in
+company (Admin-managed) and/or per member; placeholders such as the client's name.
+Drafts are already planned as `status = draft` messages in
 [Messaging design](messaging-design.md) §5; reuse that. A per-member email send limit is
 queued in the roadmap and fits here. UI goes through `product_designer`, Messenger style.
 
@@ -66,12 +66,11 @@ Needs decisions D1, D2 and D6, a Twilio account and approved templates; see
 ### Smaller follow-ups already recorded
 
 - Virus scanning of files from clients before hosting (F3b review M1).
-- Decoding older encodings such as windows-1256 (Arabic): **deferred by the owner**.
 - Showing the Admin how much mail the budgets dropped (E3c M2); rate limits for the public
   webhook routes at the hosting edge.
 - Spam reports and unsubscribes becoming an email opt-out (with the consents table, W1).
 - A test for an inbound file whose storage fails (hidden and counted, not yet automated).
-- A right-to-left screenshot pass for Channels; address changes in Team activity.
+- Address changes in Team activity.
 
 ## 3. How a packet is run here
 
@@ -82,7 +81,7 @@ Needs decisions D1, D2 and D6, a Twilio account and approved templates; see
    real business questions, each with a recommended option, and record the answers in
    [Product decisions](product-decisions.md).
 3. Build in small modules: one owning module per table ([Service boundaries](service-boundaries.md)),
-   150 lines per file, English and Arabic text, logical CSS. UI changes go through
+   150 lines per file, English text only ([English only](product-decisions.md#english-only-decided-2026-10-22)). UI changes go through
    `product_designer`; conversations keep the Messenger layout.
 4. Test with synthetic data on the disposable Docker database. Add every new API suite to
    `scripts/crm-api-test-files*.mjs`.
@@ -96,7 +95,8 @@ Needs decisions D1, D2 and D6, a Twilio account and approved templates; see
 9. Report to the owner in simple English: what they can now do, how to try it, and what is
    not done.
 
-Owner preferences: simple English; function first, whole-app redesign later; connected
+Owner preferences: simple English; everything in English, no Arabic or right-to-left work
+(2026-10-22); function first, whole-app redesign later; connected
 mode only (the demo is frozen); never real client data.
 
 ## 4. Running and checking

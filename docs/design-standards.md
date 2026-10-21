@@ -19,7 +19,7 @@ The user-approved [CRM design refresh](design-refresh.md) is the visual baseline
 
 - **Hierarchy through type and space, not boxes:** larger, confident figures with tabular numerals; clear label, value and caption levels; generous, consistent spacing on the 4px scale; fewer nested panels; group with alignment and thin rules.
 - **Restrained depth:** hairline borders and soft, layered shadows; no heavy outlines, gradient washes or decorative banners.
-- **Purposeful data visuals:** small charts beside key figures, and hand-built SVG charts using the existing palette tokens, with text alternatives, both themes and right-to-left mirroring. The chart forms, motion and right-to-left rules in the parked [Design system v2](design-system-v2.md) may be reused **with the current colours only**.
+- **Purposeful data visuals:** small charts beside key figures, and hand-built SVG charts using the existing palette tokens, with text alternatives and both themes (right-to-left is not required: [English only](product-decisions.md#english-only-decided-2026-10-22)). The chart forms and motion in the parked [Design system v2](design-system-v2.md) may be reused **with the current colours only**.
 - **Smooth, calm motion:** brief transitions, skeleton loading in place of spinners or layout jumps, gentle entrance of content; all honour reduced motion.
 - **Consistency:** reuse shared components; one primary action per area; aligned controls; the same states (hover, focus, loading, empty, error) everywhere.
 - Review new work with screenshots at 390px and 1280px in both themes before it is accepted.
