@@ -1,6 +1,7 @@
 # Company email through SendGrid — design (packet E3)
 
-Status: **draft for owner approval; security review done, no High findings** (2026-10-21). Nothing in E3 is
+Status: **approved by the owner** (decisions E3a–E3d, 2026-10-21); security review done, no
+High findings. Not built yet. Nothing in E3 is
 built yet. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
 each member writes and reads client email in the CRM from an address on the company's own
 domain, with no separate Gmail or Outlook mailbox. The Google Workspace adapter (E1) stays
@@ -20,9 +21,9 @@ privacy, sealed credentials, verified webhooks) applies unless this page says ot
 - Statuses are Sent, Delivered (the client's mail server accepted it), Failed (bounced or
   refused, with a plain reason) and Status unknown. No open or click tracking.
 
-## 2. Decisions this design needs
+## 2. Decisions (owner chose each recommendation, 2026-10-21)
 
-| #   | Decision                   | Recommendation                                                                                                                                                                                                                                                                                                                                 |
+| #   | Decision                   | Decided                                                                                                                                                                                                                                                                                                                                        |
 | --- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | E3a | Whose SendGrid account     | **Each company connects its own SendGrid account** (like one Twilio account per company, D3). SendGrid itself then refuses to send from a domain the account has not authenticated, so one company's key can never send as another. A platform account with one subuser per company (SendGrid Pro) can be added later behind the same adapter. |
 | E3b | Which domain receives mail | **The company's main domain** when SendGrid is its only email (Keys with Simoni). A company that keeps another mailbox on its main domain uses a receiving subdomain such as `crm.company.com`, because incoming mail needs the domain's MX record to point at SendGrid.                                                                       |
