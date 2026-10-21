@@ -18,6 +18,12 @@ pub async fn send(
     out: &mail::Outgoing<'_>,
     row: &ConnectionRow,
 ) -> ApiResult<mail::Delivery> {
+    // Gmail's message builder has no attachments yet (F3 design, review L3).
+    if !out.attachments.is_empty() {
+        return Ok(mail::Delivery::Failed {
+            code: "attachments_unsupported",
+        });
+    }
     let mut tx = pool.begin().await?;
     let author = workspaces::member(&mut tx, out.workspace, out.author).await;
     let allowed = author.is_ok_and(|user| mailbox::may_connect(&user, out.workspace));

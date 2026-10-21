@@ -31,6 +31,9 @@ export function inboxRoutes({ request, scope }) {
     /** Email sending (E1b): reply, Start message and Send again. */
     replyToConversation: action('messages'),
     startConversation: (workspace, body) => request(base(workspace), { method: 'POST', body }),
+    /** A message's attachment (F3a), served after the conversation's access check. */
+    inboxFileUrl: (workspace, id, message, file) =>
+      `/api/crm${item(workspace, id)}/messages/${encodeURIComponent(message)}/files/${encodeURIComponent(file)}`,
     sendMessageAgain: (workspace, id, message) =>
       request(`${item(workspace, id)}/messages/${encodeURIComponent(message)}/again`, {
         method: 'POST',

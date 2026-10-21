@@ -25,6 +25,10 @@ pub fn router() -> Router<AppState> {
         )
         .route(&format!("{item}/messages"), post(send::reply).layer(body()))
         .route(
+            &format!("{item}/messages/{{message}}/files/{{file}}"),
+            get(send::files::file),
+        )
+        .route(
             &format!("{item}/messages/{{message}}/again"),
             post(send::again).layer(body()),
         )

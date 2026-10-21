@@ -56,7 +56,11 @@ against the item the file belongs to.
   visibility check. Earlier inline photos (`{name, src}`) still display and save unchanged.
   **Remaining:** a command that moves existing inline photos into storage; until then they
   stay in the record JSON.
-- **F3 — email attachments:** see the F3 design below.
+- **F3 — email attachments:** see the F3 design below. **F3a (sending) is built** (2026-10-21):
+  migration 0048, `media/contents.rs` and `naming.rs`, `inbox/send/files.rs` and
+  `domain_files.rs`, Attach files in the reply box and New email, files on messages; suites
+  `tests/api/sendgrid-attachments.test.mjs` and `tests/server-browser/inbox-attachments.spec.js`.
+  **F3b (receiving)** is next.
 - **F4 — public photos:** approved, re-encoded copies for the public website through the
   CDN, only for listings the Super Admin has approved.
 

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { useSession } from '../../../hooks/useSession.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
+import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { useAttachments } from '../chat/useAttachments.js';
+import { AttachFiles } from './AttachFiles.jsx';
 
 /** Why this member cannot reply here, with the way to fix it when there is one. */
 function ReplyNotice({ state, channel }) {
@@ -46,17 +50,21 @@ export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const { api } = useSession();
+  const { owner } = useWorkspaceScope();
+  const files = useAttachments(api, owner.id);
   if (state !== 'send') return <ReplyNotice state={state} channel={conversation.channel} />;
   const send = async (event) => {
     event.preventDefault();
     if (!text.trim() || busy) return;
     setBusy(true);
-    const failure = await onReply(text.trim());
+    const failure = await onReply(text.trim(), files.ids);
     setBusy(false);
     if (failure) setError(t('inboxSend.reply.failed', { reason: failure }));
     else {
       setText('');
       setError('');
+      files.clear();
     }
   };
   return (
@@ -75,12 +83,14 @@ export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
           if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) send(event);
         }}
       />
+      {/* Attachments go through company email only (F3a). */}
+      {mailbox.company && <AttachFiles files={files} disabled={busy} />}
       <div className="inbox-reply-actions">
         <small>
           {t('inboxSend.reply.hint', { mailbox: '' })}
           <bdi>{mailbox.label}</bdi>
         </small>
-        <Button type="submit" icon="arrow" disabled={busy || !text.trim()}>
+        <Button type="submit" icon="arrow" disabled={busy || files.busy || !text.trim()}>
           {busy ? t('inboxSend.reply.sending') : t('inboxSend.reply.send')}
         </Button>
       </div>

@@ -38,8 +38,9 @@ pub async fn file(
 fn respond(stored: &Stored, bytes: Vec<u8>) -> Response {
     let inline = stored.content_type.starts_with("image/");
     // RFC 6266: an ASCII fallback plus the UTF-8 name.
-    let ascii: String = stored
-        .file_name
+    // The name always ends with the stored type's extension (F3 review M3).
+    let name = super::naming::typed_name(&stored.file_name, &stored.content_type);
+    let ascii: String = name
         .chars()
         .map(|c| {
             if c.is_ascii_alphanumeric() || " .-_()".contains(c) {
@@ -49,7 +50,7 @@ fn respond(stored: &Stored, bytes: Vec<u8>) -> Response {
             }
         })
         .collect();
-    let encoded: String = url::form_urlencoded::byte_serialize(stored.file_name.as_bytes())
+    let encoded: String = url::form_urlencoded::byte_serialize(name.as_bytes())
         .collect::<String>()
         .replace('+', "%20");
     let disposition = format!(

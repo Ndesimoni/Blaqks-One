@@ -41,11 +41,11 @@ pub async fn usage(tx: &mut Tx<'_>, workspace: &str, member: Uuid) -> ApiResult<
         .await?;
     sqlx::query_as(
         "SELECT (SELECT count(*) FROM media.crm_media_objects \
-           WHERE uploaded_by=$2 AND created_at>now()-interval '1 hour'), \
+           WHERE uploaded_by=$2 AND origin='upload' AND created_at>now()-interval '1 hour'), \
          (SELECT coalesce(sum(byte_size),0)::bigint FROM media.crm_media_objects \
            WHERE workspace_id=$1 AND deleted_at IS NULL), \
          (SELECT coalesce(sum(byte_size),0)::bigint FROM media.crm_media_objects \
-           WHERE uploaded_by=$2 AND owner_id IS NULL AND deleted_at IS NULL)",
+           WHERE uploaded_by=$2 AND origin='upload' AND owner_id IS NULL AND deleted_at IS NULL)",
     )
     .bind(workspace)
     .bind(member)

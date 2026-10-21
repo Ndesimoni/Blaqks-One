@@ -20,6 +20,8 @@ pub struct Outgoing<'a> {
     pub author: Uuid,
     /// The Inbox message; SendGrid builds its Message-ID from it.
     pub message: Uuid,
+    /// Its files, read by owner right before the send (F3a); SendGrid only.
+    pub attachments: &'a [crate::media::contents::File],
     pub email: mime::Email<'a>,
     /// Gmail's thread ID once the conversation has one.
     pub thread: Option<&'a str>,
@@ -101,4 +103,14 @@ pub(super) async fn reconnect(pool: &PgPool, out: &Outgoing<'_>) -> ApiResult<De
     Ok(Delivery::Failed {
         code: "mailbox_reconnect",
     })
+}
+
+/// Whether this connection can send attachments: company email through SendGrid (F3a).
+pub async fn takes_attachments(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspace: &str,
+    connection: Uuid,
+) -> ApiResult<bool> {
+    let provider = store::load(tx, workspace, connection).await?;
+    Ok(provider.is_some_and(|row| row.provider == "sendgrid"))
 }

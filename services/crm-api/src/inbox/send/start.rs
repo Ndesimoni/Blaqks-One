@@ -30,7 +30,8 @@ pub async fn start(
     request: Result<Json<Value>, JsonRejection>,
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     access::ensure_writer(&state, &session, &headers, &workspace).await?;
-    let Json(request) = request.map_err(|_| ApiError::invalid(START))?;
+    let Json(mut request) = request.map_err(|_| ApiError::invalid(START))?;
+    let attachments = super::files::take(&mut request)?;
     let map = object(
         request,
         &["collection", "recordId", "subject", "body"],
@@ -98,7 +99,16 @@ pub async fn start(
         return Err(ApiError::invalid("This address is blocked."));
     }
     events::append(&mut tx, &workspace, id, Some(user.id), "started").await?;
-    let message = store::queue(&mut tx, &workspace, id, user.id, &text, None).await?;
+    let mut message = store::queue(&mut tx, &workspace, id, user.id, &text, None).await?;
+    let files = super::files::attach(
+        &mut tx,
+        &workspace,
+        user.id,
+        mailbox,
+        &message,
+        &attachments,
+    );
+    message["attachments"] = json!(files.await?);
     tx.commit().await?;
     Ok((
         StatusCode::CREATED,

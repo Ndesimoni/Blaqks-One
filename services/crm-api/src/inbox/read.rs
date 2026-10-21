@@ -115,7 +115,7 @@ pub async fn read(
         }
         _ => None,
     };
-    tx.commit().await?;
+    let ids: Vec<Uuid> = messages.iter().map(|m| m.id).collect();
     let messages: Vec<Value> = messages
         .iter()
         .map(|m| {
@@ -127,6 +127,9 @@ pub async fn read(
             })
         })
         .collect();
+    // Email attachments (F3a) are listed on the message that carries them.
+    let messages = super::send::files::views(&mut tx, &ids, messages).await?;
+    tx.commit().await?;
     let notes: Vec<Value> = notes
         .iter()
         .map(|n| {

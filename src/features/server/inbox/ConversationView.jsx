@@ -100,7 +100,13 @@ export function ConversationView({
         user={user}
         compact={review}
       />
-      <Thread data={data} nameOf={nameOf} userId={user.id} onAgain={conversation.sendAgain} />
+      <Thread
+        data={data}
+        nameOf={nameOf}
+        userId={user.id}
+        onAgain={conversation.sendAgain}
+        fileUrl={conversation.fileUrl}
+      />
       {row.state !== 'spam' && (
         <Composer
           conversation={row}

@@ -4,6 +4,7 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { canSendAgain } from './composerModel.js';
 import { threadGroups } from './inboxModel.js';
 import { MessageAgain } from './MessageAgain.jsx';
+import { MessageFiles } from '../chat/MessageFiles.jsx';
 import { MessageBody } from './MessageBody.jsx';
 import { useThreadScroll } from './useThreadScroll.js';
 
@@ -15,7 +16,7 @@ function statusText(t, message, channel) {
   return t(`inbox.message.${message.status}`);
 }
 
-function Message({ message, channel, contact, t, format, again, onAgain }) {
+function Message({ message, channel, contact, t, format, again, onAgain, fileUrl }) {
   const otherSender = message.sender && message.sender !== contact ? message.sender : '';
   const outbound = message.direction === 'outbound';
   const status = statusText(t, message, channel);
@@ -35,7 +36,8 @@ function Message({ message, channel, contact, t, format, again, onAgain }) {
           </strong>
         )}
         <MessageBody message={message} channel={channel} t={t} />
-        {message.body && message.hasMedia && (
+        <MessageFiles files={message.attachments} urlOf={(file) => fileUrl(message.id, file)} />
+        {message.body && message.hasMedia && !message.attachments?.length && (
           <em className="inbox-media">{t('inbox.message.media')}</em>
         )}
       </div>
@@ -72,7 +74,7 @@ function Note({ note, author, t, format }) {
  * Messages and internal notes by Dubai day, scrolled to the newest. New inbound messages
  * are announced politely to screen readers.
  */
-export function Thread({ data, nameOf, userId, onAgain }) {
+export function Thread({ data, nameOf, userId, onAgain, fileUrl }) {
   const { t, format } = useI18n();
   const box = useRef(null);
   const groups = threadGroups(data.messages, data.notes);
@@ -110,6 +112,7 @@ export function Thread({ data, nameOf, userId, onAgain }) {
                   format={format}
                   again={canSendAgain(item, data.messages, userId)}
                   onAgain={onAgain}
+                  fileUrl={fileUrl}
                 />
               ),
             )}

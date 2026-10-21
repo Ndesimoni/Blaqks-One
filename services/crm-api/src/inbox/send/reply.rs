@@ -1,6 +1,6 @@
 //! `POST /inbox/conversations/{id}/messages`: reply by email in a visible conversation,
 //! through the caller's own mailbox, which must be the conversation's mailbox (O9).
-use super::{body, object, same_mailbox, sender, store, BODY};
+use super::{body, files, object, same_mailbox, sender, store, BODY};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -28,7 +28,8 @@ pub async fn reply(
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     access::ensure_writer(&state, &session, &headers, &workspace).await?;
     let id = access::id(&id)?;
-    let Json(request) = request.map_err(|_| ApiError::invalid(BODY))?;
+    let Json(mut request) = request.map_err(|_| ApiError::invalid(BODY))?;
+    let attachments = files::take(&mut request)?;
     let text = body(&object(request, &["body"], BODY)?, "body")?;
     let mut tx = state.pool.begin().await?;
     // Live membership and grants are read after the workspace lock (H4).
@@ -40,7 +41,16 @@ pub async fn reply(
         .ok_or_else(ApiError::missing)?;
     let mailbox = sender(&mut tx, &workspace, &user).await?;
     same_mailbox(&store::thread(&mut tx, id).await?, mailbox)?;
-    let message = store::queue(&mut tx, &workspace, id, user.id, &text, None).await?;
+    let mut message = store::queue(&mut tx, &workspace, id, user.id, &text, None).await?;
+    let files = files::attach(
+        &mut tx,
+        &workspace,
+        user.id,
+        mailbox,
+        &message,
+        &attachments,
+    );
+    message["attachments"] = json!(files.await?);
     events::append(&mut tx, &workspace, id, Some(user.id), "replied").await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(json!({ "message": message }))))

@@ -4,8 +4,8 @@
 use super::domain_settle::settle;
 use crate::{
     config::{
-        google_settings::GoogleConfig, messaging_settings::MessagingKey,
-        sendgrid_settings::SendgridConfig,
+        google_settings::GoogleConfig, media_settings::MediaConfig,
+        messaging_settings::MessagingKey, sendgrid_settings::SendgridConfig,
     },
     error::ApiResult,
     integrations::mail::{self, Email},
@@ -19,6 +19,7 @@ pub struct InboxSender {
     pub key: MessagingKey,
     pub google: Option<GoogleConfig>,
     pub sendgrid: SendgridConfig,
+    pub media: Option<MediaConfig>,
 }
 
 #[derive(FromRow)]
@@ -81,6 +82,13 @@ impl InboxSender {
                 })
             }
         };
+        let finish = |delivery| {
+            super::domain_settle::apply(&self.pool, job, queued.conversation_id, delivery)
+        };
+        let files = match super::domain_files::load(&self.pool, self.media.as_ref(), job).await {
+            Ok(files) => files,
+            Err(delivery) => return finish(delivery).await,
+        };
         let base = queued.subject.as_deref().unwrap_or("Your enquiry");
         let subject = match queued.replying && !base.to_lowercase().starts_with("re:") {
             true => format!("Re: {base}"),
@@ -92,6 +100,7 @@ impl InboxSender {
             connection: queued.connection_id,
             author: queued.author_user_id,
             message: job.object_id,
+            attachments: &files,
             email: Email {
                 to: &queued.contact_key,
                 subject: &subject,
@@ -102,7 +111,7 @@ impl InboxSender {
         };
         let google = self.google.as_ref();
         let delivery = mail::send(&self.pool, &self.key, google, &self.sendgrid, &out).await?;
-        super::domain_settle::apply(&self.pool, job, queued.conversation_id, delivery).await
+        finish(delivery).await
     }
 
     /// Loads the queued message, refuses what may no longer be sent, and commits `sending`.

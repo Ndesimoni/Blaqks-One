@@ -74,6 +74,7 @@ async fn run() -> Result<(), String> {
         key: key.clone(),
         google: config.google.clone(),
         sendgrid: config.sendgrid.clone(),
+        media: config.media.clone(),
     })];
     let mut handles = Vec::new();
     if wants("outbox") {

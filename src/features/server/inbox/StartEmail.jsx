@@ -1,8 +1,12 @@
 import React, { useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Drawer } from '../../../components/ui/Drawer.jsx';
+import { useSession } from '../../../hooks/useSession.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
+import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { useAttachments } from '../chat/useAttachments.js';
+import { AttachFiles } from './AttachFiles.jsx';
 import { RecipientPicker } from './RecipientPicker.jsx';
 
 /**
@@ -24,6 +28,9 @@ export function StartEmail({ mailbox, onStart, onClose }) {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
+  const { api } = useSession();
+  const { owner } = useWorkspaceScope();
+  const files = useAttachments(api, owner.id);
   const [error, setError] = useState('');
   const ready = mailbox?.state === 'connected';
   const send = async (event) => {
@@ -35,6 +42,7 @@ export function StartEmail({ mailbox, onStart, onClose }) {
       recordId: to.id,
       subject: subject.trim(),
       body: body.trim(),
+      ...(files.ids.length ? { attachments: files.ids } : {}),
     });
     setBusy(false);
     if (failure) setError(t('inboxSend.start.failed', { reason: failure }));
@@ -83,6 +91,7 @@ export function StartEmail({ mailbox, onStart, onClose }) {
             value={body}
             onChange={(event) => setBody(event.target.value)}
           />
+          {mailbox.company && <AttachFiles files={files} disabled={busy} />}
           <p className="inbox-panel-hint">
             {t('inboxSend.start.from', { mailbox: '' })}
             <bdi>{mailbox.label}</bdi>
@@ -96,7 +105,7 @@ export function StartEmail({ mailbox, onStart, onClose }) {
             <Button
               type="submit"
               icon="arrow"
-              disabled={busy || !to || !subject.trim() || !body.trim()}
+              disabled={busy || files.busy || !to || !subject.trim() || !body.trim()}
             >
               {busy ? t('inboxSend.start.sending') : t('inboxSend.start.send')}
             </Button>

@@ -18,7 +18,8 @@ pub async fn attach(
 ) -> ApiResult<Vec<Item>> {
     let items: Vec<Item> = sqlx::query_as(&format!(
         "UPDATE media.crm_media_objects SET owner_kind=$4,owner_id=$5,attached_at=now() \
-         WHERE id=ANY($1) AND workspace_id=$2 AND uploaded_by=$3 AND owner_id IS NULL \
+         WHERE id=ANY($1) AND workspace_id=$2 AND uploaded_by=$3 AND origin='upload' \
+           AND owner_id IS NULL \
            AND deleted_at IS NULL AND created_at>now()-interval '24 hours' RETURNING {ITEM}"
     ))
     .bind(ids)

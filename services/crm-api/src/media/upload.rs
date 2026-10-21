@@ -82,6 +82,7 @@ pub async fn upload(
             .get("x-file-name")
             .and_then(|value| value.to_str().ok()),
     );
+    let name = super::naming::typed_name(&name, kind.content_type());
     let mut tx = state.pool.begin().await?;
     let user = workspaces::member(&mut tx, &workspace, session.user.id).await?;
     let (recent, used, pending) = store::usage(&mut tx, &workspace, user.id).await?;

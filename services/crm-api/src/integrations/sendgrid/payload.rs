@@ -2,7 +2,11 @@
 //! allowlist: one recipient, the server's From/Reply-To, plain text, the CRM Message-ID
 //! and threading headers, the message UUID as the only custom argument, and every kind
 //! of tracking switched off. No request field reaches it directly.
-use crate::integrations::google::mime::{message_id, plain_address, subject_ok, Email};
+use crate::{
+    integrations::google::mime::{message_id, plain_address, subject_ok, Email},
+    media::contents::File,
+};
+use base64::{engine::general_purpose::STANDARD, Engine};
 use serde_json::{json, Value};
 use uuid::Uuid;
 
@@ -17,7 +21,13 @@ pub fn rfc_id(message: Uuid, domain: &str) -> String {
 }
 
 /// `None` for anything that is not plainly safe to send.
-pub fn mail(email: &Email<'_>, from: &From<'_>, rfc: &str, message: Uuid) -> Option<Value> {
+pub fn mail(
+    email: &Email<'_>,
+    from: &From<'_>,
+    rfc: &str,
+    message: Uuid,
+    files: &[File],
+) -> Option<Value> {
     let parent_ok = email.in_reply_to.is_none_or(message_id);
     if !plain_address(email.to)
         || !plain_address(from.address)
@@ -33,7 +43,7 @@ pub fn mail(email: &Email<'_>, from: &From<'_>, rfc: &str, message: Uuid) -> Opt
         headers["References"] = json!(parent);
     }
     let sender = json!({ "email": from.address, "name": from.name });
-    Some(json!({
+    let mut mail = json!({
         "personalizations": [{ "to": [{ "email": email.to }] }],
         "from": sender,
         "reply_to": sender,
@@ -47,7 +57,23 @@ pub fn mail(email: &Email<'_>, from: &From<'_>, rfc: &str, message: Uuid) -> Opt
             "subscription_tracking": { "enable": false },
             "ganalytics": { "enable": false },
         },
-    }))
+    });
+    // F3a: the message's own files; names already end with their stored type's extension.
+    if !files.is_empty() {
+        let attached: Vec<Value> = files
+            .iter()
+            .map(|file| {
+                json!({
+                    "content": STANDARD.encode(&file.bytes),
+                    "filename": file.name,
+                    "type": file.content_type,
+                    "disposition": "attachment",
+                })
+            })
+            .collect();
+        mail["attachments"] = json!(attached);
+    }
+    Some(mail)
 }
 
 #[cfg(test)]
@@ -71,7 +97,7 @@ mod tests {
             address: "aidah@keys.test",
             name: "Aidah",
         };
-        let body = mail(&email("c@x.test", Some("<p@x.test>")), &from, &rfc, id).unwrap();
+        let body = mail(&email("c@x.test", Some("<p@x.test>")), &from, &rfc, id, &[]).unwrap();
         assert_eq!(body["headers"]["In-Reply-To"], "<p@x.test>");
         assert_eq!(
             body["custom_args"],
@@ -82,12 +108,19 @@ mod tests {
             body["personalizations"][0]["to"].as_array().unwrap().len(),
             1
         );
-        assert!(mail(&email("a@x.test, b@y.test", None), &from, &rfc, id).is_none());
-        assert!(mail(&email("c@x.test", Some("<p@x>\r\nBcc: z")), &from, &rfc, id).is_none());
+        assert!(mail(&email("a@x.test, b@y.test", None), &from, &rfc, id, &[]).is_none());
+        assert!(mail(
+            &email("c@x.test", Some("<p@x>\r\nBcc: z")),
+            &from,
+            &rfc,
+            id,
+            &[]
+        )
+        .is_none());
         let bad = From {
             address: "x@keys.test\r\nBcc: z@y.test",
             name: "X",
         };
-        assert!(mail(&email("c@x.test", None), &bad, &rfc, id).is_none());
+        assert!(mail(&email("c@x.test", None), &bad, &rfc, id, &[]).is_none());
     }
 }

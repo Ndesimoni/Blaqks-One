@@ -1,7 +1,9 @@
 //! Private file storage (docs/media-storage.md, packet F1): an S3-compatible bucket behind
 //! the API. This module stores, serves and removes files; owning modules attach them to
 //! their own items and check access before serving (service boundaries rule 9).
+pub mod contents;
 mod jpeg;
+pub mod naming;
 pub mod owned;
 mod request;
 pub mod routes;

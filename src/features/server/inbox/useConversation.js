@@ -68,7 +68,16 @@ export function useConversation(api, workspaceId, id, onChanged) {
     refresh,
     addNote: (body) => run(() => api.addConversationNote(workspaceId, id, { body })),
     /** Email sending (E1b): a reply, or one failed message sent again. */
-    reply: (body) => run(() => api.replyToConversation(workspaceId, id, { body })),
+    reply: (body, attachments = []) =>
+      run(() =>
+        api.replyToConversation(
+          workspaceId,
+          id,
+          attachments.length ? { body, attachments } : { body },
+        ),
+      ),
+    /** Where one of a message's attachments opens (F3a). */
+    fileUrl: (message, file) => api.inboxFileUrl(workspaceId, id, message, file),
     sendAgain: (message) => run(() => api.sendMessageAgain(workspaceId, id, message)),
     update: (changes) =>
       run(() => api.updateConversation(workspaceId, id, { expectedVersion: version, ...changes })),

@@ -21,8 +21,10 @@ import './inbox-head.css';
 import './inbox-thread.css';
 import './inbox-panel.css';
 import './inbox-triage.css';
+import '../chat/chat-files.css';
 import './inbox-list-start.css';
 import './inbox-send.css';
+import './inbox-attach.css';
 import './inbox-start.css';
 import './inbox-responsive.css';
 

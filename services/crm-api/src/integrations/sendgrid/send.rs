@@ -45,12 +45,14 @@ pub async fn send(
         name: &address.display_name,
     };
     let rfc = payload::rfc_id(out.message, domain);
-    let Some(body) = payload::mail(&out.email, &from, &rfc, out.message) else {
+    let Some(body) = payload::mail(&out.email, &from, &rfc, out.message, out.attachments) else {
         return failed("invalid_message");
     };
     let sent = client()
         .post(format!("{}/v3/mail/send", config.api_url))
         .bearer_auth(&api_key)
+        // A larger message gets longer than the ordinary 10 seconds (F3 review L1).
+        .timeout(Duration::from_secs(10 + 2 * (attached(out) >> 20) as u64))
         .json(&body)
         .send()
         .await;
@@ -88,6 +90,10 @@ pub async fn send(
         400..=499 => failed("provider_refused"),
         _ => unknown(),
     }
+}
+
+fn attached(out: &mail::Outgoing<'_>) -> usize {
+    out.attachments.iter().map(|file| file.bytes.len()).sum()
 }
 
 fn retry(after: Option<Duration>, code: &'static str) -> ApiResult<mail::Delivery> {

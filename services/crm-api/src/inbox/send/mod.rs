@@ -5,7 +5,9 @@
 mod again;
 pub mod delivery;
 pub mod domain;
+mod domain_files;
 mod domain_settle;
+pub mod files;
 mod reply;
 mod start;
 mod store;
