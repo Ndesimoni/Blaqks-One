@@ -49,5 +49,9 @@ pub fn router() -> Router<AppState> {
                 .delete(addresses::reserve)
                 .layer(body()),
         )
+        .route(
+            &format!("{ADDRESSES}/{{id}}/remove"),
+            post(addresses::remove).layer(body()),
+        )
         .route(CALLBACK_PATH, get(google::callback::callback))
 }

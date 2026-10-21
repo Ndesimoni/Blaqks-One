@@ -5,6 +5,7 @@ import { OverflowList } from '../../../components/ui/OverflowList.jsx';
 import { AddressForm } from './AddressForm.jsx';
 import { eligibleMembers, withAdmin } from './addressModel.js';
 import { AddressRow } from './AddressRow.jsx';
+import { useAddressActions } from './useAddressActions.js';
 import { useAddresses } from './useAddresses.js';
 import './addresses.css';
 
@@ -17,51 +18,14 @@ export function SendingAddresses({ api, workspaceId, connection, admin, t }) {
   const { data, error, reload } = loaded;
   const members = withAdmin(loaded.members, admin);
   const [adding, setAdding] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState('');
-  const run = async (action, key, values) => {
-    setBusy(true);
-    setNotice('');
-    try {
-      await action();
-      setNotice(t(key, values));
-      reload();
-      return '';
-    } catch (failure) {
-      return failure.message || t('emailAddresses.failed');
-    } finally {
-      setBusy(false);
-    }
-  };
   const names = new Map(members.map((member) => [member.id, member.name]));
   const addresses = data?.addresses ?? [];
   const eligible = eligibleMembers(members, addresses);
+  const actions = useAddressActions({ api, workspaceId, domain: data?.domain, reload, t });
+  const { busy, notice } = actions;
   const add = async (body) => {
-    const failure = await run(
-      () => api.addEmailAddress(workspaceId, body),
-      'emailAddresses.addedNotice',
-      { address: `${body.localPart}@${data.domain}` },
-    );
+    const failure = await actions.add(body);
     if (!failure) setAdding(false);
-    return failure;
-  };
-  const rename = (address, displayName) =>
-    run(
-      () =>
-        api.renameEmailAddress(workspaceId, address.id, {
-          expectedVersion: address.version,
-          displayName,
-        }),
-      'emailAddresses.renamedNotice',
-      { address: address.address },
-    );
-  const reserve = async (address) => {
-    const failure = await run(
-      () => api.reserveEmailAddress(workspaceId, address.id, { expectedVersion: address.version }),
-      'emailAddresses.reservedNotice',
-      { address: address.address },
-    );
-    if (failure) setNotice(failure);
     return failure;
   };
   return (
@@ -134,8 +98,9 @@ export function SendingAddresses({ api, workspaceId, connection, admin, t }) {
                   memberName={names.get(address.memberId)}
                   t={t}
                   busy={busy}
-                  onRename={rename}
-                  onReserve={reserve}
+                  onRename={actions.rename}
+                  onReserve={actions.reserve}
+                  onRemove={actions.remove}
                 />
               )}
             />

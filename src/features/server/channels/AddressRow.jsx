@@ -5,8 +5,11 @@ import { displayNameProblem } from './addressModel.js';
 import { ChannelField } from './ChannelField.jsx';
 import { ConfirmDisconnect } from './ConfirmDisconnect.jsx';
 
-/** One sending address with Rename and Keep for former member (never deleted or reassigned). */
-export function AddressRow({ address, memberName, t, busy, onRename, onReserve }) {
+/**
+ * One sending address with Rename, Keep for former member and Remove. Only an address never
+ * used with clients can be removed (the server checks); a used one is kept for ever.
+ */
+export function AddressRow({ address, memberName, t, busy, onRename, onReserve, onRemove }) {
   const id = useId();
   const [step, setStep] = useState(null);
   const [name, setName] = useState(address.displayName);
@@ -71,31 +74,55 @@ export function AddressRow({ address, memberName, t, busy, onRename, onReserve }
             if (!(await onReserve(address))) setStep(null);
           }}
         />
+      ) : step === 'remove' ? (
+        <ConfirmDisconnect
+          t={t}
+          busy={busy}
+          title={t('emailAddresses.removeTitle', { address: address.address })}
+          body={t('emailAddresses.removeBody')}
+          action={t('emailAddresses.remove')}
+          onCancel={() => setStep(null)}
+          onConfirm={async () => {
+            // A refusal (the address was used) shows in the section notice.
+            await onRemove(address);
+            setStep(null);
+          }}
+        />
       ) : (
-        active && (
-          <div className="channel-actions">
-            <Button
-              variant="light"
-              disabled={busy}
-              aria-label={t('emailAddresses.renameFor', { address: address.address })}
-              onClick={() => {
-                setName(address.displayName);
-                setError('');
-                setStep('rename');
-              }}
-            >
-              {t('emailAddresses.rename')}
-            </Button>
-            <Button
-              variant="light"
-              disabled={busy}
-              aria-label={t('emailAddresses.reserveFor', { address: address.address })}
-              onClick={() => setStep('reserve')}
-            >
-              {t('emailAddresses.reserve')}
-            </Button>
-          </div>
-        )
+        <div className="channel-actions">
+          {active && (
+            <>
+              <Button
+                variant="light"
+                disabled={busy}
+                aria-label={t('emailAddresses.renameFor', { address: address.address })}
+                onClick={() => {
+                  setName(address.displayName);
+                  setError('');
+                  setStep('rename');
+                }}
+              >
+                {t('emailAddresses.rename')}
+              </Button>
+              <Button
+                variant="light"
+                disabled={busy}
+                aria-label={t('emailAddresses.reserveFor', { address: address.address })}
+                onClick={() => setStep('reserve')}
+              >
+                {t('emailAddresses.reserve')}
+              </Button>
+            </>
+          )}
+          <Button
+            variant="light"
+            disabled={busy}
+            aria-label={t('emailAddresses.removeFor', { address: address.address })}
+            onClick={() => setStep('remove')}
+          >
+            {t('emailAddresses.remove')}
+          </Button>
+        </div>
       )}
     </div>
   );

@@ -42,5 +42,11 @@ export default {
   addedNotice: '{address} is ready to send.',
   renamedNotice: 'The name for {address} is saved.',
   reservedNotice: '{address} is kept for a former member.',
+  remove: 'Remove',
+  removeFor: 'Remove {address}',
+  removeTitle: 'Remove {address}?',
+  removeBody:
+    'Only an address that has never been used with clients can be removed. Its name is then free to give to someone else.',
+  removedNotice: '{address} was removed.',
   failed: 'The change could not be saved. Try again.',
 };

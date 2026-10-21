@@ -1,0 +1,27 @@
+/** The messaging API suites (chat, media, mailboxes, SendGrid, channels, Inbox), run in
+ * this order after the CRM suites in crm-api-test-files.mjs. */
+export const messagingTestFiles = [
+  'tests/api/chat.test.mjs',
+  'tests/api/media.test.mjs',
+  'tests/api/property-media.test.mjs',
+  'tests/api/sample-media.test.mjs',
+  'tests/api/mailbox-google.test.mjs',
+  'tests/api/sendgrid.test.mjs',
+  'tests/api/sendgrid-addresses.test.mjs',
+  'tests/api/sendgrid-address-remove.test.mjs',
+  'tests/api/sendgrid-send.test.mjs',
+  'tests/api/sendgrid-events.test.mjs',
+  'tests/api/sendgrid-inbound.test.mjs',
+  'tests/api/channels-archive.test.mjs',
+  'tests/api/mailbox-departure.test.mjs',
+  'tests/api/mailbox-replies.test.mjs',
+  'tests/api/mailbox-replies-guards.test.mjs',
+  'tests/api/mailbox-send.test.mjs',
+  'tests/api/channels-lifecycle.test.mjs',
+  'tests/api/activity-channels.test.mjs',
+  'tests/api/webhooks.test.mjs',
+  'tests/api/inbox.test.mjs',
+  'tests/api/inbox-assign.test.mjs',
+  'tests/api/inbox-triage.test.mjs',
+  'tests/api/inbox-guards.test.mjs',
+];

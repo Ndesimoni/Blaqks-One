@@ -6,6 +6,7 @@ pub mod access;
 pub mod blocks;
 pub mod change;
 pub mod commands;
+pub mod company_usage;
 pub mod events;
 pub mod intake;
 mod intake_company;

@@ -4,11 +4,13 @@
 //! email grant, and a reserved address can return only to its own member (decision E3d).
 mod change;
 pub mod lookup;
+mod remove;
 mod rules;
 pub mod store;
 pub mod write;
 
 pub use change::{rename, reserve};
+pub use remove::remove;
 
 use super::{access, mailbox::may_connect, wire};
 use crate::workspaces;

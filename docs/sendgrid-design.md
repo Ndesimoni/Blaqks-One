@@ -335,3 +335,9 @@ themes, with English and Arabic text and logical CSS.
   `deliveryUpdates` and `incomingMail`; `GET /mailbox` gives `companyEmail`.
 - Browser suite `tests/server-browser/channels-sendgrid.spec.js`. Not yet: a right-to-left
   screenshot pass, and address changes in Team activity.
+- **Removing an unused address (owner, 2026-10-21):** `POST /email-addresses/{id}/remove`
+  lets the Admin remove an address given by mistake, freeing its name, but only while it
+  has never been used: no email the member sent and no conversation they were given on the
+  company's SendGrid connections since the address was made (`inbox::company_usage`).
+  When unsure it counts as used, and a used address is kept for ever (decision E3d). The
+  signed-in Admin is listed first in Add address, so they can give themselves one.

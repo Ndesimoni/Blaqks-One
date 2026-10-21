@@ -41,5 +41,11 @@ export default {
   addedNotice: '{address} جاهز للإرسال.',
   renamedNotice: 'تم حفظ اسم {address}.',
   reservedNotice: 'تم حفظ {address} لعضو سابق.',
+  remove: 'إزالة',
+  removeFor: 'إزالة {address}',
+  removeTitle: 'إزالة {address}؟',
+  removeBody:
+    'لا يمكن إزالة إلا عنوان لم يُستخدم مع العملاء قط. يصبح اسمه بعد ذلك متاحًا لشخص آخر.',
+  removedNotice: 'تمت إزالة {address}.',
   failed: 'تعذّر حفظ التغيير. حاول مرة أخرى.',
 };

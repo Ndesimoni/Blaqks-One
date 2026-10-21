@@ -94,7 +94,8 @@ test('an Admin connects SendGrid and manages a sending address', async ({
   await expect(addresses.getByText(`${address} is kept for a former member.`)).toBeVisible();
   await expect(row).toContainText('Kept for a former member');
   await expect(row).toContainText('It can only return to the same person.');
-  await expect(row.getByRole('button')).toHaveCount(0);
+  // A kept address can no longer be renamed; only an unused one can still be removed.
+  await expect(row.getByRole('button')).toHaveText(['Remove']);
   await member.page.reload();
   await expect(mine).toContainText('Ask your Admin for a sending address.');
   await expect(mine).toContainText('No address yet');

@@ -26,5 +26,8 @@ export function integrationRoutes({ request, scope }) {
       request(`${addresses(workspace)}/${encodeURIComponent(id)}`, { method: 'PATCH', body }),
     reserveEmailAddress: (workspace, id, body) =>
       request(`${addresses(workspace)}/${encodeURIComponent(id)}`, { method: 'DELETE', body }),
+    /** Removes an address that was never used with clients (owner decision 2026-10-21). */
+    removeEmailAddress: (workspace, id, body) =>
+      request(`${addresses(workspace)}/${encodeURIComponent(id)}/remove`, { method: 'POST', body }),
   };
 }
