@@ -31,7 +31,9 @@ export function useFieldHint(id) {
       onBlurCapture: (event) => {
         if (event.target.matches?.(CONTROL)) setFocused(false);
       },
-      onInputCapture: () => {
+      // Bubble phase, after the control's onChange: a capture-phase state update re-renders
+      // the controlled control before React reads it, which dropped the first keystroke.
+      onInput: () => {
         setTyped(true);
         setPinned(false);
       },

@@ -44,8 +44,9 @@ test('field hints follow focus, typing and the member preference', async ({ page
   await expect(field.getByRole('note')).toContainText(hintText);
   await info().click();
 
-  // The reopened hint also works in dark mode on a phone-sized viewport.
-  await page.getByRole('button', { name: /Switch to dark mode/ }).click();
+  // The reopened hint also works in dark mode (the default; the modal editor makes the
+  // header's theme switch unreachable) on a phone-sized viewport.
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.setViewportSize({ width: 390, height: 844 });
   await info().click();
   await expect(field.getByRole('note')).toBeVisible();
