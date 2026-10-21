@@ -53,11 +53,13 @@ test('wrong, expired and exhausted codes have fixed errors and atomic counters',
     '5',
   );
   const expired = await started(details({ email: email('expired') }));
+  // Read the code before expiring it: the API's cleanup may remove an expired request.
+  const code = codeFor(expired.ticket);
   query(
     `UPDATE crm_signup_requests SET code_expires_at=now()-interval '1 second' ` +
       `WHERE ticket_hash='${digest(expired.ticket)}'`,
   );
-  const response = await verify(expired.ticket, codeFor(expired.ticket));
+  const response = await verify(expired.ticket, code);
   assert.equal(response.status, 400);
   assert.equal(response.value.code, 'invalid_code');
 });

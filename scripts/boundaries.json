@@ -67,7 +67,8 @@
       "chat",
       "integrations",
       "outbox",
-      "sample"
+      "sample",
+      "media"
     ]
   },
   "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],

@@ -10,6 +10,7 @@ pub mod finance;
 pub mod imports;
 pub mod inbox;
 pub mod integrations;
+pub mod media;
 pub mod outbox;
 pub mod performance;
 pub mod records;

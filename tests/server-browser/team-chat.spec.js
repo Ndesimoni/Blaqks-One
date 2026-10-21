@@ -4,6 +4,9 @@ import { activate, invite } from '../api/team-helpers.mjs';
 import { signIn } from './helpers.js';
 import { memberPage, noPageOverflow, setTheme } from './assign-helpers.js';
 
+const PNG =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
 const shots = async (page, testInfo, name) => {
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 860 });
@@ -29,6 +32,19 @@ test('a team talks in #general and privately', async ({ page, browser }, testInf
   await composer.fill('Good morning team, viewing schedule is in the shared calendar.');
   await composer.press('Enter');
   await expect(thread).toContainText('viewing schedule is in the shared calendar');
+  // A photo travels with a message (packet F1): a tiny synthetic PNG.
+  await page.locator('.chat-composer input[type=file]').setInputFiles({
+    name: 'Villa front.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(PNG, 'base64'),
+  });
+  await expect(page.locator('.chat-file.is-ready')).toBeVisible();
+  await composer.fill('Front of the villa');
+  await composer.press('Enter');
+  const photo = thread.getByRole('img', { name: 'Villa front.png' });
+  await expect(photo).toBeVisible();
+  // The private file really loads through the API (not a broken image).
+  await expect.poll(() => photo.evaluate((image) => image.naturalWidth)).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'New channel' }).click();
   await page.getByLabel('Channel name').fill('Listings');
   await page.getByRole('button', { name: 'Create channel' }).click();

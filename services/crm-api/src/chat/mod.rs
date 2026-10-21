@@ -3,6 +3,7 @@
 //! conversations between two members. Own schema `chat`; message bodies never leave it.
 pub mod access;
 mod change;
+mod files;
 mod messages;
 mod read;
 mod rooms;

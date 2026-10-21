@@ -1,5 +1,5 @@
 //! Chat routes under `/api/crm/workspaces/{workspace}/chat`, merged by `routes.rs`.
-use super::{change, messages, read, rooms, start};
+use super::{change, files, messages, read, rooms, start};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
@@ -28,5 +28,9 @@ pub fn router() -> Router<AppState> {
         .route(
             &format!("{room}/messages/{{message}}"),
             patch(change::edit).delete(change::delete).layer(body()),
+        )
+        .route(
+            &format!("{room}/messages/{{message}}/files/{{file}}"),
+            get(files::file),
         )
 }

@@ -75,7 +75,7 @@ export function useRoom(api, workspaceId, roomId, onRead) {
   return {
     ...state,
     earlier,
-    send: (body) => run(() => api.sendChat(workspaceId, roomId, body)),
+    send: (body, files = []) => run(() => api.sendChat(workspaceId, roomId, body, files)),
     edit: (id, body) => run(() => api.editChat(workspaceId, roomId, id, body)),
     remove: (id) => run(() => api.deleteChat(workspaceId, roomId, id)),
   };

@@ -6,7 +6,7 @@ import { selectedApiTestFiles } from './crm-api-test-files.mjs';
 import { FAKE_GOOGLE_PORT, testEnv } from './crm-test-env.mjs';
 import { createFixtures, raiseFixtureSeats } from './crm-test-fixtures.mjs';
 import { startFakeGoogle } from './fake-google.mjs';
-import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
+import { ensurePortFree, run, startWorker, stop, waitForApi } from './crm-test-processes.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
 // Optional API_TEST_FILES (comma-separated) narrows the API suites; see crm-api-test-files.mjs.
@@ -33,6 +33,10 @@ try {
   const port = address.split(':').at(-1);
   if (!/^\d+$/.test(port)) throw Error('Docker did not report a PostgreSQL port.');
   env.CRM_DATABASE_URL = `postgres://kws_crm_test:${env.CRM_TEST_DB_PASSWORD}@127.0.0.1:${port}/kws_crm_test`;
+  const storage = await run('docker', [...compose, 'port', 'storage', '8333'], env, {
+    capture: true,
+  });
+  env.CRM_MEDIA_ENDPOINT = `http://127.0.0.1:${storage.split(':').at(-1)}`;
   await createFixtures(binary, env);
   await ensurePortFree('127.0.0.1', 8790);
   await ensurePortFree('127.0.0.1', FAKE_GOOGLE_PORT);
@@ -66,13 +70,8 @@ try {
       env,
     );
   }
-  // After the Rust contracts, which create and inspect outbox jobs themselves: the worker
-  // sends queued email and reads replies through the Google stand-in (E1b, E1c). Webhook
-  // intake stays off so suites can inspect staged events.
-  worker = spawn(binary.replace('kws-crm-api', 'messaging_worker'), [], {
-    env: { ...env, CRM_WORKER_LOOPS: 'outbox,revocations,mailsync', CRM_MAIL_SYNC_SECONDS: '1' },
-    stdio: 'inherit',
-  });
+  // After the Rust contracts, which create and inspect outbox jobs themselves.
+  worker = startWorker(binary, env);
   if (!process.argv.includes('--browser-only')) {
     await run('node', ['--test', '--test-concurrency=1', ...apiTestFiles], env);
   }

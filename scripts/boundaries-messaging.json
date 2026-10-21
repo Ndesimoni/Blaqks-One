@@ -50,6 +50,14 @@
       "crm_outbox_jobs_purge",
       "crm_outbox_attempts",
       "crm_outbox_attempts_open"
+    ],
+    "media": [
+      "crm_media_objects",
+      "crm_media_objects_owner",
+      "crm_media_objects_pending",
+      "crm_media_objects_sweep",
+      "crm_media_objects_uploader",
+      "crm_media_objects_usage"
     ]
   }
 }

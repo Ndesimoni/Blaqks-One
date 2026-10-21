@@ -35,6 +35,11 @@ export function testEnv() {
     CRM_API_PROXY: 'http://127.0.0.1:8790',
   };
   Object.assign(env, {
+    // File storage keys for the disposable storage container; its endpoint is set once
+    // Docker reports the port.
+    CRM_MEDIA_ACCESS_KEY: `crm${randomBytes(6).toString('hex')}`,
+    CRM_MEDIA_SECRET_KEY: randomBytes(24).toString('hex'),
+    CRM_MEDIA_BUCKET: 'crm-media-test',
     CRM_GOOGLE_CLIENT_ID: 'crm-test-client.apps.example',
     CRM_GOOGLE_CLIENT_SECRET: randomBytes(24).toString('hex'),
     CRM_GOOGLE_WORKSPACE_DOMAIN: 'keys-fixture.test',

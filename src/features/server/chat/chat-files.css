@@ -1,0 +1,78 @@
+/* Photos and files in team chat (F1): chosen files above the composer, attachments below
+   a message. */
+.chat-files,
+.chat-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chat-file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-inline-size: 100%;
+  padding: 4px 4px 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  font-size: 13px;
+}
+.chat-file span {
+  display: grid;
+  min-inline-size: 0;
+}
+.chat-file bdi {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-file small {
+  color: var(--muted);
+}
+.chat-file.is-failed {
+  border-color: var(--danger);
+}
+.chat-file.is-failed small {
+  color: var(--danger);
+}
+.chat-file button {
+  inline-size: 28px;
+  block-size: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.chat-attachments {
+  margin-block-start: 6px;
+}
+.chat-attachments .is-photo img {
+  display: block;
+  max-inline-size: min(240px, 100%);
+  max-block-size: 240px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  object-fit: cover;
+}
+.chat-attachments .is-file a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+}
+@media (max-width: 899px) {
+  .chat-file button {
+    inline-size: 44px;
+    block-size: 44px;
+  }
+  .chat-attachments .is-file a {
+    min-block-size: 44px;
+  }
+}

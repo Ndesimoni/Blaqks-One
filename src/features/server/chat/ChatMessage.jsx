@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { MessageFiles } from './MessageFiles.jsx';
 
 /**
  * One chat message. The author may edit or delete it; the Admin may delete others'
  * messages in a channel (never in a private conversation). Deleted messages keep their
  * place without their text.
  */
-export function ChatMessage({ message, author, mine, canRemove, onEdit, onRemove }) {
+export function ChatMessage({ message, author, mine, canRemove, onEdit, onRemove, urlOf }) {
   const { t, format } = useI18n();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(message.body);
@@ -47,7 +48,10 @@ export function ChatMessage({ message, author, mine, canRemove, onEdit, onRemove
           </div>
         </form>
       ) : (
-        <p className="chat-body">{message.body}</p>
+        <>
+          {message.body && <p className="chat-body">{message.body}</p>}
+          <MessageFiles files={message.attachments} urlOf={urlOf} />
+        </>
       )}
       {!message.deleted && !editing && (mine || canRemove) && (
         <div className="chat-actions" role="group" aria-label={t('chat.actions')}>

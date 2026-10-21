@@ -38,5 +38,11 @@ export default {
   delete: 'Delete',
   'delete.confirm': 'Delete this message?',
   actions: 'Message actions',
+  'files.attach': 'Photo or file',
+  'files.chosen': 'Files to send',
+  'files.uploading': 'Uploading…',
+  'files.failed': 'Not uploaded: {reason}',
+  'files.remove': 'Remove {name}',
+  'files.open': 'Open {name}',
   failed: 'That did not work: {reason}',
 };

@@ -9,6 +9,7 @@ import { RoomView } from './RoomView.jsx';
 import { useChat } from './useChat.js';
 import './chat.css';
 import './chat-message.css';
+import './chat-files.css';
 import './chat-phone.css';
 
 /**

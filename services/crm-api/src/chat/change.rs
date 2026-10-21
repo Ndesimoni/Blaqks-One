@@ -53,8 +53,9 @@ pub async fn edit(
     .fetch_optional(&mut *tx)
     .await?;
     let edited = edited.ok_or_else(ApiError::missing)?;
+    let view = super::files::views(&mut tx, std::slice::from_ref(&edited)).await?;
     tx.commit().await?;
-    Ok(Json(json!({ "message": edited.view() })))
+    Ok(Json(json!({ "message": view[0] })))
 }
 
 pub async fn delete(
@@ -84,6 +85,8 @@ pub async fn delete(
     .fetch_optional(&mut *tx)
     .await?;
     let removed = removed.ok_or_else(ApiError::missing)?;
+    // Its photos and files go with it.
+    crate::media::owned::remove(&mut tx, super::files::KIND, removed.id).await?;
     tx.commit().await?;
     Ok(Json(json!({ "message": removed.view() })))
 }

@@ -16,8 +16,16 @@ export function chatRoutes({ request, scope }) {
         `${room(workspace, id)}/messages${before ? `?before=${encodeURIComponent(before)}` : ''}`,
         { signal },
       ),
-    sendChat: (workspace, id, body) =>
-      request(`${room(workspace, id)}/messages`, { method: 'POST', body: { body } }),
+    sendChat: (workspace, id, body, attachments = []) =>
+      request(`${room(workspace, id)}/messages`, {
+        method: 'POST',
+        body: attachments.length ? { body, attachments } : { body },
+      }),
+    /** One private upload (docs/media-storage.md); attach it by sending its ID. */
+    uploadMedia: (workspace, file) =>
+      request(`${scope(workspace)}/media`, { method: 'POST', file }),
+    chatFileUrl: (workspace, id, message, file) =>
+      `/api/crm${item(workspace, id, message)}/files/${encodeURIComponent(file)}`,
     editChat: (workspace, id, message, body) =>
       request(item(workspace, id, message), { method: 'PATCH', body: { body } }),
     deleteChat: (workspace, id, message) =>

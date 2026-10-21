@@ -6,6 +6,7 @@ use serde_json::{Map, Value};
 use uuid::Uuid;
 
 pub const BODY: &str = "Write a message of up to 4,000 characters.";
+const FILES: &str = "Attach up to 10 different files.";
 pub const STAMP: &str =
     "to_char(m.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')";
 
@@ -36,6 +37,33 @@ pub fn text(map: &Map<String, Value>) -> ApiResult<String> {
     (clean && sized)
         .then(|| value.to_owned())
         .ok_or(ApiError::invalid(BODY))
+}
+
+/// A new message: text, or files, or both (`attachments`: up to 10 upload IDs).
+pub fn outgoing(map: &Map<String, Value>) -> ApiResult<(String, Vec<Uuid>)> {
+    let ids: Vec<Uuid> = match map.get("attachments") {
+        None => Vec::new(),
+        Some(Value::Array(items)) if items.len() <= 10 => items
+            .iter()
+            .map(|item| item.as_str().and_then(|value| Uuid::parse_str(value).ok()))
+            .collect::<Option<Vec<Uuid>>>()
+            .ok_or(ApiError::invalid(FILES))?,
+        Some(_) => return Err(ApiError::invalid(FILES)),
+    };
+    let mut unique = ids.clone();
+    unique.sort();
+    unique.dedup();
+    if unique.len() != ids.len() {
+        return Err(ApiError::invalid(FILES));
+    }
+    let blank = map
+        .get("body")
+        .and_then(Value::as_str)
+        .is_some_and(|text| text.trim().is_empty());
+    if blank && !ids.is_empty() {
+        return Ok((String::new(), ids));
+    }
+    Ok((text(map)?, ids))
 }
 
 /// Creates a direct conversation and its two participants in the caller's transaction.

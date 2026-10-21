@@ -40,6 +40,7 @@ writes: `GET /` (rooms, colleagues, `canCreateChannel`), `GET /summary`, `POST /
 
 - Edits replace the text without keeping earlier versions (security review C1 L2,
   accepted as privacy-friendly); revisit if the owner wants an edit history.
-- Later packets: mentions and notifications, group conversations, attachments (after private
-  media storage), WebSockets in place of polling, translation of messages, retention
+- Photos and files: up to 10 per message through [private file storage](media-storage.md)
+  (F1, 2026-10-21); served only to members who may see the room.
+- Later packets: mentions and notifications, group conversations, WebSockets in place of polling, translation of messages, retention
   periods, and deal rooms between companies with locked messages (product vision §3).

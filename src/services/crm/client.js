@@ -21,7 +21,8 @@ export class CrmApiError extends Error {
 /** Sessions use HttpOnly cookies; the anti-forgery token lives only in memory. */
 export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized = () => {}) {
   let csrfToken = '';
-  const request = async (path, { method = 'GET', body, signal } = {}) => {
+  // `file` sends one raw file (media uploads); `body` sends JSON.
+  const request = async (path, { method = 'GET', body, file, signal } = {}) => {
     let response;
     try {
       response = await fetchRequest(`/api/crm${path}`, {
@@ -30,10 +31,17 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         signal,
         headers: {
           Accept: 'application/json',
-          ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+          ...(file
+            ? {
+                'Content-Type': 'application/octet-stream',
+                'X-File-Name': encodeURIComponent(file.name || 'file'),
+              }
+            : body !== undefined
+              ? { 'Content-Type': 'application/json' }
+              : {}),
           ...(method !== 'GET' && csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
         },
-        ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+        ...(file ? { body: file } : body !== undefined ? { body: JSON.stringify(body) } : {}),
       });
     } catch (error) {
       if (error.name === 'AbortError') throw error;

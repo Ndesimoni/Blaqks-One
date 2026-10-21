@@ -9,12 +9,23 @@ use kws_crm_api::{
         mail_sync, revocation,
         webhooks::inbound::{self, Sink},
     },
+    media::sweep as media_sweep,
     outbox, routes, shutdown,
 };
 use sqlx::postgres::PgPoolOptions;
 use std::{sync::Arc, time::Duration};
 
-const ALL: &str = "outbox,revocations,inbound,mailsync";
+const ALL: &str = "outbox,revocations,inbound,mailsync,mediasweep";
+
+/// A loop interval from the environment, 1–3600 seconds.
+fn seconds(name: &str, default: u64) -> Duration {
+    let value = std::env::var(name)
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        .filter(|seconds| (1..=3600).contains(seconds))
+        .unwrap_or(default);
+    Duration::from_secs(value)
+}
 
 #[tokio::main]
 async fn main() {
@@ -83,26 +94,32 @@ async fn run() -> Result<(), String> {
         ));
     }
     if let (true, Some(google)) = (wants("mailsync"), config.google.clone()) {
-        let every = std::env::var("CRM_MAIL_SYNC_SECONDS")
-            .ok()
-            .and_then(|value| value.parse::<u64>().ok())
-            .filter(|seconds| (1..=3600).contains(seconds))
-            .unwrap_or(30);
+        let every = seconds("CRM_MAIL_SYNC_SECONDS", 30);
         let sync = mail_sync::Sync {
             pool: pool.clone(),
             key: key.clone(),
             google,
             sink: Arc::new(InboxSink { pool: pool.clone() }),
         };
-        handles.push(mail_sync::spawn(
-            sync,
-            Duration::from_secs(every),
-            shutdown_rx.clone(),
-        ));
+        handles.push(mail_sync::spawn(sync, every, shutdown_rx.clone()));
     }
     if wants("inbound") {
         let sink: Arc<dyn Sink> = Arc::new(InboxSink { pool: pool.clone() });
-        handles.extend(inbound::spawn(pool, key, Some(sink), shutdown_rx));
+        handles.extend(inbound::spawn(
+            pool.clone(),
+            key.clone(),
+            Some(sink),
+            shutdown_rx.clone(),
+        ));
+    }
+    if let (true, Some(media)) = (wants("mediasweep"), config.media.clone()) {
+        let every = seconds("CRM_MEDIA_SWEEP_SECONDS", 600);
+        handles.push(media_sweep::spawn(
+            pool.clone(),
+            media,
+            every,
+            shutdown_rx.clone(),
+        ));
     }
     println!("CRM messaging worker running.");
     shutdown::signal().await;

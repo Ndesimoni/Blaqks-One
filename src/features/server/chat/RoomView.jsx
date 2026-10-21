@@ -82,13 +82,14 @@ export function RoomView({ api, workspaceId, room, people, user, onBack, onRead 
                   canRemove={moderator}
                   onEdit={view.edit}
                   onRemove={view.remove}
+                  urlOf={(file) => api.chatFileUrl(workspaceId, room.id, message.id, file)}
                 />
               </React.Fragment>
             );
           })}
         </ol>
       </div>
-      <ChatComposer onSend={view.send} />
+      <ChatComposer api={api} workspaceId={workspaceId} onSend={view.send} />
     </>
   );
 }

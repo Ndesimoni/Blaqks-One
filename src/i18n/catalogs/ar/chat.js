@@ -38,5 +38,11 @@ export default {
   delete: 'حذف',
   'delete.confirm': 'حذف هذه الرسالة؟',
   actions: 'إجراءات الرسالة',
+  'files.attach': 'صورة أو ملف',
+  'files.chosen': 'ملفات للإرسال',
+  'files.uploading': 'جارٍ الرفع…',
+  'files.failed': 'لم يُرفع: {reason}',
+  'files.remove': 'إزالة {name}',
+  'files.open': 'فتح {name}',
   failed: 'لم ينجح ذلك: {reason}',
 };

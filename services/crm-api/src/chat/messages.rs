@@ -4,6 +4,7 @@ use super::{access, wire};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
+    media::owned,
     state::AppState,
     workspaces,
 };
@@ -70,8 +71,8 @@ pub async fn list(
     .bind(PAGE)
     .fetch_all(&mut *tx)
     .await?;
+    let messages = super::files::views(&mut tx, &rows).await?;
     tx.commit().await?;
-    let messages: Vec<Value> = rows.iter().map(Message::view).collect();
     let more = messages.len() as i64 == PAGE;
     Ok(Json(json!({ "messages": messages, "more": more })))
 }
@@ -84,7 +85,15 @@ pub async fn send(
     body: Result<Json<Value>, JsonRejection>,
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     access::ensure(&state, &session, Some(&headers), &workspace).await?;
-    let text = wire::text(&wire::exact(body, &["body"], wire::BODY)?)?;
+    let map = match body {
+        Ok(Json(Value::Object(map))) if map.contains_key("attachments") => wire::exact(
+            Ok(Json(Value::Object(map))),
+            &["body", "attachments"],
+            wire::BODY,
+        )?,
+        other => wire::exact(other, &["body"], wire::BODY)?,
+    };
+    let (text, files) = wire::outgoing(&map)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     let user = access::live(&mut tx, &workspace, session.user.id).await?;
@@ -120,10 +129,19 @@ pub async fn send(
         .bind(room.id)
         .execute(&mut *tx)
         .await?;
+    if !files.is_empty() {
+        owned::attach(
+            &mut tx,
+            &workspace,
+            user.id,
+            &files,
+            super::files::KIND,
+            message.id,
+        )
+        .await?;
+    }
     super::read::mark(&mut tx, room.id, user.id).await?;
+    let view = super::files::views(&mut tx, std::slice::from_ref(&message)).await?;
     tx.commit().await?;
-    Ok((
-        StatusCode::CREATED,
-        Json(json!({ "message": message.view() })),
-    ))
+    Ok((StatusCode::CREATED, Json(json!({ "message": view[0] }))))
 }
