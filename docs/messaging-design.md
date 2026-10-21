@@ -107,7 +107,8 @@ Schema-level invariants:
 - disconnecting a connection sets it to `disconnected`, stops intake, deletes the sealed
   credential immediately and keeps conversations and messages for their retention period;
 - archiving or deactivating a member disconnects that member's connections in the same
-  transaction.
+  transaction; archiving an Admin also disconnects every company connection, releasing its
+  domain, number or Page (owner, 2026-10-21; `integrations::company_archived`).
 
 ## 4. Conversation lifecycle
 

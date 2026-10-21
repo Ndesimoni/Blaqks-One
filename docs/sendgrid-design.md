@@ -199,9 +199,9 @@ address (D7) or a development tunnel.
 - Follow-ups:
   - **L1 rest:** a SendGrid connection made between a member's Google start and finish
     still drops that Google grant unrevoked; queue its revocation when E3b touches finish.
-  - **L2 (owner decision):** archiving an Admin freezes the company but keeps its SendGrid
-    connection and domain held, as company Twilio channels already do. Decide whether an
-    archive disconnects company channels before E3c routes incoming mail.
+  - **L2 (owner decided 2026-10-21, built):** archiving an Admin disconnects every company
+    channel in the archive's transaction (SendGrid, WhatsApp, Facebook, Instagram, TikTok),
+    deleting the sealed keys and releasing the domain or number; history stays.
   - **L5:** the CRM cannot delete a SendGrid key (key management is refused by design), so
     the E3d disconnect copy tells the Admin to delete the key in SendGrid.
   - Confirm the exact scope names in the sandbox (§8); address history in Team activity

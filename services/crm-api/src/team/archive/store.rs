@@ -58,6 +58,11 @@ pub async fn archive(
     sessions::revoke_all(&mut transaction, &ids).await?;
     // Their mailboxes end with their accounts (messaging design §3, review M1).
     crate::integrations::departure(&mut transaction, &scope.target_workspace, &ids, actor).await?;
+    // An Admin archive also ends the company's channels, releasing its domain and numbers.
+    if admin {
+        crate::integrations::company_archived(&mut transaction, &scope.target_workspace, actor)
+            .await?;
+    }
     sqlx::query(
         "UPDATE crm_team_invitations SET revoked_at=COALESCE(revoked_at,now()) \
          WHERE user_id=ANY($1) OR owner_id=ANY($1)",

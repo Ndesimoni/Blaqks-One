@@ -4,6 +4,7 @@ pub mod access;
 pub mod activity;
 mod addresses;
 mod commands;
+mod company;
 mod credential;
 mod crypto;
 mod google;
@@ -22,6 +23,8 @@ mod vocabulary;
 pub mod webhooks;
 mod wire;
 
+/// Called by `team` when an Admin is archived; see `company.rs`.
+pub use company::archived as company_archived;
 pub use mailbox::revoke_soon;
 /// Called by `team` when members leave or lose the email grant; see `revocation.rs`.
 pub use revocation::departure;
