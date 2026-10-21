@@ -101,3 +101,13 @@ export const sampleRows = (workspace) =>
 
 export const loginStatus = async (email, password) =>
   (await request('/auth/login', { method: 'POST', body: { email, password } })).status;
+
+// The test Google and file-storage stand-ins are refused outside local development.
+const standIns = [
+  'GOOGLE_ENDPOINT',
+  'MEDIA_ENDPOINT',
+  'MEDIA_BUCKET',
+  'MEDIA_ACCESS_KEY',
+  'MEDIA_SECRET_KEY',
+];
+export const noLocalStandIns = Object.fromEntries(standIns.map((name) => [`CRM_${name}`, '']));

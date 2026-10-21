@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { query } from './helpers.mjs';
 import {
   loginStatus,
+  noLocalStandIns,
   sampleAdmin,
   sampleRows,
   seed,
@@ -124,8 +125,7 @@ test('sample commands refuse other targets and non-local configurations', async 
       CRM_ALLOW_INSECURE_LOCAL: 'false',
       CRM_APP_ORIGIN: 'https://crm.example.com',
       CRM_SIGNUP: 'off',
-      // The test Google stand-in is refused outside local development, so drop it here.
-      CRM_GOOGLE_ENDPOINT: '',
+      ...noLocalStandIns,
     },
   ]) {
     for (const command of ['seed-sample', 'clear-sample']) {
