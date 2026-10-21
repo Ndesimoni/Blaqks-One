@@ -56,7 +56,63 @@ against the item the file belongs to.
   visibility check. Earlier inline photos (`{name, src}`) still display and save unchanged.
   **Remaining:** a command that moves existing inline photos into storage; until then they
   stay in the record JSON.
-- **F3 — email attachments:** received attachments stored for linked conversations; sending
-  attachments with replies.
+- **F3 — email attachments:** see the F3 design below.
 - **F4 — public photos:** approved, re-encoded copies for the public website through the
   CDN, only for listings the Super Admin has approved.
+
+## F3 design: email attachments (2026-10-21, security reviewed)
+
+Company email through SendGrid (E3) first; a Google Workspace mailbox refuses attachments
+(409 when queuing, and again in the worker) until its MIME builder gains them. The
+separate security review found two High and six Medium issues; all are written in below.
+Sending (F3a) builds first; receiving (F3b) builds on this corrected design.
+
+**Files in general.**
+
+- `crm_media_objects` gains `origin` (`upload` or `inbound`) and the owner kind
+  `inbox_message`. Members' per-hour, pending and attach rules count and attach only
+  `upload` files, so inbound mail can never use up a member's limits or be attached by a
+  member (review H1).
+- A display name always ends with the extension of its stored type (`.pdf`, `.jpg`,
+  `.png`, `.webp`), replacing any other ending, in storage, in `Content-Disposition` and in
+  the SendGrid `filename`, so a PDF can never be saved as `invoice.html` (M3).
+- Production condition: inbound files are scanned (ClamAV or the storage provider) before
+  they are served, or labelled "from outside the company" on download (M6).
+
+**Sending (F3a).**
+
+- The composer uploads each file through the existing upload route (F1 types, sizes and
+  metadata removal). A reply or Start message names at most 10 of the author's own pending
+  uploads, 15 MiB in all, attached to the new message (owner kind `inbox_message`) in the
+  message's own transaction. Send again takes no new files and reuses the files of the
+  original message (followed back through `repeat_of`).
+- The worker reads files only by owner: kind `inbox_message`, the original message, in the
+  message's own workspace, never IDs from the job or the request; each file's bytes must
+  match its stored SHA-256 (L4). A missing or hidden file fails the message permanently: it
+  never goes out without its files (M5). A storage failure before the call retries.
+- SendGrid sends with attachments use their own client, whose timeout grows with the body,
+  so a large send does not turn Unknown on the ordinary 10-second limit (L1).
+
+**Receiving (F3b).**
+
+- File parts are read as slices of the verified body (no copies), one at a time, and their
+  names come from `attachment-info`; one unreadable part drops only that file (M4, L2).
+- Files are reserved inside the intake transaction, already attached to the stored inbound
+  message and marked not yet stored; after the commit the bytes are put, one overall
+  deadline of 45 seconds for the mail, then marked stored. Only stored files are listed; a
+  failed put marks the file not kept. Dropped, unverified-new, report and re-posted mail
+  therefore keep no files (M1).
+- Mail that is unverified or scored as spam keeps no files, only a count of files not kept
+  (M2).
+- Budgets per connection per day (1 GiB, 300 files) and per sender (100 MiB); inbound files
+  never take the company above 80% of its 5 GB; a file whose SHA-256 is already in the same
+  conversation is not stored again. Over any limit the message is kept and the file counted
+  as not kept (H2).
+
+**Viewing.** `GET …/inbox/conversations/{id}/messages/{message}/files/{file}` loads the
+conversation with the viewer's own visibility, checks that the message belongs to it, then
+serves through `media::serve` (`nosniff`, fixed type, `private, no-store`, sandbox CSP;
+images inline, PDFs as downloads). Every refusal is the same 404: another member's
+conversation for assigned-only staff, another company, a file of another message, a
+guessed ID, the Super Admin, an archived member. `owned::list` gains a workspace filter.
+The thread shows photos as thumbnails and other files as named pills, reusing chat's.
