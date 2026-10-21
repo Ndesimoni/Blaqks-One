@@ -1,8 +1,7 @@
 # Company email through SendGrid — design (packet E3)
 
 Status: **approved by the owner** (decisions E3a–E3d, 2026-10-21); security review done, no
-High findings. Not built yet. Nothing in E3 is
-built yet. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
+High findings. Nothing in E3 is built yet. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
 each member writes and reads client email in the CRM from an address on the company's own
 domain, with no separate Gmail or Outlook mailbox. The Google Workspace adapter (E1) stays
 available. This document extends the [messaging design](messaging-design.md); every rule
