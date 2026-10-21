@@ -51,13 +51,18 @@
 .composer-meta {
   flex: 1 1 auto;
   min-inline-size: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.4;
 }
-.composer-meta small {
+/* One line that ends in "…" rather than breaking an address mid-word on phones. */
+.composer-meta > * {
+  display: block;
+  overflow: hidden;
   font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* The "+": a round, quiet icon button; its native input stays focusable inside. */
 .composer-attach {
