@@ -25,6 +25,8 @@ mod wire;
 
 /// Called by `team` when an Admin is archived; see `company.rs`.
 pub use company::archived as company_archived;
+/// Whether a member may send and own email: the Admin, or staff with the email grant.
+pub use mailbox::may_connect as mailbox_allowed;
 pub use mailbox::revoke_soon;
 /// Called by `team` when members leave or lose the email grant; see `revocation.rs`.
 pub use revocation::departure;

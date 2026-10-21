@@ -37,6 +37,7 @@
       "crm_inbox_messages",
       "crm_inbox_messages_provider",
       "crm_inbox_messages_thread",
+      "crm_inbox_messages_rfc",
       "crm_inbox_notes",
       "crm_inbox_notes_thread",
       "crm_inbox_reads",

@@ -58,8 +58,12 @@ pub struct EmailMeta {
     pub bounce: bool,
     /// The mailbox owner: email conversations are theirs (review E1c H1).
     pub owner: Option<uuid::Uuid>,
-    /// Gmail authenticated the sender (DMARC pass, review E1c M2).
+    /// The provider authenticated the sender (Gmail DMARC, SendGrid aligned DKIM/SPF).
     pub verified: bool,
+    /// Company mail on a SendGrid domain (E3c): any verified sender may start a thread.
+    pub company: bool,
+    /// Message-IDs the mail answers, newest first, for threading company mail (E3c).
+    pub references: Vec<String>,
 }
 
 const KEYS: [&str; 8] = [

@@ -1,7 +1,7 @@
 # Company email through SendGrid — design (packet E3)
 
 Status: **approved by the owner** (decisions E3a–E3d, 2026-10-21); security review done, no
-High findings. **E3a and E3b are built** (2026-10-21, §10–§11); E3c and E3d follow. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
+High findings. **E3a, E3b and E3c are built** (2026-10-21, §10–§12); E3d (screens) follows. Decision D4 (revised 2026-10-21) chose Twilio SendGrid as the first email system:
 each member writes and reads client email in the CRM from an address on the company's own
 domain, with no separate Gmail or Outlook mailbox. The Google Workspace adapter (E1) stays
 available. This document extends the [messaging design](messaging-design.md); every rule
@@ -256,3 +256,58 @@ address (D7) or a development tunnel.
 - Follow-ups: rate or concurrency limits for the public route at the hosting edge (L2);
   webhooks left at SendGrid by an archive or a failed delete are refused but may count
   against an account limit, so E3d's disconnect copy names them (L5).
+
+## 12. E3c as built (2026-10-21)
+
+- **Setup.** With `CRM_PUBLIC_URL` set, connect and reconnect also create a signature
+  security policy and, with it attached at creation (no `update` scope), the Inbound Parse
+  setting for the company domain: spam check on, `send_raw` off, URL
+  `/api/integrations/webhooks/sendgrid/{connection}/inbound`. The policy's public key is
+  stored as the connection's `inbound` webhook. An existing setting for the domain is never
+  overwritten; connect then answers `incomingMail: false`. Disconnect removes the setting
+  after its commit and forgets the key.
+- **Parsed fields, not raw MIME.** `send_raw` is off (a change from §4, which suggested it):
+  SendGrid's parsed `from`, `subject`, `text`/`html`, `headers`, `envelope`, `dkim`, `SPF`
+  and `spam_score` avoid a MIME parser in the CRM. HTML is reduced to text on the server;
+  attachments arrive as file parts and are only counted (shown as media until F3).
+- **Route.** Before any body byte: one of four slots (503 when busy, SendGrid retries), a
+  `multipart/form-data` boundary, both signature headers, a timestamp within five minutes,
+  a declared length within 25 MiB (413 above) and a live connection with a stored key.
+  Then the ECDSA signature over the timestamp and raw body, then a strict form reader (at
+  most 64 parts, part headers of 8 KiB, no repeated field). Verification failures are the
+  same 401; a verified post that is not client mail is answered 200 and dropped.
+- **Trust.** A pass counts only from the top-level `dkim` (domain aligned with `From`) or
+  `SPF` (with the envelope sender aligned); `From` must hold exactly one address. Mail
+  SendGrid scores above 5 counts as unverified, so it may only join a known thread (a
+  change from §6, which sent it to Spam: provider-flagged mail never triggers a lead).
+- **Routing and threading.** Only envelope recipients on the company domain exactly
+  count; the first one that is a member's active address makes the conversation theirs,
+  otherwise normal routing applies (listing agent, record holder, Unassigned). One post is
+  one conversation. A reply joins the conversation whose `external_thread_id` or any
+  message's Message-ID it names (`In-Reply-To`, `References`); an unverified sender may
+  only join such a thread, flagged. A new thread also needs the daily budget: 10 per
+  sender and 500 per connection. Reports, mailer-daemon notices and the company's own mail
+  are dropped; inbound mail never changes a sent message's status (only signed events do).
+- **In the request.** Intake is database work only, so it runs in the request (not the
+  staging queue of §7): a database failure answers 503 and SendGrid posts again; replays
+  are absorbed by a hashed provider message ID per connection.
+- Stand-in: `scripts/fake-sendgrid-parse.mjs`; suite `tests/api/sendgrid-inbound.test.mjs`.
+- Code security review (2026-10-21): no High findings, nothing blocking. Fixed: a slot is
+  taken only after the cheap checks and the key lookup, two per connection and eight in
+  all, and a post must arrive within 30 seconds, so one company's slow posts cannot hold
+  back another's mail (M1); a per-sender-domain budget of 25 new threads a day, with known
+  Clients and Contacts never held back (M2); an index on Message-IDs and no thread lookup
+  without references (M3, migration 0047); the conversation's member is re-checked live
+  with the email grant under the workspace lock (L1); a Parse setting created without its
+  key being kept is removed (L2); control characters are stripped from sender names and the
+  form reader allows its full 64 parts (L4).
+- Accepted: a mail that names a Message-ID of a conversation joins it, even when sent to
+  another member's address; the stored sender (and the unverified flag when `From` is not
+  authenticated) tells the reader who wrote it, as in E1c (L6). Mail with more than about 60
+  attachments, or over 25 MiB, is refused or dropped: a known limit.
+- Follow-ups: a rate limit at the hosting edge for the public routes (M1); show the Admin
+  how much mail the budgets dropped, or move it to Spam (M2); a security policy created
+  before a refused Parse setting stays in the SendGrid account, as deleting it needs a
+  scope the key may not hold (L3); decode the `charsets` field, so mail in encodings such as
+  windows-1256 (Arabic) is not stored garbled (L5); a reconnect with a key from another
+  SendGrid account keeps the old webhook keys until disconnect.

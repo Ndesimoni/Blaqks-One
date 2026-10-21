@@ -29,3 +29,23 @@ pub async fn active(
         display_name,
     }))
 }
+
+/// The member whose active address this local part is, for routing incoming mail (E3c).
+/// A reserved, unknown or role address answers `None`: the mail follows normal routing.
+pub async fn member_for(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    domain: &str,
+    local: &str,
+) -> ApiResult<Option<Uuid>> {
+    sqlx::query_scalar(
+        "SELECT member_id FROM integrations.crm_sendgrid_addresses
+         WHERE workspace_id=$1 AND domain=$2 AND local_part=$3 AND state='active'",
+    )
+    .bind(workspace)
+    .bind(domain)
+    .bind(local)
+    .fetch_optional(&mut **tx)
+    .await
+    .map_err(Into::into)
+}

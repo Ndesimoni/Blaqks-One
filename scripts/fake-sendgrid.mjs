@@ -6,6 +6,7 @@
 import { createServer } from 'node:http';
 import { createWebhooks } from './fake-sendgrid-events.mjs';
 import { mailSend } from './fake-sendgrid-mail.mjs';
+import { createParse } from './fake-sendgrid-parse.mjs';
 
 const SCOPES = [
   'mail.send',
@@ -33,6 +34,7 @@ export async function startFakeSendgrid({ port }) {
   const sent = [];
   const revoked = new Set();
   const webhooks = createWebhooks();
+  const parse = createParse(webhooks.body);
   const json = (response, status, value) => {
     response.writeHead(status, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify(value));
@@ -45,6 +47,9 @@ export async function startFakeSendgrid({ port }) {
       return json(response, 200, {});
     }
     if (url.pathname === '/test/events') return webhooks.deliver(request, response, url, json);
+    if (['/test/inbound', '/test/parse-preset'].includes(url.pathname)) {
+      return parse.deliver(request, response, url, json);
+    }
     calls.push(url.pathname);
     const key = parseKey(request.headers.authorization);
     if (!key) return json(response, 401, { errors: [{ message: 'authorization required' }] });
@@ -52,6 +57,8 @@ export async function startFakeSendgrid({ port }) {
     if (revoked.has(key.domain)) return json(response, 401, { errors: [{ message: 'revoked' }] });
     const handled = await webhooks.settings(request, response, url, key, json);
     if (handled !== null) return handled;
+    const parsed = await parse.api(request, response, url, json);
+    if (parsed !== null) return parsed;
     if (request.method === 'GET' && url.pathname === '/v3/scopes') {
       return json(response, 200, { scopes: key.kind.scopes });
     }

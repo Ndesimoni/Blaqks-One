@@ -93,6 +93,7 @@ pub async fn import(
             && permanent_failure(&full.payload),
         owner: Some(mail.owner),
         verified,
+        ..EmailMeta::default()
     };
     let event = Event {
         receipt_id: Uuid::new_v4(),

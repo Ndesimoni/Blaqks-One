@@ -63,5 +63,5 @@ export function createWebhooks() {
       ? json(response, 200, posted)
       : json(response, 404, { error: 'no signed webhook' });
   }
-  return { settings, deliver, post, byDomain };
+  return { settings, deliver, post, body, byDomain };
 }

@@ -36,7 +36,8 @@ pub async fn events(
         return Err(rejected());
     };
     let connection = Uuid::parse_str(&connection).map_err(|_| rejected())?;
-    let Some((workspace, public_key)) = webhooks::events_key(&state.pool, connection).await? else {
+    let stored = webhooks::key(&state.pool, connection, webhooks::Kind::Events).await?;
+    let Some((workspace, public_key, _)) = stored else {
         return Err(rejected());
     };
     // The body is read only after every cheap refusal (design M2, review L2).

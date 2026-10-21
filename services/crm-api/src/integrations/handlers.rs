@@ -137,8 +137,9 @@ pub async fn connect(
     tx.commit().await?;
     let mut body = json!({ "connection": row.view() });
     if provider == Provider::Sendgrid {
-        let ready = super::sendgrid::webhooks::ensure(&state, &workspace, id).await;
-        body["deliveryUpdates"] = json!(ready);
+        let (events, mail) = super::sendgrid::webhooks::ensure(&state, &workspace, id).await;
+        body["deliveryUpdates"] = json!(events);
+        body["incomingMail"] = json!(mail);
     }
     Ok((StatusCode::CREATED, Json(body)))
 }

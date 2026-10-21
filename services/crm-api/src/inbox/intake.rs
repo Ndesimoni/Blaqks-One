@@ -3,7 +3,9 @@
 //! Clients and Contacts through the records module, run through the lead rules and
 //! routed: listing agent, then the matched record's holder, else Unassigned.
 use super::{
-    events, intake_store as store, matching,
+    events,
+    intake_company::Thread,
+    intake_store as store, matching,
     normalize::{self, Contact},
     rules::Decision,
 };
@@ -68,10 +70,13 @@ async fn store_event(pool: &PgPool, event: &Event, contact: &Contact) -> ApiResu
         tx.commit().await?;
         return Ok(());
     }
-    let conversation = match store::thread(&mut tx, event.connection_id, &message.thread_id).await?
-    {
-        Some(id) => id,
-        None => open(&mut tx, event, contact).await?,
+    let conversation = match super::intake_company::thread(&mut tx, event).await? {
+        Thread::Known(id) => id,
+        Thread::New => open(&mut tx, event, contact).await?,
+        Thread::Drop => {
+            tx.commit().await?;
+            return Ok(());
+        }
     };
     let stored = store::message(
         &mut tx,
@@ -115,10 +120,8 @@ async fn open(
             .as_ref()
             .map(|(collection, record, _)| (collection.as_str(), *record)),
         // A mailbox's mail stays with its owner, never the record's holder (E1c H1).
-        assignee: message
-            .email
-            .as_ref()
-            .and_then(|meta| meta.owner)
+        assignee: super::intake_company::live_owner(tx, event)
+            .await?
             .or(found.listing_agent.or(holder)),
         state: if linked.is_some() { "open" } else { "new" },
         suggested: decision == Decision::Suggest,

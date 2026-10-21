@@ -7,7 +7,7 @@ pub mod deliver;
 pub mod gmail;
 pub mod grant;
 pub mod history;
-mod html;
+pub mod html;
 pub mod message;
 pub mod mime;
 pub mod oauth;

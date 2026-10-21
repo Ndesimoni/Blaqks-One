@@ -6,10 +6,12 @@
 //! own per-connection route (E3b, `sendgrid.rs`).
 pub mod cleanup;
 pub mod inbound;
+mod inbound_slots;
 mod inbound_store;
 pub mod message;
 mod receipt;
 mod sendgrid;
+mod sendgrid_inbound;
 pub mod signature;
 pub mod sink;
 mod store;
@@ -42,6 +44,12 @@ pub fn router() -> Router<AppState> {
         .route(
             "/api/integrations/webhooks/sendgrid/{connection}/events",
             post(sendgrid::events).layer(DefaultBodyLimit::max(MAX_BODY)),
+        )
+        // SendGrid Inbound Parse: incoming company mail, attachments included (E3c).
+        .route(
+            "/api/integrations/webhooks/sendgrid/{connection}/inbound",
+            post(sendgrid_inbound::inbound)
+                .layer(DefaultBodyLimit::max(sendgrid_inbound::MAX_MAIL)),
         )
 }
 
