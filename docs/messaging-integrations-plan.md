@@ -17,7 +17,7 @@ Design reference: the **CRM Inbox design** canvas (8 screens, https://claude.ai/
 | D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.                |
 | D2  | WhatsApp number                   | Open: keep the current number (only if Twilio supports coexistence in the UAE) or a new dedicated number.                      |
 | D3  | One number per company            | Recommended yes; each company connects its own number through its own Twilio subaccount.                                       |
-| D4  | Business email system             | **Google Workspace (owner, 2026-10-20).** E1 builds the Gmail adapter first; Microsoft 365 can follow behind the same adapter. |
+| D4  | Business email system             | **SendGrid first (owner, revised 2026-10-21)**, packet E3; the built Google adapter (E1) stays an option, too. Needs a domain. |
 | D5  | Social platforms first            | Facebook Page and Instagram first; **TikTok added to the Channels registry by the owner on 2026-10-20** (messaging in T1).     |
 | D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies.             |
 | D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                                     |

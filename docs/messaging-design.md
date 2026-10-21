@@ -490,7 +490,7 @@ Blocking the named packet:
 | ID  | Decision                                                                                        | Blocks |
 | --- | ----------------------------------------------------------------------------------------------- | ------ |
 | D2  | Keep the current WhatsApp number or buy a dedicated one                                         | W1     |
-| D4  | Decided 2026-10-20: Google Workspace (Gmail adapter first)                                      | E1     |
+| D4  | Revised 2026-10-21: SendGrid first (E3); Google Workspace adapter (E1) built and kept           | E3     |
 | D5  | Facebook Page and Instagram first                                                               | S1     |
 | D6  | Meta Business Portfolio, Page and app verification                                              | S1     |
 | D7  | Public HTTPS address for webhooks                                                               | W2     |
