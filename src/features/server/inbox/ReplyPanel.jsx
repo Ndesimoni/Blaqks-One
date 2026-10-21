@@ -12,6 +12,7 @@ function ReplyNotice({ state, channel }) {
     'connectMailbox',
     'reconnect',
     'needAddress',
+    'adminNeedsAddress',
     'companyReconnect',
     'otherMailbox',
     'notSendable',
@@ -21,6 +22,11 @@ function ReplyNotice({ state, channel }) {
       <span>
         {own ? t(`inboxSend.reply.${state}`) : t(`inbox.reply.${state}`, { channel: channelName })}
       </span>
+      {state === 'adminNeedsAddress' && (
+        <Button variant="light" onClick={() => navigate('Channels')}>
+          {t('inboxSend.reply.openChannels')}
+        </Button>
+      )}
       {['connectMailbox', 'reconnect'].includes(state) && (
         <Button variant="light" onClick={() => navigate('My mailbox')}>
           {t('inboxSend.reply.openMailbox')}

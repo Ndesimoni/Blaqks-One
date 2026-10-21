@@ -16,6 +16,9 @@ export default {
     'This conversation belongs to another team member’s mailbox. Only they can reply by email; you can add an internal note.',
   'reply.notSendable': 'This sender is blocked or marked as spam, so no reply can be sent.',
   'reply.openMailbox': 'Open My mailbox',
+  'reply.adminNeedsAddress':
+    'Give yourself a sending address under Channels → Sending addresses to reply by email.',
+  'reply.openChannels': 'Open Channels',
   'message.sending': 'Sending…',
   'message.quoted': 'Earlier messages',
   'message.from': 'from {sender}',
@@ -41,6 +44,8 @@ export default {
   'start.sending': 'Sending…',
   'start.from': 'Sent from {mailbox}',
   'start.needMailbox': 'Connect your Google mailbox before sending email.',
+  'start.adminNeedsAddress':
+    'Give yourself a sending address under Channels → Sending addresses before sending email.',
   'start.needAddress':
     'Ask your Admin for a sending address on the company email before sending email.',
   'start.companyReconnect':

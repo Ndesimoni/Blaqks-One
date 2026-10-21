@@ -25,6 +25,11 @@ test('a SendGrid company uses the member’s company address in the Inbox', () =
     state(company({ connectionId: 'sg1', connected: true, address: null })),
     'needAddress',
   );
+  const bare = {
+    mailbox: null,
+    companyEmail: { connectionId: 'sg1', connected: true, address: null },
+  };
+  assert.equal(state(sendingMailbox(bare, true)), 'adminNeedsAddress');
   const attention = company({ connectionId: 'sg1', connected: false, address: 'aidah@keys.test' });
   assert.equal(state(attention), 'companyReconnect');
   // An older Google conversation cannot be answered from the company connection.

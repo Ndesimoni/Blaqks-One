@@ -10,10 +10,12 @@ import { linkCandidates } from './triageModel.js';
  * What a member sends through (E3d): the company's SendGrid account with their own
  * address when the company uses SendGrid, otherwise their own Google mailbox.
  */
-export function sendingMailbox(data) {
+export function sendingMailbox(data, admin = false) {
   const company = data?.companyEmail;
   if (!company) return data?.mailbox ?? null;
-  if (!company.address) return { company: true, state: 'needAddress' };
+  // The Admin gives addresses, so they are pointed at Channels, not told to ask themselves.
+  if (!company.address)
+    return { company: true, state: admin ? 'adminNeedsAddress' : 'needAddress' };
   return {
     company: true,
     id: company.connectionId,
@@ -30,7 +32,8 @@ export function replyState({ conversation, user, mailbox, health }) {
   }
   if (!canReplyOn(user, channel)) return 'noPermission';
   if (!mailbox) return 'connectMailbox';
-  if (['needAddress', 'companyReconnect'].includes(mailbox.state)) return mailbox.state;
+  if (['needAddress', 'adminNeedsAddress', 'companyReconnect'].includes(mailbox.state))
+    return mailbox.state;
   if (mailbox.state !== 'connected') return 'reconnect';
   if (conversation.connectionId !== mailbox.id) return 'otherMailbox';
   return 'send';

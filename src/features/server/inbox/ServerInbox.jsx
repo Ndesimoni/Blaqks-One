@@ -21,6 +21,7 @@ import './inbox-head.css';
 import './inbox-thread.css';
 import './inbox-panel.css';
 import './inbox-triage.css';
+import './inbox-list-start.css';
 import './inbox-send.css';
 import './inbox-start.css';
 import './inbox-responsive.css';
@@ -60,7 +61,7 @@ export function ServerInbox({ owner }) {
   const conversation = useConversation(api, owner.id, selectedId, refreshAll);
   const { members, nameOf } = useMembers(api, owner.id, user);
   // A SendGrid company sends from each member's own address (E3d), else Google.
-  const mailbox = sendingMailbox(useMailbox(api, owner.id).data);
+  const mailbox = sendingMailbox(useMailbox(api, owner.id).data, user.roleId === 'admin');
   const [starting, setStarting] = useState(false);
   /** New email: returns '' and opens the new conversation, or the server's message. */
   const start = async (body) => {

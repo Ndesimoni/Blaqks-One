@@ -12,6 +12,7 @@ import { RecipientPicker } from './RecipientPicker.jsx';
 // A SendGrid company member without a usable address asks their Admin (E3d).
 const notReady = {
   needAddress: 'inboxSend.start.needAddress',
+  adminNeedsAddress: 'inboxSend.start.adminNeedsAddress',
   companyReconnect: 'inboxSend.start.companyReconnect',
 };
 
@@ -52,6 +53,11 @@ export function StartEmail({ mailbox, onStart, onClose }) {
       {!ready ? (
         <div className="drawer-body inbox-start-body">
           <p>{t(notReady[mailbox?.state] ?? 'inboxSend.start.needMailbox')}</p>
+          {mailbox?.state === 'adminNeedsAddress' && (
+            <Button onClick={() => navigate('Channels')}>
+              {t('inboxSend.reply.openChannels')}
+            </Button>
+          )}
           {!mailbox?.company && (
             <Button onClick={() => navigate('My mailbox')}>
               {t('inboxSend.reply.openMailbox')}

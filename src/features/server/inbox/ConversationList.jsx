@@ -48,13 +48,9 @@ export function ConversationList({ view, list, summary, selectedId, onOpen, onSt
             />
           </label>
           {onStart && (
-            <Button
-              icon="plus"
-              className="inbox-start-button"
-              aria-label={t('inboxSend.start.button')}
-              title={t('inboxSend.start.button')}
-              onClick={onStart}
-            />
+            <Button icon="plus" className="inbox-start-button" onClick={onStart}>
+              {t('inboxSend.start.button')}
+            </Button>
           )}
         </div>
         <div role="tablist" aria-label={t('inbox.list.views')} className="inbox-tabs">
