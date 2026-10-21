@@ -3,6 +3,7 @@
 //! members never choose a From address. An address goes only to a live member with the
 //! email grant, and a reserved address can return only to its own member (decision E3d).
 mod change;
+pub mod lookup;
 mod rules;
 pub mod store;
 pub mod write;

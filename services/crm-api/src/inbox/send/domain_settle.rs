@@ -18,8 +18,18 @@ pub async fn apply(
 ) -> ApiResult<Outcome> {
     let mut tx = pool.begin().await?;
     let outcome = match delivery {
-        Delivery::Sent { id, thread_id } => {
+        Delivery::Sent {
+            id,
+            thread_id,
+            rfc_id,
+        } => {
             settle(&mut tx, job, "sent", Some(&id), "").await?;
+            // The CRM's own Message-ID (SendGrid), so replies and bounces can find it (E3c).
+            sqlx::query("UPDATE inbox.crm_inbox_messages SET rfc_message_id=$2 WHERE id=$1 AND $2 IS NOT NULL")
+                .bind(job.object_id)
+                .bind(rfc_id)
+                .execute(&mut *tx)
+                .await?;
             // Another conversation already holding this thread keeps it; this one keeps
             // its placeholder, and the message is still sent.
             sqlx::query(

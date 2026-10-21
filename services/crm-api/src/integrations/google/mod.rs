@@ -3,6 +3,7 @@
 //! (E1b) and reading replies (E1c) use the same token helpers.
 pub mod auth_results;
 pub mod callback;
+pub mod deliver;
 pub mod gmail;
 pub mod grant;
 pub mod history;

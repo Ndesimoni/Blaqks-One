@@ -68,14 +68,13 @@ async fn run() -> Result<(), String> {
         ));
     }
     println!("CRM messaging worker loops: {loops}.");
-    let mut domains: Vec<Arc<dyn outbox::model::Domain>> = Vec::new();
-    if let Some(google) = config.google.clone() {
-        domains.push(Arc::new(InboxSender {
-            pool: pool.clone(),
-            key: key.clone(),
-            google,
-        }));
-    }
+    // Google mailboxes (when configured) and SendGrid accounts send through one domain.
+    let domains: Vec<Arc<dyn outbox::model::Domain>> = vec![Arc::new(InboxSender {
+        pool: pool.clone(),
+        key: key.clone(),
+        google: config.google.clone(),
+        sendgrid: config.sendgrid.clone(),
+    })];
     let mut handles = Vec::new();
     if wants("outbox") {
         let domains: outbox::worker::Domains = Arc::new(domains);

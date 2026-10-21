@@ -1,16 +1,14 @@
-//! Sending one email through a member's own mailbox (E1b), for the Inbox's outbox domain.
-//! Right before every send it re-checks that the mailbox is connected, that its owner is
-//! the message's author, and that the author is still live with the email grant (security
-//! review M1 and its notes). Results are fixed codes, never provider text.
-use super::{
-    credential,
-    google::{gmail, mime, oauth, refresh},
-    mailbox, store, store_write,
-};
+//! Sending one email for the Inbox's outbox domain: through a member's own Google mailbox
+//! (E1b, `google/deliver.rs`) or the company's SendGrid account (E3b, `sendgrid/send.rs`).
+//! Each adapter re-checks the connection and the author right before the call. Results
+//! are fixed codes, never provider text.
+use super::{google::mime, store, store_write};
 use crate::{
-    config::{google_settings::GoogleConfig, messaging_settings::MessagingKey},
+    config::{
+        google_settings::GoogleConfig, messaging_settings::MessagingKey,
+        sendgrid_settings::SendgridConfig,
+    },
     error::ApiResult,
-    workspaces,
 };
 use sqlx::PgPool;
 use std::time::Duration;
@@ -20,6 +18,8 @@ pub struct Outgoing<'a> {
     pub workspace: &'a str,
     pub connection: Uuid,
     pub author: Uuid,
+    /// The Inbox message; SendGrid builds its Message-ID from it.
+    pub message: Uuid,
     pub email: mime::Email<'a>,
     /// Gmail's thread ID once the conversation has one.
     pub thread: Option<&'a str>,
@@ -30,6 +30,8 @@ pub enum Delivery {
     Sent {
         id: String,
         thread_id: String,
+        /// The Message-ID the CRM set (SendGrid); Gmail sets its own.
+        rfc_id: Option<String>,
     },
     Retry {
         after: Option<Duration>,
@@ -43,6 +45,7 @@ pub enum Delivery {
     },
 }
 
+pub use super::sendgrid::sender::company_sender;
 pub use mime::{plain_address, subject_ok, Email};
 
 /// The member's connected Google mailbox, for the Inbox's reply and start rules.
@@ -60,7 +63,8 @@ pub async fn sending_mailbox(
 pub async fn send(
     pool: &PgPool,
     key: &MessagingKey,
-    google: &GoogleConfig,
+    google: Option<&GoogleConfig>,
+    sendgrid: &SendgridConfig,
     out: &Outgoing<'_>,
 ) -> ApiResult<Delivery> {
     let unavailable = Delivery::Failed {
@@ -70,56 +74,18 @@ pub async fn send(
     let Some(row) = store::load(&mut tx, out.workspace, out.connection).await? else {
         return Ok(unavailable);
     };
-    let author = workspaces::member(&mut tx, out.workspace, out.author).await;
-    let allowed = author.is_ok_and(|user| mailbox::may_connect(&user, out.workspace));
-    if !allowed || row.owner_member_id != Some(out.author) || row.provider != "google" {
-        return Ok(unavailable);
-    }
-    if row.state != "connected" {
-        return Ok(Delivery::Failed {
-            code: "mailbox_reconnect",
-        });
-    }
-    let token = credential::open(&mut tx, key, &row).await?;
     tx.commit().await?;
-    let Some(token) = token else {
-        return Ok(Delivery::Failed {
-            code: "mailbox_reconnect",
-        });
-    };
-    let access = match refresh::refresh(google, &token).await {
-        Ok(access) => access,
-        Err(oauth::Failure::Refused) => return reconnect(pool, out).await,
-        Err(oauth::Failure::Unavailable | oauth::Failure::Invalid) => {
-            return Ok(Delivery::Retry {
-                after: None,
-                code: "google_unavailable",
-            })
+    match (row.provider.as_str(), google) {
+        ("sendgrid", _) => super::sendgrid::send::send(pool, key, sendgrid, out, &row).await,
+        ("google", Some(google)) => {
+            super::google::deliver::send(pool, key, google, out, &row).await
         }
-    };
-    let Some(raw) = mime::raw(&out.email) else {
-        return Ok(Delivery::Failed {
-            code: "invalid_message",
-        });
-    };
-    Ok(match gmail::send(google, &access, &raw, out.thread).await {
-        gmail::Sent::Accepted { id, thread_id } => Delivery::Sent { id, thread_id },
-        gmail::Sent::Retry { after } => Delivery::Retry {
-            after,
-            code: "rate_limited",
-        },
-        gmail::Sent::Unauthorised => return reconnect(pool, out).await,
-        gmail::Sent::Refused => Delivery::Failed {
-            code: "provider_refused",
-        },
-        gmail::Sent::Unknown => Delivery::Unknown {
-            code: "provider_unclear",
-        },
-    })
+        _ => Ok(unavailable),
+    }
 }
 
-/// Google no longer honours the token: mark the mailbox for its owner to sign in again.
-async fn reconnect(pool: &PgPool, out: &Outgoing<'_>) -> ApiResult<Delivery> {
+/// The provider no longer honours the credential: mark the connection for reconnecting.
+pub(super) async fn reconnect(pool: &PgPool, out: &Outgoing<'_>) -> ApiResult<Delivery> {
     let mut tx = pool.begin().await?;
     if store_write::set_reconnect_required(&mut tx, out.workspace, out.connection).await? {
         store_write::event(

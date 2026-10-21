@@ -3,7 +3,10 @@
 //! then it settles the message from the integrations result (design §5).
 use super::domain_settle::settle;
 use crate::{
-    config::{google_settings::GoogleConfig, messaging_settings::MessagingKey},
+    config::{
+        google_settings::GoogleConfig, messaging_settings::MessagingKey,
+        sendgrid_settings::SendgridConfig,
+    },
     error::ApiResult,
     integrations::mail::{self, Email},
     outbox::model::{Domain, Job, Outcome, SendFuture},
@@ -14,7 +17,8 @@ use uuid::Uuid;
 pub struct InboxSender {
     pub pool: PgPool,
     pub key: MessagingKey,
-    pub google: GoogleConfig,
+    pub google: Option<GoogleConfig>,
+    pub sendgrid: SendgridConfig,
 }
 
 #[derive(FromRow)]
@@ -87,6 +91,7 @@ impl InboxSender {
             workspace: &job.workspace_id,
             connection: queued.connection_id,
             author: queued.author_user_id,
+            message: job.object_id,
             email: Email {
                 to: &queued.contact_key,
                 subject: &subject,
@@ -95,7 +100,8 @@ impl InboxSender {
             },
             thread,
         };
-        let delivery = mail::send(&self.pool, &self.key, &self.google, &out).await?;
+        let google = self.google.as_ref();
+        let delivery = mail::send(&self.pool, &self.key, google, &self.sendgrid, &out).await?;
         super::domain_settle::apply(&self.pool, job, queued.conversation_id, delivery).await
     }
 

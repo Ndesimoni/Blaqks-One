@@ -48,7 +48,7 @@ fn conflict(message: &'static str, code: &'static str) -> ApiError {
     ApiError(StatusCode::CONFLICT, message, code)
 }
 
-/// The caller's connected mailbox: the Admin or staff with the email grant only.
+/// The connection the caller sends through: the Admin or staff with the email grant only.
 pub async fn sender(
     tx: &mut Transaction<'_, Postgres>,
     workspace: &str,
@@ -56,6 +56,17 @@ pub async fn sender(
 ) -> ApiResult<Uuid> {
     if user.role != "admin" && !user.channel_access.0.email {
         return Err(ApiError::forbidden());
+    }
+    // A SendGrid company sends from each member's own address on its domain (E3b).
+    match mail::company_sender(tx, workspace, user.id).await? {
+        Some(Some(connection)) => return Ok(connection),
+        Some(None) => {
+            return Err(conflict(
+                "Ask your Admin for a sending address on the company email before sending.",
+                "address_required",
+            ))
+        }
+        None => {}
     }
     mail::sending_mailbox(tx, workspace, user.id)
         .await?

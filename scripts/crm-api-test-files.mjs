@@ -116,6 +116,7 @@ export const apiTestFiles = [
   'tests/api/mailbox-google.test.mjs',
   'tests/api/sendgrid.test.mjs',
   'tests/api/sendgrid-addresses.test.mjs',
+  'tests/api/sendgrid-send.test.mjs',
   'tests/api/channels-archive.test.mjs',
   'tests/api/mailbox-departure.test.mjs',
   'tests/api/mailbox-replies.test.mjs',
