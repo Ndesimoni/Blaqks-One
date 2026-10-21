@@ -21,6 +21,7 @@ test('replies join their thread once, and new mail is routed by its address', as
   assert.deepEqual([company.deliveryUpdates, company.incomingMail], [true, true]);
   const mine = (await agent.request(`/workspaces/${workspace}/mailbox`)).value.companyEmail;
   assert.deepEqual(mine, {
+    connectionId: company.id,
     connected: true,
     address: `agent@${domain}`,
     displayName: 'Synthetic Agent',

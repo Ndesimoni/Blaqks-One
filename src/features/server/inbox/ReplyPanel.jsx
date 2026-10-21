@@ -8,7 +8,14 @@ function ReplyNotice({ state, channel }) {
   const { t } = useI18n();
   const { navigate } = useNavigation();
   const channelName = t(`inbox.channel.${channel}`);
-  const own = ['connectMailbox', 'reconnect', 'otherMailbox', 'notSendable'].includes(state);
+  const own = [
+    'connectMailbox',
+    'reconnect',
+    'needAddress',
+    'companyReconnect',
+    'otherMailbox',
+    'notSendable',
+  ].includes(state);
   return (
     <div className="inbox-reply-notice" role="status">
       <span>

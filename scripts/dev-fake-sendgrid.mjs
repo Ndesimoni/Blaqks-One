@@ -11,7 +11,7 @@ const line = readFileSync('.env', 'utf8')
 const endpoint = line?.slice('CRM_SENDGRID_ENDPOINT='.length) ?? '';
 const port = Number(new URL(endpoint || 'http://invalid').port);
 if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(endpoint) || !port) {
-  throw Error('Set CRM_SENDGRID_ENDPOINT=http://127.0.0.1:8792 in .env for local email trials.');
+  throw Error('Set CRM_SENDGRID_ENDPOINT=http://127.0.0.1:8793 in .env for local email trials.');
 }
 await startFakeSendgrid({ port });
 console.log(`Pretend SendGrid is running on ${endpoint}. No real email is sent.`);

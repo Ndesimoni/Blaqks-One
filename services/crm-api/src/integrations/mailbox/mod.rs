@@ -85,8 +85,9 @@ pub async fn mine(
         super::sendgrid::sender::own_address(&mut tx, &workspace, session.user.id).await?;
     tx.commit().await?;
     // A SendGrid company sends from each member's address on its domain (E3d).
-    let company_email = company.map(|(connected, address)| {
+    let company_email = company.map(|(connection, connected, address)| {
         json!({
+            "connectionId": connection,
             "connected": connected,
             "address": address.as_ref().map(|(address, _)| address),
             "displayName": address.as_ref().map(|(_, name)| name),

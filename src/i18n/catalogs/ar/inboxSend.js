@@ -8,6 +8,8 @@ export default {
   'reply.failed': 'تعذّر إرسال الرد: {reason}',
   'reply.connectMailbox': 'اربط بريد Google الخاص بك للرد عبر البريد.',
   'reply.reconnect': 'سجّل الدخول إلى Google مرة أخرى لمتابعة الرد عبر البريد.',
+  'reply.needAddress': 'اطلب من المسؤول عنوان إرسال على بريد الشركة للرد عبر البريد.',
+  'reply.companyReconnect': 'يحتاج بريد الشركة إلى مراجعة المسؤول في القنوات قبل إرسال الردود.',
   'reply.otherMailbox':
     'تخص هذه المحادثة بريد عضو آخر في الفريق. هو وحده يستطيع الرد عبر البريد، ويمكنك إضافة ملاحظة داخلية.',
   'reply.notSendable': 'هذا المرسل محظور أو مصنّف كرسائل مزعجة، لذلك لا يمكن إرسال رد.',
@@ -19,7 +21,7 @@ export default {
   'message.repeated': 'أُعيد إرسالها أدناه',
   'again.button': 'إعادة الإرسال',
   'again.unknownTitle': 'ربما أُرسلت هذه الرسالة بالفعل.',
-  'again.unknownBody': 'لم تؤكد Google الإرسال. تحقّق مع العميل قبل إعادة إرسالها.',
+  'again.unknownBody': 'لم تؤكد خدمة البريد الإرسال. تحقّق مع العميل قبل إعادة إرسالها.',
   'again.confirm': 'إعادة إرسالها',
   'again.cancel': 'إلغاء',
   'again.failed': 'تعذّرت إعادة الإرسال: {reason}',
@@ -34,8 +36,11 @@ export default {
   'start.body': 'الرسالة',
   'start.send': 'إرسال البريد',
   'start.sending': 'جارٍ الإرسال…',
-  'start.from': 'يُرسل من بريدك {mailbox}',
+  'start.from': 'يُرسل من {mailbox}',
   'start.needMailbox': 'اربط بريد Google الخاص بك قبل إرسال البريد.',
+  'start.needAddress': 'اطلب من المسؤول عنوان إرسال على بريد الشركة قبل إرسال البريد.',
+  'start.companyReconnect':
+    'يحتاج بريد الشركة إلى مراجعة المسؤول في القنوات قبل أن تتمكن من الإرسال.',
   'start.failed': 'تعذّر إرسال البريد: {reason}',
   'start.close': 'إغلاق البريد الجديد',
 };

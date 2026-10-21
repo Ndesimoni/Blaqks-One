@@ -9,6 +9,12 @@ import { RecipientPicker } from './RecipientPicker.jsx';
  * New email (Start message, E1b/E1d): to a Client or Contact the member may see, from the
  * member's own connected mailbox. On success the new conversation opens.
  */
+// A SendGrid company member without a usable address asks their Admin (E3d).
+const notReady = {
+  needAddress: 'inboxSend.start.needAddress',
+  companyReconnect: 'inboxSend.start.companyReconnect',
+};
+
 export function StartEmail({ mailbox, onStart, onClose }) {
   const { t } = useI18n();
   const { navigate } = useNavigation();
@@ -45,8 +51,12 @@ export function StartEmail({ mailbox, onStart, onClose }) {
       </div>
       {!ready ? (
         <div className="drawer-body inbox-start-body">
-          <p>{t('inboxSend.start.needMailbox')}</p>
-          <Button onClick={() => navigate('My mailbox')}>{t('inboxSend.reply.openMailbox')}</Button>
+          <p>{t(notReady[mailbox?.state] ?? 'inboxSend.start.needMailbox')}</p>
+          {!mailbox?.company && (
+            <Button onClick={() => navigate('My mailbox')}>
+              {t('inboxSend.reply.openMailbox')}
+            </Button>
+          )}
         </div>
       ) : (
         <form className="drawer-body inbox-start-body" onSubmit={send}>

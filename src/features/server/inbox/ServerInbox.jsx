@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { sendingMailbox } from './composerModel.js';
 import { useMailbox } from '../mailbox/useMailbox.js';
 import { SidePanel } from './SidePanel.jsx';
 import { ConversationList } from './ConversationList.jsx';
@@ -58,7 +59,8 @@ export function ServerInbox({ owner }) {
   }, [list, summary]);
   const conversation = useConversation(api, owner.id, selectedId, refreshAll);
   const { members, nameOf } = useMembers(api, owner.id, user);
-  const mailbox = useMailbox(api, owner.id).data?.mailbox ?? null;
+  // A SendGrid company sends from each member's own address (E3d), else Google.
+  const mailbox = sendingMailbox(useMailbox(api, owner.id).data);
   const [starting, setStarting] = useState(false);
   /** New email: returns '' and opens the new conversation, or the server's message. */
   const start = async (body) => {

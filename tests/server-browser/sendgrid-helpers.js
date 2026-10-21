@@ -16,6 +16,7 @@ export async function sendgridCompany(label) {
     admin: { email: `${tag}-admin@team-fixture.test`, name: `Synthetic ${tag}-admin` },
     agent: { email: `${tag}-agent@team-fixture.test`, name: `Synthetic ${tag}-agent` },
     agentId: agent.user.id,
+    session: admin,
     domain,
     key: sendgridKey(domain),
   };
