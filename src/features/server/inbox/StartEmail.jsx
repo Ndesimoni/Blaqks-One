@@ -88,12 +88,6 @@ export function StartEmail({ mailbox, onStart, onClose }) {
           <ComposerBox
             files={mailbox.company ? files : null}
             attachDisabled={busy}
-            meta={
-              <small>
-                {t('inboxSend.start.from', { mailbox: '' })}
-                <bdi>{mailbox.label}</bdi>
-              </small>
-            }
             action={
               <Button
                 type="submit"

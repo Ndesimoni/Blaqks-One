@@ -2,7 +2,6 @@
 export default {
   'reply.field': 'ردّك',
   'reply.placeholder': 'اكتب ردك…',
-  'reply.hint': 'يُرسل من {mailbox}',
   'reply.send': 'إرسال',
   'reply.sending': 'جارٍ الإرسال…',
   'reply.failed': 'تعذّر إرسال الرد: {reason}',
@@ -38,7 +37,6 @@ export default {
   'start.body': 'الرسالة',
   'start.send': 'إرسال البريد',
   'start.sending': 'جارٍ الإرسال…',
-  'start.from': 'يُرسل من {mailbox}',
   'start.needMailbox': 'اربط بريد Google الخاص بك قبل إرسال البريد.',
   'start.adminNeedsAddress': 'أضف لنفسك عنوان إرسال من القنوات ← عناوين الإرسال قبل إرسال البريد.',
   'start.needAddress': 'اطلب من المسؤول عنوان إرسال على بريد الشركة قبل إرسال البريد.',

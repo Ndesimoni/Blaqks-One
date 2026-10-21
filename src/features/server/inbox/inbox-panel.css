@@ -19,8 +19,9 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+/* Tabs and a one-line message box, compact as in messenger apps. */
 .inbox-composer {
-  padding: 12px 20px 16px;
+  padding: 6px 16px 8px;
   border-block-start: 1px solid var(--line);
   background: var(--panel);
 }
@@ -29,7 +30,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 12px;
-  margin-block-end: 10px;
+  margin-block-end: 6px;
 }
 .inbox-composer-tabs {
   display: flex;

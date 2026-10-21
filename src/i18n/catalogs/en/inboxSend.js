@@ -2,7 +2,6 @@
 export default {
   'reply.field': 'Your reply',
   'reply.placeholder': 'Write your reply…',
-  'reply.hint': 'Sent from {mailbox}',
   'reply.send': 'Send',
   'reply.sending': 'Sending…',
   'reply.failed': 'The reply could not be sent: {reason}',
@@ -42,7 +41,6 @@ export default {
   'start.body': 'Message',
   'start.send': 'Send email',
   'start.sending': 'Sending…',
-  'start.from': 'Sent from {mailbox}',
   'start.needMailbox': 'Connect your Google mailbox before sending email.',
   'start.adminNeedsAddress':
     'Give yourself a sending address under Channels → Sending addresses before sending email.',

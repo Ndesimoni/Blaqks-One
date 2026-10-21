@@ -75,7 +75,7 @@
   gap: 8px 12px;
 }
 .chat-composer {
-  padding: 12px 20px 16px;
+  padding: 6px 16px 8px;
   border-block-start: 1px solid var(--line);
 }
 .chat-new small {

@@ -76,12 +76,6 @@ export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
       <ComposerBox
         files={mailbox.company ? files : null}
         attachDisabled={busy}
-        meta={
-          <small>
-            {t('inboxSend.reply.hint', { mailbox: '' })}
-            <bdi>{mailbox.label}</bdi>
-          </small>
-        }
         action={
           <Button type="submit" icon="arrow" disabled={busy || files.busy || !text.trim()}>
             {busy ? t('inboxSend.reply.sending') : t('inboxSend.reply.send')}
@@ -91,7 +85,7 @@ export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
         <textarea
           id={`${id}-reply-text`}
           className="composer-input"
-          rows={2}
+          rows={1}
           maxLength={20000}
           value={text}
           placeholder={t('inboxSend.reply.placeholder')}

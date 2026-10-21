@@ -9,9 +9,13 @@
   transform: scaleX(-1);
 }
 @media (max-width: 899px) {
+  /* Edge to edge, as in messenger apps. */
   .chat-layout {
     grid-template-columns: minmax(0, 1fr);
-    block-size: calc(100dvh - 100px);
+    min-block-size: 480px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
   .chat-layout.is-room .chat-list,
   .chat-layout.is-list .chat-room-pane {

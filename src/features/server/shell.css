@@ -27,3 +27,35 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Inbox and Team chat fill the window below the top bar like messenger apps (owner,
+   2026-10-22): the page does not scroll and the tool takes all the height left. */
+.connected-shell .main-area.is-full-height {
+  display: flex;
+  flex-direction: column;
+  block-size: 100vh;
+  block-size: 100dvh;
+}
+.connected-shell .main-area.is-full-height > .topbar {
+  flex: 0 0 auto;
+}
+:root[data-theme] .main-area.is-full-height > .main-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  inline-size: 100%;
+  min-block-size: 0;
+  padding: 12px 16px;
+}
+.main-area.is-full-height .workspace-banner {
+  flex: 0 0 auto;
+  margin-block-end: 12px;
+}
+/* Phones: the conversation runs edge to edge, as in messenger apps. */
+@media (max-width: 899px) {
+  :root[data-theme] .main-area.is-full-height > .main-content {
+    padding: 0;
+  }
+  .main-area.is-full-height .workspace-banner {
+    margin: 12px;
+  }
+}

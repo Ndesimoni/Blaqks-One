@@ -45,13 +45,18 @@
   .inbox-tab.is-active .inbox-tab-count {
     color: var(--accent);
   }
-  /* One row when the column allows; otherwise the controls wrap below, never the name. */
+  /* Always one row: the name keeps a readable width, then the controls give way. */
+  .inbox-head {
+    flex-wrap: nowrap;
+  }
   .inbox-head-text {
-    flex: 1 1 180px;
+    flex: 1 1 0;
+    min-inline-size: 120px;
   }
   .inbox-head-actions {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     flex-wrap: nowrap;
+    min-inline-size: 0;
     margin-inline-start: auto;
   }
   .inbox-details {
@@ -59,10 +64,6 @@
   }
 }
 @media (max-width: 899px) {
-  .inbox-layout,
-  .inbox-layout.has-panel {
-    block-size: calc(100dvh - 88px);
-  }
   .inbox-search input,
   .inbox-tab,
   .inbox-filters select,
@@ -74,6 +75,13 @@
   .inbox-icon-button {
     inline-size: 44px;
     block-size: 44px;
+  }
+  .inbox-head {
+    padding: 8px 12px;
+  }
+  .inbox-thread,
+  .inbox-composer {
+    padding-inline: 12px;
   }
   .inbox-head-text {
     flex: 1 1 100px;

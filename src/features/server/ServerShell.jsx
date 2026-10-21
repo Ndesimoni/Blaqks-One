@@ -34,6 +34,8 @@ export function ServerShell({ owner, workspaces }) {
   const supported = isRecordSection(route);
   const team = route === 'Team & access';
   const title = route === 'Team activity' ? activityLabel(user) : route;
+  // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
+  const fullHeight = ['Inbox', 'Team chat'].includes(route);
   const { toast, setToast } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
   const location = useLocation();
@@ -56,7 +58,7 @@ export function ServerShell({ owner, workspaces }) {
         Skip to main content
       </a>
       <ServerNavigation />
-      <div className="main-area">
+      <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
         <ServerHeader owner={owner} />
         <main className="main-content" id="main-content" tabIndex={-1}>
           {/* Members see their company in the top bar; the panel is only for the Super Admin,
@@ -87,9 +89,8 @@ export function ServerShell({ owner, workspaces }) {
               )}
             </section>
           )}
-          {/* The Inbox gives its full height to the conversation; it keeps an
-              accessible heading of its own. */}
-          {!['Inbox', 'Team chat'].includes(route) && (
+          {/* The full-height tools keep accessible headings of their own. */}
+          {!fullHeight && (
             <div className="page-heading">
               <div className="heading-left">
                 <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>
@@ -119,10 +120,12 @@ export function ServerShell({ owner, workspaces }) {
             </div>
           )}
           <ServerContent owner={owner} />
-          <footer className="main-footer">
-            <span>© {new Date().getFullYear()} Keys with Simoni</span>
-            <span>Connected CRM · Messaging and public publication are not connected yet.</span>
-          </footer>
+          {!fullHeight && (
+            <footer className="main-footer">
+              <span>© {new Date().getFullYear()} Keys with Simoni</span>
+              <span>Connected CRM · Messaging and public publication are not connected yet.</span>
+            </footer>
+          )}
         </main>
       </div>
       <ServerDialogs />

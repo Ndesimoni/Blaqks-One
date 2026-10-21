@@ -1,11 +1,11 @@
-/* Chosen files inside the message box: compact cards with a type icon, the name, its
+/* Chosen files inside the typing box, above the text: compact cards with a type icon, the name, its
    status line and a remove button; uploading cards show a calm progress line. */
 .composer-files {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   margin: 0;
-  padding: 2px 2px 4px;
+  padding: 6px 6px 0;
   list-style: none;
   cursor: default;
 }

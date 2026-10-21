@@ -1,12 +1,22 @@
-/* The shared message box (owner feedback 2026-10-21): files, text, "+" and send in one
-   bordered container, as in mail and chat apps. Chips and states: composer-files.css. */
+/* The shared message row (owner, 2026-10-22, as in Messenger and WhatsApp): the "+" outside
+   on the start side, the rounded typing box (chosen files inside, above the text), then Send,
+   all aligned to the bottom; a short note sits under the row. Chips: composer-files.css. */
+.composer-group {
+  display: grid;
+  min-inline-size: 0;
+}
+.composer-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-inline-size: 0;
+}
 .composer-box {
   display: grid;
-  gap: 4px;
+  flex: 1 1 auto;
   min-inline-size: 0;
-  padding: 6px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 22px;
   background: var(--surface-subtle);
   cursor: text;
   transition:
@@ -21,15 +31,15 @@
 .composer-box .composer-input {
   display: block;
   inline-size: 100%;
-  /* About three lines to start (team chat); Inbox boxes start taller (owner, 2026-10-22).
-     useAutoGrow follows the text up to half the screen, then the field scrolls. */
-  min-block-size: 78px;
-  max-block-size: 50vh;
+  /* One line to start, as tall as Send (owner, 2026-10-22); useAutoGrow follows the text up
+     to about 40% of the conversation panel, then the field scrolls. */
+  min-block-size: 42px;
+  max-block-size: 35vh;
+  max-block-size: 35dvh;
   overflow-y: auto;
   margin: 0;
-  padding: 6px 8px;
+  padding: 10px 14px;
   border: 0;
-  border-radius: 8px;
   background: transparent;
   color: var(--ink);
   font: inherit;
@@ -44,35 +54,35 @@
 .composer-box .composer-input::placeholder {
   color: var(--muted);
 }
-.composer-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-inline-size: 0;
-}
+/* The note under the row, lined up with the text in the box. */
 .composer-meta {
-  flex: 1 1 auto;
   min-inline-size: 0;
   overflow: hidden;
+  padding-inline: 15px;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.4;
 }
+.composer-group.has-attach .composer-meta {
+  padding-inline-start: 63px;
+}
 /* One line that ends in "…" rather than breaking an address mid-word on phones. */
 .composer-meta > * {
   display: block;
+  margin-block-start: 4px;
   overflow: hidden;
   font-size: inherit;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* The "+": a round, quiet icon button; its native input stays focusable inside. */
+/* The "+": a round, quiet icon button beside the box; its native input stays focusable. */
 .composer-attach {
   display: inline-grid;
   flex: 0 0 auto;
   place-items: center;
-  inline-size: 36px;
-  block-size: 36px;
+  inline-size: 40px;
+  block-size: 40px;
+  margin-block-end: 2px;
   border-radius: 50%;
   color: var(--muted);
   cursor: pointer;
@@ -97,24 +107,14 @@
   background: transparent;
   color: var(--muted);
 }
-.composer-bar > .btn {
+.composer-row > .btn {
   flex: 0 0 auto;
-  min-block-size: 36px;
   padding-block: 6px;
   border-radius: 10px;
 }
 /* Send arrows point the way text runs. */
-[dir='rtl'] .composer-bar > .btn svg {
+[dir='rtl'] .composer-row > .btn svg {
   transform: scaleX(-1);
-}
-@media (max-width: 899px) {
-  .composer-attach {
-    inline-size: 44px;
-    block-size: 44px;
-  }
-  .composer-bar > .btn {
-    min-block-size: 44px;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .composer-box,
