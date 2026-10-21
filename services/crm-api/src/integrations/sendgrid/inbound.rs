@@ -125,11 +125,11 @@ pub fn read(form: &Form) -> Option<Mail> {
             &field(form, "SPF"),
             envelope_from,
         ),
-        // No score means the mail was never checked: treated as spam (F3b review L2).
+        // SendGrid scores mail up to 2.5 MB only: no score is unchecked, not spam (§14).
         spam: field(form, "spam_score")
             .trim()
             .parse::<f64>()
-            .map_or(true, |s| s > SPAM_SCORE),
+            .is_ok_and(|s| s > SPAM_SCORE),
         report: is_report(header(&headers, "Content-Type").as_deref())
             || matches!(local, "mailer-daemon" | "postmaster"),
         message_id: header(&headers, "Message-ID").filter(|id| message_id(id)),

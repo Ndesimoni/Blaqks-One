@@ -46,10 +46,10 @@ privacy, sealed credentials, verified webhooks) applies unless this page says ot
 
 ## 4. Connecting (SEC-1)
 
-1. The Admin pastes a SendGrid **restricted API key**. The adapter calls `GET /v3/scopes` and
-   refuses a key holding anything beyond an exact allowlist: mail send, sender/domain
-   authentication read, Inbound Parse settings, Event Webhook settings and security-policy
-   create (exact names fixed in E3a). A full-access key is refused (review M4).
+1. The Admin pastes a SendGrid **Custom Access API key**. The adapter calls `GET /v3/scopes`
+   and refuses a key holding anything beyond an allowlist: Mail Send, Sender Authentication
+   read, and the Inbound Parse, Event Notification and security-policy groups as SendGrid's
+   key screen grants them (§14). A full-access key is refused (review M4, revised in §14).
 2. The adapter reads the account's authenticated domains and accepts only a domain marked
    valid. The Admin names the domain, but it counts only when SendGrid lists it as
    authenticated for that key's account, so the provider proves it.
@@ -175,9 +175,9 @@ address (D7) or a development tunnel.
   `(workspace_id, domain, local_part)` with one active address per member and domain.
 - Connect (`POST /channels`, `provider: sendgrid`, `externalAccountId` = the domain,
   `credential` = the key) calls `GET /v3/scopes` and `GET /v3/whitelabel/domains` before
-  any lock: the key may hold only `mail.send`, `whitelabel.read`, create/read/delete of the
-  Inbound Parse and Event Webhook settings, security-policy create and SendGrid's account
-  flags, never an `update` (code review M1); the domain must be listed as valid. Reconnect proves the new key
+  any lock: the key may hold only `mail.send`, `whitelabel.read`, SendGrid's account flags
+  and the groups listed in §14 (the earlier "never an `update`" rule, code review M1, is
+  revised there); the domain must be listed as valid. Reconnect proves the new key
   on the same domain. Failures are fixed messages; no SendGrid text or key is returned.
 - One email system at a time: SendGrid refuses a company with a live Google mailbox, and
   Google sign-in refuses a company with SendGrid, each under the workspace lock.
@@ -231,8 +231,8 @@ address (D7) or a development tunnel.
   from sending, sent or unknown; Failed (`bounced`, `dropped`) from those or Delivered.
   Replays change nothing, so no receipt row is kept. A `sent` from the worker never
   overwrites an event that arrived first.
-- Signing needs `user.webhooks.event.settings.update` in the key allowlist; incoming mail
-  still has no `update`, so a leaked key cannot repoint client mail.
+- Signing needs `user.webhooks.event.settings.update` in the key allowlist. (Incoming mail
+  had no `update` either, revised in §14: `delete` and `create` could repoint it anyway.)
 - Disconnect removes the webhook at SendGrid (best effort, while the key still opens) and
   forgets its key in the disconnect transaction; an archived company's webhook is left at
   SendGrid but its events are refused.
@@ -260,8 +260,8 @@ address (D7) or a development tunnel.
 ## 12. E3c as built (2026-10-21)
 
 - **Setup.** With `CRM_PUBLIC_URL` set, connect and reconnect also create a signature
-  security policy and, with it attached at creation (no `update` scope), the Inbound Parse
-  setting for the company domain: spam check on, `send_raw` off, URL
+  security policy and the Inbound Parse setting for the company domain, then attach the
+  policy by updating the setting and read it back (§14): spam check on, `send_raw` off, URL
   `/api/integrations/webhooks/sendgrid/{connection}/inbound`. The policy's public key is
   stored as the connection's `inbound` webhook. An existing setting for the domain is never
   overwritten; connect then answers `incomingMail: false`. Disconnect removes the setting
@@ -341,3 +341,72 @@ themes, with English and Arabic text and logical CSS.
   company's SendGrid connections since the address was made (`inbox::company_usage`).
   When unsure it counts as used, and a used address is kept for ever (decision E3d). The
   signed-in Admin is listed first in Add address, so they can give themselves one.
+
+## 14. Preflight against SendGrid's documentation (2026-10-22)
+
+Before the live check (handoff N1), each SendGrid call was compared with SendGrid's current
+API reference and guides (twilio.com/docs/sendgrid). Everything below the stand-in had only
+assumed; the stand-in now follows the documented behaviour.
+
+**Matches the documentation:** `GET /v3/scopes` (`{scopes: […]}`); `GET
+/v3/whitelabel/domains` (a top-level array with `domain` and `valid`); `POST
+/v3/mail/send` with attachments; Event Webhook create (`POST
+/v3/user/webhooks/event/settings`, `id` returned, signing not possible at creation) and
+`PATCH …/event/settings/signed/{id}` returning `id` and `public_key`; Parse security
+policies (`POST /v3/user/webhooks/security/policies` returning `policy.id` and
+`policy.signature.public_key`); signed Parse posts using the
+`X-Twilio-Email-Event-Webhook-Signature` and `-Timestamp` headers with ECDSA, as for events;
+the Parse fields `headers`, `dkim`, `SPF`, `spam_score`, `envelope`, `charsets`,
+`attachment-info` (keyed by `attachment1…N`, with `filename` and `type`) and file parts.
+
+**Changed:**
+
+- **Key permissions.** SendGrid's key screen grants each group as No, Read or Full Access,
+  and Full Access includes every action of the group (Mail: `mail.send` and `mail.batch.*`;
+  Inbound Parse: `user.webhooks.parse.settings.*` and `parse.stats.read`; Event Notification:
+  `user.webhooks.event.settings.*` and `event.test.*`). The old exact allowlist refused any
+  such key. The CRM now accepts those groups whole, plus security-policy actions, and still
+  refuses every other permission. Refusing Parse `update` (review M4) protected nothing: the
+  allowed `delete` and `create` can repoint a setting just as well.
+- **Signing incoming mail.** SendGrid attaches a security policy by updating the Parse
+  setting (`PATCH …/parse/settings/{hostname}` with `security_policy`); the create call has
+  no such field. The CRM now creates the setting, attaches the policy (repeating the URL,
+  spam check and `send_raw`), then reads the setting back: it counts only if it shows this
+  policy, this connection's URL, spam check on and `send_raw` off. Otherwise the setting and
+  the policy are removed, best effort, and Channels shows incoming mail as not set up. A
+  setting left by an attempt whose answer never came is finished on reconnect, but only when
+  it already posts to this connection's own URL; any other setting is never taken over.
+- **Spam score.** SendGrid scores only mail of 2.5 MB or less. A signed post without a score
+  is larger mail it did not check, not spam; the F3b rule that treated it as spam (review L2)
+  dropped a new client's first email with photos. Sender trust (DKIM or SPF aligned with
+  From) and the daily budgets still decide what opens a conversation or keeps files.
+
+**Security review (2026-10-22): no High findings.** Accepted: the permission groups (a
+stolen key gains nothing it could not already do, as the CRM keeps the public keys it was
+given at connect and never re-reads them, so changing or removing a policy only gets posts
+refused); the spam-score change (posts are verified first, and the thread and file budgets
+bound any sender who pads mail past 2.5 MB); the screen text. Fixed: M1, an update answered
+but not applied (read back, test with the stand-in's quiet mode); L1, a setting left by an
+unanswered attempt; L2, the unused policy removed on failure. To do after the live check:
+narrow the security-policy names to those a real key shows (L4); optionally, treat a
+missing score as unchecked only for large posts (L3), and a regular read-back that flags
+"incoming mail redirected".
+
+**Live check list** (handoff N1; record each result here):
+
+1. The exact `GET /v3/scopes` list of a key made as in Connecting platforms step 6, the
+   security-policy permission names, and whether the plan offers Parse security policies.
+2. Connect: the policy update's status and body, then the read-back showing
+   `security_policy`, the CRM's URL, `spam_check: true` and `send_raw: false`.
+3. Incoming mail arrives signed and verifies with the stored key; mail is threaded into the
+   right conversation (whether SendGrid keeps the CRM's own `Message-ID`).
+4. A small email carries a `spam_score`; one over 2.5 MB arrives without it (missing or
+   empty), and its photos are kept.
+5. The exact `dkim` and `SPF` formats; retry periods, and whether a retried post is re-signed
+   with a fresh timestamp (§8 M5).
+6. Delivery events arrive signed and mark mail Delivered; SendGrid's test events are dropped.
+7. Automatic Security is off when the receiving domain is also the sending domain.
+8. Disconnect removes the Parse setting (the policy stays in the SendGrid account).
+
+SendGrid accepts mail up to 30 MB, but the CRM refuses posts over 25 MiB (a known limit,
+§12).

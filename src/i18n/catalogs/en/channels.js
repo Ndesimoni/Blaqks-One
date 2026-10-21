@@ -74,7 +74,7 @@ export default {
   'sendgrid.step2':
     "Point the domain's MX record at mx.sendgrid.net when you are ready to receive client mail in the CRM.",
   'sendgrid.step3':
-    'Create a restricted API key with only the permissions in the setup guide. A full-access key is refused.',
+    'Create an API key with Custom Access: Mail Send, Sender Authentication (Read), Inbound Parse and Mail Settings → Event Notification, everything else No Access. A full-access key is refused.',
   'sendgrid.domain': 'Company domain',
   'sendgrid.domainHint': 'The domain you authenticated in SendGrid, such as keyswithsimoni.com.',
   'sendgrid.domainInvalid': 'Enter the domain only, such as keyswithsimoni.com, without www or @.',

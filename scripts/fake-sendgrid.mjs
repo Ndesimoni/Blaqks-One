@@ -47,7 +47,7 @@ export async function startFakeSendgrid({ port }) {
       return json(response, 200, {});
     }
     if (url.pathname === '/test/events') return webhooks.deliver(request, response, url, json);
-    if (['/test/inbound', '/test/parse-preset'].includes(url.pathname)) {
+    if (['/test/inbound', '/test/parse-preset', '/test/parse-quiet'].includes(url.pathname)) {
       return parse.deliver(request, response, url, json);
     }
     calls.push(url.pathname);

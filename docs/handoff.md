@@ -23,11 +23,14 @@ from clients are labelled but not virus-scanned.
 
 ### N1 — Real SendGrid check (recommended first)
 
-Proves E3 and F3 with the owner's real account before more is built on them.
+Proves E3 and F3 with the owner's real account before more is built on them. **Preflight
+done (2026-10-22):** the calls were checked against SendGrid's documentation and three
+mismatches fixed; [SendGrid design §14](sendgrid-design.md#14-preflight-against-sendgrids-documentation-2026-10-22)
+lists what the live check must still prove.
 
 - **Owner first:** steps 1–7 of [Connecting platforms](connecting-platforms.md#email-through-sendgrid-packet-e3)
-  (domain, SendGrid account, domain authentication, MX and DMARC records, restricted key,
-  two-factor sign-in).
+  (domain, SendGrid account, domain authentication, MX and DMARC records, a Custom Access
+  key, two-factor sign-in).
 - **Agent:**
   1. In `.env`, remove `CRM_SENDGRID_ENDPOINT` (it points at the stand-in on 8793) so the
      API calls SendGrid itself.

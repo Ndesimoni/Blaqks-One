@@ -20,18 +20,19 @@ fn only_a_restricted_key_with_send_and_domain_read_is_accepted() {
     assert_eq!(scopes_ok(&owned(&broad)), Err(TOO_BROAD));
     let edit = ["mail.send", "whitelabel.read", "whitelabel.delete"];
     assert_eq!(scopes_ok(&owned(&edit)), Err(TOO_BROAD));
-    let repoint = [
+    // The groups exactly as SendGrid's key screen grants them (design §14).
+    let screen = [
         "mail.send",
+        "mail.batch.update",
         "whitelabel.read",
         "user.webhooks.parse.settings.update",
-    ];
-    assert_eq!(scopes_ok(&owned(&repoint)), Err(TOO_BROAD));
-    let policy = [
-        "mail.send",
-        "whitelabel.read",
+        "user.webhooks.parse.stats.read",
+        "user.webhooks.event.test.create",
         "user.webhooks.security.policies.delete",
     ];
-    assert_eq!(scopes_ok(&owned(&policy)), Err(TOO_BROAD));
+    assert!(scopes_ok(&owned(&screen)).is_ok());
+    let account = ["mail.send", "whitelabel.read", "user.profile.update"];
+    assert_eq!(scopes_ok(&owned(&account)), Err(TOO_BROAD));
     assert_eq!(scopes_ok(&owned(&["teammates.create"])), Err(TOO_BROAD));
 }
 

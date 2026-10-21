@@ -37,6 +37,9 @@ fn a_reply_keeps_its_sender_thread_and_trust() {
     assert_eq!(mail.references, ["<m2@keys.test>", "<m1@keys.test>"]);
     assert_eq!(mail.recipients, ["aidah@keys.test", "x@other.test"]);
     assert!(mail.verified && !mail.spam && !mail.report);
+    // Mail over 2.5 MB arrives without a score: SendGrid did not check it (design §14).
+    let large = [("from", "client@gmail.com"), ("text", "Photos"), ENVELOPE];
+    assert!(!read(&form(&large)).unwrap().spam);
 }
 
 #[test]

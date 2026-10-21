@@ -12,32 +12,46 @@ const FLAGS: [&str; 4] = [
     "sender_verification_eligible",
     "sender_verification_exempt",
 ];
-/// Exactly what E3b and E3c need to create, read and remove their own incoming-mail and
-/// event settings (code review M1). Incoming mail has no `update`, so a leaked key cannot
-/// repoint client mail; events need it once, to turn signing on, and unsigned events are
-/// refused anyway. The names are confirmed in the SendGrid sandbox (design §8).
-const WEBHOOKS: [&str; 8] = [
+/// The groups SendGrid's key screen grants whole (design §14, checked against SendGrid's
+/// documentation 2026-10-22): Mail Send, and Full access to Inbound Parse and Mail
+/// Settings → Event Notification, which E3b and E3c use to set up their own incoming-mail
+/// and event settings. Full access always includes `update`; refusing it protected nothing,
+/// as `delete` and `create` can already repoint a Parse setting (review M4, revised). The
+/// security-policy names are not listed by SendGrid and are confirmed in the live check.
+const GROUPS: [&str; 20] = [
+    "mail.batch.create",
+    "mail.batch.delete",
+    "mail.batch.read",
+    "mail.batch.update",
     "user.webhooks.parse.settings.create",
     "user.webhooks.parse.settings.read",
+    "user.webhooks.parse.settings.update",
     "user.webhooks.parse.settings.delete",
+    "user.webhooks.parse.stats.read",
     "user.webhooks.event.settings.create",
     "user.webhooks.event.settings.read",
-    "user.webhooks.event.settings.delete",
     "user.webhooks.event.settings.update",
+    "user.webhooks.event.settings.delete",
+    "user.webhooks.event.test.create",
+    "user.webhooks.event.test.read",
+    "user.webhooks.event.test.update",
     "user.webhooks.security.policies.create",
+    "user.webhooks.security.policies.read",
+    "user.webhooks.security.policies.update",
+    "user.webhooks.security.policies.delete",
 ];
 
 pub const MISSING: &str =
     "This key cannot send mail or read your domain. Give it Mail Send and Sender Authentication read access.";
 pub const TOO_BROAD: &str =
-    "This key has more access than the CRM needs. Create a restricted key with only the listed permissions.";
+    "This key has more access than the CRM needs. Create a Custom Access key with only Mail Send, Sender Authentication (Read), Inbound Parse and Mail Settings → Event Notification.";
 pub const DOMAIN: &str = "Enter the company domain, such as keyswithsimoni.com.";
 pub const NOT_AUTHENTICATED: &str =
     "SendGrid has not verified this domain for this account. Finish Sender Authentication first.";
 
 pub fn scopes_ok(scopes: &[String]) -> Result<(), &'static str> {
     let allowed = |scope: &str| {
-        REQUIRED.contains(&scope) || FLAGS.contains(&scope) || WEBHOOKS.contains(&scope)
+        REQUIRED.contains(&scope) || FLAGS.contains(&scope) || GROUPS.contains(&scope)
     };
     if scopes.iter().any(|scope| !allowed(scope)) {
         return Err(TOO_BROAD);

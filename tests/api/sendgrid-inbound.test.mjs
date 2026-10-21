@@ -39,6 +39,7 @@ test('replies join their thread once, and new mail is routed by its address', as
   const posted = await inbound(domain, answer, { attachments: 1 });
   assert.equal(posted.status, 200);
   assert.deepEqual([posted.input.send_raw, posted.input.spam_check], [false, true]);
+  assert.ok(posted.input.security_policy, 'signing attached by updating the setting');
   assert.equal((await inbound(domain, answer)).status, 200, 'a repeat adds nothing');
   const thread = await read(admin, conversationId);
   const received = thread.messages.filter((item) => item.direction === 'inbound');
@@ -95,6 +96,14 @@ test('unverified, spam, reports, own mail and forged posts never open a thread',
   });
   const other = await connectSendgrid(await freshAdmin('sendgrid-preset-admin'), preset);
   assert.deepEqual([other.status, other.value.incomingMail], [201, false]);
+  // An update SendGrid answers without attaching signing is caught and removed (preflight M1).
+  const quiet = 'e3c-quiet.example.test';
+  await fetch(`${process.env.CRM_TEST_SENDGRID}/test/parse-quiet?domain=${quiet}`, {
+    method: 'POST',
+  });
+  const unsigned = await connectSendgrid(await freshAdmin('sendgrid-quiet-admin'), quiet);
+  assert.deepEqual([unsigned.status, unsigned.value.incomingMail], [201, false]);
+  assert.equal((await inbound(quiet, good)).error, 'no parse setting');
   // Disconnect removes the Parse setting at SendGrid and forgets its key.
   const off = await admin.request(channelPath(admin, `/${connection.id}`), {
     method: 'DELETE',

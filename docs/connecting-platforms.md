@@ -41,10 +41,11 @@ statuses do not.
    receive that domain's mail.
 5. **Add a DMARC record** (`_dmarc` TXT, starting with `v=DMARC1; p=none;`) so receiving
    servers trust the domain; it can be tightened later.
-6. **Create a restricted API key** in Settings → API Keys with only the permissions the CRM's
-   Connections screen lists; the CRM refuses a full-access key. Paste it into that screen
-   once E3 is built; the CRM then checks the domain and sets up incoming mail and delivery
-   events by itself.
+6. **Create an API key** in Settings → API Keys with **Custom Access**: Mail Send (Full),
+   Sender Authentication (Read), Inbound Parse (Full) and Mail Settings → Event Notification
+   (Full); everything else No Access. The CRM refuses a full-access key or any other
+   permission. Paste the key into Channels → SendGrid; the CRM then checks the domain and
+   sets up incoming mail and delivery events by itself.
 7. **Protect the SendGrid account:** turn on two-factor sign-in and keep its teammates to the
    people who need them. Whoever controls the SendGrid account can send as any member outside
    the CRM.

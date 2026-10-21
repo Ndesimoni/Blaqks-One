@@ -75,7 +75,7 @@ against the item the file belongs to.
   `tests/api/sendgrid-inbound-files.test.mjs` and `sendgrid-inbound-files-guards.test.mjs`.
   Code security review (2026-10-22): no High findings. Fixed: storing runs apart from the
   request and holds the connection's slot, so SendGrid hanging up cannot lose files (L1);
-  mail without a spam score counts as spam (L2); the sender budget key is tied to the
+  mail without a spam score counted as spam (L2; revised 2026-10-22, as SendGrid scores only mail up to 2.5 MB, [SendGrid design §14](sendgrid-design.md#14-preflight-against-sendgrids-documentation-2026-10-22)); the sender budget key is tied to the
   company (L3); files are only looked at for verified, unspammy mail (L4); more tests (L5).
   Accepted: the files are labelled, not yet scanned (M1); **scanning (ClamAV or the storage
   provider) is required before hosting**. Not covered by an automated test: a put that
