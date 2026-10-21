@@ -38,7 +38,7 @@
   overflow-wrap: anywhere;
   color: var(--muted);
 }
-/* The message box grows to fill the dialog so the email reads like a page. */
+/* The message box starts tall, so the email reads like a page. */
 .inbox-start-body .composer-input {
-  min-block-size: 160px;
+  min-block-size: 220px;
 }

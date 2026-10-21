@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { AttachButton } from './AttachButton.jsx';
 import { ComposerFiles } from './ComposerFiles.jsx';
+import { useAutoGrow } from './useAutoGrow.js';
 import './composer.css';
 import './composer-files.css';
 
@@ -11,6 +12,8 @@ import './composer-files.css';
  */
 export function ComposerBox({ files, attachDisabled, meta, action, className = '', children }) {
   const bar = Boolean(files || meta || action);
+  const box = useRef(null);
+  useAutoGrow(box);
   // A click on the box's empty space puts the cursor in the text, as in mail and chat apps.
   const focusText = (event) => {
     if (event.target === event.currentTarget || event.target.dataset.composerSpace) {
@@ -18,7 +21,7 @@ export function ComposerBox({ files, attachDisabled, meta, action, className = '
     }
   };
   return (
-    <div className={('composer-box ' + className).trim()} onClick={focusText}>
+    <div ref={box} className={('composer-box ' + className).trim()} onClick={focusText}>
       {files && <ComposerFiles files={files} />}
       {children}
       {bar && (

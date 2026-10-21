@@ -82,7 +82,16 @@
 [dir='rtl'] .inbox-quoted[open] summary svg {
   transform: rotate(90deg);
 }
+/* Replies and notes start at about five lines; phones keep more of the thread in view. */
+.inbox-reply-form .composer-input,
+.inbox-note-form .composer-input {
+  min-block-size: 132px;
+}
 @media (max-width: 899px) {
+  .inbox-reply-form .composer-input,
+  .inbox-note-form .composer-input {
+    min-block-size: 96px;
+  }
   .inbox-quoted summary {
     min-block-size: 44px;
   }

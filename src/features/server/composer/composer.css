@@ -21,8 +21,11 @@
 .composer-box .composer-input {
   display: block;
   inline-size: 100%;
-  min-block-size: 44px;
-  max-block-size: 40vh;
+  /* About three lines to start (team chat); Inbox boxes start taller (owner, 2026-10-22).
+     useAutoGrow follows the text up to half the screen, then the field scrolls. */
+  min-block-size: 78px;
+  max-block-size: 50vh;
+  overflow-y: auto;
   margin: 0;
   padding: 6px 8px;
   border: 0;
@@ -32,7 +35,6 @@
   font: inherit;
   line-height: 1.5;
   resize: none;
-  field-sizing: content;
 }
 /* Beats the theme's field outline (system/motion.css) inside the box. */
 .composer-box .composer-input:focus-visible,
