@@ -78,9 +78,9 @@ export function PurchaseCalculator() {
         <h4>{t('calculators.costs')}</h4>
         {costs ? (
           <dl>
-            <CalcRow label={t('calculators.dld')} value={format.money(costs.dldFils)} />
-            <CalcRow label={t('calculators.agency')} value={format.money(costs.agencyFils)} />
-            <CalcRow label={t('calculators.vat')} value={format.money(costs.vatFils)} />
+            <CalcRow label={t('calculators.dldCost')} value={format.money(costs.dldFils)} />
+            <CalcRow label={t('calculators.agencyCost')} value={format.money(costs.agencyFils)} />
+            <CalcRow label={t('calculators.vatCost')} value={format.money(costs.vatFils)} />
             <CalcRow label={t('calculators.total')} value={format.money(costs.totalFils)} strong />
           </dl>
         ) : (

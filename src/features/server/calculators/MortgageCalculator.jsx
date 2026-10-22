@@ -99,9 +99,9 @@ export function MortgageCalculator() {
       <section
         className="calc-results"
         aria-live="polite"
-        aria-label={t('calculators.mortgageTitle')}
+        aria-label={t('calculators.repayment')}
       >
-        <h4>{t('calculators.mortgageTitle')}</h4>
+        <h4>{t('calculators.repayment')}</h4>
         {result ? (
           <dl>
             <CalcRow label={t('calculators.loan')} value={format.money(result.loanFils)} />

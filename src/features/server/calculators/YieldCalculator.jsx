@@ -76,8 +76,8 @@ export function YieldCalculator() {
         />
       </div>
       <p className="calc-note">{t('calculators.yieldNote')}</p>
-      <section className="calc-results" aria-live="polite" aria-label={t('calculators.yieldTitle')}>
-        <h4>{t('calculators.yieldTitle')}</h4>
+      <section className="calc-results" aria-live="polite" aria-label={t('calculators.returns')}>
+        <h4>{t('calculators.returns')}</h4>
         {summary ? (
           <dl>
             <CalcRow

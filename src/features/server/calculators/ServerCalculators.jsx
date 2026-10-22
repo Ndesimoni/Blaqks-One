@@ -6,17 +6,15 @@ import { PurchaseCalculator } from './PurchaseCalculator.jsx';
 import { YieldCalculator } from './YieldCalculator.jsx';
 import './calculators.css';
 
-/** Connected calculators (packet Q3): client-side estimates only; nothing is saved. */
+/**
+ * Connected calculators (packet Q3): client-side estimates only; nothing is saved. The shell
+ * already shows the page title, so the page opens with its note.
+ */
 export function ServerCalculators() {
   const { t } = useI18n();
   return (
     <div className="page-stack calculators-page">
-      <div className="subhead-row">
-        <div>
-          <h2>{t('calculators.title')}</h2>
-          <p>{t('calculators.intro')}</p>
-        </div>
-      </div>
+      <p className="calc-note">{t('calculators.intro')}</p>
       <PurchaseCalculator />
       <MortgageCalculator />
       <YieldCalculator />

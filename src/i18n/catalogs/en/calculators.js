@@ -1,6 +1,5 @@
 /** Calculators text in English (packet Q3); keys are referenced as `calculators.<key>`. */
 export default {
-  title: 'Calculators',
   intro: 'Estimate UAE costs before you commit. Every default can be edited.',
   purchaseTitle: 'Purchase costs',
   purchaseBody:
@@ -12,6 +11,9 @@ export default {
   vat: 'VAT on agency fee %',
   defaultsNote:
     'Defaults: DLD 4%, agency 2%, VAT 5%. Edit them to match the transaction; they are not legal advice.',
+  dldCost: 'DLD transfer fee',
+  agencyCost: 'Agency fee',
+  vatCost: 'VAT on agency fee',
   costs: 'Estimated costs',
   total: 'Total costs',
   prompt: 'Enter a property price to see the estimated costs.',
@@ -20,6 +22,7 @@ export default {
   downPayment: 'Down payment (AED)',
   rate: 'Annual interest rate %',
   term: 'Term (years)',
+  repayment: 'Estimated repayment',
   loan: 'Loan amount',
   monthly: 'Monthly payment',
   interest: 'Total interest',
@@ -36,6 +39,7 @@ export default {
   costsHint: 'Service charges, maintenance and other annual costs.',
   cashInvested: 'Cash invested (AED)',
   cashHint: 'Down payment plus purchase costs.',
+  returns: 'Estimated returns',
   grossYield: 'Gross yield',
   netYield: 'Net yield',
   netIncome: 'Annual net income',
