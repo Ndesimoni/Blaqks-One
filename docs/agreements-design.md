@@ -546,3 +546,70 @@ Build notes (for the security review before building):
   approver's approval on the same revision; the approver's verification is distinct from
   an Admin decision. The approver must hold the Approve right when chosen and when
   approving.
+
+### Security review amendments to H2 (2026-10-22)
+
+A separate security review approved §17 only with these changes, which override the
+build notes above where they differ.
+
+1. **Open requests.** "Open" means `pending` or `awaiting_approval`, in one shared SQL
+   predicate used by the edit freeze, `handOver`, holder moves, departure, deletion,
+   sample clearing, lists and a new unique index of open requests per deal.
+2. **Finance guard.** `pending` → accepted, declined, cancelled, approved or
+   `awaiting_approval`; `awaiting_approval` → approved or cancelled only. The share is
+   frozen once awaiting; `requires_approval` and `approver_id` are frozen identity, with
+   `approver_id` never the sender or receiver, `requires_approval = (approver_id IS NOT
+NULL)`, and approval only with an agreement. New `accepted_by` and `accepted_at`
+   record the receiver's acceptance without overwriting `decided_by`.
+3. **Agreement state while awaiting.** The receiver's `accepted` action is recorded and
+   the agreement stays `sent` (a sent → sent step); it becomes `accepted` only with the
+   approval, in the transaction that moves the deal. Test: no `sent` or `accepted`
+   agreement links to a closed hand-over whose deal did not move.
+4. **The approver's decision** is a new path, separate from the Admin's approval in place:
+   only while awaiting, by the chosen approver (a live staff member with the Approve right
+   in the same company) or the company's Admin, with the share unchanged; it writes no
+   revision.
+5. **Admin share changes** (an Admin revision) only while `pending` with no acceptance;
+   approval in place of the receiver stays Admin-only.
+6. **Evidence migration (agreements).** One `accepted` and one `approved` row per
+   revision; a new verification `approver_decision`; `approved` exactly when the
+   verification is `admin_decision` or `approver_decision`.
+7. **Evidence trigger.** `approver_decision` needs a same-company hand-over agreement, the
+   recipient's `accepted` row on that revision with the same digest, and an actor who is
+   neither participant; no `approved` row by the receiving member; no Admin revision after
+   an acceptance.
+8. **Wording.** The certificate and screens say "in place of the agent's acceptance" only
+   when no acceptance exists. Verification readers refuse unknown values.
+9. **Preview access.** An explicit view read by request and company, never locking.
+   Allowed: the receiver while pending or awaiting and still eligible; the approver while
+   awaiting and still holding Approve; the company's own Admin. Everyone else, including
+   the Super Admin and other team-view staff, and any unknown or decided request, gets the
+   same not-found.
+10. **Preview content.** Always the own-view money shape, never the stored details object
+    as a whole, and no client, property or contact IDs. Property facts come from a
+    records-module allowlist function; the terms from an agreements function that checks
+    the hand-over's two members.
+11. **Free text.** The blocker and next-action texts are left out (the next action's date
+    stays) unless the owner accepts that free text may show client details; the owner
+    confirms the same for the listing title and the partner name.
+12. **Hand-overs to the Admin.** Only to the company's own Admin (never the Super Admin),
+    with no referral and no approval step; the receiving Admin accepts or declines, never
+    "approves in place" of themselves.
+13. **Choosing the approver.** Checked live under lock: active, same company, staff with
+    Approve or the company's Admin, not the sender, the receiver or the deal's second
+    agent; checked again at approval. "Needs approval" is refused when the sender or
+    receiver is the Admin. The list of approvers shows names and IDs only.
+14. **While awaiting.** The receiver cannot withdraw their acceptance; the approver may
+    reject (cancelled; agreement withdrawn with the approver as actor, no party); the holder
+    and the Admin may cancel. A request whose approver became ineligible stays open for
+    the Admin.
+15. **Expiry.** One offer end for both steps, checked with `clock_timestamp()`; an expired
+    awaiting request can only be cancelled; the approver sees the deadline; badges ignore
+    expired requests.
+16. **Earning.** Earn, unearn and revise are refused while a hand-over is open.
+17. **`/finance/handovers/waiting`** returns the caller's counts only, with a live
+    finance-module check: `answer` (open pending requests to them) and `approve` (awaiting
+    requests where they are the approver with Approve, or every awaiting request of their
+    own company for the Admin). The Super Admin gets none.
+18. **`/agreements/waiting`** returns counts only: sent, unexpired, direct, between two
+    companies, addressed to the caller in the path's company; the Super Admin is refused.
