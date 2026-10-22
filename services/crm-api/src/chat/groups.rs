@@ -86,7 +86,8 @@ pub async fn create(
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;
-    let room = json!({"id": id, "kind": "group", "name": null, "title": title, "peerId": null,
+    let room = json!({"id": id, "kind": "group", "name": null, "title": title,
+        "createdBy": user.id, "peerId": null,
         "members": everyone, "unread": 0, "mentions": 0});
     Ok((StatusCode::CREATED, Json(json!({ "room": room }))))
 }

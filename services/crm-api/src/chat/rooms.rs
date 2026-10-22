@@ -20,6 +20,7 @@ struct Row {
     kind: String,
     name: Option<String>,
     title: Option<String>,
+    created_by: Uuid,
     peer: Option<Uuid>,
     /// A group's participants, the caller included; colleagues who left the company stay.
     members: Option<Vec<Uuid>>,
@@ -58,7 +59,7 @@ pub async fn list(
     let user = access::live(&mut tx, &workspace, session.user.id).await?;
     general(&mut tx, &workspace, user.id).await?;
     let rows: Vec<Row> = sqlx::query_as(&format!(
-        "SELECT r.id,r.kind,r.name,r.title, \
+        "SELECT r.id,r.kind,r.name,r.title,r.created_by, \
            (SELECT p.member_id FROM chat.crm_chat_participants p WHERE r.kind='direct' \
             AND p.room_id=r.id AND p.member_id<>$2 LIMIT 1) AS peer, \
            CASE WHEN r.kind='group' THEN ARRAY(SELECT p.member_id \
@@ -86,6 +87,7 @@ pub async fn list(
         .iter()
         .map(|row| {
             json!({"id": row.id, "kind": row.kind, "name": row.name, "title": row.title,
+                "createdBy": row.created_by,
                 "peerId": row.peer, "members": row.members,
                 "lastMessageAt": row.last_message_at, "unread": row.unread,
                 "mentions": row.mentions})

@@ -45,6 +45,7 @@ pub struct Room {
     pub id: Uuid,
     pub kind: String,
     pub name: Option<String>,
+    pub created_by: Uuid,
 }
 
 /// SQL condition that room `r` is visible to member `$2` in workspace `$1`.
@@ -61,7 +62,8 @@ pub async fn room(
 ) -> ApiResult<Room> {
     let id = Uuid::parse_str(id).map_err(|_| ApiError::missing())?;
     let sql = format!(
-        "SELECT r.id,r.kind,r.name FROM chat.crm_chat_rooms r WHERE r.id=$3 AND {VISIBLE} {}",
+        "SELECT r.id,r.kind,r.name,r.created_by FROM chat.crm_chat_rooms r \
+         WHERE r.id=$3 AND {VISIBLE} {}",
         if lock { "FOR UPDATE OF r" } else { "" }
     );
     sqlx::query_as(&sql)

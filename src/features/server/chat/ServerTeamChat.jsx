@@ -12,6 +12,7 @@ import './chat-message.css';
 import './chat-files.css';
 import './chat-mentions.css';
 import './chat-groups.css';
+import './chat-members.css';
 import './chat-phone.css';
 
 /**
@@ -62,6 +63,7 @@ export function ServerTeamChat() {
               user={user}
               onBack={() => open('')}
               onRead={() => chat.refresh()}
+              onAdd={(memberIds) => chat.addMembers(room.id, memberIds)}
               onLeave={async () => {
                 const failure = await chat.leave(room.id);
                 if (!failure) open('');

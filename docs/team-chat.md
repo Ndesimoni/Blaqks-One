@@ -1,7 +1,7 @@
 # Team chat
 
-Packets C1 (server) and C2 (screen), built 2026-10-21; C3 (groups and mentions), built
-2026-10-22. Colleagues in one company talk in team channels, private one-to-one
+Packets C1 (server) and C2 (screen), built 2026-10-21; C3 (groups, mentions and later
+membership), built 2026-10-22. Colleagues in one company talk in team channels, private one-to-one
 conversations and private groups. This is internal chat; client conversations stay in the
 [Inbox](messaging-design.md).
 
@@ -38,7 +38,10 @@ Defaults assumed from the owner's chat decisions above, for the owner to confirm
   company plus themselves, with an optional name of up to 60 characters (blank shows the
   members' names). Only its participants read or post: the Admin cannot open a group they
   are not in (not-found, like a guessed ID), and the Super Admin reads none. Members are
-  chosen at creation; there is no adding later. Any participant may leave (their messages
+  chosen at creation. The group creator, or a company Admin who is already a participant,
+  may later add live colleagues, up to 21 people total, after a clear warning that new
+  people receive the full history. Ordinary participants cannot add people. There is
+  no invitation acceptance. Any participant may leave (their messages
   keep their place; they lose the room, its read mark and their mentions in it). A
   colleague who leaves the company stays listed, shown as "Former team member", and loses
   the group at once. A member may start at most 20 groups an hour.
@@ -59,6 +62,25 @@ Defaults assumed from the owner's chat decisions above, for the owner to confirm
   participants use `crm_chat_participants` as direct conversations do, so the existing
   visibility rule covers groups unchanged.
 
+### Adding people: design and security review (2026-10-22)
+
+- The group creator and participating company Admins see a room-header action that opens a
+  focused, keyboard-contained dialog. Ordinary participants do not receive the action. It separates available
+  colleagues from current members, shows the server-derived 21-person capacity, and asks
+  for confirmation before expanding access. The confirmation explicitly states that new
+  people can read the full conversation history.
+- `POST /rooms/{id}/participants` authorizes the actor as the group creator or a company
+  Admin who is already a current participant before expanding access. A nonparticipant
+  Admin still receives the same 404 as any outsider. Under the company and room locks, it validates the
+  whole batch as live same-company non-Super-Admin colleagues and atomically enforces the
+  21-person limit. Invalid batches reveal no target-specific detail; hidden rooms stay 404.
+- A person who left may be re-added. Added members can page through all earlier messages
+  and files, but receive a join-time read mark so old history creates no unread badge or
+  historical mention notification. Future messages and mentions behave normally.
+- Successful add operations are limited to 20 per actor per hour in a chat-owned table.
+  Neither group metadata nor membership changes are copied into Team activity or logs
+  visible to nonparticipants.
+
 ## API
 
 All under `/api/crm/workspaces/{workspace}/chat`, with the session, and Origin and CSRF on
@@ -68,7 +90,8 @@ colleagues; `canCreateChannel`), `GET /summary` (`unread`, `mentions`), `POST /c
 /rooms/{id}/messages` (`?before=` for earlier pages; a sent message may carry
 `mentions`; every message lists its `mentions`), `PATCH|DELETE
 /rooms/{id}/messages/{message}` (`PATCH` may carry `mentions`), `POST /rooms/{id}/read`,
-`POST /rooms/{id}/leave` (groups only).
+`POST /rooms/{id}/leave` (groups only), `POST /rooms/{id}/participants` (`memberIds`, group
+creator or a company Admin who already participates).
 
 ## Decided for now, and later
 
@@ -76,6 +99,6 @@ colleagues; `canCreateChannel`), `GET /summary` (`unread`, `mentions`), `POST /c
   accepted as privacy-friendly); revisit if the owner wants an edit history.
 - Photos and files: up to 10 per message through [private file storage](media-storage.md)
   (F1, 2026-10-21); served only to members who may see the room.
-- Later packets: adding members to a group, email or push notifications for mentions,
-  WebSockets in place of polling, translation of messages, retention periods, and deal
+- Later packets: email or push notifications for mentions, WebSockets in place of polling,
+  translation of messages, retention periods, and deal
   rooms between companies with locked messages (product vision §3).

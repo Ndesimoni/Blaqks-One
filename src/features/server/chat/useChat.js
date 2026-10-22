@@ -49,6 +49,15 @@ export function useChat(api, workspaceId) {
     createChannel: (name) => start(() => api.createChannel(workspaceId, name)),
     openDirect: (memberId) => start(() => api.openDirect(workspaceId, memberId)),
     createGroup: (memberIds, name) => start(() => api.createGroup(workspaceId, memberIds, name)),
+    addMembers: async (roomId, memberIds) => {
+      try {
+        await api.addChatMembers(workspaceId, roomId, memberIds);
+        await load();
+        return '';
+      } catch (failure) {
+        return failure.message || 'error';
+      }
+    },
     /** Leaves a group; answers '' or the server's message. */
     leave: async (roomId) => {
       try {

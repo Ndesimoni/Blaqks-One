@@ -31,7 +31,9 @@
       "crm_chat_rooms_kind",
       "crm_chat_rooms_title",
       "crm_chat_mentions",
-      "crm_chat_mentions_member"
+      "crm_chat_mentions_member",
+      "crm_chat_group_adds",
+      "crm_chat_group_adds_actor"
     ],
     "inbox": [
       "crm_inbox_conversations",

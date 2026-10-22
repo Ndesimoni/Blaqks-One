@@ -26,7 +26,12 @@ test('a group is started, a colleague is mentioned and sees the mention', async 
   const stamp = Date.now();
   const invitedA = await invite(admin, `c3-browser-a-${stamp}`);
   const invitedB = await invite(admin, `c3-browser-b-${stamp}`);
-  const [first, second] = [await activate(invitedA), await activate(invitedB)];
+  const invitedC = await invite(admin, `c3-browser-c-${stamp}`);
+  const [first, second, third] = [
+    await activate(invitedA),
+    await activate(invitedB),
+    await activate(invitedC),
+  ];
   await signIn(page);
   await page.goto('/#/team-chat');
   await page.getByRole('button', { name: 'New group' }).click();
@@ -67,6 +72,22 @@ test('a group is started, a colleague is mentioned and sees the mention', async 
   await composer.press('Enter');
   await expect(thread.locator('.chat-mention')).toHaveCount(2);
   await expect(composer).toHaveValue('');
+  // A participant expands access only after confirming that the new member sees history.
+  await page.getByRole('button', { name: 'Add people' }).click();
+  const addDialog = page.getByRole('dialog', { name: 'Add people' });
+  await expect(addDialog.getByText('full conversation history')).toBeVisible();
+  await addDialog.getByLabel('Search colleagues').fill(third.user.name);
+  await addDialog.getByRole('checkbox', { name: third.user.name }).check();
+  await addDialog.getByRole('button', { name: 'Continue' }).click();
+  await expect(addDialog.getByRole('heading', { name: 'Add 1 person?' })).toBeVisible();
+  await addDialog.getByRole('button', { name: 'Add 1 person' }).click();
+  await expect(addDialog).toHaveCount(0);
+  await expect(page.getByText('only its 4 members can read it')).toBeVisible();
+  const newest = await memberPage(browser, invitedC.email);
+  await newest.page.getByRole('button', { name: /^Team chat/ }).click();
+  await newest.page.getByRole('button', { name: /Marina viewings/ }).click();
+  await expect(newest.page.getByText('Please call')).toBeVisible();
+  await newest.context.close();
   // The mentioned colleague sees @1 on the sidebar and on the group, then reads it.
   const other = await memberPage(browser, invitedA.email);
   const nav = other.page.getByRole('navigation', { name: 'CRM sections', exact: true });

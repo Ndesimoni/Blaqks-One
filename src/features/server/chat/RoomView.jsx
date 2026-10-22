@@ -12,7 +12,7 @@ import { useRoom } from './useRoom.js';
  * The open channel, group or private conversation: messages by day and the composer. In
  * channels and groups, `@` mentions the colleagues who can see the room (packet C3).
  */
-export function RoomView({ api, workspaceId, room, people, user, onBack, onRead, onLeave }) {
+export function RoomView({ api, workspaceId, room, people, user, onBack, onRead, onAdd, onLeave }) {
   const { t, format } = useI18n();
   const box = useRef(null);
   const view = useRoom(api, workspaceId, room.id, onRead);
@@ -41,7 +41,15 @@ export function RoomView({ api, workspaceId, room, people, user, onBack, onRead,
   let day = '';
   return (
     <>
-      <RoomHeader room={room} title={title} people={people} onBack={onBack} onLeave={onLeave} />
+      <RoomHeader
+        room={room}
+        title={title}
+        people={people}
+        user={user}
+        onBack={onBack}
+        onAdd={onAdd}
+        onLeave={onLeave}
+      />
       <div ref={box} className="chat-thread" tabIndex={0} aria-label={title} onScroll={onScroll}>
         {view.status === 'loading' && <p role="status">{t('chat.loading')}</p>}
         {view.status === 'error' && (

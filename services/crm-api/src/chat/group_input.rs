@@ -1,27 +1,40 @@
 //! The body of `POST /chat/groups` (packet C3): the chosen colleagues and an optional name.
+//! Adding people later (`participants.rs`) reads its colleague list the same way.
 use crate::error::{ApiError, ApiResult};
 use serde_json::Value;
+use std::ops::RangeInclusive;
 use uuid::Uuid;
 
 pub const MEMBERS: &str = "Choose 2–20 different colleagues in your company.";
 const TITLE: &str = "Use a group name of up to 60 characters.";
-/// 2–20 distinct colleague IDs, never the creator (who joins anyway).
-pub fn members(value: Option<&Value>, creator: Uuid) -> ApiResult<Vec<Uuid>> {
+
+/// Distinct colleague IDs, never the actor, as many as `count` allows; else `message`.
+pub fn colleagues(
+    value: Option<&Value>,
+    actor: Uuid,
+    count: RangeInclusive<usize>,
+    message: &'static str,
+) -> ApiResult<Vec<Uuid>> {
     let Some(Value::Array(items)) = value else {
-        return Err(ApiError::invalid(MEMBERS));
+        return Err(ApiError::invalid(message));
     };
     let ids: Vec<Uuid> = items
         .iter()
         .map(|item| item.as_str().and_then(|value| Uuid::parse_str(value).ok()))
         .collect::<Option<Vec<Uuid>>>()
-        .filter(|ids| (2..=20).contains(&ids.len()) && !ids.contains(&creator))
-        .ok_or(ApiError::invalid(MEMBERS))?;
+        .filter(|ids| count.contains(&ids.len()) && !ids.contains(&actor))
+        .ok_or(ApiError::invalid(message))?;
     let mut unique = ids.clone();
     unique.sort();
     unique.dedup();
     (unique.len() == ids.len())
         .then_some(ids)
-        .ok_or(ApiError::invalid(MEMBERS))
+        .ok_or(ApiError::invalid(message))
+}
+
+/// 2–20 distinct colleague IDs, never the creator (who joins anyway).
+pub fn members(value: Option<&Value>, creator: Uuid) -> ApiResult<Vec<Uuid>> {
+    colleagues(value, creator, 2..=20, MEMBERS)
 }
 
 /// Zero-width and text-direction marks that could disguise a name (C3 review L1).
@@ -52,9 +65,19 @@ pub fn title(value: Option<&Value>) -> ApiResult<Option<String>> {
 
 #[cfg(test)]
 mod tests {
-    use super::{members, title};
+    use super::{colleagues, members, title};
     use serde_json::json;
     use uuid::Uuid;
+
+    #[test]
+    fn added_colleagues_are_distinct_and_never_the_actor() {
+        let (actor, person) = (Uuid::new_v4(), Uuid::new_v4());
+        let add = |value| colleagues(Some(&value), actor, 1..=20, "x");
+        assert_eq!(add(json!([person])).unwrap(), vec![person]);
+        assert!(add(json!([])).is_err());
+        assert!(add(json!([person, person])).is_err());
+        assert!(add(json!([actor])).is_err());
+    }
 
     #[test]
     fn groups_have_two_to_twenty_distinct_colleagues_and_a_plain_name() {

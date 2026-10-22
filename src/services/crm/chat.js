@@ -20,6 +20,8 @@ export function chatRoutes({ request, scope }) {
         body: name ? { memberIds, name } : { memberIds },
       }),
     leaveChat: (workspace, id) => request(`${room(workspace, id)}/leave`, { method: 'POST' }),
+    addChatMembers: (workspace, id, memberIds) =>
+      request(`${room(workspace, id)}/participants`, { method: 'POST', body: { memberIds } }),
     chatMessages: (workspace, id, before, signal) =>
       request(
         `${room(workspace, id)}/messages${before ? `?before=${encodeURIComponent(before)}` : ''}`,

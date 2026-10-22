@@ -3,6 +3,7 @@
 export const messagingTestFiles = [
   'tests/api/chat.test.mjs',
   'tests/api/chat-groups.test.mjs',
+  'tests/api/chat-group-members.test.mjs',
   'tests/api/chat-mentions.test.mjs',
   'tests/api/media.test.mjs',
   'tests/api/property-media.test.mjs',

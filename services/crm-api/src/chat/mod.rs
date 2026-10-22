@@ -11,6 +11,7 @@ mod groups;
 mod leave;
 mod mentions;
 mod messages;
+mod participants;
 mod read;
 mod rooms;
 pub mod routes;

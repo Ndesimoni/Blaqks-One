@@ -28,6 +28,12 @@ export const markRead = (session, room) =>
 export const leave = (session, room) =>
   session.request(chatPath(session, `/rooms/${room}/leave`), { method: 'POST' });
 
+export const addMembers = (session, room, memberIds) =>
+  session.request(chatPath(session, `/rooms/${room}/participants`), {
+    method: 'POST',
+    body: { memberIds },
+  });
+
 export const startGroup = (session, memberIds, name) =>
   session.request(chatPath(session, '/groups'), {
     method: 'POST',
