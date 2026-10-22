@@ -1,4 +1,5 @@
 import React, { useId, useState } from 'react';
+import { useI18n } from '../../../i18n/useI18n.js';
 import { parsePercent } from '../../../lib/finance/money.js';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText, FinanceDialog } from './FinanceDialog.jsx';
@@ -8,10 +9,12 @@ import { HandoverShareFields } from './HandoverShareFields.jsx';
 /**
  * The holder offers their deal to a teammate (finance-design §13 H-F1): fully, or keeping a
  * referral share that becomes a second-agent line from the receiver's share. Nothing moves
- * until the receiver accepts; the team's referral limit is checked by the server.
+ * until the receiver accepts; the team's referral limit is checked by the server. Only
+ * staff with Finance can receive a deal; offers to other companies are made in Agreements.
  */
 export function DealHandoverDialog({ deal, onClose, onDone }) {
   const { actions, assignees, user, team, overview } = useFinanceContext();
+  const { t } = useI18n();
   const id = useId();
   const [toId, setToId] = useState('');
   const [mode, setMode] = useState('full');
@@ -74,6 +77,12 @@ export function DealHandoverDialog({ deal, onClose, onDone }) {
             </option>
           ))}
         </select>
+        {!assignees.loading && !assignees.error && !people.length && (
+          <p className="field-error" role="alert">
+            {t('handoverOffer.noTeammates')}
+          </p>
+        )}
+        <small className="finance-hint">{t('handoverOffer.otherCompany')}</small>
       </div>
       <HandoverShareFields
         id={id}
