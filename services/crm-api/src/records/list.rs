@@ -1,6 +1,6 @@
 use super::{
     collections::COLLECTIONS,
-    deal_links,
+    deal_links, keeps,
     mutation::Entry,
     projections,
     visibility::{predicate, RecordScope},
@@ -68,6 +68,9 @@ pub async fn list(
     let mut projected = projections::build(&mut transaction, &workspace, &user, &rows).await?;
     projected["dealLinks"] =
         deal_links::projection(&mut transaction, &workspace, &user, &rows).await?;
+    // Handed-over rows the caller still reads, outside the projections (agreements §18).
+    let tx = &mut transaction;
+    let (kept, badges) = keeps::listed(tx, &workspace, &user, &granted, scope.caller()).await?;
     transaction.commit().await?;
     let mut records = json!({});
     for collection in COLLECTIONS {
@@ -75,12 +78,18 @@ pub async fn list(
             .iter()
             .filter(|row| row.collection == collection.name)
             .map(|row| &row.entry)
+            .chain(
+                kept.iter()
+                    .filter(|row| row.collection == collection.name)
+                    .map(|row| &row.entry),
+            )
             .collect();
         records[collection.name] = json!(entries);
     }
     let mut body = projected;
     body["scope"] = json!(if scope.is_team() { "team" } else { "assigned" });
     body["records"] = records;
+    body["kept"] = badges;
     Ok(Json(body))
 }
 

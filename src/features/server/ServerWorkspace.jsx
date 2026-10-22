@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   RecordsContext,
   NavigationContext,
@@ -14,6 +14,7 @@ import { useServerRecordActions } from './useServerRecordActions.js';
 import { ServerShell } from './ServerShell.jsx';
 import { DealLinkField } from './dealLinks/DealLinkField.jsx';
 import { ServerMediaProvider } from './media/ServerMediaProvider.jsx';
+import { withKept } from './keptRecords.js';
 
 /** Connected pickers for link fields whose targets are not workspace records. */
 const linkFields = Object.freeze({ 'Deal ID': DealLinkField });
@@ -24,6 +25,12 @@ export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
   const view = useWorkspaceViewState(navigation.route, navigation.initialQuery);
   const records = { ...useServerRecords(api, owner.id), linkFields };
   const readOnly = owner.status === 'archived';
+  // Kept listings show their photos too (agreements design §18).
+  const { entries, keptEntries } = records;
+  const mediaEntries = useMemo(
+    () => withKept(entries, keptEntries, ['Properties']),
+    [entries, keptEntries],
+  );
   const actions = useServerRecordActions({
     api,
     workspaceId: owner.id,
@@ -38,7 +45,7 @@ export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
         <NavigationContext.Provider value={navigation}>
           <ViewContext.Provider value={view}>
             <ActionsContext.Provider value={actions}>
-              <ServerMediaProvider api={api} workspaceId={owner.id} entries={records.entries}>
+              <ServerMediaProvider api={api} workspaceId={owner.id} entries={mediaEntries}>
                 <ServerShell owner={owner} workspaces={workspaces} />
               </ServerMediaProvider>
             </ActionsContext.Provider>

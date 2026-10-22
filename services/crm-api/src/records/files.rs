@@ -1,7 +1,7 @@
 //! `GET /records/{collection}/{id}/files/{file}`: a record's stored photo or floor plan
 //! (packet F2), only for members who may see that record (collection grant and record
 //! scope); hidden, foreign and malformed IDs are all not-found.
-use super::{lookup, media_links::KIND};
+use super::{keeps, lookup, media_links::KIND};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -26,10 +26,11 @@ pub async fn file(
     let (id, file) = (parse(&id)?, parse(&file)?);
     let mut tx = state.pool.begin().await?;
     let user = workspaces::member(&mut tx, &workspace, session.user.id).await?;
-    if lookup::visible(&mut tx, &workspace, &user, &collection, &[id])
+    let visible = !lookup::visible(&mut tx, &workspace, &user, &collection, &[id])
         .await?
-        .is_empty()
-    {
+        .is_empty();
+    // A handed-over client or listing the caller keeps reading (agreements design §18).
+    if !visible && !keeps::readable(&mut tx, &workspace, &user, &collection, id).await? {
         return Err(ApiError::missing());
     }
     let response = serve::file(&state, &mut tx, &workspace, KIND, id, file).await?;

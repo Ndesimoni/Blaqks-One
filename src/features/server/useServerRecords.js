@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { readServerRecords, serverWorkspaceData } from './records.js';
 import { emptyProjections, linkedDeal, linkReference } from './projections.js';
+import { keptBadge } from './keptRecords.js';
 
 /**
  * Connected records context: visible entries plus the read-only projections (`scope`,
@@ -53,6 +54,12 @@ export function useServerRecords(api, workspaceId) {
     (logId, value) => linkedDeal(projections, logId, value),
     [projections],
   );
+  /** The view-only badge of a handed-over record the caller still reads (agreements §18). */
+  const keptFor = useCallback(
+    (collection, record) =>
+      keptBadge(projections.keptEntries, projections.kept, collection, record),
+    [entries, projections],
+  );
   return {
     entries,
     setEntries,
@@ -60,6 +67,7 @@ export function useServerRecords(api, workspaceId) {
     ...projections,
     referenceFor,
     dealLinkFor,
+    keptFor,
     install,
     refresh,
     loading,

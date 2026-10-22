@@ -15,15 +15,20 @@ import {
   stored,
 } from './agreements-handover-helpers.mjs';
 
-let teams, client;
+let teams;
 before(async () => {
   teams = await dealTeams('agr-hand', { maxReferralShareBp: 2500 });
-  client = await heldClient(teams.agent);
 });
 
 test('an offer becomes a sent in-company agreement with server-built terms', async () => {
   const { admin, agent, second, desk, viewer, other } = teams;
-  const handover = await offer(admin, agent, await createDeal(agent, client), second, 2000);
+  const handover = await offer(
+    admin,
+    agent,
+    await createDeal(agent, await heldClient(agent)),
+    second,
+    2000,
+  );
   assert.match(handover.agreementId, /^[0-9a-f-]{36}$/);
   const shown = await read(second, admin, handover);
   assert.equal(shown.status, 200, JSON.stringify(shown.value));
@@ -61,7 +66,12 @@ test('an offer becomes a sent in-company agreement with server-built terms', asy
 
 test('the agreement routes refuse hand-overs; only Deals moves them', async () => {
   const { admin, agent, second } = teams;
-  const handover = await offer(admin, agent, await createDeal(agent, client), second);
+  const handover = await offer(
+    admin,
+    agent,
+    await createDeal(agent, await heldClient(agent)),
+    second,
+  );
   const id = handover.agreementId;
   for (const [who, name, extra] of [
     [second, 'accept'],
@@ -83,7 +93,13 @@ test('the agreement routes refuse hand-overs; only Deals moves them', async () =
 
 test('the receiver accepts exactly the version they were shown', async () => {
   const { admin, agent, second } = teams;
-  const handover = await offer(admin, agent, await createDeal(agent, client), second, 1500);
+  const handover = await offer(
+    admin,
+    agent,
+    await createDeal(agent, await heldClient(agent)),
+    second,
+    1500,
+  );
   refused(await decide(second, admin, handover, 'accept'), 400, RELOAD, 'invalid_request');
   const stale = await decide(second, admin, handover, 'accept', { agreementVersion: 1 });
   assert.equal(stale.status, 409, JSON.stringify(stale.value));
@@ -98,7 +114,7 @@ test('the receiver accepts exactly the version they were shown', async () => {
 
 test('an Admin approval is recorded as itself, with any new share as an Admin revision', async () => {
   const { admin, agent, second } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   const handover = await offer(admin, agent, deal, second, 2000);
   const approve = (body) => decide(admin, admin, handover, 'approve', body);
   const asFull = { referralShareBp: null, reason: 'Synthetic', agreementVersion: 2 };
@@ -117,7 +133,8 @@ test('an Admin approval is recorded as itself, with any new share as an Admin re
 
 test('declines and cancels close the agreement with the right party', async () => {
   const { admin, agent, second } = teams;
-  const offerAgain = async () => offer(admin, agent, await createDeal(agent, client), second);
+  const offerAgain = async () =>
+    offer(admin, agent, await createDeal(agent, await heldClient(agent)), second);
   const [declined, cancelled, adminDeclined] = [
     await offerAgain(),
     await offerAgain(),

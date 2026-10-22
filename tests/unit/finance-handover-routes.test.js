@@ -79,6 +79,8 @@ test('open hand-overs read their approval, and approver decisions follow allowed
   ]);
 });
 
+const FILE = '0b6f2f3e-6a1c-4e57-9c1a-2f8d3c4b5a69';
+
 test('the preview keeps only the listed fields', () => {
   const deal = {
     ...{ dealType: 'Sale', stage: 'Offer', earned: false, agreedValueFils: 100_000 },
@@ -92,8 +94,14 @@ test('the preview keeps only the listed fields', () => {
     offer: { agreementVersion: 2, expiresAt: null, expired: false, kind: 'full', feeFils: 2000 },
     deal,
     client: { name: 'Mariam K.', email: 'hidden@example.test' },
-    property: { emirate: 'Dubai', bedrooms: 2, ownerPhone: '+971' },
+    property: {
+      ...{ emirate: 'Dubai', bedrooms: 2, ownerPhone: '+971', description: 'Sea view' },
+      photos: [{ name: 'front.jpg', file: FILE, thumb: null, owner: '+971' }],
+    },
   });
+  assert.deepEqual(preview.property.photos, [{ name: 'front.jpg', file: FILE, thumb: null }]);
+  assert.deepEqual(preview.property.floorPlans, []);
+  assert.equal(preview.property.description, 'Sea view');
   assert.equal(preview.offer.agreementVersion, 2);
   assert.equal(preview.property.bedrooms, '2');
   assert.equal(preview.property.community, null);

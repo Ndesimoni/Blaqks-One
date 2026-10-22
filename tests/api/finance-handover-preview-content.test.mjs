@@ -11,6 +11,14 @@ before(async () => {
   teams = await reviewTeams('h2-show');
 });
 
+const LISTING = [
+  ...['listingTitle', 'saleRental', 'emirate', 'community', 'building', 'unitReference'],
+  ...['propertyType', 'bedrooms', 'bathrooms', 'sizeSqft', 'priceAed', 'priceBasis'],
+  ...['listingStatus', 'readyOffPlan', 'furnishing', 'availableFrom', 'rentalCheques'],
+  ...['depositAed', 'minimumStayNights', 'maximumGuests', 'parkingSpaces', 'amenities'],
+  ...['description', 'keySellingPoints', 'address', 'mapLink', 'listingUrl'],
+  ...['virtualTourUrl', 'floorPlanUrl'],
+];
 const KEYS = {
   top: ['client', 'deal', 'handover', 'offer', 'property'],
   offer: ['agreementVersion', 'expired', 'expiresAt', 'feeFils', 'kind', 'referralShareBp'],
@@ -20,10 +28,8 @@ const KEYS = {
     ...['partnerName', 'partnerShareBp', 'receivedFils', 'receiverEarnsFils', 'stage'],
     'targetCloseDate',
   ].sort(),
-  property: [
-    ...['bathrooms', 'bedrooms', 'building', 'community', 'emirate', 'furnishing'],
-    ...['listingTitle', 'priceAed', 'propertyType', 'readyOffPlan', 'saleRental', 'sizeSqft'],
-  ].sort(),
+  // H3 (§18): every listing detail except the owner contact, plus stored photos and plans.
+  property: [...LISTING, 'photos', 'floorPlans'].sort(),
 };
 
 async function shown(session, handover) {
@@ -61,6 +67,8 @@ test('the preview shows the offer, the deal and the property facts, and nothing 
   });
   assert.deepEqual(body.client, { name: 'Synthetic Z.' });
   assert.deepEqual(body.property, {
+    ...Object.fromEntries(LISTING.map((key) => [key, null])),
+    ...{ photos: [], floorPlans: [], unitReference: 'ZQX-UNIT-9' },
     ...{ listingTitle: 'Synthetic Marina View', saleRental: 'Sale', emirate: 'Dubai' },
     ...{ community: 'Dubai Marina', building: 'Synthetic Tower', propertyType: 'Apartment' },
     ...{ bedrooms: '2', bathrooms: '3', sizeSqft: '1250', priceAed: '2450000' },
@@ -69,7 +77,7 @@ test('the preview shows the offer, the deal and the property facts, and nothing 
   const text = JSON.stringify(body);
   const hidden = [
     ...[client.id, client.record.client_id, property.id, property.record.property_id],
-    ...[contact.id, contact.record.contact_id, 'Zqxbuyer', 'Zqxowner', 'ZQX-UNIT-9'],
+    ...[contact.id, contact.record.contact_id, 'Zqxbuyer', 'Zqxowner'],
     ...['zqx.buyer@example.test', '+971500000302', 'zqx.owner@example.test', '+971500000301'],
     ...['Zqx client private note', 'Zqx property private note', ...Object.values(SECRET)],
   ];

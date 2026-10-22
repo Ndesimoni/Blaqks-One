@@ -32,6 +32,7 @@ import enInboxRules from './en/inboxRules.js';
 import enInboxSaved from './en/inboxSaved.js';
 import enHandoverOffer from './en/handoverOffer.js';
 import enHandoverRequests from './en/handoverRequests.js';
+import enRecordKeeps from './en/recordKeeps.js';
 import enHandoverReview from './en/handoverReview.js';
 import enInboxSend from './en/inboxSend.js';
 import enInboxTriage from './en/inboxTriage.js';
@@ -59,6 +60,7 @@ export const catalogs = Object.freeze({
     handoverOffer: enHandoverOffer,
     handoverRequests: enHandoverRequests,
     handoverReview: enHandoverReview,
+    recordKeeps: enRecordKeeps,
     inboxSend: enInboxSend,
     inboxTriage: enInboxTriage,
     mailbox: enMailbox,

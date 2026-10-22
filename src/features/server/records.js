@@ -5,6 +5,7 @@ import {
   readReferences,
   readTaskClients,
 } from './projections.js';
+import { readKept } from './keptRecords.js';
 
 export const connectedCollections = [
   'Clients',
@@ -54,9 +55,15 @@ export function readServerEntry(collection, row) {
   return { id: row.id, version: row.version, record, assignee };
 }
 
-/** Parses the scoped list response: visible entries plus read-only projections. */
+/**
+ * Parses the scoped list response: visible entries plus read-only projections. Handed-over
+ * rows the caller only keeps (agreements design §18) go to `keptEntries`, so counts,
+ * pickers and recipients never treat them as the caller's own.
+ */
 export function readServerRecords(payload) {
   const entries = {};
+  const keptEntries = {};
+  const kept = readKept(payload?.kept);
   for (const collection of connectedCollections) {
     const rows = payload?.records?.[collection];
     if (!Array.isArray(rows)) throw incomplete();
@@ -68,6 +75,8 @@ export function readServerRecords(payload) {
       keys.add(entry.record[identifier]);
       return entry;
     });
+    keptEntries[collection] = entries[collection].filter((entry) => kept[entry.id]);
+    entries[collection] = entries[collection].filter((entry) => !kept[entry.id]);
   }
   for (const key of ['scope', 'references', 'taskClients', 'listingViewings', 'dealLinks'])
     if (payload[key] === undefined) throw incomplete();
@@ -79,6 +88,8 @@ export function readServerRecords(payload) {
     taskClients: readTaskClients(payload.taskClients),
     listingViewings: readListingViewings(payload.listingViewings),
     dealLinks: readDealLinks(payload.dealLinks),
+    kept,
+    keptEntries,
   };
 }
 

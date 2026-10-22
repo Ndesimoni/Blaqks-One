@@ -8,10 +8,9 @@ import { offerTo, offered, requestsFor, reviewTeams } from './finance-handover-h
 import { shownVersion, status, withoutApprove } from './finance-handover-helpers.mjs';
 
 // Choosing the approver and what an open request freezes (H2 amendments 1, 13, 14, 16).
-let teams, client;
+let teams;
 before(async () => {
   teams = await reviewTeams('h2-rule');
-  client = await heldClient(teams.agent);
 });
 
 /** A refused offer creates no request (400 or 409, never a server error). */
@@ -29,9 +28,10 @@ async function current(deal) {
   return deals.find((row) => row.id === deal.id);
 }
 
+// Each deal gets its own client: an accepted hand-over moves the client (§18).
 test('the approver holds Approve in this company and is neither the sender nor the receiver', async () => {
   const { admin, agent, second, approver, backup, viewer, third, other, owner } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   const to = second.user.id;
   await refusedOffer(agent, deal, to, viewer.user.id, 'team view without Approve');
   await refusedOffer(agent, deal, to, third.user.id, 'own-view staff');
@@ -59,6 +59,7 @@ test('the approver holds Approve in this company and is neither the sender nor t
 
 test('one open request per deal; the deal cannot be edited or earned while it is open', async () => {
   const { admin, agent, second, third, approver } = teams;
+  const client = await heldClient(agent);
   const deal = await createDeal(agent, client);
   const handover = await offered(admin, agent, deal, second, { approver });
   assert.equal((await accept(second, admin, handover)).status, 200);
@@ -79,7 +80,7 @@ test('one open request per deal; the deal cannot be edited or earned while it is
   assert.notEqual(earn.value.message, M.stale);
   live = await current(deal);
   assert.equal(live.earnedOn, null, 'not earned while the request is open (amendment 16)');
-  const earned = await earnDeal(admin, await createDeal(agent, client));
+  const earned = await earnDeal(admin, await createDeal(agent, await heldClient(agent)));
   await offered(admin, agent, earned, second);
   live = await current(earned);
   const body = { version: live.version, reason: 'Synthetic' };
@@ -93,7 +94,7 @@ test('one open request per deal; the deal cannot be edited or earned while it is
 
 test('an approver who loses Approve is skipped; the Admin still approves', async () => {
   const { admin, agent, second, backup } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   const handover = await offered(admin, agent, deal, second, { approver: backup });
   assert.equal((await accept(second, admin, handover)).status, 200);
   const version = await shownVersion(backup, admin, handover);

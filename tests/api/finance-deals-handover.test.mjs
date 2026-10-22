@@ -102,7 +102,8 @@ test('accepting moves the deal and keeps a referral taken from the receiver (H-F
 
 test('requesters cancel; the Admin approves or adjusts a referral with a reason', async () => {
   const { agent, second, admin, approver } = teams;
-  const other = await createDeal(agent, client);
+  // A fresh client: the earlier accepted hand-over moved the first one (§18).
+  const other = await createDeal(agent, await heldClient(agent));
   const first = await offer(agent, other, second.user.id, 2000);
   const cancelled = await decide(agent, first.value.handover.id, 'cancel');
   assert.equal(cancelled.value.handover.status, 'cancelled');

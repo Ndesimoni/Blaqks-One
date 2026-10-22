@@ -11,6 +11,7 @@ mod draft_input;
 pub mod draft_sent;
 pub mod drafts;
 pub mod events;
+pub mod handover;
 pub mod intake;
 mod intake_company;
 pub mod intake_email;

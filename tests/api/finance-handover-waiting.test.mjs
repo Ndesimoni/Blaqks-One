@@ -13,19 +13,19 @@ import {
 } from './finance-handover-helpers.mjs';
 
 // The sidebar's waiting counts (agreements design §17 item 2, H2 amendments 15, 17, 18).
-let teams, client;
+let teams;
 before(async () => {
   teams = await reviewTeams('h2-wait');
-  client = await heldClient(teams.agent);
 });
 
 const zero = { answer: 0, approve: 0 };
 const counted = (...sessions) => Promise.all(sessions.map((s) => counts(s, teams.admin)));
 const fresh = (to, options) =>
-  createDeal(teams.agent, client).then((deal) =>
-    offered(teams.admin, teams.agent, deal, to, options),
-  );
+  heldClient(teams.agent)
+    .then((client) => createDeal(teams.agent, client))
+    .then((deal) => offered(teams.admin, teams.agent, deal, to, options));
 
+// Each deal gets its own client: an accepted hand-over moves the client (§18).
 test('hand-over counts follow each step for the receiver, the approver and the Admin', async () => {
   const { admin, agent, second, approver, viewer, desk, owner } = teams;
   assert.deepEqual(await counted(second, approver, admin, agent), [zero, zero, zero, zero]);

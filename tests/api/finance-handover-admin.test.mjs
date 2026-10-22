@@ -9,15 +9,15 @@ import { reviewTeams, status } from './finance-handover-helpers.mjs';
 
 // Hand-overs to the company's own Admin (agreements design §17 item 3, H2 amendment 12) and
 // the list of approvers the sender chooses from (H2 API contract).
-let teams, client;
+let teams;
 before(async () => {
   teams = await reviewTeams('h2-boss');
-  client = await heldClient(teams.agent);
 });
 
+// Each deal gets its own client: an accepted hand-over moves the client (§18).
 test('staff hand a deal fully to their Admin, who reviews and accepts it like an agent', async () => {
   const { admin, agent } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   const handover = await offered(admin, agent, deal, admin);
   assert.deepEqual([handover.status, handover.toAdmin, handover.approval], ['pending', true, null]);
   assert.equal(handover.to.id, admin.user.id);
@@ -46,7 +46,7 @@ test('staff hand a deal fully to their Admin, who reviews and accepts it like an
 
 test('a hand-over to the Admin is full and without approval, and never to the Super Admin', async () => {
   const { admin, agent, approver, owner, other } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   for (const [toId, share, extra, label] of [
     [admin.user.id, 1000, {}, 'a referral to the Admin'],
     [admin.user.id, null, { approverId: approver.user.id }, 'an approval step to the Admin'],

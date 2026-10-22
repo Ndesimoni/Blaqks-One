@@ -707,3 +707,121 @@ furnishing}` (text or `null`).
   finance module get the module's 403 from the preview, which reveals nothing about the
   request. Not built: the Agreements list rows still show the usual turn text while an
   acceptance waits (the detail says "Accepted, waiting for approval").
+
+## 18. H3 design: the client and property go with the deal (2026-10-22)
+
+Owner decisions (2026-10-22), after trying H2: the receiving agent had no way to contact
+the client, because a hand-over moved only the deal.
+
+1. **Contact after accepting.** The client's phone and email are not in the review; the
+   receiver gets them the moment the deal moves to them (acceptance, or the approval when
+   one is needed). The review says so.
+2. **The client and the property move with the deal**, and the sender **keeps seeing
+   them, read-only, with a badge**: "Handed over to {name} on {date} · deal {dealId} ·
+   full hand-over" (or "· referral {share}").
+3. **All listing details in the review**, except the property owner's name and phone.
+
+Proposed build (for the security review):
+
+- **When.** In the transaction that moves the deal (`holder::apply` from an acceptance,
+  an Admin approval in place or an approved acceptance), finance calls one records
+  function. Declines, cancellations, rejections and Admin reassignments move nothing.
+- **What moves.** The deal's client and its property, each only when the sender holds it
+  and the receiver may hold that record type (the assignments eligibility check); otherwise
+  it stays where it is and the decision response says so. The move uses the assignments
+  history writer (`crm_assignments` reason `handover`, actor the decider, activity
+  `assigned`). The client's follow-ups, viewings and other children follow the client
+  under the existing rules; the property owner's contact follows the property.
+- **What the sender keeps.** A new records-owned table `crm_record_keeps` (workspace,
+  record, member, handed-to member, deal reference, kind, referral share, created at; one
+  row per record and member). The keeping member reads the record in lists, the record
+  view and its photos and floor plans, marked `kept` with the badge facts and with no edit,
+  delete, assign or link actions. Writes, record pickers, message recipients, assignment,
+  finance links and the Inbox keep the strict rule. A keep ends when the member leaves the
+  company or the record is deleted, and is not created when the sender is the Admin.
+- **Review content.** The preview's `property` adds the unit reference, address, map link,
+  availability, listing status, cheques, deposit, price basis, minimum stay, maximum
+  guests, parking, amenities, description, key selling points, listing, tour, floor plan
+  and photos links, and the stored photos and floor plans through
+  `GET /finance/handovers/{id}/preview/files/{file}` (same access as the preview, only
+  files the property names). Left out: the owner contact, notes, permit and authorisation
+  fields and internal checks.
+- **Not changed.** No backfill for hand-overs accepted before H3; the deal itself follows
+  the finance rules (a referral sender still sees it as second agent).
+
+### Security review amendments to H3 (2026-10-22)
+
+The specialist reviewer stopped at its usage limit, so the primary agent reviewed §18 as a
+separate step; a specialist code review follows when one is available. These override the
+proposed build where they differ.
+
+1. **Lock order.** Workspace lock, request, deal, members, agreement, then the client and
+   property rows `FOR UPDATE`; each move bumps the record's version, so a concurrent edit
+   gets the usual stale-version answer.
+2. **Move only what the sender holds.** A record moves only when the sender holds it and
+   the receiver passes the assignments eligibility check for its type; anything else stays
+   and the decision response reports `records: {client, property}` as `moved`, `shared` or
+   `unchanged`. The hand-over is never refused for this.
+3. **A listing used elsewhere stays** (owner, 2026-10-22). When another deal that is not
+   lost, cancelled or earned uses the same property, the property stays with the sender and
+   the receiver gets a read-only keep of it (`shared`).
+4. **Keeps are strictly two records.** A keep covers the client or property row only:
+   never its follow-ups, viewings, interaction log, client care, shortlist or the owner's
+   contact. No keep is written for an Admin, who sees every record anyway.
+5. **Read paths.** Kept rows appear only in the record list (outside the projections and
+   deal links, so no linked names leak) and in the record's photos and floor plans, each
+   only while the keeper holds the collection grant and does not see the row already.
+   Writes, deletes, assignment, record pickers, link checks, message recipients, the
+   Inbox, finance links and activity keep the strict rule, so every write on a kept record
+   is the usual not-found. Exports leave kept records out.
+6. **Lifecycle.** A member's keeps are removed in the departure transaction; a record's
+   keeps go with the record (`ON DELETE CASCADE`).
+7. **Table** `crm_record_keeps`, owned by records: workspace, record, member, other member
+   (the receiver for `handed_over`, the holder for `shared`), reason, deal reference (text,
+   no foreign key), kind and referral share, created at; one keep per record and member;
+   checks on reason, kind and share. The move itself is orchestrated by the assignments
+   module through the records history writer and its eligibility check.
+8. **Review content.** Viewing instructions (often the owner's phone or access codes) and
+   the photos-and-documents link (often title deeds) stay out with the owner contact,
+   notes, permits, authorisation and internal checks. Photos and floor plans are served only
+   when the open request's property names the file and the caller may preview it.
+
+Owner answers (2026-10-22): a listing used in other open deals stays with the sender and
+the receiver gets a read-only view; the deal itself follows the finance rules (the sender
+sees the hand-over on Agreements), and taking a deal back stays a new hand-over or an Admin
+reassignment.
+
+### H3 as built (2026-10-22)
+
+- **Migration 0061 (records).** `crm_record_keeps`: one read-only keep per record and
+  member, `handed_over` or `shared`, with the other member, the deal reference, the kind and
+  the referral share for the badge; removed with the record and when the member leaves.
+- **Moving.** `finance/deals/handover_follow.rs` says whether another live deal uses the
+  property and calls `assignments/follow.rs`, which locks the client and property rows and
+  moves each the sender holds to an eligible receiver through the assignments history
+  writer (`handover`), keeping it for the sender; a listing in use stays and is shared with
+  the receiver. `inbox/handover.rs` moves the client's conversations the sender holds, with
+  redacted `assigned` events, so the receiver texts the client and gets the replies. The
+  decision response reports `records: {client, property}`.
+- **Reading.** `records/keeps.rs` adds kept rows to the record list (outside projections
+  and deal links) with `kept` badges, and lets `records/files.rs` serve their photos and
+  floor plans. Every write keeps the strict visibility rule, so editing a kept record is
+  the usual not-found.
+- **Review.** `records/handover_listing.rs` allowlists 29 listing fields plus the stored
+  photos and floor plans; `GET /finance/handovers/{id}/preview/files/{file}`
+  (`handover_preview_files.rs`) serves a file only when the open request's listing names
+  it and the caller may review the hand-over.
+- **Screens.** The review shows all listing details, the photos and floor plans, and says
+  the phone and email come on acceptance (`HandoverListing.jsx`). Kept records are split
+  from the caller's own on the client (`keptRecords.js`): they show only on the Clients,
+  Leads and Properties pages and their photos, never in counts, pickers, recipients or
+  dashboards; their details carry the "View only" badge (`KeptNotice.jsx`) without edit,
+  delete or reassignment. The record list reloads after a decision that moves a deal.
+- **Tests.** `finance-handover-records.test.mjs` (moves, conversations, keeps, a shared
+  listing, decline, departure), `finance-handover-photos.test.mjs`, the updated H2 suites
+  (each deal has its own client now), unit tests in `tests/unit/kept-records.test.js` and
+  the listing allowlist test in Rust; the browser flow checks the sender's badge.
+- **Review status.** The design review was done by the primary agent (the specialist
+  stopped at its usage limit); a specialist code security review is still due. Not built:
+  a "View only" chip in the record lists (the badge shows in the record's details), and
+  closing a client's other deals when one completes.

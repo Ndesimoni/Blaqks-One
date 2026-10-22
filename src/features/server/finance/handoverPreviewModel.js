@@ -39,6 +39,28 @@ export const propertyFactKeys = [
   'furnishing',
 ];
 
+/** H3 (agreements design §18): the rest of the listing, shown only when recorded. */
+export const listingDetailKeys = [
+  ...['unitReference', 'priceBasis', 'listingStatus', 'availableFrom', 'rentalCheques'],
+  ...['depositAed', 'minimumStayNights', 'maximumGuests', 'parkingSpaces', 'address'],
+  ...['amenities', 'description', 'keySellingPoints', 'mapLink', 'listingUrl'],
+  ...['virtualTourUrl', 'floorPlanUrl'],
+];
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const fileId = (value) => {
+  if (typeof value !== 'string' || !UUID.test(value)) throw Error('Invalid listing file.');
+  return value;
+};
+
+/** Stored photos or floor plans: a name and the file IDs the review route serves. */
+const files = (value) =>
+  (Array.isArray(value) ? value : []).map((item) => ({
+    name: typeof item?.name === 'string' ? item.name.slice(0, 120) : '',
+    file: fileId(item?.file),
+    thumb: item?.thumb === null || item?.thumb === undefined ? null : fileId(item.thumb),
+  }));
+
 function readOffer(value) {
   const offer = object(value);
   return {
@@ -79,7 +101,12 @@ function readPreviewDeal(value) {
 function readProperty(value) {
   if (value === null || value === undefined) return null;
   const property = object(value);
-  return Object.fromEntries(propertyFactKeys.map((key) => [key, fact(property[key])]));
+  const keys = [...propertyFactKeys, ...listingDetailKeys];
+  return {
+    ...Object.fromEntries(keys.map((key) => [key, fact(property[key])])),
+    photos: files(property.photos),
+    floorPlans: files(property.floorPlans),
+  };
 }
 
 /** `{ handover, offer, deal, client, property }`; a malformed response rejects as a whole. */

@@ -12,10 +12,9 @@ import {
 } from './finance-handover-helpers.mjs';
 
 // Who may open a hand-over's review preview (agreements design §17, H2 amendment 9).
-let teams, client;
+let teams;
 before(async () => {
   teams = await reviewTeams('h2-peek');
-  client = await heldClient(teams.agent);
 });
 
 async function opens(session, handover, label) {
@@ -25,10 +24,11 @@ async function opens(session, handover, label) {
 }
 
 const fresh = (options) =>
-  createDeal(teams.agent, client).then((deal) =>
-    offered(teams.admin, teams.agent, deal, teams.second, options),
-  );
+  heldClient(teams.agent)
+    .then((client) => createDeal(teams.agent, client))
+    .then((deal) => offered(teams.admin, teams.agent, deal, teams.second, options));
 
+// Each deal gets its own client: an accepted hand-over moves the client (§18).
 test('the receiver and the Admin review a pending offer; everyone else gets one 404', async () => {
   const { admin, second, agent, third, viewer, approver, backup, owner, other, desk } = teams;
   const handover = await fresh({ approver: backup });

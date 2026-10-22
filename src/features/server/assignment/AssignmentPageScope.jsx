@@ -3,6 +3,7 @@ import { RecordsContext } from '../../../app/WorkspaceContext.js';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../../hooks/useWorkspace.js';
 import { filterAssignedEntries, isAssignable } from './assignmentModel.js';
+import { withKept } from '../keptRecords.js';
 import { useAssignees } from './useAssignees.js';
 import { AssignedToFilter } from './AssignedToFilter.jsx';
 import { BulkReassignDialog } from './BulkReassignDialog.jsx';
@@ -29,13 +30,15 @@ export function AssignmentPageScope({ module, children }) {
     () => (active ? filterAssignedEntries(records.entries, module, filter) : null),
     [active, records.entries, module, filter],
   );
-  const scoped = useMemo(
-    () =>
-      rows
-        ? { ...records, data: { ...records.data, [module]: rows.map((row) => row.record) } }
-        : records,
-    [records, rows, module],
-  );
+  // Handed-over clients and listings the caller keeps reading show on their pages (§18).
+  const kept = records.keptEntries?.[module];
+  const scoped = useMemo(() => {
+    if (rows) return { ...records, data: { ...records.data, [module]: rows.map((r) => r.record) } };
+    if (!kept?.length) return records;
+    const entries = withKept(records.entries, records.keptEntries, [module]);
+    const data = { ...records.data, [module]: entries[module].map((entry) => entry.record) };
+    return { ...records, entries, data };
+  }, [records, rows, module, kept]);
   const toolbar = enabled ? (
     <AssignedToFilter
       module={module}

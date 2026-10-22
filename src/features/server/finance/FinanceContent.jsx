@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
+import { useRecords } from '../../../hooks/useWorkspace.js';
 import { Button } from '../../../components/ui/Button.jsx';
 import { ServerUnavailableSection } from '../ServerUnavailableSection.jsx';
 import { useFinance } from './useFinance.js';
@@ -35,7 +36,12 @@ export function FinanceContent({ route, owner }) {
   const { api, user } = useSession();
   const readOnly = owner.status === 'archived';
   const finance = useFinance(api, owner.id, user);
-  const actions = useFinanceActions({ api, workspaceId: owner.id, user, finance, readOnly });
+  const records = useRecords();
+  // The client and listing move with an accepted deal (agreements design §18).
+  const reloadRecords = records?.refresh;
+  const afterMove = useCallback(() => reloadRecords?.().catch(() => {}), [reloadRecords]);
+  const options = { api, workspaceId: owner.id, user, finance, readOnly, afterMove };
+  const actions = useFinanceActions(options);
   const assignees = useFinanceAssignees(api, owner.id, finance.access);
   const value = useMemo(
     () => ({

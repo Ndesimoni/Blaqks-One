@@ -7,7 +7,7 @@ use super::{
     gate::{self, Need},
     handover::ensure_move,
     handover_checks::{self as checks, Receiver},
-    handover_evidence,
+    handover_evidence, handover_follow,
     handover_rows::{self, HandoverRow, NOT_PENDING},
     handover_store::{self, Decision},
     holder::{self, Move},
@@ -47,14 +47,14 @@ pub async fn decide(
     let mut tx = state.pool.begin().await?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, need).await?;
     let request = handover_store::fetch(&mut tx, &workspace, &live, id, decision).await?;
-    let mut entry = Value::Null;
+    let (mut entry, mut records) = (Value::Null, Value::Null);
     if decision == Decision::Accept && request.requires_approval {
         movable(&mut tx, (&workspace, live.id), &request, None).await?;
         handover_evidence::decide(&mut tx, &request, (decision, &live), version, None).await?;
         handover_store::set_awaiting(&mut tx, id, live.id).await?;
     } else if decision.moves() {
         let decided = (decision, &live);
-        entry = moved(&mut tx, &workspace, &request, decided, version, approval).await?;
+        (entry, records) = moved(&mut tx, &workspace, &request, decided, version, approval).await?;
     } else {
         handover_evidence::decide(&mut tx, &request, (decision, &live), None, None).await?;
         let referral = request.referral_share_bp;
@@ -62,7 +62,9 @@ pub async fn decide(
     }
     let view = handover_rows::shown(&mut tx, id, &Viewer::of(&live)).await?;
     tx.commit().await?;
-    Ok(Json(json!({"handover": view, "entry": entry})))
+    Ok(Json(
+        json!({"handover": view, "entry": entry, "records": records}),
+    ))
 }
 
 /// The locked deal, still held by the sender, with a receiver who can still hold it and
@@ -91,7 +93,8 @@ async fn movable(
     Ok(deal)
 }
 
-/// Accepting, approving in place or approving an acceptance: the deal moves.
+/// Accepting, approving in place or approving an acceptance: the deal moves, and its
+/// client and property with it.
 async fn moved(
     tx: &mut Tx<'_>,
     workspace: &str,
@@ -99,7 +102,7 @@ async fn moved(
     (decision, live): (Decision, &UserRow),
     version: Option<i64>,
     approval: Option<(Option<i32>, String)>,
-) -> ApiResult<Value> {
+) -> ApiResult<(Value, Value)> {
     let referral = match &approval {
         Some((share, _)) => *share,
         None => request.referral_share_bp,
@@ -127,7 +130,9 @@ async fn moved(
         requested_by: Some(request.requested_by),
     };
     holder::apply(tx, change).await?;
-    Ok(json!(
-        list::entry(tx, workspace, live, request.deal_id).await?
-    ))
+    // The client and the property go with the deal (agreements design §18).
+    let records =
+        handover_follow::follow(tx, workspace, (request, &deal), live.id, referral).await?;
+    let entry = json!(list::entry(tx, workspace, live, request.deal_id).await?);
+    Ok((entry, records))
 }

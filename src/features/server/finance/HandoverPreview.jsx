@@ -1,8 +1,7 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { parseAed } from '../../../lib/finance/money.js';
 import { Facts } from '../agreements/AgreementTerms.jsx';
-import { propertyFactKeys } from './handoverPreviewModel.js';
+import { HandoverListing } from './HandoverListing.jsx';
 import '../agreements/agreement-terms.css';
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
@@ -23,8 +22,8 @@ function earning({ handover, deal }, k, money) {
 
 /**
  * The server-shaped review of an open hand-over (agreements design §17, owner decision 1):
- * the deal's money and dates, the offer and what the receiver would earn, the property facts
- * and the client's first name and last initial. Client contact, notes and documents are never
+ * the deal's money and dates, the offer and what the receiver would earn, the listing
+ * (`HandoverListing`) and the client's first name and last initial. Client contact, notes and documents are never
  * sent before acceptance, so nothing here can show them. `viewerId` words the earning line.
  */
 export function HandoverPreview({ preview, viewerId }) {
@@ -35,14 +34,6 @@ export function HandoverPreview({ preview, viewerId }) {
   const day = (value) => known(value, (v) => (DAY.test(v) ? format.date(v) : v));
   const figure = (fils) => <span className="agreement-figure">{format.money(fils)}</span>;
   const partner = deal.partnerShareBp > 0 || Boolean(deal.partnerName);
-  const price = (value) => {
-    const parsed = parseAed(value);
-    return parsed.error || parsed.value === null ? value : format.money(parsed.value);
-  };
-  const shown = {
-    sizeSqft: (size) => k('property.sqft', { size }),
-    priceAed: price,
-  };
   const names = { from: handover.from.name, to: handover.to.name };
   return (
     <div className="agreement-terms handover-preview">
@@ -100,14 +91,7 @@ export function HandoverPreview({ preview, viewerId }) {
         ]}
       />
       {property ? (
-        <Facts
-          title={k('property.title')}
-          rows={propertyFactKeys.map((key) => [
-            k(`property.${key}`),
-            known(property[key], shown[key]),
-            key === 'listingTitle',
-          ])}
-        />
+        <HandoverListing property={property} handoverId={handover.id} />
       ) : (
         <section className="agreement-facts">
           <h3>{k('property.title')}</h3>

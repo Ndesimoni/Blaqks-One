@@ -99,6 +99,8 @@ export const emptyProjections = Object.freeze({
   taskClients: Object.freeze([]),
   listingViewings: Object.freeze([]),
   dealLinks: Object.freeze([]),
+  kept: Object.freeze({}),
+  keptEntries: Object.freeze({}),
 });
 
 /**

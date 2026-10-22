@@ -15,7 +15,7 @@ The owner chooses the next packet: nothing in §2 starts until they say so.
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
 | Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
 
-Migrations run through `0060`. **Evidence limit:** all of this is proven against the local
+Migrations run through `0061`. **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
 from clients are labelled but not virus-scanned.
 
@@ -83,6 +83,10 @@ stored records). Test on the disposable database with synthetic records.
   badges; full hand-overs to the company Admin; an agent may tick Needs approval and choose
   the approver, and the deal moves only after the receiver accepts and the approver
   approves. Migrations 0059 and 0060.
+- **H3** (built 2026-10-22, design §18): the client (with its conversations) and the
+  listing move with an accepted deal; the sender keeps them view only with a badge; a
+  listing other deals use stays and is shared view only; the review shows all listing
+  details and photos. Migration 0061. A specialist code security review is still due.
 
 ### N4 — WhatsApp (blocked on the owner)
 

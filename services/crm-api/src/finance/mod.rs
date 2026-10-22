@@ -28,6 +28,7 @@ pub mod payments;
 pub mod receipts;
 pub mod references;
 pub mod routes;
+pub mod routes_handovers;
 pub mod selection;
 pub mod settings;
 pub mod settings_store;

@@ -13,9 +13,9 @@ use crate::{
     agreements::handover::OfferTerms,
     error::ApiResult,
     finance::{access, calc::SecondSource, settings_store},
-    records::handover_facts::PropertyPreview,
+    records::handover_listing::Listing,
 };
-use serde_json::{json, Value};
+use serde_json::{json, Map, Value};
 use sqlx::{Postgres, Transaction};
 
 fn text(value: Option<&str>, max: usize) -> Value {
@@ -39,15 +39,28 @@ fn iso_date(value: Option<&str>) -> Value {
     }
 }
 
-pub fn property(facts: &PropertyPreview) -> Value {
-    let short = |value: &Option<String>| text(value.as_deref(), 80);
-    json!({"listingTitle": text(facts.listing_title.as_deref(), 160),
-        "saleRental": short(&facts.sale_rental), "emirate": short(&facts.emirate),
-        "community": short(&facts.community), "building": short(&facts.building),
-        "propertyType": short(&facts.property_type), "bedrooms": short(&facts.bedrooms),
-        "bathrooms": short(&facts.bathrooms), "sizeSqft": short(&facts.size_sqft),
-        "priceAed": short(&facts.price_aed), "readyOffPlan": short(&facts.ready_off_plan),
-        "furnishing": short(&facts.furnishing)})
+/// The listing: the allowlisted facts and the stored photos and floor plans, which the
+/// review loads through `preview/files/{file}`.
+pub fn property(listing: &Listing) -> Value {
+    let long = ["description", "keySellingPoints", "amenities"];
+    let mut value: Map<String, Value> = listing
+        .facts()
+        .map(|(name, stored)| {
+            let max = if long.contains(&name) { 2000 } else { 200 };
+            (name.to_owned(), text(stored, max))
+        })
+        .collect();
+    let media = |field: &str| -> Value {
+        let entries = listing.media(field).into_iter();
+        Value::Array(
+            entries
+                .map(|(name, file, thumb)| json!({"name": name, "file": file, "thumb": thumb}))
+                .collect(),
+        )
+    };
+    value.insert("photos".into(), media("media_photos"));
+    value.insert("floorPlans".into(), media("media_floorplans"));
+    Value::Object(value)
 }
 
 /// The offer: frozen in the agreement, or read from the request for older ones.

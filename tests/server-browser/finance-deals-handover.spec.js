@@ -10,13 +10,15 @@ import {
   openDeals,
   shoot,
 } from './finance-deals-fixtures.js';
+import { openRecord } from './assign-helpers.js';
 
 test('a holder offers a deal keeping a referral share and the teammate accepts it', async ({
   browser,
 }) => {
   const team = await financeDealTeam('fin-ui-hand');
   const { agent, second } = team.people;
-  const deal = await createDeal(team.agent, await heldClient(team.agent));
+  const clientId = await heldClient(team.agent);
+  const deal = await createDeal(team.agent, clientId);
   const holder = await memberPage(browser, agent.email);
   await openDeals(holder.page);
   let details = await openDeal(holder.page, deal.dealId);
@@ -89,6 +91,14 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   await expect(holder.page.locator('.page-heading h1')).toHaveText('Deals & commissions');
   await expect(holder.page.getByRole('heading', { name: 'No deals yet' })).toBeVisible();
   await expect(holder.page.getByRole('region', { name: 'Hand-over requests' })).toHaveCount(0);
+  // The client went with the deal; the holder keeps it view only (agreements design §18).
+  await holder.page.goto('/#/clients');
+  const client = await openRecord(holder.page, clientId);
+  await expect(client).toContainText(`View only. Handed over to ${second.name}`);
+  await expect(client).toContainText('referral 10%');
+  await expect(client.getByRole('button', { name: 'Edit record' })).toHaveCount(0);
+  await expect(client.getByRole('button', { name: /Delete/ })).toHaveCount(0);
+  await holder.page.keyboard.press('Escape');
   // The accepted hand-over is kept under Agreements, decided only from Deals.
   await details.getByRole('button', { name: 'Close deal details' }).click();
   await receiver.page

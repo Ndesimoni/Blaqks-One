@@ -10,8 +10,17 @@ const busyResult = { ok: false, message: '', errors: {}, conflict: false, gone: 
  * and basis points only, refreshes the overview on success and resolves to `{ ok, ... }` so
  * editors and dialogs keep their draft on any refusal, 403, 404 or 409. `finance` is the
  * `useFinance` result; deal and entry arguments are parsed views (`{ id, version, allowed }`).
+ * `afterMove` runs after a decision that moves a deal, whose client and listing move with
+ * it (agreements design §18), so the record list can reload.
  */
-export function useFinanceActions({ api, workspaceId, user, finance, readOnly = false }) {
+export function useFinanceActions({
+  api,
+  workspaceId,
+  user,
+  finance,
+  readOnly = false,
+  afterMove,
+}) {
   const access = useMemo(() => readFinanceAccess(user), [user]);
   const [busy, setBusy] = useState(false);
   const running = useRef(false);
@@ -32,6 +41,11 @@ export function useFinanceActions({ api, workspaceId, user, finance, readOnly = 
   );
   return useMemo(() => {
     const ws = workspaceId;
+    const moved = (pending) =>
+      pending.then((outcome) => {
+        if (outcome.ok) afterMove?.();
+        return outcome;
+      });
     const can = (operation, row = null) => !financeRefusal(access, operation, row, readOnly);
     const entryOperation = { approve: 'approveEntry', reject: 'rejectEntry', void: 'voidEntry' };
     return {
@@ -68,20 +82,26 @@ export function useFinanceActions({ api, workspaceId, user, finance, readOnly = 
           api.requestHandover(ws, deal, toId, referralShareBp, approverId),
         ),
       /** `decision` is accept, decline or cancel; `handover` carries the server's `allowed`. */
-      decideHandover: (handover, decision, agreementVersion) =>
-        run(`${decision}Handover`, handover, () =>
+      decideHandover: (handover, decision, agreementVersion) => {
+        const pending = run(`${decision}Handover`, handover, () =>
           api.decideHandover(ws, handover.id, decision, agreementVersion),
-        ),
+        );
+        return decision === 'accept' ? moved(pending) : pending;
+      },
       approveHandover: (handover, referralShareBp, reason, agreementVersion) =>
-        run(
-          'approveHandover',
-          handover,
-          () => api.approveHandover(ws, handover.id, referralShareBp, reason, agreementVersion),
-          { reason: reason ?? '' },
+        moved(
+          run(
+            'approveHandover',
+            handover,
+            () => api.approveHandover(ws, handover.id, referralShareBp, reason, agreementVersion),
+            { reason: reason ?? '' },
+          ),
         ),
       approveHandoverAcceptance: (handover, agreementVersion) =>
-        run('approveHandoverAcceptance', handover, () =>
-          api.approveAcceptance(ws, handover.id, agreementVersion),
+        moved(
+          run('approveHandoverAcceptance', handover, () =>
+            api.approveAcceptance(ws, handover.id, agreementVersion),
+          ),
         ),
       rejectHandoverAcceptance: (handover) =>
         run('rejectHandoverAcceptance', handover, () => api.rejectAcceptance(ws, handover.id)),
@@ -104,5 +124,5 @@ export function useFinanceActions({ api, workspaceId, user, finance, readOnly = 
           decision === 'approve' ? {} : { reason: reason ?? '' },
         ),
     };
-  }, [access, api, busy, readOnly, run, workspaceId]);
+  }, [access, afterMove, api, busy, readOnly, run, workspaceId]);
 }

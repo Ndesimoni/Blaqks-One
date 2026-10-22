@@ -10,10 +10,9 @@ import { notFound, offered, reviewTeams, shownVersion } from './finance-handover
 import { status, stranded } from './finance-handover-helpers.mjs';
 
 // Approval chosen by the sender (agreements design §17 item 4, H2 amendments 2–5, 14, 15).
-let teams, client;
+let teams;
 before(async () => {
   teams = await reviewTeams('h2-flow');
-  client = await heldClient(teams.agent);
 });
 
 const ALLOWED = [
@@ -27,16 +26,17 @@ const lastActor = (handover) =>
 /** A deal offered to `second` with `approver` chosen, and accepted by `second`. */
 async function awaiting() {
   const { admin, agent, second, approver } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   const offer = await offered(admin, agent, deal, second, { approver });
   const accepted = await accept(second, admin, offer);
   assert.equal(accepted.status, 200, JSON.stringify(accepted.value));
   return { deal, handover: accepted.value.handover };
 }
 
+// Each deal gets its own client: an accepted hand-over moves the client (§18).
 test('the receiver accepts first; only the approval moves the deal', async () => {
   const { admin, agent, second, approver } = teams;
-  const deal = await createDeal(agent, client);
+  const deal = await createDeal(agent, await heldClient(agent));
   const handover = await offered(admin, agent, deal, second, { share: 1500, approver });
   assert.deepEqual([handover.status, handover.toAdmin], ['pending', false]);
   const named = { approver: { id: approver.user.id, name: approver.user.name }, acceptedAt: null };
@@ -116,9 +116,15 @@ test('the approver may reject and the holder may cancel; the receiver cannot wit
 
 test('approving an acceptance needs one that waits, before the offer ends', async () => {
   const { admin, agent, second, approver } = teams;
-  const pending = await offered(admin, agent, await createDeal(agent, client), second, {
-    approver,
-  });
+  const pending = await offered(
+    admin,
+    agent,
+    await createDeal(agent, await heldClient(agent)),
+    second,
+    {
+      approver,
+    },
+  );
   const early = await shownVersion(admin, admin, pending);
   const tooSoon = await decide(approver, admin, pending, 'approve-acceptance', early);
   refused(tooSoon, 409, M.notPending, 'conflict');
