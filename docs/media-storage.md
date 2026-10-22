@@ -54,8 +54,8 @@ against the item the file belongs to.
   transaction, hides files no longer named and removes them all when the record is deleted.
   Files load through `GET …/records/{collection}/{id}/files/{file}` after the record's own
   visibility check. Earlier inline photos (`{name, src}`) still display and save unchanged.
-  **Remaining:** a command that moves existing inline photos into storage; until then they
-  stay in the record JSON.
+  **Backfill built (2026-10-22):** the operator command `media-backfill` moves existing
+  inline photos into storage; see [F2 backfill as built](#f2-backfill-as-built-2026-10-22).
 - **F3 — email attachments:** see the F3 design below. **F3a (sending) is built** (2026-10-21):
   migration 0048, `media/contents.rs` and `naming.rs`, `inbox/send/files.rs` and
   `domain_files.rs`, Attach files in the reply box and New email, files on messages; suites
@@ -82,6 +82,81 @@ against the item the file belongs to.
   fails is hidden and counted (storage would have to fail on cue).
 - **F4 — public photos:** approved, re-encoded copies for the public website through the
   CDN, only for listings the Super Admin has approved.
+
+## F2 backfill as built (2026-10-22)
+
+Photos and floor plans saved before F2 sit inside the record JSON as inline entries
+(`{name, src, type?, added?}`, `src` a base64 data URL). `media-backfill` is a subcommand of
+the API binary for the trusted operator only, like `migrate`: it runs on the server with the
+database and storage settings and has no HTTP route.
+
+**What it does.** For each workspace (or only `--workspace <id>`), it finds `Properties`
+records with an inline entry in `media_photos` or `media_floorplans` and handles them one
+record at a time. Each inline entry is decoded and checked exactly like an upload (the real
+type from the bytes, the 10 MB / 20 MB limits, EXIF and PNG/WebP text removed, the display
+name ending in the stored type's extension) and becomes `{name, file, type, added?}`, the
+shape F2 writes, owned by that record. There is no `thumb`: the server has no image
+resizer, and the browser shows `file` when an entry has no thumbnail
+(`ServerMediaProvider`). Already stored entries are not touched; the order of entries is
+kept.
+
+**What stays inline, unchanged, and is reported** (`left`, by record UUID, field and index):
+`unsupported` (not a base64 data URL, not JPEG/PNG/WebP/PDF by its bytes, or a PDF among
+photos), `unreadable` (bad base64 or a malformed image), `too_large`, `over_quota` (it would
+take the company over its 5 GB) and `other_fields` (the entry carries fields a stored entry
+cannot keep, such as the `demo: true, source: generated-demo` label, so
+[labelled demo photos](demo-property-photos.md) stay labelled). Nothing is ever dropped.
+
+**One record, one transaction.** Per record: (1) its files are reserved as rows attached
+to the record, `origin = 'backfill'`, marked not yet stored, and committed; (2) their
+cleaned bytes are put into storage; (3) in the record's own transaction, under the
+workspace lock, the workspace must not be archived, the version must still be the one read
+(`UPDATE … WHERE version = $read`), only the changed media fields are replaced
+(`payload || {media_photos: …}`), the version is bumped and the reserved files are marked
+stored. A record that changed meanwhile (`changed_meanwhile`), a storage failure
+(`failed`) or a newly archived workspace rolls back with nothing changed in the record;
+its reserved files are hidden at once, or by the sweep after an hour if even that fails,
+and the sweep removes their objects. Before the commit the rewritten fields are checked
+with the same validation a member's save uses. Archived workspaces are frozen and skipped
+(`archived: true`). A second run finds nothing left to move and changes nothing.
+
+**Migration 0054** adds the `backfill` origin: such files never count against a member's
+hourly or pending upload limits and can never be attached by a member, but they do count
+toward the company's storage cap. The workspace owner is recorded as `uploaded_by`, as for
+inbound mail.
+
+**No activity entry (decision).** The command writes no `crm_activity` row. Activity
+answers "which member did what"; its `actor_id` must be a member, and the operator is not
+one, so naming the Admin (or anyone) would be a false attribution, which AGENTS.md forbids
+(actor and workspace IDs stay distinct). The listing also reads the same before and after:
+same photos, same order, same names apart from the added extension. The durable trace is
+the `origin = 'backfill'` media rows (when, which record) plus the version bump, which
+also makes any open editor reload instead of saving over the change. Schema migrations
+that rewrite data write no activity either.
+
+**Report and logs.** The command prints one JSON report: `mode` (`dry-run` or `apply`)
+and per workspace `records`, `entries` and `bytes` (stored size after cleaning) that moved
+or would move, `changed_meanwhile`, `failed` and `left`. It names only workspace IDs and
+record UUIDs: never file names, bytes, data URLs or other record contents. A database
+failure stops the command with a fixed message; records already moved stay moved.
+
+**Operator steps.**
+
+1. Back up the database first (a full PostgreSQL dump) and make sure the storage settings
+   (`CRM_MEDIA_*`) are the production ones. Like every command, it first applies pending
+   migrations (0054).
+2. Dry run: `kws-crm-api media-backfill` (or `--workspace <id>`). Read the report: what
+   would move, and what stays inline and why. Nothing changes.
+3. Apply: `kws-crm-api media-backfill --apply` (optionally per workspace). Re-run it for
+   any `changed_meanwhile` or `failed` records; it is safe to repeat.
+4. Entries left inline keep working as before; a member can replace them by uploading the
+   photo again.
+
+Tests: unit tests in `records/backfill/inline_tests.rs`, `plan_tests.rs` and `options.rs`;
+API suite `tests/api/media-backfill.test.mjs` (dry run, apply, served files without photo
+metadata, repeat run, items left inline, another company untouched, a member save after).
+Not covered automatically: a record changing between reading and committing, storage
+failing mid-run and a workspace archived mid-run (each rolls the record back as above).
 
 ## F3 design: email attachments (2026-10-21, security reviewed)
 

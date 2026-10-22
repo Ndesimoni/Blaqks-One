@@ -2,6 +2,7 @@ use kws_crm_api::{
     auth::{password, session},
     bootstrap,
     config::Config,
+    records::backfill,
     routes,
     sample::{self, guard, marker, options::Options},
     shutdown, signup,
@@ -27,9 +28,9 @@ async fn run() -> Result<(), String> {
         eprintln!("Channel connections are disabled: CRM_MESSAGING_KEY is not set.");
     }
     let command = std::env::args().nth(1);
+    let args: Vec<String> = std::env::args().skip(2).collect();
     let sample_options = match command.as_deref() {
         Some(name @ ("seed-sample" | "clear-sample")) => {
-            let args: Vec<String> = std::env::args().skip(2).collect();
             let options = Options::parse(name, &args)?;
             // Before connecting: never reach a database outside local development.
             guard::ensure_local(!config.secure_cookie, &config.database_url)?;
@@ -37,6 +38,7 @@ async fn run() -> Result<(), String> {
         }
         _ => None,
     };
+    let backfill_options = backfill::options::requested(command.as_deref(), &args)?;
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&config.database_url)
@@ -64,6 +66,11 @@ async fn run() -> Result<(), String> {
         println!("{}", sample::run(&pool, options, &database).await?);
         return Ok(());
     }
+    if let Some(options) = backfill_options {
+        let report = backfill::run(&pool, config.media.as_ref(), options).await?;
+        println!("{report}");
+        return Ok(());
+    }
     if command.as_deref() == Some("migrate") {
         println!("CRM database migrations applied.");
         return Ok(());
@@ -76,7 +83,10 @@ async fn run() -> Result<(), String> {
         return Ok(());
     }
     if command.is_some() {
-        return Err("Supported commands: create-user, migrate, seed-sample, clear-sample.".into());
+        return Err(
+            "Supported commands: create-user, migrate, media-backfill, seed-sample, clear-sample."
+                .into(),
+        );
     }
     let address = config.address;
     let signup_worker = config.signup_worker;

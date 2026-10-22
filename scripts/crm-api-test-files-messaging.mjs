@@ -31,4 +31,5 @@ export const messagingTestFiles = [
   'tests/api/inbox-guards.test.mjs',
   'tests/api/saved-replies.test.mjs',
   'tests/api/inbox-drafts.test.mjs',
+  'tests/api/media-backfill.test.mjs',
 ];

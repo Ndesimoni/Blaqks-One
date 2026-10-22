@@ -65,6 +65,23 @@ pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str)
     Ok(())
 }
 
+/// Whether nothing in `workspace` may change: its owning Admin is archived (which freezes
+/// the whole team's workspace) or the workspace does not exist.
+pub async fn frozen(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspace: &str,
+) -> ApiResult<bool> {
+    let writable: bool = sqlx::query_scalar(
+        "SELECT u.deleted_at IS NULL FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
+         WHERE w.id=$1",
+    )
+    .bind(workspace)
+    .fetch_optional(&mut **transaction)
+    .await?
+    .unwrap_or(false);
+    Ok(!writable)
+}
+
 /// Re-reads the caller's live profile for `workspace` inside `transaction` (H4, L3).
 /// Inactive members, suspended owners and other teams are refused.
 pub async fn member(
@@ -94,15 +111,7 @@ pub async fn ensure_writable(
     collection: Option<&str>,
     action: Option<Action>,
 ) -> ApiResult<UserRow> {
-    let writable: bool = sqlx::query_scalar(
-        "SELECT u.deleted_at IS NULL FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
-         WHERE w.id=$1",
-    )
-    .bind(workspace)
-    .fetch_optional(&mut **transaction)
-    .await?
-    .unwrap_or(false);
-    if !writable {
+    if frozen(transaction, workspace).await? {
         return Err(ApiError::forbidden());
     }
     let user = member(transaction, workspace, actor).await?;

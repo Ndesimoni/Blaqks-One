@@ -71,7 +71,8 @@
       "crm_media_objects_uploader",
       "crm_media_objects_usage",
       "crm_media_objects_inbound",
-      "crm_media_objects_inbound_keys"
+      "crm_media_objects_inbound_keys",
+      "crm_media_objects_origin_check"
     ]
   }
 }
