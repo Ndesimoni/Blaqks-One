@@ -58,13 +58,22 @@ Drafts are already planned as `status = draft` messages in
 [Messaging design](messaging-design.md) §5; reuse that. A per-member email send limit is
 queued in the roadmap and fits here. UI goes through `product_designer`, Messenger style.
 
-### N3 — Move existing inline property photos into storage (F2 remaining)
+### N3 — Move existing inline property photos into storage (built 2026-10-22)
+
+Built as the `media-backfill` command; see [Media storage](media-storage.md) "F2 backfill as built". Run it on real data only after backing up the database and the bucket.
 
 Photos saved before F2 still sit inside record JSON (`{name, src}`). A trusted command that,
 per workspace, puts each into media storage and rewrites the entry to `{name, file, thumb}`
 in the record's own transaction with its version check; repeatable, with a dry run first;
 connected records only, never browser or demo data. Security review first (it rewrites
 stored records). Test on the disposable database with synthetic records.
+
+### Also built 2026-10-22
+
+- **Agreements screens:** the Agreements page for the A2 server core; see
+  [Agreements design](agreements-design.md) §13.
+- **Team chat C3:** private groups (with adding people later) and in-app @mentions; see
+  [Team chat](team-chat.md).
 
 ### N4 — WhatsApp (blocked on the owner)
 
