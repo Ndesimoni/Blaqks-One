@@ -27,11 +27,13 @@ pub struct HandoverRow {
     pub status: String,
     pub requested_by: Uuid,
     pub created_at: String,
+    /// The agreement recording this offer (agreements design §14); none for older ones.
+    pub agreement_id: Option<Uuid>,
 }
 
 pub const SELECT: &str = "SELECT h.id,h.deal_id,d.legacy_id AS deal_ref,d.deal_type,d.stage, \
     d.earned_on IS NOT NULL AS earned,h.from_id,f.name AS from_name,h.to_id,t.name AS to_name, \
-    h.referral_share_bp,h.status,h.requested_by, \
+    h.referral_share_bp,h.status,h.requested_by,h.agreement_id, \
     to_char(h.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS created_at \
     FROM crm_deal_handovers h JOIN crm_deals d ON d.id=h.deal_id \
     JOIN crm_users f ON f.id=h.from_id JOIN crm_users t ON t.id=h.to_id";
@@ -47,7 +49,8 @@ impl HandoverRow {
             "from": {"id": self.from_id, "name": self.from_name},
             "to": {"id": self.to_id, "name": self.to_name},
             "referralShareBp": self.referral_share_bp, "status": self.status,
-            "createdAt": self.created_at, "allowed": allowed})
+            "createdAt": self.created_at, "agreementId": self.agreement_id,
+            "allowed": allowed})
     }
 }
 

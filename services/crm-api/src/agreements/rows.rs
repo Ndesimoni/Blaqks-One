@@ -1,8 +1,10 @@
 //! Stored agreement and revision rows with their wire views.
 use super::{
+    errors::REVISION,
     evidence::Parties,
     model::{Party, State},
 };
+use crate::error::{ApiError, ApiResult};
 use serde_json::{json, Value};
 use uuid::Uuid;
 
@@ -13,6 +15,8 @@ pub struct AgreementRow {
     pub workspace_id: String,
     pub recipient_workspace_id: String,
     pub kind: String,
+    /// `direct`, or `deal_handover` for an in-company hand-over that only finance changes.
+    pub origin: String,
     pub state: String,
     pub version: i64,
     pub current_revision_id: Option<Uuid>,
@@ -29,6 +33,10 @@ impl AgreementRow {
         State::parse(&self.state)
     }
 
+    pub fn handover(&self) -> bool {
+        self.origin == "deal_handover"
+    }
+
     pub fn parties(&self) -> Parties {
         Parties {
             sender_workspace: self.workspace_id.clone(),
@@ -43,6 +51,7 @@ impl AgreementRow {
         json!({
             "id": self.id,
             "kind": self.kind,
+            "origin": self.origin,
             "state": self.state,
             "version": self.version,
             "senderWorkspaceId": self.workspace_id,
@@ -67,10 +76,13 @@ pub struct RevisionRow {
 }
 
 impl RevisionRow {
-    pub fn author(&self) -> Party {
+    /// The participant who wrote these terms. An Admin's hand-over terms (or anything
+    /// unexpected) are no participant's, so party commands refuse them.
+    pub fn author(&self) -> ApiResult<Party> {
         match self.author_party.as_str() {
-            "recipient" => Party::Recipient,
-            _ => Party::Sender,
+            "sender" => Ok(Party::Sender),
+            "recipient" => Ok(Party::Recipient),
+            _ => Err(ApiError::conflict(REVISION)),
         }
     }
 
@@ -78,7 +90,7 @@ impl RevisionRow {
         json!({
             "id": self.id,
             "number": self.number,
-            "authorParty": self.author().as_str(),
+            "authorParty": self.author_party,
             "digest": self.digest,
             "terms": self.terms,
         })

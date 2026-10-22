@@ -37,8 +37,8 @@ test('percentages become basis points per type, without floats or rounding', () 
   assert.deepEqual(readShare('co_broking', '100'), { error: 'shareCoBroking' });
   assert.deepEqual(readShare('co_broking', '0'), { error: 'shareCoBroking' });
   assert.deepEqual(readShare('co_broking', '12.345'), { error: 'shareCoBroking' });
-  assert.deepEqual(readShare('handover_referral', '50'), { value: 5000 });
-  assert.deepEqual(readShare('handover_referral', '50.01'), { error: 'shareReferral' });
+  assert.deepEqual(readShare('handover_referral', '99.99'), { value: 9999 });
+  assert.deepEqual(readShare('handover_referral', '100'), { error: 'shareReferral' });
   assert.deepEqual(readShare('handover_referral', ''), { error: 'required' });
   assert.deepEqual(readShare('handover_full', 'anything'), { value: 0 });
 });

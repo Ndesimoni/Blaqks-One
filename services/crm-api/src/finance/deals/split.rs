@@ -81,6 +81,9 @@ pub async fn split(
         return Ok(Json(json!({ "deal": entry })));
     }
     let reason = reason.ok_or(ApiError::invalid(gate::REASON))?;
+    if deal.pending_agreement.is_some() {
+        return Err(ApiError::conflict(super::handover_evidence::PENDING_FROZEN));
+    }
     if let Some((agent, _)) = wanted.filter(|(agent, _)| Some(*agent) != deal.second_agent_id) {
         let eligible = links::finance_member(&mut tx, &workspace, agent, true).await?;
         if !eligible || Some(agent) == deal.assignee_id {

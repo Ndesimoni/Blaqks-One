@@ -60,7 +60,10 @@ export function DealsPage() {
           This workspace is archived. Deals are read-only.
         </p>
       )}
-      <HandoverRequests onApprove={(handover) => open('approveHandover', null, { handover })} />
+      <HandoverRequests
+        onApprove={(handover) => open('approveHandover', null, { handover })}
+        onAccept={(handover) => open('acceptHandover', null, { handover })}
+      />
       <div className="tabs finance-tabs" role="group" aria-label="Deals views">
         {tabs.map((item) => (
           <button

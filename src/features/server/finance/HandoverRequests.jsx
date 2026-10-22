@@ -22,15 +22,17 @@ function summary(handover, me) {
 
 /**
  * Pending hand-over requests the caller takes part in (all of them for team finance). The
- * receiver sees the deal's ID, type, stage and earned state only — never its money — and
- * accepts or declines; the requester or Admin cancels; the Admin may approve with changes.
+ * row shows the deal's ID, type, stage and earned state. An offer recorded as an agreement
+ * opens its full terms before the receiver accepts (agreements design §14–§15); the
+ * requester or Admin cancels; the Admin may approve with changes.
  */
-export function HandoverRequests({ onApprove }) {
+export function HandoverRequests({ onApprove, onAccept }) {
   const { overview, actions, user } = useFinanceContext();
   const [message, setMessage] = useState('');
   const pending = overview.handovers.filter((handover) => handover.status === 'pending');
   if (!pending.length) return null;
   const decide = async (handover, decision) => {
+    if (decision === 'accept' && handover.agreementId) return onAccept(handover);
     setMessage('');
     const result = await actions.decideHandover(handover, decision);
     if (!result.ok) setMessage(failureText(result));

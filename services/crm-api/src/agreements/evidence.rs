@@ -1,7 +1,10 @@
 //! Revision evidence (docs/agreements-design.md §3). The stored terms name both
 //! parties, and the digest also covers the agreement ID, revision number and parent,
 //! so an accepted digest identifies exactly one revision of one agreement between
-//! two named participants. Recomputing it from the stored row reproduces it.
+//! two named participants. Recomputing it from the stored row reproduces it. Scheme 2
+//! (A3, stored as `digest_scheme`) also covers who wrote the terms: the sender, the
+//! recipient or, on an in-company hand-over, the company Admin. Scheme 1 revisions
+//! digest the same object without `scheme` and `author`.
 use super::terms::{digest_of, BuiltTerms};
 use serde_json::{json, Value};
 use uuid::Uuid;
@@ -39,22 +42,25 @@ pub struct Sealed {
     pub digest: String,
 }
 
-/// Adds the parties to the terms and digests them with the revision's place.
-pub fn seal(built: &BuiltTerms, parties: &Parties, place: &Place) -> Sealed {
+/// Adds the parties to the terms and digests them (scheme 2) with the revision's place
+/// and author.
+pub fn seal(built: &BuiltTerms, parties: &Parties, place: &Place, author: &str) -> Sealed {
     let mut terms = built.value.clone();
     terms["parties"] = parties.view();
     Sealed {
-        digest: digest(&terms, place),
+        digest: authored(&terms, place, author),
         terms,
     }
 }
 
-/// The evidence digest of stored terms at `place`.
-pub fn digest(terms: &Value, place: &Place) -> String {
+/// The scheme 2 digest of stored terms at `place`, written by `author`.
+pub fn authored(terms: &Value, place: &Place, author: &str) -> String {
     digest_of(&json!({
+        "scheme": 2,
         "agreementId": place.agreement,
         "revision": place.number,
         "parentId": place.parent,
+        "author": author,
         "terms": terms,
     }))
 }

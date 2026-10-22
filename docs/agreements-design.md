@@ -453,3 +453,49 @@ where they differ.
    facts.
 6. When a participant of an agreement between companies leaves their company, nobody takes
    over recording or confirming payments for that side.
+
+## 16. A3a as built (2026-10-22)
+
+- **Migrations 0057 (agreements) and 0058 (finance).** `origin` on agreements, frozen with
+  their identity; `digest_scheme` on revisions (2 for every new revision, whose digest also
+  covers its author); the widened action, verification and author checks with one
+  acceptance or approval per revision; the `crm_agreement_handover_guard` trigger
+  (approvals and Admin terms only on in-company hand-overs, no receiver terms on them);
+  `agreement_id` on hand-overs, written with the request and frozen by the hand-over guard.
+- **Agreements module.** `handover.rs` (offer, decline, withdraw), `handover_decide.rs`
+  (accept, approve with an optional Admin revision) and `handover_terms.rs` (server-built
+  terms) are called only by finance. In-company terms use money basis `agent_commission`:
+  the shares are of the receiving agent's commission line and the deal fee is context, so
+  the screens show percentages without AED amounts. Every agreements-route command refuses
+  these agreements; staff read them only while they hold the finance module. Reads use
+  `current_revision_id`; `RevisionRow::author` fails closed; events are stamped with
+  `clock_timestamp()` so events written in one transaction keep their order. `limits.rs`
+  applies the sending company's referral limit at create, edit, counter-offer and send.
+- **Finance module.** `handover_evidence.rs` builds the offer from the deal (fee before any
+  split) and the records module's `handover_facts`, and maps each decision onto its
+  agreement. `handover_routes.rs` holds the routes: accept takes `{agreementVersion}` (no
+  body for an older hand-over), approve adds `agreementVersion`. Deal moves, departures and
+  deletions withdraw the linked agreements in the same transaction; a pending hand-over with
+  an agreement freezes the deal's fee, client, property and split. The sample data command
+  records no agreements.
+- **Screens.** Accept in Deals opens "Review the hand-over offer" with the frozen terms and
+  sends the version shown; the Admin's approval shows the offer, says it is recorded as an
+  Admin approval and keeps a full hand-over full. Agreements labels these "In-company",
+  shows both sides as the caller's company, names the referral and the receiver's share,
+  and points to Deals instead of offering commands. The form's referral maximum follows the
+  server (99.99%), with the company limit explained in the hint.
+- **Tests.** `tests/api/agreements-handovers.test.mjs`, `agreements-handover-closes.test.mjs`
+  (with `agreements-handover-helpers.mjs`), Rust unit tests in `agreements/handover_tests.rs`
+  and `limits.rs`, the updated finance and agreements suites, and the browser flow in
+  `tests/server-browser/finance-deals-handover.spec.js`.
+- **Code security review (2026-10-22): no High findings.** Fixed: clearing sample data
+  withdraws the agreements of open in-app offers before deleting their hand-overs
+  (Medium); an Admin revise of an earned deal respects the pending-offer freeze; actions
+  and the `expired` flag use `clock_timestamp()`; the receiving company sees a neutral
+  message about the sender's referral limit ("This referral share is above what the
+  sending company allows."); a one-word client name that looks like an email or a number
+  becomes "Client"; an Admin cannot decline an expired offer (only cancel it); the
+  origin-lock test covers every agreements command.
+- **Not in A3a:** amend, complete, cancel, archive, the certificate and payment tracking
+  (A3b). Existing, outside A3a: clearing sample data suspends sample staff without the
+  finance departure step, so app offers to or from them stay open until cancelled.

@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { login } from '../api/helpers.mjs';
 import { activate, invite } from '../api/team-helpers.mjs';
-import { command, createAgreement, terms } from '../api/agreements-helpers.mjs';
+import { allowReferrals, command, createAgreement, terms } from '../api/agreements-helpers.mjs';
 import { newCompany } from '../api/company-helpers.mjs';
 import { signIn } from './helpers.js';
 import { memberPage, noPageOverflow } from './assign-helpers.js';
@@ -92,6 +92,7 @@ test('a counter-offer becomes a new revision that the sender accepts', async ({
   const stamp = Date.now();
   const member = await companyBMember(`agreement-counter-${stamp}`);
   const sender = await login('admin-a');
+  await allowReferrals(sender);
   const listing = `AG-CO-${stamp.toString(36).toUpperCase()}`;
   const property = { ...terms().property, listingRef: listing };
   const created = await createAgreement(sender, member, {

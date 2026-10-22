@@ -1,8 +1,9 @@
 //! Finance on departure (finance-design §5.1, §5.4, §13 M-F3): a staff member who stops
 //! being active or loses the finance module releases the deals they hold — earned or not
 //! — to the Admin queue, and their pending hand-overs are cancelled. Commission lines
-//! stay attributed to them; losing teamView releases nothing.
-use crate::{auth::permissions::Permissions, error::ApiResult};
+//! stay attributed to them; losing teamView releases nothing. The agreements recording
+//! those hand-overs are withdrawn in the same transaction (agreements design §14).
+use crate::{agreements::handover, auth::permissions::Permissions, error::ApiResult};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
@@ -36,7 +37,7 @@ pub async fn release(
     actor: Uuid,
     reason: &'static str,
 ) -> ApiResult<u64> {
-    let released: i64 = sqlx::query_scalar(
+    let (released, withdrawn): (i64, Vec<Uuid>) = sqlx::query_as(
         "WITH released AS (UPDATE crm_deals SET assignee_id=NULL,version=version+1, \
          updated_at=now() WHERE workspace_id=$1 AND assignee_id=$2 RETURNING id), \
          history AS (INSERT INTO crm_assignments \
@@ -52,8 +53,9 @@ pub async fn release(
          SELECT gen_random_uuid(),$3,$1,'assigned','Deals',id FROM released), \
          cancelled AS (UPDATE crm_deal_handovers SET status='cancelled',decided_by=$3, \
          decided_at=now() WHERE workspace_id=$1 AND status='pending' \
-         AND (from_id=$2 OR to_id=$2)) \
-         SELECT count(*) FROM released",
+         AND (from_id=$2 OR to_id=$2) RETURNING agreement_id) \
+         SELECT (SELECT count(*) FROM released), \
+         ARRAY(SELECT agreement_id FROM cancelled WHERE agreement_id IS NOT NULL)",
     )
     .bind(workspace)
     .bind(member)
@@ -62,6 +64,7 @@ pub async fn release(
     .bind(event_reason(reason))
     .fetch_one(&mut **tx)
     .await?;
+    handover::withdraw_all(tx, &withdrawn, actor).await?;
     Ok(released as u64)
 }
 

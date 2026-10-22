@@ -75,7 +75,7 @@ export function AgreementDetail({ id, onClose, onChanged, onEdit }) {
   const title = detail
     ? t(`agreements.kind.${detail.agreement.kind}`)
     : t('agreements.detail.title');
-  const subtitle = detail?.revision.terms.subject.property.listingRef;
+  const subtitle = detail?.revision.terms.subject.property?.listingRef;
   return (
     <Drawer className="agreement-dialog" size="wide" titleId={titleId} onClose={close}>
       <div className="drawer-top">

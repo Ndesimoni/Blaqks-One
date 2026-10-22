@@ -111,6 +111,8 @@ export const apiTestFiles = [
   'tests/api/agreements.test.mjs',
   'tests/api/agreements-guards.test.mjs',
   'tests/api/agreements-screens.test.mjs',
+  'tests/api/agreements-handovers.test.mjs',
+  'tests/api/agreements-handover-closes.test.mjs',
   'tests/api/channels.test.mjs',
   ...messagingTestFiles,
 ];

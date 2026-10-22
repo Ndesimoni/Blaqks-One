@@ -15,7 +15,8 @@ const COLUMNS: &str = "d.id,d.version,d.legacy_id,d.assignee_id,a.name AS assign
     WHERE m.entity='deal' AND m.entity_id=d.id AND m.action IN ('earned','unearned')), \
     '-infinity'::timestamptz)) AS reassigned_by_actor, \
     (SELECT h.id FROM crm_deal_handovers h WHERE h.deal_id=d.id AND h.status='pending') \
-    AS pending_handover";
+    AS pending_handover, (SELECT h.agreement_id FROM crm_deal_handovers h \
+    WHERE h.deal_id=d.id AND h.status='pending') AS pending_agreement";
 
 /// `$1` workspace, `$2` the acting user, `$3` the predicate caller (NULL = team view),
 /// `$4` an optional holder filter, `$5` an optional deal ID.

@@ -8,23 +8,34 @@ export const TABS = ['incoming', 'sent', 'all'];
 
 const opposite = (side) => (side === 'sender' ? 'recipient' : 'sender');
 
-/** 'sent' when the caller's company sends the agreement, otherwise 'incoming'. */
-export const direction = (agreement, workspaceId) =>
-  agreement.senderWorkspaceId === workspaceId ? 'sent' : 'incoming';
+/** A deal hand-over inside one company (design §14), changed only from Deals. */
+export const inCompany = (agreement) => agreement.origin === 'deal_handover';
 
-export const filterByTab = (agreements, tab, workspaceId) =>
+/**
+ * 'sent' when the caller's company sends the agreement, otherwise 'incoming'. Inside one
+ * company both sides are the same company, so the named receiver (`memberId`) sees it as
+ * incoming and everyone else, the Admin included, as sent.
+ */
+export const direction = (agreement, workspaceId, memberId) => {
+  if (agreement.senderWorkspaceId !== workspaceId) return 'incoming';
+  const receiver = inCompany(agreement) && agreement.recipientMemberId === memberId;
+  return receiver ? 'incoming' : 'sent';
+};
+
+export const filterByTab = (agreements, tab, workspaceId, memberId) =>
   tab === 'all'
     ? agreements
-    : agreements.filter((agreement) => direction(agreement, workspaceId) === tab);
+    : agreements.filter((agreement) => direction(agreement, workspaceId, memberId) === tab);
 
-/** The caller company's side of the agreement, and the other company's side. */
-export const ownSide = (agreement, workspaceId) =>
-  direction(agreement, workspaceId) === 'sent' ? 'sender' : 'recipient';
-export const otherSide = (agreement, workspaceId) => opposite(ownSide(agreement, workspaceId));
+/** The caller's side of the agreement, and the other side. */
+export const ownSide = (agreement, workspaceId, memberId) =>
+  direction(agreement, workspaceId, memberId) === 'sent' ? 'sender' : 'recipient';
+export const otherSide = (agreement, workspaceId, memberId) =>
+  opposite(ownSide(agreement, workspaceId, memberId));
 
-/** The other company's named participant: `{ name, company }`. */
-export const counterparty = (agreement, workspaceId) =>
-  agreement.parties?.[otherSide(agreement, workspaceId)] ?? {};
+/** The other side's named participant: `{ name, company }`. */
+export const counterparty = (agreement, workspaceId, memberId) =>
+  agreement.parties?.[otherSide(agreement, workspaceId, memberId)] ?? {};
 
 /** The caller's named role ('sender' or 'recipient'), or null for a non-party Admin. */
 export function partyOf(agreement, user) {
@@ -57,7 +68,7 @@ export const responder = (authorParty) => opposite(authorParty || 'sender');
  * the sender may revoke any sent offer, even an expired one. Admins act for no one.
  */
 export function allowedActions({ agreement, authorParty, party }) {
-  if (!agreement || !party) return [];
+  if (!agreement || !party || inCompany(agreement)) return [];
   if (agreement.state === 'draft') return party === 'sender' ? ['revise', 'send'] : [];
   if (agreement.state !== 'sent') return [];
   const actions = [];

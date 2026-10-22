@@ -125,3 +125,21 @@ test('every company member opens Agreements; the Super Admin sees no terms', () 
     assert.equal(canOpenSection({ roleId, permissions: {} }, 'Agreements'), true, roleId);
   assert.equal(canOpenSection({ roleId: 'super-admin', permissions: {} }, 'Agreements'), false);
 });
+
+test('an in-company hand-over is incoming for its receiver only and has no actions here', () => {
+  const handover = {
+    origin: 'deal_handover',
+    state: 'sent',
+    senderWorkspaceId: 'ws-a',
+    recipientWorkspaceId: 'ws-a',
+    senderMemberId: 'holder',
+    recipientMemberId: 'receiver',
+  };
+  assert.equal(direction(handover, 'ws-a', 'receiver'), 'incoming');
+  assert.equal(direction(handover, 'ws-a', 'holder'), 'sent');
+  assert.equal(direction(handover, 'ws-a', 'admin'), 'sent');
+  const receiver = { id: 'receiver', workspaceId: 'ws-a' };
+  const party = partyOf(handover, receiver);
+  assert.equal(party, 'recipient');
+  assert.deepEqual(allowedActions({ agreement: handover, authorParty: 'sender', party }), []);
+});

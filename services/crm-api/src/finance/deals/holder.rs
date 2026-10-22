@@ -4,6 +4,7 @@
 //! earned deal never change; a referral is only added to unearned deals.
 use super::row::DealRow;
 use crate::{
+    agreements::handover,
     error::ApiResult,
     finance::events::{self, Action, Changes, Entity},
     records::{
@@ -46,14 +47,16 @@ pub async fn apply(tx: &mut Transaction<'_, Postgres>, change: Move<'_>) -> ApiR
     .bind(referral.map(|(share, _)| share))
     .execute(&mut **tx)
     .await?;
-    sqlx::query(
+    let withdrawn: Vec<Option<Uuid>> = sqlx::query_scalar(
         "UPDATE crm_deal_handovers SET status='cancelled',decided_by=$2,decided_at=now() \
-         WHERE deal_id=$1 AND status='pending'",
+         WHERE deal_id=$1 AND status='pending' RETURNING agreement_id",
     )
     .bind(deal.id)
     .bind(change.actor)
-    .execute(&mut **tx)
+    .fetch_all(&mut **tx)
     .await?;
+    let withdrawn: Vec<Uuid> = withdrawn.into_iter().flatten().collect();
+    handover::withdraw_all(tx, &withdrawn, change.actor).await?;
     let record = Change {
         workspace: change.workspace,
         record: deal.id,

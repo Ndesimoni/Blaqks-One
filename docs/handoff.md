@@ -74,6 +74,10 @@ stored records). Test on the disposable database with synthetic records.
   [Agreements design](agreements-design.md) §13.
 - **Team chat C3:** private groups (with adding people later) and in-app @mentions; see
   [Team chat](team-chat.md).
+- **Agreements A3a:** every deal hand-over inside a company is recorded as an agreement;
+  the receiver reviews the full offer before accepting; see
+  [Agreements design](agreements-design.md) §14–§16. Next in this line: **A3b** (amend,
+  complete, cancel, archive, the certificate and payment tracking between companies).
 
 ### N4 — WhatsApp (blocked on the owner)
 

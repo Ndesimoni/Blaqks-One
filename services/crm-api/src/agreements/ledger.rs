@@ -54,16 +54,30 @@ pub async fn event(
     actor: Uuid,
     party: Party,
 ) -> ApiResult<()> {
+    event_by(tx, agreement, revision, action, actor, Some(party)).await
+}
+
+/// An event by a participant, or (`party` `None`) by an Admin or system path on an
+/// in-company hand-over, such as a deal moved or a member leaving.
+pub async fn event_by(
+    tx: &mut Transaction<'_, Postgres>,
+    agreement: Uuid,
+    revision: Option<Uuid>,
+    action: &str,
+    actor: Uuid,
+    party: Option<Party>,
+) -> ApiResult<()> {
     sqlx::query(
         "INSERT INTO agreements.crm_agreement_events
-         (id,agreement_id,revision_id,action,actor_id,party) VALUES ($1,$2,$3,$4,$5,$6)",
+         (id,agreement_id,revision_id,action,actor_id,party,created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,clock_timestamp())",
     )
     .bind(Uuid::new_v4())
     .bind(agreement)
     .bind(revision)
     .bind(action)
     .bind(actor)
-    .bind(party.as_str())
+    .bind(party.map(Party::as_str))
     .execute(&mut **tx)
     .await?;
     Ok(())
@@ -73,8 +87,8 @@ pub async fn event(
 pub async fn respond(tx: &mut Transaction<'_, Postgres>, response: &Response<'_>) -> ApiResult<()> {
     sqlx::query(
         "INSERT INTO agreements.crm_agreement_actions
-         (id,agreement_id,revision_id,action,actor_id,party,verification,accepted_digest)
-         VALUES ($1,$2,$3,$4,$5,$6,'member',$7)",
+         (id,agreement_id,revision_id,action,actor_id,party,verification,accepted_digest,
+         created_at) VALUES ($1,$2,$3,$4,$5,$6,'member',$7,clock_timestamp())",
     )
     .bind(Uuid::new_v4())
     .bind(response.agreement)

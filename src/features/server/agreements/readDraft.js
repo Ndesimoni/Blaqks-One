@@ -7,10 +7,14 @@ import { parseAed, parsePercent } from '../../../lib/finance/money.js';
 import { dubaiToday } from '../../../lib/dubaiDate.js';
 import { BASES, PAYMENTS, endOfDubaiDay, expiryRange } from './agreementDraft.js';
 
-/** Sender share limits in basis points per type (model.rs `Kind::shares`). */
+/**
+ * Sender share limits in basis points per type (model.rs `Kind::shares`). A referral is
+ * further capped by the sending company's limit in Finance settings, which the server
+ * checks (agreements design §14).
+ */
 export const SHARE_LIMITS = {
   handover_full: [0, 0],
-  handover_referral: [1, 5_000],
+  handover_referral: [1, 9_999],
   co_broking: [1, 9_999],
 };
 

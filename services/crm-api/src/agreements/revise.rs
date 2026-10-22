@@ -6,7 +6,7 @@ use super::{
     command::{self, Command},
     errors,
     evidence::Place,
-    ledger,
+    ledger, limits,
     model::{Kind, Party, State as AgreementState},
     store, terms,
     write::{self, NewRevision},
@@ -36,6 +36,8 @@ async fn freeze(
     let kind = Kind::parse(&row.kind)?;
     let input = command.body.get("terms").cloned().unwrap_or(Value::Null);
     let built = terms::build(kind, &input, OffsetDateTime::now_utc())?;
+    let sender = (row.workspace_id.as_str(), author == Party::Sender);
+    limits::ensure(&mut command.tx, kind, &built.value, sender).await?;
     let current = store::current(&mut command.tx, row.id).await?;
     let parties = row.parties();
     let revision = NewRevision {
@@ -45,7 +47,7 @@ async fn freeze(
             parent: Some(current.id),
         },
         parties: &parties,
-        author,
+        author: author.as_str(),
         created_by: command.actor,
     };
     let tx = &mut command.tx;
@@ -84,7 +86,7 @@ pub async fn counter(
     let mut command =
         command::begin(&state, &session, &headers, &workspace, &id, body, &KEYS).await?;
     let current = store::current(&mut command.tx, command.row.id).await?;
-    let author = current.author().other();
+    let author = current.author()?.other();
     access::require(command.party, author)?;
     command.ensure_open()?;
     freeze(command, author, "sent", "countered").await

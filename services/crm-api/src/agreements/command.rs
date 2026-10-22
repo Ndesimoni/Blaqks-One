@@ -1,8 +1,11 @@
 //! The shared start of every agreement command (docs/agreements-design.md §4, §9):
 //! CSRF, an exact body with `expectedVersion`, the caller's workspace lock, a live
 //! membership re-check, the agreement row lock, then participant and version checks.
-//! Party checks run before any state check, so non-parties learn nothing.
-use super::{access, model::Party, model::STALE, rows::AgreementRow, store, wire};
+//! Party checks run before any state check, so non-parties learn nothing. In-company
+//! hand-overs change only through Deals (design §14), so every command here refuses them.
+use super::{
+    access, errors::HANDOVER, model::Party, model::STALE, rows::AgreementRow, store, wire,
+};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -47,6 +50,9 @@ pub async fn begin(
         .await?
         .ok_or_else(ApiError::missing)?;
     let party = access::acting_party(&row, session, workspace)?;
+    if row.handover() {
+        return Err(ApiError::conflict(HANDOVER));
+    }
     if row.version != expected {
         return Err(ApiError::stale(STALE));
     }

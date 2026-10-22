@@ -35,12 +35,15 @@ fn deal_routes() -> Router<AppState> {
             &deal("/handovers"),
             post(deals::handover::request).layer(body()),
         )
-        .route(&handover("accept"), post(deals::handover_decide::accept))
-        .route(&handover("decline"), post(deals::handover_decide::decline))
-        .route(&handover("cancel"), post(deals::handover_decide::cancel))
+        .route(
+            &handover("accept"),
+            post(deals::handover_routes::accept).layer(body()),
+        )
+        .route(&handover("decline"), post(deals::handover_routes::decline))
+        .route(&handover("cancel"), post(deals::handover_routes::cancel))
         .route(
             &handover("approve"),
-            post(deals::handover_decide::approve).layer(body()),
+            post(deals::handover_routes::approve).layer(body()),
         )
         .route(
             &format!("{BASE}/assignees"),

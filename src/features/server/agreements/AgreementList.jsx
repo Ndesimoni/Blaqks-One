@@ -11,6 +11,7 @@ import {
   direction,
   displayState,
   filterByTab,
+  inCompany,
   ownSide,
   partyOf,
   shareOf,
@@ -36,22 +37,28 @@ function AgreementRow({ agreement, onOpen }) {
   const { t, format } = useI18n();
   const summary = agreement.summary || {};
   const state = displayState(agreement, summary.authorParty);
-  const other = counterparty(agreement, user.workspaceId);
+  const other = counterparty(agreement, user.workspaceId, user.id);
   const name = other.name || t('agreements.party.unknown');
-  const where = direction(agreement, user.workspaceId) === 'sent' ? 'to' : 'from';
+  const where = direction(agreement, user.workspaceId, user.id) === 'sent' ? 'to' : 'from';
   const move = turn(agreement, partyOf(agreement, user), summary.authorParty);
   const details = [other.company, summary.listingRef, summary.area].filter(Boolean).join(' · ');
   return (
     <li>
       <button type="button" className="agreement-row" onClick={() => onOpen(agreement.id)}>
         <span className="agreement-row-main">
-          <span className="agreement-row-kind">{t(`agreements.kind.${agreement.kind}`)}</span>
+          <span className="agreement-row-kind">
+            {inCompany(agreement)
+              ? t('agreements.kind.inCompany', { kind: t(`agreements.kind.${agreement.kind}`) })
+              : t(`agreements.kind.${agreement.kind}`)}
+          </span>
           <strong>{t(`agreements.row.${where}`, { name })}</strong>
           {details && <span className="agreement-row-sub">{details}</span>}
         </span>
         <span className="agreement-row-share">
           <small>{t('agreements.row.yourShare')}</small>
-          <strong>{format.percent(shareOf(summary, ownSide(agreement, user.workspaceId)))}</strong>
+          <strong>
+            {format.percent(shareOf(summary, ownSide(agreement, user.workspaceId, user.id)))}
+          </strong>
         </span>
         <span className="agreement-row-status">
           <Badge tone={stateTone(state)}>{t(`agreements.state.${state}`)}</Badge>
@@ -98,7 +105,7 @@ export function AgreementList({ list, tab, onOpen, onCreate }) {
         />
       </section>
     );
-  const shown = filterByTab(list.items, tab, user.workspaceId);
+  const shown = filterByTab(list.items, tab, user.workspaceId, user.id);
   if (!shown.length)
     return (
       <section className="panel agreements-state">

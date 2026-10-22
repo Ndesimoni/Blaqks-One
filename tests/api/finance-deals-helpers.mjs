@@ -116,3 +116,11 @@ export async function earnDeal(admin, deal, earnedOn) {
 }
 
 export const sortedKeys = (value) => Object.keys(value).sort();
+
+/** The version of a hand-over's agreement as `session` sees it (agreements design §14). */
+export async function seen(session, admin, handover) {
+  const path = `/workspaces/${admin.user.workspaceId}/agreements/${handover.agreementId}`;
+  const read = await session.request(path);
+  if (read.status !== 200) throw Error(`agreement: ${JSON.stringify(read.value)}`);
+  return { agreementVersion: read.value.agreement.version };
+}

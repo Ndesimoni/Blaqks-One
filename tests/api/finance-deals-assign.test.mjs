@@ -3,7 +3,7 @@ import { before, test } from 'node:test';
 import { query } from './helpers.mjs';
 import { events, financePath, refused } from './finance-helpers.mjs';
 import { DEAL_MESSAGES as M, createDeal, dealPath, dealTeams } from './finance-deals-helpers.mjs';
-import { earnDeal, heldClient, overview, post } from './finance-deals-helpers.mjs';
+import { earnDeal, heldClient, overview, post, seen } from './finance-deals-helpers.mjs';
 
 let teams, client;
 before(async () => {
@@ -102,6 +102,7 @@ test('earned deals hand over fully only, and their lines never change', async ()
   const id = full.value.handover.id;
   const accepted = await second.request(financePath(admin, `/handovers/${id}/accept`), {
     method: 'POST',
+    body: await seen(second, admin, full.value.handover),
   });
   assert.equal(accepted.status, 200, JSON.stringify(accepted.value));
   assert.deepEqual(accepted.value.entry.calculation.lines, [], 'not their line');

@@ -30,6 +30,7 @@ import enFieldHints from './en/fieldHints.js';
 import enInbox from './en/inbox.js';
 import enInboxRules from './en/inboxRules.js';
 import enInboxSaved from './en/inboxSaved.js';
+import enHandoverOffer from './en/handoverOffer.js';
 import enInboxSend from './en/inboxSend.js';
 import enInboxTriage from './en/inboxTriage.js';
 import enMailbox from './en/mailbox.js';
@@ -53,6 +54,7 @@ export const catalogs = Object.freeze({
     inbox: enInbox,
     inboxRules: enInboxRules,
     inboxSaved: enInboxSaved,
+    handoverOffer: enHandoverOffer,
     inboxSend: enInboxSend,
     inboxTriage: enInboxTriage,
     mailbox: enMailbox,

@@ -17,6 +17,8 @@ pub mod fixtures;
 pub mod gate;
 pub mod handover;
 pub mod handover_decide;
+pub mod handover_evidence;
+pub mod handover_routes;
 pub mod handover_rows;
 pub mod handover_store;
 pub mod holder;

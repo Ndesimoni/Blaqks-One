@@ -1,6 +1,6 @@
 //! `POST/GET /agreements` (docs/agreements-design.md §9–§10, §13): participant-scoped
 //! lists with both parties' names, and drafts created by the named sender.
-use super::{access, evidence::Parties, model::Kind, parties, store, terms, wire, write};
+use super::{access, evidence::Parties, limits, model::Kind, parties, store, terms, wire, write};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -42,13 +42,15 @@ pub async fn create(
     let live =
         workspaces::ensure_writable(&mut tx, &workspace, session.user.id, None, None).await?;
     store::ensure_recipient(&mut tx, &workspace, &recipient_workspace, recipient_member).await?;
+    limits::ensure(&mut tx, kind, &built.value, (&workspace, true)).await?;
     let parties = Parties {
         sender_workspace: workspace.clone(),
         sender_member: live.id,
         recipient_workspace,
         recipient_member,
     };
-    let id = write::insert_draft(&mut tx, &parties, kind.as_str(), live.id, &built).await?;
+    let kind = (kind.as_str(), "direct");
+    let id = write::insert_draft(&mut tx, &parties, kind, live.id, &built).await?;
     let row = store::load(&mut tx, id)
         .await?
         .ok_or_else(ApiError::missing)?;
@@ -67,8 +69,10 @@ pub async fn list(
     access::ensure_reader(&state, &session, &workspace).await?;
     let admin = session.user.role == "admin";
     let mut tx = state.pool.begin().await?;
-    let rows = store::list(&mut tx, &workspace, session.user.id, admin).await?;
+    let mut rows = store::list(&mut tx, &workspace, session.user.id, admin).await?;
+    rows.retain(|row| access::can_read(row, &session, &workspace));
     let items = parties::views(&mut tx, &rows).await?;
+    let cap = limits::referral_cap(&mut tx, &workspace).await?;
     tx.commit().await?;
-    Ok(Json(json!({ "agreements": items })))
+    Ok(Json(json!({ "agreements": items, "referralCapBp": cap })))
 }

@@ -1,9 +1,11 @@
 //! `POST /finance/deals/{id}/handovers {version, toId, referralShareBp|null}` (§13 H-F1):
 //! the holder offers their deal to an active finance colleague, fully or keeping a
 //! referral share (capped by the team setting). Nothing moves until the receiver accepts.
+//! An offer made in the app is recorded as an agreement (agreements design §14).
 use super::{
     assign::SHARES,
     gate::{self, Need, STALE},
+    handover_evidence,
     handover_rows::{self, CAP, HAS_SECOND},
     links,
     row::{self, DealRow},
@@ -74,7 +76,7 @@ pub async fn request(
     if deal.version != version {
         return Err(ApiError::stale(STALE));
     }
-    let handover = offer(&mut tx, &workspace, &live, &deal, to, referral).await?;
+    let handover = offer(&mut tx, &workspace, &live, &deal, to, referral, true).await?;
     let row = handover_rows::find(&mut tx, handover).await?;
     tx.commit().await?;
     let view = row.view(&Viewer::of(&live));
@@ -83,6 +85,7 @@ pub async fn request(
 
 /// Steps 7–10 on the locked deal with the live holder: holder-only, one pending request,
 /// an eligible receiver and the move rules, then the pending request. Returns its ID.
+/// `evidence` records the offer as an agreement; the sample data command records none.
 pub async fn offer(
     tx: &mut Transaction<'_, Postgres>,
     workspace: &str,
@@ -90,6 +93,7 @@ pub async fn offer(
     deal: &DealRow,
     to: Uuid,
     referral: Option<i32>,
+    evidence: bool,
 ) -> ApiResult<Uuid> {
     if deal.assignee_id != Some(live.id) {
         return Err(ApiError::denied(HOLDER_ONLY));
@@ -101,11 +105,15 @@ pub async fn offer(
         return Err(ApiError::invalid(INELIGIBLE));
     }
     ensure_move(tx, workspace, deal, to, referral).await?;
+    let agreement = match evidence {
+        true => Some(handover_evidence::offer(tx, workspace, deal, (live.id, to), referral).await?),
+        false => None,
+    };
     let handover = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO crm_deal_handovers \
-         (id,workspace_id,deal_id,from_id,to_id,referral_share_bp,requested_by) \
-         VALUES ($1,$2,$3,$4,$5,$6,$4)",
+         (id,workspace_id,deal_id,from_id,to_id,referral_share_bp,requested_by,agreement_id) \
+         VALUES ($1,$2,$3,$4,$5,$6,$4,$7)",
     )
     .bind(handover)
     .bind(workspace)
@@ -113,6 +121,7 @@ pub async fn offer(
     .bind(live.id)
     .bind(to)
     .bind(referral)
+    .bind(agreement)
     .execute(&mut **tx)
     .await?;
     Ok(handover)

@@ -8,6 +8,7 @@ import {
   memberPage,
   openDeal,
   openDeals,
+  shoot,
 } from './finance-deals-fixtures.js';
 
 test('a holder offers a deal keeping a referral share and the teammate accepts it', async ({
@@ -59,7 +60,16 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   ).toHaveCount(0);
   for (const layout of layouts) await checkLayout(receiver.page, layout, 'deal-handover-incoming');
   await receiver.page.setViewportSize({ width: 1280, height: 900 });
+  // The receiver reviews the full offer (agreements design §14–§15) and accepts that version.
   await incoming.getByRole('button', { name: `Accept hand-over of ${deal.dealId}` }).click();
+  const review = receiver.page.getByRole('dialog', { name: 'Review the hand-over offer' });
+  await expect(review).toContainText('Deal fee');
+  await expect(review).toContainText('No property is linked to this deal.');
+  await expect(review).toContainText('Share of the receiving agent’s commission');
+  for (const layout of layouts) await checkLayout(receiver.page, layout, 'deal-handover-review');
+  await receiver.page.setViewportSize({ width: 1280, height: 900 });
+  await review.getByRole('button', { name: 'Accept offer' }).click();
+  await expect(review).toHaveCount(0);
   await expect(incoming).toHaveCount(0);
   details = await openDeal(receiver.page, deal.dealId);
   await expect(details.getByRole('region', { name: 'Commission' })).toContainText(
@@ -71,6 +81,22 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   await expect(holder.page.locator('.page-heading h1')).toHaveText('Deals & commissions');
   await expect(holder.page.getByRole('heading', { name: 'No deals yet' })).toBeVisible();
   await expect(holder.page.getByRole('region', { name: 'Hand-over requests' })).toHaveCount(0);
+  // The accepted hand-over is kept under Agreements, decided only from Deals.
+  await details.getByRole('button', { name: 'Close deal details' }).click();
+  await receiver.page
+    .getByRole('navigation', { name: 'CRM sections' })
+    .getByRole('button', { name: 'Agreements', exact: true })
+    .click();
+  await receiver.page
+    .getByRole('button', { name: /In-company/ })
+    .first()
+    .click();
+  const kept = receiver.page.getByRole('dialog');
+  await expect(kept).toContainText('Accepted');
+  await expect(kept.getByRole('button', { name: 'Accept' })).toHaveCount(0);
+  await expect(kept).not.toContainText('Another company');
+  await receiver.page.waitForTimeout(400);
+  await shoot(receiver.page, 'deal-handover-agreement');
   await holder.context.close();
   await receiver.context.close();
 });

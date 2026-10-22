@@ -87,7 +87,7 @@ async fn offer(
     let holder = deal.assignee_id.unwrap_or(admin.id);
     let live = gate::relock(tx, workspace, holder, Need::Assign).await;
     let live = live.map_err(failed)?;
-    let request = handover::offer(tx, workspace, &live, deal, to, referral).await;
+    let request = handover::offer(tx, workspace, &live, deal, to, referral, false).await;
     let request = request.map_err(failed)?;
     present::mark(tx, "handover", request, workspace).await?;
     if !approved {

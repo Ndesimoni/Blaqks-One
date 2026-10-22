@@ -84,16 +84,21 @@ export function financeDealRoutes(base, send, request) {
         toId,
         referralShareBp: referralShareBp ?? null,
       }),
-    /** Receiver accept/decline, requester or Admin cancel; no body. */
-    decideHandover: (workspace, id, decision) => {
+    /**
+     * Receiver accept/decline, requester or Admin cancel. Accepting an offer recorded as an
+     * agreement names the agreement version the receiver was shown (agreements §14).
+     */
+    decideHandover: (workspace, id, decision, agreementVersion) => {
       if (!handoverDecisions.includes(decision)) throw new Error('Unknown hand-over decision.');
-      return send(handover(workspace, id, decision), 'POST');
+      const body = decision === 'accept' && agreementVersion ? { agreementVersion } : undefined;
+      return send(handover(workspace, id, decision), 'POST', body);
     },
     /** Admin approval, optionally adjusting the referral share, with a reason. */
-    approveHandover: (workspace, id, referralShareBp, reason) =>
+    approveHandover: (workspace, id, referralShareBp, reason, agreementVersion) =>
       send(handover(workspace, id, 'approve'), 'POST', {
         referralShareBp: referralShareBp ?? null,
         reason,
+        agreementVersion: agreementVersion ?? null,
       }),
   };
 }

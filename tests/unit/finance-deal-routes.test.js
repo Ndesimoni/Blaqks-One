@@ -31,9 +31,10 @@ test('hand-over, earn-preview, revise and Admin move routes follow the B3 contra
   await api.requestHandover('ws', meta, 'u-4', null);
   await api.requestHandover('ws', meta, 'u-4', 1000);
   await api.decideHandover('ws', 'h/1', 'accept');
+  await api.decideHandover('ws', 'h/1', 'accept', 2);
   await api.decideHandover('ws', 'h/1', 'decline');
   await api.decideHandover('ws', 'h/1', 'cancel');
-  await api.approveHandover('ws', 'h/1', 500, 'Adjusted');
+  await api.approveHandover('ws', 'h/1', 500, 'Adjusted', 2);
   await api.approveHandover('ws', 'h/1', undefined, 'Full');
   assert.deepEqual(calls, [
     ['GET', '/deals/d%2F1/earn-preview?earnedOn=2026-10-01', undefined],
@@ -52,10 +53,19 @@ test('hand-over, earn-preview, revise and Admin move routes follow the B3 contra
     ['POST', '/deals/d%2F1/handovers', { version: 3, toId: 'u-4', referralShareBp: null }],
     ['POST', '/deals/d%2F1/handovers', { version: 3, toId: 'u-4', referralShareBp: 1000 }],
     ['POST', '/handovers/h%2F1/accept', undefined],
+    ['POST', '/handovers/h%2F1/accept', { agreementVersion: 2 }],
     ['POST', '/handovers/h%2F1/decline', undefined],
     ['POST', '/handovers/h%2F1/cancel', undefined],
-    ['POST', '/handovers/h%2F1/approve', { referralShareBp: 500, reason: 'Adjusted' }],
-    ['POST', '/handovers/h%2F1/approve', { referralShareBp: null, reason: 'Full' }],
+    [
+      'POST',
+      '/handovers/h%2F1/approve',
+      { referralShareBp: 500, reason: 'Adjusted', agreementVersion: 2 },
+    ],
+    [
+      'POST',
+      '/handovers/h%2F1/approve',
+      { referralShareBp: null, reason: 'Full', agreementVersion: null },
+    ],
   ]);
   assert.throws(() => api.decideHandover('ws', 'h', 'approve'), /Unknown hand-over decision/);
   assert.equal(typeof api.financeHistory, 'function', 'history stays for B4');

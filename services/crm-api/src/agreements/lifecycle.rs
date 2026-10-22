@@ -2,8 +2,8 @@
 use super::{
     access,
     command::{self, Command},
-    ledger,
-    model::{Party, State as AgreementState, INVALID},
+    ledger, limits,
+    model::{Kind, Party, State as AgreementState, INVALID},
     store,
 };
 use crate::{
@@ -59,6 +59,9 @@ pub async fn send(
     if expires <= OffsetDateTime::now_utc() + Duration::hours(1) {
         return Err(ApiError::conflict(EXPIRY_PASSED));
     }
+    let kind = Kind::parse(&command.row.kind)?;
+    let sender = command.row.workspace_id.clone();
+    limits::ensure(&mut command.tx, kind, &revision.terms, (&sender, true)).await?;
     let tx = &mut command.tx;
     let version = ledger::bump(tx, id, command.row.version, "sent", Some(expires), None).await?;
     ledger::event(

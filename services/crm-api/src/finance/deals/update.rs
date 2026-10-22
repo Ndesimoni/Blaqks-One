@@ -2,6 +2,7 @@
 //! Split fields are refused; earned money terms change only on the Admin path.
 use super::{
     gate::{self, Need, STALE},
+    handover_evidence::PENDING_FROZEN,
     input::{self, INVALID},
     links, list,
     row::{self, LOST},
@@ -56,6 +57,11 @@ pub async fn update(
     }
     let before = stored(&deal);
     let money = money_changed(&before, &input);
+    let subject =
+        (&input.client_ref, &input.property_ref) != (&before.client_ref, &before.property_ref);
+    if deal.pending_agreement.is_some() && (money || subject) {
+        return Err(ApiError::conflict(PENDING_FROZEN));
+    }
     if deal.earned() && money && !live.finance_access().manage {
         return Err(ApiError::denied(EARNED_LOCKED));
     }

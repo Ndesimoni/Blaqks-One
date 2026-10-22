@@ -48,6 +48,8 @@ pub struct DealRow {
     /// earn or unearn.
     pub reassigned_by_actor: bool,
     pub pending_handover: Option<Uuid>,
+    /// The agreement recording the pending hand-over, if it has one (agreements §14).
+    pub pending_agreement: Option<Uuid>,
 }
 
 impl DealRow {

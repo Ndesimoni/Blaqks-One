@@ -1,40 +1,34 @@
-//! Deciding hand-over requests (§13 H-F1): `POST /finance/handovers/{id}/accept`,
-//! `/decline`, `/cancel` (no body) and `/approve {referralShareBp|null, reason}` (Admin,
-//! may adjust the referral). Accepting or approving moves the deal to the receiver.
+//! Deciding hand-over requests (§13 H-F1; routes in `handover_routes.rs`). Accepting or
+//! approving moves the deal to the receiver. A request recorded as an agreement moves its
+//! agreement in the same transaction (agreements design §14), after the deal lock.
 use super::{
     gate::{self, Need},
     handover::ensure_move,
+    handover_evidence,
     handover_rows::{self, NOT_PENDING},
     handover_store::{self, Decision},
     holder::{self, Move},
     links, list, row,
-    split::nullable_bp,
     views::Viewer,
 };
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
-    finance::wire,
     state::AppState,
 };
-use axum::{
-    extract::{rejection::JsonRejection, Path, State},
-    http::HeaderMap,
-    Json,
-};
+use axum::Json;
 use serde_json::{json, Value};
 
 pub const RECEIVER_GONE: &str = "The receiving agent can no longer hold this deal.";
-const INVALID: &str = "Provide a referral share or null, and a reason.";
 const ACCEPTED: &str = "Hand-over accepted by the receiving agent.";
 
 /// Steps 4–10 once the caller-only checks passed. `approval` is the Admin's referral
-/// share and reason.
-async fn decide(
+/// share and reason; `version` the agreement version the decider saw.
+pub async fn decide(
     state: AppState,
     session: Session,
     (workspace, id): (String, String),
-    decision: Decision,
+    (decision, version): (Decision, Option<i64>),
     approval: Option<(Option<i32>, String)>,
 ) -> ApiResult<Json<Value>> {
     let need = match decision {
@@ -60,6 +54,8 @@ async fn decide(
             return Err(ApiError::conflict(RECEIVER_GONE));
         }
         ensure_move(&mut tx, &workspace, &deal, request.to_id, referral).await?;
+        let decided = (decision, &live);
+        handover_evidence::decide(&mut tx, &request, decided, version, referral).await?;
         handover_store::set_status(&mut tx, id, decision, referral, live.id).await?;
         let reason = approval
             .as_ref()
@@ -77,6 +73,7 @@ async fn decide(
         holder::apply(&mut tx, change).await?;
         entry = json!(list::entry(&mut tx, &workspace, &live, deal_id).await?);
     } else {
+        handover_evidence::decide(&mut tx, &request, (decision, &live), None, None).await?;
         handover_store::set_status(&mut tx, id, decision, referral, live.id).await?;
     }
     let view = handover_rows::find(&mut tx, id)
@@ -84,64 +81,4 @@ async fn decide(
         .view(&Viewer::of(&live));
     tx.commit().await?;
     Ok(Json(json!({"handover": view, "entry": entry})))
-}
-
-async fn simple(
-    State(state): State<AppState>,
-    session: Session,
-    headers: HeaderMap,
-    Path(path): Path<(String, String)>,
-    decision: Decision,
-) -> ApiResult<Json<Value>> {
-    gate::writer(&state, &session, &headers, &path.0, Need::Module).await?;
-    decide(state, session, path, decision, None).await
-}
-
-pub async fn accept(
-    state: State<AppState>,
-    session: Session,
-    headers: HeaderMap,
-    path: Path<(String, String)>,
-) -> ApiResult<Json<Value>> {
-    simple(state, session, headers, path, Decision::Accept).await
-}
-
-pub async fn decline(
-    state: State<AppState>,
-    session: Session,
-    headers: HeaderMap,
-    path: Path<(String, String)>,
-) -> ApiResult<Json<Value>> {
-    simple(state, session, headers, path, Decision::Decline).await
-}
-
-pub async fn cancel(
-    state: State<AppState>,
-    session: Session,
-    headers: HeaderMap,
-    path: Path<(String, String)>,
-) -> ApiResult<Json<Value>> {
-    simple(state, session, headers, path, Decision::Cancel).await
-}
-
-pub async fn approve(
-    State(state): State<AppState>,
-    session: Session,
-    headers: HeaderMap,
-    Path(path): Path<(String, String)>,
-    body: Result<Json<Value>, JsonRejection>,
-) -> ApiResult<Json<Value>> {
-    gate::writer(&state, &session, &headers, &path.0, Need::Manage).await?;
-    let Json(body) = body.map_err(|_| ApiError::invalid(INVALID))?;
-    let body = wire::exact(body, &["referralShareBp", "reason"], INVALID)?;
-    let referral = nullable_bp(&body["referralShareBp"])?.filter(|share| *share > 0);
-    let reason = gate::reason(&body["reason"])?;
-    decide(
-        state,
-        session,
-        path,
-        Decision::Approve,
-        Some((referral, reason)),
-    )
-    .await
 }

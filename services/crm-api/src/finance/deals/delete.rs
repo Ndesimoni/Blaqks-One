@@ -7,6 +7,7 @@ use super::{
     row,
 };
 use crate::{
+    agreements::handover,
     auth::session::Session,
     error::{ApiError, ApiResult},
     finance::{
@@ -48,6 +49,10 @@ pub async fn delete(
     }
     if deal.ever_earned {
         return Err(ApiError::conflict(EVER_EARNED));
+    }
+    // The hand-over row goes with the deal; its agreement is withdrawn first (§14).
+    if let Some(agreement) = deal.pending_agreement {
+        handover::withdraw(&mut tx, agreement, live.id, None).await?;
     }
     sqlx::query("DELETE FROM crm_deals WHERE id=$1")
         .bind(deal.id)

@@ -10,31 +10,34 @@ use crate::error::ApiResult;
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
-/// A new revision of an existing agreement, authored by one party.
+/// A new revision of an existing agreement, written by `author`: `sender`, `recipient`
+/// or, on an in-company hand-over, `admin`.
 pub struct NewRevision<'a> {
     pub place: Place,
     pub parties: &'a Parties,
-    pub author: Party,
+    pub author: &'static str,
     pub created_by: Uuid,
 }
 
+/// A draft; `origin` is `direct`, or `deal_handover` when finance records a hand-over.
 pub async fn insert_draft(
     tx: &mut Transaction<'_, Postgres>,
     parties: &Parties,
-    kind: &str,
+    (kind, origin): (&str, &str),
     created_by: Uuid,
     terms: &BuiltTerms,
 ) -> ApiResult<Uuid> {
     let id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO agreements.crm_agreements
-         (id,workspace_id,recipient_workspace_id,kind,state,version,created_by)
-         VALUES ($1,$2,$3,$4,'draft',1,$5)",
+         (id,workspace_id,recipient_workspace_id,kind,origin,state,version,created_by)
+         VALUES ($1,$2,$3,$4,$5,'draft',1,$6)",
     )
     .bind(id)
     .bind(&parties.sender_workspace)
     .bind(&parties.recipient_workspace)
     .bind(kind)
+    .bind(origin)
     .bind(created_by)
     .execute(&mut **tx)
     .await?;
@@ -57,7 +60,7 @@ pub async fn insert_draft(
     let first = NewRevision {
         place,
         parties,
-        author: Party::Sender,
+        author: Party::Sender.as_str(),
         created_by,
     };
     let (revision, _) = insert_revision(tx, first, terms).await?;
@@ -77,17 +80,17 @@ pub async fn insert_revision(
     terms: &BuiltTerms,
 ) -> ApiResult<(Uuid, String)> {
     let id = Uuid::new_v4();
-    let sealed = evidence::seal(terms, revision.parties, &revision.place);
+    let sealed = evidence::seal(terms, revision.parties, &revision.place, revision.author);
     sqlx::query(
-        "INSERT INTO agreements.crm_agreement_revisions
-         (id,agreement_id,number,parent_id,author_party,terms,subject_digest,digest,created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)",
+        "INSERT INTO agreements.crm_agreement_revisions (id,agreement_id,number,parent_id,
+         author_party,terms,subject_digest,digest,created_by,digest_scheme)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,2)",
     )
     .bind(id)
     .bind(revision.place.agreement)
     .bind(revision.place.number)
     .bind(revision.place.parent)
-    .bind(revision.author.as_str())
+    .bind(revision.author)
     .bind(&sealed.terms)
     .bind(&terms.subject_digest)
     .bind(&sealed.digest)

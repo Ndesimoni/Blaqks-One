@@ -1,3 +1,5 @@
+import { settingsBody } from './finance-helpers.mjs';
+
 /** Shared fixtures for the agreement API suites (docs/agreements-design.md). */
 export function terms(overrides = {}) {
   return {
@@ -51,4 +53,13 @@ export async function sentAgreement(sender, recipient, body) {
   const sent = await command(sender, id, 'send', { expectedVersion: 1 });
   if (sent.status !== 200) throw Error(JSON.stringify(sent.value));
   return id;
+}
+
+/** Sets the sending company's referral limit (design §14), which referral offers need. */
+export async function allowReferrals(admin, maxReferralShareBp = 5000) {
+  const finance = `/workspaces/${admin.user.workspaceId}/finance`;
+  const current = (await admin.request(finance)).value?.settings;
+  const body = settingsBody({ version: current?.version ?? null, maxReferralShareBp });
+  const saved = await admin.request(`${finance}/settings`, { method: 'PUT', body });
+  if (saved.status !== 200) throw Error(`referral limit: ${JSON.stringify(saved.value)}`);
 }

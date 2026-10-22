@@ -6,7 +6,7 @@ use super::{
     rows::AgreementRow,
 };
 use crate::{
-    auth::{protection, session::Session},
+    auth::{finance_access::FinanceScope, protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces,
@@ -56,10 +56,14 @@ fn visible_to(row: &AgreementRow, workspace: &str) -> bool {
 }
 
 /// Participants read their own agreements; an Admin reads the company's. Other
-/// staff, including team-wide readers, get not-found.
+/// staff, including team-wide readers, get not-found. A deal hand-over shows deal money,
+/// so staff read it only while they hold the finance module (design §14).
 pub fn can_read(row: &AgreementRow, session: &Session, workspace: &str) -> bool {
+    let admin = session.user.role == "admin";
+    let finance = session.user.finance_access().scope != FinanceScope::None;
     visible_to(row, workspace)
-        && (party_of(row, session.user.id, workspace).is_some() || session.user.role == "admin")
+        && (party_of(row, session.user.id, workspace).is_some() || admin)
+        && (admin || finance || !row.handover())
 }
 
 /// The caller's party when they may act on this agreement at all; otherwise not-found.

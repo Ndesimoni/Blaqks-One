@@ -8,12 +8,13 @@ use uuid::Uuid;
 pub const NOT_MEMBER: &str = "Choose an active member of the receiving company.";
 pub const SAME_COMPANY: &str = "Choose a member of another company.";
 
-const SELECT: &str = "SELECT a.id,a.workspace_id,a.recipient_workspace_id,a.kind,a.state,a.version,
+const SELECT: &str =
+    "SELECT a.id,a.workspace_id,a.recipient_workspace_id,a.kind,a.origin,a.state,a.version,
     a.current_revision_id,
     to_char(a.expires_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS expires_at,
     to_char(a.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS created_at,
     to_char(a.updated_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS updated_at,
-    (a.expires_at IS NOT NULL AND a.expires_at <= now()) AS expired,
+    (a.expires_at IS NOT NULL AND a.expires_at <= clock_timestamp()) AS expired,
     s.member_id AS sender_member_id, r.member_id AS recipient_member_id
     FROM agreements.crm_agreements a
     JOIN agreements.crm_agreement_participants s ON s.agreement_id=a.id AND s.party='sender'
@@ -84,13 +85,16 @@ pub async fn list(
     .map_err(Into::into)
 }
 
+/// The revision in force (or on offer): always `current_revision_id`, never simply the
+/// highest number, so a later proposal never stands in for accepted terms.
 pub async fn current(
     tx: &mut Transaction<'_, Postgres>,
     agreement: Uuid,
 ) -> ApiResult<RevisionRow> {
     sqlx::query_as::<_, RevisionRow>(
-        "SELECT id,number,author_party,digest,terms FROM agreements.crm_agreement_revisions
-         WHERE agreement_id=$1 ORDER BY number DESC LIMIT 1",
+        "SELECT r.id,r.number,r.author_party,r.digest,r.terms
+         FROM agreements.crm_agreement_revisions r
+         JOIN agreements.crm_agreements a ON a.current_revision_id=r.id WHERE a.id=$1",
     )
     .bind(agreement)
     .fetch_optional(&mut **tx)

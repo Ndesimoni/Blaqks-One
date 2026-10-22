@@ -3,7 +3,7 @@ import { before, test } from 'node:test';
 import { query } from './helpers.mjs';
 import { events, financePath, refused } from './finance-helpers.mjs';
 import { DEAL_MESSAGES as M, UNKNOWN, createDeal, dealTeams } from './finance-deals-helpers.mjs';
-import { earnDeal, heldClient, overview, post } from './finance-deals-helpers.mjs';
+import { earnDeal, heldClient, overview, post, seen } from './finance-deals-helpers.mjs';
 
 let teams, client, deal;
 before(async () => {
@@ -38,7 +38,7 @@ test('only the holder offers a deal, to active finance staff, within the referra
     [[handover.id, 1500, true]],
   );
   assert.deepEqual(Object.keys(offered[0]).sort(), [
-    ...['allowed', 'createdAt', 'dealId', 'dealType', 'earned', 'from', 'id'],
+    ...['agreementId', 'allowed', 'createdAt', 'dealId', 'dealType', 'earned', 'from', 'id'],
     ...['referralShareBp', 'stage', 'status', 'to'],
   ]);
   assert.equal((await overview(agent, admin)).deals[0].pendingHandover, handover.id);
@@ -63,7 +63,8 @@ test('only the holder offers a deal, to active finance staff, within the referra
 test('accepting moves the deal and keeps a referral taken from the receiver (H-F1)', async () => {
   const { agent, second, admin } = teams;
   const made = await offer(agent, deal, second.user.id, 1500);
-  const accepted = await decide(second, made.value.handover.id, 'accept');
+  const { handover } = made.value;
+  const accepted = await decide(second, handover.id, 'accept', await seen(second, admin, handover));
   assert.equal(accepted.status, 200, JSON.stringify(accepted.value));
   assert.equal(accepted.value.handover.status, 'accepted');
   assert.equal(accepted.value.entry.assignee.id, second.user.id);
@@ -112,11 +113,11 @@ test('requesters cancel; the Admin approves or adjusts a referral with a reason'
   refused(
     await decide(admin, id, 'approve', { referralShareBp: 1000 }),
     400,
-    'Provide a referral share or null, and a reason.',
+    'Provide a referral share or null, a reason and the agreement version.',
     'invalid_request',
   );
   refused(
-    await decide(admin, id, 'approve', { referralShareBp: 1000, reason: '' }),
+    await decide(admin, id, 'approve', { referralShareBp: 1000, reason: '', agreementVersion: 2 }),
     400,
     M.reason,
     'invalid_request',
@@ -124,6 +125,7 @@ test('requesters cancel; the Admin approves or adjusts a referral with a reason'
   const approved = await decide(admin, id, 'approve', {
     referralShareBp: 1000,
     reason: 'Synthetic adjust',
+    ...(await seen(admin, admin, again.value.handover)),
   });
   assert.equal(approved.status, 200, JSON.stringify(approved.value));
   assert.equal(approved.value.handover.status, 'approved');

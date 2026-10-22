@@ -65,13 +65,15 @@ export function useFinanceActions({ api, workspaceId, user, finance, readOnly = 
       requestHandover: (deal, toId, referralShareBp) =>
         run('handOverDeal', deal, () => api.requestHandover(ws, deal, toId, referralShareBp)),
       /** `decision` is accept, decline or cancel; `handover` carries the server's `allowed`. */
-      decideHandover: (handover, decision) =>
-        run(`${decision}Handover`, handover, () => api.decideHandover(ws, handover.id, decision)),
-      approveHandover: (handover, referralShareBp, reason) =>
+      decideHandover: (handover, decision, agreementVersion) =>
+        run(`${decision}Handover`, handover, () =>
+          api.decideHandover(ws, handover.id, decision, agreementVersion),
+        ),
+      approveHandover: (handover, referralShareBp, reason, agreementVersion) =>
         run(
           'approveHandover',
           handover,
-          () => api.approveHandover(ws, handover.id, referralShareBp, reason),
+          () => api.approveHandover(ws, handover.id, referralShareBp, reason, agreementVersion),
           { reason: reason ?? '' },
         ),
       /** `kind` is "payments" or "expenses"; editing an approved row (Admin) needs a reason. */

@@ -6,9 +6,13 @@ mod detail;
 pub mod errors;
 mod evidence;
 pub mod handlers;
+pub mod handover;
+pub mod handover_decide;
+pub mod handover_terms;
 mod history;
 mod ledger;
 mod lifecycle;
+mod limits;
 pub mod model;
 mod parties;
 mod recipients;
@@ -23,5 +27,7 @@ mod write;
 
 #[cfg(test)]
 mod evidence_tests;
+#[cfg(test)]
+mod handover_tests;
 #[cfg(test)]
 mod tests;

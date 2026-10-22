@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import {
   agreementPath as path,
+  allowReferrals,
   command,
   createAgreement as create,
   terms,
@@ -17,6 +18,7 @@ before(async () => {
   sender = await login('admin-a');
   recipient = await login('admin-b');
   superAdmin = await login('owner');
+  await allowReferrals(sender);
 });
 
 test('a draft freezes one sealed revision and stays with the sending company', async () => {

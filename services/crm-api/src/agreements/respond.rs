@@ -30,7 +30,7 @@ async fn answer(
         command::begin(state, session, headers, &workspace, &id, body, &VERSION).await?;
     let id = command.row.id;
     let revision = store::current(&mut command.tx, id).await?;
-    let responder = revision.author().other();
+    let responder = revision.author()?.other();
     access::require(command.party, responder)?;
     command.ensure_open()?;
     let accepted = action == "accepted";

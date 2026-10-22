@@ -26,7 +26,7 @@ export function ServerAgreements() {
   const [openId, setOpenId] = useState(null);
   const [form, setForm] = useState(null);
   const counts = Object.fromEntries(
-    TABS.map((name) => [name, filterByTab(list.items, name, user.workspaceId).length]),
+    TABS.map((name) => [name, filterByTab(list.items, name, user.workspaceId, user.id).length]),
   );
   const saved = (id) => {
     setForm(null);

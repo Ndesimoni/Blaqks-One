@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button.jsx';
+import { routePath } from '../../../config/routes.js';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { allowedActions } from './agreementModel.js';
+import { allowedActions, inCompany } from './agreementModel.js';
 
 /** Commands that cannot be taken back ask once more, naming what will happen. */
 const CONFIRMED = ['send', 'accept', 'decline', 'revoke'];
@@ -10,10 +12,11 @@ const DANGER = ['decline', 'revoke'];
 /**
  * Exactly the commands the caller may take now (agreementModel `allowedActions`). Editing
  * and counter-offers open the form; the others confirm first. One primary action at most:
- * Send for a draft, Accept for an offer.
+ * Send for a draft, Accept for an offer. An in-company hand-over is decided in Deals.
  */
 export function AgreementActions({ view, onEdit, onClose, onDone }) {
   const { t } = useI18n();
+  const go = useNavigate();
   const [confirming, setConfirming] = useState(null);
   const { detail, busy, run } = view;
   const { agreement, revision, party } = detail;
@@ -58,12 +61,20 @@ export function AgreementActions({ view, onEdit, onClose, onDone }) {
     );
   return (
     <div className="drawer-footer agreement-actions">
-      {!party && ['draft', 'sent'].includes(agreement.state) && (
+      {!party && !inCompany(agreement) && ['draft', 'sent'].includes(agreement.state) && (
         <p className="agreement-muted">{t('agreements.actions.participantsOnly')}</p>
+      )}
+      {inCompany(agreement) && agreement.state === 'sent' && (
+        <p className="agreement-muted">{t('agreements.actions.inDeals')}</p>
       )}
       <Button variant="light" disabled={busy} onClick={onClose}>
         {t('agreements.action.close')}
       </Button>
+      {inCompany(agreement) && agreement.state === 'sent' && (
+        <Button variant="primary" onClick={() => go(routePath('Deals'))}>
+          {t('agreements.action.openDeals')}
+        </Button>
+      )}
       {button('revoke', 'danger-light')}
       {button('decline', 'danger-light')}
       {button('counter')}

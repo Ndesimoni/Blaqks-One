@@ -5,6 +5,7 @@
 //! finance event. Settings the seed created go too unless they were changed in the app or
 //! the team's own finance uses them; kept settings stop being sample data.
 use super::super::{failed, target::Target, Outcome};
+use crate::agreements::handover;
 use sqlx::{Postgres, Transaction};
 
 type Tx<'c> = Transaction<'c, Postgres>;
@@ -17,6 +18,11 @@ const DEALS: Table = ("crm_deals", "deal", Some("Deals"));
 const AGREEMENTS: Table = ("crm_commission_agreements", "agreement", None);
 const SETTINGS: Table = ("crm_finance_settings", "settings", None);
 
+/// Offers made in the app on marked deals, still open: their agreements are withdrawn
+/// before the hand-overs go (agreements design §14).
+const OPEN_OFFERS: &str = "SELECT c.agreement_id FROM crm_deal_handovers c \
+     JOIN crm_sample_finance m ON m.entity='deal' AND m.entity_id=c.deal_id \
+     WHERE m.workspace_id=$1 AND c.status='pending' AND c.agreement_id IS NOT NULL";
 /// Rows that belong to marked deals: hand-overs, then lines, then snapshots.
 const HANDOVERS: &str = "DELETE FROM crm_deal_handovers c USING crm_sample_finance m \
      WHERE m.entity='deal' AND m.entity_id=c.deal_id AND m.workspace_id=$1 RETURNING c.id";
@@ -34,6 +40,14 @@ pub struct Cleared {
 
 pub async fn clear(tx: &mut Tx<'_>, target: &Target) -> Outcome<Cleared> {
     let (workspace, owner) = (target.workspace.as_str(), target.owner);
+    let open: Vec<uuid::Uuid> = sqlx::query_scalar(OPEN_OFFERS)
+        .bind(workspace)
+        .fetch_all(&mut **tx)
+        .await
+        .map_err(failed)?;
+    handover::withdraw_all(tx, &open, owner)
+        .await
+        .map_err(failed)?;
     let mut counts = vec![
         ("Payments", remove(tx, workspace, owner, PAYMENTS).await?),
         ("Expenses", remove(tx, workspace, owner, EXPENSES).await?),

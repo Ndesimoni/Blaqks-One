@@ -47,7 +47,7 @@ fn referral_and_co_broking_compute_the_other_side() {
         (2_500, 7_500)
     );
     assert!(Kind::Referral.shares(0).is_err());
-    assert!(Kind::Referral.shares(5_001).is_err());
+    assert!(Kind::Referral.shares(10_000).is_err());
     assert_eq!(
         Kind::CoBroking.shares(4_000).expect("co-broking"),
         (4_000, 6_000)

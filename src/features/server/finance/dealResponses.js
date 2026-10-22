@@ -35,6 +35,8 @@ export function readHandover(value) {
     referralShareBp: optional(bp)(row.referralShareBp),
     status: oneOf(handoverStatuses)(row.status),
     createdAt: text(row.createdAt),
+    /** The agreement recording the offer (agreements design §14); none for older ones. */
+    agreementId: optional(id)(row.agreementId),
     allowed: allowed(row.allowed, handoverAllowedKeys),
   };
 }

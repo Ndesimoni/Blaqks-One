@@ -30,12 +30,12 @@ impl Kind {
         }
     }
 
-    /// Sender and recipient shares. A full handover carries no sender share and a
-    /// referral keeps at most half until A3 ties the cap to the finance setting.
+    /// Sender and recipient shares. A full handover carries no sender share; a referral
+    /// keeps 0.01–99.99%, and the company limit in `limits.rs` narrows it further.
     pub fn shares(self, sender_bp: i64) -> ApiResult<(i64, i64)> {
         let valid = match self {
             Self::Full => sender_bp == 0,
-            Self::Referral => (1..=5_000).contains(&sender_bp),
+            Self::Referral => (1..=9_999).contains(&sender_bp),
             Self::CoBroking => (1..=9_999).contains(&sender_bp),
         };
         if !valid {

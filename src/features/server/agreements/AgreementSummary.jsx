@@ -2,9 +2,10 @@ import React from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { displayState, ownSide, stateTone, turn } from './agreementModel.js';
+import { displayState, inCompany, ownSide, stateTone, turn } from './agreementModel.js';
 
-function PartyCard({ role, person, mine, named }) {
+/** `ours` marks a side of the caller's own company: theirs, or both in an in-company hand-over. */
+function PartyCard({ role, person, mine, ours, named }) {
   const { t } = useI18n();
   return (
     <div className={'agreement-party' + (mine ? ' is-mine' : '')}>
@@ -15,7 +16,7 @@ function PartyCard({ role, person, mine, named }) {
       </strong>
       <small>
         {person?.company ||
-          t(mine ? 'agreements.party.yourCompany' : 'agreements.party.otherCompany')}
+          t(ours ? 'agreements.party.yourCompany' : 'agreements.party.otherCompany')}
       </small>
     </div>
   );
@@ -31,7 +32,7 @@ export function AgreementSummary({ detail }) {
   const { agreement, revision, party } = detail;
   const state = displayState(agreement, revision.authorParty);
   const move = turn(agreement, party, revision.authorParty);
-  const side = ownSide(agreement, user.workspaceId);
+  const side = ownSide(agreement, user.workspaceId, user.id);
   const open = ['draft', 'sent'].includes(agreement.state);
   return (
     <>
@@ -57,6 +58,7 @@ export function AgreementSummary({ detail }) {
             role={role}
             person={agreement.parties?.[role]}
             mine={side === role}
+            ours={side === role || inCompany(agreement)}
             named={party === role}
           />
         ))}

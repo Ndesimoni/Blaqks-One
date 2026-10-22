@@ -3,7 +3,7 @@ import { before, test } from 'node:test';
 import { query } from './helpers.mjs';
 import { day, events, refused } from './finance-helpers.mjs';
 import { DEAL_MESSAGES as M, createDeal, dealPath, dealTeams } from './finance-deals-helpers.mjs';
-import { heldClient, post } from './finance-deals-helpers.mjs';
+import { heldClient, post, seen } from './finance-deals-helpers.mjs';
 
 let teams, client;
 before(async () => {
@@ -59,6 +59,7 @@ test('staff approvers never earn deals they hold, share or handed on (H-F1, M-F2
   const accept = `/workspaces/${admin.user.workspaceId}/finance/handovers`;
   const accepted = await agent.request(`${accept}/${handed.value.handover.id}/accept`, {
     method: 'POST',
+    body: await seen(agent, admin, handed.value.handover),
   });
   assert.equal(accepted.status, 200, JSON.stringify(accepted.value));
   const moved = accepted.value.entry;

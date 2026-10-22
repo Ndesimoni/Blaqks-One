@@ -25,7 +25,7 @@ export default {
   'kind.legend': 'Agreement type',
   'kind.handover_full': 'You pass the whole deal and its commission to the other company.',
   'kind.handover_referral':
-    'You pass the deal and keep a referral share of the commission, up to 50%.',
+    "You pass the deal and keep a referral share of the commission, up to your company's referral limit.",
   'kind.co_broking': 'You work the deal together and split the commission.',
   'lookup.label': 'Recipient’s email',
   'lookup.find': 'Find',
@@ -42,7 +42,7 @@ export default {
   'error.tooLong': 'Use {max} characters or fewer.',
   'error.whole': 'Enter a whole number from 0 to {max}.',
   'error.amount': 'Enter an AED amount above zero with up to two decimal places.',
-  'error.shareReferral': 'Enter a share from 0.01% to 50%, with up to two decimals.',
+  'error.shareReferral': 'Enter a share from 0.01% to 99.99%, with up to two decimals.',
   'error.shareCoBroking': 'Enter a share from 0.01% to 99.99%, with up to two decimals.',
   'error.expiry': 'Choose a day from tomorrow up to 89 days ahead.',
   'section.property': 'Property',
@@ -73,7 +73,8 @@ export default {
   'hint.notes': '{count}/2,000 characters. Optional.',
   'share.full': 'In a full handover the receiving company takes 100% of the commission.',
   'share.handover_referral': 'Referral share kept by the sending side (%)',
-  'share.handover_referralHint': 'Up to 50%. The receiving side gets the rest.',
+  'share.handover_referralHint':
+    "Up to your company's referral limit, set by your Admin in Finance settings. The receiving side gets the rest.",
   'share.co_broking': 'Sending side’s share (%)',
   'share.co_brokingHint': 'The receiving side gets the rest, so the two shares make 100%.',
   'split.sender': 'Sending side · {name}: {share}',

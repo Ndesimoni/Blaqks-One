@@ -7,6 +7,7 @@ pub mod deal_links;
 pub mod deletion;
 pub mod files;
 pub mod handlers;
+pub mod handover_facts;
 pub mod history;
 pub mod ids;
 pub mod links;

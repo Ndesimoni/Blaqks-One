@@ -55,6 +55,7 @@ pub fn deal(holder: Uuid, second: Uuid) -> DealRow {
         approved_fils: 0,
         reassigned_by_actor: false,
         pending_handover: None,
+        pending_agreement: None,
     }
 }
 
