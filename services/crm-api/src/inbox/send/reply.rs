@@ -6,7 +6,7 @@ use crate::{
     error::{ApiError, ApiResult},
     inbox::{
         access::{self, Viewer},
-        drafts, events,
+        draft_sent, events,
         read::load,
     },
     state::AppState,
@@ -53,7 +53,7 @@ pub async fn reply(
     message["attachments"] = json!(files.await?);
     events::append(&mut tx, &workspace, id, Some(user.id), "replied").await?;
     // The writer's draft is emptied with the send (docs/saved-replies-drafts.md, H1).
-    let draft = drafts::sent(&mut tx, id, user.id).await?;
+    let draft = draft_sent::sent(&mut tx, &workspace, id, user.id).await?;
     tx.commit().await?;
     let sent = json!({ "message": message, "draftRevision": draft });
     Ok((StatusCode::CREATED, Json(sent)))

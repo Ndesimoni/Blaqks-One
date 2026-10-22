@@ -104,7 +104,11 @@ pub async fn put(
     .await?;
     let revision = match (updated, base, &text) {
         (Some(revision), _, _) => revision,
-        (None, 0, None) => 0,
+        // Clearing from a window that never saw a draft is fine only when there is none.
+        (None, 0, None) => match exists(&mut tx, id, me).await? {
+            true => return Err(ApiError::stale(CHANGED)),
+            false => 0,
+        },
         (None, 0, Some(text)) => sqlx::query_scalar(
             "INSERT INTO inbox.crm_inbox_drafts (conversation_id,member_id,workspace_id,body) \
              VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING RETURNING revision",
@@ -122,16 +126,13 @@ pub async fn put(
     Ok(Json(json!({"revision": revision})))
 }
 
-/// In the reply's own transaction: the writer's draft is emptied and its revision moved
-/// on, so a save based on the old one is refused. Answers the new revision (0 for none).
-pub async fn sent(tx: &mut Transaction<'_, Postgres>, id: Uuid, member: Uuid) -> ApiResult<i64> {
-    let revision: Option<i64> = sqlx::query_scalar(
-        "UPDATE inbox.crm_inbox_drafts SET body=NULL,revision=revision+1,updated_at=now() \
-         WHERE conversation_id=$1 AND member_id=$2 RETURNING revision",
+async fn exists(tx: &mut Transaction<'_, Postgres>, id: Uuid, member: Uuid) -> ApiResult<bool> {
+    Ok(sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM inbox.crm_inbox_drafts \
+           WHERE conversation_id=$1 AND member_id=$2)",
     )
     .bind(id)
     .bind(member)
-    .fetch_optional(&mut **tx)
-    .await?;
-    Ok(revision.unwrap_or(0))
+    .fetch_one(&mut **tx)
+    .await?)
 }

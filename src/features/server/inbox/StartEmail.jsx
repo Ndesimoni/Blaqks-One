@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Drawer } from '../../../components/ui/Drawer.jsx';
 import { useSession } from '../../../hooks/useSession.js';
@@ -8,6 +8,8 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { useAttachments } from '../chat/useAttachments.js';
 import { ComposerBox } from '../composer/ComposerBox.jsx';
 import { RecipientPicker } from './RecipientPicker.jsx';
+import { safeName } from './saved/savedRepliesModel.js';
+import { SavedRepliesButton } from './saved/SavedRepliesButton.jsx';
 
 /**
  * New email (Start message, E1b/E1d): to a Client or Contact the member may see, from the
@@ -28,7 +30,8 @@ export function StartEmail({ mailbox, onStart, onClose }) {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
-  const { api } = useSession();
+  const bodyRef = useRef(null);
+  const { api, user } = useSession();
   const { owner } = useWorkspaceScope();
   const files = useAttachments(api, owner.id);
   const [error, setError] = useState('');
@@ -88,6 +91,15 @@ export function StartEmail({ mailbox, onStart, onClose }) {
           <ComposerBox
             files={mailbox.company ? files : null}
             attachDisabled={busy}
+            tools={
+              <SavedRepliesButton
+                textareaRef={bodyRef}
+                text={body}
+                setText={setBody}
+                values={{ clientName: safeName(to?.name), myName: user.name, company: owner.name }}
+                disabled={busy}
+              />
+            }
             action={
               <Button
                 type="submit"
@@ -100,6 +112,7 @@ export function StartEmail({ mailbox, onStart, onClose }) {
           >
             <textarea
               id={`${id}-body`}
+              ref={bodyRef}
               className="composer-input"
               rows={6}
               maxLength={20000}

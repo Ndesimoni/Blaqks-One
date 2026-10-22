@@ -2,7 +2,8 @@
 
 Status: designed 2026-10-22 from the owner's decisions in
 [Product decisions](product-decisions.md), with a separate security review of the design
-(§7) and the product designer's spec (§5). N2a (server) is built; N2b (screens) follows.
+(§7) and the product designer's spec (§5). Built 2026-10-22: N2a (server) and N2b (screens);
+see §8.
 Owned by the `inbox` module (schema `inbox`), like internal notes and lead rules. English
 only ([English only](product-decisions.md#english-only-decided-2026-10-22)).
 
@@ -116,3 +117,32 @@ One High (H1, a sent reply restored by a late autosave) and four Medium findings
 names in fill-ins, M2 drafts and the company lock, M3 check order, M4 saving on leave); all
 are written into §2–§5 above, with the Low ones (L1 draft limit, L2 exports and age, L3
 invisible marks).
+
+## 8. As built (2026-10-22)
+
+- Server: migration 0051, `inbox/saved_replies.rs` (+ `saved_replies_change.rs`,
+  `saved_reply_input.rs`), `inbox/drafts.rs` (+ `draft_input.rs`); the reply route empties
+  the writer's draft (`drafts::sent`). Suites `tests/api/saved-replies.test.mjs` and
+  `tests/api/inbox-drafts.test.mjs`.
+- Screens: `src/features/server/inbox/saved/` (button, picker, manage dialog, form, model),
+  `ReplyForm.jsx` with `useDraft.js` and `DraftStatus.jsx`, the composer's `tools` slot
+  (`composer-tools.css`), and `src/services/crm/inboxSaved.js`. The picker is a native popover
+  inside the form, so it works inside New email's dialog; the manage dialog is rendered on
+  the page body and its form never submits the reply. Unit tests
+  `tests/unit/saved-replies-model.test.js`; browser suite
+  `tests/server-browser/saved-replies.spec.js`.
+- Also fixed: after a reload the composer opened on Internal note, because it chose its tab
+  before the mailbox loaded; it now opens on Reply once sending is possible, unless the
+  member already picked a tab.
+
+**Code security review (2026-10-22): one High, two Medium, four Low, all fixed.** H1: a
+draft save could still start while a reply was being sent (switching tab or conversation in
+that second), and a first save could land after the reply. Now sending always leaves an
+empty draft row with a new revision, no save starts while a reply is on its way, and nothing
+is scheduled once the form has closed. M1: only a changed revision refreshes; any other
+refusal (such as the 300-draft limit) shows "Draft not saved". M2: when another window
+changed the draft, the line offers "Use that version" or "Keep mine" and saves nothing
+until the member chooses. Low: clearing from an out-of-date window is refused; reopening a
+conversation waits for its previous save; client names also lose phone numbers with
+separators, bare domains and more invisible marks; a NUL in a reply or draft is a 400, not a
+server error.

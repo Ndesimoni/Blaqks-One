@@ -90,3 +90,16 @@
     min-block-size: 44px;
   }
 }
+/* The draft line under the reply box (N2, DraftStatus.jsx). */
+.draft-status.is-failed {
+  color: var(--danger);
+}
+.draft-retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

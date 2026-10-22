@@ -1,0 +1,44 @@
+/* Tools inside the typing box on its end side, like WhatsApp's in-box icons (saved replies,
+   docs/saved-replies-drafts.md §5): the row stays "+ | box | Send" and the text keeps the
+   rest of the box. Touch sizes: composer-phone.css. */
+.composer-box.has-tools {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.composer-box.has-tools > .composer-files {
+  grid-column: 1 / -1;
+}
+.composer-tools {
+  display: flex;
+  align-self: end;
+  padding: 5px;
+}
+.composer-tool {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+.composer-tool:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--ink);
+}
+.composer-tool:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.composer-tool.is-open {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.composer-tool:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

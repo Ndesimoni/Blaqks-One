@@ -26,6 +26,9 @@ import './inbox-list-start.css';
 import './inbox-send.css';
 import './inbox-attach.css';
 import './inbox-start.css';
+import './saved-picker.css';
+import './saved-picker-phone.css';
+import './saved-manager.css';
 import './inbox-responsive.css';
 
 /**

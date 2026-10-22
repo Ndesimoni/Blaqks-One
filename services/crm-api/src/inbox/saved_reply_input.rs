@@ -31,7 +31,11 @@ fn exact(body: Value, keys: &[&str]) -> ApiResult<Map<String, Value>> {
 
 /// Zero-width and text-direction marks that could disguise saved text (review L3).
 fn invisible(c: char) -> bool {
-    matches!(c, '\u{200B}'..='\u{200F}' | '\u{202A}'..='\u{202E}' | '\u{2060}'..='\u{2069}' | '\u{FEFF}')
+    matches!(
+        c,
+        '\u{00AD}' | '\u{061C}' | '\u{180E}' | '\u{200B}'..='\u{200F}' | '\u{2028}'..='\u{202E}'
+            | '\u{2060}'..='\u{2069}' | '\u{FEFF}' | '\u{E0000}'..='\u{E007F}'
+    )
 }
 
 fn bounded(value: &Value, max: usize, one_line: bool) -> ApiResult<String> {

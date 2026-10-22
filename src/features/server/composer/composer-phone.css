@@ -1,6 +1,13 @@
 /* The message row on touch screens: a 44px "+", and on phones a round arrow for Send, as in
    messenger apps, so the typing box keeps its width. The word stays for screen readers. */
 @media (max-width: 899px) {
+  .composer-tool {
+    inline-size: 40px;
+    block-size: 40px;
+  }
+  .composer-tools {
+    padding: 1px;
+  }
   .composer-attach {
     inline-size: 44px;
     block-size: 44px;

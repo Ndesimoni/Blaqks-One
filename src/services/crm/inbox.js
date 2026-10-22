@@ -1,4 +1,6 @@
 /** Connected Inbox (docs/messaging-design.md §12): conversations, triage and lead rules. */
+import { inboxSavedRoutes } from './inboxSaved.js';
+
 const query = (params = {}) => {
   const search = new URLSearchParams(
     Object.entries(params).filter(
@@ -41,5 +43,6 @@ export function inboxRoutes({ request, scope }) {
     inboxRules: (workspace, signal) => request(`${scope(workspace)}/inbox/rules`, { signal }),
     saveInboxRules: (workspace, body) =>
       request(`${scope(workspace)}/inbox/rules`, { method: 'PUT', body }),
+    ...inboxSavedRoutes({ request, scope }),
   };
 }

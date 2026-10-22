@@ -17,6 +17,11 @@ export const actionIcons = {
       <path d="m6 9 6 6 6-6" />
     </>
   ),
+  bolt: (
+    <>
+      <path d="M13 3 5 13h6l-1 8 8-10h-6l1-8z" />
+    </>
+  ),
   plus: (
     <>
       <path d="M12 5v14M5 12h14" />

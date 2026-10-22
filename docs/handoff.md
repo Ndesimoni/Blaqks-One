@@ -21,7 +21,10 @@ from clients are labelled but not virus-scanned.
 
 ## 2. Next packets, in the recommended order
 
-### N1 — Real SendGrid check (recommended first)
+### N1 — Real SendGrid check (waits for the owner's domain and SendGrid account)
+
+The owner has no domain or SendGrid account yet (2026-10-22); everything up to the live
+check is built and checked.
 
 Proves E3 and F3 with the owner's real account before more is built on them. **Preflight
 done (2026-10-22):** the calls were checked against SendGrid's documentation and three
@@ -45,7 +48,9 @@ lists what the live check must still prove.
      matched and what differed; fix differences as their own small packet. Stop the tunnel
      afterwards and restore the stand-in setting for local work.
 
-### N2 — Inbox time-savers: templates, quick replies, drafts
+### N2 — Inbox time-savers: templates, quick replies, drafts (built 2026-10-22)
+
+Built as [Saved replies and drafts](saved-replies-drafts.md).
 
 Needs nothing from outside. Write a short design first and ask the owner: templates per
 company (Admin-managed) and/or per member; placeholders such as the client's name.

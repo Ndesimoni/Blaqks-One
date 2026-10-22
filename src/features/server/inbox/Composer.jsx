@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ComposerBox } from '../composer/ComposerBox.jsx';
@@ -17,6 +17,12 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
   const health = channelHealth(channels, conversation.channel);
   const state = replyState({ conversation, user, mailbox, health });
   const [mode, setMode] = useState(state === 'send' ? 'reply' : 'note');
+  const [chosen, setChosen] = useState(false);
+  // The mailbox loads after the first render: open on Reply once sending is possible, unless
+  // the member already picked a tab, so a reload shows their draft (N2).
+  useEffect(() => {
+    if (!chosen && state === 'send') setMode('reply');
+  }, [chosen, state]);
   const [text, setText] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -49,7 +55,10 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
                 (mode === name ? ' is-active' : '') +
                 (name === 'note' ? ' is-note' : '')
               }
-              onClick={() => setMode(name)}
+              onClick={() => {
+                setChosen(true);
+                setMode(name);
+              }}
             >
               {t(`inbox.composer.${name}`)}
             </button>

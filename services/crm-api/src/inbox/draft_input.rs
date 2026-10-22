@@ -13,7 +13,10 @@ pub fn input(body: Value) -> ApiResult<(Option<String>, i64)> {
     let text = map.get("body").and_then(Value::as_str);
     let base = map.get("baseRevision").and_then(Value::as_i64);
     match (map.len(), text, base) {
-        (2, Some(text), Some(base)) if base >= 0 && text.chars().count() <= 20000 => {
+        // A NUL cannot be stored in PostgreSQL text: refused here, not a server error.
+        (2, Some(text), Some(base))
+            if base >= 0 && text.chars().count() <= 20000 && !text.contains('\0') =>
+        {
             Ok(((!text.trim().is_empty()).then(|| text.to_owned()), base))
         }
         _ => Err(ApiError::invalid(DRAFT)),
@@ -39,6 +42,7 @@ mod tests {
             json!({"body": "x", "baseRevision": 0, "send": true}),
             json!({"body": 5, "baseRevision": 0}),
             json!("x"),
+            json!({"body": "a\u{0}b", "baseRevision": 0}),
         ] {
             assert!(input(bad).is_err());
         }

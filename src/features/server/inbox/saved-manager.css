@@ -1,0 +1,147 @@
+/* Manage saved replies (designer spec §3): the centred dialog with Company and Mine tabs,
+   rows with Edit and Remove, and the add or edit form. */
+.saved-manager-body {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+.saved-manager-intro,
+.saved-manager-note,
+.saved-manager-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.saved-manager-tabs {
+  display: flex;
+  gap: 4px;
+}
+.saved-manager-count {
+  margin-inline-start: 6px;
+  color: var(--muted);
+}
+.saved-manager-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+}
+.saved-manager-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.saved-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  padding: 12px 0;
+  border-block-end: 1px solid var(--line);
+}
+.saved-manager-text {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.saved-manager-text span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.saved-manager-actions {
+  display: flex;
+  align-items: start;
+  gap: 6px;
+}
+.saved-manager-confirm {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--danger);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.saved-manager-confirm > div,
+.saved-form-actions,
+.saved-form-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.saved-form {
+  display: grid;
+  gap: 6px;
+}
+.saved-form label {
+  margin-block-start: 8px;
+  font-weight: 600;
+}
+.saved-form-text {
+  min-block-size: 200px;
+  resize: vertical;
+}
+.saved-form-count,
+.saved-form-fillins small,
+.saved-form-shared {
+  color: var(--muted);
+  font-size: 12px;
+}
+.saved-form-count {
+  justify-self: end;
+}
+.saved-form-fillins {
+  display: grid;
+  gap: 4px;
+}
+.saved-form-chip {
+  min-block-size: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.saved-form-chip:hover {
+  background: var(--hover);
+}
+.saved-form-scope {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+}
+.saved-form-scope label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: 400;
+}
+.saved-form-problem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.saved-form-actions {
+  justify-content: end;
+  margin-block-start: 12px;
+}
+@media (max-width: 899px) {
+  .saved-form-chip,
+  .saved-manager-actions .btn {
+    min-block-size: 44px;
+  }
+}

@@ -38,6 +38,12 @@ test('a draft comes back for its writer, and a sent reply can never return as on
   assert.equal((await save(admin, id, 'Next time', 3)).value.revision, 4);
   assert.equal((await save(admin, id, '   ', 4)).value.revision, 5, 'blank clears it');
   assert.deepEqual(await read(admin, id), { body: null, revision: 5 });
+  // A reply sent with no draft still leaves an empty one, so a late first save is refused.
+  const other = await startMessage(admin, await clientWith(admin, 'draft.other@example.test'));
+  const second = other.value.conversationId;
+  assert.equal((await reply(admin, second, 'Quick answer')).value.draftRevision, 1);
+  assert.equal((await save(admin, second, 'Quick answer', 0)).status, 409);
+  assert.equal((await save(admin, second, '', 0)).status, 409, 'nor cleared from an old window');
 });
 
 test('drafts stay with their writer and with conversations they can see', async () => {

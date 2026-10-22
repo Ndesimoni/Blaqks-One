@@ -34,7 +34,7 @@ pub fn body(map: &Map<String, Value>, key: &str) -> ApiResult<String> {
     map.get(key)
         .and_then(Value::as_str)
         .map(str::trim)
-        .filter(|text| !text.is_empty() && text.chars().count() <= 20_000)
+        .filter(|text| !text.is_empty() && text.chars().count() <= 20_000 && !text.contains('\0'))
         .map(str::to_owned)
         .ok_or(ApiError::invalid(BODY))
 }

@@ -22,13 +22,14 @@ export class CrmApiError extends Error {
 export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized = () => {}) {
   let csrfToken = '';
   // `file` sends one raw file (media uploads); `body` sends JSON.
-  const request = async (path, { method = 'GET', body, file, signal } = {}) => {
+  const request = async (path, { method = 'GET', body, file, signal, keepalive } = {}) => {
     let response;
     try {
       response = await fetchRequest(`/api/crm${path}`, {
         method,
         credentials: 'include',
         signal,
+        keepalive,
         headers: {
           Accept: 'application/json',
           ...(file
