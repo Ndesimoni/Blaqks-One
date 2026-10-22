@@ -99,6 +99,8 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   await expect(client).toContainText('referral 10%');
   await expect(client.getByRole('button', { name: 'Edit record' })).toHaveCount(0);
   await expect(client.getByRole('button', { name: /Delete/ })).toHaveCount(0);
+  for (const layout of layouts) await checkLayout(holder.page, layout, 'deal-handover-kept-client');
+  await holder.page.setViewportSize({ width: 1280, height: 900 });
   await holder.page.keyboard.press('Escape');
   // The accepted hand-over is kept under Agreements, decided only from Deals.
   await details.getByRole('button', { name: 'Close deal details' }).click();
