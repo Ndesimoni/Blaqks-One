@@ -89,12 +89,23 @@ test('only participants read and post; the Admin outside it gets not-found', asy
 
 test('a participant leaves a group; the others keep it', async () => {
   const room = (await group(first, [second, third], 'Leaving test')).id;
-  assert.equal((await send(third, room, 'Bye for now.')).status, 201);
+  const bye = await send(third, room, 'Bye for now.');
+  assert.equal(bye.status, 201);
   const left = await leave(third, room);
   assert.equal(left.status, 204);
   assert.equal(await roomOf(third, room), undefined);
   assert.equal((await third.request(chatPath(third, `/rooms/${room}/messages`))).status, 404);
   assert.equal((await send(third, room, 'Back again')).status, 404);
+  // Every way back is closed, even to their own earlier message (C3 review L5).
+  const mine = chatPath(third, `/rooms/${room}/messages/${bye.value.message.id}`);
+  const earlier = chatPath(third, `/rooms/${room}/messages?before=${bye.value.message.id}`);
+  assert.equal(
+    (await third.request(mine, { method: 'PATCH', body: { body: 'Edit' } })).status,
+    404,
+  );
+  assert.equal((await third.request(mine, { method: 'DELETE' })).status, 404);
+  assert.equal((await third.request(earlier)).status, 404);
+  assert.equal((await markRead(third, room)).status, 404);
   const kept = await roomOf(first, room);
   assert.deepEqual([...kept.members].sort(), ids(first, second).sort());
   assert.ok((await messages(first, room)).some((item) => item.body === 'Bye for now.'));
@@ -105,6 +116,11 @@ test('a participant leaves a group; the others keep it', async () => {
     body: { memberId: second.user.id },
   });
   assert.equal((await leave(first, direct.value.room.id)).status, 400);
+  // The Admin inside a group is an ordinary participant: no moderation outside channels.
+  const inside = (await group(first, [second, admin], 'Admin inside')).id;
+  const said = (await send(second, inside, 'Only mine to delete')).value.message;
+  const path = chatPath(admin, `/rooms/${inside}/messages/${said.id}`);
+  assert.equal((await admin.request(path, { method: 'DELETE' })).status, 404);
 });
 
 test('a colleague who leaves the company stays listed and loses the group', async () => {

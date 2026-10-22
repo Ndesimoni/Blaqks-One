@@ -22,9 +22,14 @@ pub async fn read(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Written only while the room is still visible to the member, so a read racing a leave
+/// cannot bring the mark back (C3 review L3).
 pub async fn mark(tx: &mut access::Tx<'_>, room: Uuid, member: Uuid) -> ApiResult<()> {
     sqlx::query(
-        "INSERT INTO chat.crm_chat_reads (room_id,member_id,read_at) VALUES ($1,$2,now()) \
+        "INSERT INTO chat.crm_chat_reads (room_id,member_id,read_at) \
+         SELECT r.id,$2,now() FROM chat.crm_chat_rooms r WHERE r.id=$1 AND (r.kind='channel' \
+           OR EXISTS (SELECT 1 FROM chat.crm_chat_participants p \
+             WHERE p.room_id=r.id AND p.member_id=$2)) \
          ON CONFLICT (room_id,member_id) DO UPDATE SET read_at=now()",
     )
     .bind(room)

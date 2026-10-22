@@ -24,8 +24,17 @@ pub fn members(value: Option<&Value>, creator: Uuid) -> ApiResult<Vec<Uuid>> {
         .ok_or(ApiError::invalid(MEMBERS))
 }
 
+/// Zero-width and text-direction marks that could disguise a name (C3 review L1).
+fn invisible(c: char) -> bool {
+    matches!(
+        c,
+        '\u{00AD}' | '\u{061C}' | '\u{180E}' | '\u{200B}'..='\u{200F}' | '\u{2028}'..='\u{202E}'
+            | '\u{2060}'..='\u{2069}' | '\u{FEFF}' | '\u{E0000}'..='\u{E007F}'
+    )
+}
+
 /// An optional plain name of up to 60 characters; blank means none (the screen then shows
-/// the members' names).
+/// the members' names). It may not start with "#", so a group never looks like a channel.
 pub fn title(value: Option<&Value>) -> ApiResult<Option<String>> {
     let text = match value {
         None | Some(Value::Null) => return Ok(None),
@@ -35,7 +44,7 @@ pub fn title(value: Option<&Value>) -> ApiResult<Option<String>> {
     if text.is_empty() {
         return Ok(None);
     }
-    let plain = !text.chars().any(char::is_control);
+    let plain = !text.starts_with('#') && !text.chars().any(|c| c.is_control() || invisible(c));
     (plain && text.chars().count() <= 60)
         .then(|| Some(text.to_owned()))
         .ok_or(ApiError::invalid(TITLE))
@@ -68,7 +77,14 @@ mod tests {
         );
         assert_eq!(title(Some(&json!("   "))).unwrap(), None);
         assert_eq!(title(None).unwrap(), None);
-        for bad in [json!("x".repeat(61)), json!("bell\u{0007}"), json!(5)] {
+        for bad in [
+            json!("x".repeat(61)),
+            json!("bell\u{0007}"),
+            json!(5),
+            json!("\u{200B}"),
+            json!("a\u{202E}b"),
+            json!("#general"),
+        ] {
             assert!(title(Some(&bad)).is_err());
         }
     }
