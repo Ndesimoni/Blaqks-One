@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { keptMentions } from './mentionModel.js';
+import { MentionText } from './MentionText.jsx';
 import { MessageFiles } from './MessageFiles.jsx';
 
 /**
  * One chat message. The author may edit or delete it; the Admin may delete others'
  * messages in a channel (never in a private conversation). Deleted messages keep their
- * place without their text.
+ * place without their text. Mentions (`named`: the mentioned members' IDs and names) are
+ * highlighted, and a message that mentions the reader (`me`) stands out (packet C3).
  */
-export function ChatMessage({ message, author, mine, canRemove, onEdit, onRemove, urlOf }) {
+export function ChatMessage(props) {
+  const { message, author, mine, canRemove, named = [], me, onEdit, onRemove, urlOf } = props;
   const { t, format } = useI18n();
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(message.body);
@@ -21,13 +25,17 @@ export function ChatMessage({ message, author, mine, canRemove, onEdit, onRemove
   };
   const save = async (event) => {
     event.preventDefault();
-    if (text.trim() && (await act(() => onEdit(message.id, text.trim())))) setEditing(false);
+    // Keep the mentions whose @Name is still in the text; with none, nothing changes.
+    const kept = named.length ? keptMentions(text, named) : undefined;
+    if (text.trim() && (await act(() => onEdit(message.id, text.trim(), kept)))) setEditing(false);
   };
+  const forMe = !message.deleted && (message.mentions ?? []).includes(me);
   return (
-    <li className={'chat-message' + (mine ? ' is-mine' : '')}>
+    <li className={'chat-message' + (mine ? ' is-mine' : '') + (forMe ? ' is-mentioned' : '')}>
       <div className="chat-message-head">
         <strong>{mine ? t('chat.you') : author}</strong>
         <time dateTime={message.at}>{format.time(message.at)}</time>
+        {forMe && <span className="chat-mention-tag">{t('chat.mention.you')}</span>}
         {message.edited && !message.deleted && <span>· {t('chat.edited')}</span>}
       </div>
       {message.deleted ? (
@@ -49,7 +57,7 @@ export function ChatMessage({ message, author, mine, canRemove, onEdit, onRemove
         </form>
       ) : (
         <>
-          {message.body && <p className="chat-body">{message.body}</p>}
+          {message.body && <MentionText body={message.body} named={named} me={me} />}
           <MessageFiles files={message.attachments} urlOf={urlOf} />
         </>
       )}

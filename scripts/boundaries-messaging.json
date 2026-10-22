@@ -27,7 +27,11 @@
       "crm_chat_messages",
       "crm_chat_messages_room",
       "crm_chat_reads",
-      "crm_chat_messages_author"
+      "crm_chat_messages_author",
+      "crm_chat_rooms_kind",
+      "crm_chat_rooms_title",
+      "crm_chat_mentions",
+      "crm_chat_mentions_member"
     ],
     "inbox": [
       "crm_inbox_conversations",

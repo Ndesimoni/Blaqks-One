@@ -1,15 +1,18 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useThreadScroll } from '../inbox/useThreadScroll.js';
 import { ChatComposer } from './ChatComposer.jsx';
 import { ChatMessage } from './ChatMessage.jsx';
-import { dayOf, roomTitle } from './chatModel.js';
+import { dayOf, mentionable, roomTitle } from './chatModel.js';
+import { RoomHeader } from './RoomHeader.jsx';
 import { useRoom } from './useRoom.js';
 
-/** The open channel or private conversation: messages by day and the composer. */
-export function RoomView({ api, workspaceId, room, people, user, onBack, onRead }) {
+/**
+ * The open channel, group or private conversation: messages by day and the composer. In
+ * channels and groups, `@` mentions the colleagues who can see the room (packet C3).
+ */
+export function RoomView({ api, workspaceId, room, people, user, onBack, onRead, onLeave }) {
   const { t, format } = useI18n();
   const box = useRef(null);
   const view = useRoom(api, workspaceId, room.id, onRead);
@@ -21,34 +24,25 @@ export function RoomView({ api, workspaceId, room, people, user, onBack, onRead 
   const nameOf = (id) => people.find((person) => person.id === id)?.name || t('chat.formerMember');
   const channel = room.kind === 'channel';
   const moderator = channel && user.roleId === 'admin';
+  const suggest = useMemo(() => mentionable(room, people), [room, people]);
+  // Mentions are shown for the reader and live colleagues; edits keep only those who
+  // can still see the room.
+  const known = useMemo(() => [{ id: user.id, name: user.name }, ...people], [user, people]);
+  const allowed = new Set([user.id, ...suggest.map((person) => person.id)]);
+  const namedIn = (message) =>
+    known.filter((person) => (message.mentions ?? []).includes(person.id));
+  const edit = (id, body, mentions) =>
+    view.edit(
+      id,
+      body,
+      mentions?.filter((member) => allowed.has(member)),
+    );
+  const title = roomTitle(room, people, t);
   let day = '';
   return (
     <>
-      <header className="chat-room-head">
-        <Button
-          variant="light"
-          icon="arrow"
-          className="chat-back"
-          aria-label={t('chat.back')}
-          onClick={onBack}
-        />
-        <div>
-          <h2>
-            <bdi>{roomTitle(room, people, t)}</bdi>
-          </h2>
-          <p>
-            <Icon name={channel ? 'users' : 'lock'} size={14} />
-            {t(channel ? 'chat.channel.everyone' : 'chat.direct.private')}
-          </p>
-        </div>
-      </header>
-      <div
-        ref={box}
-        className="chat-thread"
-        tabIndex={0}
-        aria-label={roomTitle(room, people, t)}
-        onScroll={onScroll}
-      >
+      <RoomHeader room={room} title={title} people={people} onBack={onBack} onLeave={onLeave} />
+      <div ref={box} className="chat-thread" tabIndex={0} aria-label={title} onScroll={onScroll}>
         {view.status === 'loading' && <p role="status">{t('chat.loading')}</p>}
         {view.status === 'error' && (
           <p className="field-error" role="alert">
@@ -80,7 +74,9 @@ export function RoomView({ api, workspaceId, room, people, user, onBack, onRead 
                   author={nameOf(message.authorId)}
                   mine={message.authorId === user.id}
                   canRemove={moderator}
-                  onEdit={view.edit}
+                  named={namedIn(message)}
+                  me={user.id}
+                  onEdit={edit}
                   onRemove={view.remove}
                   urlOf={(file) => api.chatFileUrl(workspaceId, room.id, message.id, file)}
                 />
@@ -89,7 +85,7 @@ export function RoomView({ api, workspaceId, room, people, user, onBack, onRead 
           })}
         </ol>
       </div>
-      <ChatComposer api={api} workspaceId={workspaceId} onSend={view.send} />
+      <ChatComposer api={api} workspaceId={workspaceId} onSend={view.send} people={suggest} />
     </>
   );
 }

@@ -15,11 +15,26 @@ pub fn exact(
     keys: &[&str],
     message: &'static str,
 ) -> ApiResult<Map<String, Value>> {
+    fields(body, keys, &[], message)
+}
+
+/// A JSON object with every `required` key and no keys other than those and `optional`.
+pub fn fields(
+    body: Result<Json<Value>, JsonRejection>,
+    required: &[&str],
+    optional: &[&str],
+    message: &'static str,
+) -> ApiResult<Map<String, Value>> {
     let Ok(Json(Value::Object(map))) = body else {
         return Err(ApiError::invalid(message));
     };
-    let complete = map.len() == keys.len() && keys.iter().all(|key| map.contains_key(*key));
-    complete.then_some(map).ok_or(ApiError::invalid(message))
+    let known = map
+        .keys()
+        .all(|key| required.contains(&key.as_str()) || optional.contains(&key.as_str()));
+    let complete = required.iter().all(|key| map.contains_key(*key));
+    (known && complete)
+        .then_some(map)
+        .ok_or(ApiError::invalid(message))
 }
 
 /// A message text: trimmed at the ends, 1–4,000 characters, no control characters except

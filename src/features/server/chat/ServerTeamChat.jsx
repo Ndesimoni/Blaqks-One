@@ -10,11 +10,14 @@ import { useChat } from './useChat.js';
 import './chat.css';
 import './chat-message.css';
 import './chat-files.css';
+import './chat-mentions.css';
+import './chat-groups.css';
 import './chat-phone.css';
 
 /**
- * Team chat (packet C2): channels and private messages on the left, the open room on the
- * right; one pane at a time on a phone. The open room lives in the URL (`?room=`).
+ * Team chat (packets C2 and C3): channels, groups and private messages on the left, the
+ * open room on the right; one pane at a time on a phone. The open room lives in the URL
+ * (`?room=`).
  */
 export function ServerTeamChat() {
   const { api, user } = useSession();
@@ -59,6 +62,11 @@ export function ServerTeamChat() {
               user={user}
               onBack={() => open('')}
               onRead={() => chat.refresh()}
+              onLeave={async () => {
+                const failure = await chat.leave(room.id);
+                if (!failure) open('');
+                return failure;
+              }}
             />
           ) : (
             <p className="chat-muted chat-choose">{t('chat.choose')}</p>

@@ -1,8 +1,9 @@
 //! `PATCH /chat/rooms/{id}/messages/{message}` (the author edits; the message shows as
 //! edited) and `DELETE` (the author, or the Admin in a channel, removes the text; the
 //! message keeps its place as "deleted"). The Admin never touches direct conversations.
+//! An edit may replace the message's mentions (C3); a deletion removes them.
 use super::{
-    access,
+    access, mentions,
     messages::{Message, COLUMNS},
     wire,
 };
@@ -34,12 +35,20 @@ pub async fn edit(
     body: Result<Json<Value>, JsonRejection>,
 ) -> ApiResult<Json<Value>> {
     access::ensure(&state, &session, Some(&headers), &workspace).await?;
-    let text = wire::text(&wire::exact(body, &["body"], wire::BODY)?)?;
+    let map = wire::fields(body, &["body"], &["mentions"], wire::BODY)?;
+    let text = wire::text(&map)?;
+    let mentioned = map
+        .contains_key("mentions")
+        .then(|| mentions::parse(&map))
+        .transpose()?;
     let message = message_id(&message)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     let user = access::live(&mut tx, &workspace, session.user.id).await?;
     let room = access::room(&mut tx, &workspace, user.id, &room, false).await?;
+    if let Some(ids) = &mentioned {
+        mentions::check(&mut tx, &workspace, &room, ids).await?;
+    }
     let edited: Option<Message> = sqlx::query_as(&format!(
         "UPDATE chat.crm_chat_messages m SET body=$4,edited_at=now() \
          WHERE m.id=$1 AND m.room_id=$2 AND m.author_id=$3 AND m.deleted_at IS NULL \
@@ -53,7 +62,10 @@ pub async fn edit(
     .fetch_optional(&mut *tx)
     .await?;
     let edited = edited.ok_or_else(ApiError::missing)?;
-    let view = super::files::views(&mut tx, std::slice::from_ref(&edited)).await?;
+    if let Some(ids) = mentioned {
+        mentions::store(&mut tx, room.id, edited.id, &ids).await?;
+    }
+    let view = super::view::views(&mut tx, std::slice::from_ref(&edited)).await?;
     tx.commit().await?;
     Ok(Json(json!({ "message": view[0] })))
 }
@@ -85,8 +97,9 @@ pub async fn delete(
     .fetch_optional(&mut *tx)
     .await?;
     let removed = removed.ok_or_else(ApiError::missing)?;
-    // Its photos and files go with it.
+    // Its photos, files and mentions go with it.
     crate::media::owned::remove(&mut tx, super::files::KIND, removed.id).await?;
+    mentions::store(&mut tx, room.id, removed.id, &[]).await?;
     tx.commit().await?;
     Ok(Json(json!({ "message": removed.view() })))
 }

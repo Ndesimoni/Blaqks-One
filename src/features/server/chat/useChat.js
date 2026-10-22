@@ -5,9 +5,9 @@ export const ROOMS_POLL_MS = 5000;
 const empty = { rooms: [], people: [], canCreateChannel: false };
 
 /**
- * The member's channels and direct conversations (with unread counts) and the colleagues
- * they can message, refreshed while visible. Starting a channel or a direct conversation
- * returns the room, or the server's message.
+ * The member's channels, groups and direct conversations (with unread and mention counts)
+ * and the colleagues they can message, refreshed while visible. Starting a channel, group
+ * or direct conversation returns the room, or the server's message.
  */
 export function useChat(api, workspaceId) {
   const [state, setState] = useState({ status: 'loading', data: empty });
@@ -48,5 +48,16 @@ export function useChat(api, workspaceId) {
     refresh: load,
     createChannel: (name) => start(() => api.createChannel(workspaceId, name)),
     openDirect: (memberId) => start(() => api.openDirect(workspaceId, memberId)),
+    createGroup: (memberIds, name) => start(() => api.createGroup(workspaceId, memberIds, name)),
+    /** Leaves a group; answers '' or the server's message. */
+    leave: async (roomId) => {
+      try {
+        await api.leaveChat(workspaceId, roomId);
+        await load();
+        return '';
+      } catch (failure) {
+        return failure.message || 'error';
+      }
+    },
   };
 }

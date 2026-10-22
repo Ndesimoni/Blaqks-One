@@ -1,0 +1,88 @@
+/* Groups in team chat (C3): the room head's members and Leave group, and the New group
+   form (name, search, colleagues to tick). Phones in the media query at the end. */
+.chat-room-title {
+  flex: 1;
+  min-inline-size: 0;
+}
+.chat-room-head p.chat-room-members {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-room-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.chat-pick {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.chat-pick legend {
+  margin-block-end: 6px;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.chat-new label.chat-pick-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    background var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.chat-new label.chat-pick-person:hover {
+  background: var(--hover);
+}
+.chat-new label.chat-pick-person.is-chosen {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+.chat-new .chat-pick-person input {
+  flex: none;
+  inline-size: 18px;
+  block-size: 18px;
+  min-block-size: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--primary);
+}
+.chat-pick-person:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.chat-pick-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-new label.chat-pick-person {
+    transition: none;
+  }
+}
+@media (max-width: 899px) {
+  .chat-room-head {
+    flex-wrap: wrap;
+  }
+  .chat-room-actions .btn {
+    min-block-size: 44px;
+  }
+}

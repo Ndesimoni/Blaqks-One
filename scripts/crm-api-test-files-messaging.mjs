@@ -2,6 +2,8 @@
  * this order after the CRM suites in crm-api-test-files.mjs. */
 export const messagingTestFiles = [
   'tests/api/chat.test.mjs',
+  'tests/api/chat-groups.test.mjs',
+  'tests/api/chat-mentions.test.mjs',
   'tests/api/media.test.mjs',
   'tests/api/property-media.test.mjs',
   'tests/api/sample-media.test.mjs',

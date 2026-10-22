@@ -1,16 +1,9 @@
-//! `GET /chat/rooms/{id}/messages` (the latest 100, or those before `before`), `POST` to
-//! send (at most 30 a minute per member).
+//! `GET /chat/rooms/{id}/messages`: the latest 100, or those before `before`, with their
+//! files and mentions. Sending is in `send.rs`.
 use super::{access, wire};
-use crate::{
-    auth::session::Session,
-    error::{ApiError, ApiResult},
-    media::owned,
-    state::AppState,
-    workspaces,
-};
+use crate::{auth::session::Session, error::ApiResult, state::AppState};
 use axum::{
-    extract::{rejection::JsonRejection, Path, Query, State},
-    http::{HeaderMap, StatusCode},
+    extract::{Path, Query, State},
     Json,
 };
 use serde::Deserialize;
@@ -19,7 +12,6 @@ use sqlx::FromRow;
 use uuid::Uuid;
 
 const PAGE: i64 = 100;
-const SENDS_PER_MINUTE: i64 = 30;
 
 #[derive(FromRow)]
 pub struct Message {
@@ -71,77 +63,8 @@ pub async fn list(
     .bind(PAGE)
     .fetch_all(&mut *tx)
     .await?;
-    let messages = super::files::views(&mut tx, &rows).await?;
+    let messages = super::view::views(&mut tx, &rows).await?;
     tx.commit().await?;
     let more = messages.len() as i64 == PAGE;
     Ok(Json(json!({ "messages": messages, "more": more })))
-}
-
-pub async fn send(
-    State(state): State<AppState>,
-    session: Session,
-    headers: HeaderMap,
-    Path((workspace, room)): Path<(String, String)>,
-    body: Result<Json<Value>, JsonRejection>,
-) -> ApiResult<(StatusCode, Json<Value>)> {
-    access::ensure(&state, &session, Some(&headers), &workspace).await?;
-    let map = match body {
-        Ok(Json(Value::Object(map))) if map.contains_key("attachments") => wire::exact(
-            Ok(Json(Value::Object(map))),
-            &["body", "attachments"],
-            wire::BODY,
-        )?,
-        other => wire::exact(other, &["body"], wire::BODY)?,
-    };
-    let (text, files) = wire::outgoing(&map)?;
-    let mut tx = state.pool.begin().await?;
-    workspaces::lock(&mut tx, &workspace).await?;
-    let user = access::live(&mut tx, &workspace, session.user.id).await?;
-    let room = access::room(&mut tx, &workspace, user.id, &room, true).await?;
-    // Each send holds the company's write lock, so one member may not flood (review C1 L1).
-    let recent: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM chat.crm_chat_messages \
-         WHERE author_id=$1 AND created_at>now()-interval '1 minute'",
-    )
-    .bind(user.id)
-    .fetch_one(&mut *tx)
-    .await?;
-    if recent >= SENDS_PER_MINUTE {
-        return Err(ApiError(
-            StatusCode::TOO_MANY_REQUESTS,
-            "You are sending too fast. Wait a moment and try again.",
-            "chat_rate_limited",
-        ));
-    }
-    let message: Message = sqlx::query_as(&format!(
-        "INSERT INTO chat.crm_chat_messages AS m (id,room_id,workspace_id,author_id,body) \
-         VALUES ($1,$2,$3,$4,$5) RETURNING {COLUMNS},{} AS at",
-        wire::STAMP
-    ))
-    .bind(Uuid::new_v4())
-    .bind(room.id)
-    .bind(&workspace)
-    .bind(user.id)
-    .bind(&text)
-    .fetch_one(&mut *tx)
-    .await?;
-    sqlx::query("UPDATE chat.crm_chat_rooms SET last_message_at=now() WHERE id=$1")
-        .bind(room.id)
-        .execute(&mut *tx)
-        .await?;
-    if !files.is_empty() {
-        owned::attach(
-            &mut tx,
-            &workspace,
-            user.id,
-            &files,
-            super::files::KIND,
-            message.id,
-        )
-        .await?;
-    }
-    super::read::mark(&mut tx, room.id, user.id).await?;
-    let view = super::files::views(&mut tx, std::slice::from_ref(&message)).await?;
-    tx.commit().await?;
-    Ok((StatusCode::CREATED, Json(json!({ "message": view[0] }))))
 }

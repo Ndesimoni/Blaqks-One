@@ -1,35 +1,16 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { badge, roomTitle, splitRooms } from './chatModel.js';
+import { splitRooms } from './chatModel.js';
 import { NewConversation } from './NewConversation.jsx';
+import { NewGroup } from './NewGroup.jsx';
+import { RoomRow } from './RoomRow.jsx';
 
-function RoomRow({ room, people, selected, onOpen, t }) {
-  const count = badge(room.unread);
-  return (
-    <li>
-      <button
-        type="button"
-        className={'chat-room' + (selected ? ' is-selected' : '') + (count ? ' is-unread' : '')}
-        aria-current={selected ? 'true' : undefined}
-        onClick={() => onOpen(room.id)}
-      >
-        <Icon name={room.kind === 'channel' ? 'chat' : 'person'} size={16} />
-        <span className="chat-room-name">
-          <bdi>{roomTitle(room, people, t)}</bdi>
-        </span>
-        {count && <span className="chat-badge">{count}</span>}
-      </button>
-    </li>
-  );
-}
-
-/** Channels and direct messages, with New channel (the Admin) and New message. */
+/** Channels, groups and direct messages, with New channel (the Admin), New group and New message. */
 export function RoomList({ chat, selectedId, onOpen }) {
   const { t } = useI18n();
   const [mode, setMode] = useState(null);
-  const { channels, direct } = splitRooms(chat.rooms);
+  const { channels, groups, direct } = splitRooms(chat.rooms);
   const opened = (result) => {
     if (result.error) return result.error;
     setMode(null);
@@ -39,13 +20,21 @@ export function RoomList({ chat, selectedId, onOpen }) {
   if (mode)
     return (
       <section className="chat-list" aria-label={t('chat.rooms')}>
-        <NewConversation
-          mode={mode}
-          people={chat.people}
-          onChannel={async (name) => opened(await chat.createChannel(name))}
-          onDirect={async (id) => opened(await chat.openDirect(id))}
-          onCancel={() => setMode(null)}
-        />
+        {mode === 'group' ? (
+          <NewGroup
+            people={chat.people}
+            onCreate={async (ids, name) => opened(await chat.createGroup(ids, name))}
+            onCancel={() => setMode(null)}
+          />
+        ) : (
+          <NewConversation
+            mode={mode}
+            people={chat.people}
+            onChannel={async (name) => opened(await chat.createChannel(name))}
+            onDirect={async (id) => opened(await chat.openDirect(id))}
+            onCancel={() => setMode(null)}
+          />
+        )}
       </section>
     );
   const group = (title, rooms, action) => (
@@ -85,6 +74,7 @@ export function RoomList({ chat, selectedId, onOpen }) {
         channels,
         chat.canCreateChannel && add('chat.newChannel', 'channel'),
       )}
+      {group(t('chat.groups'), groups, add('chat.newGroup', 'group'))}
       {group(t('chat.direct'), direct, add('chat.newMessage', 'direct'))}
     </section>
   );

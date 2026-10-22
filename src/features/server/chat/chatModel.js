@@ -1,10 +1,21 @@
-/** Pure helpers for team chat (C2). */
+/** Pure helpers for team chat (C2, groups in C3). */
 
-/** `#name` for a channel; the colleague's name (or "former member") for a direct room. */
+const nameIn = (people, id) => people.find((person) => person.id === id)?.name;
+
+/** A group's members other than the caller, by name; colleagues who left are skipped. */
+export const groupNames = (room, people = []) =>
+  (room?.members ?? []).map((id) => nameIn(people, id)).filter(Boolean);
+
+/**
+ * `#name` for a channel; a group's name, or its members' names; the colleague's name (or
+ * "former member") for a direct room.
+ */
 export function roomTitle(room, people, t) {
   if (!room) return '';
   if (room.kind === 'channel') return `#${room.name}`;
-  return people.find((person) => person.id === room.peerId)?.name || t('chat.formerMember');
+  if (room.kind === 'group')
+    return room.title || groupNames(room, people).join(', ') || t('chat.group.untitled');
+  return nameIn(people, room.peerId) || t('chat.formerMember');
 }
 
 export const badge = (count) => (count > 99 ? '99+' : count > 0 ? String(count) : '');
@@ -18,15 +29,23 @@ export function mergeMessages(...lists) {
   );
 }
 
-/** Channels first (alphabetical), then direct rooms, most recent first. */
+const recent = (a, b) => (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?? '');
+
+/** Channels first (alphabetical), then groups and direct rooms, most recent first. */
 export function splitRooms(rooms = []) {
   const channels = rooms
     .filter((room) => room.kind === 'channel')
     .sort((a, b) => a.name.localeCompare(b.name));
-  const direct = rooms
-    .filter((room) => room.kind === 'direct')
-    .sort((a, b) => (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?? ''));
-  return { channels, direct };
+  const groups = rooms.filter((room) => room.kind === 'group').sort(recent);
+  const direct = rooms.filter((room) => room.kind === 'direct').sort(recent);
+  return { channels, groups, direct };
+}
+
+/** Who can be mentioned in a room: everyone in a channel, the members of a group. */
+export function mentionable(room, people = []) {
+  if (room?.kind === 'channel') return people;
+  if (room?.kind === 'group') return people.filter((person) => room.members?.includes(person.id));
+  return [];
 }
 
 /** Colleagues whose name matches every word of the search. */

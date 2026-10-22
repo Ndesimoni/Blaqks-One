@@ -1,41 +1,18 @@
 //! Photos and files in team chat (packet F1). Uploads go to `media`; a message attaches the
-//! sender's own pending uploads in its transaction. `GET /chat/rooms/{room}/messages/
-//! {message}/files/{file}` serves one only to members who may see that room.
-use super::{access, messages::Message};
+//! sender's own pending uploads in its transaction (message views in `view.rs`).
+//! `GET /chat/rooms/{room}/messages/{message}/files/{file}` serves one only to members who
+//! may see that room.
+use super::access;
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
-    media::{owned, serve},
+    media::serve,
     state::AppState,
 };
 use axum::{extract::Path, extract::State, response::Response};
-use serde_json::Value;
-use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
 pub const KIND: &str = "chat";
-
-/// Message views with their attachments, in one query for the whole page.
-pub async fn views(
-    tx: &mut Transaction<'_, Postgres>,
-    messages: &[Message],
-) -> ApiResult<Vec<Value>> {
-    let ids: Vec<Uuid> = messages.iter().map(|message| message.id).collect();
-    let files = owned::list(tx, KIND, &ids).await?;
-    Ok(messages
-        .iter()
-        .map(|message| {
-            let mut view = message.view();
-            let attached: Vec<Value> = files
-                .iter()
-                .filter(|(owner, _)| *owner == message.id)
-                .map(|(_, item)| item.view())
-                .collect();
-            view["attachments"] = Value::Array(attached);
-            view
-        })
-        .collect())
-}
 
 pub async fn file(
     State(state): State<AppState>,
