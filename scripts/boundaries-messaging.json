@@ -45,7 +45,10 @@
       "crm_inbox_rules",
       "crm_inbox_events",
       "crm_inbox_events_feed",
-      "crm_inbox_events_immutable"
+      "crm_inbox_events_immutable",
+      "crm_inbox_saved_replies",
+      "crm_inbox_saved_replies_title",
+      "crm_inbox_drafts"
     ],
     "outbox": [
       "crm_outbox_jobs",

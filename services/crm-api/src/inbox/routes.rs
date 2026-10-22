@@ -1,13 +1,16 @@
 //! Inbox routes under `/api/crm/workspaces/{workspace}/inbox`, merged by `routes.rs`.
-use super::{blocks, commands, list, notes, read, rules_api, send, summary, triage};
+use super::{
+    blocks, commands, drafts, list, notes, read, rules_api, saved_replies, send, summary, triage,
+};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
-    routing::{get, post},
+    routing::{get, patch, post},
     Router,
 };
 
 const BASE: &str = "/api/crm/workspaces/{workspace}/inbox/conversations";
+const SAVED: &str = "/api/crm/workspaces/{workspace}/inbox/saved-replies";
 
 pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(32 * 1024);
@@ -24,6 +27,10 @@ pub fn router() -> Router<AppState> {
             post(notes::mark_read).layer(body()),
         )
         .route(&format!("{item}/messages"), post(send::reply).layer(body()))
+        .route(
+            &format!("{item}/draft"),
+            get(drafts::get).put(drafts::put).layer(body()),
+        )
         .route(
             &format!("{item}/messages/{{message}}/files/{{file}}"),
             get(send::files::file),
@@ -50,5 +57,19 @@ pub fn router() -> Router<AppState> {
         .route(
             "/api/crm/workspaces/{workspace}/inbox/rules",
             get(rules_api::get).put(rules_api::put).layer(body()),
+        )
+        .route(
+            SAVED,
+            get(saved_replies::list)
+                .post(saved_replies::create)
+                .layer(body()),
+        )
+        .route(
+            &format!("{SAVED}/{{id}}"),
+            patch(saved_replies::update).layer(body()),
+        )
+        .route(
+            &format!("{SAVED}/{{id}}/remove"),
+            post(saved_replies::remove).layer(body()),
         )
 }

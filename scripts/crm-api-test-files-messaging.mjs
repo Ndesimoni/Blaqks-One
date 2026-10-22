@@ -27,4 +27,6 @@ export const messagingTestFiles = [
   'tests/api/inbox-assign.test.mjs',
   'tests/api/inbox-triage.test.mjs',
   'tests/api/inbox-guards.test.mjs',
+  'tests/api/saved-replies.test.mjs',
+  'tests/api/inbox-drafts.test.mjs',
 ];
