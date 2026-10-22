@@ -67,11 +67,14 @@ pub enum Committed {
     Stale,
     /// The workspace was archived meanwhile, which freezes it.
     Frozen,
+    /// With this record's files the company would be over its storage cap (review L3).
+    OverQuota,
 }
 
 /// In the record's own transaction, under the workspace lock: replaces only the changed media
-/// fields when the version is still the one read, bumps it, and makes the reserved files
-/// visible. Anything else rolls back with nothing changed.
+/// fields when the version is still the one read and the company stays within its cap with
+/// the reserved files counted, bumps the version and makes the files visible. Anything else
+/// rolls back with nothing changed.
 pub async fn commit(
     pool: &PgPool,
     workspace: &str,
@@ -83,6 +86,9 @@ pub async fn commit(
     workspaces::lock(&mut tx, workspace).await?;
     if workspaces::frozen(&mut tx, workspace).await? {
         return Ok(Committed::Frozen);
+    }
+    if !media::within_cap(&mut tx, workspace).await? {
+        return Ok(Committed::OverQuota);
     }
     let updated = sqlx::query(
         "UPDATE crm_records SET payload=payload || $1,version=version+1,updated_at=now() \

@@ -25,6 +25,9 @@ pub enum Reason {
     OtherFields,
     /// Storing it would take the company over its storage cap.
     OverQuota,
+    /// The record's media fields, rewritten, would fail the validation a member's save uses
+    /// (for example more than 20 entries); the whole record is left as it is.
+    Invalid,
 }
 
 pub enum Entry<'a> {

@@ -67,9 +67,8 @@ async fn run() -> Result<(), String> {
         return Ok(());
     }
     if let Some(options) = backfill_options {
-        let report = backfill::run(&pool, config.media.as_ref(), options).await?;
-        println!("{report}");
-        return Ok(());
+        let mut out = std::io::stdout();
+        return backfill::run(&pool, config.media.as_ref(), options, &mut out).await;
     }
     if command.as_deref() == Some("migrate") {
         println!("CRM database migrations applied.");

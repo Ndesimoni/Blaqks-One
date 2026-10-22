@@ -16,9 +16,13 @@ pub async fn round(pool: &PgPool, config: &MediaConfig) -> ApiResult<()> {
     )
     .execute(pool)
     .await?;
+    // A hidden backfill reservation keeps its object for an hour, longer than the command's
+    // put deadline, so a put landing late is still removed here (F2 backfill review L1).
     let due: Vec<(Uuid, String)> = sqlx::query_as(
         "SELECT id,storage_key FROM media.crm_media_objects \
-         WHERE deleted_at IS NOT NULL AND storage_removed_at IS NULL ORDER BY deleted_at LIMIT $1",
+         WHERE deleted_at IS NOT NULL AND storage_removed_at IS NULL \
+           AND NOT (origin='backfill' AND storage_pending AND created_at>now()-interval '1 hour') \
+         ORDER BY deleted_at LIMIT $1",
     )
     .bind(BATCH)
     .fetch_all(pool)

@@ -94,69 +94,88 @@ database and storage settings and has no HTTP route.
 records with an inline entry in `media_photos` or `media_floorplans` and handles them one
 record at a time. Each inline entry is decoded and checked exactly like an upload (the real
 type from the bytes, the 10 MB / 20 MB limits, EXIF and PNG/WebP text removed, the display
-name ending in the stored type's extension) and becomes `{name, file, type, added?}`, the
-shape F2 writes, owned by that record. There is no `thumb`: the server has no image
-resizer, and the browser shows `file` when an entry has no thumbnail
-(`ServerMediaProvider`). Already stored entries are not touched; the order of entries is
-kept.
+name without path prefixes and ending in the stored type's extension) and becomes
+`{name, file, type, added?}`, the shape F2 writes, owned by that record. There is no
+`thumb`: the server has no image resizer, and the browser shows `file` when an entry has no
+thumbnail (`ServerMediaProvider`). Stored entries and the order of entries are kept.
 
 **What stays inline, unchanged, and is reported** (`left`, by record UUID, field and index):
 `unsupported` (not a base64 data URL, not JPEG/PNG/WebP/PDF by its bytes, or a PDF among
 photos), `unreadable` (bad base64 or a malformed image), `too_large`, `over_quota` (it would
-take the company over its 5 GB) and `other_fields` (the entry carries fields a stored entry
-cannot keep, such as the `demo: true, source: generated-demo` label, so
-[labelled demo photos](demo-property-photos.md) stay labelled). Nothing is ever dropped.
+take the company over its 5 GB), `other_fields` (fields a stored entry cannot keep, such as
+the `demo: true, source: generated-demo` label, so
+[labelled demo photos](demo-property-photos.md) stay labelled) and `invalid` (the record's
+media fields, rewritten, would fail the validation a member's save uses, for example more
+than 20 entries or another entry that is not a data URL; checked before anything is
+reserved, so such a record is never uploaded again and again). Nothing is ever dropped.
 
-**One record, one transaction.** Per record: (1) its files are reserved as rows attached
-to the record, `origin = 'backfill'`, marked not yet stored, and committed; (2) their
-cleaned bytes are put into storage; (3) in the record's own transaction, under the
-workspace lock, the workspace must not be archived, the version must still be the one read
-(`UPDATE … WHERE version = $read`), only the changed media fields are replaced
-(`payload || {media_photos: …}`), the version is bumped and the reserved files are marked
-stored. A record that changed meanwhile (`changed_meanwhile`), a storage failure
-(`failed`) or a newly archived workspace rolls back with nothing changed in the record;
-its reserved files are hidden at once, or by the sweep after an hour if even that fails,
-and the sweep removes their objects. Before the commit the rewritten fields are checked
-with the same validation a member's save uses. Archived workspaces are frozen and skipped
-(`archived: true`). A second run finds nothing left to move and changes nothing.
+**One record, one transaction.** Per record: (1) the rewritten media fields are built with
+new file IDs and validated; (2) the files are reserved as rows attached to the record,
+`origin = 'backfill'`, not yet stored, and committed; (3) each cleaned file is put and then
+**read back from the bucket and compared with its reserved SHA-256** (security review M1),
+all within 30 minutes; (4) in the record's own transaction, under the workspace lock, the
+workspace must not be archived, the company must still be within its cap with these files
+counted (review L3), the version must still be the one read (`UPDATE … WHERE version =
+$read`), only the changed media fields are replaced (`payload || {media_photos: …}`), the
+version is bumped and the files are marked stored. A record that changed meanwhile
+(`changed_meanwhile`), a storage failure or mismatch (`failed`), the cap or a newly archived
+workspace rolls back with nothing changed in the record, and its reserved files are hidden
+at once (or by the sweep after an hour). The sweep keeps the objects of hidden, unconfirmed
+backfill rows for that hour, longer than the 30-minute put deadline, so a put still landing
+after a member's save hid its row is removed later rather than left untracked (review L1;
+chosen over deleting from the command, which a crash could skip). Archived workspaces are
+frozen and skipped (`archived: true`). A second run finds nothing left to move.
 
 **Migration 0054** adds the `backfill` origin: such files never count against a member's
-hourly or pending upload limits and can never be attached by a member, but they do count
-toward the company's storage cap. The workspace owner is recorded as `uploaded_by`, as for
-inbound mail.
+hourly or pending upload limits and can never be attached by a member. They do count toward
+the company's 5 GB, and the backfill may use the company's remaining headroom; no margin is
+kept, because the photos already belong to the company, inline photos are small (about
+200 KB) and an over-cap entry simply stays inline as `over_quota`. The workspace owner is
+recorded as `uploaded_by`, as for inbound mail.
 
-**No activity entry (decision).** The command writes no `crm_activity` row. Activity
-answers "which member did what"; its `actor_id` must be a member, and the operator is not
-one, so naming the Admin (or anyone) would be a false attribution, which AGENTS.md forbids
-(actor and workspace IDs stay distinct). The listing also reads the same before and after:
-same photos, same order, same names apart from the added extension. The durable trace is
-the `origin = 'backfill'` media rows (when, which record) plus the version bump, which
-also makes any open editor reload instead of saving over the change. Schema migrations
-that rewrite data write no activity either.
+**No activity entry: an exception awaiting the owner's decision.** AGENTS.md asks that
+connected activity commit with scoped record mutations; this command writes no
+`crm_activity` row, which is an exception the owner has been asked to confirm. Reasons:
+activity answers "which member did what" and its `actor_id` must be a member; the operator
+is not one, so naming the Admin would be a false attribution (actor and workspace IDs stay
+distinct). The listing reads the same afterwards. The trace is the `origin = 'backfill'`
+media rows (when, which record) and the version bump.
 
-**Report and logs.** The command prints one JSON report: `mode` (`dry-run` or `apply`)
-and per workspace `records`, `entries` and `bytes` (stored size after cleaning) that moved
-or would move, `changed_meanwhile`, `failed` and `left`. It names only workspace IDs and
-record UUIDs: never file names, bytes, data URLs or other record contents. A database
-failure stops the command with a fixed message; records already moved stay moved.
+**Side effects to expect.** Members with the property open in an editor get "This record
+changed. Reload before saving." when they save; `updated_at` changes; only the two media
+fields pass through `serde_json` (a number inside them beyond f64 precision would be
+rounded; inline entries carry none), other fields are merged unchanged by PostgreSQL.
+
+**Report and logs.** JSON lines on standard output: first `{"mode", "storage": {"host",
+"bucket"}}` (never credentials), then one line per workspace as soon as it finishes, with
+`records`, `entries` and `bytes` (stored size after cleaning) moved or that would move,
+`changed_meanwhile`, `failed`, `left`, `archived` and `stopped`. If a database error stops
+the run, the current workspace's line is still written with `stopped: true` (review M2) and
+the command exits with a fixed message; records already moved stay moved. Only workspace
+IDs and record UUIDs are named: never file names, bytes, data URLs or record contents.
 
 **Operator steps.**
 
-1. Back up the database first (a full PostgreSQL dump) and make sure the storage settings
-   (`CRM_MEDIA_*`) are the production ones. Like every command, it first applies pending
-   migrations (0054).
-2. Dry run: `kws-crm-api media-backfill` (or `--workspace <id>`). Read the report: what
-   would move, and what stays inline and why. Nothing changes.
-3. Apply: `kws-crm-api media-backfill --apply` (optionally per workspace). Re-run it for
+1. Back up the database (a full PostgreSQL dump) **and the storage bucket**: after the
+   move, database dumps no longer contain these photos.
+2. Choose a quiet time (members editing properties will be asked to reload). Like every
+   command, even the dry run first applies pending migrations (0054).
+3. Dry run: `kws-crm-api media-backfill` (or `--workspace <id>`). Check that the
+   `storage` host and bucket in the first line are the production ones, and read what
+   would move and what stays inline and why. Nothing changes.
+4. Apply: `kws-crm-api media-backfill --apply` (optionally per workspace). Re-run it for
    any `changed_meanwhile` or `failed` records; it is safe to repeat.
-4. Entries left inline keep working as before; a member can replace them by uploading the
+5. Entries left inline keep working as before; a member can replace them by uploading the
    photo again.
 
-Tests: unit tests in `records/backfill/inline_tests.rs`, `plan_tests.rs` and `options.rs`;
-API suite `tests/api/media-backfill.test.mjs` (dry run, apply, served files without photo
-metadata, repeat run, items left inline, another company untouched, a member save after).
-Not covered automatically: a record changing between reading and committing, storage
-failing mid-run and a workspace archived mid-run (each rolls the record back as above).
+Tests: unit tests in `records/backfill/inline_tests.rs`, `plan_tests.rs`, `rewrite_tests.rs`
+and `options.rs`; the database-backed `apply_tests.rs` (a record saved meanwhile is skipped
+and its reserved files hidden); API suites `tests/api/media-backfill.test.mjs` (dry run with
+nothing reserved, apply, served files without photo metadata, repeat run, items left
+inline, another company untouched, a member save afterwards) and
+`media-backfill-guards.test.mjs` (unreachable storage, archived company). Not covered
+automatically: a read-back mismatch, a database error mid-run, and a workspace archived or
+over the cap between planning and commit.
 
 ## F3 design: email attachments (2026-10-21, security reviewed)
 

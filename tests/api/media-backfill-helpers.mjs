@@ -6,18 +6,24 @@ import { api, query } from './helpers.mjs';
 
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 
-/** Runs the command against the disposable test database and parses its JSON report. */
-export function backfill(...args) {
+/**
+ * Runs the command against the disposable test database, with optional environment
+ * overrides, and parses its JSON-lines report: a header, then one line per workspace.
+ */
+export function backfillWith(env, ...args) {
   assert.ok(process.env.CRM_TEST_PROJECT?.startsWith('kws-crm-test-'));
   const result = spawnSync(binary, ['media-backfill', ...args], {
-    env: process.env,
+    env: { ...process.env, ...env },
     input: '',
     encoding: 'utf8',
   });
-  const start = result.stdout.indexOf('{');
-  const report = result.status === 0 ? JSON.parse(result.stdout.slice(start)) : null;
+  const lines = result.stdout.split('\n').filter((line) => line.startsWith('{'));
+  const [header, ...workspaces] = lines.map((line) => JSON.parse(line));
+  const report = header ? { ...header, workspaces } : null;
   return { status: result.status, stdout: result.stdout, stderr: result.stderr, report };
 }
+
+export const backfill = (...args) => backfillWith({}, ...args);
 
 export const dataUrl = (mime, bytes) => `data:${mime};base64,${bytes.toString('base64')}`;
 
@@ -40,6 +46,17 @@ export const movedFiles = (workspace) =>
        WHERE workspace_id='${workspace}' AND origin='backfill' AND deleted_at IS NULL`,
     ),
   );
+
+/** Every file row of the workspace in any state, and the hidden backfill ones. */
+const countFiles = (workspace, where) =>
+  Number(
+    query(
+      `SELECT count(*) FROM media.crm_media_objects WHERE workspace_id='${workspace}' ${where}`,
+    ),
+  );
+export const allFiles = (workspace) => countFiles(workspace, '');
+export const hiddenFiles = (workspace) =>
+  countFiles(workspace, "AND origin='backfill' AND deleted_at IS NOT NULL");
 
 /** The workspace's report, which must exist. */
 export function workspaceReport(report, workspace) {

@@ -9,14 +9,16 @@ pub mod inline;
 pub mod options;
 pub mod plan;
 pub mod report;
+pub mod rewrite;
 pub mod store;
 pub mod workspace;
 
 pub use options::Options;
 
 use crate::{config::media_settings::MediaConfig, error::ApiError};
-use report::Report;
+use report::{emit, Header, Storage, Workspace};
 use sqlx::PgPool;
+use std::io::Write;
 
 const UNCONFIGURED: &str =
     "File storage is not set up: set CRM_MEDIA_* before running media-backfill --apply.";
@@ -27,34 +29,41 @@ fn stopped(_: ApiError) -> String {
         .into()
 }
 
-/// Runs the command on a migrated database and returns the report.
+/// Runs the command on a migrated database, writing the report to `out` line by line.
 pub async fn run(
     pool: &PgPool,
     media: Option<&MediaConfig>,
     options: Options,
-) -> Result<String, String> {
+    out: &mut impl Write,
+) -> Result<(), String> {
     let config = match (options.apply, media) {
         (false, _) => None,
         (true, Some(config)) => Some(config),
         (true, None) => return Err(UNCONFIGURED.into()),
     };
+    let header = Header {
+        mode: if options.apply { "apply" } else { "dry-run" },
+        storage: media.map(Storage::of),
+    };
+    emit(out, &header)?;
     let workspaces = match options.workspace {
         Some(id) => vec![id],
         None => store::workspaces(pool).await.map_err(stopped)?,
     };
-    let mut report = Report {
-        mode: if options.apply { "apply" } else { "dry-run" },
-        workspaces: Vec::with_capacity(workspaces.len()),
-    };
-    for workspace in workspaces {
-        match workspace::run(pool, config, &workspace).await {
-            Ok(done) => report.workspaces.push(done),
-            // `owner_of` refuses a workspace that does not exist.
+    for id in workspaces {
+        let mut report = Workspace::new(&id);
+        match workspace::run(pool, config, &mut report).await {
+            Ok(()) => emit(out, &report)?,
+            // `owner_of` refuses a workspace that does not exist, before anything is done.
             Err(error) if error.2 == "forbidden" => {
-                return Err(format!("No workspace has the ID {workspace}."))
+                return Err(format!("No workspace has the ID {id}."))
             }
-            Err(error) => return Err(stopped(error)),
+            Err(error) => {
+                report.stopped = true;
+                emit(out, &report)?;
+                return Err(stopped(error));
+            }
         }
     }
-    Ok(report.json())
+    Ok(())
 }

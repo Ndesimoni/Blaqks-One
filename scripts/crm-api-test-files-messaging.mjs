@@ -32,4 +32,5 @@ export const messagingTestFiles = [
   'tests/api/saved-replies.test.mjs',
   'tests/api/inbox-drafts.test.mjs',
   'tests/api/media-backfill.test.mjs',
+  'tests/api/media-backfill-guards.test.mjs',
 ];

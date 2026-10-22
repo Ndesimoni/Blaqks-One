@@ -5,7 +5,7 @@ import * as backfillHelpers from './media-backfill-helpers.mjs';
 import * as fixtures from './media-backfill-fixtures.mjs';
 
 // F2 backfill: the trusted command moves inline property photos and floor plans into storage.
-const { backfill, snapshot, payload, version, movedFiles } = backfillHelpers;
+const { backfill, snapshot, payload, version, movedFiles, allFiles } = backfillHelpers;
 const { workspaceReport, recordFile } = backfillHelpers;
 const { admin, workspace, recordsPath, otherWorkspace, demo, animation } = fixtures;
 const { villa, huge, other, ids, expectedLeft } = fixtures;
@@ -15,6 +15,10 @@ test('a dry run reports what would move and changes nothing', () => {
   const run = backfill('--workspace', workspace);
   assert.equal(run.status, 0, run.stderr);
   assert.equal(run.report.mode, 'dry-run');
+  const endpoint = new URL(process.env.CRM_MEDIA_ENDPOINT);
+  const storage = { host: endpoint.host, bucket: process.env.CRM_MEDIA_BUCKET };
+  assert.deepEqual(run.report.storage, storage, 'the operator sees where files would go');
+  assert.ok(!run.stdout.includes(process.env.CRM_MEDIA_SECRET_KEY), 'never credentials');
   const ours = workspaceReport(run.report, workspace);
   assert.equal(ours.archived, false);
   assert.deepEqual([ours.records, ours.entries], [1, 2]);
@@ -28,7 +32,7 @@ test('a dry run reports what would move and changes nothing', () => {
   workspaceReport(everywhere.report, workspace);
   workspaceReport(everywhere.report, otherWorkspace);
   assert.equal(snapshot(ids), before, 'no record changed');
-  assert.equal(movedFiles(workspace), 0, 'nothing was stored');
+  assert.equal(allFiles(workspace), 0, 'nothing was reserved or stored');
 });
 
 test('--apply moves inline files into storage, cleaned, served by the record route', async () => {
