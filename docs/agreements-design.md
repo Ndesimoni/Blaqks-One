@@ -499,3 +499,50 @@ where they differ.
 - **Not in A3a:** amend, complete, cancel, archive, the certificate and payment tracking
   (A3b). Existing, outside A3a: clearing sample data suspends sample staff without the
   finance departure step, so app offers to or from them stay open until cancelled.
+
+## 17. H2 design: reviewing, badges, hand-overs to the Admin and approvals (2026-10-22)
+
+Owner decisions (2026-10-22), after trying A3a:
+
+1. **Review before deciding.** A hand-over request shows one **Review offer** button; the
+   window shows the deal and the property, with **Accept** and **Decline** inside it, so
+   nobody decides blind.
+   - Shown: deal type, stage, agreed value, fee basis and rate or fixed fee, the fee, any
+     partner company's share and name, the referral split and what the receiver would
+     earn, payments received so far, dates and pipeline (opened, target close, milestone,
+     current blocker, next action and its date); the property's listing title, sale or
+     rental, emirate, community, building, type, bedrooms, bathrooms, size, price, ready or
+     off-plan and furnishing.
+   - Hidden until acceptance: the client's full name (shown as first name and last
+     initial), email, phone and every other client detail; the property owner's contact;
+     the deal's notes and documents link (free text often holds client details). After
+     acceptance the receiver holds the deal and sees everything under the normal rules.
+2. **Badges.** Deals shows a count of hand-overs waiting for your answer or your
+   approval; Agreements shows offers from other companies waiting for your answer. In the
+   CRM only, refreshed every 15 seconds like Team chat.
+3. **Hand-overs to the Admin.** An agent may offer a deal to their Admin as a full
+   hand-over only (no referral): an Admin-held deal earns no agent commission and the
+   company keeps the net (finance owner question Q4, 2026-10-14). The Admin accepts in
+   Deals like an agent.
+4. **Needs approval.** The agent may tick **Needs approval** and choose the approver: the
+   Admin by default, or a staff member the Admin has given the Finance **Approve** right,
+   never the sender or the receiver. The receiver accepts first; then the chosen approver
+   approves, and only then does the deal move. Any Admin may still approve or cancel. The
+   chosen approver gets the badge. Without the tick, the receiver's acceptance moves the
+   deal, as today.
+5. The client's name before acceptance stays first name and last initial.
+
+Build notes (for the security review before building):
+
+- `GET /finance/handovers/{id}/preview`: the receiver, the chosen approver and the Admin,
+  while pending and with the finance module; a server-shaped view of exactly the fields in
+  item 1, so hidden fields never reach the browser. The money terms stay frozen in the
+  agreement; stage, dates and payments are read live.
+- `GET /finance/handovers/waiting` (`answer`, `approve` counts for the caller) and
+  `GET /agreements/waiting` (`answer`), polled by the sidebar.
+- A finance migration lets an Admin of the same company receive a full hand-over, and
+  adds the approval columns (required flag, chosen approver) with a status for "accepted,
+  waiting for approval". The agreement records the receiver's acceptance and the
+  approver's approval on the same revision; the approver's verification is distinct from
+  an Admin decision. The approver must hold the Approve right when chosen and when
+  approving.

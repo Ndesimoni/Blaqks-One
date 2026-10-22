@@ -78,6 +78,9 @@ stored records). Test on the disposable database with synthetic records.
   the receiver reviews the full offer before accepting; see
   [Agreements design](agreements-design.md) §14–§16. Next in this line: **A3b** (amend,
   complete, cancel, archive, the certificate and payment tracking between companies).
+  Before A3b, the owner chose **H2** (2026-10-22, design §17): reviewing a hand-over
+  before deciding, sidebar badges, hand-overs to the Admin and approvals chosen by the
+  sender. It needs a security review of §17 first.
 
 ### N4 — WhatsApp (blocked on the owner)
 
