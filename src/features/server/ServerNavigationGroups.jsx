@@ -1,5 +1,6 @@
 import React from 'react';
 import { nav } from '../../config/navigation.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import { canOpenSection } from './access.js';
 import { ServerNavigationItem } from './ServerNavigationItem.jsx';
 import { InboxNavItem } from './inbox/InboxNavItem.jsx';
@@ -7,13 +8,22 @@ import { TeamChatNavItem } from './chat/TeamChatNavItem.jsx';
 
 export { ServerNavigationItem };
 
+/** Connected-only Agreements sit after Deals, for every company member (agreements §13). */
+function withAgreements(group, items, user) {
+  if (group.header !== 'SALES & RELATIONSHIPS' || !canOpenSection(user, 'Agreements')) return items;
+  const at = items.findIndex(([name]) => name === 'Deals') + 1 || items.length;
+  return [...items.slice(0, at), ['Agreements', 'note'], ...items.slice(at)];
+}
+
 export function ServerNavigationGroups({ user, route, onSelect }) {
+  const { t } = useI18n();
   return nav.map((group) => {
     // The Messages slot is the Inbox for company members, whatever their reply grants.
-    const items = group.items.filter(
+    const allowed = group.items.filter(
       ([name]) =>
         canOpenSection(user, name) || (name === 'Messages' && canOpenSection(user, 'Inbox')),
     );
+    const items = withAgreements(group, allowed, user);
     if (!items.length) return null;
     return (
       <div className="nav-group" key={group.header}>
@@ -33,6 +43,7 @@ export function ServerNavigationGroups({ user, route, onSelect }) {
               key={name}
               name={name}
               icon={icon}
+              label={name === 'Agreements' ? t('agreements.title') : undefined}
               route={route}
               onSelect={onSelect}
             />

@@ -9,6 +9,7 @@ import { RecordsPage } from '../records/RecordsPage.jsx';
 import { ServerTeamPage } from '../server-team/ServerTeamPage.jsx';
 import { canOpenSection } from './access.js';
 import { ServerActivity } from './activity/ServerActivity.jsx';
+import { ServerAgreements } from './agreements/ServerAgreements.jsx';
 import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 import { ServerCalculators } from './calculators/ServerCalculators.jsx';
 import { ServerChannels } from './channels/ServerChannels.jsx';
@@ -49,6 +50,7 @@ export function ServerContent({ owner }) {
   if (route === 'Channels') return <ServerChannels />;
   if (route === 'Inbox rules') return <ServerInboxRules />;
   if (route === 'Team chat') return <ServerTeamChat />;
+  if (route === 'Agreements') return <ServerAgreements />;
   if (route === 'My mailbox') return <ServerMailbox />;
   if (route === 'Google sign-in') return <GoogleReturn />;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;

@@ -1,0 +1,143 @@
+/* Agreement detail: status, parties, revisions and frozen terms. After agreement-rows.css. */
+.agreement-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-content: start;
+}
+.agreement-muted {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.agreement-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+}
+.agreement-notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.agreement-notice.is-error {
+  border-color: var(--danger);
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+.agreement-notice.is-success {
+  border-color: var(--primary);
+}
+.agreement-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+}
+.agreement-status p {
+  margin: 0;
+  font-size: 14px;
+}
+.agreement-status small {
+  inline-size: 100%;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.agreement-parties {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+.agreement-party {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.agreement-party.is-mine {
+  border-color: var(--primary);
+  background: var(--surface-subtle);
+}
+.agreement-party small,
+.agreement-label {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.agreement-label {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.agreement-you {
+  color: var(--muted-dark);
+  font-weight: 500;
+}
+.agreement-revisions {
+  /* Wraps rather than scrolls: a scroll container would collapse in the dialog's grid. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.agreement-revisions button {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 2px;
+  min-block-size: 44px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--ink);
+  text-align: start;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.agreement-revisions button:hover {
+  background: var(--hover);
+}
+.agreement-revisions button[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--hover);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.agreement-revisions small {
+  color: var(--muted-dark);
+  font-size: 11px;
+}
+.agreement-actions,
+.agreement-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.agreement-actions > p,
+.agreement-confirm > p {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+@media (min-width: 760px) {
+  .agreement-actions > p,
+  .agreement-confirm > p {
+    flex-basis: 0;
+    min-inline-size: 240px;
+  }
+}
+@media (max-width: 520px) {
+  .agreement-actions .btn,
+  .agreement-confirm .btn {
+    flex: 1 1 calc(50% - 4px);
+  }
+}

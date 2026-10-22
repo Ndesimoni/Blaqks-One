@@ -1,6 +1,6 @@
-//! `POST/GET /agreements` and `GET /agreements/{id}` (docs/agreements-design.md
-//! §9–§10): participant-scoped reads, drafts created by the named sender.
-use super::{access, evidence::Parties, model::Kind, store, terms, wire, write};
+//! `POST/GET /agreements` (docs/agreements-design.md §9–§10, §13): participant-scoped
+//! lists with both parties' names, and drafts created by the named sender.
+use super::{access, evidence::Parties, model::Kind, parties, store, terms, wire, write};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -68,29 +68,7 @@ pub async fn list(
     let admin = session.user.role == "admin";
     let mut tx = state.pool.begin().await?;
     let rows = store::list(&mut tx, &workspace, session.user.id, admin).await?;
+    let items = parties::views(&mut tx, &rows).await?;
     tx.commit().await?;
-    let items: Vec<Value> = rows.iter().map(|row| row.view()).collect();
     Ok(Json(json!({ "agreements": items })))
-}
-
-pub async fn read(
-    State(state): State<AppState>,
-    session: Session,
-    Path((workspace, id)): Path<(String, String)>,
-) -> ApiResult<Json<Value>> {
-    access::ensure_reader(&state, &session, &workspace).await?;
-    let id = access::id(&id)?;
-    let mut tx = state.pool.begin().await?;
-    let row = store::load(&mut tx, id)
-        .await?
-        .filter(|row| access::can_read(row, &session, &workspace))
-        .ok_or_else(ApiError::missing)?;
-    let revision = store::current(&mut tx, id).await?;
-    tx.commit().await?;
-    let party = access::party_of(&row, session.user.id, &workspace).map(|party| party.as_str());
-    Ok(Json(json!({
-        "agreement": row.view(),
-        "revision": revision.view(),
-        "party": party,
-    })))
 }

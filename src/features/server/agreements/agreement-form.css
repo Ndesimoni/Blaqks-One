@@ -1,0 +1,124 @@
+/* Agreement form: type cards, recipient lookup and the review. After agreement-terms.css. */
+.agreement-fieldset {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.agreement-fieldset > legend,
+.agreement-kinds > legend {
+  margin-block-end: 4px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.agreement-fieldset + .agreement-fieldset {
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--line);
+}
+.agreement-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 10px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.agreement-kinds label,
+.agreement-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  cursor: pointer;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.agreement-kinds label:hover,
+.agreement-check:hover {
+  background: var(--hover);
+}
+.agreement-kinds label.is-selected {
+  border-color: var(--primary);
+  background: var(--surface-subtle);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.agreement-kinds input,
+.agreement-check input {
+  flex: 0 0 18px;
+  block-size: 18px;
+  margin-block-start: 2px;
+  accent-color: var(--primary);
+}
+.agreement-kinds span,
+.agreement-check span {
+  display: grid;
+  gap: 4px;
+}
+.agreement-kinds small,
+.agreement-check small {
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.agreement-lookup-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.agreement-lookup-row input {
+  flex: 1 1 220px;
+  min-inline-size: 0;
+}
+.agreement-recipient {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.agreement-recipient > div {
+  display: grid;
+  flex: 1 1 160px;
+  gap: 2px;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.agreement-recipient small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.agreement-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.agreement-note {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.agreement-review {
+  display: grid;
+  gap: 18px;
+}
+@media (max-width: 640px) {
+  .agreement-form .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

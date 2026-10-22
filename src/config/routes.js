@@ -19,6 +19,7 @@ export const connectedRoutes = [
   { name: 'Team chat', path: '/team-chat' },
   { name: 'Inbox rules', path: '/inbox-rules' },
   { name: 'My mailbox', path: '/my-mailbox' },
+  { name: 'Agreements', path: '/agreements' },
   // Google's sign-in returns here (E1a); the page finishes it and clears the address bar.
   { name: 'Google sign-in', path: '/oauth/google' },
 ];

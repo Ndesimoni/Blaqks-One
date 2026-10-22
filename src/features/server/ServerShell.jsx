@@ -25,6 +25,7 @@ const translated = {
   'Inbox rules': 'inboxRules',
   'My mailbox': 'mailbox',
   'Google sign-in': 'mailbox',
+  Agreements: 'agreements',
 };
 
 export function ServerShell({ owner, workspaces }) {

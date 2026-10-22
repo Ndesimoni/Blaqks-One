@@ -33,6 +33,8 @@ const connectedSections = new Set([
   // `/mailbox`: each member's own Google mailbox (packets E1a, E1d).
   'My mailbox',
   'Google sign-in',
+  // `/agreements`: cross-company deal agreements (packet A2 screens).
+  'Agreements',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);

@@ -231,3 +231,53 @@ amend, cancel, complete, archive, certificate. Each mutation takes an explicit
   frontend client.
 - Tests: `tests/api/agreements.test.mjs`, `tests/api/agreements-guards.test.mjs` and the
   module's unit tests, including evidence digests.
+
+## 13. Screens as built (2026-10-22)
+
+The A2 core now has its screens. Every company member reaches **Agreements** from the
+connected sidebar (after Deals); the Super Admin does not, matching the routes' refusal.
+
+- **List:** Incoming, Sent and All tabs (by the caller's company side), twelve per page,
+  newest first and refreshed every 15 seconds. Each row shows the type, the counterparty
+  ("To …" or "From …"), the company name when set, the listing label and area, the
+  caller's side's share, the state and whose move it is. Empty, loading (skeleton) and
+  failed states are distinct.
+- **Detail:** the state, the offer end, both named participants (the caller's side and
+  "(you)" marked), a revision picker, the selected revision's frozen terms (both shares
+  as percentages with their AED amounts), its evidence digest, author and freeze time,
+  the acceptance when there is one, and the event history. The footer offers exactly the
+  commands `allowedActions` derives from the server's rules (`agreementModel.js`): the
+  sender edits and sends a draft; whoever did not write the current revision accepts,
+  declines or counters it while it is open; the sender may withdraw (revoke) a sent
+  offer, even an expired one; a non-party Admin only reads. Send, accept, decline and
+  withdraw ask for confirmation. A version conflict reloads the latest agreement and
+  says so; other refusals show the server's reason.
+- **Form:** one stepped form for a new draft (type and recipient → property and client →
+  commission and terms → review), a draft revision and a counter-offer (the last three
+  steps). The review shows exactly the terms that will be frozen, as §6 requires. Money
+  is typed in AED and shares as percentages; `readDraft.js` converts them to fils and
+  basis points without floats and applies the server's limits (referral 0.01–50%,
+  co-broking 0.01–99.99%, a full handover keeps nothing). The offer end is a Dubai day
+  from tomorrow to 89 days ahead, sent as 23:59:59 Dubai time. Client contact is off
+  by default. Closing with entries asks first; refusals keep every entry.
+- **Server additions** (agreements module, no migration):
+  - `POST /agreements/recipients` with `{ email }` finds the named recipient by exact
+    sign-in email. It answers only for an active member of another live company (the
+    `ensure_recipient` rule) with their IDs, name and company display name; the caller's
+    own company, the Super Admin, inactive members and unknown addresses all get one
+    identical not-found. There is no partial search. It needs the CSRF token.
+  - List and read views add `parties` (each participant's name from the published
+    identity view and the company display name through `workspaces::company::get`) and,
+    on lists, a `summary` of the current revision (number, author, area, listing label,
+    amount and both shares; never the client snapshot).
+  - Read adds `revisions` (every revision with its creation time and parent number) and
+    `events` (action, party, revision number and time; no actor IDs). A draft belongs to
+    the sending company (§9), so the receiving company sees only revisions that were
+    offered (sent or countered) and no `created` or `revised` events.
+- Code: `src/services/crm/agreements.js`, `src/features/server/agreements/`, the
+  `agreements` and `agreementForm` English catalogues. Tests:
+  `tests/unit/agreements-model.test.js`, `tests/unit/agreements-draft.test.js`,
+  `tests/api/agreements-screens.test.mjs`, `tests/server-browser/agreements.spec.js`.
+- Still not built: amend, cancel, complete, archive, certificate, dispute export, guest
+  links, the Super Admin metadata view, a rate limit on the recipient lookup, and
+  same-subject overlap conflicts.

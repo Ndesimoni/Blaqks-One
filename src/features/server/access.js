@@ -23,6 +23,9 @@ export function canOpenSection(user, route) {
   // Team chat is company-only too; private messages stay between their two members.
   if (route === 'Team chat') return user?.roleId !== 'super-admin';
   if (route === 'Inbox rules') return user?.roleId === 'admin';
+  // Every company member may send agreements (owner decision 2026-10-20); the Super Admin
+  // sees no agreement terms (agreements-design §9).
+  if (route === 'Agreements') return user?.roleId !== 'super-admin';
   // Each member's own mailbox: the Admin, and staff the Admin gave email (decision O8).
   if (route === 'My mailbox' || route === 'Google sign-in')
     return user?.roleId === 'admin' || (user?.roleId === 'staff' && user.channelAccess?.email);
