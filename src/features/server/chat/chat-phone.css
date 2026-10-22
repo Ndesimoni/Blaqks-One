@@ -1,10 +1,4 @@
 /* Team chat on phones and narrow windows (C2): one pane at a time, larger targets. */
-/* The keyboard hint is for physical keyboards only. */
-@media (pointer: coarse) {
-  .chat-hint {
-    display: none;
-  }
-}
 [dir='ltr'] .chat-back svg {
   transform: scaleX(-1);
 }

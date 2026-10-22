@@ -3,6 +3,12 @@
 .chat-composer {
   position: relative;
 }
+/* The placeholder (with the keyboard hint on computers) stays on one line. */
+.chat-composer .composer-input::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .chat-mentions {
   position: absolute;
   inset-block-end: calc(100% + 4px);

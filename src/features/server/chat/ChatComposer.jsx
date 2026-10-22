@@ -6,9 +6,13 @@ import { MentionList } from './MentionList.jsx';
 import { useAttachments } from './useAttachments.js';
 import { useMentions } from './useMentions.js';
 
+/** Phones have no Shift+Enter: there Enter adds a line and Send sends. */
+const touch = () => Boolean(window.matchMedia?.('(pointer: coarse)').matches);
+
 /**
  * Write and send, with photos and files: Enter sends on desktop, adds a line on phones.
  * In channels and groups, `@` suggests the colleagues in `people` to mention (packet C3).
+ * On a computer the placeholder also says how Enter works, and goes as soon as you type.
  */
 export function ChatComposer({ api, workspaceId, onSend, people = [] }) {
   const { t } = useI18n();
@@ -20,6 +24,8 @@ export function ChatComposer({ api, workspaceId, onSend, people = [] }) {
   const [error, setError] = useState('');
   const mentions = useMentions(people, text, setText, field);
   const listId = `${id}-mentions`;
+  const keys = touch() ? '' : 'Keys';
+  const placeholder = `chat.composer.${people.length ? 'mention' : 'placeholder'}${keys}`;
   const ready = Boolean(text.trim() || files.ids.length) && !files.busy;
   const send = async (event) => {
     event.preventDefault();
@@ -44,7 +50,6 @@ export function ChatComposer({ api, workspaceId, onSend, people = [] }) {
       </label>
       <ComposerBox
         files={files}
-        meta={<small className="chat-hint">{t('chat.composer.hint')}</small>}
         action={
           <Button type="submit" icon="arrow" disabled={busy || !ready}>
             {t('chat.composer.send')}
@@ -58,7 +63,7 @@ export function ChatComposer({ api, workspaceId, onSend, people = [] }) {
           rows={1}
           maxLength={4000}
           value={text}
-          placeholder={t(people.length ? 'chat.composer.mention' : 'chat.composer.placeholder')}
+          placeholder={t(placeholder)}
           aria-autocomplete={people.length ? 'list' : undefined}
           aria-controls={mentions.open ? listId : undefined}
           aria-activedescendant={mentions.open ? `${listId}-${mentions.active}` : undefined}
@@ -70,9 +75,8 @@ export function ChatComposer({ api, workspaceId, onSend, people = [] }) {
           onBlur={mentions.close}
           onKeyDown={(event) => {
             if (event.nativeEvent.isComposing || mentions.onKeyDown(event)) return;
-            // Phones have no Shift+Enter: there Enter adds a line and Send sends.
             if (event.key !== 'Enter' || event.shiftKey) return;
-            if (!window.matchMedia?.('(pointer: coarse)').matches) send(event);
+            if (!touch()) send(event);
           }}
         />
       </ComposerBox>
