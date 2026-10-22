@@ -431,7 +431,7 @@ Split any packet further if it crosses too many contracts. Do not ship empty con
   1. Premium redesign direction and design system v2, right-to-left ready, with a chart-rich Dashboard first. **Paused (2026-10-16):** the owner kept the original design after trying Limestone and Midnight; see [Product decisions](product-decisions.md#premium-redesign-direction-decided-2026-10-16).
   2. Language preference: English and Arabic, then more languages, with message translation. **Decided 2026-10-16:** build the foundation next (translation catalogues, language choice in My profile, right-to-left layout, date/number/AED formatting per language); new features use it from the start, existing screens are translated in a later pass. **Foundation built (2026-10-16):** see [Language foundation](i18n.md); Arabic stays behind `VITE_I18N_PREVIEW` until the translation pass. **Stopped (owner, 2026-10-22):** everything is in English; Arabic and right-to-left work is frozen ([English only](product-decisions.md#english-only-decided-2026-10-22)). New work keeps the current colours with [premium polish](design-standards.md#premium-polish-for-new-work-owner-2026-10-16).
   3. Blaqks One platform foundation.
-  4. Field hints and calculators.
+  4. Field hints and calculators. **Built 2026-10-19:** field hints on focus with an ⓘ icon and a My profile switch (packet Q1, `src/components/ui/FieldHint.jsx`); the commission estimate in Deals on the shared engine; purchase costs, mortgage, rental yield/ROI and off-plan schedule on the Calculators screen ([Calculators](calculators.md)).
   5. Deal rooms: cross-company agreements with chat.
   6. Internal messaging, then provider integrations.
   7. AI assistant, in three levels.
