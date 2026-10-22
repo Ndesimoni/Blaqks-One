@@ -3,7 +3,7 @@
 Packet A1. This document fixes the decisions that packets A2–A6 implement.
 
 Status: the owner confirmed the §11 decisions on 2026-10-20, and the A2 core is built on
-them (§12).
+them (§12). The A3 design is §14, with the owner's answers in §15 (2026-10-22).
 
 ## 1. Scope
 
@@ -281,3 +281,175 @@ connected sidebar (after Deals); the Super Admin does not, matching the routes' 
 - Still not built: amend, cancel, complete, archive, certificate, dispute export, guest
   links, the Super Admin metadata view, a rate limit on the recipient lookup, and
   same-subject overlap conflicts.
+
+## 14. A3 design: in-company evidence, certificate and payments (2026-10-22)
+
+A3 is built in two parts. **A3a** turns every in-company deal hand-over into an agreement.
+**A3b** adds amendments, completion, cancellation, archiving, the certificate and payment
+tracking. The owner's answers are in §15.
+
+### A3a — in-company hand-overs become agreements
+
+- **One direction.** The finance module keeps owning hand-overs (`crm_deal_handovers`)
+  and calls a new agreements function in the same transaction at every step; the
+  agreements module never reads or writes finance tables. The Agreements form stays
+  cross-company only: in-company agreements are created only by a Deals hand-over, so their
+  terms are always built by the server, never typed by the sender.
+- **Offer.** `deals::handover::offer` builds the frozen terms from the locked deal:
+  `kind` `handover_full` or `handover_referral`; the §6 property and client snapshot,
+  produced through the records module's functions (first name plus last initial, no
+  contact); `money.basis` and `amountFils` from the deal's current fee; the referral share
+  as `senderShareBp`; `paymentExpectation` `on_receipt`; the governing emirate from the
+  property (or `Dubai` when blank); the default 14-day expiry. It creates the agreement in
+  `sent` with both participants in the same workspace, and stores the agreement ID on the
+  hand-over row (a new nullable `agreement_id` column, frozen by the existing guard; no
+  foreign key across modules).
+- **Accept.** `POST /finance/handovers/{id}/accept` now requires
+  `{agreementVersion}` when the hand-over has an agreement. The receiver accepts exactly
+  the revision at that version; a mismatch is the existing 409 "This agreement changed.
+  Reload before saving." The acceptance stores the revision digest with `member`
+  verification, as cross-company acceptance does.
+- **Admin approval (owner, 2026-10-22: keep it, record it honestly).** `approve` stays
+  Admin-only. It records action `approved` with verification `admin_decision` and the
+  Admin as the actor, on the recipient's side. If the Admin changes the referral share, the
+  Admin first adds a new revision (author `admin`) with the adjusted terms, and the
+  approval names that revision. The certificate says "Approved by the company Admin in
+  place of the receiving agent's acceptance." Migration 0057 widens three checks:
+  `actions.action` adds `approved`, `actions.verification` adds `admin_decision` and
+  `revisions.author_party` adds `admin`. Only the in-company path may write these values;
+  a trigger refuses them when the two parties are in different companies.
+- **Decline, cancel and withdrawals.** Decline → `declined`. The holder's cancel →
+  `revoked` by the sender. An Admin's cancel, a deal move (`holder::apply`), a member
+  leaving (`finance::departure`) and deleting a never-earned deal → `revoked` with the
+  acting person as actor and no party. Every path that closes a pending hand-over closes
+  its agreement in the same transaction.
+- **Expiry.** An in-company offer expires after 14 days, like every offer. An expired
+  hand-over cannot be accepted or approved ("This hand-over offer has expired."); the
+  holder or an Admin cancels it and offers again. It still blocks a second pending offer
+  until cancelled, so nothing moves silently.
+- **Who sees them.** The holder and receiver as the two parties, and the company Admin
+  (read-only), under the §9 rules. In the Agreements list they show under Incoming or Sent
+  with an "In-company" label; accept and decline there call the finance routes, so both
+  screens do the same thing. The Super Admin sees none.
+- **Older and sample hand-overs.** Hand-overs made before A3, and those made by the sample
+  data command, have no agreement and are decided as before; there is no backfill.
+  Sample clearing never has to delete evidence, because agreement rows are insert-only.
+- **Cross-company referral cap (owner, 2026-10-22).** A cross-company `handover_referral`
+  is capped by the sending company's `maxReferralShareBp` (through the finance settings
+  function) instead of 50%. While the Admin has not set a limit (0%), referral offers to
+  other companies are refused: "Your Admin has not set a referral limit yet. Ask them to
+  set one in Finance settings." The form shows the limit and the message.
+
+### A3b — amend, complete, cancel, archive, certificate and payments
+
+- **Amend.** Either participant of an accepted cross-company agreement proposes a new
+  revision. The agreement stays `accepted` on its accepted revision, which stays in force,
+  while `proposed_revision_id` (new column) holds the amendment. The other participant
+  accepts it (the proposed revision becomes current and gets its own acceptance) or
+  declines it (the proposal is closed; the earlier terms stay). One proposal at a time.
+  In-company agreements are not amended: a later change is a new hand-over.
+- **Complete** (either participant) and **cancel** (both participants, each recorded;
+  the second one cancels) follow §4. **Archive** (an Admin of either company, draft or
+  sent only) hides it from lists; evidence stays.
+- **Certificate (owner, 2026-10-22: printable page plus evidence file).**
+  `GET /agreements/{id}/certificate` returns, for parties and their Admins only, a
+  deterministic JSON evidence file: agreement ID, both parties' names and companies, every
+  revision with its terms, digest and author, every acceptance, approval or decline with
+  time, actor name and verification level, and the event history. The screen renders it as
+  a print-ready certificate page (saved as PDF with the browser's Print) and offers the
+  JSON file for download. The file states how to recompute each digest, so anyone can
+  check it. No client contact, private record IDs or message bodies appear.
+- **Payments (owner, 2026-10-22: payer records, payee confirms).** Only for agreements
+  between companies that move money between the parties: a `handover_referral` (the
+  recipient pays the sender its share) and a `co_broking`, whose new revisions name the
+  `collectingParty` that collects the fee from the client and pays the other side.
+  A new insert-only table `agreements.crm_agreement_payments` keeps entries: the payer
+  records `paid` (amount in fils and date, up to the amount due); the payee `confirms`
+  that exact entry; the payer may `withdraw` an entry not yet confirmed. The agreement
+  shows due, paid, confirmed and outstanding. No money moves through Blaqks One. Inside a
+  company, the referral is a commission line of the deal, so Deals and the commission
+  statement already track it and no payment entries are made.
+
+### Security review amendments (2026-10-22)
+
+A separate security review approved §14 with these changes, which override the text above
+where they differ.
+
+- **Origin lock.** `crm_agreements.origin` (`direct` or `deal_handover`). Every command on
+  the agreements routes refuses a `deal_handover` agreement with 409 "Use Deals to act on
+  this hand-over."; only the finance-called functions change it, and they assert that the
+  current revision was written by the sender or an Admin.
+- **Current revision.** Every read and write uses `current_revision_id`, never the highest
+  revision number; an amendment proposal is read only through `proposed_revision_id`.
+- **Every close path.** Bulk cancels in `holder::apply` and `finance::departure` return the
+  agreement IDs and revoke each in the same transaction; deleting a never-earned deal
+  revokes first; the sample command passes "no evidence" so it creates no agreements. A
+  test checks after each path that no `sent` agreement links to a closed hand-over.
+- **Admin decline** becomes `revoked` with the Admin as actor and no party; the holder's
+  cancel is `revoked` by the sender.
+- **Migration 0057.** Besides widening the three checks and naming each dropped
+  constraint: the digest is stored for `approved` as for `accepted`; one unique index
+  allows one `accepted` or `approved` row per revision; a structural trigger requires the
+  same company for `approved`, `admin_decision` and author `admin`, `approved` exactly
+  when `admin_decision`, party `recipient`, and a parent revision for author `admin`. The
+  Admin-role check stays in Rust (`gate`), since triggers may not read profiles.
+- **Author.** `RevisionRow::author()` reads three values and refuses anything else; new
+  revisions put the author into the digest (a versioned digest scheme, old revisions
+  unchanged).
+- **Kind is fixed.** An Admin approval may change the referral share only within the same
+  kind; turning a full hand-over into a referral, or back, needs a fresh offer. In-company
+  referrals are capped by the team limit (1–9,999 basis points), passed into
+  `Kind::shares`.
+- **Offer view (owner, 2026-10-22).** The receiving agent sees the full offer before
+  accepting: fee, referral share, client first name and last initial, property facts.
+  Staff parties read in-company agreements only while they hold the finance module.
+- **Frozen while pending.** While a hand-over with an agreement is pending, the deal's fee,
+  client, property and split cannot be edited ("This deal has a pending hand-over. Cancel
+  it before editing."). Accept and approve check that the share and the two members still
+  match the hand-over; `approve` also takes `agreementVersion`. Expiry compares with
+  `clock_timestamp()`. An expired offer can only be cancelled, not declined.
+- **Hand-over link.** `agreement_id` is written in the hand-over's INSERT and added to the
+  guard's frozen fields.
+- **In-company terms.** The server-built terms allow no property (`property: null`) and a
+  zero fee, which typed cross-company terms still refuse.
+- **Archive per company** (`sender_archived_at`, `recipient_archived_at`); in-company
+  agreements cannot be archived.
+- **Amendments.** The version guard allows accepted → accepted only to set or clear
+  `proposed_revision_id`, or to promote it with an acceptance by the party who did not
+  write it, naming that `revisionId`; `current_revision_id` is otherwise frozen. History
+  shows proposals to both companies. A cancel request is tied to the current revision and
+  voided by an amendment.
+- **Payments.** Every entry locks the agreement row; one confirm or withdraw per paid
+  entry (partial unique index); a trigger checks the referenced entry, the acting party
+  against the kind or `collectingParty`, and refuses in-company and full hand-overs. The
+  live paid total never exceeds the amount due, computed in 128-bit integers and rounded
+  half-up to the fils; an amendment may not lower the due below what is confirmed.
+  Entries hold amount and date only (no later than today in Dubai), and are allowed while
+  the agreement is accepted or completed. When a participant leaves their company, nobody
+  takes over their side's payment entries (owner, 2026-10-22).
+- **Certificate.** A stable evidence block (every offered revision with its full terms,
+  including a contact the sender switched on, so every digest can be recomputed, and the
+  same revision filter for both companies) plus a separate display block (names,
+  `generatedAt`). Served as JSON with `attachment`, `nosniff` and `no-store`; no deal or
+  hand-over IDs; the Super Admin is refused.
+- **Cross-company referral cap** is checked at every revision write and at send, not at
+  acceptance, with a maximum of 9,999 basis points; a recipient's counter-offer is capped
+  by the sender company's limit too.
+
+## 15. Owner decisions (2026-10-22)
+
+1. Admins keep approving hand-overs in place of the receiving agent; the agreement and
+   certificate record it truthfully as an Admin approval, not an acceptance.
+2. A cross-company referral is capped by the sending company's referral limit in Finance
+   settings. While that limit is 0%, referral offers to other companies are refused and the
+   form asks the agent to have their Admin set it.
+3. The certificate is a printable page in the CRM (saved as PDF through the browser) plus a
+   downloadable evidence file with the digests.
+4. Payments between companies: the paying side records what it paid and the side owed
+   confirms receipt; both are kept as evidence. Co-broking offers name the side that
+   collects the fee.
+5. The receiving agent of an in-company hand-over sees the full offer before accepting:
+   the fee, the referral share, the client's first name and last initial, and the property
+   facts.
+6. When a participant of an agreement between companies leaves their company, nobody takes
+   over recording or confirming payments for that side.
