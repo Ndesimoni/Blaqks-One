@@ -7,6 +7,7 @@ import { demoListingPhoto } from '../../lib/demoPropertyPhotos.js';
 import { N } from '../../lib/format.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
+import { KeptChip } from '../records/KeptChip.jsx';
 
 export function PropertyCard({ property: p, index: i, onSelect }) {
   const photos = mediaPhotos(p);
@@ -40,6 +41,7 @@ export function PropertyCard({ property: p, index: i, onSelect }) {
         <div className="property-card-meta">
           <span>{get(p, 'Property type') || 'Property'}</span>
           <span>{get(p, 'Ready / off-plan') || 'Ready'}</span>
+          <KeptChip module="Properties" record={p} />
           {(!photos.length || cover.demo) && (
             <span className="property-demo-label">Demo photo</span>
           )}

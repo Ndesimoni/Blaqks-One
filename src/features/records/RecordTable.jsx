@@ -9,6 +9,7 @@ import React, { useEffect } from 'react';
 import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 import { RecordRowActions } from './RecordRowActions.jsx';
 import { RecordTableEmpty } from './RecordTableEmpty.jsx';
+import { KeptChip } from './KeptChip.jsx';
 
 function RecordTable({
   module,
@@ -83,7 +84,10 @@ function RecordTable({
                     {/stage|status|tier|priority/i.test(f.name) ? (
                       <Badge>{formatValue(data, module, r, f)}</Badge>
                     ) : f === pick[0] ? (
-                      <span className="mono id-link">{formatValue(data, module, r, f)}</span>
+                      <>
+                        <span className="mono id-link">{formatValue(data, module, r, f)}</span>
+                        <KeptChip module={module} record={r} />
+                      </>
                     ) : /Full name|Listing title|Next action|Community/i.test(f.name) ? (
                       <span className="cell-strong">{formatValue(data, module, r, f)}</span>
                     ) : (

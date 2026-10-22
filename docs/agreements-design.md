@@ -815,13 +815,13 @@ reassignment.
   the phone and email come on acceptance (`HandoverListing.jsx`). Kept records are split
   from the caller's own on the client (`keptRecords.js`): they show only on the Clients,
   Leads and Properties pages and their photos, never in counts, pickers, recipients or
-  dashboards; their details carry the "View only" badge (`KeptNotice.jsx`) without edit,
-  delete or reassignment. The record list reloads after a decision that moves a deal.
+  dashboards. Their rows and listing cards show a "View only" chip (`KeptChip.jsx`) and
+  their details the badge (`KeptNotice.jsx`), without edit, delete or reassignment. The
+  record list reloads after a decision that moves a deal.
 - **Tests.** `finance-handover-records.test.mjs` (moves, conversations, keeps, a shared
   listing, decline, departure), `finance-handover-photos.test.mjs`, the updated H2 suites
   (each deal has its own client now), unit tests in `tests/unit/kept-records.test.js` and
   the listing allowlist test in Rust; the browser flow checks the sender's badge.
 - **Review status.** The design review was done by the primary agent (the specialist
   stopped at its usage limit); a specialist code security review is still due. Not built:
-  a "View only" chip in the record lists (the badge shows in the record's details), and
   closing a client's other deals when one completes.
