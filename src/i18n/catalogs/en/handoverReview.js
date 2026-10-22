@@ -2,7 +2,7 @@
 export default {
   answerTitle: 'Review the hand-over offer',
   answerIntro:
-    '{from} offers you this deal. You get the client’s phone and email, and the client and listing records, when you accept.',
+    '{from} offers you this deal. You get the client’s phone and email, and the client and listing records, when the deal moves to you.',
   answerApproval: 'After you accept, {name} approves before the deal moves to you.',
   approvalTitle: 'Approve the hand-over',
   approvalIntro: '{from} offers this deal to {to}. It moves only when it is approved.',
@@ -21,6 +21,7 @@ export default {
   expiredApproval:
     'This offer has expired. It can only be cancelled now; the holder can then offer the deal again.',
   deadline: 'Offer open until {date}',
+  close: 'Close',
   'deal.title': 'Deal',
   'deal.type': 'Type',
   'deal.stage': 'Stage',

@@ -22,6 +22,7 @@ function earning({ handover, deal }, k, money) {
 
 /**
  * The server-shaped review of an open hand-over (agreements design §17, owner decision 1):
+ * the offer and what the receiver would earn first (so phones see it without scrolling), then
  * the deal's money and dates, the offer and what the receiver would earn, the listing
  * (`HandoverListing`) and the client's first name and last initial. Client contact, notes and documents are never
  * sent before acceptance, so nothing here can show them. `viewerId` words the earning line.
@@ -37,6 +38,25 @@ export function HandoverPreview({ preview, viewerId }) {
   const names = { from: handover.from.name, to: handover.to.name };
   return (
     <div className="agreement-terms handover-preview">
+      <Facts
+        title={k('offer.title')}
+        rows={[
+          [
+            k('offer.kind'),
+            offer.kind === 'referral'
+              ? k('offer.referral', { ...names, share: format.percent(offer.referralShareBp) })
+              : k('offer.full', { name: names.to }),
+            true,
+          ],
+          [k('offer.fee'), figure(offer.feeFils)],
+          [
+            handover.to.id === viewerId
+              ? k('offer.youEarn')
+              : k('offer.theyEarn', { name: names.to }),
+            earning(preview, k, format.money),
+          ],
+        ]}
+      />
       <Facts
         title={k('deal.title')}
         rows={[
@@ -69,25 +89,6 @@ export function HandoverPreview({ preview, viewerId }) {
           [k('deal.targetClose'), day(deal.targetCloseDate)],
           [k('deal.milestone'), known(deal.milestone)],
           [k('deal.nextAction'), day(deal.nextActionDue)],
-        ]}
-      />
-      <Facts
-        title={k('offer.title')}
-        rows={[
-          [
-            k('offer.kind'),
-            offer.kind === 'referral'
-              ? k('offer.referral', { ...names, share: format.percent(offer.referralShareBp) })
-              : k('offer.full', { name: names.to }),
-            true,
-          ],
-          [k('offer.fee'), figure(offer.feeFils)],
-          [
-            handover.to.id === viewerId
-              ? k('offer.youEarn')
-              : k('offer.theyEarn', { name: names.to }),
-            earning(preview, k, format.money),
-          ],
         ]}
       />
       {property ? (

@@ -9,6 +9,7 @@ import { Icon } from '../../../components/ui/Icon.jsx';
  * while the title and actions stay reachable. `message` is the server's refusal; the caller
  * keeps its draft so nothing typed is lost on 403/409. `secondary` (`{ label, onClick,
  * disabled }`) adds a second decision, such as Decline, before the submit button.
+ * `dismissLabel` renames the button that only closes the window ("Cancel" by default).
  */
 export function FinanceDialog({
   eyebrow,
@@ -23,6 +24,7 @@ export function FinanceDialog({
   danger = false,
   wide = false,
   secondary = null,
+  dismissLabel = '',
   className = '',
   children,
 }) {
@@ -68,7 +70,7 @@ export function FinanceDialog({
         </div>
         <div className="drawer-footer">
           <Button variant="light" disabled={busy} onClick={close}>
-            {onSubmit ? 'Cancel' : 'Close'}
+            {dismissLabel || (onSubmit ? 'Cancel' : 'Close')}
           </Button>
           {secondary && (
             <Button

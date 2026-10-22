@@ -13,17 +13,20 @@ export function HandoverApproverFields({ id, needed, onNeeded, approvers, value,
   const { people, loading, error } = approvers;
   return (
     <>
-      <label className="deal-option" data-checked={needed}>
-        <input
-          type="checkbox"
-          checked={needed}
-          onChange={(event) => onNeeded(event.target.checked)}
-        />
-        <span className="deal-option-text">
-          <span className="deal-option-title">{k('needsApproval')}</span>
-          <small>{k('needsApprovalDetail')}</small>
-        </span>
-      </label>
+      {/* A group, like the radio cards, so the card keeps its height when the body scrolls. */}
+      <div className="deal-options">
+        <label className="deal-option" data-checked={needed}>
+          <input
+            type="checkbox"
+            checked={needed}
+            onChange={(event) => onNeeded(event.target.checked)}
+          />
+          <span className="deal-option-text">
+            <span className="deal-option-title">{k('needsApproval')}</span>
+            <small>{k('needsApprovalDetail')}</small>
+          </span>
+        </label>
+      </div>
       {needed && (
         <div className="field">
           <label htmlFor={`${id}-approver`}>

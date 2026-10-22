@@ -48,7 +48,7 @@ export function HandoverShareFields({
           value="full"
           checked={!keep}
           title="Hand over fully"
-          detail="Your teammate takes the whole deal and its commission."
+          detail="The person you choose takes the whole deal."
           onChange={() => setMode('full')}
         />
         <Option

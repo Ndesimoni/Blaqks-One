@@ -825,3 +825,10 @@ reassignment.
 - **Review status.** The design review was done by the primary agent (the specialist
   stopped at its usage limit); a specialist code security review is still due. Not built:
   closing a client's other deals when one completes.
+- **Design review (2026-10-22, light pass).** Fixed the three blocking issues: the "Needs
+  approval" card kept its height when the form scrolls; the review shows the offer and
+  what the receiver would earn before the deal facts, so phones see it without scrolling;
+  the review's dismiss button says "Close", not "Cancel". Also: "the phone and email come
+  when the deal moves to you", "hand-over" spelled the same on Agreements, and a neutral
+  full hand-over hint. Left for the redesign: grouping the footer's decisions, hiding
+  "Not recorded" rows and an earnings figure on the request row.

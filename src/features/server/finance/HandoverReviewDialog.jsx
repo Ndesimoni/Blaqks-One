@@ -69,6 +69,7 @@ export function HandoverReviewDialog({ handover, onClose }) {
       onClose={onClose}
       onSubmit={positive.can ? () => decide(positive) : undefined}
       submitLabel={positive.label}
+      dismissLabel={k('close')}
       submitDisabled={!ready}
       secondary={
         negative.can
