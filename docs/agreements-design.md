@@ -814,8 +814,8 @@ reassignment.
 - **Screens.** The review shows all listing details, the photos and floor plans, and says
   the phone and email come on acceptance (`HandoverListing.jsx`). Kept records are split
   from the caller's own on the client (`keptRecords.js`): they show only on the Clients,
-  Leads and Properties pages and their photos, never in counts, pickers, recipients or
-  dashboards. Their rows and listing cards show a "View only" chip (`KeptChip.jsx`) and
+  Leads and Properties pages (counted in those pages' totals) and their photos, never in
+  pickers, recipients or dashboards, and without "Start message". Their rows and listing cards show a "View only" chip (`KeptChip.jsx`) and
   their details the badge (`KeptNotice.jsx`), without edit, delete or reassignment. The
   record list reloads after a decision that moves a deal.
 - **Tests.** `finance-handover-records.test.mjs` (moves, conversations, keeps, a shared
@@ -823,8 +823,19 @@ reassignment.
   (each deal has its own client now), unit tests in `tests/unit/kept-records.test.js` and
   the listing allowlist test in Rust; the browser flow checks the sender's badge.
 - **Review status.** The design review was done by the primary agent (the specialist
-  stopped at its usage limit); a specialist code security review is still due. Not built:
-  closing a client's other deals when one completes.
+  stopped at its usage limit); the specialist code security review followed (below). Not
+  built: closing a client's other deals when one completes.
+- **Code security review (2026-10-22): no High findings.** Fixed: a listing shared with a
+  receiver now carries only the review's allowlisted fields, its photos and its ID, never
+  the owner contact, notes, viewing instructions, documents link or permits (M1,
+  `listing_fields::shared`); a keep stays listed when its record goes to the queue
+  (L1); a member who holds a record again loses their old keep, for every writer, through
+  the records trigger `crm_records_keeps_on_hold` (L2, migration 0062); the review shows
+  the full listing and its photos only when the sender holds it, otherwise the twelve
+  basic facts (L3); kept rows never name the current holder (L4); kept clients show no
+  "Start message" (L6). New tests in `finance-handover-keeps.test.mjs`. Accepted: an Admin
+  ends a keep only by suspending the member (the owner's current rule); owner contact
+  typed into the description, selling points or amenities is shown (owner decision 3).
 - **Design review (2026-10-22, light pass).** Fixed the three blocking issues: the "Needs
   approval" card kept its height when the form scrolls; the review shows the offer and
   what the receiver would earn before the deal facts, so phones see it without scrolling;

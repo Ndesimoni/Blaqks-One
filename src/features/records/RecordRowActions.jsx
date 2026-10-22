@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { RecordsContext } from '../../app/WorkspaceContext.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useWorkspaceActions } from '../../hooks/useWorkspace.js';
 import { useSession } from '../../hooks/useSession.js';
@@ -7,9 +8,11 @@ import { hasMessagingAccess } from '../messaging/model.js';
 export function RecordRowActions({ module, record, id, readOnly }) {
   const { startMessage } = useWorkspaceActions();
   const { user } = useSession();
+  // A handed-over client the caller only keeps is not theirs to message (agreements §18).
+  const kept = Boolean(useContext(RecordsContext)?.keptFor?.('Clients', record));
   return (
     <>
-      {module === 'Clients' && !readOnly && (
+      {module === 'Clients' && !readOnly && !kept && (
         <button
           type="button"
           className="row-link message-row-action"

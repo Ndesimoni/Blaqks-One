@@ -29,8 +29,10 @@ pub async fn file(
     let mut tx = state.pool.begin().await?;
     let request = reviewable(&mut tx, &workspace, id, user).await?;
     let deal = row::for_preview(&mut tx, &workspace, user.id, request.deal_id).await?;
+    // Photos only of a listing the sender holds, as the review shows (review L3).
     let listing = handover_listing::listing(&mut tx, &workspace, deal.property_ref.as_deref())
         .await?
+        .filter(|listing| listing.holder == Some(request.from_id))
         .ok_or_else(ApiError::missing)?;
     let response = handover_listing::file(&state, &mut tx, (&workspace, &listing), file)
         .await?

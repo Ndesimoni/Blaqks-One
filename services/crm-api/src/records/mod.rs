@@ -14,6 +14,7 @@ pub mod ids;
 pub mod keeps;
 pub mod links;
 pub mod list;
+pub mod listing_fields;
 pub mod lookup;
 pub mod media_links;
 pub mod mutation;

@@ -2,58 +2,34 @@
 //! 2026-10-22: all listing details except the owner's name and phone). An allowlist of
 //! property fields plus the stored photos and floor plans; never the owner contact, notes,
 //! viewing instructions, the documents link, permits, authorisation, checks or record IDs.
-use super::media_links::{self, KIND};
+use super::{
+    listing_fields::BASIC,
+    media_links::{self, KIND},
+};
 use crate::{error::ApiResult, media::serve, state::AppState};
 use axum::response::Response;
 use serde_json::Value;
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
-/// Stored field → the name the review uses.
-pub const FIELDS: [(&str, &str); 29] = [
-    ("listing_title", "listingTitle"),
-    ("sale_rental", "saleRental"),
-    ("emirate", "emirate"),
-    ("community", "community"),
-    ("building_project", "building"),
-    ("unit_reference", "unitReference"),
-    ("property_type", "propertyType"),
-    ("bedrooms", "bedrooms"),
-    ("bathrooms", "bathrooms"),
-    ("area_sq_ft", "sizeSqft"),
-    ("price_annual_rent_aed", "priceAed"),
-    ("price_basis", "priceBasis"),
-    ("listing_status", "listingStatus"),
-    ("ready_off_plan", "readyOffPlan"),
-    ("furnishing", "furnishing"),
-    ("available_from", "availableFrom"),
-    ("rental_cheques", "rentalCheques"),
-    ("deposit_aed", "depositAed"),
-    ("minimum_stay_nights", "minimumStayNights"),
-    ("maximum_guests", "maximumGuests"),
-    ("parking_spaces", "parkingSpaces"),
-    ("amenities", "amenities"),
-    ("property_description", "description"),
-    ("key_selling_points", "keySellingPoints"),
-    ("address", "address"),
-    ("map_link", "mapLink"),
-    ("listing_url", "listingUrl"),
-    ("virtual_tour_url", "virtualTourUrl"),
-    ("floor_plan_url", "floorPlanUrl"),
-];
+pub use super::listing_fields::{shared, FIELDS};
 
-/// The property's stored row: its ID (kept on the server) and payload.
+/// The property's stored row: its ID and holder (kept on the server) and payload.
 pub struct Listing {
     pub record: Uuid,
+    pub holder: Option<Uuid>,
     pub payload: Value,
 }
 
 impl Listing {
-    /// Each allowlisted field as stored text, if any.
-    pub fn facts(&self) -> impl Iterator<Item = (&'static str, Option<&str>)> + '_ {
-        FIELDS
-            .iter()
-            .map(|(stored, shown)| (*shown, self.payload.get(*stored).and_then(Value::as_str)))
+    /// Each allowlisted field as stored text, if any; only the twelve basic facts unless
+    /// `full` (the sender holds the listing, so it moves or is shared; review L3).
+    pub fn facts(&self, full: bool) -> impl Iterator<Item = (&'static str, Option<&str>)> + '_ {
+        FIELDS.iter().map(move |(stored, shown)| {
+            let shown_here = full || BASIC.contains(stored);
+            let value = self.payload.get(*stored).and_then(Value::as_str);
+            (*shown, value.filter(|_| shown_here))
+        })
     }
 
     /// Stored photos or floor plans as `(name, file, thumb)`; older inline images are left
@@ -87,15 +63,19 @@ pub async fn listing(
     let Some(property_ref) = property_ref else {
         return Ok(None);
     };
-    let found: Option<(Uuid, Value)> = sqlx::query_as(
-        "SELECT id,payload FROM crm_records WHERE workspace_id=$1 AND collection='Properties' \
-         AND legacy_id=$2",
+    let found: Option<(Uuid, Option<Uuid>, Value)> = sqlx::query_as(
+        "SELECT id,assignee_id,payload FROM crm_records WHERE workspace_id=$1 \
+         AND collection='Properties' AND legacy_id=$2",
     )
     .bind(workspace)
     .bind(property_ref)
     .fetch_optional(&mut **tx)
     .await?;
-    Ok(found.map(|(record, payload)| Listing { record, payload }))
+    Ok(found.map(|(record, holder, payload)| Listing {
+        record,
+        holder,
+        payload,
+    }))
 }
 
 /// One of the listing's own stored photos or floor plans, or not-found for any other file.
@@ -114,36 +94,5 @@ pub async fn file(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-
-    #[test]
-    fn the_review_never_names_the_owner_or_private_fields() {
-        let hidden = [
-            "contact_id",
-            "notes",
-            "viewing_instructions",
-            "photos_documents_url",
-        ];
-        let more = [
-            "permit_reference",
-            "listing_authorization",
-            "record_check",
-            "property_id",
-        ];
-        for field in hidden.iter().chain(more.iter()) {
-            assert!(FIELDS.iter().all(|(stored, _)| stored != field), "{field}");
-        }
-        let file = Uuid::new_v4();
-        let payload = json!({"media_photos": [{"name": "a.jpg", "file": file}, {"src": "x"}]});
-        let listing = Listing {
-            record: Uuid::new_v4(),
-            payload,
-        };
-        assert_eq!(
-            listing.media("media_photos"),
-            vec![("a.jpg".into(), file, None)]
-        );
-    }
-}
+#[path = "handover_listing_tests.rs"]
+mod tests;

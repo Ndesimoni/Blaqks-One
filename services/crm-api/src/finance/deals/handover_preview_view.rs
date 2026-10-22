@@ -13,12 +13,11 @@ use crate::{
     agreements::handover::OfferTerms,
     error::ApiResult,
     finance::{access, calc::SecondSource, settings_store},
-    records::handover_listing::Listing,
 };
-use serde_json::{json, Map, Value};
+use serde_json::{json, Value};
 use sqlx::{Postgres, Transaction};
 
-fn text(value: Option<&str>, max: usize) -> Value {
+pub fn text(value: Option<&str>, max: usize) -> Value {
     match value.map(str::trim) {
         Some(text) if !text.is_empty() => json!(text.chars().take(max).collect::<String>()),
         _ => Value::Null,
@@ -37,30 +36,6 @@ fn iso_date(value: Option<&str>) -> Value {
         true => json!(value),
         false => Value::Null,
     }
-}
-
-/// The listing: the allowlisted facts and the stored photos and floor plans, which the
-/// review loads through `preview/files/{file}`.
-pub fn property(listing: &Listing) -> Value {
-    let long = ["description", "keySellingPoints", "amenities"];
-    let mut value: Map<String, Value> = listing
-        .facts()
-        .map(|(name, stored)| {
-            let max = if long.contains(&name) { 2000 } else { 200 };
-            (name.to_owned(), text(stored, max))
-        })
-        .collect();
-    let media = |field: &str| -> Value {
-        let entries = listing.media(field).into_iter();
-        Value::Array(
-            entries
-                .map(|(name, file, thumb)| json!({"name": name, "file": file, "thumb": thumb}))
-                .collect(),
-        )
-    };
-    value.insert("photos".into(), media("media_photos"));
-    value.insert("floorPlans".into(), media("media_floorplans"));
-    Value::Object(value)
 }
 
 /// The offer: frozen in the agreement, or read from the request for older ones.
@@ -145,3 +120,5 @@ async fn receiver_earns(
     };
     Ok(compute::compute(&moved, basis)?.calculation.primary_fils)
 }
+
+pub use super::handover_preview_listing::property;

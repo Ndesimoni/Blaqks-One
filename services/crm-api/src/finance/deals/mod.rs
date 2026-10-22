@@ -23,6 +23,7 @@ pub mod handover_follow;
 pub mod handover_offer;
 pub mod handover_preview;
 pub mod handover_preview_files;
+pub mod handover_preview_listing;
 pub mod handover_preview_view;
 pub mod handover_routes;
 pub mod handover_rows;

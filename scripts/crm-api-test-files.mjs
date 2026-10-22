@@ -122,6 +122,7 @@ export const apiTestFiles = [
   'tests/api/finance-handover-review-fixes.test.mjs',
   'tests/api/finance-handover-records.test.mjs',
   'tests/api/finance-handover-photos.test.mjs',
+  'tests/api/finance-handover-keeps.test.mjs',
   'tests/api/channels.test.mjs',
   ...messagingTestFiles,
 ];

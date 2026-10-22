@@ -82,7 +82,9 @@ pub async fn preview(
     };
     let property = handover_listing::listing(&mut tx, &workspace, deal.property_ref.as_deref())
         .await?
-        .map_or(Value::Null, |listing| shape::property(&listing));
+        .map_or(Value::Null, |listing| {
+            shape::property(&listing, listing.holder == Some(request.from_id))
+        });
     let money = shape::deal(&mut tx, &workspace, &deal, &request).await?;
     let offer = shape::offer(terms.as_ref(), &request, fee(&deal)?);
     let ends = terms.as_ref().map(|terms| terms.expires_at.as_str());

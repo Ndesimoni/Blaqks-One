@@ -3,7 +3,7 @@
 //! (`handed_over`); a listing that stays with the sender is shared with the receiver
 //! (`shared`). A keep covers that one Clients or Properties row: it shows in the record
 //! list and its photos, never in writes, pickers, recipients, children or projections.
-use super::{mutation::Entry, visibility::predicate};
+use super::{handover_listing, mutation::Entry, visibility::predicate};
 use crate::{auth::profile::UserRow, error::ApiResult};
 use serde_json::{json, Map, Value};
 use sqlx::{FromRow, Postgres, Transaction};
@@ -102,16 +102,23 @@ pub async fn listed(
         "SELECT r.id,r.version,r.payload,r.assignee_id,r.collection,k.reason,k.other_id, \
          o.name AS other_name,k.deal_ref AS keep_deal,k.kind,k.referral_share_bp, \
          to_char(k.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') \
-         AS kept_at {KEPT} AND NOT {} ORDER BY r.created_at,r.id",
+         AS kept_at {KEPT} AND ({}) IS NOT TRUE ORDER BY r.created_at,r.id",
         predicate("r", "$1", "$4")
     );
-    let rows = sqlx::query_as::<_, KeptRow>(&sql)
+    let mut rows = sqlx::query_as::<_, KeptRow>(&sql)
         .bind(workspace)
         .bind(user.id)
         .bind(granted)
         .bind(caller)
         .fetch_all(&mut **tx)
         .await?;
+    // Never who holds it now (review L4); a shared listing is its allowlist only (M1).
+    for row in &mut rows {
+        row.entry.assignee = None;
+        if row.reason == "shared" {
+            row.entry.record = handover_listing::shared(&row.entry.record);
+        }
+    }
     let badges: Map<String, Value> = rows
         .iter()
         .map(|row| (row.entry.id.to_string(), row.badge()))
