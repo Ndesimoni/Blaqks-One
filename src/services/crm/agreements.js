@@ -15,6 +15,8 @@ export function agreementRoutes({ request, scope }) {
   return {
     agreements: (workspace, signal) => request(base(workspace), { signal }),
     agreement: (workspace, id, signal) => request(item(workspace, id), { signal }),
+    /** `{ answer }`: offers from other companies waiting for the caller (sidebar badge). */
+    agreementsWaiting: (workspace, signal) => request(`${base(workspace)}/waiting`, { signal }),
     /** The named recipient of a new agreement, by their exact sign-in email. */
     findAgreementRecipient: (workspace, email) =>
       request(`${base(workspace)}/recipients`, { method: 'POST', body: { email } }),

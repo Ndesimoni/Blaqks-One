@@ -2,6 +2,7 @@
 //! calls these, inside the transaction that changes the hand-over and after it took the
 //! workspace lock, so the hand-over and its agreement always change together. The
 //! agreement routes refuse these agreements (`origin` `deal_handover`).
+pub use super::handover_read::{deadlines, offer_terms, OfferTerms};
 use super::{
     evidence::Parties,
     handover_terms::{self, HandoverFacts},
@@ -74,7 +75,8 @@ pub async fn expired(tx: &mut Transaction<'_, Postgres>, agreement: Uuid) -> Api
     Ok(expired.unwrap_or(false))
 }
 
-/// The receiving agent declines an open offer. An expired offer can only be cancelled.
+/// The receiving agent declines an open offer. An expired offer can only be cancelled, and
+/// an acceptance waiting for approval cannot be taken back (H2 amendment 14).
 pub async fn decline(
     tx: &mut Transaction<'_, Postgres>,
     agreement: Uuid,
@@ -88,6 +90,9 @@ pub async fn decline(
         return Err(ApiError::conflict(EXPIRED));
     }
     let revision = store::current(tx, agreement).await?;
+    if store::accepted_by(tx, revision.id).await?.is_some() {
+        return Err(ApiError::conflict(CHANGED));
+    }
     ledger::bump(tx, agreement, row.version, "declined", None, None).await?;
     let response = Response {
         agreement,

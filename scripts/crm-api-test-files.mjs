@@ -113,6 +113,13 @@ export const apiTestFiles = [
   'tests/api/agreements-screens.test.mjs',
   'tests/api/agreements-handovers.test.mjs',
   'tests/api/agreements-handover-closes.test.mjs',
+  'tests/api/finance-handover-preview.test.mjs',
+  'tests/api/finance-handover-preview-content.test.mjs',
+  'tests/api/finance-handover-approval.test.mjs',
+  'tests/api/finance-handover-approver-rules.test.mjs',
+  'tests/api/finance-handover-admin.test.mjs',
+  'tests/api/finance-handover-waiting.test.mjs',
+  'tests/api/finance-handover-review-fixes.test.mjs',
   'tests/api/channels.test.mjs',
   ...messagingTestFiles,
 ];

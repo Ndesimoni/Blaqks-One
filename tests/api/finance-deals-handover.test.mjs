@@ -12,6 +12,8 @@ before(async () => {
   deal = await createDeal(teams.agent, client);
 });
 
+const TO_ADMIN =
+  'A hand-over to your Admin is a full hand-over, without a referral share or an approval.';
 const offer = (session, target, toId, referralShareBp = null) =>
   post(session, teams.admin, target.id, 'handovers', {
     version: target.version,
@@ -24,9 +26,11 @@ const decide = (session, id, action, body) =>
 test('only the holder offers a deal, to active finance staff, within the referral cap', async () => {
   const { agent, viewer, second, desk, admin } = teams;
   refused(await offer(viewer, deal, second.user.id), 403, M.holderOnly, 'forbidden');
-  for (const to of [agent.user.id, desk.user.id, admin.user.id, UNKNOWN]) {
+  for (const to of [agent.user.id, desk.user.id, UNKNOWN]) {
     refused(await offer(agent, deal, to), 400, M.ineligible, 'invalid_request', to);
   }
+  // H2: the company's Admin may receive a deal, but only fully (agreements design §17).
+  refused(await offer(agent, deal, admin.user.id, 1500), 400, TO_ADMIN, 'invalid_request');
   refused(await offer(agent, deal, second.user.id, 2500), 409, M.cap, 'conflict');
   const made = await offer(agent, deal, second.user.id, 1500);
   assert.equal(made.status, 201, JSON.stringify(made.value));
@@ -38,8 +42,8 @@ test('only the holder offers a deal, to active finance staff, within the referra
     [[handover.id, 1500, true]],
   );
   assert.deepEqual(Object.keys(offered[0]).sort(), [
-    ...['agreementId', 'allowed', 'createdAt', 'dealId', 'dealType', 'earned', 'from', 'id'],
-    ...['referralShareBp', 'stage', 'status', 'to'],
+    ...['agreementId', 'allowed', 'approval', 'createdAt', 'dealId', 'dealType', 'earned'],
+    ...['expiresAt', 'from', 'id', 'referralShareBp', 'stage', 'status', 'to', 'toAdmin'],
   ]);
   assert.equal((await overview(agent, admin)).deals[0].pendingHandover, handover.id);
   refused(

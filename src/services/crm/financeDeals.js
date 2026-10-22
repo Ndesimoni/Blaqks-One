@@ -1,3 +1,5 @@
+import { financeHandoverRoutes } from './financeHandovers.js';
+
 /**
  * Deal and hand-over routes under `/finance` (finance-design §6.2, §13 H-F1, §15.5–§15.6).
  * Bodies are exact because the server refuses unknown keys: money is integer fils, shares
@@ -24,7 +26,6 @@ export const dealKeys = [
 ];
 /** Optional revise changes (§15.5); the second agent and their share travel together. */
 const reviseKeys = ['primaryAgentId', 'agreementId', 'overrideAgentShareBp'];
-const handoverDecisions = ['accept', 'decline', 'cancel'];
 
 function reviseBody(metadata, reason, changes = {}) {
   const body = { version: metadata.version, reason, ...pick(changes, reviseKeys) };
@@ -38,8 +39,6 @@ function reviseBody(metadata, reason, changes = {}) {
 export function financeDealRoutes(base, send, request) {
   const deal = (workspace, metadata, action = '') =>
     `${base(workspace)}/deals/${segment(metadata.id)}${action}`;
-  const handover = (workspace, id, action) =>
-    `${base(workspace)}/handovers/${segment(id)}/${action}`;
   return {
     createDeal: (workspace, draft) =>
       send(`${base(workspace)}/deals`, 'POST', { deal: pick(draft, dealKeys) }),
@@ -77,28 +76,6 @@ export function financeDealRoutes(base, send, request) {
         reason: reason ?? '',
       }),
     financeAssignees: (workspace, signal) => request(`${base(workspace)}/assignees`, { signal }),
-    /** The holder offers the deal to `toId`, fully or keeping a referral share (null = full). */
-    requestHandover: (workspace, metadata, toId, referralShareBp) =>
-      send(deal(workspace, metadata, '/handovers'), 'POST', {
-        version: metadata.version,
-        toId,
-        referralShareBp: referralShareBp ?? null,
-      }),
-    /**
-     * Receiver accept/decline, requester or Admin cancel. Accepting an offer recorded as an
-     * agreement names the agreement version the receiver was shown (agreements §14).
-     */
-    decideHandover: (workspace, id, decision, agreementVersion) => {
-      if (!handoverDecisions.includes(decision)) throw new Error('Unknown hand-over decision.');
-      const body = decision === 'accept' && agreementVersion ? { agreementVersion } : undefined;
-      return send(handover(workspace, id, decision), 'POST', body);
-    },
-    /** Admin approval, optionally adjusting the referral share, with a reason. */
-    approveHandover: (workspace, id, referralShareBp, reason, agreementVersion) =>
-      send(handover(workspace, id, 'approve'), 'POST', {
-        referralShareBp: referralShareBp ?? null,
-        reason,
-        agreementVersion: agreementVersion ?? null,
-      }),
+    ...financeHandoverRoutes(base, send, request),
   };
 }

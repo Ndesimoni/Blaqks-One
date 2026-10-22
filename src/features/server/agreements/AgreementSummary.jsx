@@ -3,6 +3,7 @@ import { Badge } from '../../../components/ui/Badge.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { displayState, inCompany, ownSide, stateTone, turn } from './agreementModel.js';
+import { awaitingApproval } from './approvalWording.js';
 
 /** `ours` marks a side of the caller's own company: theirs, or both in an in-company hand-over. */
 function PartyCard({ role, person, mine, ours, named }) {
@@ -31,7 +32,9 @@ export function AgreementSummary({ detail }) {
   const { t, format } = useI18n();
   const { agreement, revision, party } = detail;
   const state = displayState(agreement, revision.authorParty);
-  const move = turn(agreement, party, revision.authorParty);
+  // An accepted in-company hand-over stays sent until it is approved (design §17).
+  const waiting = awaitingApproval(agreement, detail.events, revision.number);
+  const move = waiting ? 'awaitingApproval' : turn(agreement, party, revision.authorParty);
   const side = ownSide(agreement, user.workspaceId, user.id);
   const open = ['draft', 'sent'].includes(agreement.state);
   return (
@@ -41,7 +44,9 @@ export function AgreementSummary({ detail }) {
         <p className={move === 'yourAnswer' ? 'is-urgent' : ''}>
           {move === 'closed'
             ? t('agreements.row.updated', { date: format.dateTime(agreement.updatedAt) })
-            : t(`agreements.turn.${move}`)}
+            : waiting
+              ? t('handoverOffer.awaitingApproval')
+              : t(`agreements.turn.${move}`)}
         </p>
         {open && (
           <small>

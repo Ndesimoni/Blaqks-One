@@ -613,3 +613,97 @@ NULL)`, and approval only with an agreement. New `accepted_by` and `accepted_at`
     own company for the Admin). The Super Admin gets none.
 18. **`/agreements/waiting`** returns counts only: sent, unexpired, direct, between two
     companies, addressed to the caller in the path's company; the Super Admin is refused.
+
+### Owner answer on free text (2026-10-22)
+
+The preview leaves out the current blocker and next-action texts (the next action's date
+stays) and shows the listing title and the partner company's name (amendment 11).
+
+### H2 API contract
+
+All paths are under `/api/crm/workspaces/{workspace}`.
+
+- `POST /finance/deals/{id}/handovers {version, toId, referralShareBp|null, approverId?}`:
+  `approverId` is optional (absent or `null` = no approval). `toId` may be the company's
+  Admin (an `owner` row of `/finance/assignees`): then the share must be `null` and there is
+  no approver.
+- `GET /finance/approvers` → `{approvers: [{id, name}]}`: the company's Admin and active
+  staff with the Finance Approve right, without the caller; needs the finance module and
+  the Assign right. The server also refuses the receiver and the deal's second agent.
+- Hand-over view (overview `handovers`, every decision response): the A3a fields plus
+  `status` `pending` or `awaiting_approval` while open, `toAdmin`, `approval`
+  (`null`, or `{approver: {id, name}, acceptedAt}`), `expiresAt` (`null` for older offers)
+  and `allowed` `{review, accept, decline, cancel, approve, approveAcceptance,
+rejectAcceptance}`. The overview lists open requests.
+- `GET /finance/handovers/{id}/preview` → `{handover, offer, deal, client, property}`:
+  `offer` `{agreementVersion|null, expiresAt|null, expired, kind ('full'|'referral'),
+feeFils, referralShareBp|null}`; `deal` `{dealType, stage, earned, agreedValueFils,
+feeBasis, feeRateBp, fixedFeeFils, feeFils, partnerShareBp, partnerName, partnerFils,
+netFils, receivedFils, receiverEarnsFils|null, openedDate, targetCloseDate, milestone,
+nextActionDue}` (dates and milestone are text or `null`; `receiverEarnsFils` is `0` for
+  the Admin, `null` when earned or before finance settings exist); `client` `{name}` (first
+  name and last initial); `property` `null` or `{listingTitle, saleRental, emirate,
+community, building, propertyType, bedrooms, bathrooms, sizeSqft, priceAed, readyOffPlan,
+furnishing}` (text or `null`).
+- `POST /finance/handovers/{id}/accept {agreementVersion}`: with approval required the
+  request becomes `awaiting_approval` and the response's `entry` is `null`.
+- `POST /finance/handovers/{id}/approve-acceptance {agreementVersion}` (the chosen
+  approver or the Admin, while awaiting) moves the deal; `POST
+/finance/handovers/{id}/reject-acceptance` (no body) cancels it.
+- `GET /finance/handovers/waiting` → `{answer, approve}`; `GET /agreements/waiting` →
+  `{answer}`.
+
+### H2 as built (2026-10-22)
+
+- **Migrations 0059 (agreements) and 0060 (finance).** 0059 adds the verification
+  `approver_decision`, one `accepted` and one `approved` row per revision, and the evidence
+  rules of amendment 7 in `crm_agreement_handover_guard`. 0060 adds `requires_approval`,
+  `approver_id`, `accepted_by` and `accepted_at` to `crm_deal_handovers`, the status
+  `awaiting_approval`, one open request per deal (`crm_deal_handover_open`) and a guard that
+  allows exactly the steps of amendment 2: a receiver who is active staff or, for a full
+  hand-over without approval, the company's Admin; an approver who is an active member of
+  the company; never an approval decided by the receiver; the approval choice and the
+  receiver's acceptance frozen once written.
+- **Finance module.** `handover_offer.rs` (the offer with the receiver and approver
+  checks), `handover_checks.rs` (receiver, approver, referral cap and the "settled" rule
+  that holds earning, unearning and revising while a hand-over is open), `handover_rules.rs`
+  (who may make which decision at which step, used by both the decisions and the
+  `allowed` flags), `handover_decide.rs` (an acceptance that needs approval waits; the
+  approver's decision moves the deal), `handover_preview.rs` and `handover_preview_view.rs`
+  (the preview), `handover_waiting.rs` (the Deals badge) and `assignees::approvers`. Every
+  open-request check (edit freeze, `handOver`, holder moves, departures, deletions, sample
+  clearing, lists) uses `pending` or `awaiting_approval`. Property facts for the preview
+  come from `records::handover_facts::preview`, a twelve-field allowlist.
+- **Agreements module.** `handover_approval.rs` (`accept_awaiting`, `approve_acceptance`
+  with `Approver::Admin` or `Approver::Chosen`, through a shared `ledger::approve`),
+  `handover_read.rs` (`offer_terms` and `deadlines` for the preview, lists and badges),
+  `handover_adjust.rs` (the Admin's share revision, moved out of `handover_decide.rs`) and
+  `waiting.rs` (`GET /agreements/waiting`). The Admin's approval in place and the
+  receiver's decline are refused once an acceptance exists. History events carry their
+  `verification`; an unknown stored value fails the read.
+- **Agreements badge.** `answer` counts a sent, unexpired, direct agreement between two
+  companies for the participant who did not write its current revision, so after a
+  counter-offer it counts for the original sender, matching the screen's "your answer".
+- **Screens.** Deals shows one **Review offer** button to the receiver; the review window
+  (`HandoverReviewDialog`, `HandoverPreview`) shows the deal, the offer, what the receiver
+  would earn and the property facts, with Accept and Decline inside. At
+  `awaiting_approval` the chosen approver or the Admin gets **Review** with Approve and
+  Reject. The hand-over form lists the Admin (full hand-over only) and offers **Needs
+  approval** with an approver list, for staff to staff. `WaitingNavItem` shows the Deals and
+  Agreements badges, refreshed every 15 seconds. Agreements words an approval as "Approved
+  by the company Admin" or "Approved by the chosen approver", adding "in place of the
+  agent's acceptance" only when the revision has no acceptance.
+- **Tests.** `tests/api/finance-handover-*.test.mjs` (preview access and content, approval
+  steps, approver rules, hand-overs to the Admin, waiting counts and the review fixes),
+  Rust unit tests in `agreements/approval_tests.rs` and `handover_tests.rs`, and the browser
+  flows `finance-deals-handover.spec.js` and `finance-deals-approval.spec.js`.
+- **Code security review (2026-10-22): no High or Medium findings.** Fixed: the receiver
+  keeps the preview while an acceptance waits (amendment 9); the preview's three dates are
+  sent only as `YYYY-MM-DD`; a client name whose first word looks like an email or a
+  number becomes "Client"; the Super Admin's finance overview carries no agreement ID,
+  offer end or approver for hand-overs (§9); the preview reads one repeatable-read
+  snapshot; only an agent may keep a referral share. Accepted: the pipeline milestone is
+  shown as text (owner decision 1; the screens do not edit it); callers without the
+  finance module get the module's 403 from the preview, which reveals nothing about the
+  request. Not built: the Agreements list rows still show the usual turn text while an
+  acceptance waits (the detail says "Accepted, waiting for approval").

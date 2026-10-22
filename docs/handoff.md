@@ -15,7 +15,7 @@ The owner chooses the next packet: nothing in §2 starts until they say so.
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
 | Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
 
-Migrations run through `0050`. **Evidence limit:** all of this is proven against the local
+Migrations run through `0060`. **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
 from clients are labelled but not virus-scanned.
 
@@ -78,9 +78,11 @@ stored records). Test on the disposable database with synthetic records.
   the receiver reviews the full offer before accepting; see
   [Agreements design](agreements-design.md) §14–§16. Next in this line: **A3b** (amend,
   complete, cancel, archive, the certificate and payment tracking between companies).
-  Before A3b, the owner chose **H2** (2026-10-22, design §17): reviewing a hand-over
-  before deciding, sidebar badges, hand-overs to the Admin and approvals chosen by the
-  sender. It needs a security review of §17 first.
+- **H2** (built 2026-10-22, design §17): a receiver reviews a hand-over (deal and
+  property, client details hidden) before accepting or declining; Deals and Agreements
+  badges; full hand-overs to the company Admin; an agent may tick Needs approval and choose
+  the approver, and the deal moves only after the receiver accepts and the approver
+  approves. Migrations 0059 and 0060.
 
 ### N4 — WhatsApp (blocked on the owner)
 

@@ -5,6 +5,8 @@ import { canOpenSection } from './access.js';
 import { ServerNavigationItem } from './ServerNavigationItem.jsx';
 import { InboxNavItem } from './inbox/InboxNavItem.jsx';
 import { TeamChatNavItem } from './chat/TeamChatNavItem.jsx';
+import { WaitingNavItem } from './WaitingNavItem.jsx';
+import { waitingSources } from './waitingCounts.js';
 
 export { ServerNavigationItem };
 
@@ -38,12 +40,21 @@ export function ServerNavigationGroups({ user, route, onSelect }) {
                 <TeamChatNavItem route={route} onSelect={onSelect} />
               )}
             </React.Fragment>
+          ) : waitingSources[name] ? (
+            // Deals and Agreements count what waits for the caller's answer (agreements §17).
+            <WaitingNavItem
+              key={name}
+              name={name}
+              icon={icon}
+              label={name === 'Agreements' ? t('agreements.title') : undefined}
+              route={route}
+              onSelect={onSelect}
+            />
           ) : (
             <ServerNavigationItem
               key={name}
               name={name}
               icon={icon}
-              label={name === 'Agreements' ? t('agreements.title') : undefined}
               route={route}
               onSelect={onSelect}
             />

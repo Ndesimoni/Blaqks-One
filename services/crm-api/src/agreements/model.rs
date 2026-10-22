@@ -86,3 +86,37 @@ impl State {
         }
     }
 }
+
+pub const UNKNOWN_EVIDENCE: &str = "This agreement's evidence could not be read.";
+
+/// How an action's actor was verified (design §5, H2 amendment 8). An approval is an
+/// Admin's decision or the chosen approver's; readers refuse any other stored value rather
+/// than show evidence they do not understand.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Verification {
+    Member,
+    ContactVerified,
+    AdminDecision,
+    ApproverDecision,
+}
+
+impl Verification {
+    pub fn parse(value: &str) -> ApiResult<Self> {
+        Ok(match value {
+            "member" => Self::Member,
+            "contact_verified" => Self::ContactVerified,
+            "admin_decision" => Self::AdminDecision,
+            "approver_decision" => Self::ApproverDecision,
+            _ => return Err(ApiError::conflict(UNKNOWN_EVIDENCE)),
+        })
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Member => "member",
+            Self::ContactVerified => "contact_verified",
+            Self::AdminDecision => "admin_decision",
+            Self::ApproverDecision => "approver_decision",
+        }
+    }
+}

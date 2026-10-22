@@ -60,12 +60,20 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   ).toHaveCount(0);
   for (const layout of layouts) await checkLayout(receiver.page, layout, 'deal-handover-incoming');
   await receiver.page.setViewportSize({ width: 1280, height: 900 });
-  // The receiver reviews the full offer (agreements design §14–§15) and accepts that version.
-  await incoming.getByRole('button', { name: `Accept hand-over of ${deal.dealId}` }).click();
+  // The receiver decides only inside the review window (agreements design §17).
+  await expect(
+    incoming.getByRole('button', { name: `Decline hand-over of ${deal.dealId}` }),
+  ).toHaveCount(0);
+  await incoming
+    .getByRole('button', { name: `Review offer for hand-over of ${deal.dealId}` })
+    .click();
   const review = receiver.page.getByRole('dialog', { name: 'Review the hand-over offer' });
-  await expect(review).toContainText('Deal fee');
+  await expect(review).toContainText('Deal fee offered');
+  await expect(review).toContainText('Agreed value');
   await expect(review).toContainText('No property is linked to this deal.');
-  await expect(review).toContainText('Share of the receiving agent’s commission');
+  await expect(review).toContainText(`${agent.name} keeps 10% of ${second.name}’s commission`);
+  await expect(review).not.toContainText('Synthetic finance client');
+  await expect(review.getByRole('button', { name: 'Decline offer' })).toBeEnabled();
   for (const layout of layouts) await checkLayout(receiver.page, layout, 'deal-handover-review');
   await receiver.page.setViewportSize({ width: 1280, height: 900 });
   await review.getByRole('button', { name: 'Accept offer' }).click();

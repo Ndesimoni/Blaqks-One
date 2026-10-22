@@ -1,6 +1,6 @@
 //! Agreement routes under `/api/crm/workspaces/{workspace}/agreements`, merged
 //! into the application router by `routes.rs`.
-use super::{detail, handlers, lifecycle, recipients, respond, revise};
+use super::{detail, handlers, lifecycle, recipients, respond, revise, waiting};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
@@ -23,6 +23,7 @@ pub fn router() -> Router<AppState> {
             &format!("{BASE}/recipients"),
             post(recipients::find).layer(body()),
         )
+        .route(&format!("{BASE}/waiting"), get(waiting::count))
         .route(&item, get(detail::read).patch(revise::edit).layer(body()))
         .route(&action("send"), post(lifecycle::send).layer(body()))
         .route(&action("accept"), post(respond::accept).layer(body()))

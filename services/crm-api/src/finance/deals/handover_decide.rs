@@ -1,26 +1,34 @@
-//! Deciding hand-over requests (§13 H-F1; routes in `handover_routes.rs`). Accepting or
-//! approving moves the deal to the receiver. A request recorded as an agreement moves its
-//! agreement in the same transaction (agreements design §14), after the deal lock.
+//! Deciding hand-over requests (§13 H-F1, agreements design §17; routes in
+//! `handover_routes.rs`). Accepting or approving moves the deal to the receiver, except
+//! that an acceptance needing approval waits for the chosen approver or an Admin. A
+//! request recorded as an agreement moves its agreement in the same transaction, after
+//! the deal lock.
 use super::{
     gate::{self, Need},
     handover::ensure_move,
+    handover_checks::{self as checks, Receiver},
     handover_evidence,
-    handover_rows::{self, NOT_PENDING},
+    handover_rows::{self, HandoverRow, NOT_PENDING},
     handover_store::{self, Decision},
     holder::{self, Move},
-    links, list, row,
+    list,
+    row::{self, DealRow},
     views::Viewer,
 };
 use crate::{
-    auth::session::Session,
+    auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
 };
 use axum::Json;
 use serde_json::{json, Value};
+use sqlx::{Postgres, Transaction};
 
 pub const RECEIVER_GONE: &str = "The receiving agent can no longer hold this deal.";
 const ACCEPTED: &str = "Hand-over accepted by the receiving agent.";
+const APPROVED: &str = "Hand-over accepted by the receiving agent and approved.";
+
+type Tx<'c> = Transaction<'c, Postgres>;
 
 /// Steps 4–10 once the caller-only checks passed. `approval` is the Admin's referral
 /// share and reason; `version` the agreement version the decider saw.
@@ -39,46 +47,87 @@ pub async fn decide(
     let mut tx = state.pool.begin().await?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, need).await?;
     let request = handover_store::fetch(&mut tx, &workspace, &live, id, decision).await?;
-    let mut referral = request.referral_share_bp;
     let mut entry = Value::Null;
-    if decision.moves() {
-        if let Some((share, _)) = &approval {
-            referral = *share;
-        }
-        let deal_id = request.deal_id;
-        let deal = row::locked_for_handover(&mut tx, &workspace, live.id, deal_id).await?;
-        if deal.assignee_id != Some(request.from_id) {
-            return Err(ApiError::conflict(NOT_PENDING));
-        }
-        if !links::finance_member(&mut tx, &workspace, request.to_id, true).await? {
-            return Err(ApiError::conflict(RECEIVER_GONE));
-        }
-        ensure_move(&mut tx, &workspace, &deal, request.to_id, referral).await?;
+    if decision == Decision::Accept && request.requires_approval {
+        movable(&mut tx, (&workspace, live.id), &request, None).await?;
+        handover_evidence::decide(&mut tx, &request, (decision, &live), version, None).await?;
+        handover_store::set_awaiting(&mut tx, id, live.id).await?;
+    } else if decision.moves() {
         let decided = (decision, &live);
-        handover_evidence::decide(&mut tx, &request, decided, version, referral).await?;
-        handover_store::set_status(&mut tx, id, decision, referral, live.id).await?;
-        let reason = approval
-            .as_ref()
-            .map_or(ACCEPTED, |(_, reason)| reason.as_str());
-        let change = Move {
-            workspace: &workspace,
-            deal: &deal,
-            to: Some(request.to_id),
-            actor: live.id,
-            history: "handover",
-            reason,
-            referral,
-            requested_by: Some(request.requested_by),
-        };
-        holder::apply(&mut tx, change).await?;
-        entry = json!(list::entry(&mut tx, &workspace, &live, deal_id).await?);
+        entry = moved(&mut tx, &workspace, &request, decided, version, approval).await?;
     } else {
         handover_evidence::decide(&mut tx, &request, (decision, &live), None, None).await?;
+        let referral = request.referral_share_bp;
         handover_store::set_status(&mut tx, id, decision, referral, live.id).await?;
     }
-    let view = handover_rows::find(&mut tx, id)
-        .await?
-        .view(&Viewer::of(&live));
+    let view = handover_rows::shown(&mut tx, id, &Viewer::of(&live)).await?;
     tx.commit().await?;
     Ok(Json(json!({"handover": view, "entry": entry})))
+}
+
+/// The locked deal, still held by the sender, with a receiver who can still hold it and
+/// the move rules for `referral` (the request's own share when `None`).
+async fn movable(
+    tx: &mut Tx<'_>,
+    (workspace, actor): (&str, uuid::Uuid),
+    request: &HandoverRow,
+    referral: Option<Option<i32>>,
+) -> ApiResult<DealRow> {
+    let deal = row::locked_for_handover(tx, workspace, actor, request.deal_id).await?;
+    if deal.assignee_id != Some(request.from_id) {
+        return Err(ApiError::conflict(NOT_PENDING));
+    }
+    let receiver = checks::receiver(tx, workspace, request.to_id).await?;
+    let expected = if request.to_admin {
+        Receiver::Admin
+    } else {
+        Receiver::Staff
+    };
+    if receiver != Some(expected) {
+        return Err(ApiError::conflict(RECEIVER_GONE));
+    }
+    let referral = referral.unwrap_or(request.referral_share_bp);
+    ensure_move(tx, workspace, &deal, request.to_id, referral).await?;
+    Ok(deal)
+}
+
+/// Accepting, approving in place or approving an acceptance: the deal moves.
+async fn moved(
+    tx: &mut Tx<'_>,
+    workspace: &str,
+    request: &HandoverRow,
+    (decision, live): (Decision, &UserRow),
+    version: Option<i64>,
+    approval: Option<(Option<i32>, String)>,
+) -> ApiResult<Value> {
+    let referral = match &approval {
+        Some((share, _)) => *share,
+        None => request.referral_share_bp,
+    };
+    let deal = movable(tx, (workspace, live.id), request, Some(referral)).await?;
+    let chosen = decision == Decision::ApproveAcceptance && live.role != "admin";
+    if chosen && deal.second_agent_id == Some(live.id) {
+        return Err(ApiError::conflict(checks::APPROVER_ROLE));
+    }
+    handover_evidence::decide(tx, request, (decision, live), version, referral).await?;
+    handover_store::set_status(tx, request.id, decision, referral, live.id).await?;
+    let reason = match (&approval, decision) {
+        (Some((_, reason)), _) => reason.as_str(),
+        (None, Decision::ApproveAcceptance) => APPROVED,
+        (None, _) => ACCEPTED,
+    };
+    let change = Move {
+        workspace,
+        deal: &deal,
+        to: Some(request.to_id),
+        actor: live.id,
+        history: "handover",
+        reason,
+        referral,
+        requested_by: Some(request.requested_by),
+    };
+    holder::apply(tx, change).await?;
+    Ok(json!(
+        list::entry(tx, workspace, live, request.deal_id).await?
+    ))
 }

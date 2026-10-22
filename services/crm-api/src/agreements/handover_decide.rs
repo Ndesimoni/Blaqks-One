@@ -1,23 +1,20 @@
-//! Accepting and approving an in-company hand-over (design §14–§15). The receiving agent
+//! Accepting and approving an in-company hand-over (design §14–§17). The receiving agent
 //! accepts exactly the revision at the version they were shown. An Admin approval is
 //! recorded as itself (`approved`, `admin_decision`), never as the agent's acceptance;
-//! a changed referral share is first written as a new revision by the Admin, within
-//! the same kind and the team's limit.
+//! a changed referral share is first written as a new revision by the Admin
+//! (`handover_adjust.rs`). The approval step after an acceptance is in
+//! `handover_approval.rs`.
+pub use super::handover_approval::{approve_acceptance, Approver};
 use super::{
-    evidence::Place,
     handover::{expired, locked, CHANGED, EXPIRED},
+    handover_adjust::adjusted,
     ledger::{self, Response},
-    limits,
-    model::{Kind, Party, State, INVALID, STALE},
+    model::{Party, State, Verification, STALE},
     rows::{AgreementRow, RevisionRow},
     store,
-    terms::{digest_of, BuiltTerms},
-    write::{self, NewRevision},
 };
 use crate::error::{ApiError, ApiResult};
-use serde_json::{json, Value};
 use sqlx::{Postgres, Transaction};
-use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 use uuid::Uuid;
 
 pub const KIND_FIXED: &str = "Changing between a full hand-over and a referral needs a new offer.";
@@ -32,7 +29,7 @@ pub struct Decide {
     pub referral: Option<i32>,
 }
 
-async fn open(
+pub(super) async fn open(
     tx: &mut Transaction<'_, Postgres>,
     d: &Decide,
 ) -> ApiResult<(AgreementRow, RevisionRow)> {
@@ -55,10 +52,25 @@ async fn open(
     Ok((row, revision))
 }
 
-/// The receiving agent accepts the exact offer.
+/// The receiving agent accepts the exact offer, which moves the deal.
 pub async fn accept(tx: &mut Transaction<'_, Postgres>, d: &Decide) -> ApiResult<()> {
+    acceptance(tx, d, "accepted").await
+}
+
+/// The receiving agent accepts an offer that still needs approval (H2 amendment 3): the
+/// acceptance is recorded on the revision and the agreement stays `sent`, one version on.
+pub async fn accept_awaiting(tx: &mut Transaction<'_, Postgres>, d: &Decide) -> ApiResult<()> {
+    acceptance(tx, d, "sent").await
+}
+
+/// The receiving agent's one acceptance of the current revision, leaving `state`.
+async fn acceptance(tx: &mut Transaction<'_, Postgres>, d: &Decide, state: &str) -> ApiResult<()> {
     let (row, revision) = open(tx, d).await?;
-    ledger::bump(tx, d.agreement, row.version, "accepted", None, None).await?;
+    if d.actor != d.members.1 {
+        return Err(ApiError::forbidden());
+    }
+    unaccepted(tx, &revision).await?;
+    ledger::bump(tx, d.agreement, row.version, state, None, None).await?;
     let response = Response {
         agreement: d.agreement,
         revision: revision.id,
@@ -70,6 +82,14 @@ pub async fn accept(tx: &mut Transaction<'_, Postgres>, d: &Decide) -> ApiResult
     ledger::respond(tx, &response).await
 }
 
+/// Refuses a revision the receiver already accepted: the next step is its approval.
+async fn unaccepted(tx: &mut Transaction<'_, Postgres>, revision: &RevisionRow) -> ApiResult<()> {
+    match store::accepted_by(tx, revision.id).await? {
+        Some(_) => Err(ApiError::conflict(CHANGED)),
+        None => Ok(()),
+    }
+}
+
 /// The company Admin approves in place of the receiving agent, with `share` (which may
 /// differ from the offer, within the same kind).
 pub async fn approve(
@@ -78,6 +98,7 @@ pub async fn approve(
     share: Option<i32>,
 ) -> ApiResult<()> {
     let (row, offered) = open(tx, d).await?;
+    unaccepted(tx, &offered).await?;
     if share.is_some() != d.referral.is_some() {
         return Err(ApiError::conflict(KIND_FIXED));
     }
@@ -88,60 +109,13 @@ pub async fn approve(
     };
     let current = (revision != offered.id).then_some(revision);
     ledger::bump(tx, d.agreement, row.version, "accepted", None, current).await?;
-    sqlx::query(
-        "INSERT INTO agreements.crm_agreement_actions
-         (id,agreement_id,revision_id,action,actor_id,party,verification,accepted_digest,
-         created_at)
-         VALUES ($1,$2,$3,'approved',$4,'recipient','admin_decision',$5,clock_timestamp())",
+    let evidence = (revision, digest.as_str());
+    ledger::approve(
+        tx,
+        d.agreement,
+        evidence,
+        d.actor,
+        Verification::AdminDecision,
     )
-    .bind(Uuid::new_v4())
-    .bind(d.agreement)
-    .bind(revision)
-    .bind(d.actor)
-    .bind(&digest)
-    .execute(&mut **tx)
-    .await?;
-    ledger::event_by(tx, d.agreement, Some(revision), "approved", d.actor, None).await
-}
-
-/// The Admin's revision of the offer with a new referral share, within the team limit.
-async fn adjusted(
-    tx: &mut Transaction<'_, Postgres>,
-    row: &AgreementRow,
-    offered: &RevisionRow,
-    share: i32,
-    actor: Uuid,
-) -> ApiResult<(Uuid, String)> {
-    let (sender_bp, recipient_bp) = Kind::Referral.shares(i64::from(share))?;
-    let cap = limits::referral_cap(tx, &row.workspace_id).await?;
-    limits::check(Kind::Referral, sender_bp, cap)?;
-    let mut value: Value = offered.terms.clone();
-    if let Value::Object(map) = &mut value {
-        map.remove("parties");
-    }
-    value["money"]["senderShareBp"] = json!(sender_bp);
-    value["money"]["recipientShareBp"] = json!(recipient_bp);
-    let expires_at = value["expiresAt"]
-        .as_str()
-        .and_then(|raw| OffsetDateTime::parse(raw, &Rfc3339).ok())
-        .ok_or(ApiError::invalid(INVALID))?;
-    let built = BuiltTerms {
-        subject_digest: digest_of(&value["subject"]),
-        value,
-        expires_at,
-    };
-    let parties = row.parties();
-    let revision = NewRevision {
-        place: Place {
-            agreement: row.id,
-            number: offered.number + 1,
-            parent: Some(offered.id),
-        },
-        parties: &parties,
-        author: "admin",
-        created_by: actor,
-    };
-    let (id, digest) = write::insert_revision(tx, revision, &built).await?;
-    ledger::event_by(tx, row.id, Some(id), "adjusted", actor, None).await?;
-    Ok((id, digest))
+    .await
 }

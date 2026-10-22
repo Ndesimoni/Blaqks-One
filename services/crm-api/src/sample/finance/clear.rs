@@ -22,7 +22,8 @@ const SETTINGS: Table = ("crm_finance_settings", "settings", None);
 /// before the hand-overs go (agreements design §14).
 const OPEN_OFFERS: &str = "SELECT c.agreement_id FROM crm_deal_handovers c \
      JOIN crm_sample_finance m ON m.entity='deal' AND m.entity_id=c.deal_id \
-     WHERE m.workspace_id=$1 AND c.status='pending' AND c.agreement_id IS NOT NULL";
+     WHERE m.workspace_id=$1 AND c.status IN ('pending','awaiting_approval') \
+     AND c.agreement_id IS NOT NULL";
 /// Rows that belong to marked deals: hand-overs, then lines, then snapshots.
 const HANDOVERS: &str = "DELETE FROM crm_deal_handovers c USING crm_sample_finance m \
      WHERE m.entity='deal' AND m.entity_id=c.deal_id AND m.workspace_id=$1 RETURNING c.id";

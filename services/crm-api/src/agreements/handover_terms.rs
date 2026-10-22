@@ -26,15 +26,15 @@ pub struct HandoverFacts {
     pub property: Option<PropertyFacts>,
 }
 
-/// "Layla Hassan" → "Layla H."; one word stays as it is unless it looks like an email or
-/// a number; nothing → "Client".
+/// "Layla Hassan" → "Layla H."; a first word like an email or a number → "Client".
 pub fn display_name(full: Option<&str>) -> String {
+    let plain = |word: &str| !word.chars().any(|c| c == '@' || c.is_ascii_digit());
     let mut words = full.unwrap_or("").split_whitespace();
     match (words.next(), words.last()) {
-        (Some(first), Some(last)) => format!("{} {}.", clip(first, 60), initial(last)),
-        (Some(only), None) if !only.chars().any(|c| c == '@' || c.is_ascii_digit()) => {
-            clip(only, 40)
+        (Some(first), Some(last)) if plain(first) => {
+            format!("{} {}.", clip(first, 60), initial(last))
         }
+        (Some(only), None) if plain(only) => clip(only, 40),
         _ => "Client".into(),
     }
 }

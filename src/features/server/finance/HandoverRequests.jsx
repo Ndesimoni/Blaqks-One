@@ -1,38 +1,31 @@
-import React, { useState } from 'react';
-import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
-import { formatPercent } from '../../../lib/finance/money.js';
+import React, { useEffect, useState } from 'react';
+import { useI18n } from '../../../i18n/useI18n.js';
+import { announceHandoversChanged } from '../waitingCounts.js';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { failureText } from './FinanceDialog.jsx';
 import { DealChip } from './DealChips.jsx';
-
-/** Secondary responses first, so the positive response sits last (right, or full width). */
-const decisions = [
-  { decision: 'decline', label: 'Decline', variant: 'light' },
-  { decision: 'cancel', label: 'Cancel request', variant: 'light' },
-  { decision: 'accept', label: 'Accept', variant: 'primary', icon: 'check' },
-];
-
-/** Who the request is for, from the caller's side. */
-function summary(handover, me) {
-  if (handover.to.id === me) return `${handover.from.name} offers you this deal`;
-  if (handover.from.id === me) return `Waiting for ${handover.to.name} to respond`;
-  return `${handover.from.name} → ${handover.to.name}`;
-}
+import { openHandoverStatuses } from './dealResponses.js';
+import { HandoverRow } from './HandoverRow.jsx';
 
 /**
- * Pending hand-over requests the caller takes part in (all of them for team finance). The
- * row shows the deal's ID, type, stage and earned state. An offer recorded as an agreement
- * opens its full terms before the receiver accepts (agreements design §14–§15); the
- * requester or Admin cancels; the Admin may approve with changes.
+ * Open hand-over requests the caller takes part in (all of them for team finance): pending
+ * offers and accepted ones waiting for approval (agreements design §17). The receiver reviews
+ * an offer before deciding; the chosen approver or the Admin reviews an accepted one; the
+ * requester or Admin cancels; the Admin may still approve in place of the receiver.
  */
-export function HandoverRequests({ onApprove, onAccept }) {
-  const { overview, actions, user } = useFinanceContext();
+export function HandoverRequests({ onApprove, onReview }) {
+  const { overview, actions } = useFinanceContext();
+  const { t } = useI18n();
   const [message, setMessage] = useState('');
-  const pending = overview.handovers.filter((handover) => handover.status === 'pending');
-  if (!pending.length) return null;
+  const open = overview.handovers.filter((handover) =>
+    openHandoverStatuses.includes(handover.status),
+  );
+  // A changed list (a decision, a refresh) refreshes the sidebar's Deals badge too.
+  useEffect(() => {
+    announceHandoversChanged();
+  }, [overview.handovers]);
+  if (!open.length) return null;
   const decide = async (handover, decision) => {
-    if (decision === 'accept' && handover.agreementId) return onAccept(handover);
     setMessage('');
     const result = await actions.decideHandover(handover, decision);
     if (!result.ok) setMessage(failureText(result));
@@ -43,9 +36,9 @@ export function HandoverRequests({ onApprove, onAccept }) {
       aria-labelledby="finance-handovers-title"
     >
       <div className="finance-calc-head">
-        <h2 id="finance-handovers-title">Hand-over requests</h2>
+        <h2 id="finance-handovers-title">{t('handoverRequests.title')}</h2>
         <DealChip tone="amber" glyph="wait">
-          {pending.length} awaiting response
+          {t('handoverRequests.count', { count: open.length })}
         </DealChip>
       </div>
       {message && (
@@ -54,60 +47,14 @@ export function HandoverRequests({ onApprove, onAccept }) {
         </p>
       )}
       <ul className="finance-handover-list">
-        {pending.map((handover) => (
-          <li key={handover.id} className="finance-handover deal-handover">
-            <span className="deal-handover-icon" aria-hidden="true">
-              <Icon name="users" size={18} />
-            </span>
-            <div className="finance-handover-text">
-              <strong>
-                {handover.dealId} · {handover.dealType} · {handover.stage}
-                {handover.earned ? ' · Earned' : ''}
-              </strong>
-              <span>{summary(handover, user.id)}</span>
-              <span className="deal-handover-terms">
-                <DealChip tone="slate" glyph={handover.referralShareBp ? 'move' : 'done'}>
-                  {handover.referralShareBp ? 'Referral share' : 'Full hand-over'}
-                </DealChip>
-                {handover.referralShareBp ? (
-                  <small>
-                    {handover.from.name} keeps a {formatPercent(handover.referralShareBp)} referral
-                    share
-                  </small>
-                ) : null}
-              </span>
-            </div>
-            <div
-              className="finance-action-group deal-handover-actions"
-              role="group"
-              aria-label={`Hand-over of ${handover.dealId}`}
-            >
-              {decisions
-                .filter((item) => actions.can(`${item.decision}Handover`, handover))
-                .map((item) => (
-                  <Button
-                    key={item.decision}
-                    variant={item.variant}
-                    icon={item.icon}
-                    disabled={actions.busy}
-                    aria-label={`${item.label} hand-over of ${handover.dealId}`}
-                    onClick={() => decide(handover, item.decision)}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
-              {actions.can('approveHandover', handover) && (
-                <Button
-                  icon="check"
-                  disabled={actions.busy}
-                  aria-label={`Approve hand-over of ${handover.dealId}`}
-                  onClick={() => onApprove(handover)}
-                >
-                  Approve
-                </Button>
-              )}
-            </div>
-          </li>
+        {open.map((handover) => (
+          <HandoverRow
+            key={handover.id}
+            handover={handover}
+            onReview={onReview}
+            onApprove={onApprove}
+            onDecide={decide}
+          />
         ))}
       </ul>
     </section>

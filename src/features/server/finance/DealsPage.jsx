@@ -62,7 +62,7 @@ export function DealsPage() {
       )}
       <HandoverRequests
         onApprove={(handover) => open('approveHandover', null, { handover })}
-        onAccept={(handover) => open('acceptHandover', null, { handover })}
+        onReview={(handover) => open('reviewHandover', null, { handover })}
       />
       <div className="tabs finance-tabs" role="group" aria-label="Deals views">
         {tabs.map((item) => (

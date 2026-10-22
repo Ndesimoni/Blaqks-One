@@ -2,6 +2,7 @@
 //! §13). Agreements are evidence, so frozen terms and every offered revision stay visible.
 //! A draft belongs to the sending company (§9): the receiving company sees only revisions
 //! that were offered (sent or countered) and no draft-stage events.
+use super::model::Verification;
 use crate::error::ApiResult;
 use serde_json::{json, Value};
 use sqlx::{Postgres, Transaction};
@@ -25,6 +26,7 @@ struct Event {
     action: String,
     party: Option<String>,
     revision: Option<i32>,
+    verification: Option<String>,
     at: String,
 }
 
@@ -64,7 +66,9 @@ pub async fn revisions(
         .collect())
 }
 
-/// Who did what and when, without actor IDs, terms or contact details.
+/// Who did what and when, without actor IDs, terms or contact details. An acceptance,
+/// decline or approval carries its action's verification (H2 amendment 8); an unknown
+/// stored value fails the read.
 pub async fn events(
     tx: &mut Transaction<'_, Postgres>,
     agreement: Uuid,
@@ -72,6 +76,9 @@ pub async fn events(
 ) -> ApiResult<Vec<Value>> {
     let rows = sqlx::query_as::<_, Event>(&format!(
         "SELECT e.action, e.party, r.number AS revision,
+         (SELECT x.verification FROM agreements.crm_agreement_actions x
+          WHERE x.revision_id=e.revision_id AND x.action=e.action AND x.actor_id=e.actor_id
+          ORDER BY x.created_at LIMIT 1) AS verification,
          to_char(e.created_at AT TIME ZONE 'UTC',{STAMP}) AS at
          FROM agreements.crm_agreement_events e
          LEFT JOIN agreements.crm_agreement_revisions r ON r.id=e.revision_id
@@ -82,15 +89,16 @@ pub async fn events(
     .bind(sending)
     .fetch_all(&mut **tx)
     .await?;
-    Ok(rows
-        .into_iter()
+    rows.into_iter()
         .map(|row| {
-            json!({
+            let verification = row.verification.as_deref().map(Verification::parse);
+            Ok(json!({
                 "action": row.action,
                 "party": row.party,
                 "revision": row.revision,
+                "verification": verification.transpose()?.map(Verification::as_str),
                 "at": row.at,
-            })
+            }))
         })
-        .collect())
+        .collect()
 }

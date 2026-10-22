@@ -7,7 +7,7 @@ use super::{gate::STALE, handover_rows::HandoverRow, handover_store::Decision, r
 use crate::{
     agreements::{
         handover::{self as evidence, Offer},
-        handover_decide::{self, Decide},
+        handover_decide::{self, Approver, Decide},
         handover_terms::HandoverFacts,
         model::Party,
     },
@@ -35,7 +35,7 @@ pub fn unfrozen(deal: &DealRow, version: i64) -> ApiResult<()> {
 }
 
 /// The deal's fee before any partner or agent split, in fils.
-fn fee(deal: &DealRow) -> ApiResult<i64> {
+pub fn fee(deal: &DealRow) -> ApiResult<i64> {
     let fee = match deal.fee_basis.as_str() {
         "fixed" => Fee::Fixed {
             fee_fils: deal.fixed_fee_fils.unwrap_or(0),
@@ -87,8 +87,9 @@ pub async fn offer(
 }
 
 /// Moves the request's agreement with `decision`, taken by `live`. Accepting and
-/// approving name the agreement version the decider saw; approving may carry the
-/// Admin's referral share.
+/// approving name the agreement version the decider saw; approving in place may carry
+/// the Admin's referral share. An acceptance that needs approval is recorded while the
+/// agreement stays sent; approving it records the approver's decision (§17).
 pub async fn decide(
     tx: &mut Transaction<'_, Postgres>,
     request: &HandoverRow,
@@ -109,8 +110,18 @@ pub async fn decide(
             referral: request.referral_share_bp,
         })
     };
+    let approver = match live.role.as_str() {
+        "admin" => Approver::Admin,
+        _ => Approver::Chosen,
+    };
     match decision {
+        Decision::Accept if request.requires_approval => {
+            handover_decide::accept_awaiting(tx, &decide(version)?).await
+        }
         Decision::Accept => handover_decide::accept(tx, &decide(version)?).await,
+        Decision::ApproveAcceptance => {
+            handover_decide::approve_acceptance(tx, &decide(version)?, approver).await
+        }
         Decision::Approve => handover_decide::approve(tx, &decide(version)?, share).await,
         Decision::Decline if live.id == request.to_id => {
             evidence::decline(tx, agreement, members).await
@@ -118,10 +129,12 @@ pub async fn decide(
         Decision::Cancel if live.id == request.requested_by => {
             evidence::withdraw(tx, agreement, live.id, Some(Party::Sender)).await
         }
-        Decision::Decline if evidence::expired(tx, agreement).await? => {
+        Decision::Decline | Decision::RejectAcceptance
+            if evidence::expired(tx, agreement).await? =>
+        {
             Err(ApiError::conflict(evidence::EXPIRED))
         }
-        Decision::Decline | Decision::Cancel => {
+        Decision::Decline | Decision::Cancel | Decision::RejectAcceptance => {
             evidence::withdraw(tx, agreement, live.id, None).await
         }
     }

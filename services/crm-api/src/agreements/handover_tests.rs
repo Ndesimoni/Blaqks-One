@@ -34,6 +34,8 @@ fn client_names_keep_a_first_name_and_last_initial() {
     assert_eq!(display_name(Some("Karim")), "Karim");
     assert_eq!(display_name(Some("karim@example.test")), "Client");
     assert_eq!(display_name(Some("+971501234567")), "Client");
+    assert_eq!(display_name(Some("zqx@x.test Smith")), "Client");
+    assert_eq!(display_name(Some("0501234567 Ahmed")), "Client");
     assert_eq!(
         display_name(Some("Synthetic finance client")),
         "Synthetic C."

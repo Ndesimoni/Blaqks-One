@@ -1,6 +1,6 @@
 //! Versioned state changes, redacted events and acceptance or decline evidence.
 //! Events and actions are insert-only; neither stores terms, contacts or bodies.
-use super::model::{Party, STALE};
+use super::model::{Party, Verification, STALE};
 use crate::error::{ApiError, ApiResult};
 use sqlx::{Postgres, Transaction};
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
@@ -108,4 +108,30 @@ pub async fn respond(tx: &mut Transaction<'_, Postgres>, response: &Response<'_>
         response.party,
     )
     .await
+}
+
+/// An approval of the revision `(id, digest)` on an in-company hand-over (design §14, §17):
+/// the Admin's decision, in place of the receiver or after their acceptance, or the chosen
+/// approver's after it. The database guard checks the acceptance an approver follows.
+pub async fn approve(
+    tx: &mut Transaction<'_, Postgres>,
+    agreement: Uuid,
+    (revision, digest): (Uuid, &str),
+    actor: Uuid,
+    verification: Verification,
+) -> ApiResult<()> {
+    sqlx::query(
+        "INSERT INTO agreements.crm_agreement_actions
+         (id,agreement_id,revision_id,action,actor_id,party,verification,accepted_digest,
+         created_at) VALUES ($1,$2,$3,'approved',$4,'recipient',$5,$6,clock_timestamp())",
+    )
+    .bind(Uuid::new_v4())
+    .bind(agreement)
+    .bind(revision)
+    .bind(actor)
+    .bind(verification.as_str())
+    .bind(digest)
+    .execute(&mut **tx)
+    .await?;
+    event_by(tx, agreement, Some(revision), "approved", actor, None).await
 }

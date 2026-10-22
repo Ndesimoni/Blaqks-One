@@ -71,7 +71,12 @@ test('deal views keep the hand-over marker, the handOver flag and the second-age
 
 test('hand-over views show no money and are read strictly', () => {
   const view = readHandover(handover());
-  assert.deepEqual(view.allowed, { accept: true, decline: true, cancel: false, approve: false });
+  assert.deepEqual(view.allowed, {
+    ...{ review: false, accept: true, decline: true, cancel: false, approve: false },
+    ...{ approveAcceptance: false, rejectAcceptance: false },
+  });
+  assert.equal(view.toAdmin, false);
+  assert.equal(view.approval, null);
   assert.equal(JSON.stringify(view).includes('Fils'), false);
   for (const broken of [
     { status: 'sent' },

@@ -25,9 +25,19 @@ function Option({ name, value, checked, disabled, title, detail, onChange }) {
  * "What you keep" for a hand-over offer (finance-design §13 H-F1): a full hand-over, or a
  * referral share taken from the receiver's share. The team's cap shows when the caller can
  * see it; otherwise the server checks it. A referral needs an unearned deal with no second
- * agent.
+ * agent, and a hand-over to the Admin is always full (`blockedDetail` says why).
  */
-export function HandoverShareFields({ id, keep, setMode, share, setShare, allowed, cap, error }) {
+export function HandoverShareFields({
+  id,
+  keep,
+  setMode,
+  share,
+  setShare,
+  allowed,
+  cap,
+  error,
+  blockedDetail = 'Only on deals that are not earned and have no second agent.',
+}) {
   const limit = cap !== null && cap !== undefined;
   return (
     <>
@@ -50,7 +60,7 @@ export function HandoverShareFields({ id, keep, setMode, share, setShare, allowe
           detail={
             allowed
               ? `You stay on the deal as second agent${limit ? `, up to ${formatPercent(cap)}` : ''}.`
-              : 'Only on deals that are not earned and have no second agent.'
+              : blockedDetail
           }
           onChange={() => setMode('referral')}
         />

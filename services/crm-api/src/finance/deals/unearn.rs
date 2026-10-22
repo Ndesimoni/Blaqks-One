@@ -1,8 +1,8 @@
 //! `POST /finance/deals/{id}/unearn {version, reason}` (Admin, finance-design §2.4, §13
 //! M-F4): only without approved payments; the snapshot stays as superseded history.
 use super::{
-    gate::{self, Need, STALE},
-    list,
+    gate::{self, Need},
+    handover_checks, list,
     revise::NOT_EARNED,
     row, snapshot,
 };
@@ -43,9 +43,7 @@ pub async fn unearn(
     let mut tx = state.pool.begin().await?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Manage).await?;
     let deal = row::locked(&mut tx, &workspace, &live, id).await?;
-    if deal.version != version {
-        return Err(ApiError::stale(STALE));
-    }
+    handover_checks::settled(&deal, version)?;
     if !deal.earned() {
         return Err(ApiError::conflict(NOT_EARNED));
     }

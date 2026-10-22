@@ -7,7 +7,8 @@ import { Icon } from '../../../components/ui/Icon.jsx';
  * The shared centred finance dialog: titled, focus-trapped (native modal), Escape and the
  * close button route through `onClose`, which callers guard while saving. The body scrolls
  * while the title and actions stay reachable. `message` is the server's refusal; the caller
- * keeps its draft so nothing typed is lost on 403/409.
+ * keeps its draft so nothing typed is lost on 403/409. `secondary` (`{ label, onClick,
+ * disabled }`) adds a second decision, such as Decline, before the submit button.
  */
 export function FinanceDialog({
   eyebrow,
@@ -21,6 +22,7 @@ export function FinanceDialog({
   submitDisabled = false,
   danger = false,
   wide = false,
+  secondary = null,
   className = '',
   children,
 }) {
@@ -68,6 +70,15 @@ export function FinanceDialog({
           <Button variant="light" disabled={busy} onClick={close}>
             {onSubmit ? 'Cancel' : 'Close'}
           </Button>
+          {secondary && (
+            <Button
+              variant="light"
+              disabled={busy || secondary.disabled}
+              onClick={secondary.onClick}
+            >
+              {secondary.label}
+            </Button>
+          )}
           {onSubmit && (
             <Button
               type="submit"

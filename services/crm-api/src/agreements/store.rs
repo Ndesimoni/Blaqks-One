@@ -101,3 +101,19 @@ pub async fn current(
     .await?
     .ok_or_else(ApiError::missing)
 }
+
+/// Who accepted `revision`, if anyone: at most one acceptance per revision (0059). A
+/// hand-over that needs approval keeps its agreement `sent` after the acceptance.
+pub async fn accepted_by(
+    tx: &mut Transaction<'_, Postgres>,
+    revision: Uuid,
+) -> ApiResult<Option<Uuid>> {
+    sqlx::query_scalar(
+        "SELECT actor_id FROM agreements.crm_agreement_actions
+         WHERE revision_id=$1 AND action='accepted'",
+    )
+    .bind(revision)
+    .fetch_optional(&mut **tx)
+    .await
+    .map_err(Into::into)
+}

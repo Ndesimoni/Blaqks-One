@@ -3,8 +3,8 @@
 //! share or reassigned since the last earn/unearn, and only within the last 31 days.
 use super::{
     compute, earn_rules,
-    gate::{self, Need, STALE},
-    list,
+    gate::{self, Need},
+    handover_checks, list,
     row::{self, DealRow},
     snapshot,
 };
@@ -47,9 +47,7 @@ pub async fn earn(
     earn_rules::ensure_not_future(&earned_on, &today)?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Approve).await?;
     let deal = row::locked(&mut tx, &workspace, &live, id).await?;
-    if deal.version != version {
-        return Err(ApiError::stale(STALE));
-    }
+    handover_checks::settled(&deal, version)?;
     let warnings = apply(&mut tx, &workspace, &live, &deal, &earned_on, &today).await?;
     let entry = list::entry(&mut tx, &workspace, &live, id).await?;
     tx.commit().await?;

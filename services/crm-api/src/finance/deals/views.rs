@@ -74,11 +74,14 @@ pub fn allowed(deal: &DealRow, viewer: &Viewer) -> Value {
     let own = deal.assignee_id == Some(viewer.id);
     let separate = !own && deal.second_agent_id != Some(viewer.id) && !deal.reassigned_by_actor;
     let earnable = !earned && !LOST.contains(&deal.stage.as_str());
+    // An open hand-over holds earning, unearning and revising (agreements design §17).
+    let settled = deal.pending_handover.is_none();
     json!({"edit": access.edit, "assign": access.manage,
-        "handOver": access.assign && own && deal.pending_handover.is_none(),
-        "earn": access.approve && earnable && (access.manage || separate),
-        "split": access.manage && !earned, "revise": access.manage && earned,
-        "unearn": access.manage && earned, "delete": access.manage && !deal.ever_earned})
+        "handOver": access.assign && own && settled,
+        "earn": access.approve && earnable && (access.manage || separate) && settled,
+        "split": access.manage && !earned, "revise": access.manage && earned && settled,
+        "unearn": access.manage && earned && settled,
+        "delete": access.manage && !deal.ever_earned})
 }
 
 pub fn deal(deal: &DealRow, figures: Option<&Figures>, viewer: &Viewer) -> Value {

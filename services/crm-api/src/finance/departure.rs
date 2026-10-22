@@ -52,7 +52,8 @@ pub async fn release(
          (id,actor_id,workspace_id,action,collection,record_id) \
          SELECT gen_random_uuid(),$3,$1,'assigned','Deals',id FROM released), \
          cancelled AS (UPDATE crm_deal_handovers SET status='cancelled',decided_by=$3, \
-         decided_at=now() WHERE workspace_id=$1 AND status='pending' \
+         decided_at=now() WHERE workspace_id=$1 \
+         AND status IN ('pending','awaiting_approval') \
          AND (from_id=$2 OR to_id=$2) RETURNING agreement_id) \
          SELECT (SELECT count(*) FROM released), \
          ARRAY(SELECT agreement_id FROM cancelled WHERE agreement_id IS NOT NULL)",

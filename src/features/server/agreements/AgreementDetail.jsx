@@ -52,6 +52,7 @@ function Body({ view, selected, onSelect }) {
         revision={shown}
         total={revisions.at(-1).number}
         acceptance={acceptance}
+        events={detail.events}
       />
       <AgreementHistory agreement={agreement} events={detail.events} />
     </div>

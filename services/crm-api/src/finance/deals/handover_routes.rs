@@ -2,7 +2,9 @@
 //! body) and `/approve {referralShareBp|null, reason, agreementVersion}` (Admin, may adjust
 //! the referral within the same kind). `agreementVersion` is the version of the hand-over's
 //! agreement the decider was shown (agreements design §14); hand-overs without an agreement
-//! accept no body and take `null`.
+//! accept no body and take `null`. While an acceptance waits for approval (§17), the chosen
+//! approver or an Admin calls `/approve-acceptance {agreementVersion}` or
+//! `/reject-acceptance` (no body).
 use super::{
     gate::{self, Need},
     handover_decide::decide,
@@ -61,6 +63,30 @@ pub async fn accept(
         Err(_) => return Err(ApiError::invalid(VERSION)),
     };
     decide(state, session, path, (Decision::Accept, seen), None).await
+}
+
+pub async fn approve_acceptance(
+    State(state): State<AppState>,
+    session: Session,
+    headers: HeaderMap,
+    Path(path): Path<(String, String)>,
+    body: Result<Json<Value>, JsonRejection>,
+) -> ApiResult<Json<Value>> {
+    gate::writer(&state, &session, &headers, &path.0, Need::Module).await?;
+    let Json(body) = body.map_err(|_| ApiError::invalid(VERSION))?;
+    let body = wire::exact(body, &["agreementVersion"], VERSION)?;
+    let seen = gate::version(&body["agreementVersion"])?;
+    let decision = (Decision::ApproveAcceptance, Some(seen));
+    decide(state, session, path, decision, None).await
+}
+
+pub async fn reject_acceptance(
+    state: State<AppState>,
+    session: Session,
+    headers: HeaderMap,
+    path: Path<(String, String)>,
+) -> ApiResult<Json<Value>> {
+    simple(state, session, headers, path, Decision::RejectAcceptance).await
 }
 
 pub async fn decline(

@@ -45,9 +45,35 @@ fn deal_routes() -> Router<AppState> {
             &handover("approve"),
             post(deals::handover_routes::approve).layer(body()),
         )
+        .merge(handover_review_routes())
         .route(
             &format!("{BASE}/assignees"),
             get(deals::assignees::assignees),
+        )
+}
+
+/// H2 (agreements design §17): approving a waiting acceptance, the preview, the
+/// sidebar's waiting counts and the approver list.
+fn handover_review_routes() -> Router<AppState> {
+    let body = || DefaultBodyLimit::max(32 * 1024);
+    let handover = |suffix: &str| format!("{BASE}/handovers/{{id}}/{suffix}");
+    Router::new()
+        .route(
+            &handover("approve-acceptance"),
+            post(deals::handover_routes::approve_acceptance).layer(body()),
+        )
+        .route(
+            &handover("reject-acceptance"),
+            post(deals::handover_routes::reject_acceptance),
+        )
+        .route(&handover("preview"), get(deals::handover_preview::preview))
+        .route(
+            &format!("{BASE}/handovers/waiting"),
+            get(deals::handover_waiting::waiting),
+        )
+        .route(
+            &format!("{BASE}/approvers"),
+            get(deals::assignees::approvers),
         )
 }
 

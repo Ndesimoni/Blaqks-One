@@ -45,4 +45,5 @@ export function stored(handover) {
 /** No sent agreement may outlive its hand-over (design §14 invariant). */
 export const orphans = () =>
   query(`SELECT count(*) FROM crm_deal_handovers h JOIN agreements.crm_agreements a
-    ON a.id=h.agreement_id WHERE a.state='sent' AND h.status<>'pending'`);
+    ON a.id=h.agreement_id WHERE a.state='sent'
+    AND h.status NOT IN ('pending','awaiting_approval')`);

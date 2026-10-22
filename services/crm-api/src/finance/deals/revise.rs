@@ -5,7 +5,7 @@ use super::{
     compute,
     figures::Figures,
     gate::{self, Need},
-    handover_evidence, links, list, revise_input, row, snapshot,
+    handover_checks, links, list, revise_input, row, snapshot,
     views::{self, Viewer},
 };
 use crate::{
@@ -43,7 +43,7 @@ pub async fn revise(
     let mut tx = state.pool.begin().await?;
     let live = gate::relock(&mut tx, &workspace, session.user.id, Need::Manage).await?;
     let mut deal = row::locked(&mut tx, &workspace, &live, id).await?;
-    handover_evidence::unfrozen(&deal, request.version)?;
+    handover_checks::settled(&deal, request.version)?;
     let (snapshots, lines) = snapshot::current(&mut tx, &workspace, &[deal.id]).await?;
     let previous = snapshots.into_iter().next().filter(|_| deal.earned());
     let previous = previous.ok_or(ApiError::conflict(NOT_EARNED))?;

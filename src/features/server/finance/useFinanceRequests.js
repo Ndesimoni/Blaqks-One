@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { readEarnPreview, readFinanceAssignees } from './dealResponses.js';
+import { readEarnPreview, readFinanceApprovers, readFinanceAssignees } from './dealResponses.js';
 import { readFinanceOverview } from './financeModel.js';
 import { readHistory } from './historyModel.js';
 
@@ -49,6 +49,16 @@ export function useFinanceAssignees(api, workspaceId, access) {
     enabled,
   );
   return { people: read.value ?? [], loading: read.loading, error: read.error, retry: read.retry };
+}
+
+/** Who may approve a hand-over (`GET /finance/approvers`), read only once `enabled`. */
+export function useFinanceApprovers(api, workspaceId, enabled) {
+  const read = useRead(
+    async (signal) => readFinanceApprovers(await api.financeApprovers(workspaceId, signal)),
+    `${workspaceId}`,
+    enabled,
+  );
+  return { people: read.value ?? [], loading: read.loading, error: read.error };
 }
 
 /** A chosen agent's commission statement (team view only, `GET /finance?agent=`). */

@@ -14,9 +14,10 @@ const COLUMNS: &str = "d.id,d.version,d.legacy_id,d.assignee_id,a.name AS assign
     AND e.created_at > COALESCE((SELECT max(m.created_at) FROM crm_finance_events m \
     WHERE m.entity='deal' AND m.entity_id=d.id AND m.action IN ('earned','unearned')), \
     '-infinity'::timestamptz)) AS reassigned_by_actor, \
-    (SELECT h.id FROM crm_deal_handovers h WHERE h.deal_id=d.id AND h.status='pending') \
-    AS pending_handover, (SELECT h.agreement_id FROM crm_deal_handovers h \
-    WHERE h.deal_id=d.id AND h.status='pending') AS pending_agreement";
+    (SELECT h.id FROM crm_deal_handovers h WHERE h.deal_id=d.id \
+    AND h.status IN ('pending','awaiting_approval')) AS pending_handover, \
+    (SELECT h.agreement_id FROM crm_deal_handovers h WHERE h.deal_id=d.id \
+    AND h.status IN ('pending','awaiting_approval')) AS pending_agreement";
 
 /// `$1` workspace, `$2` the acting user, `$3` the predicate caller (NULL = team view),
 /// `$4` an optional holder filter, `$5` an optional deal ID.

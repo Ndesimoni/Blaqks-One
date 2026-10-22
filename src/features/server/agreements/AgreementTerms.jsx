@@ -2,7 +2,8 @@ import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { shareFils } from './agreementModel.js';
 
-function Facts({ title, rows }) {
+/** Label and value pairs under a heading; a third `wide` value spans the row. */
+export function Facts({ title, rows }) {
   return (
     <section className="agreement-facts">
       <h3>{title}</h3>

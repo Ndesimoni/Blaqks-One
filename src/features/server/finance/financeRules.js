@@ -25,10 +25,14 @@ export const financeOperations = Object.freeze({
   editDeal: { grant: 'edit', row: 'edit' },
   assignDeal: { grant: 'manage', row: 'assign' },
   handOverDeal: { grant: 'assign', row: 'handOver' },
+  reviewHandover: { grant: 'module', row: 'review' },
   acceptHandover: { grant: 'module', row: 'accept' },
   declineHandover: { grant: 'module', row: 'decline' },
   cancelHandover: { grant: 'module', row: 'cancel' },
   approveHandover: { grant: 'manage', row: 'approve' },
+  // The chosen approver or the Admin, while the receiver's acceptance waits (agreements §17).
+  approveHandoverAcceptance: { grant: 'module', row: 'approveAcceptance' },
+  rejectHandoverAcceptance: { grant: 'module', row: 'rejectAcceptance' },
   earnDeal: { grant: 'approve', row: 'earn' },
   splitDeal: { grant: 'manage', row: 'split' },
   reviseDeal: { grant: 'manage', row: 'revise' },
@@ -54,7 +58,8 @@ function rowMessage(operation, row) {
   if (operation === 'earnDeal' && !row.earnedOn) return selfReviewMessage;
   if (operation === 'handOverDeal')
     return row.pendingHandover ? pendingHandoverMessage : holderOnlyMessage;
-  if (operation.endsWith('Handover')) return handoverDecidedMessage;
+  if (operation.endsWith('Handover') || operation.endsWith('HandoverAcceptance'))
+    return handoverDecidedMessage;
   return financeDeniedMessages[financeOperations[operation].grant];
 }
 

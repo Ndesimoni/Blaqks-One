@@ -120,6 +120,18 @@ pub async fn locked_for_handover(
     found.into_iter().next().ok_or_else(ApiError::missing)
 }
 
+/// The deal of a hand-over request the caller may preview, without a lock; the request
+/// was the visibility check (agreements design §17).
+pub async fn for_preview(
+    transaction: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    actor: Uuid,
+    id: Uuid,
+) -> ApiResult<DealRow> {
+    let found = query(transaction, workspace, (actor, None), None, Some(id), "").await?;
+    found.into_iter().next().ok_or_else(ApiError::missing)
+}
+
 /// Visible deals, optionally one holder's or one deal, oldest first.
 pub async fn visible(
     transaction: &mut Transaction<'_, Postgres>,

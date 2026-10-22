@@ -73,7 +73,15 @@ pub async fn overview(
         .collect();
     let tx = &mut transaction;
     let references = totals::references(tx, &workspace, user, &loaded, properties).await?;
-    let handovers = handover_rows::pending(&mut transaction, &workspace, &viewer).await?;
+    let mut handovers = handover_rows::open(&mut transaction, &workspace, &viewer).await?;
+    if user.role == "super-admin" {
+        // The Super Admin sees no company agreements (agreements design §9).
+        for handover in &mut handovers {
+            for key in ["agreementId", "expiresAt", "approval"] {
+                handover[key] = serde_json::Value::Null;
+            }
+        }
+    }
     transaction.commit().await?;
     let settings = settings.map(|row| {
         if team {

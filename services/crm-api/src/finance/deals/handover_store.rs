@@ -1,6 +1,11 @@
-//! Locking and recording hand-over decisions (§13 H-F1). A caller who may not make a
-//! decision on a request gets the same 404 as for an unknown request.
-use super::handover_rows::{self, HandoverRow, NOT_PENDING};
+//! Locking and recording hand-over decisions (§13 H-F1, agreements design §17). A caller
+//! who may not make a decision on a request gets the same 404 as for an unknown request;
+//! a request at another step is a 409.
+use super::{
+    handover_rows::{self, HandoverRow, NOT_PENDING},
+    handover_rules,
+    views::Viewer,
+};
 use crate::{
     auth::profile::UserRow,
     error::{ApiError, ApiResult},
@@ -14,37 +19,32 @@ pub enum Decision {
     Decline,
     Cancel,
     Approve,
+    /// The chosen approver or an Admin approves the receiver's acceptance (H2).
+    ApproveAcceptance,
+    /// The chosen approver or an Admin rejects it; the request is cancelled.
+    RejectAcceptance,
 }
 
 impl Decision {
+    /// The status a decision ends in; an acceptance that needs approval waits instead.
     pub fn status(self) -> &'static str {
         match self {
             Self::Accept => "accepted",
             Self::Decline => "declined",
-            Self::Cancel => "cancelled",
-            Self::Approve => "approved",
+            Self::Cancel | Self::RejectAcceptance => "cancelled",
+            Self::Approve | Self::ApproveAcceptance => "approved",
         }
     }
 
-    /// Accepting and approving move the deal; declining and cancelling do not.
+    /// Accepting (without an approval step) and approving move the deal.
     pub fn moves(self) -> bool {
-        matches!(self, Self::Accept | Self::Approve)
-    }
-
-    /// Receivers accept or decline, requesters cancel, Admins decline, cancel or approve.
-    pub fn allowed(self, live: &UserRow, to: Uuid, requester: Uuid) -> bool {
-        let manage = live.finance_access().manage;
-        match self {
-            Self::Accept => to == live.id,
-            Self::Decline => to == live.id || manage,
-            Self::Cancel => requester == live.id || manage,
-            Self::Approve => manage,
-        }
+        matches!(self, Self::Accept | Self::Approve | Self::ApproveAcceptance)
     }
 }
 
 /// Step 5: the request, locked, when this caller may make this decision (404 otherwise);
-/// a decided request is a 409.
+/// a request at another step is a 409. The chosen approver must be a member of this
+/// company with the Approve right now (amendment 13).
 pub async fn fetch(
     tx: &mut Transaction<'_, Postgres>,
     workspace: &str,
@@ -52,23 +52,25 @@ pub async fn fetch(
     id: Uuid,
     decision: Decision,
 ) -> ApiResult<HandoverRow> {
-    let locked: Option<(Uuid, Uuid, String)> = sqlx::query_as(
-        "SELECT to_id,requested_by,status FROM crm_deal_handovers WHERE id=$1 \
-         AND workspace_id=$2 FOR UPDATE",
+    let locked: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM crm_deal_handovers WHERE id=$1 AND workspace_id=$2 FOR UPDATE",
     )
     .bind(id)
     .bind(workspace)
     .fetch_optional(&mut **tx)
     .await?;
-    match locked {
-        Some((to, requester, status)) if decision.allowed(live, to, requester) => {
-            if status != "pending" {
-                return Err(ApiError::conflict(NOT_PENDING));
-            }
-            handover_rows::find(tx, id).await
-        }
-        _ => Err(ApiError::missing()),
+    if locked.is_none() {
+        return Err(ApiError::missing());
     }
+    let row = handover_rows::find(tx, id).await?;
+    let member = live.workspace_id == workspace && matches!(live.role.as_str(), "staff" | "admin");
+    if !member || !handover_rules::may(&row, decision, &Viewer::of(live)) {
+        return Err(ApiError::missing());
+    }
+    if !handover_rules::fits(&row, decision) {
+        return Err(ApiError::conflict(NOT_PENDING));
+    }
+    Ok(row)
 }
 
 pub async fn set_status(
@@ -85,6 +87,23 @@ pub async fn set_status(
     .bind(id)
     .bind(decision.status())
     .bind(referral)
+    .bind(actor)
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}
+
+/// The receiver accepted an offer that needs approval: it now waits for the approver.
+pub async fn set_awaiting(
+    tx: &mut Transaction<'_, Postgres>,
+    id: Uuid,
+    actor: Uuid,
+) -> ApiResult<()> {
+    sqlx::query(
+        "UPDATE crm_deal_handovers SET status='awaiting_approval',accepted_by=$2, \
+         accepted_at=now() WHERE id=$1",
+    )
+    .bind(id)
     .bind(actor)
     .execute(&mut **tx)
     .await?;

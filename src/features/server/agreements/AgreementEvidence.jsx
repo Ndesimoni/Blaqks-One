@@ -1,5 +1,6 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { approvalKey, approvalOf } from './approvalWording.js';
 
 const nameOf = (agreement, party, t) =>
   agreement.parties?.[party]?.name || t(`agreements.party.${party}`);
@@ -33,10 +34,11 @@ export function RevisionPicker({ revisions, selected, current, accepted, onSelec
 
 /**
  * The evidence for the revision on screen (docs/agreements-design.md §3): who wrote it,
- * when it was sealed and its SHA-256 digest, plus the acceptance when there is one.
+ * when it was sealed and its SHA-256 digest, plus the acceptance and any approval (§17).
  */
-export function AgreementEvidence({ agreement, revision, total, acceptance }) {
+export function AgreementEvidence({ agreement, revision, total, acceptance, events }) {
   const { t, format } = useI18n();
+  const approval = approvalOf(events, revision.number);
   return (
     <section className="agreement-evidence" aria-labelledby="agreement-evidence-title">
       <h3 id="agreement-evidence-title">{t('agreements.evidence.title')}</h3>
@@ -67,6 +69,15 @@ export function AgreementEvidence({ agreement, revision, total, acceptance }) {
             </dd>
           </div>
         )}
+        {approval && (
+          <div>
+            <dt>{t('handoverOffer.evidenceApproved')}</dt>
+            <dd>
+              {t(approvalKey(approval, events))}
+              <small>{`\n${format.dateTime(approval.at)}`}</small>
+            </dd>
+          </div>
+        )}
         <div className="is-wide">
           <dt>{t('agreements.evidence.digest')}</dt>
           <dd>
@@ -89,9 +100,11 @@ export function AgreementHistory({ agreement, events }) {
         {events.map((event, index) => (
           <li key={`${event.action}-${event.at}-${index}`}>
             <span>
-              {t(`agreements.event.${event.action}`, {
-                name: nameOf(agreement, event.party || 'sender', t),
-              })}
+              {event.action === 'approved'
+                ? t(approvalKey(event, events))
+                : t(`agreements.event.${event.action}`, {
+                    name: nameOf(agreement, event.party || 'sender', t),
+                  })}
             </span>
             <small>
               {event.revision

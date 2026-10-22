@@ -1,6 +1,6 @@
 //! Changing a deal's holder (§5.4, §13 H-F1): one version step, `crm_assignments`
 //! history ('Deals'), an `assigned` finance event (from, to, actor, reason) and an
-//! `assigned` activity entry. Pending hand-overs of the deal are cancelled. Lines of an
+//! `assigned` activity entry. Open hand-overs of the deal are cancelled. Lines of an
 //! earned deal never change; a referral is only added to unearned deals.
 use super::row::DealRow;
 use crate::{
@@ -49,7 +49,8 @@ pub async fn apply(tx: &mut Transaction<'_, Postgres>, change: Move<'_>) -> ApiR
     .await?;
     let withdrawn: Vec<Option<Uuid>> = sqlx::query_scalar(
         "UPDATE crm_deal_handovers SET status='cancelled',decided_by=$2,decided_at=now() \
-         WHERE deal_id=$1 AND status='pending' RETURNING agreement_id",
+         WHERE deal_id=$1 AND status IN ('pending','awaiting_approval') \
+         RETURNING agreement_id",
     )
     .bind(deal.id)
     .bind(change.actor)

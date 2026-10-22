@@ -18,8 +18,32 @@ import {
   text,
 } from './financeValues.js';
 
-export const handoverAllowedKeys = ['accept', 'decline', 'cancel', 'approve'];
-export const handoverStatuses = ['pending', 'accepted', 'declined', 'cancelled', 'approved'];
+export const handoverAllowedKeys = [
+  'review',
+  'accept',
+  'decline',
+  'cancel',
+  'approve',
+  'approveAcceptance',
+  'rejectAcceptance',
+];
+/** `pending` and `awaiting_approval` are open; the rest are decided. */
+export const handoverStatuses = [
+  'pending',
+  'awaiting_approval',
+  'accepted',
+  'declined',
+  'cancelled',
+  'approved',
+];
+export const openHandoverStatuses = ['pending', 'awaiting_approval'];
+
+/** `null`, or the chosen approver and when the receiver accepted (agreements design §17). */
+function readApproval(value) {
+  if (value === null || value === undefined) return null;
+  const approval = object(value);
+  return { approver: person(approval.approver), acceptedAt: optional(text)(approval.acceptedAt) };
+}
 
 /** One hand-over request view. */
 export function readHandover(value) {
@@ -37,9 +61,17 @@ export function readHandover(value) {
     createdAt: text(row.createdAt),
     /** The agreement recording the offer (agreements design §14); none for older ones. */
     agreementId: optional(id)(row.agreementId),
+    /** Offered to the company's Admin: a full hand-over with no approval step. */
+    toAdmin: row.toAdmin === true,
+    approval: readApproval(row.approval),
+    /** The one offer end for both steps; `null` for older offers. */
+    expiresAt: optional(text)(row.expiresAt),
     allowed: allowed(row.allowed, handoverAllowedKeys),
   };
 }
+
+/** `GET /finance/approvers`: who may approve a hand-over (names and IDs only). */
+export const readFinanceApprovers = (body) => list(object(body).approvers, person, 'id');
 
 export const readHandovers = (value) => list(value ?? [], readHandover, 'id');
 
