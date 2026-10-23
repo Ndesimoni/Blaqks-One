@@ -209,8 +209,10 @@ closedAt|null, allowed: {accept, decline, withdraw, stop}}`.
 ## R2 — sharing a listing or a lead with another company
 
 Status: designed 2026-10-23; reviewed with required amendments in
-[R2/A6 design review](sharing-guest-design-review.md). The review amendments override this
-proposal; owner choices remain pending. Implementation has not started.
+[R2/A6 design review](sharing-guest-design-review.md), which override this proposal. The
+owner accepted every recommendation (product decisions, "R2 details"). **R2a (listing
+sharing) is built**; see [R2a as built](#r2a-as-built-2026-10-23). R2b (lead referrals) and
+co-broking from a share are next.
 It reuses R1's link, WhatsApp, badge and expiry patterns and builds on
 [Agreements](agreements-design.md) for everything that crosses companies. Agreements §1's
 non-goal "exposing private CRM records across companies" stays: only server-made, frozen
@@ -710,3 +712,53 @@ workspaces. Every route refuses the Super Admin (`access::ensure_reader`).
 7. **Photo retention.** _Recommended:_ keep the facts and the photo fingerprints for five
    years as proof, and remove the photo copies 90 days after the listing's last outside
    share closes, to keep storage small.
+
+### R2a as built (2026-10-23)
+
+Listing sharing with one named agent at another company. Code: `agreements/listings/`
+(routes under `/agreements/listing-shares`), `records::outside_facts`, `media::copies` and
+`media::copy_bytes`; screens in `src/features/server/listingShares/` and the client
+`src/services/crm/agreementListings.js`. Migrations: **0067** (snapshots, shares, events),
+**0068** (the share guard and the functions that end shares), **0069** (media copies) and
+**0070** (the records triggers, decision D12). Migration numbers moved by one from the draft
+reservation because the rules needed their own file; A6 starts at 0071.
+
+- **Sending.** The listing's holder or the Admin, with the Properties grant (403 when they
+  only see it, 404 otherwise). Not for a Sold, Rented or Withdrawn listing. The agent is
+  found by exact email; the lookup is now limited to 20 an hour per member (also for
+  Agreements). One open share per listing and agent; 100 shares per member a day.
+- **What you reviewed is what is sent.** `previewDigest` is an unsalted digest of the
+  facts, the location values, the files and the switch, shown only to the sender's side.
+  Sending is refused with 409 "This listing just changed. Review it again." when it differs.
+  The snapshot digest itself uses the salted location fingerprint; the salt is reused from the
+  listing's earlier snapshot, so an unchanged listing reuses its snapshot and photo copies.
+- **Photo copies (amendment 3).** Three steps, no lock held while bytes move: reserve tracked
+  copy rows (origin `copy`, pending, own key, counted in the company's bytes; one copy run per
+  member at a time) → copy and check each file's SHA-256 → under the locks again, attach only
+  stored copies to the new snapshot. A refusal or a parallel duplicate hides its unattached
+  copies at once; the existing sweep removes pending (1 hour) and unattached (24 hours) ones.
+  Older inline photos are left out and the review says so. Copies get neutral names.
+- **Exported-content policy as built (amendment 5).** Structured fields come only from the
+  allowlist (a Rust test sorts every Properties field into sent, location or never sent).
+  Free text, links and photos go as the listing has them: the review shows exactly what is
+  sent, warns about phone- or email-like text and links, and the sender must tick "I checked
+  the text and links above" before Send. Uploads already had their metadata removed. This is
+  not automatic redaction; the owner may still choose a stricter policy.
+- **Response matrix (amendment 6).** As in `agreements/listings/view.rs`: the sender's side
+  sees everything at any time; the agent sees the twelve facts while pending, the listing,
+  photos and the sender's work phone and email while accepted and open, and no facts once
+  closed; the receiving Admin sees the twelve facts while open and none once closed, never
+  photos or actions. Everyone else, the Super Admin included, gets one identical 404 on every
+  route (an R2-specific access wrapper; `agreements::access` still answers 403).
+- **Endings (amendment 2).** Triggers end open shares when the listing changes holder (any
+  writer), becomes Sold, Rented or Withdrawn, or is deleted; departure and an Admin archive
+  call `agreements::listings::end_for_member` / `end_for_company`. Any failure there rolls
+  the source change back (tested with an injected failure). A share past its time reads as
+  closed and is marked, with the true end time, under the row lock on the next command, even
+  when that command is refused.
+- **Evidence.** `GET …/evidence` as designed; the A3b-style recipe is in the file. Retention
+  (five years, photo copies after 90 days) is not built yet: nothing deletes evidence.
+- **Not in R2a:** Propose co-broking from a share, lead referrals (R2b), the retention job.
+- **Tests:** Rust (allowlist sort, digests, Dubai days, response matrix, contact warning),
+  `tests/api/outside-sharing-{contract,security,lifecycle,endings,guards}.test.mjs` (22),
+  `tests/unit/listing-shares.test.js` and `tests/server-browser/outside-sharing.spec.js`.

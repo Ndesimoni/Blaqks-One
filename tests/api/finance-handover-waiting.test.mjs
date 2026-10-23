@@ -80,7 +80,9 @@ test('agreement counts show offers from other companies to whoever must answer',
       sessions.map(async (session) => {
         const result = await agreementsWaiting(session);
         assert.equal(result.status, 200, JSON.stringify(result.value));
-        assert.deepEqual(Object.keys(result.value), ['answer']);
+        // R2a adds the listing shares waiting for the caller; none are sent here.
+        assert.deepEqual(Object.keys(result.value).sort(), ['answer', 'listings']);
+        assert.equal(result.value.listings, 0);
         return result.value.answer;
       }),
     );

@@ -62,6 +62,9 @@ pub async fn archive(
     if admin {
         crate::integrations::company_archived(&mut transaction, &scope.target_workspace, actor)
             .await?;
+        // Listings shared with or from other companies end too (R2).
+        crate::agreements::listings::end_for_company(&mut transaction, &scope.target_workspace)
+            .await?;
     }
     sqlx::query(
         "UPDATE crm_team_invitations SET revoked_at=COALESCE(revoked_at,now()) \

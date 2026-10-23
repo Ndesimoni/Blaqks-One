@@ -5,6 +5,7 @@ import { RecordDetails } from '../records/RecordDetails.jsx';
 import { AssignmentDetails } from './assignment/AssignmentDetails.jsx';
 import { KeptNotice } from './KeptNotice.jsx';
 import { RecordSharing } from './shares/RecordSharing.jsx';
+import { OutsideSharing } from './listingShares/OutsideSharing.jsx';
 import { actionCollection, serverIdPolicy } from './access.js';
 
 export function ServerDialogs() {
@@ -30,6 +31,7 @@ export function ServerDialogs() {
               <>
                 <AssignmentDetails module={detail.module} record={detail.record} />
                 <RecordSharing module={detail.module} record={detail.record} />
+                <OutsideSharing module={detail.module} record={detail.record} />
               </>
             )
           }

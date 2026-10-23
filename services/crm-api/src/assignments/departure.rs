@@ -42,8 +42,10 @@ pub async fn release(
     )
     .await?;
     if reason == "departure" {
-        // A leaving member's read-only keeps end with them (agreements design §18).
+        // A leaving member's read-only keeps end with them (agreements design §18), and so
+        // do the listings they shared with or received from other companies (R2).
         crate::records::keeps::forget(tx, workspace, member).await?;
+        crate::agreements::listings::end_for_member(tx, workspace, member).await?;
     }
     if collections.is_empty() {
         return Ok(0);

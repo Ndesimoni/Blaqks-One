@@ -3,6 +3,8 @@
 //! their own items and check access before serving (service boundaries rule 9).
 pub mod backfill;
 pub mod contents;
+pub mod copies;
+pub mod copy_bytes;
 pub mod inbound;
 pub mod inbound_store;
 mod jpeg;

@@ -1,11 +1,13 @@
 /**
  * Sidebar badge sources (agreements design §17, owner decision 2): Deals counts hand-overs
- * waiting for the caller's answer or approval; Agreements counts offers from other companies
- * waiting for the caller's answer; Leads, Clients, Properties and Contacts count records a
- * colleague shared with the caller (record sharing R1). The server returns counts only.
+ * waiting for the caller's answer or approval; Agreements counts offers and listings from
+ * other companies waiting for the caller's answer (record sharing R2); Leads, Clients,
+ * Properties and Contacts count records a colleague shared with the caller (record sharing
+ * R1). The server returns counts only.
  */
 export const HANDOVERS_CHANGED = 'kws:handovers-changed';
 export const SHARES_CHANGED = 'kws:shares-changed';
+export const LISTING_SHARES_CHANGED = 'kws:listing-shares-changed';
 
 /** Asks the Deals badge to refresh now, e.g. after a hand-over decision. */
 export function announceHandoversChanged() {
@@ -33,6 +35,11 @@ function sharesWaiting(api, workspace) {
   return sharesRead.promise;
 }
 
+/** Asks the Agreements badge and listing-share lists to refresh now (record sharing R2). */
+export function announceListingSharesChanged() {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(LISTING_SHARES_CHANGED));
+}
+
 /** Asks the share badges and panels to refresh now, e.g. after a share is sent or answered. */
 export function announceSharesChanged() {
   sharesRead = null;
@@ -57,9 +64,11 @@ export const waitingSources = Object.freeze({
   },
   Agreements: {
     read: (api, workspace, signal) =>
-      api.agreementsWaiting(workspace, signal).then((value) => count(value?.answer)),
+      api
+        .agreementsWaiting(workspace, signal)
+        .then((value) => count(value?.answer) + count(value?.listings)),
     labelKey: 'handoverRequests.nav.agreements',
-    event: null,
+    event: LISTING_SHARES_CHANGED,
   },
   // Leads and Clients are one collection, so both show the leads shared with the caller.
   Leads: shareSource('Clients'),

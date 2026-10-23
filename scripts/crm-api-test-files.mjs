@@ -115,6 +115,11 @@ export const apiTestFiles = [
   'tests/api/record-sharing-lifecycle.test.mjs',
   'tests/api/record-sharing-copies.test.mjs',
   'tests/api/record-sharing-guards.test.mjs',
+  'tests/api/outside-sharing-contract.test.mjs',
+  'tests/api/outside-sharing-security.test.mjs',
+  'tests/api/outside-sharing-lifecycle.test.mjs',
+  'tests/api/outside-sharing-endings.test.mjs',
+  'tests/api/outside-sharing-guards.test.mjs',
   'tests/api/channels.test.mjs',
   ...messagingTestFiles,
 ];

@@ -16,14 +16,18 @@ import { DealLinkField } from './dealLinks/DealLinkField.jsx';
 import { ServerMediaProvider } from './media/ServerMediaProvider.jsx';
 import { withKept } from './keptRecords.js';
 import { shareRoute } from './shares/shareModel.js';
+import { listingShareRoute } from './listingShares/listingShareLinks.js';
+
+/** Share links: a colleague's share (R1) or a listing from another company (R2). */
+const linkRoute = (pathname) => shareRoute(pathname) || listingShareRoute(pathname);
 
 /** Connected pickers for link fields whose targets are not workspace records. */
 const linkFields = Object.freeze({ 'Deal ID': DealLinkField });
 
 export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
   const { api, user } = useSession();
-  // `#/shares/{id}` opens a colleague's share (record sharing R1); nothing else matches it.
-  const navigation = useWorkspaceNavigation('/dashboard', shareRoute);
+  // `#/shares/{id}` and `#/listing-shares/{id}` open shares; nothing else matches them.
+  const navigation = useWorkspaceNavigation('/dashboard', linkRoute);
   const view = useWorkspaceViewState(navigation.route, navigation.initialQuery);
   const records = { ...useServerRecords(api, owner.id), linkFields };
   const readOnly = owner.status === 'archived';

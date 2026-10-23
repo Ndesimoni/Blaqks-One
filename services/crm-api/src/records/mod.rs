@@ -19,6 +19,7 @@ pub mod listing_fields;
 pub mod lookup;
 pub mod media_links;
 pub mod mutation;
+pub mod outside_facts;
 pub mod projections;
 pub mod recipient;
 pub mod requests;

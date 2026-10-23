@@ -40,6 +40,7 @@ export default {
   'lookup.none': 'No active member of another company uses this email.',
   'lookup.invalid': 'Enter a full email address, such as name@company.ae.',
   'lookup.failed': 'The recipient could not be checked. Please try again.',
+  'lookup.limited': 'You have looked up 20 agents in the last hour. Try again later.',
   'lookup.required': 'Enter the recipient’s email, then choose Find.',
   'error.recipient': 'Find the person who will receive this agreement.',
   'error.required': 'This is required.',

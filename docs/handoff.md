@@ -1,10 +1,11 @@
 # Handoff for the next coding agent
 
-Latest checkpoint (2026-10-23): Claude completed R1 (`4232ba5`) and the dropdown fix
-(`1817ff6`), then drafted R2 and A6 in `record-sharing.md` and Agreements §19. Their
-[design review](sharing-guest-design-review.md) records required amendments, unresolved
-owner choices and the A3b dependency. R2/A6 implementation has not started. Preserve the
-uncommitted drafts; this checkpoint supersedes the older next-packet assumptions below.
+Latest checkpoint (2026-10-23): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2/A6/BO1
+designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
+company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)). Migrations run through
+**0070**. Next, in order: co-broking from a listing share, then R2b (lead referrals), then A6
+(outside agents, migrations from 0071). BO1 and P1 wait until the owner says. The specialist
+code security reviews of A3b and R2a are still owed (specialists were unavailable).
 
 Updated 2026-10-22, after commit `20955d8` on `feature/connected-crm`. Read this with
 `AGENTS.md` (project rules), the [token-efficient delivery protocol](token-efficient-delivery.md)
@@ -21,7 +22,7 @@ The owner chooses the next packet: nothing in §2 starts until they say so.
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
 | Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
 
-Migrations run through `0066`. **Evidence limit:** all of this is proven against the local
+Migrations then ran through `0066` (now `0070`, see the checkpoint above). **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
 from clients are labelled but not virus-scanned.
 

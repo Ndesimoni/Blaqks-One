@@ -116,6 +116,7 @@ pub fn app(state: AppState) -> Router {
         )
         .merge(crate::auth::account::router())
         .merge(agreements::routes::router())
+        .merge(agreements::listings::routes::router())
         .merge(integrations::routes::router())
         .merge(integrations::webhooks::router())
         .merge(inbox::routes::router())

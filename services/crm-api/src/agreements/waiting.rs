@@ -1,7 +1,8 @@
 //! `GET /agreements/waiting` (design §17, H2 amendment 18): how many offers from other
 //! companies wait for the caller's answer in this company, for the sidebar badge. An offer
 //! waits for the participant who did not write its current revision, as on the screen, so
-//! a counter-offer waits for the original sender. Counts only; the Super Admin is refused.
+//! a counter-offer waits for the original sender. `listings` counts the listing shares
+//! waiting for the caller (R2a). Counts only; the Super Admin is refused.
 use super::access;
 use crate::{auth::session::Session, error::ApiResult, state::AppState};
 use axum::{
@@ -29,5 +30,7 @@ pub async fn count(
     .bind(&workspace)
     .fetch_one(&state.pool)
     .await?;
-    Ok(Json(json!({ "answer": answer })))
+    let listings =
+        super::listings::waiting::count(&state.pool, &workspace, session.user.id).await?;
+    Ok(Json(json!({ "answer": answer, "listings": listings })))
 }

@@ -1,4 +1,5 @@
 import { agreementLifecycleRoutes } from './agreementLifecycle.js';
+import { agreementListingRoutes } from './agreementListings.js';
 
 /**
  * Cross-company deal agreements (docs/agreements-design.md §10, §13). Every command sends
@@ -16,9 +17,10 @@ export function agreementRoutes({ request, scope }) {
     });
   return {
     ...agreementLifecycleRoutes({ request, item }),
+    ...agreementListingRoutes({ request, base }),
     agreements: (workspace, signal) => request(base(workspace), { signal }),
     agreement: (workspace, id, signal) => request(item(workspace, id), { signal }),
-    /** `{ answer }`: offers from other companies waiting for the caller (sidebar badge). */
+    /** `{ answer, listings }`: offers and listing shares waiting for the caller (badge). */
     agreementsWaiting: (workspace, signal) => request(`${base(workspace)}/waiting`, { signal }),
     /** The named recipient of a new agreement, by their exact sign-in email. */
     findAgreementRecipient: (workspace, email) =>

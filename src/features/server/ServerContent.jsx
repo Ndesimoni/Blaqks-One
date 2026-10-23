@@ -31,6 +31,8 @@ import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
 import { IncomingShares } from './shares/IncomingShares.jsx';
 import { ShareLinkPage } from './shares/ShareLinkPage.jsx';
 import { SHARE_ROUTE } from './shares/shareModel.js';
+import { ListingShareLinkPage } from './listingShares/ListingShareLinkPage.jsx';
+import { LISTING_SHARE_ROUTE } from './listingShares/listingShareLinks.js';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -38,6 +40,8 @@ export function ServerContent({ owner }) {
   const { loading, error, retry } = useRecords();
   // `#/shares/{id}`: the server decides who may read the share (record sharing R1).
   if (route === SHARE_ROUTE) return <ShareLinkPage />;
+  // `#/listing-shares/{id}`: a listing from another company (record sharing R2).
+  if (route === LISTING_SHARE_ROUTE) return <ListingShareLinkPage />;
   if (!canOpenSection(user, route))
     return (
       <section className="panel recovery-panel">

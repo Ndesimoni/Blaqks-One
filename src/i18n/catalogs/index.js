@@ -35,6 +35,8 @@ import enHandoverOffer from './en/handoverOffer.js';
 import enHandoverRequests from './en/handoverRequests.js';
 import enRecordKeeps from './en/recordKeeps.js';
 import enRecordShares from './en/recordShares.js';
+import enListingShares from './en/listingShares.js';
+import enListingShareViews from './en/listingShareViews.js';
 import enHandoverReview from './en/handoverReview.js';
 import enInboxSend from './en/inboxSend.js';
 import enInboxTriage from './en/inboxTriage.js';
@@ -65,6 +67,8 @@ export const catalogs = Object.freeze({
     handoverReview: enHandoverReview,
     recordKeeps: enRecordKeeps,
     recordShares: enRecordShares,
+    listingShares: enListingShares,
+    listingShareViews: enListingShareViews,
     inboxSend: enInboxSend,
     inboxTriage: enInboxTriage,
     mailbox: enMailbox,

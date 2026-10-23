@@ -4,15 +4,16 @@ import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 
-const reason = (failure) =>
-  failure.status === 404 ? 'none' : failure.status === 400 ? 'invalid' : 'failed';
+const reasons = { 404: 'none', 400: 'invalid', 429: 'limited' };
+const reason = (failure) => reasons[failure.status] || 'failed';
 
 /**
  * Names the agreement's recipient by their exact sign-in email (`POST /agreements/
  * recipients`). The server answers only for an active member of another company, so the
- * person sees who will receive the offer before any terms are written.
+ * person sees who will receive the offer before any terms are written. A member may look up
+ * 20 addresses an hour.
  */
-export function RecipientLookup({ recipient, onChange, error }) {
+export function RecipientLookup({ recipient, onChange, error, missingText = '' }) {
   const { api, user } = useSession();
   const { t } = useI18n();
   const id = useId();
@@ -43,7 +44,8 @@ export function RecipientLookup({ recipient, onChange, error }) {
       </div>
     );
   const message = state.status === 'error' ? t(`agreementForm.lookup.${state.reason}`) : '';
-  const shown = message || (error ? t('agreementForm.error.recipient') : '');
+  const missing = missingText || t('agreementForm.error.recipient');
+  const shown = message || (error ? missing : '');
   return (
     <div className="field span-all agreement-lookup">
       <label htmlFor={id}>

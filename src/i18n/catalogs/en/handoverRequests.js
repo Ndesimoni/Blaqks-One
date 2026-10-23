@@ -51,7 +51,7 @@ export default {
     other: '{count} hand-overs waiting for you',
   },
   'nav.agreements': {
-    one: '{count} offer waiting for your answer',
-    other: '{count} offers waiting for your answer',
+    one: '{count} offer or listing waiting for your answer',
+    other: '{count} offers or listings waiting for your answer',
   },
 };
