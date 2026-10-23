@@ -5,7 +5,7 @@ import en from '../../src/i18n/catalogs/en/fieldHints.js';
 import { catalogs } from '../../src/i18n/catalogs/index.js';
 import { fieldHintKey } from '../../src/i18n/fieldHintKeys.js';
 import { lookup } from '../../src/i18n/translate.js';
-import { hintVisible } from '../../src/lib/fieldHint.js';
+import { focusOpensHint, hintVisible } from '../../src/lib/fieldHint.js';
 
 test('guidance appears only on focus, with the preference on and no typing', () => {
   const base = { enabled: true, focused: true, pinned: false, typed: false };
@@ -35,4 +35,21 @@ test('every guidance key has English and Arabic text', () => {
     assert.equal(typeof lookup(catalogs, 'ar', `fieldHints.${key}`), 'string', key);
     assert.ok(ar[key].length > 0, key);
   }
+});
+
+test('a dropdown opens its hint on keyboard focus only, never under the mouse', () => {
+  const control = (tagName, keyboard) => ({
+    tagName,
+    matches: (selector) => selector === ':focus-visible' && keyboard,
+  });
+  assert.equal(focusOpensHint(control('SELECT', false)), false, 'mouse-opened list');
+  assert.equal(focusOpensHint(control('SELECT', true)), true, 'keyboard focus');
+  assert.equal(focusOpensHint(control('INPUT', false)), true, 'text fields as before');
+  const old = {
+    tagName: 'SELECT',
+    matches: () => {
+      throw new Error('unsupported');
+    },
+  };
+  assert.equal(focusOpensHint(old), false);
 });

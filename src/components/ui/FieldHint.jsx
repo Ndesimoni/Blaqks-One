@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGuidance } from '../../app/GuidanceContext.jsx';
 import { useI18n } from '../../i18n/useI18n.js';
-import { hintVisible } from '../../lib/fieldHint.js';
+import { focusOpensHint, hintVisible } from '../../lib/fieldHint.js';
 import { Icon } from './Icon.jsx';
 import './field-hint.css';
 
@@ -9,7 +9,8 @@ const CONTROL = 'input,select,textarea';
 
 /**
  * Field guidance (packet Q1). An untouched field shows its hint while focused when the
- * member has automatic hints on; typing hides it, and the information button always
+ * member has automatic hints on (a dropdown only on keyboard focus, so a mouse-opened list
+ * is never disturbed); typing hides it, and the information button always
  * reopens it. Spread `scopeProps` on the field wrapper and pass `describedBy` to its
  * control so assistive technology announces the hint while it is shown.
  */
@@ -26,7 +27,8 @@ export function useFieldHint(id) {
     toggle: () => setPinned((current) => !current),
     scopeProps: {
       onFocusCapture: (event) => {
-        if (event.target.matches?.(CONTROL)) setFocused(true);
+        const control = event.target;
+        if (control.matches?.(CONTROL) && focusOpensHint(control)) setFocused(true);
       },
       onBlurCapture: (event) => {
         if (event.target.matches?.(CONTROL)) setFocused(false);
