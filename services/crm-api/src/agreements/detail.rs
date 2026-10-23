@@ -31,6 +31,11 @@ pub async fn read(
     let sending = workspace == row.workspace_id;
     let revisions = history::revisions(&mut tx, id, sending).await?;
     let events = history::events(&mut tx, id, sending).await?;
+    // An in-company hand-over names its deal, client and listing for the screen (H3b).
+    let deal = match row.handover() {
+        true => crate::finance::deals::handover_refs::of_agreement(&mut tx, &workspace, id).await?,
+        false => None,
+    };
     let agreement = parties::views(&mut tx, std::slice::from_ref(&row))
         .await?
         .pop()
@@ -45,5 +50,6 @@ pub async fn read(
         "party": party,
         "proposal": proposal,
         "lifecycle": lifecycle,
+        "deal": deal,
     })))
 }

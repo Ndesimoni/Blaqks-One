@@ -11,6 +11,7 @@ import { Fact } from './EntryFacts.jsx';
 import { StageChip } from './DealChips.jsx';
 import { DealSummary } from './DealSummary.jsx';
 import { DealCalculationPanel } from './DealCalculationPanel.jsx';
+import { DealParties } from './DealParties.jsx';
 import { DealActions } from './DealActions.jsx';
 import { DealActionDialog } from './DealActionDialog.jsx';
 import { FinanceHistory } from './FinanceHistory.jsx';
@@ -66,6 +67,7 @@ export function DealDetails({ deal, onClose }) {
           </p>
         )}
         <DealSummary deal={deal} team={team} />
+        <DealParties deal={deal} />
         <DealCalculationPanel
           calculation={deal.calculation}
           team={team}

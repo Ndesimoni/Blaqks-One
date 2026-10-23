@@ -26,6 +26,7 @@ import enCalculators from './en/calculators.js';
 import enChannels from './en/channels.js';
 import enChat from './en/chat.js';
 import enCommon from './en/common.js';
+import enDealParties from './en/dealParties.js';
 import enEmailAddresses from './en/emailAddresses.js';
 import enFieldHints from './en/fieldHints.js';
 import enInbox from './en/inbox.js';
@@ -56,6 +57,7 @@ export const catalogs = Object.freeze({
     channels: enChannels,
     chat: enChat,
     common: enCommon,
+    dealParties: enDealParties,
     emailAddresses: enEmailAddresses,
     profile: enProfile,
     fieldHints: enFieldHints,

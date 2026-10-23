@@ -847,6 +847,24 @@ reassignment.
   full hand-over hint. Left for the redesign: grouping the footer's decisions, hiding
   "Not recorded" rows and an earnings figure on the request row.
 
+### H3b: the client and listing on the deal and the agreement (owner, 2026-10-23)
+
+The owner found that after accepting a hand-over, nothing on the deal or the agreement
+showed the client's phone and email or the listing: they were only in the receiver's
+Clients and Properties lists. Now Deal details and the detail of an in-company hand-over
+agreement both show **Client and listing**: the client's name, phone (`tel:`) and email
+(`mailto:`), the listing's title, area, bedrooms, price and up to three photos, with
+**Open client** and **Open listing** (the usual record details, with every field).
+
+- Read live from the caller's own records and view-only copies
+  (`src/features/server/finance/DealParties.jsx`), so it shows exactly what the caller may
+  already see: the receiver after accepting, the sender through their kept copy, the Admin.
+- The agreement's evidence still holds no contact. `GET /agreements/{id}` adds
+  `deal: {dealId, clientId, propertyId}` for `deal_handover` agreements, read through the
+  finance function `finance::deals::handover_refs::of_agreement` (agreements never reads
+  finance tables).
+- Tests: `tests/server-browser/deal-parties.spec.js`.
+
 ## 19. A6 design: outside agents by recipient-locked link (2026-10-23)
 
 Status: design reviewed with required amendments in

@@ -25,6 +25,7 @@ pub mod handover_preview;
 pub mod handover_preview_files;
 pub mod handover_preview_listing;
 pub mod handover_preview_view;
+pub mod handover_refs;
 pub mod handover_routes;
 pub mod handover_rows;
 pub mod handover_rules;

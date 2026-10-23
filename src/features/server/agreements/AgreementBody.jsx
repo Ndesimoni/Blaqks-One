@@ -5,6 +5,7 @@ import { AgreementEvidence, AgreementHistory, RevisionPicker } from './Agreement
 import { AgreementSummary } from './AgreementSummary.jsx';
 import { AgreementTerms } from './AgreementTerms.jsx';
 import { AgreementPayments } from './AgreementPayments.jsx';
+import { DealParties } from '../finance/DealParties.jsx';
 
 export function AgreementBody({ view, selected, onSelect }) {
   const { t } = useI18n();
@@ -29,6 +30,12 @@ export function AgreementBody({ view, selected, onSelect }) {
         </p>
       )}
       <AgreementSummary detail={detail} />
+      {/* An in-company hand-over: its client and listing from the caller's own records (H3b). */}
+      {detail.deal && (
+        <DealParties
+          deal={{ clientId: detail.deal.clientId, propertyId: detail.deal.propertyId }}
+        />
+      )}
       {proposal && (
         <section className="agreement-proposal">
           <h3>{t('agreementLifecycle.proposal', { number: proposal.number })}</h3>
