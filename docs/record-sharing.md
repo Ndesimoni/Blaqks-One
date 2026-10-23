@@ -163,3 +163,45 @@ closedAt|null, allowed: {accept, decline, withdraw, stop}}`.
   may receive this record (amendment 2), for the holder or the Admin.
 - In the record list, a colleague copy's `kept` badge is `{reason: 'colleague', other:
 {id, name}, dealId: null, kind: null, referralShareBp: null, at}`.
+
+### R1 as built (2026-10-23)
+
+- **Migration 0063 (records).** `crm_record_shares` with its guard (identity frozen, the
+  allowed steps, pending inserts between live members, direct deletes refused while the
+  record-deletion cascade passes — told apart by `pg_trigger_depth()`), the holder-change
+  trigger `crm_records_shares_on_holder`, the `crm_records_share_target` key the share's
+  foreign key uses, and the keep changes (reason `colleague`, `share_id`, nullable deal
+  facts). Decision-log entry D11 in [Service boundaries](service-boundaries.md).
+- **Server** (`records/shares/`): `create.rs`, `actions.rs` (accept, decline, withdraw,
+  stop), `read.rs` (list, one, waiting), `candidates.rs`, `rules.rs` (sender and
+  receiver), `store.rs`, `lifecycle.rs` (system endings), `locks.rs` (member rows last in
+  the workspace → share → record → member order), `view.rs`, `access.rs` and `routes.rs`.
+  Every share route answers the Super Admin and other companies' members with the
+  identical not-found. `records/share_fields.rs` holds the per-collection allowlists, with
+  a test that sorts every workbook field; `records/keeps_list.rs` reads keeps by reason.
+  Departure calls `end_for_member` before `keeps::forget`; a hand-over ends a colleague's
+  share before it locks the listing or writes its own keep.
+- **Screens** (`src/features/server/shares/`): the Sharing panel in a record's details
+  (holder or Admin: Share, Copy link, Share on WhatsApp, the record's shares with Withdraw
+  or Stop sharing), the "Shared with you" panel on Leads, Clients, Properties and Contacts,
+  sidebar counts from one `GET /shares/waiting` poll, and the `#/shares/{uuid}` link page
+  (the only shape honoured after sign-in). Copies read "View only. Shared with you by
+  {name} on {date}." with the chip; contacts copies show on the Contacts page.
+- **Tests.** `tests/api/record-sharing-{contract,security,lifecycle,copies}.test.mjs`
+  with `record-sharing-helpers.mjs`; Rust tests in `share_fields_tests.rs` and `view.rs`;
+  `tests/unit/record-shares.test.js`, `share-badges.test.js` and the colleague cases in
+  `kept-records.test.js`; the browser flow `tests/server-browser/record-sharing.spec.js`.
+- **Built with help.** Part of the server and the first API suites were written by Codex
+  while the specialists were at their usage limit; the primary agent reviewed them against
+  the amendments.
+
+- **Code security review (2026-10-23): no High or Medium findings.** Fixed: a repeated
+  action on an expired share answers 409 instead of a server error (L1); outsiders get the
+  not-found before any query error on the list and candidates routes (L2); the candidates
+  list takes the workspace lock before its row locks (L3); the delete guard also refuses
+  while the record exists, and record deletion is tested (L5); the offer end is 336 hours,
+  whatever the session time zone (L6); `GET /shares` returns the newest 200 (L7); the C2
+  inventory names the share guard (L8). Accepted: a colleague who only holds a copy and
+  tries to share it gets not-found rather than 403 (safe; L4); the current holder sees
+  the closed shares of earlier holders, without labels (L9). Tests in
+  `record-sharing-guards.test.mjs`.

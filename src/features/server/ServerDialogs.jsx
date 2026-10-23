@@ -4,6 +4,7 @@ import { RecordEditor } from '../records/RecordEditor.jsx';
 import { RecordDetails } from '../records/RecordDetails.jsx';
 import { AssignmentDetails } from './assignment/AssignmentDetails.jsx';
 import { KeptNotice } from './KeptNotice.jsx';
+import { RecordSharing } from './shares/RecordSharing.jsx';
 import { actionCollection, serverIdPolicy } from './access.js';
 
 export function ServerDialogs() {
@@ -26,7 +27,10 @@ export function ServerDialogs() {
             kept ? (
               <KeptNotice badge={kept} />
             ) : (
-              <AssignmentDetails module={detail.module} record={detail.record} />
+              <>
+                <AssignmentDetails module={detail.module} record={detail.record} />
+                <RecordSharing module={detail.module} record={detail.record} />
+              </>
             )
           }
           close={() => {

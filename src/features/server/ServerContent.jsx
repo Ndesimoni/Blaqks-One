@@ -28,11 +28,16 @@ import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { ServerProfile } from './profile/ServerProfile.jsx';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
+import { IncomingShares } from './shares/IncomingShares.jsx';
+import { ShareLinkPage } from './shares/ShareLinkPage.jsx';
+import { SHARE_ROUTE } from './shares/shareModel.js';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
   const { route } = useNavigation();
   const { loading, error, retry } = useRecords();
+  // `#/shares/{id}`: the server decides who may read the share (record sharing R1).
+  if (route === SHARE_ROUTE) return <ShareLinkPage />;
   if (!canOpenSection(user, route))
     return (
       <section className="panel recovery-panel">
@@ -81,9 +86,17 @@ export function ServerContent({ owner }) {
     if (route === 'Properties') return <PropertyDirectory toolbarExtras={toolbarExtras} />;
     return <RecordsPage module={route} toolbarExtras={toolbarExtras} />;
   };
+  const collection = route === 'Leads' ? 'Clients' : route;
+  // Records a colleague shared with the caller wait above Leads, Clients, Properties and
+  // Contacts; other pages show nothing there.
   return (
-    <AssignmentPageScope key={route} module={route === 'Leads' ? 'Clients' : route}>
-      {page}
+    <AssignmentPageScope key={route} module={collection}>
+      {(toolbarExtras) => (
+        <>
+          <IncomingShares collection={collection} />
+          {page(toolbarExtras)}
+        </>
+      )}
     </AssignmentPageScope>
   );
 }

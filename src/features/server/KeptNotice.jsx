@@ -2,9 +2,12 @@ import React from 'react';
 import { useI18n } from '../../i18n/useI18n.js';
 import './kept-notice.css';
 
+const wording = { handed_over: 'handedOver', shared: 'shared', colleague: 'colleague' };
+
 /**
- * The badge on a handed-over client or listing the caller still reads (agreements design
- * §18): who received it, when, for which deal and on what terms. The record is view only.
+ * The badge on a record the caller reads but does not hold: a handed-over client or listing
+ * (agreements design §18) — who received it, when, for which deal and on what terms — or a
+ * colleague's shared copy (record sharing R1) — who shared it and when. It is view only.
  */
 export function KeptNotice({ badge }) {
   const { t, format } = useI18n();
@@ -21,8 +24,7 @@ export function KeptNotice({ badge }) {
   };
   return (
     <p className="record-kept-notice" role="note">
-      <strong>{k('viewOnly')}</strong>{' '}
-      {k(badge.reason === 'shared' ? 'shared' : 'handedOver', facts)}
+      <strong>{k('viewOnly')}</strong> {k(wording[badge.reason] || 'handedOver', facts)}
     </p>
   );
 }

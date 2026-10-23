@@ -5,9 +5,11 @@ import { assignmentRoutes } from './assignments.js';
 import { chatRoutes } from './chat.js';
 import { companyRoutes, readCompany } from './company.js';
 import { financeRoutes } from './finance.js';
+import { importRoutes } from './imports.js';
 import { inboxRoutes } from './inbox.js';
 import { integrationRoutes } from './integrations.js';
 import { performanceRoutes } from './performance.js';
+import { recordShareRoutes } from './recordShares.js';
 import { signupRoutes } from './signup.js';
 
 export class CrmApiError extends Error {
@@ -120,10 +122,6 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     acceptInvitation: (token, password) =>
       request('/auth/invitations/accept', { method: 'POST', body: { token, password } }),
     records: (workspace, signal) => request(`${scope(workspace)}/records`, { signal }),
-    previewImport: (workspace, payload) =>
-      request(`${scope(workspace)}/imports/preview`, { method: 'POST', body: payload }),
-    commitImport: (workspace, token) =>
-      request(`${scope(workspace)}/imports/commit`, { method: 'POST', body: { token } }),
     save: (workspace, collection, record, metadata) =>
       request(recordPath(workspace, collection, metadata?.id), {
         method: metadata ? 'PATCH' : 'POST',
@@ -144,6 +142,8 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
     ...inboxRoutes({ request, scope }),
     ...chatRoutes({ request, scope }),
     ...agreementRoutes({ request, scope }),
+    ...importRoutes({ request, scope }),
+    ...recordShareRoutes({ request, scope }),
     ...signupRoutes({ request, setCsrfToken }),
   };
 }

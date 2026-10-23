@@ -3,13 +3,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { labels } from '../config/navigation.js';
 import { routeName, routePath } from '../config/routes.js';
 
-export function useWorkspaceNavigation(dashboardPath = '/') {
+/**
+ * The current route name and `navigate(name, query)`. `extraRoute(pathname)` may name a
+ * parameterised route first (the connected share link); it returns null for other paths.
+ */
+export function useWorkspaceNavigation(dashboardPath = '/', extraRoute = null) {
   const { pathname, search } = useLocation();
   const go = useNavigate();
   const route =
-    pathname.replace(/\/$/, '') === dashboardPath.replace(/\/$/, '')
+    extraRoute?.(pathname) ||
+    (pathname.replace(/\/$/, '') === dashboardPath.replace(/\/$/, '')
       ? 'Dashboard'
-      : routeName(pathname);
+      : routeName(pathname));
   const initialQuery = new URLSearchParams(search).get('q') || '';
   const workspaceId = new URLSearchParams(search).get('workspace');
   const navigate = useCallback(

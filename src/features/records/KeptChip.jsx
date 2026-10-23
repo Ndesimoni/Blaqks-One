@@ -5,14 +5,15 @@ import './kept-chip.css';
 
 /**
  * "View only" on a handed-over client or listing the caller still reads (agreements design
- * §18). Only connected records carry keeps, so the demo never shows it.
+ * §18), or a colleague's shared copy (record sharing R1). Only connected records carry
+ * keeps, so the demo never shows it.
  */
 export function KeptChip({ module, record }) {
   const records = useContext(RecordsContext);
   const { t } = useI18n();
   const badge = records?.keptFor?.(module === 'Leads' ? 'Clients' : module, record);
   if (!badge) return null;
-  const hint = badge.reason === 'shared' ? 'chipShared' : 'chipHanded';
+  const hint = { shared: 'chipShared', colleague: 'chipColleague' }[badge.reason] || 'chipHanded';
   return (
     <span className="record-kept-chip" title={t(`recordKeeps.${hint}`, { name: badge.other.name })}>
       {t('recordKeeps.chip')}

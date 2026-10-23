@@ -26,6 +26,7 @@ const translated = {
   'My mailbox': 'mailbox',
   'Google sign-in': 'mailbox',
   Agreements: 'agreements',
+  'Shared record': 'recordShares',
 };
 
 export function ServerShell({ owner, workspaces }) {

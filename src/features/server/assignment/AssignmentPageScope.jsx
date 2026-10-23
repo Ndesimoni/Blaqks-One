@@ -30,7 +30,8 @@ export function AssignmentPageScope({ module, children }) {
     () => (active ? filterAssignedEntries(records.entries, module, filter) : null),
     [active, records.entries, module, filter],
   );
-  // Handed-over clients and listings the caller keeps reading show on their pages (§18).
+  // Handed-over clients and listings the caller keeps reading (§18), and the clients,
+  // listings and contacts colleagues shared with them (record sharing R1), show on their pages.
   const kept = records.keptEntries?.[module];
   const scoped = useMemo(() => {
     if (rows) return { ...records, data: { ...records.data, [module]: rows.map((r) => r.record) } };

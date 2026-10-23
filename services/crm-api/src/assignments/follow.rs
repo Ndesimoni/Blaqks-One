@@ -118,7 +118,17 @@ pub async fn follow(tx: &mut Tx<'_>, f: &Follow<'_>) -> ApiResult<Value> {
     }
     let mut property = "unchanged";
     let found = match f.property_ref {
-        Some(legacy) => locked(tx, f, "Properties", legacy).await?,
+        Some(legacy) => {
+            if f.property_in_use {
+                crate::records::shares::end_held_legacy_to(
+                    tx,
+                    (f.workspace, "Properties", legacy),
+                    (f.from, f.to),
+                )
+                .await?;
+            }
+            locked(tx, f, "Properties", legacy).await?
+        }
         None => None,
     };
     if let Some((record, Some(holder))) = found.filter(|(_, holder)| *holder == Some(f.from)) {

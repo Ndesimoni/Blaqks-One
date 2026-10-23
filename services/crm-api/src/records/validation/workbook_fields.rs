@@ -1,7 +1,7 @@
 use crate::error::{ApiError, ApiResult};
 use serde_json::Value;
 
-const CLIENT_FIELDS: &[&str] = &[
+pub(crate) const CLIENT_FIELDS: &[&str] = &[
     "client_id",
     "full_name",
     "phone",
@@ -49,7 +49,7 @@ const CLIENT_FIELDS: &[&str] = &[
     "recontact_possible",
 ];
 
-const PROPERTY_FIELDS: &[&str] = &[
+pub(crate) const PROPERTY_FIELDS: &[&str] = &[
     "property_id",
     "listing_title",
     "contact_id",
@@ -93,7 +93,7 @@ const PROPERTY_FIELDS: &[&str] = &[
     "map_link",
 ];
 
-const CONTACT_FIELDS: &[&str] = &[
+pub(crate) const CONTACT_FIELDS: &[&str] = &[
     "contact_id",
     "full_name",
     "contact_type",

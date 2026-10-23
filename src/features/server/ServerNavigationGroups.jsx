@@ -41,7 +41,8 @@ export function ServerNavigationGroups({ user, route, onSelect }) {
               )}
             </React.Fragment>
           ) : waitingSources[name] ? (
-            // Deals and Agreements count what waits for the caller's answer (agreements §17).
+            // Deals, Agreements and the shared record pages count what waits for the
+            // caller's answer (agreements §17, record sharing R1).
             <WaitingNavItem
               key={name}
               name={name}

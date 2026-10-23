@@ -123,6 +123,11 @@ export const apiTestFiles = [
   'tests/api/finance-handover-records.test.mjs',
   'tests/api/finance-handover-photos.test.mjs',
   'tests/api/finance-handover-keeps.test.mjs',
+  'tests/api/record-sharing-contract.test.mjs',
+  'tests/api/record-sharing-security.test.mjs',
+  'tests/api/record-sharing-lifecycle.test.mjs',
+  'tests/api/record-sharing-copies.test.mjs',
+  'tests/api/record-sharing-guards.test.mjs',
   'tests/api/channels.test.mjs',
   ...messagingTestFiles,
 ];

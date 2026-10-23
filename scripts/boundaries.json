@@ -28,7 +28,7 @@
       "crm_agreement_actions"
     ],
     "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
-    "records": ["crm_records", "crm_activity", "crm_record_keeps"],
+    "records": ["crm_records", "crm_activity", "crm_record_keeps", "crm_record_shares"],
     "assignments": [
       "crm_assignments",
       "crm_assignment_notes",

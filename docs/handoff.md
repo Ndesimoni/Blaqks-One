@@ -15,7 +15,7 @@ The owner chooses the next packet: nothing in §2 starts until they say so.
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
 | Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
 
-Migrations run through `0062`. **Evidence limit:** all of this is proven against the local
+Migrations run through `0063`. **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
 from clients are labelled but not virus-scanned.
 
@@ -87,6 +87,11 @@ stored records). Test on the disposable database with synthetic records.
   listing move with an accepted deal; the sender keeps them view only with a badge; a
   listing other deals use stays and is shared view only; the review shows all listing
   details and photos. Migrations 0061 and 0062; code security and design reviews done.
+- **R1** (built 2026-10-23, [Record sharing](record-sharing.md)): the holder or the Admin
+  shares one client, property or contact with an assigned-only colleague, who accepts a
+  view-only copy (no notes, no messaging) or declines; Copy link and Share on WhatsApp;
+  shares end when the record changes holder. Migration 0063. Next: R2, then A3b; P1
+  (performance) waits until the owner says.
 
 ### N4 — WhatsApp (blocked on the owner)
 

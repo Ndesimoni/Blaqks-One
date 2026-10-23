@@ -17,17 +17,24 @@ export function useServerRecordActions(options) {
   const mutations = useServerMutations(options);
   const { t } = useI18n();
   const can = (module, action) => !readOnly && canAct(user, module, action);
-  // A handed-over record the caller still reads is view only (agreements design §18).
-  const kept = (module, record) =>
-    Boolean(record && records?.keptFor?.(actionCollection(module), record));
-  const keptMessage = t('recordKeeps.refused');
+  // A handed-over record the caller still reads, or a colleague's shared copy, is view only
+  // (agreements design §18, record sharing R1).
+  const keptBadge = (module, record) =>
+    (record && records?.keptFor?.(actionCollection(module), record)) || null;
+  const kept = (module, record) => Boolean(keptBadge(module, record));
+  const keptMessage = (module, record) =>
+    t(
+      keptBadge(module, record)?.reason === 'colleague'
+        ? 'recordKeeps.refusedColleague'
+        : 'recordKeeps.refused',
+    );
   const refused = (module, action) => {
     if (can(module, action)) return false;
     if (!readOnly) view.setToast(actionDeniedMessages[action]);
     return true;
   };
   const edit = (module, record, initialSection) => {
-    if (kept(module, record)) return view.setToast(keptMessage);
+    if (kept(module, record)) return view.setToast(keptMessage(module, record));
     if (readOnly || mutations.busy || refused(module, 'edit')) return;
     view.setDetail(null);
     view.setDrawer({ module, record: { ...record }, original: record, initialSection });
@@ -39,7 +46,8 @@ export function useServerRecordActions(options) {
     saveRecord: (module, record, original, ...rest) => {
       if (readOnly) return Promise.resolve({ message: archivedMessage });
       // The editor keeps the draft and shows this message, as it does for a server 403.
-      if (kept(module, original)) return Promise.resolve({ message: keptMessage });
+      if (kept(module, original))
+        return Promise.resolve({ message: keptMessage(module, original) });
       const refusal = saveRefusal(user, module, original);
       if (refusal) return Promise.resolve({ message: refusal });
       return mutations.saveRecord(module, record, original, ...rest);
@@ -49,7 +57,7 @@ export function useServerRecordActions(options) {
     isKept: kept,
     deleteRecord: (module, record, ...rest) => {
       if (readOnly) return;
-      if (kept(module, record)) return view.setToast(keptMessage);
+      if (kept(module, record)) return view.setToast(keptMessage(module, record));
       const refusal = deleteRefusal(user, records, module, record);
       if (refusal) return view.setToast(refusal);
       return mutations.deleteRecord(module, record, ...rest);

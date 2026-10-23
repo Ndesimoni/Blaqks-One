@@ -34,6 +34,13 @@ pub async fn release(
     actor: Uuid,
     reason: &'static str,
 ) -> ApiResult<u64> {
+    crate::records::shares::end_for_member(
+        tx,
+        workspace,
+        member,
+        (collections, reason == "departure"),
+    )
+    .await?;
     if reason == "departure" {
         // A leaving member's read-only keeps end with them (agreements design §18).
         crate::records::keeps::forget(tx, workspace, member).await?;

@@ -124,6 +124,7 @@ pub fn app(state: AppState) -> Router {
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(activity::routes::router())
+        .merge(crate::records::shares::routes::router())
         .merge(team::routes::router())
         .merge(workspaces::routes::router())
         .merge(signup::routes::router(state.config.signup))

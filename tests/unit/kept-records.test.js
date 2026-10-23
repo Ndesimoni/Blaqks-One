@@ -55,3 +55,28 @@ test('the record list carries its keeps', () => {
   assert.equal(parsed.keptEntries.Clients[0].id, 'r-1');
   assert.deepEqual(readServerRecords(payload).kept, {}, 'older responses have none');
 });
+
+test('a colleague copy carries no deal facts and keeps the record list readable', () => {
+  const colleague = badge({ reason: 'colleague', dealId: null, kind: null });
+  const kept = readKept({ 'r-1': colleague, 'r-2': badge() });
+  assert.deepEqual(kept['r-1'], colleague);
+  assert.equal(kept['r-2'].reason, 'handed_over');
+  const empty = Object.fromEntries(connectedCollections.map((name) => [name, []]));
+  const row = { id: 'r-1', version: 1, record: { contact_id: 'CT-001' }, assignee: null };
+  const parsed = readServerRecords({
+    ...{ records: { ...empty, Contacts: [row] }, scope: 'assigned', references: {} },
+    ...{ taskClients: [], listingViewings: [], dealLinks: [], kept: { 'r-1': colleague } },
+  });
+  assert.equal(parsed.keptEntries.Contacts[0].id, 'r-1', 'contacts can be copies too');
+  assert.equal(
+    keptBadge(parsed.keptEntries, parsed.kept, 'Contacts', row.record).reason,
+    'colleague',
+  );
+  for (const bad of [
+    badge({ reason: 'colleague', kind: null }),
+    badge({ reason: 'colleague', dealId: null, kind: 'full' }),
+    badge({ reason: 'colleague', dealId: null, kind: null, referralShareBp: 1500 }),
+    badge({ reason: 'colleague', dealId: null, kind: null, other: null }),
+  ])
+    assert.throws(() => readKept({ 'r-1': bad }), /invalid record list/);
+});
