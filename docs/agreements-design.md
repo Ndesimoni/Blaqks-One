@@ -342,6 +342,9 @@ tracking. The owner's answers are in §15.
 
 ### A3b — amend, complete, cancel, archive, certificate and payments
 
+Owner authorized implementation on 2026-10-23. The reviewed implementation contract and
+verification checkpoint are in [A3b](agreements-a3b.md).
+
 - **Amend.** Either participant of an accepted cross-company agreement proposes a new
   revision. The agreement stays `accepted` on its accepted revision, which stays in force,
   while `proposed_revision_id` (new column) holds the amendment. The other participant
@@ -843,3 +846,437 @@ reassignment.
   when the deal moves to you", "hand-over" spelled the same on Agreements, and a neutral
   full hand-over hint. Left for the redesign: grouping the footer's decisions, hiding
   "Not recorded" rows and an earnings figure on the request row.
+
+## 19. A6 design: outside agents by recipient-locked link (2026-10-23)
+
+Status: design reviewed with required amendments in
+[R2/A6 design review](sharing-guest-design-review.md); owner choices remain pending;
+nothing is built. The review amendments override this proposal. It rests on the
+owner decisions of 2026-10-15 (outside agents may accept by a link sent over WhatsApp or
+email or copied; a member signs in and the agreement is filed in their account; a
+non-member is invited to sign up afterwards and may decline) and turns the "proposed
+improvements" into a build: a recipient-locked link with a one-time code, verification
+levels, the guest's own copy and certificate, decline and counter-offer, expiring and
+revocable links, no terms in link previews and past agreements attached at sign-up. The
+open choices are at the end with recommended answers.
+
+**Scope.** A sender (an active member, as today) makes a cross-company agreement for a
+person who has no live Blaqks One account. The agreement names that person; they open it
+from a link, prove they control the named email with a code, and accept, decline or
+counter-offer. Both sides keep the evidence. In-company hand-overs (§14) stay member-only.
+Links for agreements between members are added too, as plain CRM links.
+
+**Not in A6:** phone codes (no provider is connected, see below), licence checks against a
+register, UAE PASS, company verification, guest payments, cancellation or amendments after
+acceptance (owner question 7), and the Super Admin metadata view itself (A6 only adds its
+fields).
+
+### Principles
+
+1. **The link is a locator; the code is the credential.** The link may be forwarded,
+   scanned, previewed or logged by a mail security service. Holding it shows only who sent
+   an offer and lets the holder ask for a code to the one fixed address. Terms and every
+   action need a verified code.
+2. **Neutral delivery.** The code reaches the guest through a sender Blaqks One controls,
+   never through a channel the sending company controls, because the evidence is held
+   against that company.
+3. **Nothing the sender types reaches the guest's mailbox.** The code email is a fixed
+   template with no names, terms or links, so Blaqks One cannot be used to send messages.
+4. **The guest session sees one agreement.** Guest routes carry no IDs; the agreement comes
+   from the session, so no other agreement can be probed.
+5. **Honest evidence.** The certificate states exactly what was proven: control of an
+   address the sender supplied, at a time, by a code.
+
+### Proposed build (for the security review)
+
+**Ownership.** A new leaf module `services/crm-api/src/guests/` with its own schema
+`guests` (boundary rule 9) owns who an outside person is for one object and whether they
+proved their contact: guest rows, links, guest sessions, code challenges, verifications and
+claims. It knows nothing about agreements beyond `purpose = 'agreement'` and an object ID
+(no foreign key, rule 4), so R2's outside sharing ("outside agents later, with the A6 link
+and one-time code", roadmap §15) reuses it with a new purpose. `agreements` owns the guest
+recipient, the guest's actions and their evidence, the levels and the certificate, in
+`agreements/guest/`, and calls `guests` functions. `signup` calls `guests` and
+`agreements` at verify (claims). `integrations` owns the platform mail adapter. Nothing
+calls back into `agreements` from `guests`.
+
+**Guest route prefix (like D10).** `/api/guest/...` (rather than rule 10's example
+`/api/agreements/links/...`, because R2 reuses it), merged in `routes.rs` with one line,
+outside the CRM cookie boundary: the CRM cookie is `Path=/api/crm`, so the browser never
+sends it here, and the guest cookie `kws_guest` is
+`Path=/api/guest; HttpOnly; Secure; SameSite=Strict`, so it never reaches CRM routes. No
+`Session` extractor, no CORS, the exact `CRM_APP_ORIGIN` check on every mutation, a per-session CSRF token (in memory, as in the
+CRM) after the first call, `deny_unknown_fields`, 16 KiB bodies (32 KiB for a
+counter-offer), `Cache-Control: no-store`, `Referrer-Policy: no-referrer`, `nosniff` and
+`X-Robots-Tag: noindex`. A gateway can route or rate-limit the prefix separately.
+Service-boundaries gets a separate decision-log entry for the prefix and cookie when
+built; allocate its ID then, because R2 also proposes D12.
+
+**Link format.** `https://{app}/guest#{token}`: a 256-bit random token (base64url, 43
+characters) in the URL fragment, which browsers never send in requests, so it stays out of
+server and proxy logs and Referer headers, and preview fetchers (WhatsApp, iMessage, mail
+scanners that only GET) receive the static app shell with a generic title ("Blaqks One")
+and no per-link preview. `ServerSession.jsx` serves `/guest` before the CRM router, as it
+does `/sign-up`; the page posts the token, then removes the fragment with
+`history.replaceState` (reloads use the cookie). Only `SHA-256(token)` is stored (unique);
+the token is shown to the sender once, at send or re-issue, and never again.
+
+- **One named recipient.** A link belongs to one guest row with one email; the code goes
+  only there. A forwarded link shows the envelope and the masked address, nothing more.
+- **Expiry.** A link opens while the offer is open (sent and unexpired, following
+  counter-offers), or after the guest has acted while the agreement is in force and for 90
+  days after it ends (owner question 6). `agreements` decides this on every request; the
+  link row also has a backstop `expires_at` that `agreements` moves forward in the same
+  transaction as send, counter-offer and acceptance.
+- **Revocation.** The sender participant, or the sending company's Admin (a safety action,
+  not acting for the party), may revoke the live link or make a new one, which replaces
+  it; both end every session of the old link at once. Withdrawing the offer (A2 `revoke`)
+  ends the link for actions; the guest then sees only "This offer was withdrawn."
+- **No terms in previews or messages.** The share text is built from the sender's name, the
+  words "a deal agreement" and the link only (as R1 does): "{sender} sent you a deal
+  agreement on Blaqks One: {link} It asks for a code sent to your email." No amounts,
+  property, client or company names. Tested.
+
+**How the link travels.** The CRM never sends it. After send, a share dialog offers **Copy
+link**, **Share on WhatsApp** (`https://wa.me/?text=`, the sender's own phone, no
+provider) and **Email** (`mailto:` in the sender's own mail app). Links for agreements
+between members are plain CRM links (`{app}/#/agreements/{id}`) behind sign-in, with the
+same share buttons; they carry no token and open only for the parties and their Admins,
+with the usual not-found for everyone else.
+
+**Code delivery with today's channels.**
+
+- **Proposed: a platform sender.** `integrations::platform_mail` sends one fixed template
+  through Blaqks One's own transactional account, reusing the SendGrid `v3/mail/send`
+  payload builder with tracking off, one recipient and no links: "Your Blaqks One code
+  is 482913. It expires in 10 minutes. Enter it on the page where you asked for it. If you
+  did not ask for it, ignore this email." Config `CRM_PLATFORM_MAIL=off|local|sendgrid`, a
+  Mail-Send-only key from the environment (a managed secret store before production) and a
+  From on a Blaqks One domain. `local` prints the code with a masked address
+  (`[dev-outbox] guest code 482913 for n•••@example.test`) only with
+  `CRM_ALLOW_INSECURE_LOCAL` and the local-development marker, exactly as sign-up does
+  (sign-up security G1–G3); `sendgrid` refuses to start without the key and domain.
+  Sign-up's S8 can use the same sender (its decision 9 is the same choice).
+- **Rejected: the sending company's SendGrid.** That account belongs to the party the
+  evidence is held against: whoever controls it outside the CRM can copy outgoing mail
+  (for example SendGrid's BCC mail setting, or another key) and read the code meant for the
+  other party, so "the guest proved their address" would rest on the sender's own channel.
+  It would also limit outside agreements to companies with SendGrid (none is live; the real
+  account check is still pending, sendgrid-design §14) and mix verification with the
+  agent's client mail.
+- **Phone codes are not possible yet.** WhatsApp (Twilio W1/W2) and SMS are not connected,
+  and the planned WhatsApp senders are per company (D3), which has the same problem as
+  above. Proposed path (A6c, owner question 9): a platform verification service under a
+  Blaqks One account (for example Twilio Verify by SMS and WhatsApp), UAE (+971) numbers
+  only at first, the bot check before every send, per-number and global budgets and the
+  provider's fraud guard against SMS pumping. **Flag:** until then the owner's "Basic" level
+  (phone verified, always required) cannot be reached by anyone, so A6 either ships with an
+  email-only level (owner question 2) or waits.
+- Jobs go through the generic outbox (`outbox.crm_outbox_jobs`, domain `guests`, D8), run
+  by the messaging worker; the job row names only the challenge ID. The plaintext code sits
+  in the challenge row only until the provider accepts it, fails permanently or the code
+  expires, then it is cleared, as sign-up does (L3). Alternative considered: a code
+  generated in the worker and stored only as a keyed hash, rejected for now because it
+  cannot be bound to the guest's browser session and differs from the reviewed sign-up
+  pattern.
+
+**Guest flow and what the guest sees.**
+
+1. **Open** (`POST /api/guest/links/open {token}`). Unknown, replaced or revoked tokens get
+   one "This link is no longer valid. Ask the sender for a new one."; an ended offer says
+   "This offer has ended." (a 256-bit token cannot be guessed, so only its holder sees which).
+   A live link starts an unverified session (cookie, 30 minutes) and returns the
+   **envelope**: the sender's name, their company's display name marked "as entered by the
+   company, not verified by Blaqks One", the agreement type, the offer end, the masked
+   address the code goes to, the level required and a short explanation of Blaqks One. No
+   amounts, shares, property, client, notes or digest.
+2. **Send code** (`POST /api/guest/session/code {botToken}`), only on the guest's press, with
+   Turnstile when hosted (the sign-up bot-check interface, moved to a shared place) → 202
+   with the masked address, expiry and resend countdown. Six digits from `OsRng`, ten-minute
+   expiry, stored as `digest(sessionToken:code)` so a database copy cannot test codes
+   without the browser's token (sign-up C2). A resend replaces the code.
+3. **Verify** (`POST /api/guest/session/verify {code}`): attempts are counted atomically
+   before comparing, in constant time. Success rotates the session token and CSRF token
+   (no fixation), writes an insert-only verification row, and gives a verified session of
+   30 minutes idle and 2 hours at most. Every later visit needs a new code.
+4. **Offer** (`GET /api/guest/agreement`): the recipient side's view, built by the same
+   code as the receiving company's read (§13): every offered revision with its frozen terms
+   and digest, the events without actor IDs, the sender named as a Blaqks One member, the
+   guest as the sender named them, and `allowed` actions.
+5. **Accept, decline or counter-offer**
+   (`POST /api/guest/agreement/{accept|decline|counter}`), only while the offer is open and
+   the current revision was written by the sender, with `expectedVersion`; accept also
+   sends the `revisionId` and `digest` shown, the guest's full name as it should appear on
+   the certificate (1–80 characters) and an optional declared licence (number and
+   authority); counter-offers use `terms::build` with the sending company's referral cap,
+   as a member recipient's do. Lock order is the sender's workspace lock, then the agreement
+   row `FOR UPDATE`, the same order the sender's own commands use, so a guest acceptance and
+   a sender's withdrawal serialise; the sender must still be an active member of a live
+   company ("This offer is no longer available." otherwise). Text is stored and shown as
+   plain text.
+6. **Done and copy**: the result, **Print certificate** and **Download evidence file**
+   (`GET /api/guest/agreement/certificate`, A3b's evidence builder with the receiving side's
+   revision filter, `attachment`, `no-store`; available once the guest has acted), and
+   "Create a free Blaqks One account to keep this agreement in one place", linking to
+   `/sign-up` with nothing prefilled. Declining sign-up changes nothing.
+
+**Rate limits and lockouts** (keys in `crm_login_limits` through `auth::throttle`; email and
+client keys use the keyed digest of sign-up R2, never raw values; namespaced `guest:*` so
+they never touch sign-up or sign-in budgets):
+
+| Step   | Limits                                                                                                                                                                                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open   | 60 per client per hour; at most 20 unverified sessions per link (the oldest is dropped)                                                                                                                                                                 |
+| Code   | 60-second cooldown; 5 sends per session; 10 per link per day; 3 per hour and 10 per day per address; 10 per client per hour; 300 per hour for the service                                                                                               |
+| Verify | 5 wrong per code; 10 per session (the session ends); 20 per link per 24 hours, after which the link takes no codes for 24 hours ("Too many incorrect codes. Ask the sender for a new link.") and a re-issued link starts afresh; 30 per client per hour |
+| Sender | 20 guest offers per member and 100 per company per day; 5 link re-issues per agreement per day; the recipient lookup (§13, unlimited today) 30 per member per hour and 200 per day                                                                      |
+
+The per-link lockout is a denial-of-service lever for whoever holds a forwarded link; the
+remedy is a new link the attacker does not have. Twenty wrong codes a day against a
+six-digit code is a 1 in 50,000 chance per day per link, and the link dies with the offer.
+
+**Who may be a guest.** The sender types name, email and optionally the person's company
+name and licence number with authority (shown as "declared by the sender"). The email is
+refused when it belongs to a member of the sender's own company ("Choose someone outside
+your company.") or to an active member of another live company ("This person is on
+Blaqks One. Send it to them in the CRM.", the same answer the existing lookup already
+gives). Every other address, including archived, suspended, invited and the Super Admin's,
+is treated as a guest, so guest creation adds no new account oracle. The unlicensed warning
+(product decisions, lawyer review pending) shows before send when no licence is given.
+
+**Verification levels recorded on the action.** `crm_agreement_actions` gains `actor_kind`
+(`member`, `guest`), `level`, `guest_facts` and `guest_evidence` for guest actions, which
+keep verification `contact_verified` (§5).
+
+- `level` is computed by `agreements/guest/level.rs` from the session's verifications:
+  `email` (new, interim, below Basic: an email code only) and, once phone codes exist,
+  `basic` (phone), then `standard` (phone and email, plus a verified company). `licensed`
+  (needs a checked licence) and `strong` (UAE PASS) are reserved. A declared licence is
+  recorded as "declared, not checked" and never raises the level (owner question 4). The
+  computation moves to the planned `verification/` module (sign-up design §7) when it
+  exists.
+- `guest_min_level` on the agreement is fixed when the draft is written (part of its
+  identity); a guest action below it is refused, by Rust and by a trigger. In A6 it can
+  only be `email` (owner question 3).
+- `guest_facts` (stored, no raw contact): guest ID, verification IDs with channel, masked
+  address, contact commitment and time; the confirmed name (acceptance only); the declared
+  licence or null; the privacy notice version shown; the action time. A guest
+  counter-offer stores the same facts and digest on its revision (new nullable columns, set
+  exactly when the revision's author is a guest), so the sender's later acceptance rests on
+  evidence of who offered those terms. The **contact commitment** is
+  `SHA-256("guest-contact:v1:" || salt || ":" || channel || ":" || address)` with a random
+  32-byte salt kept on the guest row. `guest_evidence` is the SHA-256 of `guest_facts`
+  with the agreement, revision and revision digest, serialised as the revision digests are
+  (compact, sorted keys), so it can be recomputed from the row.
+- The certificate shows, for a guest action: "Accepted by {confirmed name} after a code sent
+  to n•••@gmail.com, an address supplied by the sender (Email verified)", the level, the
+  commitment and its salt, so anyone who knows the real address can prove it was this one,
+  and the declared licence as declared. Member actions are unchanged.
+
+**Frozen parties for a guest.** A guest recipient's terms carry
+`parties.recipient = {guestId, name, company, contactCommitment}` (the sender's typed name
+and company and the commitment, never the address), digested with scheme 2 unchanged; the
+certificate explains the guest shape. `crm_agreements.recipient_workspace_id` is null for guests, so every
+existing member query (`a.recipient_workspace_id = $1`) fails closed for them, and
+`AgreementRow` makes the recipient workspace and member optional.
+
+**Later sign-up attaches past agreements (claims).** In the sign-up verify transaction,
+after the Admin and company are created, `guests::claims::attach(tx, email, member,
+workspace, 'signup_email')` writes an insert-only claim for every guest row with that exact
+email whose agreement is open or was acted on by the guest (unopened ended offers are left),
+and `agreements::guest::claimed` writes a `claimed` event on each. The verify response says
+how many were filed; start and resend are unchanged, so claims add no sign-up oracle.
+Afterwards (owner question 8):
+
+- the agreement appears in that member's Agreements under Incoming, labelled "From a link",
+  counted in the waiting badge while open; their Admin does not see it (the guest acted
+  personally, before any company role), which falls out of today's rules because the
+  agreement has no recipient workspace;
+- the claimant acts as the recipient participant in the CRM with `member` verification
+  (accept, decline or counter-offer while open; A3b's amend, complete, cancel, payments
+  and certificate later), resolved in `access::party_of` from a `guests::claims` lookup in
+  the same transaction; a claim into the sending company itself is refused;
+- members who joined by invitation (which does not prove the mailbox) or before the offer
+  was sent use **Find agreements sent to my email** (A6b): a code to their sign-in email,
+  then the same claim with method `member_code`, routed under `/agreements/claims/...` so
+  `guests` never calls `agreements`;
+- the guest link keeps working for the copy, as before.
+
+**Retention** (proposed; confirm with counsel with §8): guest rows of agreements the guest
+acted on are kept with the agreement (five years after completion or cancellation, or for
+declined, withdrawn and expired ones 12 months after they end), because the address and
+salt prove the commitment; unopened guest rows are erased 30 days after the offer ends
+(address and names cleared, commitment and ID kept). Token hashes are cleared 30 days after
+a link ends; unverified sessions and challenges are deleted within 24 hours of expiry;
+plaintext codes as above; outbox jobs after 30 days. Bounded, lock-skipping clean-up as in
+sign-up.
+
+**Super Admin.** Guest routes have no Super Admin. The future metadata view (§9) adds the
+recipient kind, the link state, open, code and wrong-code counts and lockouts, never names,
+addresses, tokens, codes or terms. Proposed safety power (owner question 11): the Super Admin
+may revoke every live guest link of one company, for abuse, audited, without reading
+anything.
+
+**Abuse cases.**
+
+| Case                                     | Control                                                                                                                                                                                                                |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Forwarded link                           | Envelope only; the code goes to the named address; sessions end when the link is revoked or replaced                                                                                                                   |
+| Email enumeration                        | The guest flow never looks up accounts; guest creation refuses only own-company and active other-company members, already revealed by the lookup, which gets its missing rate limit; claims are told only after verify |
+| Brute force                              | 256-bit token; six-digit code bound to the session token, five tries a code, per-session, per-link and per-client caps, constant-time comparison, increment before compare (20 parallel guesses test)                  |
+| Link previews and mail scanners          | Token in the fragment; generic shell; a JavaScript-running scanner can only open the envelope (no code is sent without a press and the bot check, nothing changes); the code email has no link                         |
+| Link-wrapping services (Safe Links)      | They may see the token; by principle 1 it gives only the envelope                                                                                                                                                      |
+| Email bombing through "Send code"        | Fixed template with no sender text; per-link, per-address, per-client and global budgets                                                                                                                               |
+| Sender fabricates the guest's acceptance | Neutral sender; the certificate says the address was supplied by the sender and shows the level; higher levels (phone, licence, UAE PASS) are the real remedy                                                          |
+| Impersonating a known firm               | Company names labelled unverified on the guest page; notes visible only after the code; per-company budgets; Super Admin revocation                                                                                    |
+| Session fixation and CSRF                | Strict cookie on `/api/guest` only, exact Origin, CSRF token, rotation at verify                                                                                                                                       |
+| Guessing other agreements                | No IDs in guest routes; the session names one link, one guest, one agreement                                                                                                                                           |
+| Guest acceptance racing a withdrawal     | Same lock order as the sender; one wins, the other gets the stale or "no longer available" answer                                                                                                                      |
+| Session flooding                         | Per-link session cap and per-client open budget; clean-up                                                                                                                                                              |
+
+**Tables and migrations** (numbers 0070–0072 are reserved for A6; each names its owner):
+
+- **0070 `agreement_guests.sql` (agreements).** `crm_agreements`: `recipient_kind`
+  (`member`, `guest`, default `member`), `recipient_workspace_id` nullable with
+  `(recipient_kind = 'member') = (recipient_workspace_id IS NOT NULL)`, guests only on
+  `origin = 'direct'`, `guest_min_level` exactly for guests. **The 0057 version guard
+  compares `NEW.recipient_workspace_id <> OLD.recipient_workspace_id`, which is null, not
+  true, when either side is null; the replacement uses `IS DISTINCT FROM` for every identity
+  column and freezes `recipient_kind` and `guest_min_level`.** Participants: `workspace_id`
+  and `member_id` nullable, a `guest_id`, exactly one identity, guests only as the recipient
+  of a guest agreement (insert trigger). Revisions and events: `created_by_kind` and
+  `actor_kind`; a guest writes revisions only as `recipient` with its own guest ID, and
+  such a revision carries `guest_facts` and `guest_evidence`. Actions: `actor_kind`,
+  `level`, `guest_facts`, `guest_evidence`, with
+  `(actor_kind = 'guest') = (verification = 'contact_verified')`, the evidence columns set
+  exactly for guests, the guest actor equal to the participant's guest ID, only `accepted`
+  or `declined`, and the level at least `guest_min_level`. Index on participants'
+  `guest_id`.
+- **0071 `guests.sql` (guests, new schema).** `crm_guests` (purpose, object ID, sending
+  workspace, created by, name, company label, email, salt, first verification time, erased
+  time; one per purpose and object; identity frozen); `crm_guest_links` (token hash unique,
+  `live`/`revoked`/`replaced`, backstop expiry, first opened and verified times, who ended
+  it; one live link per guest; only live → revoked or replaced); `crm_guest_sessions` (token
+  hash, CSRF hash, verified time and verification, expiry); `crm_guest_challenges` (session,
+  channel `email`, code hash, pending plaintext code, attempts, sends, expiry);
+  `crm_guest_verifications` and `crm_guest_claims` (one per guest), both insert-only. No
+  foreign keys outside the schema; identity UUIDs are checked in Rust under lock.
+- **0072 `outbox_guest_codes.sql` (outbox).** Widens the job `domain` check to `inbox`,
+  `guests`.
+- Boundary updates in the same packet: `scripts/boundaries.json` owners, the domain map, the
+  `signup` row (calls `guests` and `agreements` at verify) and the guest-prefix decision.
+
+**Routes.**
+
+| Route                                                   | Who                         | Notes                                                                                  |
+| ------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------- |
+| `POST /api/guest/links/open`                            | anyone with a token         | Starts an unverified session; envelope and CSRF token                                  |
+| `GET /api/guest/session`                                | guest session               | Envelope, verified state, level and CSRF token after a reload                          |
+| `POST /api/guest/session/code`, `.../verify`, `.../end` | guest session               | Code, verify (rotates), sign out                                                       |
+| `GET /api/guest/agreement`, `.../certificate`           | verified guest session      | Recipient-side view; certificate once the guest has acted                              |
+| `POST /api/guest/agreement/{accept,decline,counter}`    | verified guest session      | `expectedVersion`; accept binds `revisionId` and `digest`                              |
+| `POST /workspaces/{ws}/agreements` (`recipient.guest`)  | any active member (sender)  | `{name, email, company?, licence?}` in place of `{workspaceId, memberId}`              |
+| `POST .../agreements/{id}/send`                         | sender participant          | For a guest also returns `link: {url, expiresAt}`, the only time the token is returned |
+| `POST .../agreements/{id}/link`, `.../link/revoke`      | sender participant or Admin | New link (replaces the old) or revoke; redacted `link_issued`/`link_revoked` events    |
+| `GET .../agreements/{id}` and list                      | as today                    | `guest: {name, company, email, link: {state, expiresAt, openedAt, verifiedAt}}`        |
+| `POST .../agreements/claims/code`, `.../claims/verify`  | any active member (A6b)     | Find agreements sent to my sign-in email                                               |
+
+**Screens** (English catalogue, light and dark, phone first since most links open from
+WhatsApp; premium polish within the current theme; product designer review):
+
+- **Guest pages** (`src/features/guest/`, no CRM shell, Blaqks One brand as on sign-up):
+  envelope with **Send code**; the code step (one input, `autocomplete="one-time-code"`,
+  resend countdown, plain errors); the offer (terms, both parties with the unverified-name
+  labels, history) with **Accept**, **Decline** and **Make a counter-offer** (the existing
+  counter steps); the accept confirmation (full name, "I am the person this was sent to",
+  optional licence, the privacy notice link); done with the certificate, the evidence file
+  and the sign-up invitation; invalid, ended, withdrawn, locked and loading states.
+- **Sender side** (Agreements): step 1 of the form looks up the email; when nobody is found
+  it offers "Not on Blaqks One? Send a link" with name, company and licence, the
+  verification required ("They confirm a code sent to this email") and the unlicensed
+  warning. After send, the share dialog (Copy link, Share on WhatsApp, Email) with "This
+  link is shown once". The detail shows the guest "(not on Blaqks One)", the link status
+  (Not opened, Opened, Code confirmed, Revoked) with **New link** and **Revoke link**, and
+  guest evidence worded as in the certificate. Every agreement gets Copy link and Share on
+  WhatsApp; claimed ones show "From a link".
+- Client files: `src/services/crm/guest.js` (the guest prefix) and the agreements client.
+
+**Tests.**
+
+- Rust: token and code shape; digests; the guest terms shape and its recomputed digest;
+  `guest_evidence` recomputation; level ordering and the minimum; the `IS DISTINCT FROM`
+  guard (a null recipient workspace cannot be changed); verification and actor readers
+  refuse unknown values; the share text has no amounts or names.
+- API (disposable database): `guest-links` (open for valid, unknown, replaced, revoked and
+  ended links; cookie flags and path; the CRM cookie is ignored on guest routes and the
+  guest cookie on CRM routes; the token appears once and only its hash is stored);
+  `guest-codes` (budgets, cooldown, replacement, per-code, session and link limits, 20
+  parallel wrong guesses, plaintext cleared after delivery, no code in responses or events);
+  `guest-agreement` (no terms before the code; accept binds the digest; decline;
+  counter-offer under the referral cap; expired; racing a withdrawal; sender suspended;
+  stale version; a level below the minimum; a session of one link cannot reach another
+  agreement); `guest-sender` (own-company and member emails refused, other addresses
+  allowed with the same answer; budgets; re-issue ends old sessions; Admin revoke; Super
+  Admin refused; foreign IDs not-found); `guest-claims` (sign-up attaches open and acted
+  offers only, start and resend responses unchanged, the claimant acts as recipient, their
+  Admin does not see it, a claim into the sending company is refused); `guest-retention`.
+  A scan confirms no token, code or address in agreement tables, events, jobs or logs.
+- Browser `tests/server-browser/agreements-guest.spec.js`: the sender makes a guest offer
+  and copies the link; a second browser context opens it, reads the code from the database,
+  accepts and downloads the certificate; the sender sees "Email verified"; 390 px and
+  1280 px in both themes.
+- Live check before hosting: fragments survive WhatsApp, Gmail, Outlook and their link
+  wrappers on iOS and Android; preview cards show no per-link text.
+
+**Packets.** **A6a** guest core, email code through the local sender, sender side, guest
+pages and copy, including operational cleanup and plaintext-code deletion (after A3b's
+certificate lands); **A6b** claims, Find agreements sent to my email, claim retention and
+the Super Admin metadata fields; **A6c** phone codes when a platform
+provider exists. A6a and A6b need security reviews of design and code. Going live needs the
+platform sender, Turnstile and the hosting prerequisites, as sign-up does.
+
+### Open owner questions (recommended answers)
+
+1. **Which channel delivers the code now?** Recommended: a Blaqks One platform email sender
+   on a Blaqks One domain (the same decision as sign-up's transactional provider), never the
+   sending company's SendGrid. Until the owner has the domain and account, A6 runs locally
+   with the development sender, like sign-up.
+2. **May a guest act with an email code only until phone codes exist?** The 2026-10-15 rows
+   differ: the recipient check says a code "to the named phone or email", the licence row
+   says Basic (phone) is always required. Recommended: yes, as a new interim level "Email
+   verified", shown below Basic on the certificate and to the sender before sending; once
+   phone codes exist, Basic becomes required for new guest offers.
+3. **Minimum level per agreement.** Recommended: fixed at Email verified in A6 (the only
+   level reachable); with phone codes, Basic by default and never lower, and the sender may
+   ask for more once more levels exist.
+4. **Licences.** Recommended: recorded as declared (by the sender or the guest), "not
+   checked", never raising the level; "Licensed" needs a checked licence (a later
+   verification packet).
+5. **What the guest sees before the code.** Recommended: only who sent it, the type, the
+   offer end and the masked address; terms only after the code. This changes §5's
+   `unverified_guest` ("read the shared terms") and §9's guest row accordingly.
+6. **How long the guest's copy stays reachable by link.** Recommended: while the offer is
+   open or the agreement is in force, and 90 days after it ends, each visit with a new
+   code; the downloaded certificate is theirs for ever and signing up keeps it in their
+   account.
+7. **Guest actions after acceptance** (payments, cancel, amend). Recommended: none by link
+   in A6; the agreement tells both sides these need the guest to create an account. A later
+   packet could allow confirming payments and agreeing to cancel by link with a new code.
+8. **Claims.** Recommended: automatic at sign-up for open and acted-on offers to the same
+   verified email, with a note of how many were filed; the claimant acts as the recipient;
+   only the claimant sees them, not their Admin; invited members claim by code.
+9. **Phone codes later.** Recommended: a platform verification service under a Blaqks One
+   account, UAE numbers first, not the company's WhatsApp sender.
+10. **Link delivery.** Recommended: the CRM never sends the link; Copy, WhatsApp from the
+    sender's phone, and email from the sender's own mail app.
+11. **Super Admin safety power.** Recommended: may revoke all live guest links of one
+    company for abuse, audited, with no access to terms or contacts.
+12. **The guest's email on the sender's screens.** Recommended: shown in full to the sending
+    company, which typed it; masked everywhere else.
+
+**Riskiest parts for the security review:** making the recipient identity nullable inside
+the evidence core (the `<>` guard, every query and `party_of` must fail closed); the new
+unauthenticated prefix (cookie isolation, Origin, CSRF, rotation, no IDs); code brute force
+against the per-link lockout trade-off; claims binding a new account to past evidence
+without a sign-up oracle; the honesty of what an email code proves; fragment handling by
+real messaging apps and link wrappers; and custody of the platform sender's key.

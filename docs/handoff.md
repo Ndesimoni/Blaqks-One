@@ -1,5 +1,11 @@
 # Handoff for the next coding agent
 
+Latest checkpoint (2026-10-23): Claude completed R1 (`4232ba5`) and the dropdown fix
+(`1817ff6`), then drafted R2 and A6 in `record-sharing.md` and Agreements §19. Their
+[design review](sharing-guest-design-review.md) records required amendments, unresolved
+owner choices and the A3b dependency. R2/A6 implementation has not started. Preserve the
+uncommitted drafts; this checkpoint supersedes the older next-packet assumptions below.
+
 Updated 2026-10-22, after commit `20955d8` on `feature/connected-crm`. Read this with
 `AGENTS.md` (project rules), the [token-efficient delivery protocol](token-efficient-delivery.md)
 and [roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations).
@@ -15,7 +21,7 @@ The owner chooses the next packet: nothing in §2 starts until they say so.
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
 | Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
 
-Migrations run through `0063`. **Evidence limit:** all of this is proven against the local
+Migrations run through `0066`. **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
 from clients are labelled but not virus-scanned.
 
@@ -90,8 +96,13 @@ stored records). Test on the disposable database with synthetic records.
 - **R1** (built 2026-10-23, [Record sharing](record-sharing.md)): the holder or the Admin
   shares one client, property or contact with an assigned-only colleague, who accepts a
   view-only copy (no notes, no messaging) or declines; Copy link and Share on WhatsApp;
-  shares end when the record changes holder. Migration 0063. Next: R2, then A3b; P1
-  (performance) waits until the owner says.
+  shares end when the record changes holder. Migration 0063.
+- **A3b** (built 2026-10-23, [A3b](agreements-a3b.md)): amend, complete, cancel and archive
+  agreements between companies, the certificate (print and evidence file) and payment
+  records (payer records, payee confirms). Migrations 0064–0066.
+- **R2 and A6** are designed and reviewed ([R2/A6 design review](sharing-guest-design-review.md)),
+  with the owner's answers in [Product decisions](product-decisions.md). Next: build R2,
+  then A6 (live use needs a Blaqks One platform sender). P1 waits until the owner says.
 
 ### N4 — WhatsApp (blocked on the owner)
 
