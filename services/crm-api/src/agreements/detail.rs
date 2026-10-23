@@ -1,7 +1,7 @@
 //! `GET /agreements/{id}` (docs/agreements-design.md §9, §13): the agreement with both
 //! parties' names, the current revision, every revision the caller's company may see and
 //! the redacted event log. Hidden, foreign and malformed IDs return the same not-found.
-use super::{access, history, parties, store};
+use super::{access, history, lifecycle_view, parties, store};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -26,6 +26,8 @@ pub async fn read(
         .filter(|row| access::can_read(row, &session, &workspace))
         .ok_or_else(ApiError::missing)?;
     let revision = store::current(&mut tx, id).await?;
+    let proposal = lifecycle_view::proposal(&mut tx, &row).await?;
+    let lifecycle = lifecycle_view::view(&row, &session, &workspace, proposal.as_ref());
     let sending = workspace == row.workspace_id;
     let revisions = history::revisions(&mut tx, id, sending).await?;
     let events = history::events(&mut tx, id, sending).await?;
@@ -41,5 +43,7 @@ pub async fn read(
         "revisions": revisions,
         "events": events,
         "party": party,
+        "proposal": proposal,
+        "lifecycle": lifecycle,
     })))
 }

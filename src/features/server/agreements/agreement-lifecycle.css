@@ -1,0 +1,102 @@
+.agreement-proposal,
+.agreement-payments,
+.agreement-certificate-content {
+  display: grid;
+  gap: 12px;
+}
+.agreement-proposal {
+  padding-block: 12px;
+  border-block: 1px solid var(--line);
+}
+.agreement-proposal h3,
+.agreement-proposal p {
+  margin: 0;
+}
+.agreement-proposal .btn {
+  justify-self: start;
+}
+.agreement-payment-form {
+  margin-block: 12px;
+}
+.agreement-payment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.agreement-payment-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding-block: 12px;
+  border-block-end: 1px solid var(--line);
+}
+.agreement-payment-list strong {
+  font-variant-numeric: tabular-nums;
+}
+.agreement-payment-list span {
+  flex: 1 1 160px;
+}
+.agreement-certificate-link {
+  padding: 0 24px 12px;
+}
+.certificate-revision {
+  padding-block: 16px;
+  border-block-end: 1px solid var(--line);
+}
+.certificate-json {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+@media print {
+  body:has(.agreement-certificate) {
+    background: white;
+    overflow: visible !important;
+  }
+  body:has(.agreement-certificate) * {
+    visibility: hidden;
+  }
+  body:has(.agreement-certificate) dialog:has(.agreement-certificate) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    padding: 0;
+    background: white;
+  }
+  .agreement-certificate,
+  .agreement-certificate * {
+    visibility: visible !important;
+    color: black !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+  .agreement-certificate {
+    --line: #bbb;
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+  }
+  .agreement-certificate .drawer-body {
+    overflow: visible;
+  }
+  .agreement-certificate .drawer-footer,
+  .agreement-certificate .btn {
+    display: none;
+  }
+  .agreement-certificate h3 {
+    break-after: avoid;
+  }
+  .agreement-certificate dl > div {
+    break-inside: avoid;
+  }
+}

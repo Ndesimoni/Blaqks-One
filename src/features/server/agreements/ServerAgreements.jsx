@@ -12,6 +12,7 @@ import './agreement-rows.css';
 import './agreement-detail.css';
 import './agreement-terms.css';
 import './agreement-form.css';
+import './agreement-lifecycle.css';
 
 /**
  * Agreements (docs/agreements-design.md §13): offers between this company and another,

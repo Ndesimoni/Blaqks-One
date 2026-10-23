@@ -10,7 +10,8 @@ pub const SAME_COMPANY: &str = "Choose a member of another company.";
 
 const SELECT: &str =
     "SELECT a.id,a.workspace_id,a.recipient_workspace_id,a.kind,a.origin,a.state,a.version,
-    a.current_revision_id,
+    a.current_revision_id,a.proposed_revision_id,
+    a.cancel_sender_revision_id,a.cancel_recipient_revision_id,
     to_char(a.expires_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS expires_at,
     to_char(a.created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS created_at,
     to_char(a.updated_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS updated_at,
@@ -75,6 +76,8 @@ pub async fn list(
     sqlx::query_as::<_, AgreementRow>(&format!(
         "{SELECT} WHERE (a.workspace_id=$1 OR (a.recipient_workspace_id=$1 AND a.state<>'draft')) \
          AND ($2 OR s.member_id=$3 OR r.member_id=$3) AND a.archived_at IS NULL \
+         AND (CASE WHEN a.workspace_id=$1 THEN a.sender_archived_at \
+              ELSE a.recipient_archived_at END) IS NULL \
          ORDER BY a.updated_at DESC, a.id"
     ))
     .bind(workspace)

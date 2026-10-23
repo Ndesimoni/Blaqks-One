@@ -92,6 +92,17 @@ export function AgreementTerms({ terms, names }) {
           [side('senderShare', 'sender'), share(money.senderShareBp)],
           [side('recipientShare', 'recipient'), share(money.recipientShareBp)],
           [t('agreements.terms.payment'), t(`agreements.payment.${money.paymentExpectation}`)],
+          ...(terms.kind === 'co_broking'
+            ? [
+                [
+                  t('agreementLifecycle.collectingParty'),
+                  money.collectingParty
+                    ? names?.[money.collectingParty] ||
+                      t(`agreements.party.${money.collectingParty}`)
+                    : t('agreementLifecycle.unavailable'),
+                ],
+              ]
+            : []),
         ]}
       />
       <Facts

@@ -35,6 +35,8 @@ export async function draftCoBroking(page, { email, recipientName, listing, shar
   await dialog.getByRole('button', { name: 'Next' }).click();
   await dialog.getByLabel('Agreed amount (AED)').fill('52500');
   await dialog.getByLabel(/Sending side.s share/).fill(String(share));
+  // A3b: a co-broking offer names the side that collects the fee from the client.
+  await dialog.getByLabel('Fee collected by').selectOption('sender');
   await expect(dialog.locator('.agreement-split')).toContainText(`${100 - share}%`);
   await dialog.getByRole('button', { name: 'Next' }).click();
   await expect(dialog.locator('.agreement-review')).toContainText('AED 52,500.00');

@@ -26,6 +26,8 @@ const filled = (changes = {}) => ({
   clientName: 'Synthetic A.',
   amount: '52500',
   senderShare: '40',
+  // A3b: a co-broking offer names the side that collects the fee from the client.
+  collectingParty: 'sender',
   ...changes,
 });
 
@@ -62,6 +64,7 @@ test('a complete draft becomes the server terms in fils and basis points', () =>
       amountFils: 5_250_000,
       senderShareBp: 4000,
       paymentExpectation: 'on_transfer',
+      collectingParty: 'sender',
     },
     expiresAt: '2026-11-05T19:59:59Z',
     governingEmirate: 'Dubai',
@@ -92,6 +95,9 @@ test('invalid fields are named with a reason and grouped by step', () => {
   assert.deepEqual(errors.amount, { error: 'amount' });
   assert.deepEqual(errors.expiresOn, { error: 'expiry' });
   assert.deepEqual(errors.notes, { error: 'tooLong', max: 2000 });
+  assert.deepEqual(readDraft(filled({ collectingParty: '' }), today).errors.collectingParty, {
+    error: 'required',
+  });
   assert.deepEqual(Object.keys(stepErrors(errors, 'subject')).sort(), [
     'area',
     'askingPrice',

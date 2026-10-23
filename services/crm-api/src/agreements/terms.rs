@@ -28,9 +28,6 @@ const PROPERTY_KEYS: [&str; 7] = [
     "listingRef",
 ];
 const CLIENT_KEYS: [&str; 2] = ["displayName", "contact"];
-const MONEY_KEYS: [&str; 4] = ["basis", "amountFils", "senderShareBp", "paymentExpectation"];
-const BASES: [&str; 2] = ["commission", "fixed"];
-const PAYMENTS: [&str; 3] = ["on_transfer", "on_receipt", "on_completion"];
 const DEFAULT_DAYS: i64 = 14;
 const MAX_DAYS: i64 = 90;
 
@@ -56,7 +53,7 @@ pub fn build(kind: Kind, input: &Value, now: OffsetDateTime) -> ApiResult<BuiltT
         INVALID,
     )?;
     let client = wire::exact(wire::node(&terms, "client")?.clone(), &CLIENT_KEYS, INVALID)?;
-    let money = wire::exact(wire::node(&terms, "money")?.clone(), &MONEY_KEYS, INVALID)?;
+    let money = super::term_money::build(kind, wire::node(&terms, "money")?)?;
     let property = json!({
         "emirate": wire::text(wire::node(&property, "emirate")?, 40)?,
         "area": wire::text(wire::node(&property, "area")?, 80)?,
@@ -69,17 +66,6 @@ pub fn build(kind: Kind, input: &Value, now: OffsetDateTime) -> ApiResult<BuiltT
     let client = json!({
         "displayName": wire::text(wire::node(&client, "displayName")?, 80)?,
         "contact": wire::optional_text(wire::node(&client, "contact")?, 120)?,
-    });
-    let sender_bp = wire::node(&money, "senderShareBp")?
-        .as_i64()
-        .ok_or(ApiError::invalid(INVALID))?;
-    let (sender_bp, recipient_bp) = kind.shares(sender_bp)?;
-    let money = json!({
-        "basis": wire::one_of(wire::node(&money, "basis")?, &BASES)?,
-        "amountFils": wire::amount(wire::node(&money, "amountFils")?)?,
-        "senderShareBp": sender_bp,
-        "recipientShareBp": recipient_bp,
-        "paymentExpectation": wire::one_of(wire::node(&money, "paymentExpectation")?, &PAYMENTS)?,
     });
     let expires_at = expiry(wire::node(&terms, "expiresAt")?, now)?;
     let value = json!({

@@ -70,6 +70,21 @@ export function FormMoney({ form, names }) {
         options={PAYMENTS.map((payment) => [payment, t(`agreements.payment.${payment}`)])}
       />
       <Split form={form} names={names} />
+      {draft.kind === 'co_broking' && (
+        <AgreementField
+          form={form}
+          name="collectingParty"
+          label={t('agreementLifecycle.collectingParty')}
+          hint={t('agreementLifecycle.collectingHint')}
+          options={[
+            ['', t('agreementLifecycle.chooseParty')],
+            ...['sender', 'recipient'].map((party) => [
+              party,
+              names[party] || t(`agreements.party.${party}`),
+            ]),
+          ]}
+        />
+      )}
       <AgreementField
         form={form}
         name="governingEmirate"

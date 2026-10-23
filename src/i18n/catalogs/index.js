@@ -21,6 +21,7 @@ import arSignupSetup from './ar/signupSetup.js';
 import arTeamSeats from './ar/teamSeats.js';
 import enAgreementForm from './en/agreementForm.js';
 import enAgreements from './en/agreements.js';
+import enAgreementLifecycle from './en/agreementLifecycle.js';
 import enCalculators from './en/calculators.js';
 import enChannels from './en/channels.js';
 import enChat from './en/chat.js';
@@ -48,6 +49,7 @@ export const catalogs = Object.freeze({
   en: {
     agreementForm: enAgreementForm,
     agreements: enAgreements,
+    agreementLifecycle: enAgreementLifecycle,
     calculators: enCalculators,
     channels: enChannels,
     chat: enChat,

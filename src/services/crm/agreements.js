@@ -1,3 +1,5 @@
+import { agreementLifecycleRoutes } from './agreementLifecycle.js';
+
 /**
  * Cross-company deal agreements (docs/agreements-design.md §10, §13). Every command sends
  * the agreement's `expectedVersion`; the server answers with the new state and version.
@@ -13,6 +15,7 @@ export function agreementRoutes({ request, scope }) {
       body: { expectedVersion, terms },
     });
   return {
+    ...agreementLifecycleRoutes({ request, item }),
     agreements: (workspace, signal) => request(base(workspace), { signal }),
     agreement: (workspace, id, signal) => request(item(workspace, id), { signal }),
     /** `{ answer }`: offers from other companies waiting for the caller (sidebar badge). */
@@ -20,7 +23,7 @@ export function agreementRoutes({ request, scope }) {
     /** The named recipient of a new agreement, by their exact sign-in email. */
     findAgreementRecipient: (workspace, email) =>
       request(`${base(workspace)}/recipients`, { method: 'POST', body: { email } }),
-    createAgreement: (workspace, agreement) =>
+    createDealAgreement: (workspace, agreement) =>
       request(base(workspace), { method: 'POST', body: { agreement } }),
     reviseAgreement: (workspace, id, expectedVersion, terms) =>
       request(item(workspace, id), { method: 'PATCH', body: { expectedVersion, terms } }),

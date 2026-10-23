@@ -6,21 +6,36 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { allowedActions, inCompany } from './agreementModel.js';
 
 /** Commands that cannot be taken back ask once more, naming what will happen. */
-const CONFIRMED = ['send', 'accept', 'decline', 'revoke'];
-const DANGER = ['decline', 'revoke'];
+const CONFIRMED = [
+  'send',
+  'accept',
+  'decline',
+  'revoke',
+  'acceptAmendment',
+  'declineAmendment',
+  'complete',
+  'cancel',
+  'archive',
+];
+const DANGER = ['decline', 'revoke', 'declineAmendment', 'cancel', 'archive'];
+const lifecycle = (name) =>
+  ['amend', 'acceptAmendment', 'declineAmendment', 'complete', 'cancel', 'archive'].includes(name);
 
 /**
  * Exactly the commands the caller may take now (agreementModel `allowedActions`). Editing
  * and counter-offers open the form; the others confirm first. One primary action at most:
  * Send for a draft, Accept for an offer. An in-company hand-over is decided in Deals.
  */
-export function AgreementActions({ view, onEdit, onClose, onDone }) {
+export function AgreementActions({ view, onEdit, onClose, onDone, proposalReviewed }) {
   const { t } = useI18n();
   const go = useNavigate();
   const [confirming, setConfirming] = useState(null);
   const { detail, busy, run } = view;
   const { agreement, revision, party } = detail;
   const actions = allowedActions({ agreement, authorParty: revision.authorParty, party });
+  Object.entries(detail.lifecycle?.allowed || {}).forEach(([name, allowed]) => {
+    if (allowed && (!name.endsWith('Amendment') || proposalReviewed)) actions.push(name);
+  });
   if (confirming)
     return (
       <div
@@ -29,7 +44,12 @@ export function AgreementActions({ view, onEdit, onClose, onDone }) {
         aria-labelledby="agreement-confirm"
       >
         <p id="agreement-confirm">
-          {t(`agreements.confirm.${confirming}`, { number: revision.number })}
+          {t(
+            `${lifecycle(confirming) ? 'agreementLifecycle' : 'agreements'}.confirm.${confirming}`,
+            {
+              number: confirming.endsWith('Amendment') ? detail.proposal?.number : revision.number,
+            },
+          )}
         </p>
         <Button variant="light" disabled={busy} onClick={() => setConfirming(null)}>
           {t('agreements.action.back')}
@@ -39,12 +59,24 @@ export function AgreementActions({ view, onEdit, onClose, onDone }) {
           disabled={busy}
           autoFocus
           onClick={async () => {
-            const done = await run(confirming);
+            const done = await run(
+              confirming,
+              confirming.endsWith('Amendment') ? detail.proposal?.id : undefined,
+            );
             setConfirming(null);
-            if (done) onDone();
+            if (done) {
+              onDone();
+              if (confirming === 'archive') onClose();
+            }
           }}
         >
-          {busy ? t('agreements.action.working') : t(`agreements.action.${confirming}Confirm`)}
+          {busy
+            ? t('agreements.action.working')
+            : t(
+                lifecycle(confirming)
+                  ? `agreementLifecycle.${confirming}`
+                  : `agreements.action.${confirming}Confirm`,
+              )}
         </Button>
       </div>
     );
@@ -56,7 +88,11 @@ export function AgreementActions({ view, onEdit, onClose, onDone }) {
         disabled={busy}
         onClick={() => (CONFIRMED.includes(name) ? setConfirming(name) : onEdit(name, detail))}
       >
-        {t(`agreements.action.${name}`)}
+        {t(
+          lifecycle(name)
+            ? `agreementLifecycle.${name === 'cancel' && detail.lifecycle?.cancellation?.[party === 'sender' ? 'recipient' : 'sender'] ? 'agreeCancel' : name}`
+            : `agreements.action.${name}`,
+        )}
       </Button>
     );
   return (
@@ -81,6 +117,12 @@ export function AgreementActions({ view, onEdit, onClose, onDone }) {
       {button('revise')}
       {button('send', 'primary')}
       {button('accept', 'primary')}
+      {button('archive', 'danger-light')}
+      {button('cancel', 'danger-light')}
+      {button('declineAmendment', 'danger-light')}
+      {button('amend')}
+      {button('complete')}
+      {button('acceptAmendment', 'primary')}
     </div>
   );
 }

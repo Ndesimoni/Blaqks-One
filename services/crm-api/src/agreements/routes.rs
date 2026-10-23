@@ -1,5 +1,8 @@
 //! Agreement routes under `/api/crm/workspaces/{workspace}/agreements`, merged
 //! into the application router by `routes.rs`.
+use super::{
+    amendment, amendment_answer, archive, certificate, closure, payment_read, payment_routes,
+};
 use super::{detail, handlers, lifecycle, recipients, respond, revise, waiting};
 use crate::state::AppState;
 use axum::{
@@ -30,4 +33,31 @@ pub fn router() -> Router<AppState> {
         .route(&action("decline"), post(respond::decline).layer(body()))
         .route(&action("revoke"), post(lifecycle::revoke).layer(body()))
         .route(&action("counter"), post(revise::counter).layer(body()))
+        .route(&action("amend"), post(amendment::propose).layer(body()))
+        .route(
+            &action("amend/accept"),
+            post(amendment_answer::accept).layer(body()),
+        )
+        .route(
+            &action("amend/decline"),
+            post(amendment_answer::decline).layer(body()),
+        )
+        .route(&action("complete"), post(closure::complete).layer(body()))
+        .route(&action("cancel"), post(closure::cancel).layer(body()))
+        .route(&action("archive"), post(archive::archive).layer(body()))
+        .route(&action("certificate"), get(certificate::read))
+        .route(
+            &action("payments"),
+            get(payment_read::read)
+                .post(payment_routes::paid)
+                .layer(body()),
+        )
+        .route(
+            &action("payments/{payment}/confirm"),
+            post(payment_routes::confirm).layer(body()),
+        )
+        .route(
+            &action("payments/{payment}/withdraw"),
+            post(payment_routes::withdraw).layer(body()),
+        )
 }

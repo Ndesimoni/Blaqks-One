@@ -25,7 +25,8 @@
       "crm_agreement_participants",
       "crm_agreement_revisions",
       "crm_agreement_events",
-      "crm_agreement_actions"
+      "crm_agreement_actions",
+      "crm_agreement_payments"
     ],
     "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
     "records": ["crm_records", "crm_activity", "crm_record_keeps", "crm_record_shares"],

@@ -1,4 +1,5 @@
 import { messagingTestFiles } from './crm-api-test-files-messaging.mjs';
+import { agreementTestFiles } from './crm-api-test-files-agreements.mjs';
 
 /** API suites run in order against one isolated database (see test-crm-api.mjs). */
 export const apiTestFiles = [
@@ -108,21 +109,7 @@ export const apiTestFiles = [
   'tests/api/signup-races.test.mjs',
   'tests/api/signup-release-races.test.mjs',
   'tests/api/signup-invitations.test.mjs',
-  'tests/api/agreements.test.mjs',
-  'tests/api/agreements-guards.test.mjs',
-  'tests/api/agreements-screens.test.mjs',
-  'tests/api/agreements-handovers.test.mjs',
-  'tests/api/agreements-handover-closes.test.mjs',
-  'tests/api/finance-handover-preview.test.mjs',
-  'tests/api/finance-handover-preview-content.test.mjs',
-  'tests/api/finance-handover-approval.test.mjs',
-  'tests/api/finance-handover-approver-rules.test.mjs',
-  'tests/api/finance-handover-admin.test.mjs',
-  'tests/api/finance-handover-waiting.test.mjs',
-  'tests/api/finance-handover-review-fixes.test.mjs',
-  'tests/api/finance-handover-records.test.mjs',
-  'tests/api/finance-handover-photos.test.mjs',
-  'tests/api/finance-handover-keeps.test.mjs',
+  ...agreementTestFiles,
   'tests/api/record-sharing-contract.test.mjs',
   'tests/api/record-sharing-security.test.mjs',
   'tests/api/record-sharing-lifecycle.test.mjs',

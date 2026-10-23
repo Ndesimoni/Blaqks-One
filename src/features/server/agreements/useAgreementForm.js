@@ -8,12 +8,13 @@ const STEPS = {
   create: ['parties', 'subject', 'money', 'review'],
   revise: ['subject', 'money', 'review'],
   counter: ['subject', 'money', 'review'],
+  amend: ['subject', 'money', 'review'],
 };
 
 /** The request that freezes the reviewed terms into a new revision; resolves to its ID. */
 async function save(api, workspaceId, { mode, detail, draft, recipient, terms }) {
   if (mode === 'create') {
-    const { agreement } = await api.createAgreement(workspaceId, {
+    const { agreement } = await api.createDealAgreement(workspaceId, {
       kind: draft.kind,
       recipient: { workspaceId: recipient.workspaceId, memberId: recipient.memberId },
       terms,
@@ -21,7 +22,11 @@ async function save(api, workspaceId, { mode, detail, draft, recipient, terms })
     return agreement.id;
   }
   const { id, version } = detail.agreement;
-  const command = mode === 'revise' ? api.reviseAgreement : api.counterAgreement;
+  const command = {
+    revise: api.reviseAgreement,
+    counter: api.counterAgreement,
+    amend: api.amendAgreement,
+  }[mode];
   await command(workspaceId, id, version, terms);
   return id;
 }

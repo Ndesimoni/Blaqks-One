@@ -35,6 +35,7 @@ export const STEP_FIELDS = {
     'amount',
     'senderShare',
     'paymentExpectation',
+    'collectingParty',
     'governingEmirate',
     'expiresOn',
     'notes',
@@ -97,6 +98,10 @@ export function readDraft(draft, today = dubaiToday()) {
     amount: money(draft.amount),
     senderShare: readShare(draft.kind, draft.senderShare),
     paymentExpectation: choice(draft.paymentExpectation, PAYMENTS),
+    collectingParty:
+      draft.kind === 'co_broking'
+        ? choice(draft.collectingParty, ['sender', 'recipient'])
+        : { value: null },
     governingEmirate: text(draft.governingEmirate, 40),
     expiresOn: expiry(draft.expiresOn, today),
     notes: text(draft.notes, 2_000, true),
@@ -120,6 +125,7 @@ export function readDraft(draft, today = dubaiToday()) {
       amountFils: value('amount'),
       senderShareBp: value('senderShare'),
       paymentExpectation: value('paymentExpectation'),
+      ...(draft.kind === 'co_broking' ? { collectingParty: value('collectingParty') } : {}),
     },
     expiresAt: value('expiresOn'),
     governingEmirate: value('governingEmirate'),

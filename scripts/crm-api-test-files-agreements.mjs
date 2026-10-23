@@ -1,0 +1,22 @@
+/** Agreement and linked hand-over contracts, in dependency order. */
+export const agreementTestFiles = [
+  'tests/api/agreements.test.mjs',
+  'tests/api/agreements-guards.test.mjs',
+  'tests/api/agreements-screens.test.mjs',
+  'tests/api/agreements-handovers.test.mjs',
+  'tests/api/agreements-handover-closes.test.mjs',
+  'tests/api/agreements-a3b-lifecycle.test.mjs',
+  'tests/api/agreements-a3b-payments.test.mjs',
+  'tests/api/agreements-a3b-certificate.test.mjs',
+  'tests/api/agreements-a3b-guards.test.mjs',
+  'tests/api/finance-handover-preview.test.mjs',
+  'tests/api/finance-handover-preview-content.test.mjs',
+  'tests/api/finance-handover-approval.test.mjs',
+  'tests/api/finance-handover-approver-rules.test.mjs',
+  'tests/api/finance-handover-admin.test.mjs',
+  'tests/api/finance-handover-waiting.test.mjs',
+  'tests/api/finance-handover-review-fixes.test.mjs',
+  'tests/api/finance-handover-records.test.mjs',
+  'tests/api/finance-handover-photos.test.mjs',
+  'tests/api/finance-handover-keeps.test.mjs',
+];

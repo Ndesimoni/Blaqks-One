@@ -5,59 +5,9 @@ import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { AgreementActions } from './AgreementActions.jsx';
-import { AgreementEvidence, AgreementHistory, RevisionPicker } from './AgreementEvidence.jsx';
-import { AgreementSummary } from './AgreementSummary.jsx';
-import { AgreementTerms } from './AgreementTerms.jsx';
+import { AgreementBody } from './AgreementBody.jsx';
+import { AgreementCertificate } from './AgreementCertificate.jsx';
 import { useAgreement } from './useAgreement.js';
-
-function Notice({ notice }) {
-  const { t } = useI18n();
-  if (!notice) return null;
-  const text = notice.key ? t(notice.key) : notice.message;
-  return (
-    <div
-      className={'agreement-notice is-' + notice.tone}
-      role={notice.tone === 'error' ? 'alert' : 'status'}
-    >
-      <Icon name={notice.tone === 'error' ? 'info' : 'check'} size={18} />
-      <p>{text}</p>
-    </div>
-  );
-}
-
-function Body({ view, selected, onSelect }) {
-  const { detail } = view;
-  const { agreement, revision } = detail;
-  const revisions = detail.revisions?.length ? detail.revisions : [revision];
-  const shown = revisions.find((item) => item.number === selected) || revisions.at(-1);
-  const acceptance = detail.events?.findLast((event) => event.action === 'accepted');
-  const names = {
-    sender: agreement.parties?.sender?.name,
-    recipient: agreement.parties?.recipient?.name,
-  };
-  return (
-    <div className="drawer-body agreement-body">
-      <Notice notice={view.notice} />
-      <AgreementSummary detail={detail} />
-      <RevisionPicker
-        revisions={revisions}
-        selected={shown.number}
-        current={revision.number}
-        accepted={acceptance?.revision}
-        onSelect={onSelect}
-      />
-      <AgreementTerms terms={shown.terms} names={names} />
-      <AgreementEvidence
-        agreement={agreement}
-        revision={shown}
-        total={revisions.at(-1).number}
-        acceptance={acceptance}
-        events={detail.events}
-      />
-      <AgreementHistory agreement={agreement} events={detail.events} />
-    </div>
-  );
-}
 
 /**
  * One agreement in the shared centred dialog: status, both participants, the frozen terms
@@ -69,6 +19,7 @@ export function AgreementDetail({ id, onClose, onChanged, onEdit }) {
   const titleId = useId();
   const view = useAgreement(api, user.workspaceId, id);
   const [selected, setSelected] = useState(null);
+  const [certificate, setCertificate] = useState(false);
   const close = () => {
     if (!view.busy) onClose();
   };
@@ -77,6 +28,7 @@ export function AgreementDetail({ id, onClose, onChanged, onEdit }) {
     ? t(`agreements.kind.${detail.agreement.kind}`)
     : t('agreements.detail.title');
   const subtitle = detail?.revision.terms.subject.property?.listingRef;
+  if (certificate) return <AgreementCertificate id={id} onClose={() => setCertificate(false)} />;
   return (
     <Drawer className="agreement-dialog" size="wide" titleId={titleId} onClose={close}>
       <div className="drawer-top">
@@ -95,11 +47,17 @@ export function AgreementDetail({ id, onClose, onChanged, onEdit }) {
       </div>
       {view.status === 'ready' ? (
         <>
-          <Body view={view} selected={selected} onSelect={setSelected} />
+          <AgreementBody view={view} selected={selected} onSelect={setSelected} />
+          <div className="agreement-certificate-link">
+            <Button variant="light" disabled={view.busy} onClick={() => setCertificate(true)}>
+              {t('agreementLifecycle.certificate')}
+            </Button>
+          </div>
           <AgreementActions
             view={view}
             onClose={close}
             onEdit={onEdit}
+            proposalReviewed={Boolean(detail.proposal && selected === detail.proposal.number)}
             onDone={() => {
               setSelected(null);
               onChanged();

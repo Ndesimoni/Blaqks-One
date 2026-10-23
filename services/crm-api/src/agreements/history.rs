@@ -43,7 +43,7 @@ pub async fn revisions(
          LEFT JOIN agreements.crm_agreement_revisions p ON p.id=r.parent_id
          WHERE r.agreement_id=$1 AND ($2 OR EXISTS (
              SELECT 1 FROM agreements.crm_agreement_events e
-             WHERE e.revision_id=r.id AND e.action IN ('sent','countered')))
+             WHERE e.revision_id=r.id AND e.action IN ('sent','countered','amendment_proposed')))
          ORDER BY r.number"
     ))
     .bind(agreement)

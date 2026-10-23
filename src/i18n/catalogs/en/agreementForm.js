@@ -6,6 +6,9 @@ export default {
   'title.create': 'New agreement',
   'title.revise': 'Edit draft',
   'title.counter': 'Counter-offer',
+  'title.amend': 'Propose amendment',
+  'intro.amend':
+    'The current accepted terms remain in force until the other side accepts this proposal.',
   'intro.create': 'Write the offer as a draft. The other company sees nothing until you send it.',
   'intro.revise': 'Your changes become a new revision of the draft. Earlier revisions are kept.',
   'intro.counter':
@@ -18,6 +21,7 @@ export default {
   'save.create': 'Save draft',
   'save.revise': 'Save revision',
   'save.counter': 'Send counter-offer',
+  'save.amend': 'Propose amendment',
   'step.parties': 'Type and recipient',
   'step.subject': 'Property and client',
   'step.money': 'Commission and terms',
@@ -87,4 +91,6 @@ export default {
   'review.counter':
     'Sending freezes these terms as revision {number}. The other side then accepts, declines or answers it.',
   'review.kind': 'Type',
+  'review.amend':
+    'Proposing freezes revision {number} for the other side to review. Current accepted terms remain in force.',
 };

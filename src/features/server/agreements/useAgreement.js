@@ -5,6 +5,14 @@ const COMMANDS = {
   accept: 'acceptAgreement',
   decline: 'declineAgreement',
   revoke: 'revokeAgreement',
+  acceptAmendment: 'acceptAgreementAmendment',
+  declineAmendment: 'declineAgreementAmendment',
+  complete: 'completeAgreement',
+  cancel: 'cancelAgreement',
+  archive: 'archiveAgreement',
+  recordPayment: 'recordAgreementPayment',
+  confirmPayment: 'confirmAgreementPayment',
+  withdrawPayment: 'withdrawAgreementPayment',
 };
 
 /**
@@ -53,13 +61,16 @@ export function useAgreement(api, workspaceId, id) {
     load(controller.signal);
     return () => controller.abort();
   }, [load]);
-  const run = async (action) => {
+  const run = async (action, revisionId) => {
     const { agreement } = state.detail;
     setBusy(true);
     setNotice(null);
     try {
-      await api[COMMANDS[action]](workspaceId, agreement.id, agreement.version);
-      setNotice({ tone: 'success', key: `agreements.done.${action}` });
+      await api[COMMANDS[action]](workspaceId, agreement.id, agreement.version, revisionId);
+      const namespace = ['send', 'accept', 'decline', 'revoke'].includes(action)
+        ? 'agreements'
+        : 'agreementLifecycle';
+      setNotice({ tone: 'success', key: `${namespace}.done.${action}` });
       return true;
     } catch (failure) {
       setNotice(failureNotice(failure));
