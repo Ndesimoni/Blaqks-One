@@ -37,6 +37,8 @@ export default {
     'Some older photos are stored inside the listing and can’t be sent. Upload them again to include them.',
   'warning.over': 'Only the first 40 photos and 10 floor plans are sent.',
   'warning.unavailable': 'Some photos could not be found and are left out.',
+  'warning.pdf':
+    'PDF floor plans are left out, because they can carry hidden details. Upload the plan as an image to include it.',
   beforeTitle: 'Before they accept',
   afterTitle: 'After they accept',
   filesSent: 'Photos sent: {photos} · Floor plans sent: {plans}',

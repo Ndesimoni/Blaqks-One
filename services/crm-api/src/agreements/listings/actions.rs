@@ -49,8 +49,11 @@ pub async fn accept(
     .bind(acknowledged)
     .execute(&mut *step.tx)
     .await?;
+    // The acknowledged last day stays on the event, so the digest can be recomputed after
+    // an extension (R2a security review M2).
     let by = Some((step.actor, "recipient"));
-    store::event(&mut step.tx, step.row.id, "accepted", by, (None, None)).await?;
+    let ends = Some(step.row.view_ends_at.as_str());
+    store::event(&mut step.tx, step.row.id, "accepted", by, (None, ends)).await?;
     step.finish().await
 }
 

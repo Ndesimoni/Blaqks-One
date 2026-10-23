@@ -31,7 +31,6 @@ fn row(status: &str) -> ShareRow {
         from_email: Some("sender@example.test".into()),
         from_phone: Some("+971500000000".into()),
         to_name: Some("Agent".into()),
-        snapshot_id: Uuid::new_v4(),
         reference: "LS-ABCD1234".into(),
         facts: json!({"listingTitle": "Marina view", "community": "Dubai Marina",
             "description": "Sea views", "unitReference": "U-9"}),

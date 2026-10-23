@@ -1,15 +1,16 @@
 //! `GET /agreements/listing-shares/{id}/files/{file}` (R2 security review 2): access first,
 //! then only a file the snapshot names, looked up by the snapshot's own company and ID,
 //! never by the path's workspace. The sender's side reads them while the copies are kept;
-//! the agent only while the share is accepted and open; the receiving Admin never.
+//! the agent only while the share is accepted and open; the receiving Admin never. A copy
+//! reused from an earlier snapshot of the same listing is served from that snapshot.
 use super::{
     access::{self, Caller, Viewer},
-    read, store,
+    read, snapshot_store, store,
 };
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
-    media::{copies::KIND, serve},
+    media::{copies::KIND, copy_reuse, serve},
     state::AppState,
 };
 use axum::{
@@ -48,15 +49,15 @@ pub async fn file(
     if !allowed || !named {
         return Err(ApiError::missing());
     }
-    let response = serve::file(
-        &state,
-        &mut tx,
-        &row.workspace_id,
-        KIND,
-        row.snapshot_id,
-        file,
-    )
-    .await?;
+    let (workspace, record) = (&row.workspace_id, row.source_record_id);
+    let holder = copy_reuse::holder(&mut tx, workspace, file).await?;
+    let Some(holder) = holder else {
+        return Err(ApiError::missing());
+    };
+    if !snapshot_store::of_listing(&mut tx, holder, workspace, record).await? {
+        return Err(ApiError::missing());
+    }
+    let response = serve::file(&state, &mut tx, workspace, KIND, holder, file).await?;
     tx.commit().await?;
     Ok(response)
 }

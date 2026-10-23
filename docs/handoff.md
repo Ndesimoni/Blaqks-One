@@ -4,8 +4,9 @@ Latest checkpoint (2026-10-23): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2
 designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
 company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)). Migrations run through
 **0070**. Next, in order: co-broking from a listing share, then R2b (lead referrals), then A6
-(outside agents, migrations from 0071). BO1 and P1 wait until the owner says. The specialist
-code security reviews of A3b and R2a are still owed (specialists were unavailable).
+(outside agents, migrations from 0073). BO1 and P1 wait until the owner says. R2a's code
+security review is done and its Medium findings fixed (migration 0071, [record
+sharing](record-sharing.md#r2a-security-review-2026-10-23)); A3b's is still owed.
 
 Updated 2026-10-22, after commit `20955d8` on `feature/connected-crm`. Read this with
 `AGENTS.md` (project rules), the [token-efficient delivery protocol](token-efficient-delivery.md)

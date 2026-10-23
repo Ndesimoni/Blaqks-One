@@ -742,7 +742,8 @@ reservation because the rules needed their own file; A6 starts at 0071.
   allowlist (a Rust test sorts every Properties field into sent, location or never sent).
   Free text, links and photos go as the listing has them: the review shows exactly what is
   sent, warns about phone- or email-like text and links, and the sender must tick "I checked
-  the text and links above" before Send. Uploads already had their metadata removed. This is
+  the text and links above" before Send. Image uploads already had their metadata removed, and
+  PDFs stay behind (security review M3). This is
   not automatic redaction; the owner may still choose a stricter policy.
 - **Response matrix (amendment 6).** As in `agreements/listings/view.rs`: the sender's side
   sees everything at any time; the agent sees the twelve facts while pending, the listing,
@@ -762,3 +763,38 @@ reservation because the rules needed their own file; A6 starts at 0071.
 - **Tests:** Rust (allowlist sort, digests, Dubai days, response matrix, contact warning),
   `tests/api/outside-sharing-{contract,security,lifecycle,endings,guards}.test.mjs` (22),
   `tests/unit/listing-shares.test.js` and `tests/server-browser/outside-sharing.spec.js`.
+
+### R2a security review (2026-10-23)
+
+A code security review of R2a (commit `d296687`) found no High findings, five Medium and five
+Low. The Medium ones and L9 are fixed (migration **0071**); the rest are queued below.
+
+- **M1, evidence after a share closes (fixed).** The agent and the receiving Admin get the
+  twelve facts in the evidence only while the share is open; afterwards the digests and the
+  history still prove what was introduced. The sender's side keeps the whole snapshot.
+- **M2, the acceptance digest after an extension (fixed).** The `accepted` event keeps the
+  last day the agent acknowledged (`ends_at`), and the evidence shows it as
+  `acceptedViewEndsAt`, which the share digest uses. Acceptances made before 0071 have no
+  value there; when such a share was never extended, the current last day is the
+  acknowledged one.
+- **M3, PDF metadata (fixed).** PDF floor plans stay behind, because they keep document
+  properties the sender never sees; the review says so ("pdf" warning) and suggests uploading
+  the plan as an image. Image uploads already had their metadata removed.
+- **M4, copies filling the company's space (fixed).** A changed listing shared again reuses
+  the stored copies its earlier snapshots hold for the same source file and SHA-256
+  (`media::copy_reuse`), so only new files are copied and counted. The files route serves
+  such a copy from the snapshot that holds it, after checking that snapshot belongs to the
+  same listing. The future retention job must keep a copy while any snapshot naming it is
+  kept; retention itself is still not built.
+- **M5, unbounded copy runs (fixed).** At most four files are copied at once across the
+  server, and the copy, write and clean-up steps run as their own task, so a request dropped
+  mid-run still attaches or hides what it reserved.
+- **L9, a late copy upload (fixed).** A copy is marked stored only while its row is not
+  hidden; a copy whose row the sweep hid while its bytes moved is removed again at once.
+- **Queued:** L6, suspending a sending company leaves its outgoing shares open (end or hide
+  them on suspension); L7, a sending staff member keeps the full snapshot after losing the
+  listing (the design gives the sender's side everything at any time, so this needs an owner
+  decision); L8, the share's note is not scanned for contact details and the "I checked"
+  tick is enforced only in the browser; L10, the exact-email lookup limit is per member only
+  (add a per-company budget). Before hosting, the database role also needs grants that stop
+  it altering the evidence tables.

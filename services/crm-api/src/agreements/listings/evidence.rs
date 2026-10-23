@@ -1,8 +1,9 @@
 //! `GET /agreements/listing-shares/{id}/evidence`: the proof of introduction as a JSON
 //! attachment (never cached or sniffed). The sender's side gets the whole snapshot, each
 //! file's SHA-256, the location salt, the share digest and the history; the agent's side
-//! and the receiving Admin get the twelve facts, both digests and the history: enough to
-//! prove what was acknowledged while the full listing stays with the side that owns it.
+//! and the receiving Admin get both digests and the history, with the twelve facts while the
+//! share is open (none once it closes, R2a security review M1): enough to prove what was
+//! acknowledged while the full listing stays with the side that owns it.
 use super::{
     access::{self, Caller, Viewer},
     read, store, view,
@@ -25,7 +26,8 @@ one compact JSON object with its keys sorted at every level and no spaces. Snaps
 \"locationDigest\", \"scheme\": 1}. Location fingerprint: SHA-256 of the salt, the unit \
 reference, the address and the map link, one per line. Share digest, stored on acceptance: \
 {\"note\", \"recipient\": {\"memberId\", \"workspaceId\"}, \"scheme\": 1, \"sender\": \
-{\"memberId\", \"workspaceId\"}, \"sentAt\", \"shareId\", \"snapshotDigest\", \"viewEndsAt\"}.";
+{\"memberId\", \"workspaceId\"}, \"sentAt\", \"shareId\", \"snapshotDigest\", \"viewEndsAt\"}, \
+where viewEndsAt is acceptedViewEndsAt: the last day as it stood when the agent accepted.";
 
 #[derive(sqlx::FromRow)]
 struct Event {
@@ -78,8 +80,18 @@ pub async fn evidence(
             "locationSalt": row.location_salt,
         }),
         _ => {
-            json!({"digest": row.snapshot_digest, "scheme": 1, "basicFacts": view::basic(&row.facts)})
+            let basic = row.open().then(|| view::basic(&row.facts));
+            json!({"digest": row.snapshot_digest, "scheme": 1, "basicFacts": basic})
         }
+    };
+    // The acknowledged end (review M2); shares accepted before it was kept never moved it
+    // without an `extended` event, so their current end is the acknowledged one.
+    let extended = events.iter().any(|event| event.action == "extended");
+    let accepted = events.iter().find(|event| event.action == "accepted");
+    let acknowledged = match accepted.and_then(|event| event.ends_at.clone()) {
+        Some(at) => Some(at),
+        None if accepted.is_some() && !extended => Some(row.view_ends_at.clone()),
+        None => None,
     };
     let events: Vec<Value> = events
         .into_iter()
@@ -96,7 +108,8 @@ pub async fn evidence(
                 "sender": {"workspaceId": row.workspace_id, "memberId": row.from_id},
                 "recipient": {"workspaceId": row.recipient_workspace_id, "memberId": row.to_id},
                 "sentAt": row.created_at, "offerEndsAt": row.offer_ends_at,
-                "viewEndsAt": row.view_ends_at, "decidedAt": row.decided_at,
+                "viewEndsAt": row.view_ends_at, "acceptedViewEndsAt": acknowledged,
+                "decidedAt": row.decided_at,
                 "closedAt": row.closed_at, "note": row.note, "acceptedDigest": row.accepted_digest,
             },
             "snapshot": snapshot,

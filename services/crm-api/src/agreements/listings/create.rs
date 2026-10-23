@@ -6,7 +6,10 @@
 //! 3. under the locks again (workspace → listing → members), check everything once more and
 //!    write the snapshot (attaching the copies), the share and its `sent` event.
 //!
-//! Copies left unattached by a refusal or a parallel duplicate are hidden at once.
+//! Copies left unattached by a refusal or a parallel duplicate are hidden at once. Steps 2
+//! and 3 run as their own task, so a dropped request still attaches or hides what it
+//! reserved; a changed listing copies only files no earlier snapshot holds (R2a security
+//! review M4–M5).
 use super::{
     access::{self, Caller},
     create_checks::{self, Input, CHANGED},
@@ -28,7 +31,6 @@ use axum::{
     Json,
 };
 use serde_json::{json, Value};
-use std::collections::HashMap;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
@@ -52,25 +54,41 @@ pub async fn create(
     let made = snapshot_store::existing(&mut tx, &workspace, input.record, &draft.digest).await?;
     let reserved = match made {
         Some(_) => Vec::new(),
-        None => copies::reserve(&mut tx, &workspace, live.id, &draft.plan()).await?,
+        None => {
+            let reused =
+                snapshot_store::reusable(&mut tx, &workspace, input.record, &draft).await?;
+            let mut plan = draft.plan();
+            plan.retain(|(source, _)| !reused.contains_key(&source.id));
+            copies::reserve(&mut tx, &workspace, live.id, &plan).await?
+        }
     };
     tx.commit().await?;
-    copy_bytes::store(&state, &reserved).await?;
-    let finished = finish(&state, &session, &workspace, &input, &reserved).await;
-    // Whatever was not attached (a refusal, or a parallel share made the snapshot first).
-    copy_bytes::discard(&state.pool, &copy_bytes::ids(&reserved)).await?;
-    Ok((StatusCode::CREATED, Json(json!({ "share": finished? }))))
+    let actor = live.id;
+    let task = tokio::spawn(async move {
+        copy_bytes::store(&state, &reserved).await?;
+        let finished = finish(&state, actor, &workspace, &input, &reserved).await;
+        // Whatever was not attached (a refusal, or a parallel share made the snapshot first).
+        copy_bytes::discard(&state.pool, &copy_bytes::ids(&reserved)).await?;
+        finished
+    });
+    let unavailable = ApiError(
+        StatusCode::SERVICE_UNAVAILABLE,
+        copies::FAILED,
+        "copy_failed",
+    );
+    let share = task.await.map_err(|_| unavailable)??;
+    Ok((StatusCode::CREATED, Json(json!({ "share": share }))))
 }
 
 async fn finish(
     state: &AppState,
-    session: &Session,
+    actor: Uuid,
     workspace: &str,
     input: &Input,
     reserved: &[Reserved],
 ) -> ApiResult<Value> {
     let mut tx = state.pool.begin().await?;
-    let live = access::live(&mut tx, workspace, session.user.id).await?;
+    let live = access::live(&mut tx, workspace, actor).await?;
     let outside = outside_facts::shareable(&mut tx, workspace, &live, input.record).await?;
     let draft = snapshot::draft(&mut tx, workspace, input.record, outside, input.exact).await?;
     if draft.review != input.preview {
@@ -81,19 +99,19 @@ async fn finish(
         match snapshot_store::existing(&mut tx, workspace, input.record, &draft.digest).await? {
             Some(made) => made,
             None => {
-                let copy: HashMap<Uuid, Uuid> = reserved
-                    .iter()
-                    .map(|copy| (copy.source.id, copy.id))
-                    .collect();
-                if draft
-                    .plan()
+                let record = input.record;
+                let mut copy = snapshot_store::reusable(&mut tx, workspace, record, &draft).await?;
+                copy.extend(reserved.iter().map(|copy| (copy.source.id, copy.id)));
+                let plan = draft.plan();
+                if plan
                     .iter()
                     .any(|(source, _)| !copy.contains_key(&source.id))
                 {
                     return Err(ApiError::conflict(CHANGED));
                 }
-                let owner = (workspace, input.record, live.id);
-                snapshot_store::insert(&mut tx, owner, &draft, &copy).await?
+                let fresh = copy_bytes::ids(reserved);
+                let owner = (workspace, record, live.id);
+                snapshot_store::insert(&mut tx, owner, &draft, (&copy, &fresh)).await?
             }
         };
     let id = Uuid::new_v4();
@@ -118,7 +136,12 @@ async fn finish(
     let row = store::find(&mut tx, id)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let share = read::one_view(&mut tx, &row, &Caller::of(session, workspace)).await?;
+    let caller = Caller {
+        id: live.id,
+        workspace,
+        admin: live.role == "admin",
+    };
+    let share = read::one_view(&mut tx, &row, &caller).await?;
     tx.commit().await?;
     Ok(share)
 }

@@ -1,8 +1,13 @@
 //! Snapshot rows (migration 0067): insert-only, one per listing and digest, so an unchanged
 //! listing sent to a second agent reuses the same snapshot and its photo copies. The
 //! location salt stays with the listing's snapshots, so an unchanged listing keeps its digest.
+//! A changed listing's new snapshot reuses the copies its earlier snapshots hold for the
+//! same files (R2a security review M4).
 use super::{digest, snapshot::Draft};
-use crate::{error::ApiResult, media::copies};
+use crate::{
+    error::ApiResult,
+    media::{copies, copy_reuse},
+};
 use serde_json::{json, Value};
 use sqlx::{Postgres, Transaction};
 use std::collections::HashMap;
@@ -41,13 +46,50 @@ pub async fn salt_for(tx: &mut Tx<'_>, workspace: &str, record: Uuid) -> ApiResu
     .await?)
 }
 
+/// Source file → a stored copy that an earlier snapshot of this listing already holds.
+pub async fn reusable(
+    tx: &mut Tx<'_>,
+    workspace: &str,
+    record: Uuid,
+    draft: &Draft,
+) -> ApiResult<HashMap<Uuid, Uuid>> {
+    let snapshots: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM agreements.crm_listing_snapshots \
+         WHERE workspace_id=$1 AND source_record_id=$2",
+    )
+    .bind(workspace)
+    .bind(record)
+    .fetch_all(&mut **tx)
+    .await?;
+    let sources: Vec<_> = draft.plan().into_iter().map(|(source, _)| source).collect();
+    copy_reuse::reusable(tx, workspace, &snapshots, &sources).await
+}
+
+/// Whether `snapshot` is a snapshot of `record` in `workspace`.
+pub async fn of_listing(
+    tx: &mut Tx<'_>,
+    snapshot: Uuid,
+    workspace: &str,
+    record: Uuid,
+) -> ApiResult<bool> {
+    Ok(sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM agreements.crm_listing_snapshots \
+         WHERE id=$1 AND workspace_id=$2 AND source_record_id=$3)",
+    )
+    .bind(snapshot)
+    .bind(workspace)
+    .bind(record)
+    .fetch_one(&mut **tx)
+    .await?)
+}
+
 /// A new snapshot of `draft`, its media naming the stored copies (`copy` maps each source
-/// file to its copy), which are attached to it here.
+/// file to its copy); the `fresh` copies, made for it, are attached to it here.
 pub async fn insert(
     tx: &mut Tx<'_>,
     (workspace, record, actor): (&str, Uuid, Uuid),
     draft: &Draft,
-    copy: &HashMap<Uuid, Uuid>,
+    (copy, fresh): (&HashMap<Uuid, Uuid>, &[Uuid]),
 ) -> ApiResult<Uuid> {
     let id = Uuid::new_v4();
     let media: Vec<Value> = draft
@@ -82,9 +124,8 @@ pub async fn insert(
     .bind(actor)
     .execute(&mut **tx)
     .await?;
-    let ids: Vec<Uuid> = copy.values().copied().collect();
-    if !ids.is_empty() {
-        copies::attach(tx, workspace, actor, &ids, id).await?;
+    if !fresh.is_empty() {
+        copies::attach(tx, workspace, actor, fresh, id).await?;
     }
     Ok(id)
 }

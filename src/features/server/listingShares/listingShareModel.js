@@ -12,7 +12,9 @@ export const endReasons = Object.freeze([
   ...['holder_changed', 'listing_closed', 'listing_removed', 'member_left', 'company_closed'],
   'end_date',
 ]);
-export const warningCodes = Object.freeze(['contact', 'links', 'inline', 'over', 'unavailable']);
+export const warningCodes = Object.freeze([
+  ...['contact', 'links', 'inline', 'over', 'unavailable', 'pdf'],
+]);
 const actions = ['accept', 'decline', 'withdraw', 'stop', 'extend', 'evidence'];
 const viewers = ['sender', 'agent', 'agentAdmin'];
 export const factKeys = [...propertyFactKeys, ...listingDetailKeys];

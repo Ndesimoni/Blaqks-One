@@ -2,7 +2,9 @@
 //! exported-content policy as built): structured fields come from the allowlist; free text,
 //! links and photos are sent as the listing has them, so the review flags free text that
 //! looks like a phone or email, any links, and photos that cannot be sent, and the sender
-//! confirms. Copies get neutral names ("Photo 1"); uploads already had their metadata removed.
+//! confirms. Copies get neutral names ("Photo 1"); image uploads already had their metadata
+//! removed. PDFs keep document properties the sender never sees, so they stay behind (R2a
+//! security review M3).
 use super::snapshot::File;
 use crate::{media::copies::Source, records::outside_facts::Asset};
 use serde_json::{Map, Value};
@@ -34,8 +36,9 @@ pub fn files(
     kind: &'static str,
     assets: &[Asset],
     found: &HashMap<Uuid, Source>,
-) -> (Vec<File>, usize) {
+) -> (Vec<File>, usize, usize) {
     let mut kept = Vec::new();
+    let mut pdfs = 0;
     let label = if kind == "photo" {
         "Photo"
     } else {
@@ -45,6 +48,10 @@ pub fn files(
         let Some(source) = found.get(&asset.file) else {
             continue;
         };
+        if source.content_type == "application/pdf" {
+            pdfs += 1;
+            continue;
+        }
         let thumb = asset.thumb.and_then(|thumb| found.get(&thumb)).cloned();
         let name = format!("{label} {}", kept.len() + 1);
         kept.push(File {
@@ -54,14 +61,17 @@ pub fn files(
             thumb,
         });
     }
-    let missing = assets.len() - kept.len();
-    (kept, missing)
+    let missing = assets.len() - kept.len() - pdfs;
+    (kept, missing, pdfs)
 }
 
 /// The warning codes the review shows (the screen words them).
-/// `counts` are the older inline files, those over the limits and those not found.
-pub fn warnings(facts: &Map<String, Value>, counts: (usize, usize, usize)) -> Vec<&'static str> {
-    let (inline, over, missing) = counts;
+/// `counts` are the older inline files, those over the limits, those not found and PDFs.
+pub fn warnings(
+    facts: &Map<String, Value>,
+    counts: (usize, usize, usize, usize),
+) -> Vec<&'static str> {
+    let (inline, over, missing, pdfs) = counts;
     let mut warnings = Vec::new();
     let mut free = FREE_TEXT.iter().filter_map(|key| facts.get(*key)?.as_str());
     if free.any(looks_like_contact) {
@@ -78,6 +88,9 @@ pub fn warnings(facts: &Map<String, Value>, counts: (usize, usize, usize)) -> Ve
     }
     if missing > 0 {
         warnings.push("unavailable");
+    }
+    if pdfs > 0 {
+        warnings.push("pdf");
     }
     warnings
 }

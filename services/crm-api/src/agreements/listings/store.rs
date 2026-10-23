@@ -33,7 +33,6 @@ pub struct ShareRow {
     pub from_email: Option<String>,
     pub from_phone: Option<String>,
     pub to_name: Option<String>,
-    pub snapshot_id: Uuid,
     pub reference: String,
     pub facts: Value,
     pub media: Value,
@@ -62,7 +61,7 @@ pub fn select(tail: &str) -> String {
          {} AS opened_at,{} AS decided_at, \
          CASE WHEN l.lapsed THEN {} ELSE {} END AS closed_at,s.accepted_digest, \
          f.name AS from_name,f.email AS from_email,f.phone AS from_phone,t.name AS to_name, \
-         s.snapshot_id,n.reference,n.facts,n.media,n.exact_location,n.digest AS snapshot_digest, \
+         n.reference,n.facts,n.media,n.exact_location,n.digest AS snapshot_digest, \
          n.location_digest,n.location_salt \
          FROM agreements.crm_listing_shares s \
          JOIN agreements.crm_listing_snapshots n ON n.id=s.snapshot_id \

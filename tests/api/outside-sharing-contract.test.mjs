@@ -38,7 +38,9 @@ test('the agent sees twelve facts until accepting, then the listing and its phot
     media_floorplans: [{ name: 'owner-plan.pdf', type: 'application/pdf', file: plan }],
   });
   const review = await preview(teams.one, record);
-  assert.deepEqual(review.files, { photos: ['Photo 1'], floorPlans: ['Floor plan 1'] });
+  // PDFs keep document properties the sender never sees, so they stay behind (review M3).
+  assert.deepEqual(review.files, { photos: ['Photo 1'], floorPlans: [] });
+  assert.ok(review.warnings.includes('pdf'), JSON.stringify(review.warnings));
   assert.equal(review.before.description, undefined);
   assert.equal(review.after.description, 'Bright villa');
   absent(review, [...PRIVATE, ...LOCATION], 'preview');
@@ -58,7 +60,7 @@ test('the agent sees twelve facts until accepting, then the listing and its phot
   assert.equal(result.status, 200, JSON.stringify(result.value));
   const open = result.value.share;
   assert.equal(open.listing.description, 'Bright villa');
-  assert.equal(open.photos.length + open.floorPlans.length, 2);
+  assert.equal(open.photos.length + open.floorPlans.length, 1);
   assert.ok(open.from.phone && open.from.email, 'the sender can be reached');
   assert.notEqual(open.photos[0].file, photo, 'a copy, never the listing’s own file');
   absent(open, [...PRIVATE, ...LOCATION, record.id, 'owner-front'], 'accepted');

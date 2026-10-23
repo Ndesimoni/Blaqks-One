@@ -5,6 +5,7 @@ pub mod backfill;
 pub mod contents;
 pub mod copies;
 pub mod copy_bytes;
+pub mod copy_reuse;
 pub mod inbound;
 pub mod inbound_store;
 mod jpeg;

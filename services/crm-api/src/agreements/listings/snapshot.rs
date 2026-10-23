@@ -81,8 +81,8 @@ pub async fn draft(
         .into_iter()
         .map(|source| (source.id, source))
         .collect();
-    let (mut kept, missing) = files("photo", &outside.photos, &found);
-    let (plans, missing_plans) = files("floorPlan", &outside.plans, &found);
+    let (mut kept, missing, pdfs) = files("photo", &outside.photos, &found);
+    let (plans, missing_plans, pdf_plans) = files("floorPlan", &outside.plans, &found);
     kept.extend(plans);
     let mut facts = outside.facts;
     let (salt, location) = if exact {
@@ -103,7 +103,8 @@ pub async fn draft(
         (Some(salt), Some(fingerprint))
     };
     let missing = missing + missing_plans;
-    let warnings = review::warnings(&facts, (outside.inline, outside.over, missing));
+    let counts = (outside.inline, outside.over, missing, pdfs + pdf_plans);
+    let warnings = review::warnings(&facts, counts);
     let mut draft = Draft {
         facts,
         files: kept,
