@@ -251,6 +251,8 @@ A board inside Blaqks One where brokers post what their clients are looking for 
 | Commission     | Choosing starts a co-broking agreement; the exact unit and the brokers' phones (Chat on WhatsApp) appear after both accept. Disputes only for deals with an agreement in Blaqks One.                                                                                                          |
 | Profiles       | Facts only, no star ratings: deals completed, completion rate, response time, disputes lost; a link to the broker's website listings later.                                                                                                                                                   |
 | Disputes       | Blaqks One decides on both sides' evidence; facts shown ("Commission disputes lost: 1", "Marketplace access suspended"), never an "untrustworthy" label; appeal, and the record fades once paid. A UAE lawyer reviews the terms and display before launch.                                    |
+| Company switch | Decided 2026-10-24: an Admin may turn the marketplace off for their whole company (on by default); its members then neither browse nor post, and their open requests leave the board.                                                                                                         |
+| Terms          | Decided 2026-10-24: a placeholder terms version, marked for UAE lawyer review, is used for development and testing; launch needs the lawyer's text.                                                                                                                                           |
 
 ## Still open
 

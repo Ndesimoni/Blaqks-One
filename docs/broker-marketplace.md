@@ -163,7 +163,195 @@ company has posted is blocked without saying who; 30 days, renewable.
 
 ## 12. Still open
 
-- Whether a company Admin can switch the marketplace off for their team (asked, not
-  decided).
+- ~~Whether a company Admin can switch the marketplace off~~: yes, decided 2026-10-24
+  (§13).
 - The terms text, the dispute fade period and the suspension length (lawyer review).
 - Exact stats definitions (MK4 design).
+
+## 13. Technical design (proposed 2026-10-24, for the architecture and security reviews)
+
+MK1 is designed in full; MK2–MK4 are outlined so the data model fits from the start. Each
+later packet gets its own short design before it is built.
+
+### Ownership
+
+- **Module `marketplace/`** in `services/crm-api/src`, owning the PostgreSQL schema
+  `marketplace` and the routes under `/api/crm/workspaces/{workspace}/marketplace/...`.
+  Frontend: `src/features/server/marketplace/` and the client
+  `src/services/crm/marketplace.js`. A new **Marketplace** screen in the navigation.
+- It calls `auth` for live membership and names, `workspaces` for company names, `media` for
+  the profile photo, `records` (from MK2) for client requirements and property facts, and
+  Agreements (from MK3) for listing shares and co-broking. It never reads another module's
+  tables, and adds no foreign keys into them (rule 9, decision D6).
+- **Who:** any active member of a live company. Never the Super Admin (one identical
+  not-found on every route, as in R2). A member's own company is always their session's.
+
+### MK1 tables
+
+- `crm_market_terms` (insert-only): `version` (primary key, for example `2026-10-24.1`),
+  `body` (the terms text), `commitments` (the four statements as JSON), `published_at`.
+  The newest published row is current. The first version is a **draft marked for UAE lawyer
+  review**; launch needs the reviewed text.
+- `crm_market_profiles`: `member_id` (primary key), `workspace_id`, `areas` (1–12
+  community names, each up to 80 characters), `property_types` (from residential sale,
+  residential rent, commercial sale, commercial rent; at least one), `experience_years`
+  (0–60), `licence_number` (optional, up to 40), `licence_authority` (RERA, ADREC or other;
+  required with a number), `photo_id` (optional media object), `status` (`active`, or
+  `suspended` from MK5), `joined_at`, `updated_at`, `version` (optimistic).
+- `crm_market_acceptances` (insert-only evidence): `id`, `member_id`, `workspace_id`,
+  `terms_version`, `commitments_digest` (SHA-256 of the four statements as accepted),
+  `accepted_at`. Joining writes the first; a new terms version needs a new one before the
+  member can post or answer (MK2), but they can still read.
+
+### MK1 routes
+
+| Route                                        | What it does                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /marketplace/me`                        | The caller's profile (or `null`), the current terms version and whether they accepted it                                                                                         |
+| `GET /marketplace/terms/{version}`           | One terms version's text and commitments                                                                                                                                         |
+| `POST /marketplace/join`                     | Profile fields, `commitments: [true, true, true, true]` and `termsVersion`, in one transaction: profile plus acceptance. Refused if already joined or the version is not current |
+| `PATCH /marketplace/me`                      | `expectedVersion` plus profile fields                                                                                                                                            |
+| `POST /marketplace/terms/accept`             | `termsVersion`: accept a newer version                                                                                                                                           |
+| `PUT` / `DELETE /marketplace/me/photo`       | Attach an uploaded image (`mediaId`) as the profile photo, or remove it                                                                                                          |
+| `GET /marketplace/profiles/{memberId}`       | Another member's marketplace profile, for members who joined                                                                                                                     |
+| `GET /marketplace/profiles/{memberId}/photo` | Their photo, for members who joined                                                                                                                                              |
+
+- **What another member sees:** name, company name, photo, areas, property types, years of
+  experience, licence (when given), joined date and, from MK4, the stats. Never email or
+  phone: brokers' phones appear only after a co-broking agreement is accepted (MK4).
+- **Hidden profiles:** a member who is suspended, archived or has left their company, or
+  whose company is suspended or archived, is not shown (checked on every read, as the
+  listing-share pause does).
+- **The photo:** uploaded through the existing media upload (images only, metadata removed,
+  size limits), then attached with owner kind `market_profile`. Served only to members who
+  joined, with the media module's safe headers. Removing or replacing it hides the old file.
+- **Writes** check CSRF and the caller's live profile after the workspace lock, like every
+  other connected write. Activity: "Joined the marketplace", "Accepted the marketplace
+  terms {version}", "Updated their marketplace profile" (no field values).
+
+### MK1 screens
+
+- **Not joined:** a short introduction ("Post what your clients are looking for; brokers
+  with a matching property answer privately") and **Join the marketplace**: a stepped form
+  (profile → commitments → terms), each commitment its own tick, and the terms readable in
+  full before accepting.
+- **Joined:** the Marketplace screen shows "My marketplace profile" (edit, photo) and, until
+  MK2, an empty board ("Client requests arrive with the next update"). A newer terms
+  version shows a banner and **Review and accept**.
+- **Another broker's profile** opens in a dialog from anywhere their name appears.
+
+### MK2–MK4 outline
+
+- **MK2 requests:** `crm_market_requests` (random ID, company, poster, the source client's
+  ID kept on the poster's side only, a frozen copy of the allowed requirements from a new
+  `records` function, preferences, state `open`/`full`/`closed`/`expired`, round,
+  `expires_at`, version). At most 5 open per member and 1 per client. The board is paged,
+  filtered on the server, limited per member against scraping, and never shows the client
+  or the source ID. A worker job sends the expiry reminder.
+- **MK3 answers:** `crm_market_answers` (request, round, answering company and member, the
+  listing share it created, the match checklist, state `waiting`/`chosen`/`not_chosen`/
+  `not_a_match`). The request row is locked to count 3 per round; one answer per broker per
+  round, never the same property twice. The must-match rules run on the server against the
+  property's facts. Sending the answer reuses the listing-share sending path as a function
+  (to be split out of the R2a route). Match alerts come from a worker job that checks
+  recently changed listings against open requests, so `records` gains no trigger.
+- **MK4 choosing:** choosing an answer accepts its listing share for the requester and opens
+  "co-broking from a share" (built). When the agreement is accepted, the exact unit and
+  both brokers' phones appear. Stats come from Agreements (completed, accepted, response
+  times) and disputes from MK5.
+
+### Decided before MK1 (owner, 2026-10-24)
+
+1. **Company switch:** an Admin may turn the marketplace off for their whole company; it is
+   on by default. When off, the company's members neither browse nor post, and their open
+   requests leave the board. The switch belongs to the marketplace module
+   (`crm_market_companies`: company, on or off, who changed it and when).
+2. **Draft terms:** the first terms version is a placeholder written by us and marked for
+   UAE lawyer review; development and testing use it, launch does not.
+
+## 14. Review amendments (2026-10-24)
+
+The architecture and security reviews of §13 found two High issues and asked for the
+changes below. They override §13 where they differ.
+
+### MK1
+
+1. **One gate on every route.** `marketplace::gate` refuses with the one not-found unless
+   the caller is not the Super Admin; is an active member of a live company (`active`,
+   `owner_active`, same workspace, not archived); the company is not frozen and is not the
+   organisation workspace; the company switch is on; **the company may use the marketplace**
+   (security High 1, owner decision pending); and, for anything beyond joining, the member
+   has joined with the current consent and terms. MK5 adds "not suspended". The same
+   condition, written once in SQL, decides which profiles anyone can see, and the MK2 board
+   reuses it.
+2. **Company switch:** `crm_market_companies` (company, on or off, version, who and when;
+   no row means on) with insert-only history; Admin-only `GET`/`PUT /marketplace/company`
+   with `expectedVersion`, under the workspace lock. Off hides the company's members and
+   requests when read; it does not change their stored state.
+3. **Consent and leaving.** Joining also records a separate, versioned **publication
+   consent**: "My name, photo, company, areas, experience and licence are shown to members
+   of every company on Blaqks One." `POST /marketplace/leave` removes the profile and
+   photo at once; acceptances and events stay as evidence; joining again asks for consent
+   and the current terms again. A UAE lawyer confirms the legal basis (PDPL, Decree-Law
+   45/2021) with the terms.
+4. **Terms bound to their text.** `crm_market_terms` gains `digest` (SHA-256 of the body,
+   the consent and the canonical commitments), `draft` and a unique `published_at`;
+   current is the newest `published_at` up to now, never a sort of the version text.
+   Terms are inserted only by migrations. Acceptances store `terms_digest` (foreign key to
+   the terms row, same module) with one acceptance per member and version; the client sends
+   the version, the digest it showed and one `true` per stored commitment; any mismatch is
+   409 `terms_outdated`. `accepted_at` is the database clock. Insert-only and no-truncate
+   triggers on terms, acceptances and events. Draft terms are refused when hosted.
+5. **Events, not team activity:** an insert-only `crm_market_events` (joined, left, terms
+   accepted, profile updated, photo changed, company switched), naming the member and the
+   action only. `crm_activity` belongs to records and is not used.
+6. **No `status` column.** MK5 suspensions are an insert-only `crm_market_suspensions`
+   table (start, end, decision) that the gate reads.
+7. **The photo:** JPEG, PNG or WebP only, at most 2 MB and 2048 × 2048 pixels, checked
+   before the attach commits (uploads also accept PDFs). Owner kind `market_profile` with
+   the member as owner; replacing attaches the new file, removes the old one and updates
+   `photo_id` in one transaction. Served as `GET /marketplace/profiles/{memberId}/photo`
+   (no media ID in the path) through `media::serve::file` in the profile's own company.
+   This is the first original upload served to another company; image uploads already have
+   their metadata removed.
+8. **Free text cannot carry contacts:** areas are the emirates covered (fixed list) plus up
+   to 12 communities (up to 60 characters; letters, digits, spaces and `' - . &`), each
+   stored with a normalised key for MK3 matching. The licence number has a format per
+   authority. Every text runs the listing-share contact check and refuses links. Company
+   names and licences are labelled "declared by the broker, not verified by Blaqks One".
+9. **Read limits:** profile and photo reads are limited per member and per company each
+   hour (`throttle::consume_window`), against scraping.
+10. **Migrations:** 0073 (marketplace schema, tables and triggers, error codes `P0M…`
+    mapped in `marketplace::errors`) and 0074 (media: the `market_profile` owner kind).
+    Update `scripts/boundaries*.json`, the domain map and rule 9 list in
+    [service boundaries](service-boundaries.md), and the backend-foundation module map.
+    DB1 lists the terms, acceptances and events as add-and-read only.
+
+### MK2–MK4 (for their own designs)
+
+- **MK2:** a new client-requirements allowlist in `records` (the planned
+  `outside_facts::lead` went with R2b), with a Rust test that sorts every client field;
+  fixed choices only, budget in bands, move-in by month; the source client ID in a
+  poster-side table no cross-company response reads; a client-consent tick; paging with no
+  totals and per-member and per-company read limits; a request closes when its client
+  changes holder or is deleted, or its poster leaves (lazily or by trigger, with a
+  decision-log entry). A test scans every response for the client's ID and name. Ask the
+  owner whether to build a fixed UAE community list for exact matching.
+- **MK3:** listing shares gain `origin` (`direct` or `marketplace`); marketplace shares
+  keep the exact location in the snapshot but withhold it and the sender's contact until the
+  linked co-broking agreement is accepted, and the generic accept, decline and withdraw
+  routes refuse them. An answer's liveness comes from its share through an agreements read
+  function (offers lapse after 14 days today; the marketplace offer length is decided in
+  MK3). The send path is split into `listings/send.rs` (`prepare` in the caller's
+  transaction; `run`, which keeps the copy clean-up, with a callback in the same
+  transaction), with every R2a check kept, the recipient taken from the request and exact
+  location forced on for the snapshot only. Lock order: caller's workspace, listing,
+  request, answer, share, members; never the other company's workspace. The database
+  enforces 3 slots per round (slot 1–3, unique per request, round and slot; one per member
+  per round; never the same listing twice). Must-match runs on the frozen request in the
+  same transaction; "Not a match" ends the share. Rounds and rejections are limited.
+- **MK4:** the exact unit and both phones are released only once the agreement is
+  accepted, each release an insert-only event; stats filter on the share origin.
+- **Reminders and match alerts** are worked out when the member opens the Marketplace (a
+  records read within what they may see) and shown as a badge; there is no worker job
+  until a separate `notifications` module exists.
