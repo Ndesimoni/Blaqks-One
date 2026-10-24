@@ -1,6 +1,7 @@
-//! `GET …/marketplace/board` (packet MK2): other companies' open, unexpired requests whose poster
-//! is visible and still holds their client, twenty per page with no totals. Filters run on the
-//! server; the response never carries the client, the source record, the exact budget or a phone.
+//! `GET …/marketplace/board` (packet MK2): open, unexpired requests whose poster is visible and
+//! still holds their client, twenty per page with no totals. The caller's own company is listed
+//! too, marked `yourCompany` (owner, 2026-10-24). Filters run on the server; the response never
+//! carries the client, the source record, the exact budget or a phone.
 use super::{
     board_filters::{filters, Board},
     board_limits, gate, request_view, requests, requests_board, sources, visibility,
@@ -51,7 +52,7 @@ async fn page(
     let mut items: Vec<Value> = Vec::new();
     for _ in 0..ROUNDS {
         let at = after.as_ref().map(|(at, id)| (at.as_str(), *id));
-        let rows = requests_board::board_page(tx, workspace, filters, at, PAGE).await?;
+        let rows = requests_board::board_page(tx, filters, at, PAGE).await?;
         let full = rows.len() as i64 == PAGE;
         let Some(last) = rows.last() else {
             return Ok((items, None));
@@ -87,7 +88,11 @@ async fn page(
                 "company": seen.company,
                 "hasPhoto": seen.row.photo_id.is_some(),
             });
-            items.push(request_view::board(row, broker));
+            items.push(request_view::board(
+                row,
+                broker,
+                row.workspace_id == workspace,
+            ));
             kept = Some((row.cursor_at.clone(), row.id));
             if items.len() as i64 == PAGE {
                 tail = index + 1 < rows.len();

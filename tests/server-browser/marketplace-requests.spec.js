@@ -63,9 +63,17 @@ test('a request is posted, seen by another company, renewed and closed', async (
     });
     await expect(poster.page.getByText('Synthetic Request Client').first()).toBeVisible();
     await shots(poster.page, testInfo, 'marketplace-my-requests');
+    // The poster's own company sees the request on the Board, marked as theirs.
+    await poster.page.getByRole('tab', { name: 'Board' }).click();
+    const ownCard = poster.page.locator('.market-board-card', { hasText: 'Your company' });
+    await expect(ownCard.first()).toContainText('Dubai Marina', { timeout: 30000 });
+    await expect(poster.page.getByText(record.record.full_name)).toHaveCount(0);
+    await shots(poster.page, testInfo, 'marketplace-board-own');
 
     await openSection(viewer.page, 'Marketplace');
-    const card = viewer.page.locator('.market-board-card').first();
+    const card = viewer.page
+      .locator('.market-board-card', { hasText: teams.one.user.name })
+      .first();
     await expect(card).toContainText('Dubai Marina', { timeout: 30000 });
     await expect(card).toContainText(teams.one.user.name);
     // The other company never sees who the client is.

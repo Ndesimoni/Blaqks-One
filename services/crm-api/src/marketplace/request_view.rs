@@ -49,9 +49,10 @@ pub fn mine(row: &Row, client: Option<Uuid>, name: Option<&str>) -> Value {
     Value::Object(item)
 }
 
-/// One card on the board: the facts and who posted it.
-pub fn board(row: &Row, broker: Value) -> Value {
+/// One card on the board: the facts, who posted it, and whether they are the viewer's colleague.
+pub fn board(row: &Row, broker: Value, your_company: bool) -> Value {
     let mut item = facts(row);
     item.insert("broker".to_owned(), broker);
+    item.insert("yourCompany".to_owned(), json!(your_company));
     Value::Object(item)
 }

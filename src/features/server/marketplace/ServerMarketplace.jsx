@@ -6,6 +6,7 @@ import './marketplace.css';
 import './marketplace-join.css';
 import './marketplace-profile.css';
 import './marketplace-requests.css';
+import './marketplace-picker.css';
 import { MarketplaceApproved } from './MarketplaceApproved.jsx';
 import { MarketplaceNotApplied } from './MarketplaceNotApplied.jsx';
 import { MarketplaceWaiting } from './MarketplaceWaiting.jsx';

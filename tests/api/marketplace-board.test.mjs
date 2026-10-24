@@ -34,6 +34,7 @@ const ALLOWED = [
   'propertyType',
   'purpose',
   'ready',
+  'yourCompany',
 ];
 
 test('twenty per page, an opaque cursor, no totals and no repeats', async () => {
@@ -64,6 +65,7 @@ test('a card carries the request and the broker, never the client or the budget'
   assert.equal(card.broker.name, teams.agent.user.name);
   assert.equal(card.broker.company, teams.other.user.name);
   assert.equal(card.broker.hasPhoto, false);
+  assert.equal(card.yourCompany, false);
   assert.equal(typeof card.broker.memberId, 'string');
   const text = JSON.stringify(seen.value);
   for (const secret of ['Synthetic Request Client', '050 123', 'synthetic.client@', 'Portal'])

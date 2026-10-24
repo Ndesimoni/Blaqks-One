@@ -39,8 +39,7 @@
   width: 100%;
 }
 .market-board-list,
-.market-request-list,
-.market-client-list {
+.market-request-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -66,6 +65,16 @@
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+}
+.market-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+.market-chip.is-own {
+  background: var(--primary);
+  color: var(--on-primary);
 }
 .market-chip.is-closed {
   opacity: 0.65;
@@ -120,24 +129,6 @@
 .market-consent {
   align-items: flex-start;
   margin: 0.75rem 0;
-}
-.market-picker .field {
-  margin-bottom: 0.75rem;
-}
-.market-client {
-  width: 100%;
-  text-align: left;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 0.5rem;
-  background: var(--panel);
-  color: var(--ink);
-  font: inherit;
-  cursor: pointer;
-}
-.market-client:hover,
-.market-client:focus-visible {
-  border-color: var(--accent);
 }
 .field-wide {
   grid-column: 1 / -1;

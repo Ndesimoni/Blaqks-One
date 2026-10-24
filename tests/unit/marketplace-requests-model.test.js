@@ -39,6 +39,9 @@ test('a board page reads its cards and its cursor', () => {
   assert.equal(page.requests[0].broker.name, 'Synthetic Broker');
   assert.equal(page.nextCursor, '2026-10-24|abc');
   assert.equal(readBoard({ requests: [], nextCursor: null }).nextCursor, '');
+  assert.equal(page.requests[0].yourCompany, false);
+  const own = readBoard({ requests: [{ ...facts, broker, yourCompany: true }], nextCursor: null });
+  assert.equal(own.requests[0].yourCompany, true);
 });
 
 test('a card may not carry the client or the exact budget', () => {

@@ -519,3 +519,11 @@ and a UAE lawyer's review.
   viewer's own profile) shows the request and never the client's name. Not changed: board cards
   show initials, not photos, because broker photos are served `no-store` and each one counts
   against the 300-an-hour profile read limit.
+- **Your own company on the Board (owner, 2026-10-24).** The owner asked why a posted request
+  did not show for the poster or their colleagues: the Board listed other companies only, and My
+  requests shows each member only their own. The owner decided the Board lists the caller's own
+  company too, each card marked "Your company" (`yourCompany` in the board response), so
+  colleagues see what their team posted and can help inside the CRM. The board text and the
+  client-consent line now say the request is shared with colleagues and with brokers of other
+  companies. In MK3 a colleague's request is not answered through the marketplace; answering is
+  for other companies only.

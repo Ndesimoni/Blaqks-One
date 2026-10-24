@@ -109,6 +109,7 @@ export function readBoard(value) {
   const requests = value.requests.map((card) => ({
     ...readFacts(card),
     broker: readBroker(card.broker),
+    yourCompany: card.yourCompany === true,
   }));
   const nextCursor = value.nextCursor === null ? '' : text(value.nextCursor, 200);
   return { requests, nextCursor };

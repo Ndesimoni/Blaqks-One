@@ -113,15 +113,18 @@ test('an edit keeps the expiry date and needs the version last seen', async () =
   assert.equal(stranger.status, 404, JSON.stringify(stranger.value));
 });
 
-test('the board lists another company and never your own', async () => {
+test('the board lists other companies and marks your own company', async () => {
   const theirs = await postHeld(teams.agent, (await client(teams, 'agent')).id);
   const seen = await board(teams.two);
   assert.equal(seen.status, 200, JSON.stringify(seen.value));
-  const ids = seen.value.requests.map((row) => row.id);
-  assert.equal(ids.includes(theirs.id), true);
+  const cards = new Map(seen.value.requests.map((row) => [row.id, row]));
+  assert.equal(cards.get(theirs.id)?.yourCompany, false);
   const own = (await mine(teams.one)).value.requests.filter((row) => row.state === 'open');
   assert.ok(own.length > 0);
-  for (const row of own) assert.equal(ids.includes(row.id), false, row.id);
+  for (const row of own) assert.equal(cards.get(row.id)?.yourCompany, true, row.id);
+  const text = JSON.stringify(seen.value);
+  for (const row of own.filter((one) => one.clientName))
+    assert.equal(text.includes(row.clientName), false, 'client named');
   const off = await switchCompany(teams.other, false, 0);
   assert.equal(off.status, 200, JSON.stringify(off.value));
   const hidden = await board(teams.two);
