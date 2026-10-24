@@ -17,6 +17,11 @@ a:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 3px;
 }
+/* Buttons share the link focus treatment so keyboard focus is unmistakable. */
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
 .media-upload-tile:focus-within,
 .media-attach-button:focus-within {
   outline: 3px solid var(--gold);

@@ -14,10 +14,10 @@ function statusClass(val) {
 function Badge({ children, tone }) {
   return (
     <span className={'badge badge-' + (tone || statusClass(children))}>
-      <span className="badge-dot" />
+      <span className="badge-dot" aria-hidden="true" />
       {children || '—'}
     </span>
   );
 }
 
-export { statusClass, Badge };
+export { Badge, statusClass };

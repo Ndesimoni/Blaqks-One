@@ -1,5 +1,5 @@
-import { Icon } from './Icon.jsx';
 import React from 'react';
+import { Icon } from './Icon.jsx';
 
 function Button({
   children,
@@ -16,12 +16,12 @@ function Button({
     <button
       {...props}
       type={type}
-      title={title}
+      title={title || undefined}
       className={'btn btn-' + variant + ' ' + className}
       onClick={onClick}
       disabled={disabled}
     >
-      {icon && <Icon name={icon} size={16} />}
+      {icon && <Icon name={icon} size={16} aria-hidden="true" />}
       <span>{children}</span>
     </button>
   );

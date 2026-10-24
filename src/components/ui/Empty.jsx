@@ -1,9 +1,9 @@
-import { Icon } from './Icon.jsx';
 import React from 'react';
+import { Icon } from './Icon.jsx';
 
 function Empty({
   title = 'Nothing here yet',
-  detail = 'Create your first record to get started.',
+  detail = 'No records to show here.',
   icon = 'note',
   action,
 }) {

@@ -11,10 +11,11 @@ export function Pagination({
 }) {
   const pages = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(page, pages - 1);
+  const position = `Page ${current + 1} of ${pages}`;
   return (
     <nav
       className={variant === 'table' ? 'table-footer' : 'collection-pagination'}
-      aria-label={label}
+      aria-label={label || itemLabel + ' pagination'}
     >
       <span role="status">
         Showing {total ? current * pageSize + 1 : 0}–{Math.min((current + 1) * pageSize, total)} of{' '}
@@ -26,7 +27,10 @@ export function Pagination({
             Previous
           </button>
           <span>
-            {variant === 'table' ? `${current + 1} / ${pages}` : `Page ${current + 1} of ${pages}`}
+            <span className="sr-only">{position}</span>
+            <span aria-hidden="true">
+              {variant === 'table' ? `${current + 1} / ${pages}` : position}
+            </span>
           </span>
           <button
             type="button"
