@@ -8,6 +8,8 @@ pub const CLOSED: &str = "This agreement cannot move to that state.";
 pub const IDENTITY: &str = "Agreement identity cannot be changed.";
 pub const REVISION: &str = "The agreement revision is invalid.";
 pub const HANDOVER: &str = "Use Deals to act on this hand-over.";
+pub const SHARE_CLOSED: &str = "This listing share is no longer open.";
+pub const SHARE_TAKEN: &str = "There is already a co-broking agreement for this listing.";
 
 pub fn mapped(code: &str) -> Option<ApiError> {
     Some(match code {
@@ -16,6 +18,8 @@ pub fn mapped(code: &str) -> Option<ApiError> {
         "P0G04" | "P0G05" => ApiError::conflict(IDENTITY),
         "P0G06" => ApiError::conflict(CLOSED),
         "P0G07" => ApiError::conflict(HANDOVER),
+        "P0G10" => ApiError::conflict(SHARE_CLOSED),
+        "P0G11" => ApiError::conflict(SHARE_TAKEN),
         _ => return None,
     })
 }
@@ -30,6 +34,7 @@ mod tests {
         assert_eq!(status("P0G01"), Some((409, "conflict")));
         assert_eq!(status("P0G06"), Some((409, "conflict")));
         assert_eq!(status("P0G07"), Some((409, "conflict")));
+        assert_eq!(status("P0G11"), Some((409, "conflict")));
         assert_eq!(status("P0F01"), None);
         assert_eq!(status("23505"), None);
     }

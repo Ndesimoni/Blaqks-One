@@ -38,6 +38,7 @@ import enRecordKeeps from './en/recordKeeps.js';
 import enRecordShares from './en/recordShares.js';
 import enListingShares from './en/listingShares.js';
 import enListingShareViews from './en/listingShareViews.js';
+import enCoBroking from './en/coBroking.js';
 import enHandoverReview from './en/handoverReview.js';
 import enInboxSend from './en/inboxSend.js';
 import enInboxTriage from './en/inboxTriage.js';
@@ -56,6 +57,7 @@ export const catalogs = Object.freeze({
     calculators: enCalculators,
     channels: enChannels,
     chat: enChat,
+    coBroking: enCoBroking,
     common: enCommon,
     dealParties: enDealParties,
     emailAddresses: enEmailAddresses,

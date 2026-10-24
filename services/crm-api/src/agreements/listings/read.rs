@@ -4,6 +4,7 @@
 //! agent's first read is recorded once as `opened`, evidence of receipt.
 use super::{
     access::{self, Caller, Viewer},
+    co_broking_view,
     store::{self, ShareRow},
     view::{self, Companies},
 };
@@ -60,10 +61,11 @@ pub async fn views(
     Ok(out)
 }
 
-/// One view, or the shared not-found.
+/// One view with its co-broking, or the shared not-found.
 pub async fn one_view(tx: &mut Tx<'_>, row: &ShareRow, caller: &Caller<'_>) -> ApiResult<Value> {
     let found = views(tx, std::slice::from_ref(row), caller).await?;
-    found.into_iter().next().ok_or_else(ApiError::missing)
+    let view = found.into_iter().next().ok_or_else(ApiError::missing)?;
+    co_broking_view::attach(tx, row, caller, view).await
 }
 
 pub async fn list(

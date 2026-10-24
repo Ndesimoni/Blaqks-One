@@ -95,3 +95,7 @@ label.outside-share-check {
 .listing-sides {
   justify-self: start;
 }
+.outside-share-cobroking {
+  display: flex;
+  margin: 0 0 12px;
+}

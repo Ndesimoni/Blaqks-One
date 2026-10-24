@@ -1,6 +1,8 @@
 import React from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
+import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { shareOther, unbroken } from './agreementDraft.js';
 import { AgreementTerms } from './AgreementTerms.jsx';
 import { previewTerms } from './readDraft.js';
 
@@ -10,6 +12,7 @@ import { previewTerms } from './readDraft.js';
  */
 export function FormReview({ form, mode, detail, names, number }) {
   const { t } = useI18n();
+  const { user } = useSession();
   if (!form.terms)
     return (
       <div className="agreement-notice is-error" role="alert">
@@ -17,15 +20,23 @@ export function FormReview({ form, mode, detail, names, number }) {
         <p>{t('agreementForm.review.incomplete')}</p>
       </div>
     );
-  const kind = mode === 'create' ? form.draft.kind : detail.agreement.kind;
+  const kind = detail?.agreement?.kind ?? form.draft.kind;
   const recipientCompany =
-    mode === 'create' ? form.recipient?.company : detail.agreement.parties?.recipient?.company;
+    {
+      create: () => form.recipient?.company,
+      share: () => shareOther(detail, user).company || t('listingShareViews.otherCompany'),
+    }[mode]?.() ?? detail?.agreement?.parties?.recipient?.company;
   return (
     <div className="agreement-review">
       <div className="agreement-notice is-info" role="note">
         <Icon name="shield" size={18} />
         <p>{t(`agreementForm.review.${mode}`, { number, name: names.recipient || '' })}</p>
       </div>
+      {form.draft.frozen && (
+        <p className="agreement-frozen-note">
+          {t('agreementForm.review.introduction', { reference: unbroken(form.draft.frozen) })}
+        </p>
+      )}
       <dl className="agreement-review-parties">
         <div>
           <dt>{t('agreementForm.review.kind')}</dt>

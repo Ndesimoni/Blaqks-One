@@ -15,6 +15,7 @@ function suggested(viewEndsAt) {
  * The sender side's steps on a share (record sharing R2): Withdraw a pending offer, Stop
  * sharing or Extend an accepted one, and, for every reader, the evidence file. Each step
  * follows the server's `allowed` flags; Withdraw and Stop ask for confirmation first.
+ * Co-broking is the dialog's main footer step (ListingShareDetail).
  */
 export function ListingShareSteps({ share, busy, onConfirm, onExtend, onEvidence }) {
   const { t } = useI18n();

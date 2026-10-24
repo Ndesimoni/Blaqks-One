@@ -1,5 +1,5 @@
 //! R2a routes under `/api/crm/workspaces/{workspace}/agreements/listing-shares`.
-use super::{actions, create, evidence, extend, files, preview, read};
+use super::{actions, co_broking, create, evidence, extend, files, preview, read};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
@@ -25,6 +25,10 @@ pub fn router() -> Router<AppState> {
         .route(&action("withdraw"), post(actions::withdraw).layer(body()))
         .route(&action("stop"), post(actions::stop).layer(body()))
         .route(&action("extend"), post(extend::extend).layer(body()))
+        .route(
+            &action("co-broking"),
+            post(co_broking::propose).layer(body()),
+        )
         .route(&action("evidence"), get(evidence::evidence))
         .route(&action("files/{file}"), get(files::file))
 }

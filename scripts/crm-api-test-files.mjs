@@ -121,6 +121,8 @@ export const apiTestFiles = [
   'tests/api/outside-sharing-endings.test.mjs',
   'tests/api/outside-sharing-guards.test.mjs',
   'tests/api/outside-sharing-review.test.mjs',
+  'tests/api/outside-sharing-co-broking.test.mjs',
+  'tests/api/outside-sharing-co-broking-guards.test.mjs',
   'tests/api/channels.test.mjs',
   ...messagingTestFiles,
 ];

@@ -7,8 +7,11 @@ export default {
   'title.revise': 'Edit draft',
   'title.counter': 'Counter-offer',
   'title.amend': 'Propose amendment',
+  'title.share': 'Propose co-broking',
   'intro.amend':
     'The current accepted terms remain in force until the other side accepts this proposal.',
+  'intro.share':
+    'Agree how you and {name} share the commission on this listing. It stays a draft until you send it.',
   'intro.create': 'Write the offer as a draft. The other company sees nothing until you send it.',
   'intro.revise': 'Your changes become a new revision of the draft. Earlier revisions are kept.',
   'intro.counter':
@@ -22,6 +25,7 @@ export default {
   'save.revise': 'Save revision',
   'save.counter': 'Send counter-offer',
   'save.amend': 'Propose amendment',
+  'save.share': 'Save draft',
   'step.parties': 'Type and recipient',
   'step.subject': 'Property and client',
   'step.money': 'Commission and terms',
@@ -69,6 +73,8 @@ export default {
   'field.governingEmirate': 'Governing emirate',
   'field.expiresOn': 'Offer open until',
   'field.notes': 'Notes',
+  'hint.frozenProperty':
+    'These facts come from the shared listing {reference} and cannot be changed here.',
   'hint.aed': 'In AED, for example 52,500 or 52500.50.',
   'hint.listingRef': 'A label for this agreement only. It is not a CRM record number.',
   'hint.clientName': 'First name and last initial only, for example Sara K.',
@@ -91,6 +97,10 @@ export default {
     'Saving freezes these terms as revision {number} of the draft. Earlier revisions stay with your company.',
   'review.counter':
     'Sending freezes these terms as revision {number}. The other side then accepts, declines or answers it.',
+  'review.share':
+    'Saving freezes these terms as revision {number} of a draft. Nothing reaches {name} until you choose Send offer.',
+  'review.introduction':
+    'The listing facts and the introduction {reference} are added as recorded when the listing was shared.',
   'review.kind': 'Type',
   'review.amend':
     'Proposing freezes revision {number} for the other side to review. Current accepted terms remain in force.',

@@ -46,23 +46,23 @@ pub fn hex(bytes: impl AsRef<[u8]>) -> String {
 }
 
 pub fn build(kind: Kind, input: &Value, now: OffsetDateTime) -> ApiResult<BuiltTerms> {
+    build_with(kind, input, None, now)
+}
+
+/// As `build`, with `frozen` (a listing share's property) in place of the input's.
+pub fn build_with(
+    kind: Kind,
+    input: &Value,
+    frozen: Option<&Value>,
+    now: OffsetDateTime,
+) -> ApiResult<BuiltTerms> {
     let terms = wire::exact(input.clone(), &TERM_KEYS, INVALID)?;
-    let property = wire::exact(
-        wire::node(&terms, "property")?.clone(),
-        &PROPERTY_KEYS,
-        INVALID,
-    )?;
+    let property = match frozen {
+        Some(property) => property.clone(),
+        None => property(wire::node(&terms, "property")?)?,
+    };
     let client = wire::exact(wire::node(&terms, "client")?.clone(), &CLIENT_KEYS, INVALID)?;
     let money = super::term_money::build(kind, wire::node(&terms, "money")?)?;
-    let property = json!({
-        "emirate": wire::text(wire::node(&property, "emirate")?, 40)?,
-        "area": wire::text(wire::node(&property, "area")?, 80)?,
-        "propertyType": wire::text(wire::node(&property, "propertyType")?, 40)?,
-        "bedrooms": wire::count(wire::node(&property, "bedrooms")?, 20)?,
-        "sizeSqft": wire::count(wire::node(&property, "sizeSqft")?, 1_000_000)?,
-        "askingPriceFils": wire::amount(wire::node(&property, "askingPriceFils")?)?,
-        "listingRef": wire::text(wire::node(&property, "listingRef")?, 40)?,
-    });
     let client = json!({
         "displayName": wire::text(wire::node(&client, "displayName")?, 80)?,
         "contact": wire::optional_text(wire::node(&client, "contact")?, 120)?,
@@ -81,6 +81,19 @@ pub fn build(kind: Kind, input: &Value, now: OffsetDateTime) -> ApiResult<BuiltT
         value,
         expires_at,
     })
+}
+
+fn property(input: &Value) -> ApiResult<Value> {
+    let property = wire::exact(input.clone(), &PROPERTY_KEYS, INVALID)?;
+    Ok(json!({
+        "emirate": wire::text(wire::node(&property, "emirate")?, 40)?,
+        "area": wire::text(wire::node(&property, "area")?, 80)?,
+        "propertyType": wire::text(wire::node(&property, "propertyType")?, 40)?,
+        "bedrooms": wire::count(wire::node(&property, "bedrooms")?, 20)?,
+        "sizeSqft": wire::count(wire::node(&property, "sizeSqft")?, 1_000_000)?,
+        "askingPriceFils": wire::amount(wire::node(&property, "askingPriceFils")?)?,
+        "listingRef": wire::text(wire::node(&property, "listingRef")?, 40)?,
+    }))
 }
 
 fn expiry(value: &Value, now: OffsetDateTime) -> ApiResult<OffsetDateTime> {

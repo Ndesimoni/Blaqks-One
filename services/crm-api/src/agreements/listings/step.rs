@@ -56,9 +56,23 @@ pub async fn begin<'t>(
     state: &'t AppState,
     session: &Session,
     headers: &HeaderMap,
-    (workspace, id): (String, String),
+    path: (String, String),
     needed: Viewer,
 ) -> ApiResult<Step<'t>> {
+    let (step, viewer) = open(state, session, headers, path).await?;
+    if viewer != Some(needed) {
+        return Err(ApiError::missing());
+    }
+    Ok(step)
+}
+
+/// Opens a step on share `id` with the caller's place in it; no place is the not-found.
+pub async fn open<'t>(
+    state: &'t AppState,
+    session: &Session,
+    headers: &HeaderMap,
+    (workspace, id): (String, String),
+) -> ApiResult<(Step<'t>, Option<Viewer>)> {
     access::writer(state, session, headers, &workspace).await?;
     let id = access::id(&id)?;
     let mut tx = state.pool.begin().await?;
@@ -71,17 +85,19 @@ pub async fn begin<'t>(
         workspace: &workspace,
         admin: live.role == "admin",
     };
-    if read::viewer(&row, &caller) != Some(needed) {
+    let viewer = read::viewer(&row, &caller);
+    if viewer.is_none() {
         return Err(ApiError::missing());
     }
     let admin = caller.admin;
-    Ok(Step {
+    let step = Step {
         tx,
         row,
         actor: live.id,
         workspace,
         admin,
-    })
+    };
+    Ok((step, viewer))
 }
 
 pub async fn close(

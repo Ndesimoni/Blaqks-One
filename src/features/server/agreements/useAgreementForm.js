@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
-import { draftFromTerms, emptyDraft } from './agreementDraft.js';
+import { draftFromTerms, emptyDraft, shareDraft } from './agreementDraft.js';
 import { readDraft, stepErrors } from './readDraft.js';
 import { failureNotice } from './useAgreement.js';
 
@@ -9,6 +9,13 @@ const STEPS = {
   revise: ['subject', 'money', 'review'],
   counter: ['subject', 'money', 'review'],
   amend: ['subject', 'money', 'review'],
+  share: ['subject', 'money', 'review'],
+};
+
+const firstDraft = (mode, detail) => {
+  if (mode === 'create') return emptyDraft();
+  if (mode === 'share') return shareDraft(detail.share);
+  return draftFromTerms(detail.agreement.kind, detail.revision.terms);
 };
 
 /** The request that freezes the reviewed terms into a new revision; resolves to its ID. */
@@ -19,6 +26,10 @@ async function save(api, workspaceId, { mode, detail, draft, recipient, terms })
       recipient: { workspaceId: recipient.workspaceId, memberId: recipient.memberId },
       terms,
     });
+    return agreement.id;
+  }
+  if (mode === 'share') {
+    const { agreement } = await api.proposeCoBroking(workspaceId, detail.share.id, terms);
     return agreement.id;
   }
   const { id, version } = detail.agreement;
@@ -37,9 +48,7 @@ async function save(api, workspaceId, { mode, detail, draft, recipient, terms })
  * and the save. Refusals keep every entry.
  */
 export function useAgreementForm({ api, workspaceId, mode, detail, onSaved, discardMessage }) {
-  const [initial] = useState(() =>
-    mode === 'create' ? emptyDraft() : draftFromTerms(detail.agreement.kind, detail.revision.terms),
-  );
+  const [initial] = useState(() => firstDraft(mode, detail));
   const [draft, setDraft] = useState(initial);
   const [recipient, setRecipient] = useState(null);
   const [step, setStep] = useState(0);

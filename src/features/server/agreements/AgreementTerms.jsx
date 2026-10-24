@@ -19,20 +19,50 @@ export function Facts({ title, rows }) {
   );
 }
 
+/** The §6 property facts, with any missing fact shown as not recorded. */
+export function PropertyFacts({ property }) {
+  const { t, format } = useI18n();
+  const known = (value, show = (v) => v) =>
+    value === null || value === undefined ? t('agreements.terms.notRecorded') : show(value);
+  if (!property)
+    return (
+      <section className="agreement-facts">
+        <h3>{t('agreements.terms.property')}</h3>
+        <p>{t('agreements.terms.noProperty')}</p>
+      </section>
+    );
+  return (
+    <Facts
+      title={t('agreements.terms.property')}
+      rows={[
+        [t('agreements.terms.emirate'), known(property.emirate)],
+        [t('agreements.terms.area'), known(property.area)],
+        [t('agreements.terms.propertyType'), known(property.propertyType)],
+        [t('agreements.terms.bedrooms'), known(property.bedrooms, format.number)],
+        [
+          t('agreements.terms.size'),
+          known(property.sizeSqft, (size) => t('agreements.terms.sqft', { size })),
+        ],
+        [t('agreements.terms.askingPrice'), known(property.askingPriceFils, format.money)],
+        [t('agreements.terms.listingRef'), known(property.listingRef)],
+      ]}
+    />
+  );
+}
+
 /**
  * One revision's frozen terms (docs/agreements-design.md §3, §6): property and client
  * snapshot, commission and both shares, governing emirate, offer end and notes. The same
  * view previews a new revision before it is saved. `names` labels each side's share. An
  * in-company hand-over (§14) may have no property or missing facts, and its shares are of
- * the receiving agent's commission, so they show no AED amount.
+ * the receiving agent's commission, so they show no AED amount. Co-broking from a listing
+ * share also shows the introduction it is bound to.
  */
 export function AgreementTerms({ terms, names }) {
   const { t, format } = useI18n();
   const { property, client } = terms.subject;
   const { money } = terms;
   const commission = money.basis === 'agent_commission';
-  const known = (value, show = (v) => v) =>
-    value === null || value === undefined ? t('agreements.terms.notRecorded') : show(value);
   const share = (bp) => (
     <>
       <span className="agreement-figure">{format.percent(bp)}</span>
@@ -50,27 +80,16 @@ export function AgreementTerms({ terms, names }) {
   };
   return (
     <div className="agreement-terms">
-      {property ? (
+      <PropertyFacts property={property} />
+      {terms.introduction && (
         <Facts
-          title={t('agreements.terms.property')}
+          title={t('coBroking.introduction')}
           rows={[
-            [t('agreements.terms.emirate'), known(property.emirate)],
-            [t('agreements.terms.area'), known(property.area)],
-            [t('agreements.terms.propertyType'), known(property.propertyType)],
-            [t('agreements.terms.bedrooms'), known(property.bedrooms, format.number)],
-            [
-              t('agreements.terms.size'),
-              known(property.sizeSqft, (size) => t('agreements.terms.sqft', { size })),
-            ],
-            [t('agreements.terms.askingPrice'), known(property.askingPriceFils, format.money)],
-            [t('agreements.terms.listingRef'), known(property.listingRef)],
+            [t('coBroking.sharedListing'), terms.introduction.reference],
+            [t('coBroking.sharedOn'), format.dateTime(terms.introduction.sharedAt)],
+            [t('coBroking.acceptedOn'), format.dateTime(terms.introduction.acceptedAt)],
           ]}
         />
-      ) : (
-        <section className="agreement-facts">
-          <h3>{t('agreements.terms.property')}</h3>
-          <p>{t('agreements.terms.noProperty')}</p>
-        </section>
       )}
       <Facts
         title={t('agreements.terms.client')}

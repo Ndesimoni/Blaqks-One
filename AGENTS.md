@@ -46,7 +46,7 @@ Professional real estate CRM focused on the UAE market.
 - Single/bulk email and WhatsApp message composers with client shortcuts, categorized recipient search and removable chips; see docs/messaging-preview.md
 - Connected team chat: Admin-created channels (#general for every company), private one-to-one messages and private groups the Admin cannot read, and in-app @mentions; see docs/team-chat.md
 - Cross-company deal agreements (hand-over, referral, co-broking) with frozen, evidence-bearing revisions on an Agreements screen; see docs/agreements-design.md
-- Sharing one record with a colleague (R1), and a listing with an agent at another company: view only, until a chosen day, recorded as proof of introduction (R2a); see docs/record-sharing.md
+- Sharing one record with a colleague (R1), and a listing with an agent at another company: view only, until a chosen day, recorded as proof of introduction (R2a), which either named person can turn into a co-broking agreement; see docs/record-sharing.md
 - Responsive desktop/mobile interface
 - Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log, Client care, Deals, Payments and Expenses with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
 

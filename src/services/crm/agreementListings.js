@@ -34,6 +34,9 @@ export function agreementListingRoutes({ request, base }) {
     },
     extendListingShare: (workspace, id, viewEndsOn) =>
       request(`${item(workspace, id)}/extend`, { method: 'POST', body: { viewEndsOn } }),
+    /** A co-broking draft from an accepted share, with the listing's facts fixed: `{ agreement }`. */
+    proposeCoBroking: (workspace, id, terms) =>
+      request(`${item(workspace, id)}/co-broking`, { method: 'POST', body: { terms } }),
     listingShareEvidence: (workspace, id) => request(`${item(workspace, id)}/evidence`),
     listingShareFileUrl: (workspace, id, file) =>
       `/api/crm${item(workspace, id)}/files/${segment(file)}`,

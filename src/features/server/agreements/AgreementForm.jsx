@@ -5,6 +5,7 @@ import { FormStepper } from '../../../components/ui/FormStepper.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { shareOther } from './agreementDraft.js';
 import { FormMoney } from './FormMoney.jsx';
 import { FormParties } from './FormParties.jsx';
 import { FormReview } from './FormReview.jsx';
@@ -21,6 +22,7 @@ const STEP_VIEWS = {
 /** Both sides' names: the caller and the found recipient, or the agreement's parties. */
 function sideNames(mode, detail, user, recipient) {
   if (mode === 'create') return { sender: user.name, recipient: recipient?.name };
+  if (mode === 'share') return { sender: user.name, recipient: shareOther(detail, user).name };
   return {
     sender: detail.agreement.parties?.sender?.name,
     recipient: detail.agreement.parties?.recipient?.name,
@@ -51,7 +53,8 @@ export function AgreementForm({ mode, detail, onClose, onSaved }) {
   const last = form.step === form.steps.length - 1;
   const View = STEP_VIEWS[form.name];
   const names = sideNames(mode, detail, user, form.recipient);
-  const number = mode === 'create' ? 1 : detail.revision.number + 1;
+  const first = mode === 'create' || mode === 'share';
+  const number = first ? 1 : detail.revision.number + 1;
   return (
     <Drawer
       className="agreement-dialog agreement-form"
@@ -62,14 +65,14 @@ export function AgreementForm({ mode, detail, onClose, onSaved }) {
       <div className="drawer-top">
         <div>
           <div className="eyebrow">
-            {mode === 'create'
+            {first
               ? t('agreementForm.eyebrow.create')
               : t('agreementForm.eyebrow.revision', { number })}
           </div>
           <h2 id={titleId} tabIndex={-1} data-initial-focus>
             {t(`agreementForm.title.${mode}`)}
           </h2>
-          <p>{t(`agreementForm.intro.${mode}`)}</p>
+          <p>{t(`agreementForm.intro.${mode}`, { name: names.recipient || '' })}</p>
         </div>
         <button
           className="icon-btn"

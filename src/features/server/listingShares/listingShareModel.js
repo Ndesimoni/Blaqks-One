@@ -1,9 +1,10 @@
 import { listingDetailKeys, propertyFactKeys } from '../finance/handoverPreviewModel.js';
+import { readCoBroking, readCoBrokingProperty } from './coBrokingModel.js';
 
 /**
  * A listing shared with an agent at another company (docs/record-sharing.md R2, packet R2a).
- * Views are read strictly: only the listed facts, the two people, the dates, the status and
- * the actions the caller may take. Unknown shapes are refused outright.
+ * Views are read strictly: only the listed facts, the two people, the dates, the status, the
+ * actions the caller may take and the share's co-broking. Unknown shapes are refused outright.
  */
 export const listingShareStatuses = Object.freeze([
   ...['pending', 'accepted', 'declined', 'withdrawn', 'stopped', 'ended', 'expired'],
@@ -102,7 +103,12 @@ export function readListingShare(value) {
     photos: files(value.photos, true),
     floorPlans: files(value.floorPlans, false),
     recordId: value.recordId === null ? null : uuid(value.recordId),
-    allowed: Object.freeze(Object.fromEntries(actions.map((name) => [name, value.allowed[name]]))),
+    allowed: Object.freeze({
+      ...Object.fromEntries(actions.map((name) => [name, value.allowed[name]])),
+      coBroking: value.allowed.coBroking === true,
+    }),
+    coBroking: readCoBroking(value.coBroking),
+    coBrokingProperty: readCoBrokingProperty(value.coBrokingProperty),
   });
 }
 

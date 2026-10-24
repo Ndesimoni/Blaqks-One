@@ -4,7 +4,7 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { FinanceField } from '../finance/FinanceField.jsx';
 import { BASES, PAYMENTS, expiryRange, optionsOf } from './agreementDraft.js';
 import { AgreementField, useFieldError } from './AgreementField.jsx';
-import { readShare } from './readDraft.js';
+import { readShare } from './draftFields.js';
 
 /** Both sides' shares from the entered percentage, once it is valid. */
 function Split({ form, names }) {

@@ -86,7 +86,7 @@ pub fn fils(value: &Option<String>) -> Value {
         .map_or(Value::Null, Value::from)
 }
 
-fn property(facts: &PropertyFacts) -> Value {
+pub fn property(facts: &PropertyFacts) -> Value {
     json!({
         "emirate": text(&facts.emirate, 40),
         "area": text(&facts.community, 80),

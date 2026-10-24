@@ -27,11 +27,23 @@ pub async fn insert_draft(
     created_by: Uuid,
     terms: &BuiltTerms,
 ) -> ApiResult<Uuid> {
+    insert_draft_from(tx, parties, (kind, origin), created_by, terms, None).await
+}
+
+/// A draft, made from listing share `share` when given (co-broking from a share).
+pub async fn insert_draft_from(
+    tx: &mut Transaction<'_, Postgres>,
+    parties: &Parties,
+    (kind, origin): (&str, &str),
+    created_by: Uuid,
+    terms: &BuiltTerms,
+    share: Option<Uuid>,
+) -> ApiResult<Uuid> {
     let id = Uuid::new_v4();
     sqlx::query(
-        "INSERT INTO agreements.crm_agreements
-         (id,workspace_id,recipient_workspace_id,kind,origin,state,version,created_by)
-         VALUES ($1,$2,$3,$4,$5,'draft',1,$6)",
+        "INSERT INTO agreements.crm_agreements (id,workspace_id,recipient_workspace_id,kind,
+         origin,state,version,created_by,listing_share_id)
+         VALUES ($1,$2,$3,$4,$5,'draft',1,$6,$7)",
     )
     .bind(id)
     .bind(&parties.sender_workspace)
@@ -39,6 +51,7 @@ pub async fn insert_draft(
     .bind(kind)
     .bind(origin)
     .bind(created_by)
+    .bind(share)
     .execute(&mut **tx)
     .await?;
     sqlx::query(

@@ -48,6 +48,14 @@ export function ListingShareSummary({ share }) {
           })}
         </p>
       )}
+      {share.coBroking && (
+        <p className="outside-share-cobroking">
+          <span className="demo-pill">
+            <span />{' '}
+            {t('coBroking.status', { state: t(`coBroking.state.${share.coBroking.state}`) })}
+          </span>
+        </p>
+      )}
       <Facts title={k('summaryTitle')} rows={rows} />
     </>
   );

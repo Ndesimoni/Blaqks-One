@@ -122,3 +122,17 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Co-broking from a listing share: the share's facts, fixed (record sharing R2). */
+.agreement-frozen {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.agreement-frozen .agreement-facts dl {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+}
+.agreement-frozen-note {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}

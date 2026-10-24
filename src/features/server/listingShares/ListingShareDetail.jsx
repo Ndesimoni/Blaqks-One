@@ -8,6 +8,7 @@ import { toProperty } from './listingShareLinks.js';
 import { ListingShareConfirm } from './ListingShareConfirm.jsx';
 import { ListingShareSteps } from './ListingShareSteps.jsx';
 import { ListingShareSummary } from './ListingShareSummary.jsx';
+import { ShareCoBroking } from './ShareCoBroking.jsx';
 import { useListingShare } from './useListingShares.js';
 import { useListingShareActions } from './useListingShareActions.js';
 
@@ -16,6 +17,8 @@ import { useListingShareActions } from './useListingShareActions.js';
  * basic facts and Accept or Decline while it waits, then the listing, its photos and the
  * sender's contact until the last day; the sender side sees everything with its steps; the
  * receiving Admin sees the introduction record only. Any refused read is "not available".
+ * Either named person of an accepted share proposes co-broking over it, or opens the
+ * co-broking agreement it led to.
  */
 export function ListingShareDetail({ id, onClose, onChanged }) {
   const { api, user } = useSession();
@@ -27,6 +30,7 @@ export function ListingShareDetail({ id, onClose, onChanged }) {
   const [confirm, setConfirm] = useState('');
   const [message, setMessage] = useState('');
   const [notice, setNotice] = useState('');
+  const [coBroking, setCoBroking] = useState(null);
   const share = latest || view.value;
   const busy = Boolean(actions.busy);
   const done = (result, action) => {
@@ -50,6 +54,19 @@ export function ListingShareDetail({ id, onClose, onChanged }) {
         )}
       </FinanceDialog>
     );
+  if (coBroking)
+    return (
+      <ShareCoBroking
+        view={coBroking}
+        onView={setCoBroking}
+        onClose={() => {
+          setCoBroking(null);
+          setLatest(null);
+          view.reload();
+          onChanged?.();
+        }}
+      />
+    );
   if (confirm)
     return (
       <ListingShareConfirm
@@ -70,6 +87,16 @@ export function ListingShareDetail({ id, onClose, onChanged }) {
       setMessage(failure.message || k('failed'));
     }
   };
+  // After answering, co-broking is the share's main step (proposing it, or opening it).
+  const coBrokingStep = share.allowed.coBroking
+    ? {
+        onSubmit: () => setCoBroking({ form: { mode: 'share', detail: { share } } }),
+        submitLabel: t('coBroking.propose'),
+      }
+    : share.coBroking && {
+        onSubmit: () => setCoBroking({ id: share.coBroking.id }),
+        submitLabel: t('coBroking.open'),
+      };
   const answer = share.allowed.accept
     ? {
         onSubmit: () => setConfirm('accept'),
@@ -79,7 +106,7 @@ export function ListingShareDetail({ id, onClose, onChanged }) {
           onClick: () => setConfirm('decline'),
         },
       }
-    : {};
+    : coBrokingStep || {};
   const file = (fileId) => api.listingShareFileUrl(user.workspaceId, share.id, fileId);
   return (
     <FinanceDialog

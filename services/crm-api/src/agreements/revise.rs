@@ -6,9 +6,9 @@ use super::{
     command::{self, Command},
     errors,
     evidence::Place,
-    ledger, limits,
+    introduction, ledger, limits,
     model::{Kind, Party, State as AgreementState},
-    store, terms,
+    store,
     write::{self, NewRevision},
 };
 use crate::{
@@ -35,10 +35,11 @@ async fn freeze(
     let row = command.row.clone();
     let kind = Kind::parse(&row.kind)?;
     let input = command.body.get("terms").cloned().unwrap_or(Value::Null);
-    let built = terms::build(kind, &input, OffsetDateTime::now_utc())?;
+    let current = store::current(&mut command.tx, row.id).await?;
+    let now = OffsetDateTime::now_utc();
+    let built = introduction::rebuild(kind, &input, &current.terms, now)?;
     let sender = (row.workspace_id.as_str(), author == Party::Sender);
     limits::ensure(&mut command.tx, kind, &built.value, sender).await?;
-    let current = store::current(&mut command.tx, row.id).await?;
     let parties = row.parties();
     let revision = NewRevision {
         place: Place {

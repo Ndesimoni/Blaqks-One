@@ -1,12 +1,17 @@
 # Handoff for the next coding agent
 
-Latest checkpoint (2026-10-23): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2/A6/BO1
+Latest checkpoint (2026-10-24): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2/A6/BO1
 designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
-company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)). Migrations run through
-**0070**. Next, in order: co-broking from a listing share, then R2b (lead referrals), then A6
-(outside agents, migrations from 0073). BO1 and P1 wait until the owner says. R2a's code
+company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)), then **co-broking from a
+listing share** ([as built](record-sharing.md#co-broking-from-a-share-as-built-2026-10-23)).
+Migrations run through **0072**. Next, in order: R2b (lead referrals), then A6 (outside
+agents). BO1, P1 and the broker marketplace (MK) wait until the owner says. R2a's code
 security review is done and its Medium findings fixed (migration 0071, [record
-sharing](record-sharing.md#r2a-security-review-2026-10-23)); A3b's is still owed.
+sharing](record-sharing.md#r2a-security-review-2026-10-23)). A3b and the co-broking flow now
+have separate specialist code reviews (2026-10-24): their Medium findings were fixed
+(consistent payment-read snapshots and mandatory fee collector on every share-bound
+revision). Regression tests cover the read interleaving, concurrent opposite-party sends,
+unchanged versions on rejected revisions and introduction preservation through amendments.
 
 Updated 2026-10-22, after commit `20955d8` on `feature/connected-crm`. Read this with
 `AGENTS.md` (project rules), the [token-efficient delivery protocol](token-efficient-delivery.md)
@@ -23,7 +28,7 @@ The owner chooses the next packet: nothing in §2 starts until they say so.
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
 | Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
 
-Migrations then ran through `0066` (now `0070`, see the checkpoint above). **Evidence limit:** all of this is proven against the local
+Migrations then ran through `0066` (now `0072`, see the checkpoint above). **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
 from clients are labelled but not virus-scanned.
 
@@ -119,6 +124,9 @@ Needs decisions D1, D2 and D6, a Twilio account and approved templates; see
 - Spam reports and unsubscribes becoming an email opt-out (with the consents table, W1).
 - A test for an inbound file whose storage fails (hidden and counted, not yet automated).
 - Address changes in Team activity.
+- Agreement screens (product designer, 2026-10-24): the certificate strip uses 24px padding
+  against the 16px phone gutter and seems to cover the body; an unticked checkbox looks
+  filled in light mode.
 
 ## 3. How a packet is run here
 

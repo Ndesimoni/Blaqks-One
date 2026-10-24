@@ -57,12 +57,26 @@ export function emptyDraft(kind = 'co_broking', today = dubaiToday(), now = Date
   };
 }
 
+/** A co-broking draft from a listing share: the server's fixed property, then the money. */
+export const shareDraft = (share, today = dubaiToday(), now = Date.now()) => ({
+  ...emptyDraft('co_broking', today, now),
+  frozen: share.coBrokingProperty,
+  listingRef: share.reference,
+});
+
+/** A fixed property's listing label that never wraps at its hyphen (`LS-…`). */
+export const unbroken = (property) => (property?.listingRef ?? '').replace('-', '\u2011');
+
+/** The other named person of a listing share: who a co-broking proposal goes to. */
+export const shareOther = ({ share }, user) => (share.from.id === user.id ? share.to : share.from);
+
 /** A type change keeps every entry but resets the share to that type's starting value. */
 export const withKind = (draft, kind) => ({ ...draft, kind, senderShare: defaultShare[kind] });
 
 /**
  * The draft for revising a draft or answering with a counter-offer: every frozen value of
- * `terms`, with an offer end day that can still be sent (the old one, or the default).
+ * `terms`, with an offer end day that can still be sent (the old one, or the default). Terms
+ * from a listing share keep their property fixed.
  */
 export function draftFromTerms(kind, terms, today = dubaiToday()) {
   const { property, client } = terms.subject;
@@ -72,6 +86,7 @@ export function draftFromTerms(kind, terms, today = dubaiToday()) {
   const usable = previous && previous >= min && previous <= max;
   return {
     kind,
+    frozen: terms.introduction ? property : null,
     emirate: property.emirate,
     area: property.area,
     propertyType: property.propertyType,

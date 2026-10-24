@@ -211,8 +211,9 @@ closedAt|null, allowed: {accept, decline, withdraw, stop}}`.
 Status: designed 2026-10-23; reviewed with required amendments in
 [R2/A6 design review](sharing-guest-design-review.md), which override this proposal. The
 owner accepted every recommendation (product decisions, "R2 details"). **R2a (listing
-sharing) is built**; see [R2a as built](#r2a-as-built-2026-10-23). R2b (lead referrals) and
-co-broking from a share are next.
+sharing) is built**; see [R2a as built](#r2a-as-built-2026-10-23), and so is
+[co-broking from a share](#co-broking-from-a-share-as-built-2026-10-23). R2b (lead
+referrals) is next.
 It reuses R1's link, WhatsApp, badge and expiry patterns and builds on
 [Agreements](agreements-design.md) for everything that crosses companies. Agreements §1's
 non-goal "exposing private CRM records across companies" stays: only server-made, frozen
@@ -721,7 +722,8 @@ Listing sharing with one named agent at another company. Code: `agreements/listi
 `src/services/crm/agreementListings.js`. Migrations: **0067** (snapshots, shares, events),
 **0068** (the share guard and the functions that end shares), **0069** (media copies) and
 **0070** (the records triggers, decision D12). Migration numbers moved by one from the draft
-reservation because the rules needed their own file; A6 starts at 0071.
+reservation because the rules needed their own file. The security review fixes took 0071 and
+co-broking from a share 0072; the next free number is 0073.
 
 - **Sending.** The listing's holder or the Admin, with the Properties grant (403 when they
   only see it, 404 otherwise). Not for a Sold, Rented or Withdrawn listing. The agent is
@@ -798,3 +800,56 @@ Low. The Medium ones and L9 are fixed (migration **0071**); the rest are queued 
   tick is enforced only in the browser; L10, the exact-email lookup limit is per member only
   (add a per-company budget). Before hosting, the database role also needs grants that stop
   it altering the evidence tables.
+
+### Co-broking from a share as built (2026-10-23)
+
+Either named person of an accepted, open share (the member who sent it or the agent;
+an Admin's role alone grants no access) presses **Propose co-broking** on the share. The usual agreement
+form opens with the listing's facts fixed; the proposer adds the client's first name and
+last initial, the money terms and who collects the fee, then saves a draft and sends it from
+the agreement, which opens over the share. Code: `agreements/listings/co_broking.rs` (the
+route), `co_broking_view.rs` (what the share shows), `agreements/introduction.rs` (the
+binding); screens `listingShares/ShareCoBroking.jsx` and the agreement form's `share` mode.
+Migration **0072**.
+
+- **The binding.** `POST …/listing-shares/{id}/co-broking {terms}` makes a `co_broking`
+  draft (origin `direct`) to the other named person, with a frozen `listing_share_id`. The
+  server replaces the property with the snapshot's §6 facts (missing facts stay empty, the
+  listing label is the share's reference) and adds `introduction: {reference,
+snapshotDigest, sharedAt, acceptedAt}`, so every revision's digest names the share. Draft
+  edits, counter-offers and amendments rebuild their terms the same way; database triggers
+  refuse any revision that changes the introduction or the property, an introduction on any
+  other agreement, and participants other than the share's two people. The share records a
+  `converted` event.
+- **One standing agreement per share.** An accepted or completed agreement, or an offer that
+  has not expired, blocks another; sending locks the share, so two offers cannot both stand
+  (409 "There is already a co-broking agreement for this listing."). Drafts are private and
+  one per person, and never block the other person (a change from the design's "draft, sent
+  or accepted": a draft cannot be withdrawn, so an abandoned one would block the share
+  forever). An agreement made from a share keeps going if the share later ends.
+- **On the share.** For the two named people, **Propose co-broking** (while they may) or
+  **Open co-broking agreement** is the dialog's main button, and a chip near the top shows
+  its state, such as "Co-broking: Offer sent". The product designer reviewed the screens at
+  390 and 1280 px in both themes; the eight fixes asked for are in. Everyone else, both Admins included, sees no co-broking and
+  gets the shared not-found from the route.
+- **Tests:** `tests/api/outside-sharing-co-broking.test.mjs`, `tests/unit/co-broking.test.js`
+  and `tests/server-browser/outside-co-broking.spec.js`.
+
+### Co-broking code review follow-up (2026-10-24)
+
+A separate security specialist found no High findings and one Medium validation issue:
+draft edits or counter-offers could omit the fee collector, leaving accepted terms with
+unavailable payment tracking. `introduction::bound` now requires the collector for every
+share-bound revision, while older unbound agreements retain their compatibility path.
+The specialist confirmed the fix by inspection, with no remaining Medium findings in the
+reviewed scope.
+
+Browser verification also exposed two integration fixes: the agreement review handles a
+recipient without a company display name, and introduction labels read the existing
+`coBroking` English catalogue rather than missing keys in the `agreements` namespace.
+
+`tests/api/outside-sharing-co-broking-guards.test.mjs` checks rejected edits and counters
+leave versions/revisions unchanged, opposite-party simultaneous sends allow exactly one
+standing offer, and accepted amendments preserve the server-derived listing and
+introduction. The original API and connected browser flows remain part of verification;
+final runtime evidence is in the handoff checkpoint.

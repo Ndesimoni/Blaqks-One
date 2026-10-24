@@ -2,9 +2,9 @@
 use super::{
     command,
     evidence::Place,
-    ledger, lifecycle_view, limits,
+    introduction, ledger, lifecycle_view, limits,
     model::Kind,
-    payment_store, store, terms,
+    payment_store, store,
     write::{self, NewRevision},
 };
 use crate::{
@@ -49,7 +49,9 @@ pub async fn propose(
         return Err(ApiError::conflict("Answer the existing amendment first."));
     }
     let kind = Kind::parse(&cmd.row.kind)?;
-    let built = terms::build(kind, &cmd.body["terms"], OffsetDateTime::now_utc())?;
+    let current = store::current(&mut cmd.tx, cmd.row.id).await?;
+    let now = OffsetDateTime::now_utc();
+    let built = introduction::rebuild(kind, &cmd.body["terms"], &current.terms, now)?;
     if kind == Kind::CoBroking && built.value["money"]["collectingParty"].is_null() {
         return Err(ApiError::invalid("Choose the company collecting the fee."));
     }
@@ -61,7 +63,6 @@ pub async fn propose(
     )
     .await?;
     payment_store::ensure_amendment(&mut cmd.tx, &cmd.row, &built.value).await?;
-    let current = store::current(&mut cmd.tx, cmd.row.id).await?;
     let number: i32=sqlx::query_scalar(
         "SELECT COALESCE(max(number),0)+1 FROM agreements.crm_agreement_revisions WHERE agreement_id=$1")
         .bind(cmd.row.id).fetch_one(&mut *cmd.tx).await?;
