@@ -16,6 +16,27 @@ pub async fn get<'e>(executor: impl sqlx::PgExecutor<'e>, workspace: &str) -> Ap
     .ok_or_else(ApiError::forbidden)
 }
 
+/// How long the company has existed: whole days since the workspace was created, and the
+/// creation stamp for the platform screens (broker marketplace §15 eligibility).
+#[derive(Debug, sqlx::FromRow)]
+pub struct Age {
+    pub age_days: i64,
+    pub created_at: String,
+}
+
+pub async fn age<'e>(executor: impl sqlx::PgExecutor<'e>, workspace: &str) -> ApiResult<Age> {
+    sqlx::query_as::<_, Age>(
+        "SELECT floor(extract(epoch FROM now()-created_at)/86400)::bigint AS age_days, \
+         to_char(created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') \
+           AS created_at \
+         FROM crm_workspaces WHERE id=$1",
+    )
+    .bind(workspace)
+    .fetch_optional(executor)
+    .await?
+    .ok_or_else(ApiError::forbidden)
+}
+
 /// Called with workspace creation inside the same transaction. The type derives seats.
 pub async fn create(
     transaction: &mut Transaction<'_, Postgres>,

@@ -18,6 +18,7 @@ pub mod list;
 pub mod listing_fields;
 pub mod listing_holders;
 pub mod lookup;
+pub mod market_activity;
 pub mod media_links;
 pub mod mutation;
 pub mod outside_facts;

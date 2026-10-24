@@ -27,6 +27,7 @@ mod view;
 pub mod waiting;
 
 pub use lifecycle::{end_for_company, end_for_member};
+pub use review::looks_like_contact;
 
 #[cfg(test)]
 mod tests;

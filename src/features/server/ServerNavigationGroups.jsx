@@ -2,19 +2,25 @@ import React from 'react';
 import { nav } from '../../config/navigation.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { canOpenSection } from './access.js';
-import { ServerNavigationItem } from './ServerNavigationItem.jsx';
-import { InboxNavItem } from './inbox/InboxNavItem.jsx';
 import { TeamChatNavItem } from './chat/TeamChatNavItem.jsx';
-import { WaitingNavItem } from './WaitingNavItem.jsx';
+import { InboxNavItem } from './inbox/InboxNavItem.jsx';
+import { ServerNavigationItem } from './ServerNavigationItem.jsx';
 import { waitingSources } from './waitingCounts.js';
+import { WaitingNavItem } from './WaitingNavItem.jsx';
 
 export { ServerNavigationItem };
 
-/** Connected-only Agreements sit after Deals, for every company member (agreements §13). */
-function withAgreements(group, items, user) {
-  if (group.header !== 'SALES & RELATIONSHIPS' || !canOpenSection(user, 'Agreements')) return items;
-  const at = items.findIndex(([name]) => name === 'Deals') + 1 || items.length;
-  return [...items.slice(0, at), ['Agreements', 'note'], ...items.slice(at)];
+/** Connected-only Agreements and Marketplace sit after Deals, for company members. */
+function withConnectedSections(group, items, user) {
+  if (group.header !== 'SALES & RELATIONSHIPS') return items;
+  const added = [...items];
+  const place = (after, item) => {
+    const at = added.findIndex(([name]) => name === after) + 1 || added.length;
+    added.splice(at, 0, item);
+  };
+  if (canOpenSection(user, 'Agreements')) place('Deals', ['Agreements', 'note']);
+  if (canOpenSection(user, 'Marketplace')) place('Agreements', ['Marketplace', 'layers']);
+  return added;
 }
 
 export function ServerNavigationGroups({ user, route, onSelect }) {
@@ -25,7 +31,7 @@ export function ServerNavigationGroups({ user, route, onSelect }) {
       ([name]) =>
         canOpenSection(user, name) || (name === 'Messages' && canOpenSection(user, 'Inbox')),
     );
-    const items = withAgreements(group, allowed, user);
+    const items = withConnectedSections(group, allowed, user);
     if (!items.length) return null;
     return (
       <div className="nav-group" key={group.header}>

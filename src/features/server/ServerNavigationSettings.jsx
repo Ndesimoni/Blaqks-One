@@ -1,7 +1,7 @@
 import React from 'react';
+import { useI18n } from '../../i18n/useI18n.js';
 import { activityLabel, canOpenSection } from './access.js';
 import { ServerNavigationItem } from './ServerNavigationItem.jsx';
-import { useI18n } from '../../i18n/useI18n.js';
 
 const settings = [
   ['My profile', 'person'],
@@ -11,6 +11,7 @@ const settings = [
   ['Team & access', 'shield'],
   ['Channels', 'chat'],
   ['Inbox rules', 'sliders'],
+  ['Marketplace applications', 'layers'],
 ];
 
 const translated = { 'Inbox rules': 'inboxRules', 'My mailbox': 'mailbox' };

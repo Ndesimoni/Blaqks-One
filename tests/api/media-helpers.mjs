@@ -16,6 +16,18 @@ export const jpegWithGps = () =>
     Buffer.from([0xff, 0xda, 0x00, 0x02, 0x11, 0x22, 0xff, 0xd9]),
   ]);
 
+/** A tiny JPEG with a frame header giving its size, as a camera writes it. */
+export const jpegPhoto = (width = 640, height = 480) =>
+  Buffer.concat([
+    Buffer.from([0xff, 0xd8]),
+    segment(0xe0, Buffer.from('JFIF\0')),
+    segment(
+      0xc0,
+      Buffer.from([8, height >> 8, height & 255, width >> 8, width & 255, 1, 1, 17, 0]),
+    ),
+    Buffer.from([0xff, 0xda, 0x00, 0x02, 0x11, 0x22, 0xff, 0xd9]),
+  ]);
+
 /** A phone "motion photo": a second JPEG with EXIF GPS appended after the first ends. */
 export const motionPhoto = () =>
   Buffer.concat([

@@ -6,7 +6,7 @@ use crate::{
     auth::handlers as auth,
     chat,
     error::{self, CodeMapper},
-    finance, imports, inbox, integrations, media, performance,
+    finance, imports, inbox, integrations, marketplace, media, performance,
     records::handlers as records,
     signup,
     state::AppState,
@@ -24,6 +24,7 @@ const DOMAIN_CODES: &[CodeMapper] = &[
     finance::errors::mapped,
     performance::errors::mapped,
     agreements::errors::mapped,
+    marketplace::errors::mapped,
 ];
 
 /// Registers every domain's database error mapping. `app` calls it; command-line paths
@@ -117,6 +118,7 @@ pub fn app(state: AppState) -> Router {
         .merge(crate::auth::account::router())
         .merge(agreements::routes::router())
         .merge(agreements::listings::routes::router())
+        .merge(marketplace::routes::router())
         .merge(integrations::routes::router())
         .merge(integrations::webhooks::router())
         .merge(inbox::routes::router())

@@ -1,0 +1,102 @@
+/* Broker marketplace MK1 (designer review 2026-10-24): the profile with its avatar, the join
+   steps and terms, the newer-terms banner, the leave row, button widths and dialog sizes. */
+.market-mine,
+.market-profile,
+.market-join-body {
+  display: grid;
+  gap: 16px;
+}
+.market-join-body {
+  gap: 20px;
+}
+.market-form {
+  row-gap: 20px;
+}
+.market-person {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.market-person strong {
+  display: block;
+  color: var(--ink);
+  font-size: 16px;
+}
+.market-person span {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.market-avatar {
+  flex: 0 0 auto;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--hover);
+}
+.market-avatar.is-initials {
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  font-size: 26px;
+  font-weight: 700;
+  background: var(--accent-subtle);
+}
+.market-step {
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.market-step h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+.market-terms {
+  max-height: 360px;
+  overflow: auto;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.market-terms:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.market-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--accent-subtle);
+}
+.market-leave {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.market-card > .btn {
+  justify-self: start;
+}
+.market-dialog-short {
+  --dialog-height: 360px;
+}
+.market-dialog-reason {
+  --dialog-height: 480px;
+}
+@media (max-width: 520px) {
+  .market-card > .btn,
+  .market-switch .btn {
+    width: 100%;
+  }
+  .market-avatar {
+    width: 64px;
+    height: 64px;
+  }
+}

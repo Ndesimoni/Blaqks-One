@@ -1,15 +1,7 @@
 import { accountRoutes } from './account.js';
-import { activityRoutes } from './activity.js';
-import { agreementRoutes } from './agreements.js';
 import { assignmentRoutes } from './assignments.js';
-import { chatRoutes } from './chat.js';
-import { companyRoutes, readCompany } from './company.js';
-import { financeRoutes } from './finance.js';
-import { importRoutes } from './imports.js';
-import { inboxRoutes } from './inbox.js';
-import { integrationRoutes } from './integrations.js';
-import { performanceRoutes } from './performance.js';
-import { recordShareRoutes } from './recordShares.js';
+import { readCompany } from './company.js';
+import { scopedRoutes } from './scopedRoutes.js';
 import { signupRoutes } from './signup.js';
 
 export class CrmApiError extends Error {
@@ -133,17 +125,8 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
         body: { version: metadata.version },
       }),
     ...accountRoutes({ request, setCsrfToken }),
-    ...activityRoutes({ request, scope }),
     ...assignmentRoutes({ request, scope, recordPath }),
-    ...financeRoutes({ request, scope }),
-    ...performanceRoutes({ request, scope }),
-    ...companyRoutes({ request, scope }),
-    ...integrationRoutes({ request, scope }),
-    ...inboxRoutes({ request, scope }),
-    ...chatRoutes({ request, scope }),
-    ...agreementRoutes({ request, scope }),
-    ...importRoutes({ request, scope }),
-    ...recordShareRoutes({ request, scope }),
+    ...scopedRoutes({ request, scope }),
     ...signupRoutes({ request, setCsrfToken }),
   };
 }

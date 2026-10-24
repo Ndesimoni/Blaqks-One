@@ -7,7 +7,7 @@ mod store;
 mod validation;
 
 pub use model::{AccountType, Company, NewCompany, Origin, SeatLimitRequest, SeatUsage};
-pub use store::{create, get, seat_limit, set_member_limit};
+pub use store::{age, create, get, seat_limit, set_member_limit, Age};
 
 #[cfg(test)]
 mod creation_tests;

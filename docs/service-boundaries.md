@@ -102,7 +102,8 @@ Strengths to keep:
    - `agreements/` (cross-company deal agreements);
    - `integrations/`, `inbox/`, `notifications/` (messaging and providers);
    - `publications/`, `catalogue/`, `enquiries/` (public website);
-   - `lead_agents/` (AI lead agents).
+   - `lead_agents/` (AI lead agents);
+   - `marketplace/` (broker marketplace);
 
    They do not add collections to `crm_records`, do not add projections to `GET records`, and do not take foreign keys into `crm_records` or `crm_deals`. They keep IDs plus frozen snapshots where evidence matters.
 

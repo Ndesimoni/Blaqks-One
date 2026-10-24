@@ -1,5 +1,6 @@
-import { messagingTestFiles } from './crm-api-test-files-messaging.mjs';
 import { agreementTestFiles } from './crm-api-test-files-agreements.mjs';
+import { marketplaceTestFiles } from './crm-api-test-files-marketplace.mjs';
+import { messagingTestFiles } from './crm-api-test-files-messaging.mjs';
 
 /** API suites run in order against one isolated database (see test-crm-api.mjs). */
 export const apiTestFiles = [
@@ -110,6 +111,7 @@ export const apiTestFiles = [
   'tests/api/signup-release-races.test.mjs',
   'tests/api/signup-invitations.test.mjs',
   ...agreementTestFiles,
+  ...marketplaceTestFiles,
   'tests/api/record-sharing-contract.test.mjs',
   'tests/api/record-sharing-security.test.mjs',
   'tests/api/record-sharing-lifecycle.test.mjs',

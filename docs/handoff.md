@@ -4,7 +4,7 @@ Latest checkpoint (2026-10-24): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2
 designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
 company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)), then **co-broking from a
 listing share** ([as built](record-sharing.md#co-broking-from-a-share-as-built-2026-10-23)).
-Migrations run through **0072**. The R2a review follow-ups (L6, L7 as the owner decided,
+Migrations run through **0076** (MK1 adds 0073–0076). The R2a review follow-ups (L6, L7 as the owner decided,
 L8, L10; [record sharing](record-sharing.md#r2a-security-review-2026-10-23)) are built. Lead
 referrals (R2b) are dropped (owner, 2026-10-24): only properties are shared with other
 companies. A6 is revised (outside agents accept by creating a free basic account) and waits
@@ -21,7 +21,7 @@ Updated 2026-10-22, after commit `20955d8` on `feature/connected-crm`. Read this
 and [roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations).
 The owner chooses the next packet: nothing in §2 starts until they say so. **Broker
 marketplace MK1** (2026-10-24) is assigned to DeepSeek with
-[these instructions](deepseek-prompts/MK1-marketplace-entry.md) (migrations 0073–0075);
+[these instructions](deepseek-prompts/MK1-marketplace-entry.md) (migrations 0073–0075); Claude reviewed and fixed it (0076);
 Claude reviews it before it is accepted.
 
 ## 1. Done in this stretch (2026-10-21 to 2026-10-22)

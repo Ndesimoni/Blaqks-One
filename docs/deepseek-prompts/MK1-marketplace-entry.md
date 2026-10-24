@@ -1,5 +1,6 @@
-**Status (2026-10-24): assigned to DeepSeek by the owner.** Claude reviews the work before it
-is accepted. Build exactly what this file says; when something here does not match the code,
+**Status (2026-10-24): built by DeepSeek, then restored, reviewed and fixed by Claude** (see
+`docs/broker-marketplace.md` §16). Kept for reference; do not hand this packet out again.
+Original: assigned to DeepSeek by the owner; Claude reviews the work before it is accepted. Build exactly what this file says; when something here does not match the code,
 STOP and report instead of guessing.
 
 # Packet MK1 — broker marketplace: eligibility, company switch, joining and profiles

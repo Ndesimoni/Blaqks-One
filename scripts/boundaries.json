@@ -57,6 +57,17 @@
     ],
     "imports": ["crm_import_plans"],
     "performance": ["crm_targets", "crm_targets_identity_fixed"],
+    "marketplace": [
+      "crm_market_applications",
+      "crm_market_decisions",
+      "crm_market_companies",
+      "crm_market_company_events",
+      "crm_market_events",
+      "crm_market_terms",
+      "crm_market_acceptances",
+      "crm_market_profiles",
+      "crm_market_consents"
+    ],
     "sample": ["crm_sample_records", "crm_sample_accounts", "crm_sample_finance", "crm_environment"]
   },
   "domainFree": {
@@ -75,7 +86,8 @@
       "integrations",
       "outbox",
       "sample",
-      "media"
+      "media",
+      "marketplace"
     ]
   },
   "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],

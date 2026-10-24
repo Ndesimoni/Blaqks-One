@@ -9,7 +9,7 @@ like other access work.
 Today the API, the worker and the migrations all connect as one PostgreSQL superuser
 (`kws_crm` in `compose.yaml`), and no migration grants or revokes anything. The insert-only
 triggers on the evidence tables (agreement revisions, events, actions and payments; listing
-snapshots and share events) stop mistakes in our own code, but a superuser can switch
+snapshots and share events; marketplace applications, decisions, terms, acceptances, consents and events) stop mistakes in our own code, but a superuser can switch
 triggers off, change or drop tables and empty them. If the running app were compromised, so
 would the evidence be.
 

@@ -20,30 +20,32 @@ import arSignupErrors from './ar/signupErrors.js';
 import arSignupSetup from './ar/signupSetup.js';
 import arTeamSeats from './ar/teamSeats.js';
 import enAgreementForm from './en/agreementForm.js';
-import enAgreements from './en/agreements.js';
 import enAgreementLifecycle from './en/agreementLifecycle.js';
+import enAgreements from './en/agreements.js';
 import enCalculators from './en/calculators.js';
 import enChannels from './en/channels.js';
 import enChat from './en/chat.js';
+import enCoBroking from './en/coBroking.js';
 import enCommon from './en/common.js';
 import enDealParties from './en/dealParties.js';
 import enEmailAddresses from './en/emailAddresses.js';
 import enFieldHints from './en/fieldHints.js';
+import enHandoverOffer from './en/handoverOffer.js';
+import enHandoverRequests from './en/handoverRequests.js';
+import enHandoverReview from './en/handoverReview.js';
 import enInbox from './en/inbox.js';
 import enInboxRules from './en/inboxRules.js';
 import enInboxSaved from './en/inboxSaved.js';
-import enHandoverOffer from './en/handoverOffer.js';
-import enHandoverRequests from './en/handoverRequests.js';
-import enRecordKeeps from './en/recordKeeps.js';
-import enRecordShares from './en/recordShares.js';
-import enListingShares from './en/listingShares.js';
-import enListingShareViews from './en/listingShareViews.js';
-import enCoBroking from './en/coBroking.js';
-import enHandoverReview from './en/handoverReview.js';
 import enInboxSend from './en/inboxSend.js';
 import enInboxTriage from './en/inboxTriage.js';
+import enListingShares from './en/listingShares.js';
+import enListingShareViews from './en/listingShareViews.js';
 import enMailbox from './en/mailbox.js';
+import enMarketplace from './en/marketplace.js';
+import enMarketplaceJoin from './en/marketplaceJoin.js';
 import enProfile from './en/profile.js';
+import enRecordKeeps from './en/recordKeeps.js';
+import enRecordShares from './en/recordShares.js';
 import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
 import enSignupSetup from './en/signupSetup.js';
@@ -76,6 +78,8 @@ export const catalogs = Object.freeze({
     inboxSend: enInboxSend,
     inboxTriage: enInboxTriage,
     mailbox: enMailbox,
+    marketplace: enMarketplace,
+    marketplaceJoin: enMarketplaceJoin,
     signup: enSignup,
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,

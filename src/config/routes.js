@@ -12,6 +12,7 @@ export const settingsRoutes = [
   { name: 'Channels', path: '/channels' },
   { name: 'Workspaces', path: '/workspaces' },
   { name: 'Team activity', path: '/team-activity' },
+  { name: 'Marketplace applications', path: '/marketplace-applications' },
 ];
 /** Connected-only sections outside the shared navigation (the frozen demo never links here). */
 export const connectedRoutes = [
@@ -20,6 +21,7 @@ export const connectedRoutes = [
   { name: 'Inbox rules', path: '/inbox-rules' },
   { name: 'My mailbox', path: '/my-mailbox' },
   { name: 'Agreements', path: '/agreements' },
+  { name: 'Marketplace', path: '/marketplace' },
   // Google's sign-in returns here (E1a); the page finishes it and clears the address bar.
   { name: 'Google sign-in', path: '/oauth/google' },
 ];

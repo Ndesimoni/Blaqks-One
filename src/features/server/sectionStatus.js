@@ -35,6 +35,9 @@ const connectedSections = new Set([
   'Google sign-in',
   // `/agreements`: cross-company deal agreements (packet A2 screens).
   'Agreements',
+  // `/marketplace`: company eligibility, the switch and the platform's decisions (MK1).
+  'Marketplace',
+  'Marketplace applications',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
@@ -50,6 +53,10 @@ const purposes = {
   Workspaces: 'Review the workspaces this account is permitted to open.',
   'Team activity': 'Review who changed what in this workspace, and when.',
   'My activity': 'Review the changes you have made in this workspace.',
+  Marketplace:
+    'Post what your clients are looking for; brokers with a matching property answer privately.',
+  'Marketplace applications':
+    'Companies that asked for marketplace access. You see their names, ages, who applied and the counts, never their records.',
 };
 
 export function sectionDescription(name) {

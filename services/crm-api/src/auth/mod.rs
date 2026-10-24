@@ -10,6 +10,7 @@ pub mod grants;
 pub mod handlers;
 pub mod identity_rules;
 pub(crate) mod invitation_identity;
+pub mod members;
 pub mod password;
 pub mod password_policy;
 pub mod permissions;

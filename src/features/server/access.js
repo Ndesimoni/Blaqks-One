@@ -26,6 +26,10 @@ export function canOpenSection(user, route) {
   // Every company member may send agreements (owner decision 2026-10-20); the Super Admin
   // sees no agreement terms (agreements-design §9).
   if (route === 'Agreements') return user?.roleId !== 'super-admin';
+  // The marketplace belongs to Blaqks One companies; the Super Admin reviews its applications
+  // on the platform screen instead (broker-marketplace §13–§15, packet MK1).
+  if (route === 'Marketplace') return user?.roleId !== 'super-admin';
+  if (route === 'Marketplace applications') return user?.roleId === 'super-admin';
   // Each member's own mailbox: the Admin, and staff the Admin gave email (decision O8).
   if (route === 'My mailbox' || route === 'Google sign-in')
     return user?.roleId === 'admin' || (user?.roleId === 'staff' && user.channelAccess?.email);

@@ -376,3 +376,60 @@ Until approved, members see the checklist with ticks (the Admin can apply; staff
 your Admin to apply"), "Waiting for Blaqks One approval", or the decline reason with the
 date they can apply again. The approval controls live in the platform account today and
 move into the Blaqks One console (BO1) later.
+
+## 16. MK1 as built (2026-10-24)
+
+Migrations **0073–0075**; module `services/crm-api/src/marketplace/`, schema `marketplace`.
+
+- **Eligibility and application.** `records::market_activity::counts` returns five record counts
+  and "something changed in 30 days" from the company's own `crm_records` rows; `workspaces`
+  supplies the company's age. The Admin applies (`POST …/marketplace/application`, five an hour
+  per company); the application stores the checklist. The platform's queue
+  (`GET …/super-admin-workspace/marketplace/applications`) shows name, type, age, applicant and
+  counts only. `POST …/{company}/marketplace/decision` approves or declines the pending
+  application, or revokes an approved company, always with insert-only evidence. A declined
+  company may apply again after three days.
+- **The company switch.** `PUT …/marketplace/company { enabled, expectedVersion }` under the
+  workspace lock; no row means on, and every change writes history and an event.
+- **Joining.** The first terms row (`2026-10-24.1`) is a draft for UAE lawyer review; its digest
+  is SHA-256 over the canonical `{body, commitments, consent, version}`. `POST …/join` writes
+  the profile, one acceptance and the `joined` event in one transaction; a newer version or a
+  changed digest answers `terms_outdated`; a draft is refused on a hosted server
+  (`secure_cookie`). `PATCH …/me` needs `expectedVersion`; `POST …/terms/accept` records a newer
+  version; `POST …/leave` removes the profile and photo while acceptances and events stay.
+- **Photo and profiles.** `PUT …/me/photo` attaches an image the caller uploaded (JPEG, PNG or
+  WebP, 2 MB at most) under `market_profile`, replacing the old one in the same transaction;
+  `GET …/profiles/{memberId}` and `…/photo` run one visibility rule (live member, approved,
+  switched-on, unfrozen company, never the organisation workspace) and are limited to 300 an
+  hour per member and 1,000 per company. No email or phone is ever returned; company names and
+  licences show "Declared by the broker, not verified by Blaqks One".
+- **Screens.** Marketplace (checklist, application states, switch, join stepper, my profile,
+  preview, leave) and the Super Admin's "Marketplace applications" settings screen; English
+  catalogue `marketplace` and `marketplaceJoin`.
+- **Tests.** `tests/api/marketplace-{eligibility,guards,join,profiles}.test.mjs` (21),
+  `tests/unit/marketplace-model.test.js`, `tests/server-browser/marketplace-apply.spec.js`, and
+  Rust tests for the state rules, the 3-day wait, the digest, the profile validation and the
+  commitments count.
+- **Review and fixes (Claude, 2026-10-24).** DeepSeek built MK1 and stopped before committing,
+  with the MK1b server files moved aside; Claude restored them and the hooks, then a code
+  security review found no High issues. Its five Medium and the useful Low findings are fixed:
+  community names are English letters, digits, spaces and `' - &` only, with no dots and no
+  phone number even across names (`marketplace::free_text`); the photo is at most 2048 × 2048
+  pixels (`media::dimensions` reads the header) and is renamed "profile-photo"
+  (`media::neutral`), so its uploaded name never reaches another company; every join and every
+  acceptance of newer terms records the consent (`crm_market_consents`, migration **0076**);
+  accepting newer terms needs a joined member and every tick again; the terms digest is
+  recomputed from the row on every read; leaving needs a profile; staff see ticks, not counts,
+  and cannot use up the Admin's application tries; reads take no workspace lock and a frozen
+  company gets the shared not-found; a profile shows only while its owner accepted the
+  current terms. Tests: `tests/api/marketplace-review{,-access}.test.mjs`. Not done: a
+  licence format per authority (the formats are not known; one format for all).
+- **Screens (designer review, 2026-10-24).** The join form's emirate and property-type ticks
+  had no labels or styles (wrong text group; the themed field rule sized them as fields) and
+  seven classes were unstyled. Fixed: labelled ticks in a grid, the shared form grid and
+  review grid, a round photo with an initials fallback, the join card's heading, flat steps
+  instead of cards inside a card, scrollable terms that keep their paragraphs, the
+  newer-terms banner, Leave on its own row, sized dialogs, one page subtitle and a separate
+  navigation icon. The browser test covers the whole journey with screenshots of each step.
+- **Not in MK1:** client requests, the board, answers and matching (MK2–MK4), suspensions
+  (MK5) and the lawyer-reviewed terms.

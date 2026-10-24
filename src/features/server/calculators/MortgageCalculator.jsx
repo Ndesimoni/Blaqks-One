@@ -96,11 +96,7 @@ export function MortgageCalculator() {
         />
       </div>
       {rate.value === 0 && !rate.error && <p className="calc-note">{t('calculators.zeroRate')}</p>}
-      <section
-        className="calc-results"
-        aria-live="polite"
-        aria-label={t('calculators.repayment')}
-      >
+      <section className="calc-results" aria-live="polite" aria-label={t('calculators.repayment')}>
         <h4>{t('calculators.repayment')}</h4>
         {result ? (
           <dl>

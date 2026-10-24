@@ -1,0 +1,119 @@
+/* Broker marketplace (broker-marketplace.md §13–§15, packet MK1). Theme tokens only, phone
+   width first: one card per question, the checklist as calm rows, no nested panels. */
+.marketplace-page {
+  display: grid;
+  gap: 16px;
+  max-width: 880px;
+}
+.market-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.market-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+.market-card p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.market-hint {
+  color: var(--muted) !important;
+  font-size: 13px !important;
+}
+.market-approved-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.market-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.market-switch strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+.market-checklist {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.market-checklist li:last-child {
+  border-bottom: 0;
+}
+.market-tick {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.is-met .market-tick {
+  background: var(--hover);
+  color: var(--primary);
+}
+.is-missing .market-tick {
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+.market-line {
+  display: grid;
+  gap: 2px;
+}
+.market-detail {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.market-reason {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  font-size: 13px !important;
+}
+.market-reason span {
+  font-weight: 700;
+}
+@media (max-width: 520px) {
+  .market-card {
+    padding: 16px;
+  }
+  .market-switch {
+    align-items: stretch;
+  }
+}
