@@ -822,7 +822,7 @@ Low. The Medium ones and L9 are fixed (migration **0071**); the rest are queued 
   place; and the contact check also catches numbers written with slashes or non-breaking
   spaces (the Rust and screen rules stay identical).
 - **Still open:** before hosting, the database role needs grants that stop it altering the
-  evidence tables. Co-broking agreements already made from a share follow the Agreements
+  evidence tables ([Database access rules](database-access.md), DB1, queued for hosting). Co-broking agreements already made from a share follow the Agreements
   rules for a suspended company, not the share's pause.
 
 ### Co-broking from a share as built (2026-10-23)

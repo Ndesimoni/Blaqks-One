@@ -127,6 +127,8 @@ Needs decisions D1, D2 and D6, a Twilio account and approved templates; see
 - Spam reports and unsubscribes becoming an email opt-out (with the consents table, W1).
 - A test for an inbound file whose storage fails (hidden and counted, not yet automated).
 - Address changes in Team activity.
+- Database access rules (DB1, [plan](database-access.md)): separate owner and app roles,
+  evidence tables add-and-read only; queued for the hosting phase (owner, 2026-10-24).
 - Agreement screens (product designer, 2026-10-24): the certificate strip uses 24px padding
   against the 16px phone gutter and seems to cover the body; an unticked checkbox looks
   filled in light mode.
