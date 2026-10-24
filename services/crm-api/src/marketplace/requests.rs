@@ -15,6 +15,7 @@ pub(super) const STAMPS: &str =
      AS created_at, \
      to_char(expires_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS expires_at, \
      to_char(closed_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS closed_at, \
+     to_char(created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"') AS cursor_at, \
      close_reason, closed_at IS NULL AND expires_at <= now() AS expired, \
      closed_at IS NULL AND expires_at > now() - interval '30 days' AS renewable";
 #[derive(Debug, sqlx::FromRow)]
@@ -38,6 +39,8 @@ pub struct Row {
     pub move_in: Option<String>,
     pub version: i64,
     pub created_at: String,
+    /// `created_at` to the microsecond, so a board cursor never skips a row in the same millisecond.
+    pub cursor_at: String,
     pub expires_at: String,
     pub closed_at: Option<String>,
     pub close_reason: Option<String>,

@@ -68,17 +68,22 @@ fn bedrooms(payload: &Map<String, Value>) -> Option<i16> {
     (count <= 20).then_some(count)
 }
 
-/// A budget as a whole number of dirhams: a JSON number or a numeric string with separators.
+/// A budget as a whole number of dirhams: a JSON number, or a numeric string with separators
+/// whose fils (anything after the decimal point) are dropped.
 fn money(payload: &Map<String, Value>, field: &str) -> Option<i64> {
     let stored = payload.get(field)?;
     if let Some(value) = stored.as_i64() {
         return (value >= 0).then_some(value);
     }
-    let digits: String = stored
-        .as_str()?
-        .chars()
-        .filter(char::is_ascii_digit)
-        .collect();
+    if let Some(value) = stored.as_f64() {
+        return (0.0..1e15).contains(&value).then_some(value.trunc() as i64);
+    }
+    let text = stored.as_str()?.trim();
+    if text.starts_with('-') {
+        return None;
+    }
+    let whole = text.split('.').next().unwrap_or_default();
+    let digits: String = whole.chars().filter(char::is_ascii_digit).collect();
     digits.parse().ok()
 }
 
@@ -110,9 +115,6 @@ pub fn from_payload(payload: &Value) -> Requirements {
     }
 }
 
-/// Which of `(workspace, client, member)` the member still holds: the client exists in that
-/// workspace and is assigned to them, or they are that company's Admin. One query, so the board
-/// can hide a request whose client moved on without reading `crm_records` itself.
 #[cfg(test)]
 #[path = "market_requirements_tests.rs"]
 mod tests;

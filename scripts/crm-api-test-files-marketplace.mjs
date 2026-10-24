@@ -10,4 +10,5 @@ export const marketplaceTestFiles = [
   'tests/api/marketplace-board-hiding.test.mjs',
   'tests/api/marketplace-review.test.mjs',
   'tests/api/marketplace-review-access.test.mjs',
+  'tests/api/marketplace-requests-fixes.test.mjs',
 ];

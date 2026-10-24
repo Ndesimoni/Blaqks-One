@@ -26,7 +26,6 @@ pub async fn board(
     Query(query): Query<Board>,
 ) -> ApiResult<Json<Value>> {
     gate::reader(&state, &session, &workspace).await?;
-    board_limits::consume(&state, session.user.id, &workspace).await?;
     let filters = filters(&query)?;
     let mut after = match query.cursor.as_deref() {
         Some(text) => Some(board_limits::parsed(text)?),
@@ -35,6 +34,8 @@ pub async fn board(
     let mut tx = state.pool.begin().await?;
     gate::company_open(&mut tx, &workspace).await?;
     gate::joined(&mut tx, session.user.id).await?;
+    // Counted after the company and membership checks, so only a joined member spends the budget.
+    board_limits::consume(&state, session.user.id, &workspace).await?;
     let (items, next) = page(&mut tx, &workspace, &filters, &mut after).await?;
     tx.commit().await?;
     Ok(Json(json!({ "requests": items, "nextCursor": next })))
@@ -55,7 +56,7 @@ async fn page(
         let Some(last) = rows.last() else {
             return Ok((items, None));
         };
-        let following = (last.created_at.clone(), last.id);
+        let following = (last.cursor_at.clone(), last.id);
         let ids: Vec<Uuid> = rows.iter().map(|row| row.id).collect();
         let clients: HashMap<Uuid, Uuid> =
             sources::for_requests(tx, &ids).await?.into_iter().collect();
@@ -87,7 +88,7 @@ async fn page(
                 "hasPhoto": seen.row.photo_id.is_some(),
             });
             items.push(request_view::board(row, broker));
-            kept = Some((row.created_at.clone(), row.id));
+            kept = Some((row.cursor_at.clone(), row.id));
             if items.len() as i64 == PAGE {
                 tail = index + 1 < rows.len();
                 break;

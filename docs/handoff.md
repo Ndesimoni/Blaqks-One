@@ -26,7 +26,8 @@ Claude reviews it before it is accepted. MK1 is committed (`6609603`). **MK2, cl
 and the board**, is assigned to DeepSeek with [these instructions](deepseek-prompts/MK2-marketplace-requests.md)
 (migration 0077); Claude checks and tests it before it is accepted, then applies 0077 to the
 development database. **MK2 is built (2026-10-24)**: client requests, the board and My requests
-([as built](broker-marketplace.md#18-mk2-as-built-2026-10-24)); 0077 is not yet applied to the
+([as built](broker-marketplace.md#18-mk2-as-built-2026-10-24)). DeepSeek built it (`bdc56e5`);
+Claude's review fixed seventeen problems and added regression tests, then applied 0077 to the
 development database.
 
 ## 1. Done in this stretch (2026-10-21 to 2026-10-22)

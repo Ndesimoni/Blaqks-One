@@ -1,16 +1,18 @@
 //! The poster's side of a request (packet MK2): which client it came from, in a table no other
 //! company's response reads.
-use crate::error::ApiResult;
+use crate::error::{ApiError, ApiResult};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
+/// Records the client a new request came from. Two posters racing for one client meet the
+/// one-open-per-client index; the loser gets the same refusal as the earlier check gives.
 pub async fn insert(
     tx: &mut Transaction<'_, Postgres>,
     request: Uuid,
     workspace: &str,
     client: Uuid,
 ) -> ApiResult<()> {
-    sqlx::query(
+    let inserted = sqlx::query(
         "INSERT INTO marketplace.crm_market_request_sources \
          (request_id,workspace_id,source_record_id,open) VALUES ($1,$2,$3,true)",
     )
@@ -18,8 +20,14 @@ pub async fn insert(
     .bind(workspace)
     .bind(client)
     .execute(&mut **tx)
-    .await?;
-    Ok(())
+    .await;
+    match inserted {
+        Err(sqlx::Error::Database(error)) if error.code().as_deref() == Some("23505") => {
+            Err(ApiError::conflict(super::requests_post::CLIENT_OPEN))
+        }
+        Err(error) => Err(error.into()),
+        Ok(_) => Ok(()),
+    }
 }
 
 /// The client a request came from, for My requests on the poster's side only.

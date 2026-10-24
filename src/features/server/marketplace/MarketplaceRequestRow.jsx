@@ -52,11 +52,13 @@ export function MarketplaceRequestRow({ request, busy, onEdit, onRenew, onClose 
           )}
         </div>
       )}
-      {request.state === 'expired' && request.canRenew && (
+      {request.state === 'expired' && (
         <div className="market-actions">
-          <Button onClick={onRenew} disabled={Boolean(busy)}>
-            {t('marketplaceRequests.mine.renew')}
-          </Button>
+          {request.canRenew && (
+            <Button onClick={onRenew} disabled={Boolean(busy)}>
+              {t('marketplaceRequests.mine.renew')}
+            </Button>
+          )}
           <Button variant="light" onClick={onClose} disabled={Boolean(busy)}>
             {t('marketplaceRequests.mine.close')}
           </Button>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { draftFrom } from './requestOptions.js';
 import { readBoard, readMyRequests, readRequirements } from './requestsModel.js';
@@ -19,12 +19,15 @@ export function useBoard(filters) {
     more: false,
     error: '',
   });
+  // The filters now shown: a page that arrives after the filters changed is dropped, never mixed in.
+  const current = useRef(key);
+  current.current = key;
   const load = useCallback(
     (cursor, signal) =>
       api
         .marketplaceBoard(user.workspaceId, { ...JSON.parse(key), cursor }, signal)
         .then((value) => {
-          if (signal?.aborted) return;
+          if (signal?.aborted || current.current !== key) return;
           const page = readBoard(value);
           setState((last) => ({
             requests: cursor ? [...last.requests, ...page.requests] : page.requests,

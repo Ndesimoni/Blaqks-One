@@ -73,10 +73,11 @@ async fn command(
     requests::own_row(&mut tx, request_id, user.id).await?;
     let row = match action {
         "request_renewed" => requests_edit::renew(&mut tx, request_id, user.id).await?,
-        _ => {
-            requests_close::close(&mut tx, request_id, user.id).await?;
-            requests::load(&mut tx, request_id).await?
-        }
+        // An already-closed request is refused, so it never gains a second closing event.
+        _ => match requests_close::close(&mut tx, request_id, user.id).await? {
+            true => requests::load(&mut tx, request_id).await?,
+            false => None,
+        },
     };
     let Some(row) = row else {
         return Err(ApiError::conflict(refusal));

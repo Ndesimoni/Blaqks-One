@@ -42,6 +42,12 @@
   font-weight: 700;
   background: var(--accent-subtle);
 }
+/* A broker on a board card: a small avatar beside the name and company. */
+.market-broker .market-avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 15px;
+}
 .market-step {
   display: grid;
   gap: 12px;

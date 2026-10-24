@@ -29,7 +29,7 @@ export function MarketplaceRequests() {
     setError('');
     try {
       await api.renewMarketplaceRequest(user.workspaceId, request.id);
-      done(t('marketplaceRequests.post.saved'));
+      done(t('marketplaceRequests.mine.renewed'));
     } catch (failure) {
       setError(failure.message);
     } finally {

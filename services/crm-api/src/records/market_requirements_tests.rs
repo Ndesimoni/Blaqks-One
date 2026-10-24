@@ -132,3 +132,14 @@ fn at_most_twelve_communities_are_kept() {
     assert_eq!(read.communities.len(), MAX_COMMUNITIES);
     assert_eq!(read.communities[11], "Area 12");
 }
+
+#[test]
+fn budgets_keep_whole_dirhams_only() {
+    let read = from_payload(&json!({
+        "minimum_budget_aed": "1,500,000.50", "maximum_budget_aed": 2_250_000.75,
+    }));
+    assert_eq!(read.budget_min_aed, Some(1_500_000));
+    assert_eq!(read.budget_max_aed, Some(2_250_000));
+    let negative = from_payload(&json!({ "minimum_budget_aed": "-90000" }));
+    assert_eq!(negative.budget_min_aed, None);
+}

@@ -485,8 +485,8 @@ and a UAE lawyer's review.
   or a phone; a test scans the whole response for those.
 - **Leaving** closes the member's open requests with `left` in the same transaction as the
   profile.
-- **Screens.** The joined member's Marketplace screen has Board and My requests tabs below the
-  profile: five wrapping filters, cards in the review grid with the band as a chip, the broker
+- **Screens.** The joined member's Marketplace screen has Board and My requests tabs above the
+  profile (moved there in review, so the board is what the screen opens on): five wrapping filters, cards in the review grid with the band as a chip, the broker
   opening their profile, and Load more; My requests with Post a request (pick a client, the
   pre-filled form, a review, the consent tick), Edit, Renew in the last week or after expiry,
   Close behind a confirmation, and "No answers yet".
@@ -494,3 +494,28 @@ and a UAE lawyer's review.
   like contact details rather than refusing the whole draft. My requests carries the poster's own
   exact budget, because the edit form needs it; the board still never does. My requests rows carry
   their `version` so an edit can repeat it.
+- **Review and fixes (Claude, 2026-10-24).** DeepSeek's checks were rerun and passed; the review
+  found and fixed: closing an already-closed request answered success and wrote a second closing
+  event (now refused); an expired request kept its client's slot for ever, and the screen offered
+  no Close once Renew had lapsed (posting now closes the client's expired request with the new
+  reason `expired`, and Close is always offered on an expired request); two posters racing for
+  one client got a misleading "record ID" error (now the one-open-per-client refusal); board
+  cursors kept only milliseconds, so requests created within one millisecond could be skipped
+  (now microseconds); "any bedrooms" requests vanished under a bedroom filter (now listed); board
+  reads were counted before the company and membership checks; a client's budget stored with
+  fils, such as "1,500,000.50", was read as 150,000,050 (fils now dropped, in the server and the
+  form); a stored property type in other casing or outside the list, or more than eight bedrooms,
+  could not be shown in the form; four colours in the new stylesheet named theme variables that
+  do not exist (tab divider, empty-state outline and client-picker borders were invisible, and
+  picker text was unreadable in dark mode); the stylesheet order had changed under MK1's screens
+  (restored); a renewal said "Your changes are saved"; a client the poster could not use left the
+  form with no way back; changing filters during Load more could mix two filters' results; the
+  board sat below the whole profile; the budget filter was labelled "The board shows {band}." and
+  every card carried an "Ends {date}" fact (texts used without their values; a scan now finds
+  none left on the marketplace screens); and the review before posting left out cheques and the
+  move-in month (it now reuses the card's wording, which shows the month as "November 2026"). Tests: `tests/api/marketplace-requests-fixes.test.mjs`,
+  `tests/unit/marketplace-request-options.test.js`, a budget case in
+  `records::market_requirements` tests, and a browser check that the board card (not the
+  viewer's own profile) shows the request and never the client's name. Not changed: board cards
+  show initials, not photos, because broker photos are served `no-store` and each one counts
+  against the 300-an-hour profile read limit.

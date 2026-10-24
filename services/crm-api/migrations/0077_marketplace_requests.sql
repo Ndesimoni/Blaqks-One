@@ -31,7 +31,7 @@ CREATE TABLE marketplace.crm_market_requests (
     client_consent_at timestamptz NOT NULL,
     expires_at timestamptz NOT NULL,
     closed_at timestamptz,
-    close_reason text CHECK (close_reason IN ('done', 'left', 'client_changed')),
+    close_reason text CHECK (close_reason IN ('done', 'left', 'client_changed', 'expired')),
     round smallint NOT NULL DEFAULT 1 CHECK (round >= 1),
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),

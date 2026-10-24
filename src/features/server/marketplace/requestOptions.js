@@ -1,7 +1,8 @@
+import { wholeDirhams } from './requestBands.js';
+
 /**
  * The request form's choices and the translations between the form, the server's body and the
- * draft it pre-fills (packet MK2). The budget band mirrors the server's table so the form can show
- * it while the member types; the server still decides the band it stores.
+ * draft it pre-fills (packet MK2).
  */
 export const propertyTypes = Object.freeze([
   'Apartment',
@@ -25,32 +26,8 @@ export const propertyTypes = Object.freeze([
   'Land',
   'Other',
 ]);
-export const bedroomChoices = Object.freeze([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-
-const BUY = [
-  ['buy_1m', 1_000_000],
-  ['buy_2m', 2_000_000],
-  ['buy_3m', 3_000_000],
-  ['buy_5m', 5_000_000],
-  ['buy_10m', 10_000_000],
-  ['buy_10m_plus', Number.MAX_SAFE_INTEGER],
-];
-const RENT = [
-  ['rent_50k', 50_000],
-  ['rent_100k', 100_000],
-  ['rent_150k', 150_000],
-  ['rent_250k', 250_000],
-  ['rent_500k', 500_000],
-  ['rent_500k_plus', Number.MAX_SAFE_INTEGER],
-];
-
-/** The band a maximum budget falls in (the same edges as the server's `bands.rs`). */
-export function bandFor(purpose, maximum) {
-  if (!Number.isSafeInteger(maximum) || maximum <= 0) return '';
-  const table = purpose === 'rent' ? RENT : BUY;
-  const found = table.find(([, limit]) => maximum <= limit);
-  return found ? found[0] : '';
-}
+/** 0 is a studio; the server accepts up to 20, so a client's stored count always has a choice. */
+export const bedroomChoices = Object.freeze(Array.from({ length: 21 }, (_, count) => count));
 
 export const emptyDraft = Object.freeze({
   purpose: 'rent',
@@ -68,6 +45,16 @@ export const emptyDraft = Object.freeze({
   moveIn: '',
 });
 
+/** A stored property type as one of the form's choices (any casing), or the default. */
+const knownType = (stored) =>
+  propertyTypes.find(
+    (name) =>
+      name.toLowerCase() ===
+      String(stored || '')
+        .trim()
+        .toLowerCase(),
+  ) || emptyDraft.propertyType;
+
 /** The draft a client's stored requirements suggest; empty values are left for the member. */
 export function draftFrom(requirements) {
   if (!requirements) return { ...emptyDraft };
@@ -77,7 +64,7 @@ export function draftFrom(requirements) {
     emirate: requirements.emirate || emptyDraft.emirate,
     communities: joined(requirements.communities),
     openToOtherAreas: false,
-    propertyType: requirements.propertyType || emptyDraft.propertyType,
+    propertyType: knownType(requirements.propertyType),
     bedrooms: requirements.bedrooms === null ? '' : String(requirements.bedrooms),
     budgetMinAed: requirements.budgetMinAed === null ? '' : String(requirements.budgetMinAed),
     budgetMaxAed: requirements.budgetMaxAed === null ? '' : String(requirements.budgetMaxAed),
@@ -89,10 +76,7 @@ export function draftFrom(requirements) {
   };
 }
 
-const number = (value) => {
-  const text = String(value ?? '').replace(/[^0-9]/g, '');
-  return text ? Number(text) : null;
-};
+const number = wholeDirhams;
 
 /** A stored request back in the form, for an edit. */
 export function draftFromRequest(request) {
@@ -109,7 +93,7 @@ export function draftFromRequest(request) {
     furnishing: request.furnishing,
     cheques: request.cheques === null ? '' : String(request.cheques),
     buildingAge: request.buildingAge,
-    moveIn: request.moveIn,
+    moveIn: request.moveIn || '',
   };
 }
 

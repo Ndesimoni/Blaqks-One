@@ -1,8 +1,15 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 
+/** A `YYYY-MM` move-in month as "November 2026". */
+export const monthName = (month) => {
+  const date = new Date(`${month}-01T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return month;
+  return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+};
+
 /** One request's facts, worded once for a board card and a My requests row (packet MK2). */
-export function requestFacts(t, format, request) {
+export function requestFacts(t, request) {
   const bedrooms = () => {
     if (request.bedrooms === null) return t('marketplaceRequests.board.noBedrooms');
     if (request.bedrooms === 0) return t('marketplaceRequests.board.studio');
@@ -41,23 +48,22 @@ export function requestFacts(t, format, request) {
       ? [
           [
             t('marketplaceRequests.post.moveIn'),
-            t('marketplaceRequests.board.moveIn', { month: request.moveIn }),
+            t('marketplaceRequests.board.moveIn', { month: monthName(request.moveIn) }),
           ],
         ]
       : []),
     [
       t('marketplaceRequests.post.budgetLabel'),
-      t(`marketplaceRequests.band.${request.budgetBand}`),
+      request.budgetBand ? t(`marketplaceRequests.band.${request.budgetBand}`) : '—',
     ],
-    [t('marketplaceRequests.mine.ends'), format.date(request.expiresAt) || request.expiresAt],
   ];
 }
 
 export function MarketplaceRequestFacts({ request }) {
-  const { t, format } = useI18n();
+  const { t } = useI18n();
   return (
     <dl className="record-review-grid market-review">
-      {requestFacts(t, format, request).map(([label, value]) => (
+      {requestFacts(t, request).map(([label, value]) => (
         <div key={label}>
           <dt>{label}</dt>
           <dd>{value}</dd>

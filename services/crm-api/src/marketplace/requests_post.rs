@@ -61,6 +61,11 @@ pub async fn post(
     .fetch_optional(&mut *tx)
     .await?
     .ok_or_else(|| ApiError::conflict(gate::JOIN_FIRST))?;
+    // An expired request no longer holds its client: it closes so this one can take its place.
+    for (_, poster) in requests_close::close_expired_for_client(&mut tx, &workspace, client).await?
+    {
+        events::append(&mut tx, &workspace, user.id, poster, "request_closed").await?;
+    }
     if requests_close::open_for_client(&mut tx, &workspace, client).await? {
         return Err(ApiError::conflict(CLIENT_OPEN));
     }

@@ -50,9 +50,16 @@ export function MarketplaceRequestPost({ onClose, onPosted }) {
       {!clientId && <MarketplaceRequestClientPicker onPick={setClientId} />}
       {clientId && found.loading && <p role="status">{t('marketplaceRequests.post.picking')}</p>}
       {clientId && found.error && (
-        <p className="field-error" role="alert">
-          {found.error}
-        </p>
+        <>
+          <p className="field-error" role="alert">
+            {found.error}
+          </p>
+          <div className="market-actions">
+            <Button variant="light" onClick={back}>
+              {t('marketplaceRequests.post.changeClient')}
+            </Button>
+          </div>
+        </>
       )}
       {clientId && draft && (
         <>

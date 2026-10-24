@@ -32,6 +32,33 @@ pub async fn open_for_client(
     .await?)
 }
 
+/// Closes the client's expired requests (`expired`) so a new request may take the client's slot,
+/// returning each closed request with its poster.
+pub async fn close_expired_for_client(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    client: Uuid,
+) -> ApiResult<Vec<(Uuid, Uuid)>> {
+    let closed: Vec<(Uuid, Uuid)> = sqlx::query_as(
+        "UPDATE marketplace.crm_market_requests r SET closed_at=now(),close_reason='expired', \
+         updated_at=now(),version=r.version+1 FROM marketplace.crm_market_request_sources s \
+         WHERE s.request_id=r.id AND s.workspace_id=$1 AND s.source_record_id=$2 AND s.open \
+           AND r.closed_at IS NULL AND r.expires_at <= now() RETURNING r.id,r.member_id",
+    )
+    .bind(workspace)
+    .bind(client)
+    .fetch_all(&mut **tx)
+    .await?;
+    let ids: Vec<Uuid> = closed.iter().map(|(id, _)| *id).collect();
+    sqlx::query(
+        "UPDATE marketplace.crm_market_request_sources SET open=false WHERE request_id=ANY($1)",
+    )
+    .bind(&ids)
+    .execute(&mut **tx)
+    .await?;
+    Ok(closed)
+}
+
 /// Closes the member's open requests with `reason` and frees their clients, returning the IDs.
 async fn close_where(
     tx: &mut Transaction<'_, Postgres>,

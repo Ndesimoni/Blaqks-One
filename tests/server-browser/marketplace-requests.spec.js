@@ -65,12 +65,16 @@ test('a request is posted, seen by another company, renewed and closed', async (
     await shots(poster.page, testInfo, 'marketplace-my-requests');
 
     await openSection(viewer.page, 'Marketplace');
-    await expect(viewer.page.getByText('Dubai Marina, JVC')).toBeVisible({ timeout: 30000 });
+    const card = viewer.page.locator('.market-board-card').first();
+    await expect(card).toContainText('Dubai Marina', { timeout: 30000 });
+    await expect(card).toContainText(teams.one.user.name);
+    // The other company never sees who the client is.
+    await expect(viewer.page.getByText(record.record.full_name)).toHaveCount(0);
     await shots(viewer.page, testInfo, 'marketplace-board');
     await viewer.page.getByLabel('Emirate', { exact: true }).selectOption('sharjah');
     await expect(viewer.page.getByText('No requests match these filters yet.')).toBeVisible();
     await viewer.page.getByLabel('Emirate', { exact: true }).selectOption('');
-    await expect(viewer.page.getByText('Dubai Marina, JVC')).toBeVisible();
+    await expect(card).toContainText('Dubai Marina');
     await viewer.page.locator('.market-broker').first().click();
     const dialog = viewer.page.getByRole('dialog');
     await expect(dialog).toContainText(teams.one.user.name);
@@ -86,7 +90,9 @@ test('a request is posted, seen by another company, renewed and closed', async (
     await poster.page.reload();
     await poster.page.getByRole('tab', { name: 'My requests' }).click();
     await poster.page.getByRole('button', { name: 'Renew', exact: true }).click();
-    await expect(poster.page.getByText('Your changes are saved.')).toBeVisible({ timeout: 30000 });
+    await expect(poster.page.getByText(/^Renewed: the request stays on the board/)).toBeVisible({
+      timeout: 30000,
+    });
     await shots(poster.page, testInfo, 'marketplace-request-renewed');
     await poster.page.getByRole('button', { name: 'Close', exact: true }).click();
     const confirm = poster.page.getByRole('dialog');

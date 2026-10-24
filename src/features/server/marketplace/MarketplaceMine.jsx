@@ -13,8 +13,9 @@ import { useMarketplaceTerms } from './useMarketplace.js';
 import { useMyProfile } from './useMyProfile.js';
 
 /**
- * The joined member's screen (packets MK1b and MK2): the newer-terms banner, "My marketplace
- * profile" with edit, photo, preview and leave, then the board and My requests.
+ * The joined member's screen (packets MK1b and MK2): the newer-terms banner, the board and My
+ * requests first (what the screen is for), then "My marketplace profile" with edit, photo,
+ * preview and leave.
  */
 export function MarketplaceMine({ member, onChanged }) {
   const { api, user } = useSession();
@@ -47,6 +48,7 @@ export function MarketplaceMine({ member, onChanged }) {
           </Button>
         </section>
       )}
+      <MarketplaceRequestTabs />
       <section className="market-card">
         <h3>{t('marketplaceJoin.mine.title')}</h3>
         {mine.editing ? (
@@ -98,7 +100,6 @@ export function MarketplaceMine({ member, onChanged }) {
           onChange={mine.upload}
         />
       </section>
-      <MarketplaceRequestTabs />
       {dialog === 'preview' && (
         <MarketplaceProfileDialog memberId={user.id} onClose={() => setDialog('')} />
       )}

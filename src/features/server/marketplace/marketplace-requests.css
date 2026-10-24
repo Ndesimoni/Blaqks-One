@@ -2,7 +2,7 @@
 .market-tabs {
   display: flex;
   gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--line);
   margin-bottom: 1rem;
   overflow-x: auto;
 }
@@ -18,12 +18,17 @@
   white-space: nowrap;
 }
 .market-tab.is-active {
-  color: var(--text);
+  color: var(--ink);
   border-bottom-color: var(--accent);
 }
-.market-panel {
+.market-panel,
+.market-board,
+.market-requests {
   display: grid;
   gap: 1rem;
+}
+.market-board > .btn {
+  justify-self: start;
 }
 .market-filters {
   display: grid;
@@ -57,7 +62,7 @@
   display: inline-block;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
-  background: var(--accent-soft, rgba(0, 0, 0, 0.06));
+  background: var(--accent-subtle);
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
@@ -66,7 +71,7 @@
   opacity: 0.65;
 }
 .market-chip.is-expired {
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--line);
   background: none;
 }
 .market-facts-line {
@@ -98,7 +103,7 @@
 .market-empty {
   margin: 0;
   padding: 1.25rem;
-  border: 1px dashed var(--border);
+  border: 1px dashed var(--line);
   border-radius: 0.75rem;
   color: var(--muted);
 }
@@ -106,7 +111,7 @@
   margin: 0;
   padding: 0.6rem 0.75rem;
   border-radius: 0.5rem;
-  background: var(--accent-soft, rgba(0, 0, 0, 0.06));
+  background: var(--accent-subtle);
   font-weight: 600;
 }
 .market-band {
@@ -123,9 +128,10 @@
   width: 100%;
   text-align: left;
   padding: 0.6rem 0.75rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   border-radius: 0.5rem;
-  background: var(--surface, transparent);
+  background: var(--panel);
+  color: var(--ink);
   font: inherit;
   cursor: pointer;
 }

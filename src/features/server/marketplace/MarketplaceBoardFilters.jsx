@@ -99,7 +99,7 @@ export function MarketplaceBoardFilters({ filters, onChange }) {
       )}
       {field(
         'band',
-        t('marketplaceRequests.post.band'),
+        t('marketplaceRequests.post.budgetLabel'),
         <>
           <option value={ANY}>{t('marketplaceRequests.board.anyBand')}</option>
           {[

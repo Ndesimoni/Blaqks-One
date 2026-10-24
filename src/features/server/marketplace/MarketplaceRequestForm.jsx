@@ -1,7 +1,8 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceRequestPreferenceFields } from './MarketplaceRequestPreferenceFields.jsx';
-import { bandFor, bedroomChoices, propertyTypes } from './requestOptions.js';
+import { bandFor, wholeDirhams } from './requestBands.js';
+import { bedroomChoices, propertyTypes } from './requestOptions.js';
 
 const EMIRATES = [
   'dubai',
@@ -21,7 +22,7 @@ export function MarketplaceRequestForm({ draft, onChange, prefix = 'request' }) 
       ...draft,
       [key]: event.target.type === 'checkbox' ? event.target.checked : event.target.value,
     });
-  const band = bandFor(draft.purpose, Number(String(draft.budgetMaxAed).replace(/[^0-9]/g, '')));
+  const band = bandFor(draft.purpose, wholeDirhams(draft.budgetMaxAed));
   const id = (key) => `${prefix}-${key}`;
   const field = (key, label, control) => (
     <div className="field">
