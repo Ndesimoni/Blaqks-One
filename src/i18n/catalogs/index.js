@@ -43,6 +43,7 @@ import enListingShareViews from './en/listingShareViews.js';
 import enMailbox from './en/mailbox.js';
 import enMarketplace from './en/marketplace.js';
 import enMarketplaceJoin from './en/marketplaceJoin.js';
+import enMarketplaceRequests from './en/marketplaceRequests.js';
 import enProfile from './en/profile.js';
 import enRecordKeeps from './en/recordKeeps.js';
 import enRecordShares from './en/recordShares.js';
@@ -80,6 +81,7 @@ export const catalogs = Object.freeze({
     mailbox: enMailbox,
     marketplace: enMarketplace,
     marketplaceJoin: enMarketplaceJoin,
+    marketplaceRequests: enMarketplaceRequests,
     signup: enSignup,
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,

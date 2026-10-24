@@ -105,6 +105,10 @@ Strengths to keep:
    - `lead_agents/` (AI lead agents);
    - `marketplace/` (broker marketplace);
 
+   `marketplace/` keeps a request's source client in its own `crm_market_request_sources` and
+   takes a client's requirements only through `records::market_requirements`, never by reading
+   `crm_records` itself (packet MK2).
+
    They do not add collections to `crm_records`, do not add projections to `GET records`, and do not take foreign keys into `crm_records` or `crm_deals`. They keep IDs plus frozen snapshots where evidence matters.
 
 10. **Stable API surface.**

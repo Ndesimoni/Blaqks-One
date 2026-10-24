@@ -44,5 +44,27 @@ export function marketplaceRoutes({ request, scope }) {
       request(`${base(workspace)}/profiles/${segment(memberId)}`, { signal }),
     marketplacePhotoUrl: (workspace, memberId) =>
       `/api/crm${base(workspace)}/profiles/${segment(memberId)}/photo`,
+    /** The requirements of one of your clients, pre-filled into the form (packet MK2). */
+    marketplaceDraft: (workspace, clientId, signal) =>
+      request(`${base(workspace)}/requests/draft?clientId=${segment(clientId)}`, { signal }),
+    postMarketplaceRequest: (workspace, body) =>
+      request(`${base(workspace)}/requests`, { method: 'POST', body }),
+    marketplaceRequests: (workspace, signal) =>
+      request(`${base(workspace)}/requests/mine`, { signal }),
+    editMarketplaceRequest: (workspace, id, body) =>
+      request(`${base(workspace)}/requests/${segment(id)}`, { method: 'PATCH', body }),
+    renewMarketplaceRequest: (workspace, id) =>
+      request(`${base(workspace)}/requests/${segment(id)}/renew`, { method: 'POST' }),
+    closeMarketplaceRequest: (workspace, id) =>
+      request(`${base(workspace)}/requests/${segment(id)}/close`, { method: 'POST' }),
+    /** Other companies' open requests; `filters` may hold the six board filters. */
+    marketplaceBoard: (workspace, filters = {}, signal) => {
+      const query = new URLSearchParams(
+        Object.entries(filters).filter(
+          ([, value]) => value !== undefined && value !== null && value !== '',
+        ),
+      ).toString();
+      return request(`${base(workspace)}/board${query ? `?${query}` : ''}`, { signal });
+    },
   };
 }

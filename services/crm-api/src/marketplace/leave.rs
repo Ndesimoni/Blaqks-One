@@ -1,6 +1,6 @@
 //! `POST …/marketplace/leave` (packet MK1b): the profile and its photo go at once. Acceptances
 //! and events stay as evidence, and joining again asks for the consent and terms again.
-use super::{application, events, gate, profiles};
+use super::{application, events, gate, profiles, requests_close};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -26,6 +26,11 @@ pub async fn leave(
     // Only a member who joined can leave; nobody else writes a `left` event (code review L9).
     if profiles::load(&mut tx, user.id).await?.is_none() {
         return Err(ApiError::conflict(gate::JOIN_FIRST));
+    }
+    // Leaving ends every open request in the same transaction, and frees their clients.
+    let closed = requests_close::close_left(&mut tx, user.id).await?;
+    for _ in &closed {
+        events::append(&mut tx, &workspace, user.id, user.id, "request_closed").await?;
     }
     media::owned::remove(&mut tx, super::photo::KIND, user.id).await?;
     profiles::remove(&mut tx, user.id).await?;

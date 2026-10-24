@@ -66,7 +66,9 @@
       "crm_market_terms",
       "crm_market_acceptances",
       "crm_market_profiles",
-      "crm_market_consents"
+      "crm_market_consents",
+      "crm_market_requests",
+      "crm_market_request_sources"
     ],
     "sample": ["crm_sample_records", "crm_sample_accounts", "crm_sample_finance", "crm_environment"]
   },

@@ -37,6 +37,11 @@ would the evidence be.
 4. **Tests as the app role:** the API suites and CI connect as the app role, so a missing
    grant fails a test, and a dedicated test proves the app role cannot update or delete
    evidence, truncate a table, disable a trigger or alter a table.
+5. **Marketplace client requests (migration 0077):** `marketplace.crm_market_requests` and
+   `marketplace.crm_market_request_sources` are ordinary mutable tables (a request is edited,
+   renewed and closed in place), so they are granted like other domain tables rather than like
+   the marketplace's insert-only evidence. The source client's ID is stored only there, and the
+   board hides a request whose poster no longer holds that client.
 
 ## Owner steps at hosting
 

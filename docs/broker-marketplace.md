@@ -459,3 +459,38 @@ Defaults proposed by Claude and approved by the owner (2026-10-24):
 MK3 (answers and matching) and MK4 (choosing) change listing shares and agreements, so each
 needs its own design and security review before it is handed out; MK5 needs the BO1 console
 and a UAE lawyer's review.
+
+## 18. MK2 as built (2026-10-24)
+
+- **Tables (migration 0077).** `marketplace.crm_market_requests` holds the frozen request: purpose,
+  emirate slug, up to twelve communities with their matching keys, property type label, bedrooms,
+  the budget and its band, ready, furnishing, cheques, building age and a move-in month, the
+  client consent time, the expiry, the close time and reason, the round and the version. The
+  poster-side `crm_market_request_sources` keeps the client and whether the request holds its
+  slot; no cross-company response reads it. The events check gained `request_posted`,
+  `request_edited`, `request_renewed` and `request_closed`.
+- **One allowlist.** `records::market_requirements` is the only reader of a client's
+  requirements: `buy_rent`, `emirate`, `preferred_communities`, `property_type`, `bedrooms`, the
+  two budgets and `target_date`. A Rust test sorts every Clients workbook field, so a new column
+  fails the build until it is classified. The same module answers which source clients a page of
+  posters still holds, in one query.
+- **Routes.** `GET /requests/draft`, `POST /requests` (consent tick, five open per member, one per
+  client, twenty a day), `GET /requests/mine` (closes `client_changed` on read),
+  `PATCH /requests/{id}` (version, expiry kept), `POST /requests/{id}/renew` (30 days from now)
+  and `/close` (`done`), and `GET /board` (other companies only, 20 a page, opaque cursor, no
+  totals, filters on the server, 120 reads an hour per member and 600 per company). Every route
+  runs the MK1 gate and answers the shared not-found to everyone outside.
+- **Board privacy.** A card carries the request and the broker (`memberId`, name, company,
+  whether a photo exists). It never carries the client, the client's record ID, the exact budget
+  or a phone; a test scans the whole response for those.
+- **Leaving** closes the member's open requests with `left` in the same transaction as the
+  profile.
+- **Screens.** The joined member's Marketplace screen has Board and My requests tabs below the
+  profile: five wrapping filters, cards in the review grid with the band as a chip, the broker
+  opening their profile, and Load more; My requests with Post a request (pick a client, the
+  pre-filled form, a review, the consent tick), Edit, Renew in the last week or after expiry,
+  Close behind a confirmation, and "No answers yet".
+- **Deviations from the packet.** `records::market_requirements` drops community names that look
+  like contact details rather than refusing the whole draft. My requests carries the poster's own
+  exact budget, because the edit form needs it; the board still never does. My requests rows carry
+  their `version` so an edit can repeat it.

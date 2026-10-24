@@ -4,7 +4,7 @@ Latest checkpoint (2026-10-24): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2
 designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
 company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)), then **co-broking from a
 listing share** ([as built](record-sharing.md#co-broking-from-a-share-as-built-2026-10-23)).
-Migrations run through **0076** (MK1 adds 0073–0076). The R2a review follow-ups (L6, L7 as the owner decided,
+Migrations run through **0077** (MK1 adds 0073–0076; MK2 adds 0077). The R2a review follow-ups (L6, L7 as the owner decided,
 L8, L10; [record sharing](record-sharing.md#r2a-security-review-2026-10-23)) are built. Lead
 referrals (R2b) are dropped (owner, 2026-10-24): only properties are shared with other
 companies. A6 is revised (outside agents accept by creating a free basic account) and waits
@@ -25,6 +25,8 @@ marketplace MK1** (2026-10-24) is assigned to DeepSeek with
 Claude reviews it before it is accepted. MK1 is committed (`6609603`). **MK2, client requests
 and the board**, is assigned to DeepSeek with [these instructions](deepseek-prompts/MK2-marketplace-requests.md)
 (migration 0077); Claude checks and tests it before it is accepted, then applies 0077 to the
+development database. **MK2 is built (2026-10-24)**: client requests, the board and My requests
+([as built](broker-marketplace.md#18-mk2-as-built-2026-10-24)); 0077 is not yet applied to the
 development database.
 
 ## 1. Done in this stretch (2026-10-21 to 2026-10-22)

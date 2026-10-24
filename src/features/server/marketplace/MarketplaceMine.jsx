@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Empty } from '../../../components/ui/Empty.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { JoinProfileFields } from './JoinProfileFields.jsx';
@@ -9,12 +8,13 @@ import { MarketplaceFacts } from './MarketplaceFacts.jsx';
 import { MarketplaceMineActions } from './MarketplaceMineActions.jsx';
 import { MarketplaceMineDialogs } from './MarketplaceMineDialogs.jsx';
 import { MarketplaceProfileDialog } from './MarketplaceProfileDialog.jsx';
+import { MarketplaceRequestTabs } from './MarketplaceRequestTabs.jsx';
 import { useMarketplaceTerms } from './useMarketplace.js';
 import { useMyProfile } from './useMyProfile.js';
 
 /**
- * The joined member's screen (packet MK1b): the newer-terms banner, "My marketplace profile"
- * with edit, photo, preview and leave, and the empty board until client requests arrive in MK2.
+ * The joined member's screen (packets MK1b and MK2): the newer-terms banner, "My marketplace
+ * profile" with edit, photo, preview and leave, then the board and My requests.
  */
 export function MarketplaceMine({ member, onChanged }) {
   const { api, user } = useSession();
@@ -98,13 +98,7 @@ export function MarketplaceMine({ member, onChanged }) {
           onChange={mine.upload}
         />
       </section>
-      <section className="market-card">
-        <Empty
-          icon="note"
-          title={t('marketplaceJoin.mine.boardTitle')}
-          detail={t('marketplaceJoin.mine.boardText')}
-        />
-      </section>
+      <MarketplaceRequestTabs />
       {dialog === 'preview' && (
         <MarketplaceProfileDialog memberId={user.id} onClose={() => setDialog('')} />
       )}
