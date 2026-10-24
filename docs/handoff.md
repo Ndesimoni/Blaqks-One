@@ -22,7 +22,10 @@ and [roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-w
 The owner chooses the next packet: nothing in §2 starts until they say so. **Broker
 marketplace MK1** (2026-10-24) is assigned to DeepSeek with
 [these instructions](deepseek-prompts/MK1-marketplace-entry.md) (migrations 0073–0075); Claude reviewed and fixed it (0076);
-Claude reviews it before it is accepted.
+Claude reviews it before it is accepted. MK1 is committed (`6609603`). **MK2, client requests
+and the board**, is assigned to DeepSeek with [these instructions](deepseek-prompts/MK2-marketplace-requests.md)
+(migration 0077); Claude checks and tests it before it is accepted, then applies 0077 to the
+development database.
 
 ## 1. Done in this stretch (2026-10-21 to 2026-10-22)
 

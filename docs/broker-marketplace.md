@@ -433,3 +433,29 @@ Migrations **0073–0075**; module `services/crm-api/src/marketplace/`, schema `
   navigation icon. The browser test covers the whole journey with screenshots of each step.
 - **Not in MK1:** client requests, the board, answers and matching (MK2–MK4), suspensions
   (MK5) and the lawyer-reviewed terms.
+
+## 17. MK2 plan (2026-10-24)
+
+The owner asked for MK2 to be built by DeepSeek and then checked and tested by Claude. The
+instructions are in [MK2 prompt](deepseek-prompts/MK2-marketplace-requests.md): migration
+**0077** (`crm_market_requests` and the poster-side `crm_market_request_sources`), a
+`records::market_requirements` allowlist with a test that sorts every client field, posting
+from a client the member holds (or any client for the Admin) with a client-consent tick,
+editing, renewing and closing, My requests, and a paged board of other companies' requests
+with server filters, no totals and read limits. Answers, matching and alerts stay in MK3.
+
+Defaults chosen for MK2 (the owner may change them):
+
+- Areas stay typed community names, normalised for matching, under the MK1 free-text rules;
+  a fixed UAE community list can come later.
+- Budgets show as bands (six for buying, six for yearly rent); the exact numbers stay on
+  the server for MK3.
+- A request whose client changes holder or is deleted is hidden from the board at once and
+  closed (`client_changed`) on the poster's next My requests read, so `records` gains no
+  trigger; leaving the marketplace closes the member's requests in the same transaction.
+- Editing keeps the expiry date; Renew sets 30 days from now and is offered in the last 7
+  days or within 30 days after expiry.
+
+MK3 (answers and matching) and MK4 (choosing) change listing shares and agreements, so each
+needs its own design and security review before it is handed out; MK5 needs the BO1 console
+and a UAE lawyer's review.
