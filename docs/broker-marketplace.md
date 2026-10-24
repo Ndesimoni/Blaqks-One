@@ -321,8 +321,7 @@ changes below. They override §13 where they differ.
    names and licences are labelled "declared by the broker, not verified by Blaqks One".
 9. **Read limits:** profile and photo reads are limited per member and per company each
    hour (`throttle::consume_window`), against scraping.
-10. **Migrations:** 0073 (marketplace schema, tables and triggers, error codes `P0M…`
-    mapped in `marketplace::errors`) and 0074 (media: the `market_profile` owner kind).
+10. **Migrations:** 0073 (marketplace eligibility, switch and events), 0074 (terms, acceptances and profiles), both with error codes `P0M…` mapped in `marketplace::errors`, and 0075 (media: the `market_profile` owner kind).
     Update `scripts/boundaries*.json`, the domain map and rule 9 list in
     [service boundaries](service-boundaries.md), and the backend-foundation module map.
     DB1 lists the terms, acceptances and events as add-and-read only.
@@ -355,3 +354,25 @@ changes below. They override §13 where they differ.
 - **Reminders and match alerts** are worked out when the member opens the Marketplace (a
   records read within what they may see) and shown as a badge; there is no worker job
   until a separate `notifications` module exists.
+
+## 15. Company eligibility (owner decided 2026-10-24)
+
+The security review's High 1 (a throwaway company could read the marketplace) is answered
+by three filters, all needed before a company's members can use the marketplace:
+
+1. **Age:** the company was created at least **7 days** ago.
+2. **Real use of the CRM**, counted automatically from the company's own records (Deals and
+   Agreements do not count): at least **5 listings** (Properties), **5 clients or leads**
+   (Clients), **3 contacts**, **3 follow-ups** and **1 viewing**, and something created or
+   changed in those collections in the **last 30 days**.
+3. **Blaqks One approval:** when all of the above are met, the company's Admin presses
+   **Apply**. The platform team sees the company's name, type and age, who applied and the
+   checklist counts, **never its records**, and approves or declines with a reason. A
+   declined company may apply again after **3 days**. The platform team can also revoke
+   access later (MK5 adds appeals). Phone verification is added once a Blaqks One SMS or
+   WhatsApp sender exists.
+
+Until approved, members see the checklist with ticks (the Admin can apply; staff see "Ask
+your Admin to apply"), "Waiting for Blaqks One approval", or the decline reason with the
+date they can apply again. The approval controls live in the platform account today and
+move into the Blaqks One console (BO1) later.

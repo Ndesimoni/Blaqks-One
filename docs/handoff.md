@@ -19,7 +19,10 @@ unchanged versions on rejected revisions and introduction preservation through a
 Updated 2026-10-22, after commit `20955d8` on `feature/connected-crm`. Read this with
 `AGENTS.md` (project rules), the [token-efficient delivery protocol](token-efficient-delivery.md)
 and [roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations).
-The owner chooses the next packet: nothing in §2 starts until they say so.
+The owner chooses the next packet: nothing in §2 starts until they say so. **Broker
+marketplace MK1** (2026-10-24) is assigned to DeepSeek with
+[these instructions](deepseek-prompts/MK1-marketplace-entry.md) (migrations 0073–0075);
+Claude reviews it before it is accepted.
 
 ## 1. Done in this stretch (2026-10-21 to 2026-10-22)
 
