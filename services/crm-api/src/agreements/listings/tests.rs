@@ -40,6 +40,7 @@ fn row(status: &str) -> ShareRow {
         snapshot_digest: "b".repeat(64),
         location_digest: None,
         location_salt: None,
+        sender_live: true,
     }
 }
 
@@ -91,9 +92,36 @@ fn the_sender_side_keeps_everything_and_its_listing_id() {
 }
 
 #[test]
+fn an_introducer_keeps_the_record_but_never_the_listing() {
+    let row = row("ended");
+    let kept = view(&row, Viewer::Introducer, &NAMES);
+    assert!(kept["listing"].is_null() && kept["recordId"].is_null());
+    assert_eq!(kept["photos"], json!([]));
+    assert_eq!([&kept["side"], &kept["viewer"]], ["sender", "introducer"]);
+    assert_eq!(kept["label"], "Marina view · Dubai Marina");
+}
+
+#[test]
+fn a_suspended_sender_pauses_the_share_for_the_other_company() {
+    let mut row = row("pending");
+    row.sender_live = false;
+    for viewer in [Viewer::Agent, Viewer::AgentAdmin] {
+        let paused = view(&row, viewer, &NAMES);
+        assert_eq!(paused["paused"], true);
+        assert!(paused["listing"].is_null() && paused["photos"] == json!([]));
+        assert_eq!(paused["allowed"]["accept"], false);
+    }
+    row.status = "accepted".into();
+    assert!(view(&row, Viewer::Agent, &NAMES)["from"]["phone"].is_null());
+    assert_eq!(view(&row, Viewer::Sender, &NAMES)["paused"], false);
+}
+
+#[test]
 fn contact_details_in_free_text_are_flagged() {
     assert!(looks_like_contact("Call the owner on 050 123 4567"));
     assert!(looks_like_contact("Email owner@example.test for keys"));
+    assert!(looks_like_contact("Owner: 050/123/4567"));
+    assert!(looks_like_contact("Owner: 050\u{a0}123\u{a0}4567"));
     assert!(!looks_like_contact(
         "Three bedrooms, AED 2,500,000, sea views"
     ));

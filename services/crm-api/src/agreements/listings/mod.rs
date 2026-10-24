@@ -14,6 +14,7 @@ mod evidence;
 mod extend;
 mod files;
 mod lifecycle;
+mod places;
 mod preview;
 mod read;
 mod review;

@@ -6,6 +6,7 @@ import { dubaiDay } from './listingShareLinks.js';
 import { OutsideShareFields } from './OutsideShareFields.jsx';
 import { OutsideShareReview } from './OutsideShareReview.jsx';
 import { OutsideShareSent } from './OutsideShareSent.jsx';
+import { looksLikeContact, needsCheck } from './shareChecks.js';
 import { useListingShareActions } from './useListingShareActions.js';
 
 /**
@@ -44,6 +45,7 @@ export function OutsideShareDialog({ recordId, onSent, onClose }) {
       exactLocation: fields.exact,
       note: fields.note.trim() || null,
       previewDigest: review.previewDigest,
+      checked: Boolean(needsConfirm && confirmed),
     });
     if (result.ok) {
       onSent?.();
@@ -52,7 +54,7 @@ export function OutsideShareDialog({ recordId, onSent, onClose }) {
     setMessage(result.message);
     if (result.status === 409) setReview(null);
   };
-  const needsConfirm = review?.warnings.some((code) => ['contact', 'links'].includes(code));
+  const needsConfirm = Boolean(review) && needsCheck(review.warnings, fields.note);
   const base = {
     eyebrow: k('dialogEyebrow'),
     busy: Boolean(actions.busy),
@@ -72,7 +74,13 @@ export function OutsideShareDialog({ recordId, onSent, onClose }) {
         submitDisabled={needsConfirm && !confirmed}
         secondary={{ label: k('back'), onClick: () => setReview(null) }}
       >
-        <OutsideShareReview review={review} confirmed={confirmed} onConfirm={setConfirmed} />
+        <OutsideShareReview
+          review={review}
+          needsConfirm={needsConfirm}
+          noteWarning={looksLikeContact(fields.note)}
+          confirmed={confirmed}
+          onConfirm={setConfirmed}
+        />
       </FinanceDialog>
     );
   return (

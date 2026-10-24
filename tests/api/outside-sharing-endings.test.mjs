@@ -54,9 +54,13 @@ test('a deleted listing ends its shares; the evidence stays', async () => {
   });
   assert.equal(removed.status, 200, JSON.stringify(removed.value));
   assert.equal(stored(share), 'ended|listing_removed');
-  const proof = await evidence(teams.one, share);
+  const proof = await evidence(teams.admin, share);
   assert.equal(proof.evidence.share.status, 'ended');
   assert.ok(proof.evidence.snapshot.facts.listingTitle, 'the snapshot outlives the listing');
+  // Nobody holds a deleted listing, so whoever shared it keeps the record only (review L7).
+  const kept = (await evidence(teams.one, share)).evidence;
+  assert.equal(kept.snapshot.facts, undefined);
+  assert.equal(kept.share.status, 'ended');
 });
 
 test('an agent who leaves their company ends the shares they received', async () => {

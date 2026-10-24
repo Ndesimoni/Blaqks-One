@@ -17,7 +17,7 @@ export const warningCodes = Object.freeze([
   ...['contact', 'links', 'inline', 'over', 'unavailable', 'pdf'],
 ]);
 const actions = ['accept', 'decline', 'withdraw', 'stop', 'extend', 'evidence'];
-const viewers = ['sender', 'agent', 'agentAdmin'];
+const viewers = ['sender', 'introducer', 'agent', 'agentAdmin'];
 export const factKeys = [...propertyFactKeys, ...listingDetailKeys];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
@@ -89,6 +89,7 @@ export function readListingShare(value) {
     from: person(value.from, true),
     to: person(value.to, false),
     status: oneOf(value.status, listingShareStatuses),
+    paused: value.paused === true,
     endReason: oneOf(value.endReason, endReasons, true),
     createdAt: stamp(value.createdAt),
     offerEndsAt: stamp(value.offerEndsAt),

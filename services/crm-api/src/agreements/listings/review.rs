@@ -5,8 +5,15 @@
 //! confirms. Copies get neutral names ("Photo 1"); image uploads already had their metadata
 //! removed. PDFs keep document properties the sender never sees, so they stay behind (R2a
 //! security review M3).
-use super::snapshot::File;
-use crate::{media::copies::Source, records::outside_facts::Asset};
+use super::{
+    create_checks::{Input, CHANGED},
+    snapshot::{Draft, File},
+};
+use crate::{
+    error::{ApiError, ApiResult},
+    media::copies::Source,
+    records::outside_facts::Asset,
+};
 use serde_json::{Map, Value};
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -20,6 +27,27 @@ const FREE_TEXT: [&str; 5] = [
     "keySellingPoints",
 ];
 
+pub const CHECK_FIRST: &str = "Tick that you checked the text, links and note, then send.";
+
+/// What was reviewed is what is sent, and the sender confirmed the text when the review
+/// warned about contact-like text or links, or the note looks like a contact (review L8).
+/// The answer is the `sent` event's reason: "text_checked" when they confirmed.
+pub fn sendable(draft: &Draft, input: &Input) -> ApiResult<Option<&'static str>> {
+    if draft.review != input.preview {
+        return Err(ApiError::conflict(CHANGED));
+    }
+    let warned = draft
+        .warnings
+        .iter()
+        .any(|code| ["contact", "links"].contains(code));
+    let needed = warned || input.note.as_deref().is_some_and(looks_like_contact);
+    match (needed, input.checked) {
+        (false, _) => Ok(None),
+        (true, true) => Ok(Some("text_checked")),
+        (true, false) => Err(ApiError::invalid(CHECK_FIRST)),
+    }
+}
+
 /// Phone numbers (nine or more digits) or email addresses in free text.
 pub fn looks_like_contact(text: &str) -> bool {
     let email = text.split_whitespace().any(|word| {
@@ -27,7 +55,7 @@ pub fn looks_like_contact(text: &str) -> bool {
             .is_some_and(|(user, host)| !user.is_empty() && host.contains('.'))
     });
     let phone = text
-        .split(|c: char| !(c.is_ascii_digit() || " +-().".contains(c)))
+        .split(|c: char| !(c.is_ascii_digit() || " +-()./\u{a0}".contains(c)))
         .any(|run| run.chars().filter(char::is_ascii_digit).count() >= 9);
     email || phone
 }

@@ -16,6 +16,7 @@ pub mod keeps_list;
 pub mod links;
 pub mod list;
 pub mod listing_fields;
+pub mod listing_holders;
 pub mod lookup;
 pub mod media_links;
 pub mod mutation;

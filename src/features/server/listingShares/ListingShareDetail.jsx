@@ -6,6 +6,7 @@ import { FinanceDialog } from '../finance/FinanceDialog.jsx';
 import { ListingView } from '../finance/ListingView.jsx';
 import { toProperty } from './listingShareLinks.js';
 import { ListingShareConfirm } from './ListingShareConfirm.jsx';
+import { ListingShareHidden } from './ListingShareHidden.jsx';
 import { ListingShareSteps } from './ListingShareSteps.jsx';
 import { ListingShareSummary } from './ListingShareSummary.jsx';
 import { ShareCoBroking } from './ShareCoBroking.jsx';
@@ -127,7 +128,7 @@ export function ListingShareDetail({ id, onClose, onChanged }) {
           file={file}
         />
       ) : (
-        <p className="record-share-empty">{k('noLongerAvailable')}</p>
+        <ListingShareHidden share={share} />
       )}
       <ListingShareSteps
         share={share}

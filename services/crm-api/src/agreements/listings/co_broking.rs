@@ -43,6 +43,9 @@ pub async fn propose(
         step.tx.commit().await?;
         return Err(ApiError::conflict(NOT_ACCEPTED));
     }
+    if row.paused() {
+        return Err(ApiError::conflict(step::PAUSED));
+    }
     let own: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM agreements.crm_agreements \
          WHERE listing_share_id=$1 AND created_by=$2 AND state='draft')",

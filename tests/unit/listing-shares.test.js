@@ -51,6 +51,9 @@ test('a share view keeps only the known listing facts and refuses unknown shapes
   ])
     assert.throws(() => readListingShare(view(bad)), /invalid listing share/);
   assert.equal(readListingShareList({ shares: [view()] }).length, 1);
+  const kept = readListingShare(view({ viewer: 'introducer', side: 'sender', listing: null }));
+  assert.deepEqual([kept.viewer, kept.listing, kept.paused], ['introducer', null, false]);
+  assert.equal(readListingShare(view({ paused: true })).paused, true);
   assert.throws(() => readListingShareList({ incoming: [] }));
 });
 

@@ -796,14 +796,34 @@ Low. The Medium ones and L9 are fixed (migration **0071**); the rest are queued 
   mid-run still attaches or hides what it reserved.
 - **L9, a late copy upload (fixed).** A copy is marked stored only while its row is not
   hidden; a copy whose row the sweep hid while its bytes moved is removed again at once.
-- **Queued:** L6, suspending a sending company leaves its outgoing shares open (end or hide
-  them on suspension); L7, a sending staff member keeps the full snapshot after losing the
-  listing (owner decided 2026-10-24: they keep the share and its introduction record, with
-  "Shared with {agent} at {brokerage} on {date}" and the evidence, but the listing's details
-  and photos are blurred; the Admin and the current holder keep the full view); L8, the share's note is not scanned for contact details and the "I checked"
-  tick is enforced only in the browser; L10, the exact-email lookup limit is per member only
-  (add a per-company budget). Before hosting, the database role also needs grants that stop
-  it altering the evidence tables.
+- **L6, a suspended sending company (fixed 2026-10-24).** While the member who sent a
+  share, or their company, is suspended, the share is **paused** for the other company: no
+  listing facts, photos, files or sender contact, no answer and no co-broking proposal, and
+  the evidence shows no facts. It comes back unchanged when they are active again. Nothing
+  ends, because a suspension can be lifted.
+- **L7, the sender after the listing moves (fixed 2026-10-24, owner decision).** A member
+  who sent a share but no longer holds the listing, and is not the Admin, reads it as its
+  **introducer**: the introduction record ("Shared with {agent} at {company} on {date}"),
+  the status, the dates and the evidence (digests and history, no facts or salt), never
+  the listing's details, photos, files or record ID. The screen shows a blurred
+  placeholder; the server sends no listing. A deleted listing is held by no one, so the
+  same applies. The Admin keeps the full view. Who holds the listing comes from
+  `records::listing_holders`, checked on every read, command, file and evidence request.
+- **L8, the note and the "I checked" tick (fixed 2026-10-24).** The server now requires
+  `checked: true` when the review warns about contact-like text or links, or the note looks
+  like a phone number or an email address, and records it as the `sent` event's reason
+  `text_checked`. The share dialog applies the same rule (`shareChecks.js`) and warns about
+  the note.
+- **L10, the lookup budget (fixed 2026-10-24).** Besides 20 an hour per member, a company
+  may look up 60 agents an hour among all its members.
+- **Review of these fixes (2026-10-24):** no High or Medium findings. Its three Low ones
+  are fixed: a paused share records no first read (`opened`) until it is active again; the
+  co-broking view, the evidence and the share commands all follow the same introducer
+  place; and the contact check also catches numbers written with slashes or non-breaking
+  spaces (the Rust and screen rules stay identical).
+- **Still open:** before hosting, the database role needs grants that stop it altering the
+  evidence tables. Co-broking agreements already made from a share follow the Agreements
+  rules for a suspended company, not the share's pause.
 
 ### Co-broking from a share as built (2026-10-23)
 

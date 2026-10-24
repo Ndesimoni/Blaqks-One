@@ -51,6 +51,9 @@ pub fn id(text: &str) -> ApiResult<Uuid> {
 pub enum Viewer {
     /// The member who sent it, or the sending company's Admin.
     Sender,
+    /// The member who sent it but no longer holds the listing (and is not the Admin): the
+    /// introduction record and evidence, never the listing (R2a security review L7).
+    Introducer,
     /// The named agent.
     Agent,
     /// The receiving company's Admin: the introduction record only.

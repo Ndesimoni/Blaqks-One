@@ -99,3 +99,35 @@ label.outside-share-check {
   display: flex;
   margin: 0 0 12px;
 }
+.outside-share-hidden {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+.outside-share-blur {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 10px;
+  max-height: 106px;
+  overflow: hidden;
+  filter: blur(5px);
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+.outside-share-blur span {
+  height: 48px;
+  border-radius: 10px;
+  background: var(--line);
+}
+.outside-share-hidden-note {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.outside-share-hidden-note strong {
+  color: var(--ink);
+}

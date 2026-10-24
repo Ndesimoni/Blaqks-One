@@ -60,7 +60,7 @@ export const sendBody = (
   record,
   to,
   review,
-  { days = 30, exactLocation = false, note = null } = {},
+  { days = 30, exactLocation = false, note = null, checked = true } = {},
 ) => ({
   recordId: record.id,
   recipientWorkspaceId: to.user.workspaceId,
@@ -69,6 +69,7 @@ export const sendBody = (
   exactLocation,
   note,
   previewDigest: review.previewDigest,
+  checked,
 });
 
 export async function send(sender, record, to, options = {}) {

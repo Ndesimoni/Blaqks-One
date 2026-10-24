@@ -4,7 +4,7 @@
 //! agent's first read is recorded once as `opened`, evidence of receipt.
 use super::{
     access::{self, Caller, Viewer},
-    co_broking_view,
+    co_broking_view, places,
     store::{self, ShareRow},
     view::{self, Companies},
 };
@@ -25,15 +25,6 @@ use uuid::Uuid;
 
 type Tx<'c> = Transaction<'c, Postgres>;
 
-/// The caller's place in `row`, if any.
-pub fn viewer(row: &ShareRow, caller: &Caller) -> Option<Viewer> {
-    access::viewer(
-        caller,
-        (&row.workspace_id, row.from_id),
-        (&row.recipient_workspace_id, row.to_id),
-    )
-}
-
 /// The wire views of `rows` as `caller` reads them, with both company names.
 pub async fn views(
     tx: &mut Tx<'_>,
@@ -42,8 +33,9 @@ pub async fn views(
 ) -> ApiResult<Vec<Value>> {
     let mut names: HashMap<String, Option<String>> = HashMap::new();
     let mut out = Vec::with_capacity(rows.len());
+    let held = places::held(tx, rows, caller).await?;
     for row in rows {
-        let Some(place) = viewer(row, caller) else {
+        let Some(place) = places::place(row, caller, &held) else {
             continue;
         };
         for workspace in [&row.workspace_id, &row.recipient_workspace_id] {
@@ -112,8 +104,9 @@ pub async fn one(
     let row = store::find(&mut tx, id)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let place = viewer(&row, &caller).ok_or_else(ApiError::missing)?;
-    let row = match place == Viewer::Agent && row.opened_at.is_none() && row.open() {
+    let place = places::viewer(&row, &caller).ok_or_else(ApiError::missing)?;
+    let first = row.opened_at.is_none() && row.open() && !row.paused();
+    let row = match place == Viewer::Agent && first {
         true => opened(&mut tx, row, caller.id).await?,
         false => row,
     };

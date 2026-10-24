@@ -40,11 +40,24 @@ pub struct ShareRow {
     pub snapshot_digest: String,
     pub location_digest: Option<String>,
     pub location_salt: Option<String>,
+    /// The sender and their company are active (suspension pauses a share, review L6).
+    pub sender_live: bool,
 }
 
 impl ShareRow {
     pub fn open(&self) -> bool {
         matches!(self.status.as_str(), "pending" | "accepted")
+    }
+
+    /// Open, but its sender or their company is suspended: the other company reads no
+    /// listing and cannot answer until they are active again (R2a security review L6).
+    pub fn paused(&self) -> bool {
+        self.open() && !self.sender_live
+    }
+
+    /// Whether the agent reads the whole listing: accepted, open and not paused.
+    pub fn shown_to_agent(&self) -> bool {
+        self.status == "accepted" && self.sender_live
     }
 }
 
@@ -62,7 +75,8 @@ pub fn select(tail: &str) -> String {
          CASE WHEN l.lapsed THEN {} ELSE {} END AS closed_at,s.accepted_digest, \
          f.name AS from_name,f.email AS from_email,f.phone AS from_phone,t.name AS to_name, \
          n.reference,n.facts,n.media,n.exact_location,n.digest AS snapshot_digest, \
-         n.location_digest,n.location_salt \
+         n.location_digest,n.location_salt, \
+         coalesce(f.active AND f.owner_active,false) AS sender_live \
          FROM agreements.crm_listing_shares s \
          JOIN agreements.crm_listing_snapshots n ON n.id=s.snapshot_id \
          CROSS JOIN LATERAL (SELECT CASE WHEN s.status='pending' \

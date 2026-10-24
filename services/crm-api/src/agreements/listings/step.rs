@@ -3,7 +3,7 @@
 //! anyone else gets not-found. `finish` answers with the share as the caller now reads it.
 use super::{
     access::{self, Caller, Viewer},
-    read,
+    places, read,
     store::{self, ShareRow},
 };
 use crate::{
@@ -18,6 +18,7 @@ use uuid::Uuid;
 
 pub const NOT_WAITING: &str = "This share is no longer waiting for an answer.";
 pub const NOT_OPEN: &str = "This share has already ended.";
+pub const PAUSED: &str = "This listing isn't available right now.";
 
 pub struct Step<'t> {
     pub tx: Transaction<'t, Postgres>,
@@ -85,7 +86,7 @@ pub async fn open<'t>(
         workspace: &workspace,
         admin: live.role == "admin",
     };
-    let viewer = read::viewer(&row, &caller);
+    let viewer = places::one(&mut tx, &row, &caller).await?;
     if viewer.is_none() {
         return Err(ApiError::missing());
     }

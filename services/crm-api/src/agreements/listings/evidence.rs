@@ -6,7 +6,7 @@
 //! acknowledged while the full listing stays with the side that owns it.
 use super::{
     access::{self, Caller, Viewer},
-    read, store, view,
+    places, read, store, view,
 };
 use crate::{
     auth::session::Session,
@@ -54,7 +54,9 @@ pub async fn evidence(
     let row = store::find(&mut tx, id)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let place = read::viewer(&row, &caller).ok_or_else(ApiError::missing)?;
+    let place = places::one(&mut tx, &row, &caller)
+        .await?
+        .ok_or_else(ApiError::missing)?;
     let stamp = |column: &str| {
         format!("to_char({column} AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')")
     };
@@ -80,7 +82,8 @@ pub async fn evidence(
             "locationSalt": row.location_salt,
         }),
         _ => {
-            let basic = row.open().then(|| view::basic(&row.facts));
+            let reads = matches!(place, Viewer::Agent | Viewer::AgentAdmin);
+            let basic = (reads && row.open() && row.sender_live).then(|| view::basic(&row.facts));
             json!({"digest": row.snapshot_digest, "scheme": 1, "basicFacts": basic})
         }
     };

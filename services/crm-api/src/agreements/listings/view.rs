@@ -4,7 +4,10 @@
 //! - the agent: the twelve basic facts while pending; the whole snapshot, photos and the
 //!   sender's work phone and email while accepted and open; no listing facts once closed;
 //! - the receiving company's Admin: the twelve facts while open, none once closed, never
-//!   photos and never an action.
+//!   photos and never an action;
+//! - the member who sent it but no longer holds the listing (review L7): no listing facts;
+//! - while the sender or their company is suspended (review L6), the other company reads
+//!   no listing facts and cannot answer: the share is `paused`.
 //!
 //! Everyone sees the reference, the label, the people, the dates and the status.
 use super::{access::Viewer, store::ShareRow};
@@ -58,11 +61,13 @@ fn media(row: &ShareRow, kind: &str) -> Vec<Value> {
 
 pub fn view(row: &ShareRow, viewer: Viewer, companies: &Companies) -> Value {
     let sender = viewer == Viewer::Sender;
-    let open_to_agent = viewer == Viewer::Agent && row.status == "accepted";
+    let sending_side = sender || viewer == Viewer::Introducer;
+    let paused = row.paused() && !sending_side;
+    let open_to_agent = viewer == Viewer::Agent && row.shown_to_agent();
     let listing = match viewer {
         Viewer::Sender => row.facts.clone(),
-        Viewer::Agent if row.status == "accepted" => row.facts.clone(),
-        _ if row.open() => basic(&row.facts),
+        Viewer::Agent if row.shown_to_agent() => row.facts.clone(),
+        Viewer::Agent | Viewer::AgentAdmin if row.open() && !paused => basic(&row.facts),
         _ => Value::Null,
     };
     let photos = sender || open_to_agent;
@@ -72,9 +77,10 @@ pub fn view(row: &ShareRow, viewer: Viewer, companies: &Companies) -> Value {
         "id": row.id,
         "reference": row.reference,
         "label": label(row),
-        "side": if sender { "sender" } else { "recipient" },
-        "viewer": match viewer { Viewer::Sender => "sender", Viewer::Agent => "agent",
-            Viewer::AgentAdmin => "agentAdmin" },
+        "side": if sending_side { "sender" } else { "recipient" },
+        "viewer": match viewer { Viewer::Sender => "sender", Viewer::Introducer => "introducer",
+            Viewer::Agent => "agent", Viewer::AgentAdmin => "agentAdmin" },
+        "paused": paused,
         "from": {
             "id": row.from_id, "name": row.from_name, "company": companies.from,
             "phone": if contact { row.from_phone.clone() } else { None },
@@ -97,8 +103,8 @@ pub fn view(row: &ShareRow, viewer: Viewer, companies: &Companies) -> Value {
         "floorPlans": if photos { media(row, "floorPlan") } else { Vec::new() },
         "recordId": if sender { Some(row.source_record_id) } else { None },
         "allowed": {
-            "accept": viewer == Viewer::Agent && pending,
-            "decline": viewer == Viewer::Agent && pending,
+            "accept": viewer == Viewer::Agent && pending && !paused,
+            "decline": viewer == Viewer::Agent && pending && !paused,
             "withdraw": sender && pending,
             "stop": sender && row.status == "accepted",
             "extend": sender && row.status == "accepted",

@@ -47,6 +47,12 @@ export default {
   loadingShare: 'Loading the shared listing…',
   unavailable: 'This shared listing isn’t available.',
   noLongerAvailable: 'This listing is no longer available. The introduction record stays.',
+  paused: 'This listing isn’t available right now.',
+  pausedNote: 'Check again later. You can answer or propose co-broking once it is back.',
+  hiddenLabel: 'Listing hidden',
+  introducerShared: 'Shared with {name} at {company} on {date}.',
+  introducerNote:
+    'You no longer hold this listing, so its details and photos are hidden. The introduction record and evidence stay with you.',
   close: 'Close',
   summaryTitle: 'Introduction',
   'fact.reference': 'Reference',

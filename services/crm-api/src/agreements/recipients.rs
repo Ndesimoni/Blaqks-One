@@ -4,7 +4,7 @@
 //! written) and returns just their IDs, name and company name. Every other address, the
 //! caller's own company and the Super Admin get one identical not-found, and there is no
 //! partial search, so the directory cannot be browsed. Each member may look up 20 addresses
-//! an hour.
+//! an hour, and a company 60 among all its members (R2a security review L10).
 use super::{access, parties, wire};
 use crate::{
     auth::{identity_rules, session::Session, throttle},
@@ -21,6 +21,8 @@ use uuid::Uuid;
 
 pub const NO_MATCH: &str = "No active member of another company uses this email.";
 pub const LOOKUPS: &str = "You have looked up 20 agents in the last hour. Try again later.";
+pub const COMPANY_LOOKUPS: &str =
+    "Your company has looked up 60 agents in the last hour. Try again later.";
 
 #[derive(sqlx::FromRow)]
 struct Found {
@@ -44,6 +46,9 @@ pub async fn find(
     // The lookup confirms a name and a company, so it is rate limited (R2 security review 3).
     let key = format!("agreement-recipients:{}", session.user.id);
     throttle::consume_window(&state.pool, &key, 20, 3600, LOOKUPS, "rate_limited").await?;
+    let company = format!("agreement-recipients-company:{workspace}");
+    let limited = (COMPANY_LOOKUPS, "rate_limited");
+    throttle::consume_window(&state.pool, &company, 60, 3600, limited.0, limited.1).await?;
     let Json(body) = body.map_err(|_| ApiError::invalid(wire::INVALID))?;
     let input = wire::exact(body, &["email"], wire::INVALID)?;
     let email = wire::text(wire::node(&input, "email")?, 254)?.to_lowercase();

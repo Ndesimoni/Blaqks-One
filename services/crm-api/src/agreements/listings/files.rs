@@ -5,7 +5,7 @@
 //! reused from an earlier snapshot of the same listing is served from that snapshot.
 use super::{
     access::{self, Caller, Viewer},
-    read, snapshot_store, store,
+    places, snapshot_store, store,
 };
 use crate::{
     auth::session::Session,
@@ -32,9 +32,9 @@ pub async fn file(
     let row = store::find(&mut tx, id)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let allowed = match read::viewer(&row, &caller) {
+    let allowed = match places::one(&mut tx, &row, &caller).await? {
         Some(Viewer::Sender) => true,
-        Some(Viewer::Agent) => row.status == "accepted",
+        Some(Viewer::Agent) => row.shown_to_agent(),
         _ => false,
     };
     let named = row.media.as_array().into_iter().flatten().any(|entry| {

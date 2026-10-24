@@ -14,8 +14,12 @@ pub async fn attach(
     caller: &Caller<'_>,
     mut view: Value,
 ) -> ApiResult<Value> {
-    let named = (caller.workspace == row.workspace_id && caller.id == row.from_id)
-        || (caller.workspace == row.recipient_workspace_id && caller.id == row.to_id);
+    // The place the view was built for, so an introducer (review L7) is never named.
+    let named = match view["viewer"].as_str() {
+        Some("sender") => caller.workspace == row.workspace_id && caller.id == row.from_id,
+        Some("agent") => true,
+        _ => false,
+    };
     let found: Option<(Uuid, String)> = match named {
         false => None,
         true => {
@@ -33,7 +37,7 @@ pub async fn attach(
             .await?
         }
     };
-    let allowed = named && row.status == "accepted" && found.is_none();
+    let allowed = named && row.shown_to_agent() && found.is_none();
     view["allowed"]["coBroking"] = json!(allowed);
     view["coBroking"] = found.map_or(Value::Null, |(id, state)| json!({"id": id, "state": state}));
     view["coBrokingProperty"] = match allowed {

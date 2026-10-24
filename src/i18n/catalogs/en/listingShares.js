@@ -37,13 +37,15 @@ export default {
     'Some older photos are stored inside the listing and can’t be sent. Upload them again to include them.',
   'warning.over': 'Only the first 40 photos and 10 floor plans are sent.',
   'warning.unavailable': 'Some photos could not be found and are left out.',
+  'warning.noteContact':
+    'Your note seems to include a phone number or an email address. Go back and remove it if it is the owner’s.',
   'warning.pdf':
     'PDF floor plans are left out, because they can carry hidden details. Upload the plan as an image to include it.',
   beforeTitle: 'Before they accept',
   afterTitle: 'After they accept',
   filesSent: 'Photos sent: {photos} · Floor plans sent: {plans}',
   noFiles: 'No photos or floor plans are sent.',
-  confirmChecked: 'I checked the text and links above, and they don’t reveal the owner.',
+  confirmChecked: 'I checked the text, links and my note, and they don’t reveal the owner.',
   send: 'Send',
   sentTitle: 'Shared with {name}',
   sentIntro:

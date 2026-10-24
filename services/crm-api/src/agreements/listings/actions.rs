@@ -5,7 +5,7 @@
 use super::{
     access::Viewer,
     digest::{self, ShareFacts},
-    step::{begin, close, NOT_WAITING},
+    step::{begin, close, NOT_WAITING, PAUSED},
     store,
 };
 use crate::{
@@ -30,6 +30,9 @@ pub async fn accept(
     let mut step = begin(&state, &session, &headers, path, Viewer::Agent).await?;
     if step.row.status != "pending" {
         return step.refuse(NOT_WAITING).await;
+    }
+    if step.row.paused() {
+        return step.refuse(PAUSED).await;
     }
     let row = &step.row;
     let acknowledged = digest::share(&ShareFacts {
@@ -79,6 +82,9 @@ pub async fn decline(
     let mut step = begin(&state, &session, &headers, path, Viewer::Agent).await?;
     if step.row.status != "pending" {
         return step.refuse(NOT_WAITING).await;
+    }
+    if step.row.paused() {
+        return step.refuse(PAUSED).await;
     }
     sqlx::query(
         "UPDATE agreements.crm_listing_shares SET status='declined',decided_at=now(), \

@@ -29,9 +29,11 @@ pub struct Input {
     pub exact: bool,
     pub note: Option<String>,
     pub preview: String,
+    /// The sender ticked "I checked the text and links" (review L8).
+    pub checked: bool,
 }
 
-const KEYS: [&str; 7] = [
+const KEYS: [&str; 8] = [
     "recordId",
     "recipientWorkspaceId",
     "recipientMemberId",
@@ -39,6 +41,7 @@ const KEYS: [&str; 7] = [
     "exactLocation",
     "note",
     "previewDigest",
+    "checked",
 ];
 
 pub fn parse(body: Result<Json<Value>, JsonRejection>, now: OffsetDateTime) -> ApiResult<Input> {
@@ -64,6 +67,9 @@ pub fn parse(body: Result<Json<Value>, JsonRejection>, now: OffsetDateTime) -> A
             .ok_or(ApiError::invalid(INVALID))?,
         note,
         preview: text("previewDigest")?.to_owned(),
+        checked: field("checked")?
+            .as_bool()
+            .ok_or(ApiError::invalid(INVALID))?,
     })
 }
 

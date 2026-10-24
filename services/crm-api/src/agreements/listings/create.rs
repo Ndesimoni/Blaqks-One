@@ -13,7 +13,7 @@
 use super::{
     access::{self, Caller},
     create_checks::{self, Input, CHANGED},
-    read, snapshot, snapshot_store, store,
+    read, review, snapshot, snapshot_store, store,
 };
 use crate::{
     auth::session::Session,
@@ -47,9 +47,7 @@ pub async fn create(
     let live = access::live(&mut tx, &workspace, session.user.id).await?;
     let outside = outside_facts::shareable(&mut tx, &workspace, &live, input.record).await?;
     let draft = snapshot::draft(&mut tx, &workspace, input.record, outside, input.exact).await?;
-    if draft.review != input.preview {
-        return Err(ApiError::conflict(CHANGED));
-    }
+    review::sendable(&draft, &input)?;
     create_checks::check(&mut tx, &workspace, &live, &input, false).await?;
     let made = snapshot_store::existing(&mut tx, &workspace, input.record, &draft.digest).await?;
     let reserved = match made {
@@ -91,9 +89,7 @@ async fn finish(
     let live = access::live(&mut tx, workspace, actor).await?;
     let outside = outside_facts::shareable(&mut tx, workspace, &live, input.record).await?;
     let draft = snapshot::draft(&mut tx, workspace, input.record, outside, input.exact).await?;
-    if draft.review != input.preview {
-        return Err(ApiError::conflict(CHANGED));
-    }
+    let checked = review::sendable(&draft, input)?;
     create_checks::check(&mut tx, workspace, &live, input, true).await?;
     let snapshot: Uuid =
         match snapshot_store::existing(&mut tx, workspace, input.record, &draft.digest).await? {
@@ -132,7 +128,14 @@ async fn finish(
     .bind(&input.view_ends)
     .execute(&mut *tx)
     .await?;
-    store::event(&mut tx, id, "sent", Some((live.id, "sender")), (None, None)).await?;
+    store::event(
+        &mut tx,
+        id,
+        "sent",
+        Some((live.id, "sender")),
+        (checked, None),
+    )
+    .await?;
     let row = store::find(&mut tx, id)
         .await?
         .ok_or_else(ApiError::missing)?;
