@@ -104,4 +104,18 @@ Verify keyboard access and 390px/1280px layouts in both themes.
 - **Reviews:** the design review is above; the primary agent reviewed the code (payer and
   payee checks, the agreement lock before totals, one answer per entry, no stand-in for a
   departed participant, the origin lock, the certificate's read rule and headers). A
-  specialist code security review is still due when the specialists are available.
+  specialist code security review was completed on 2026-10-24 (below).
+
+## Code security review and follow-up (2026-10-24)
+
+A separate specialist reviewed lifecycle authorization, proposal promotion, cancellation,
+archive scope, immutable payment entries and certificate filtering. No High findings were
+identified. One Medium financial-read consistency finding was fixed: the ledger endpoint
+now uses a repeatable-read, read-only transaction, so entries, effective terms and totals
+come from the same committed snapshot during concurrent amendments and payments.
+
+The controlled regression `tests/api/agreements-payment-snapshot.test.mjs` pauses a ledger
+read after its agreement snapshot, commits a payment from another transaction, and checks
+that the pending response stays wholly before the payment while a fresh read sees it.
+The specialist confirmed the correction by inspection; runtime results are recorded in
+the handoff checkpoint.

@@ -7,6 +7,7 @@ export const agreementTestFiles = [
   'tests/api/agreements-handover-closes.test.mjs',
   'tests/api/agreements-a3b-lifecycle.test.mjs',
   'tests/api/agreements-a3b-payments.test.mjs',
+  'tests/api/agreements-payment-snapshot.test.mjs',
   'tests/api/agreements-a3b-certificate.test.mjs',
   'tests/api/agreements-a3b-guards.test.mjs',
   'tests/api/finance-handover-preview.test.mjs',

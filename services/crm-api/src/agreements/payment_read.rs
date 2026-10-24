@@ -18,6 +18,10 @@ pub async fn read(
 ) -> ApiResult<Json<Value>> {
     access::ensure_reader(&state, &session, &workspace).await?;
     let mut tx = state.pool.begin().await?;
+    // Entries, effective terms and totals must describe the same committed ledger.
+    sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+        .execute(&mut *tx)
+        .await?;
     let row = store::load(&mut tx, access::id(&id)?)
         .await?
         .filter(|row| access::can_read(row, &session, &workspace))
