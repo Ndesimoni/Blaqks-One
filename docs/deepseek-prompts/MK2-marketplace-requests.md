@@ -58,7 +58,7 @@ visibility rule, free-text rules, events, error codes and screens.
   One."
 - **Board:** other companies' open requests only (your own company's appear under My
   requests or not at all), newest first, no totals, filters on the server.
-- **Defaults chosen by Claude for MK2** (report if they conflict with the code):
+- **MK2 defaults, approved by the owner on 2026-10-24** (report if they conflict with the code):
   - Areas stay typed community names, normalised for matching (trimmed, lower-cased,
     inner spaces collapsed), with the MK1 free-text rules. A fixed community list is later.
   - Budgets are shown as **bands**; the exact numbers stay on the server for MK3 matching.

@@ -444,7 +444,7 @@ from a client the member holds (or any client for the Admin) with a client-conse
 editing, renewing and closing, My requests, and a paged board of other companies' requests
 with server filters, no totals and read limits. Answers, matching and alerts stay in MK3.
 
-Defaults chosen for MK2 (the owner may change them):
+Defaults proposed by Claude and approved by the owner (2026-10-24):
 
 - Areas stay typed community names, normalised for matching, under the MK1 free-text rules;
   a fixed UAE community list can come later.
