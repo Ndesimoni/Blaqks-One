@@ -212,8 +212,9 @@ Status: designed 2026-10-23; reviewed with required amendments in
 [R2/A6 design review](sharing-guest-design-review.md), which override this proposal. The
 owner accepted every recommendation (product decisions, "R2 details"). **R2a (listing
 sharing) is built**; see [R2a as built](#r2a-as-built-2026-10-23), and so is
-[co-broking from a share](#co-broking-from-a-share-as-built-2026-10-23). R2b (lead
-referrals) is next.
+[co-broking from a share](#co-broking-from-a-share-as-built-2026-10-23). **Lead referrals
+(R2b) are dropped** (owner, 2026-10-24): only properties are shared with other companies,
+never leads. Their design below is kept for reference only.
 It reuses R1's link, WhatsApp, badge and expiry patterns and builds on
 [Agreements](agreements-design.md) for everything that crosses companies. Agreements §1's
 non-goal "exposing private CRM records across companies" stays: only server-made, frozen
@@ -227,9 +228,8 @@ snapshots cross, never a live read of another company's `crm_records`.
    name or phone**; **view only**; **with an end date**; **recorded as proof of
    introduction** (who introduced which listing to whom, and when); it can be turned into
    a **co-broking agreement**.
-3. **A lead** goes only as a **referral offer through Agreements**: before acceptance the
-   agent sees its requirements and the client's first name and last initial; the
-   **contact comes after the agent accepts**.
+3. ~~**A lead** goes only as a **referral offer through Agreements**~~. Replaced on
+   2026-10-24: **leads are never shared with other companies**; only properties are.
 4. **Contacts are never shared outside the company** (third parties' personal data; share
    the listing instead; to confirm with a UAE lawyer).
 5. Sent in the CRM, by **Copy link** or by **Share on WhatsApp**; **the link opens only
@@ -370,6 +370,9 @@ snapshots cross, never a live read of another company's `crm_records`.
   co-broking agreement per share. The share keeps its own end date.
 
 #### Lead referrals
+
+Dropped by the owner on 2026-10-24 (only properties are shared with other companies). Kept
+for reference; do not build.
 
 - **Offer.** From a lead's details, its holder or the Admin presses **Refer to another
   company**. The server builds the terms itself (as A3a does for hand-overs), so the

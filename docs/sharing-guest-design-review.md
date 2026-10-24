@@ -4,6 +4,8 @@ Status: design review complete; implementation has not started. Required amendme
 below override the proposals in [Record sharing, R2](record-sharing.md#r2--sharing-a-listing-or-a-lead-with-another-company)
 and [Agreements, A6](agreements-design.md#19-a6-design-outside-agents-by-recipient-locked-link-2026-10-23).
 The owner's unanswered choices remain unanswered; recommendations are not approvals.
+The amendments about lead referrals no longer apply: the owner dropped them on 2026-10-24
+(only properties are shared with other companies).
 
 ## Continuity and scope
 

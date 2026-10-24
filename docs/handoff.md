@@ -4,8 +4,8 @@ Latest checkpoint (2026-10-24): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2
 designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
 company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)), then **co-broking from a
 listing share** ([as built](record-sharing.md#co-broking-from-a-share-as-built-2026-10-23)).
-Migrations run through **0072**. Next, in order: R2b (lead referrals), then A6 (outside
-agents). BO1, P1 and the broker marketplace (MK) wait until the owner says. R2a's code
+Migrations run through **0072**. Next: A6 (outside agents). Lead referrals (R2b) are
+dropped (owner, 2026-10-24): only properties are shared with other companies. BO1, P1 and the broker marketplace (MK) wait until the owner says. R2a's code
 security review is done and its Medium findings fixed (migration 0071, [record
 sharing](record-sharing.md#r2a-security-review-2026-10-23)). A3b and the co-broking flow now
 have separate specialist code reviews (2026-10-24): their Medium findings were fixed
