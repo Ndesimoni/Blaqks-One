@@ -867,6 +867,11 @@ agreement both show **Client and listing**: the client's name, phone (`tel:`) an
 
 ## 19. A6 design: outside agents by recipient-locked link (2026-10-23)
 
+**Revised by the owner on 2026-10-24:** accepting needs a free basic account (phone code,
+name, company, optional licence, terms), so there are no account-less guests; this design
+is revised to match before it is built, after BO1. See [Product
+decisions](product-decisions.md) ("Outside agents (A6), revised").
+
 Status: design reviewed with required amendments in
 [R2/A6 design review](sharing-guest-design-review.md); owner choices remain pending;
 nothing is built. The review amendments override this proposal. It rests on the

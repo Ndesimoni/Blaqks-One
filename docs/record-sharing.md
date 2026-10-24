@@ -798,8 +798,9 @@ Low. The Medium ones and L9 are fixed (migration **0071**); the rest are queued 
   hidden; a copy whose row the sweep hid while its bytes moved is removed again at once.
 - **Queued:** L6, suspending a sending company leaves its outgoing shares open (end or hide
   them on suspension); L7, a sending staff member keeps the full snapshot after losing the
-  listing (the design gives the sender's side everything at any time, so this needs an owner
-  decision); L8, the share's note is not scanned for contact details and the "I checked"
+  listing (owner decided 2026-10-24: they keep the share and its introduction record, with
+  "Shared with {agent} at {brokerage} on {date}" and the evidence, but the listing's details
+  and photos are blurred; the Admin and the current holder keep the full view); L8, the share's note is not scanned for contact details and the "I checked"
   tick is enforced only in the browser; L10, the exact-email lookup limit is per member only
   (add a per-company budget). Before hosting, the database role also needs grants that stop
   it altering the evidence tables.
