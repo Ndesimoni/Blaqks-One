@@ -98,3 +98,45 @@
   background: #e7eee8;
   color: #345e4e;
 }
+/* UI3 directory heading: the authorized count beside the page's single primary action. The
+   shell owns the h1, so this states the count once and never repeats the description (B-02). */
+.record-directory-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.record-count {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+.record-count-number {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.record-count-word {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.record-directory .filters-toolbar {
+  margin-top: 0;
+}
+.record-directory .filter-right {
+  flex: 1;
+  justify-content: flex-end;
+}
+.record-directory .search-small {
+  min-width: 0;
+  width: min(320px, 100%);
+}
+/* Values wrap instead of pushing the action column out of view at directory widths (B-01). */
+.record-directory .data-table {
+  min-width: 0;
+  white-space: normal;
+}

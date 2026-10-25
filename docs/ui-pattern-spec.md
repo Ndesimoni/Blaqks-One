@@ -594,3 +594,72 @@ and entry, and it waits up to 20s for the restored session instead of 5s.
   `navigation.spec.js` on 2026-10-25). The separate `navigation-desktop-*.png` files directly
   under `ui-redesign/` remain the UI0 baseline captures recorded in
   [the baseline](ui-redesign-baseline.md#3-evidence-index); they are not UI2 output.
+
+## 14. UI3 as built (2026-10-25)
+
+The Clients directory now follows §5–§7. Records pages share one set of components, so Contacts
+and the workflow record pages (`Follow-ups`, `Viewings`, `Shortlist`, `Interaction log`,
+`Client care`) render the same pattern; they were not given their own redesign and remain
+covered by their existing specs. No field, validation, permission, version, storage or export
+contract changed.
+
+### 14.1 What changed
+
+| Area              | Built behaviour                                                                                                                                                                                                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Directory heading | New `RecordDirectoryHead` states the authorized count once (`1 client`, `12 clients`) beside the page's single `Add client`. The "Total clients" card, its repeated description and the big count are gone (B-02)                                                          |
+| Scope separation  | Page-level `Add client` no longer shares the shell heading row with the workspace-level `Import saved records` (B-10)                                                                                                                                                      |
+| Phone records     | Below 750px `RecordCards` renders one card per record: name and ID, stage badge, up to two non-empty facts, then the message/open actions at 44px. The table is not rendered at all, so no column is clipped and the page cannot scroll sideways (B-01)                    |
+| Desktop records   | Clients keeps seven columns plus the action cell — Client ID, Full name, Lead stage, Buy / rent, Maximum budget, Lead quality score, Next follow-up auto. Values wrap, so the action column stays visible; the table sits in a labelled focusable scroll region (B-01, §8) |
+| Row opening       | The card's Open action dispatches the same row handler as a desktop row click; the desktop path is unchanged                                                                                                                                                               |
+| Empty card facts  | Empty stage values and empty facts are omitted instead of printing an em dash                                                                                                                                                                                              |
+
+Files: `src/features/records/{RecordsPage.jsx,RecordDirectoryHead.jsx,RecordTable.jsx,
+RecordTableView.jsx,RecordCards.jsx,RecordRowActions.jsx,cards.css}`,
+`src/styles/records/directory.css`, `tests/server-browser/clients-pilot.spec.js` (new).
+
+### 14.2 Pilot acceptance (§7)
+
+| §7 criterion                           | Evidence                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| 1 — first record ≤520px at 390×844     | `clients-pilot.spec.js` measures the first `.record-card` top on every phone capture; no page overflow       |
+| 2 — one `h1`, one count, one action    | Exactly one `h1`, exactly one description paragraph, no `Total clients`, one `Add client`                    |
+| 3 — filter/search/pagination unchanged | Same `RecordsPage` tabs, search and `Assigned to` slot; page resets retained; existing specs green           |
+| 4 — desktop columns, phone cards       | Seven columns plus actions at 1280 with no clipping; cards at 390 with the row actions reachable             |
+| 5 — create/edit/delete/conflict paths  | `conflicts.spec.js`, `permissions-view-only.spec.js`, `assign-keyboard.spec.js`, `persistence.spec.js`       |
+| 6 — drawer keyboard behaviour          | `assign-keyboard.spec.js` (focus trap, Escape, opener restoration, reflow at 390)                            |
+| 7 — loading/empty/error/denial states  | `RecordTableEmpty` unchanged, now rendered below either presentation; archived and view-only chips untouched |
+| 8 — English catalogue only             | No new copy was added; `npm run check:i18n` passes (34 namespaces, 1796 keys)                                |
+
+### 14.3 Checks
+
+| Command                                                                                                                                                   | Result                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `npm test`                                                                                                                                                | 463 passed                                                  |
+| `npm run build`                                                                                                                                           | passed (existing chunk-size advisory only)                  |
+| `npm run check:i18n`                                                                                                                                      | passed (34 namespaces, 1796 keys)                           |
+| `npm run check:lines:ci`                                                                                                                                  | passed after splitting `RecordTable.jsx` (88 + 98 lines)    |
+| `npm run check:boundaries`                                                                                                                                | passed                                                      |
+| `PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only clients-pilot.spec.js assign-keyboard.spec.js`                                    | 4 passed                                                    |
+| `... --browser-only persistence.spec.js conflicts.spec.js permissions-view-only.spec.js permissions-visual.spec.js navigation.spec.js responsive.spec.js` | 14 of 16 passed; see §14.4 for the two environment failures |
+| Prettier on every changed file; `git diff --check`                                                                                                        | clean                                                       |
+
+Evidence: `docs/screenshots/ui-redesign/ui3/clients-{admin,staff}-{1280,390}-{light,dark}.png`
+— Admin `admin-a` fixture with two seeded Clients, restricted staff with one assigned read-only
+client, both themes. Fresh from the run above on 2026-10-25.
+
+### 14.4 Limits and follow-ups
+
+- The `h1` and its one-line description still come from the shell (UI2). Because `ServerShell.jsx`
+  is outside this packet's allowlist, the count sits directly below the heading rather than
+  inline with the title; moving it beside the title belongs to a heading packet.
+- "Preferred communities" is no longer a desktop column for Clients (it stays in the record's
+  details and on the phone card when it has a value); the column set is presentation-only.
+- Only the Clients directory was reviewed visually. Contacts and the workflow record pages inherit
+  the same components and are verified by their own specs, not by new captures.
+- The frozen demo renders the same components; it takes no new behaviour from this packet.
+- Two failures reproduce on an unmodified checkout in this environment and are not caused by
+  UI3: `persistence.spec.js` › "server unavailability never falls back to browser demo identity or
+  records" (the app is still on the lazy-load splash when the 5s assertion times out) and, under
+  load, "a client survives reload…". The fixture helper `signInMember`'s 5s wait for "Sign out" is
+  the other recurring flake; isolated runs pass.

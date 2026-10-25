@@ -1,15 +1,15 @@
-import { schema } from '../../lib/schema.js';
-import { preferredCols } from '../../config/navigation.js';
-import { Icon } from '../../components/ui/Icon.jsx';
-import { get } from '../../lib/records.js';
-import { Badge } from '../../components/ui/Badge.jsx';
-import { formatValue } from '../../lib/crm.js';
-import { Pagination } from '../../components/ui/Pagination.jsx';
 import React, { useEffect } from 'react';
-import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
-import { RecordRowActions } from './RecordRowActions.jsx';
+import { Pagination } from '../../components/ui/Pagination.jsx';
+import { preferredCols } from '../../config/navigation.js';
+import { useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { schema } from '../../lib/schema.js';
+import { RecordCards } from './RecordCards.jsx';
 import { RecordTableEmpty } from './RecordTableEmpty.jsx';
-import { KeptChip } from './KeptChip.jsx';
+import { RecordTableView } from './RecordTableView.jsx';
+
+/** Below this layout breakpoint one card per record replaces the table (UI3 §5.4). */
+const cardQuery = '(max-width: 750px)';
 
 function RecordTable({
   module,
@@ -24,6 +24,7 @@ function RecordTable({
   const { data } = useRecords();
   const { page, setSort, setPage, sort, query } = useWorkspaceView();
   const { dispatchRow, readOnly = false } = useWorkspaceActions();
+  const cards = useMediaQuery(cardQuery);
 
   const columns = schema(module);
   const pick = (columnNames || preferredCols[module] || [])
@@ -38,76 +39,30 @@ function RecordTable({
   const current = arr.slice(start, start + perPage);
   return (
     <div className="table-shell">
-      <div className="table-scroll">
-        <table className="data-table" aria-label={tableLabel || `${module} records`}>
-          <thead>
-            <tr>
-              {pick.map((f) => (
-                <th
-                  key={f.key}
-                  scope="col"
-                  aria-sort={
-                    sort.key === f.key
-                      ? sort.direction === 'asc'
-                        ? 'ascending'
-                        : 'descending'
-                      : 'none'
-                  }
-                >
-                  <button
-                    className="table-sort"
-                    onClick={() => {
-                      setSort((s) => ({
-                        key: f.key,
-                        direction: s.key === f.key && s.direction === 'asc' ? 'desc' : 'asc',
-                      }));
-                      setPage(0);
-                    }}
-                  >
-                    {f.name.replace(/ AED$/, '')}{' '}
-                    {sort.key === f.key && (
-                      <Icon name={sort.direction === 'asc' ? 'up' : 'down'} size={12} />
-                    )}
-                  </button>
-                </th>
-              ))}
-              <th className="last-th">
-                <span className="sr-only">Open record</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {current.map((r, i) => (
-              <tr key={get(r, columns[0].name) || i} onClick={() => dispatchRow(module, r)}>
-                {pick.map((f) => (
-                  <td key={f.key}>
-                    {/stage|status|tier|priority/i.test(f.name) ? (
-                      <Badge>{formatValue(data, module, r, f)}</Badge>
-                    ) : f === pick[0] ? (
-                      <>
-                        <span className="mono id-link">{formatValue(data, module, r, f)}</span>
-                        <KeptChip module={module} record={r} />
-                      </>
-                    ) : /Full name|Listing title|Next action|Community/i.test(f.name) ? (
-                      <span className="cell-strong">{formatValue(data, module, r, f)}</span>
-                    ) : (
-                      formatValue(data, module, r, f)
-                    )}
-                  </td>
-                ))}
-                <td>
-                  <RecordRowActions
-                    module={module}
-                    record={r}
-                    id={get(r, columns[0].name)}
-                    readOnly={readOnly}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {cards ? (
+        <RecordCards
+          module={module}
+          data={data}
+          current={current}
+          pick={pick}
+          readOnly={readOnly}
+          onOpen={(record) => dispatchRow(module, record)}
+        />
+      ) : (
+        <RecordTableView
+          module={module}
+          data={data}
+          current={current}
+          pick={pick}
+          columns={columns}
+          sort={sort}
+          setSort={setSort}
+          setPage={setPage}
+          dispatchRow={dispatchRow}
+          readOnly={readOnly}
+          tableLabel={tableLabel}
+        />
+      )}
       {!arr.length && (
         <RecordTableEmpty
           module={module}

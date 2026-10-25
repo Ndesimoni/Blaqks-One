@@ -1,13 +1,26 @@
-import { matchesRecordTab, recordTabs } from './selectors.js';
-import { useRecordSearch } from '../../hooks/useRecordSearch.js';
-import { descriptions } from '../../config/navigation.js';
-import { N } from '../../lib/format.js';
-import { Button } from '../../components/ui/Button.jsx';
-import { Icon } from '../../components/ui/Icon.jsx';
-import { RecordTable } from './RecordTable.jsx';
 import React from 'react';
-import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
-import { useRecordAccess } from './useRecordAccess.js';
+import { Icon } from '../../components/ui/Icon.jsx';
+import { useRecordSearch } from '../../hooks/useRecordSearch.js';
+import { useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { RecordDirectoryHead } from './RecordDirectoryHead.jsx';
+import { RecordTable } from './RecordTable.jsx';
+import { matchesRecordTab, recordTabs } from './selectors.js';
+
+/**
+ * Desktop columns for the Clients pilot: identity, requirement, stage, budget, quality and next
+ * follow-up fit beside the action cell at 1280, so nothing is clipped (UI3 §5.4, B-01).
+ */
+const pilotColumns = {
+  Clients: [
+    'Client ID',
+    'Full name',
+    'Lead stage',
+    'Buy / rent',
+    'Maximum budget AED',
+    'Lead quality score / 100',
+    'Next follow-up auto',
+  ],
+};
 
 /** `toolbarExtras` is an optional slot (connected mode supplies the "Assigned to" filter). */
 function RecordsPage({
@@ -17,43 +30,14 @@ function RecordsPage({
   emptyDetail,
   toolbarExtras = null,
 }) {
-  const { data } = useRecords();
   const { tab, setTab, setPage, query, setQuery } = useWorkspaceView();
-  const { add } = useWorkspaceActions();
-  const can = useRecordAccess();
-
   const arr = useRecordSearch(module, (record) =>
     matchesTab ? matchesTab(record, tab) : matchesRecordTab(module, record, tab),
   );
 
   return (
-    <div className="page-stack">
-      <div className="directory-top">
-        <div className="directory-count">
-          <div className="large-count">{N(data[module].length)}</div>
-          <div>
-            <strong>Total {module.toLowerCase()}</strong>
-            <p>{descriptions[module]}</p>
-          </div>
-        </div>
-        {can(module, 'create') && (
-          <Button icon="plus" onClick={() => add(module)}>
-            Add{' '}
-            {{
-              Clients: 'client',
-              Contacts: 'contact',
-              Deals: 'deal',
-              'Follow-ups': 'follow-up',
-              Viewings: 'viewing',
-              'Client care': 'touchpoint',
-              'Interaction log': 'conversation',
-              Payments: 'payment',
-              Expenses: 'expense',
-              Shortlist: 'match',
-            }[module] || 'record'}
-          </Button>
-        )}
-      </div>
+    <div className="page-stack record-directory">
+      <RecordDirectoryHead module={module} />
       <div className="filters-toolbar">
         <div className="tabs" role="group" aria-label={`Filter ${module}`}>
           {tabs.map((t) => (
@@ -86,7 +70,12 @@ function RecordsPage({
         </div>
         {toolbarExtras}
       </div>
-      <RecordTable module={module} arr={arr} emptyDetail={emptyDetail} />
+      <RecordTable
+        module={module}
+        arr={arr}
+        emptyDetail={emptyDetail}
+        columnNames={pilotColumns[module]}
+      />
     </div>
   );
 }
