@@ -1,5 +1,5 @@
-import test from 'node:test';
 import assert from 'node:assert/strict';
+import test from 'node:test';
 import { nav } from '../../src/config/navigation.js';
 import { canOpenSection } from '../../src/features/server/access.js';
 import { isConnectedSection } from '../../src/features/server/sectionStatus.js';

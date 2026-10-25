@@ -1,5 +1,16 @@
 # Handoff for the next coding agent
 
+**New UI planning request (owner, 2026-10-24):** the owner wants the entire connected UI
+organized to a professional standard and the work prepared for DeepSeek. The
+[whole-product UI redesign plan](ui-redesign-plan.md) covers navigation, shared patterns,
+every screen family, preserved contracts and bounded implementation packets. Give DeepSeek
+[UI0: audit and blueprint](deepseek-prompts/UI0-ui-redesign.md) first. This is a prepared
+plan, not an implemented or visually approved redesign; review the navigation/Clients
+pilot before broad rollout. Keep the current palette and all working features. This
+assignment overrides the old blanket Claude-only implementer note for this UI work;
+English-only and connected-only decisions remain in force. No provider/domain/publication
+work is authorized by this UI request.
+
 Latest checkpoint (2026-10-24): after R1 (`4232ba5`), A3b (`a0b039b`) and the R2/A6/BO1
 designs (`8ad0b58`), Claude built **R2a, sharing a listing with an agent at another
 company** ([as built](record-sharing.md#r2a-as-built-2026-10-23)), then **co-broking from a

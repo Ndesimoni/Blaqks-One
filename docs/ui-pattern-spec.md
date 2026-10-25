@@ -96,12 +96,12 @@ button. Do not add a second navigation surface; the company identity stays in th
 
 ### 2.4 Role examples
 
-| Viewer             | Sees                                                                                                                                                                                                                         | Omits                                                         | Notes                                                                                       |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Company Admin      | All groups; Company settings with Team & access, Team activity, Channels, Inbox rules, Workspaces                                                                                                                            | Platform administration                                       | Finance and reports follow grants                                                           |
-| Restricted staff   | Overview, Relationships, Inventory & collaboration, Work & communication, Finance & reporting, Resources, Personal account (My activity is the staff label for the Team activity route); My mailbox only with an email grant | Every Company settings entry, Platform administration         | Sections filtered by `routePermissions`; read-only pages keep the View only chip            |
-| Super Admin        | Overview, Relationships, Inventory & collaboration (no Marketplace), Work & communication (no Inbox/Team chat), Finance & reporting, Resources, Personal account, Platform administration                                    | Company settings (no team ownership), Agreements, Marketplace | Workspace switcher stays in the workspace banner; no company Inbox, chat or agreement terms |
-| Archived workspace | Same as its role, read-only                                                                                                                                                                                                  | Action-producing entries that cannot work                     | Persistent read-only banner stays conspicuous above the page title                          |
+| Viewer             | Sees                                                                                                                                                                                                                                         | Omits                                                            | Notes                                                                                                                                                                                                               |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Company Admin      | All groups; Company settings with Team & access, Team activity, Channels, Inbox rules, Workspaces                                                                                                                                            | Platform administration                                          | Finance and reports follow grants                                                                                                                                                                                   |
+| Restricted staff   | Overview, Relationships, Inventory & collaboration, Work & communication, Finance & reporting, Resources, Personal account (My activity is the staff label for the Team activity route); My mailbox only with an email grant                 | Every Company settings entry, Platform administration            | Sections filtered by `routePermissions`; read-only pages keep the View only chip                                                                                                                                    |
+| Super Admin        | Overview, Relationships, Inventory & collaboration (no Marketplace), Work & communication (Messages, not Inbox/Team chat), Finance & reporting, Resources, Personal account, Company settings (Team, Team activity), Platform administration | Channels, Inbox rules, Inbox, Team chat, Agreements, Marketplace | Workspace switcher stays in the workspace banner; no company Inbox, chat or agreement terms. Verified in UI2: `canManageTeam` also lets the Super Admin open Team and Team activity, so Company settings is present |
+| Archived workspace | Same as its role, read-only                                                                                                                                                                                                                  | Action-producing entries that cannot work                        | Persistent read-only banner stays conspicuous above the page title                                                                                                                                                  |
 
 ## 3. Layout templates
 
@@ -526,3 +526,71 @@ is unchanged.
   their own `detail` are unaffected.
 - No keyboard or screen-reader session was recorded for this packet; focus ring, ordering and
   disabled semantics were verified from source and rendered states, not by assistive technology.
+
+## 13. UI2 as built (2026-10-25)
+
+The connected shell now uses task-based navigation. Route names, paths, `canOpenSection`
+predicates, workspace resolution, badges and full-height messaging are unchanged.
+
+### 13.1 What changed
+
+| Area                | Built behaviour                                                                                                                                                                                  |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Navigation model    | New `src/features/server/connectedNav.js`: nine display groups in fixed order, icons reused from the existing route map, `connectedGroups(user)` filters with the same access predicates         |
+| One entry per route | `Workspaces` appears once (Company settings for an Admin, Platform administration for the Super Admin); `Team activity` appears once (Company settings for managers, Personal account for staff) |
+| Work group          | Members see Inbox and Team chat; the Super Admin keeps the existing `Messages` preview in the same group. No new destinations                                                                    |
+| Pinned groups       | Personal account, Company settings and Platform administration are separated from daily work by a hairline and spacing                                                                           |
+| Shell copy          | Removed the repeated "YOUR BUSINESS, CONNECTED" eyebrow (one title per page) and the false footer sentence claiming messaging is not connected                                                   |
+| Sidebar legend      | Removed the availability legend; the truthful "Not connected" chip stays on the two unavailable entries                                                                                          |
+
+Files: `src/features/server/{connectedNav.js,ServerNavigationGroups.jsx,ServerNavigation.jsx,
+ServerShell.jsx,navigation.css}`, `src/i18n/catalogs/en/navigation.js`,
+`src/i18n/catalogs/index.js`, `ServerNavigationSettings.jsx` deleted,
+`tests/unit/connected-navigation.test.js` (new), `tests/server-browser/navigation.spec.js`.
+
+### 13.2 Verified role rendering
+
+Rendered snapshot from the navigation spec (fixture owner, Super Admin):
+
+- Overview: Dashboard. Relationships: Leads, Clients, Contacts, Client desk.
+- Inventory & collaboration: Properties, Shortlist. Work & communication: Follow-ups, Viewings,
+  Messages (Not connected), Interaction log, Client care.
+- Finance & reporting: Deals, Payments, Expenses, Performance, Date search, CRM insights.
+- Resources: Calculators, Guide. Personal account: My profile. Company settings: Team,
+  Team activity. Platform administration: Workspaces (Not connected).
+
+An Admin additionally sees Marketplace and Agreements, Channels, Inbox rules, and Workspaces in
+Company settings, with Inbox and Team chat replacing Messages. Staff see My activity under
+Personal account and no Company settings or Platform administration.
+
+### 13.3 Checks
+
+| Command                                                                                                                                   | Result                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `node --test tests/unit/connected-navigation.test.js tests/unit/server-navigation.test.js`                                                | 6 passed                                       |
+| `npm test`                                                                                                                                | 463 passed                                     |
+| `npm run build`                                                                                                                           | passed (existing chunk-size advisory only)     |
+| `npm run check:i18n`                                                                                                                      | passed (34 namespaces, 1796 keys)              |
+| `npm run check:lines:ci`                                                                                                                  | passed; 37 baselined oversized files unchanged |
+| `npm run check:boundaries`                                                                                                                | passed                                         |
+| `PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only navigation.spec.js`                                               | 2 passed                                       |
+| `... responsive.spec.js`                                                                                                                  | 2 passed                                       |
+| Related connected specs (activity, agreements, record-sharing, workflow records, finance hand-over, permissions visual, dashboard layout) | see §13.4                                      |
+| `npx prettier --check` on every changed file; `git diff --check`                                                                          | passed / clean                                 |
+
+The navigation spec now allows 120s because it visits every destination and verifies every group
+and entry, and it waits up to 20s for the restored session instead of 5s.
+
+### 13.4 Limits and follow-ups
+
+- The 79px top bar is shared with the frozen demo; the 60–64px target is not part of UI2.
+- Marketplace, Agreements, Messages and Workspaces keep their existing availability; the two
+  unavailable entries still show the truthful chip.
+- The workspace banner for the Super Admin still repeats the workspace name (baseline B-08); it
+  moves with the page-heading work in a later packet.
+- Browser evidence for this packet is captured in `docs/screenshots/ui-redesign/ui2/`
+  (`navigation-desktop-{light,dark}.png` at 1440×900 and `navigation-mobile-{light,dark}.png`
+  at 390×844, Super Admin owner fixture, reduced motion, fresh from
+  `navigation.spec.js` on 2026-10-25). The separate `navigation-desktop-*.png` files directly
+  under `ui-redesign/` remain the UI0 baseline captures recorded in
+  [the baseline](ui-redesign-baseline.md#3-evidence-index); they are not UI2 output.

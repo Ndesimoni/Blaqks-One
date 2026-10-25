@@ -16,11 +16,15 @@
   line-height: 1.4;
   white-space: nowrap;
 }
-.connected-nav-legend {
-  margin: 4px 12px 16px;
-  color: var(--sidebar-text);
-  font-size: 11px;
-  line-height: 1.6;
+/* Connected groups are named sections, not shouted demo headers. */
+.connected-shell .nav-label,
+.navigation-drawer .nav-label {
+  text-transform: uppercase;
+}
+.nav-group-pinned {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding-top: 14px;
+  margin-top: 14px;
 }
 .connected-shell .nav-groups {
   overscroll-behavior: contain;

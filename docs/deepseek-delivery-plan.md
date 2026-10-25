@@ -1,5 +1,12 @@
 # Blaqks One implementation plan for DeepSeek delivery
 
+**UI assignment update, 2026-10-24:** the owner now requests a whole-product UI plan and
+DeepSeek handoff. For that scope, use the [UI redesign plan](ui-redesign-plan.md) and
+[UI0 prompt](deepseek-prompts/UI0-ui-redesign.md), not the historical implementer note or
+packet queue below. Current English-only rules supersede this document's old Arabic/RTL
+instructions. This update prepares a UI assignment; it does not authorize unrelated
+feature implementation, deployment or external delivery.
+
 **Owner decision 2026-10-20: Claude implements every packet directly; no packets are assigned to DeepSeek.** The packet order, rules, tests and acceptance below still apply, with Claude as implementer and a separate security review for sensitive packets. The owner approves commits and pushes.
 
 Owner workflow, 19 October 2026. This plan turns the approved roadmap into small implementation packets. DeepSeek may implement one packet and its focused tests. Codex then reviews the diff, verifies the security and workspace boundaries, runs the agreed checks and approves or returns the packet for correction.

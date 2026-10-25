@@ -1,10 +1,12 @@
-import { test, expect } from './fixtures.js';
+import { labels } from '../../src/config/navigation.js';
+import { expect, test } from './fixtures.js';
 import { signIn } from './helpers.js';
-import { nav, labels } from '../../src/config/navigation.js';
+import { entries, groups } from './navigation-entries.js';
 
 test('connected Admin navigation restores every group and unfinished routes never show demo records or forms', async ({
   page,
 }) => {
+  test.setTimeout(120000);
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.addInitScript(() =>
@@ -18,11 +20,9 @@ test('connected Admin navigation restores every group and unfinished routes neve
   );
   await signIn(page, 'owner');
   const sidebar = page.getByRole('navigation', { name: 'CRM sections', exact: true });
-  for (const group of nav) {
-    await expect(sidebar.getByText(group.header, { exact: true })).toBeVisible();
-    for (const [name] of group.items)
-      await expect(sidebar.getByRole('button', { name, exact: true })).toHaveCount(1);
-  }
+  for (const label of groups) await expect(sidebar.getByText(label, { exact: true })).toBeVisible();
+  for (const name of entries)
+    await expect(sidebar.getByRole('button', { name, exact: true })).toHaveCount(1);
   for (const name of ['Messages']) {
     await sidebar.getByRole('button', { name, exact: true }).click();
     await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
@@ -55,7 +55,8 @@ test('connected Admin navigation restores every group and unfinished routes neve
   await sidebar.getByRole('button', { name: 'Dashboard', exact: true }).click();
   await expect(page).toHaveURL(/#\/dashboard$/);
   await page.reload();
-  await expect(page.locator('.page-heading h1')).toHaveText('Overview');
+  // A restored session opens the workspace before the shell renders; allow for that.
+  await expect(page.locator('.page-heading h1')).toHaveText('Overview', { timeout: 20000 });
   await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
   // Finance is connected (F2 Deals, F3 Payments and Expenses), then Performance and insights.

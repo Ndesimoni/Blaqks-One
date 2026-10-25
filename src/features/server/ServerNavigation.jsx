@@ -1,13 +1,12 @@
 import React, { useRef } from 'react';
 import { BrandMark } from '../../components/layout/BrandMark.jsx';
-import { Icon } from '../../components/ui/Icon.jsx';
 import { Drawer } from '../../components/ui/Drawer.jsx';
+import { Icon } from '../../components/ui/Icon.jsx';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { useNavigationScroll } from '../../hooks/useNavigationScroll.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useNavigation, useWorkspaceView } from '../../hooks/useWorkspace.js';
-import { useNavigationScroll } from '../../hooks/useNavigationScroll.js';
 import { ServerNavigationGroups } from './ServerNavigationGroups.jsx';
-import { ServerNavigationSettings } from './ServerNavigationSettings.jsx';
 import './navigation.css';
 
 export function ServerNavigation() {
@@ -48,10 +47,6 @@ export function ServerNavigation() {
       <div className="sidebar-hairline" />
       <nav className="nav-groups" aria-label="CRM sections">
         <ServerNavigationGroups user={user} route={route} onSelect={select} />
-        <ServerNavigationSettings user={user} route={route} onSelect={select} />
-        <p className="connected-nav-legend">
-          Not connected sections show their current availability. They do not use demo records.
-        </p>
       </nav>
       <div className="sidebar-bottom">
         <div className="side-footer">

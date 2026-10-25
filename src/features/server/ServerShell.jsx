@@ -1,19 +1,19 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useSession } from '../../hooks/useSession.js';
-import { useNavigation, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
-import { labels } from '../../config/navigation.js';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { ServerHeader } from './ServerHeader.jsx';
-import { ServerNavigation } from './ServerNavigation.jsx';
-import { ServerDialogs } from './ServerDialogs.jsx';
-import { ServerImportAction } from './ServerImportAction.jsx';
+import { labels } from '../../config/navigation.js';
+import { useSession } from '../../hooks/useSession.js';
+import { useNavigation, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import { ServerContent } from './ServerContent.jsx';
+import { ServerDialogs } from './ServerDialogs.jsx';
+import { ServerHeader } from './ServerHeader.jsx';
+import { ServerImportAction } from './ServerImportAction.jsx';
+import { ServerNavigation } from './ServerNavigation.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
 import { ViewOnlyChip } from './ViewOnlyChip.jsx';
-import { isRecordSection, sectionDescription } from './sectionStatus.js';
 import { activityLabel } from './access.js';
-import { useI18n } from '../../i18n/useI18n.js';
+import { isRecordSection, sectionDescription } from './sectionStatus.js';
 
 /** Connected headings that differ from the shared labels (messaging is not part of My profile). */
 const headings = { 'My profile': 'My profile' };
@@ -95,7 +95,6 @@ export function ServerShell({ owner, workspaces }) {
           {!fullHeight && (
             <div className="page-heading">
               <div className="heading-left">
-                <div className="eyebrow">YOUR BUSINESS, CONNECTED</div>
                 <h1>
                   {team
                     ? 'Team'
@@ -125,7 +124,6 @@ export function ServerShell({ owner, workspaces }) {
           {!fullHeight && (
             <footer className="main-footer">
               <span>© {new Date().getFullYear()} Keys with Simoni</span>
-              <span>Connected CRM · Messaging and public publication are not connected yet.</span>
             </footer>
           )}
         </main>
