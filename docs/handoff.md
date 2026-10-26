@@ -1,5 +1,21 @@
 # Handoff for the next coding agent
 
+**CI repair (2026-10-26):** on `feature/connected-crm`, update Vite to 6.4.5 and
+both Rust lockfiles to rustls-webpki 0.103.16, Tokio 1.53.3 and webpki-roots
+1.0.10. These address the npm audit and RUSTSEC-2026-0381/0382/0386 findings;
+the security policy and thresholds are unchanged. Mobile Leads filters now keep
+search/reset and assignment controls on compact rows, preserving keyboard order
+and the existing 520px first-record assertion. The Leads/Contacts and assignment
+keyboard specifications pass (4 tests), as do 463 unit/smoke tests, the production
+build, formatting and the shrink-only line baseline. Full API/browser CI remains
+the broad validation pass; do not confuse earlier failures with this repair's
+GitHub check results.
+
+The npm audit reports zero vulnerabilities; cargo-deny 0.20.2 passes advisories,
+licences, bans and sources for both crates against the current RustSec database.
+CRM and Calendar Rust tests/Clippy pass. Focused API verification passes 23 HTTP
+tests and all 39 database-backed Rust contracts in the disposable Docker project.
+
 **New UI planning request (owner, 2026-10-24):** the owner wants the entire connected UI
 organized to a professional standard and the work prepared for DeepSeek. The
 [whole-product UI redesign plan](ui-redesign-plan.md) covers navigation, shared patterns,
