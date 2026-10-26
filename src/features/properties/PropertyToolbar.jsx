@@ -1,24 +1,23 @@
 import React from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { N } from '../../lib/format.js';
-import { propertyListingTags } from '../../config/properties.js';
 import { useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { PropertyPurposes } from './PropertyPurposes.jsx';
+import { useI18n } from '../../i18n/useI18n.js';
 
-export function PropertyToolbar({ result, f, activeCount, extras = null }) {
+export function PropertyToolbar({
+  all,
+  f,
+  activeCount,
+  extras,
+  filtersId,
+  filtersOpen,
+  setFiltersOpen,
+  updateFilter,
+}) {
   const { query, setQuery, setPage, viewMode, setViewMode } = useWorkspaceView();
+  const { t } = useI18n();
   return (
-    <div className="inventory-results-bar">
-      <div>
-        <strong>
-          {N(result.length)} {result.length === 1 ? 'property' : 'properties'}
-        </strong>
-        <span>
-          {f.purpose === 'All'
-            ? 'across your collection'
-            : propertyListingTags.find((t) => t.key === f.purpose)?.label || f.purpose}
-          {activeCount ? ' · refined results' : ''}
-        </span>
-      </div>
+    <div className="property-toolbar" aria-label="Property directory controls">
       <div className="inventory-tools">
         <div className="search-small inventory-search">
           <Icon name="search" size={16} />
@@ -32,6 +31,19 @@ export function PropertyToolbar({ result, f, activeCount, extras = null }) {
             }}
           />
         </div>
+        <PropertyPurposes all={all} purpose={f.purpose} updateFilter={updateFilter} />
+        {extras}
+        <button
+          type="button"
+          className="property-filter-trigger"
+          aria-expanded={filtersOpen}
+          aria-controls={filtersId}
+          onClick={() => setFiltersOpen((open) => !open)}
+        >
+          <Icon name="filter" size={17} />
+          {t('properties.filters')}
+          {activeCount ? ` (${activeCount})` : ''}
+        </button>
         <div className="view-switch" role="group" aria-label="Property view mode">
           <button
             aria-label="Table view"
@@ -53,7 +65,6 @@ export function PropertyToolbar({ result, f, activeCount, extras = null }) {
           </button>
         </div>
       </div>
-      {extras}
     </div>
   );
 }

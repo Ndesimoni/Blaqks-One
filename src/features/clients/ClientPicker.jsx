@@ -41,6 +41,7 @@ export function ClientPicker({ clients, client }) {
         renderItem={(c, _index, { close }) => (
           <button
             type="button"
+            aria-pressed={Boolean(client) && get(c, 'Client ID') === get(client, 'Client ID')}
             className={
               'desk-client ' +
               (client && get(c, 'Client ID') === get(client, 'Client ID') ? 'selected' : '')

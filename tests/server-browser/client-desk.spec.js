@@ -16,6 +16,7 @@ test('the Client desk shows a connected profile, property matches and timeline',
       0,
     );
     await expect(page.locator('.desk-list-title')).toContainText('1 contact');
+    await expect(page.locator('.desk-client').first()).toHaveAttribute('aria-pressed', 'true');
     const profile = page.locator('.profile-hero');
     await expect(profile).toContainText(`CLIENT PROFILE · ${mine.record.client_id}`);
     await expect(profile.getByRole('heading', { name: 'Dash client one' })).toBeVisible();
@@ -23,6 +24,8 @@ test('the Client desk shows a connected profile, property matches and timeline',
     const matches = page.locator('.panel').filter({ hasText: 'Curated property matches' });
     await expect(matches).toContainText('1 match');
     await expect(matches).toContainText('Dash Marina listing');
+    await expect(matches).toContainText('Property');
+    await expect(matches.locator('.property-photo img')).toBeVisible();
     await expect(matches.getByRole('button', { name: 'Shortlist' })).toBeVisible();
     const timeline = page.locator('.panel').filter({ hasText: 'Relationship timeline' });
     await expect(timeline).toContainText('Call Dash client one');

@@ -41,8 +41,13 @@ export function usePropertyDirectory() {
   return {
     all,
     f,
+    query,
     fieldValues,
     updateFilter,
+    clearQuery: () => {
+      setQuery('');
+      setPage(0);
+    },
     resetFilters,
     result,
     currentPage,

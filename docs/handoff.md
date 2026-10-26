@@ -1,5 +1,19 @@
 # Handoff for the next coding agent
 
+**UI4b — Properties and matching (2026-10-26):** the connected Properties directory now
+uses one count/action heading, a compact purpose/search/filter/view toolbar, initially closed
+advanced filters and removable active-filter chips. Card and table views share the filtered,
+sorted collection and twelve-record pagination. Property cards lead with resilient media and
+price, show a labelled fallback when an image fails, and reflow to one column at 390px.
+Client Desk selections expose their selected state, and matching cards show the listing image,
+type, bedrooms and area without changing match rules, workspace scope or Shortlist authority.
+
+Verification: 464 unit/smoke tests, production build, English catalogue, boundaries and the
+line-size baseline pass. Four focused connected-browser scenarios pass, covering thirteen
+properties across both views, pagination continuity, search/filter chips, media failure,
+mobile width, scoped Client Desk matches and view-only permissions. The first rerun used an
+unsupported comma-separated test selector and found no tests; the corrected focused run passed.
+
 **UI review repairs (2026-10-26):** reviewed the UI1–UI4a changes and restored two
 regressions: record cards now expose the desktop sort field/direction on phones,
 and Settings navigation retains its distinct profile, team, channel and rule icons.

@@ -1,4 +1,3 @@
-import { useMediaSource } from '../../lib/mediaSource.js';
 import React from 'react';
 import { isCommercialProperty, listingIntent, propertyPrice } from '../../lib/properties.js';
 import { get } from '../../lib/records.js';
@@ -8,23 +7,21 @@ import { N } from '../../lib/format.js';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { KeptChip } from '../records/KeptChip.jsx';
+import { PropertyCardImage } from './PropertyCardImage.jsx';
+import { useI18n } from '../../i18n/useI18n.js';
 
 export function PropertyCard({ property: p, index: i, onSelect }) {
+  const { t } = useI18n();
   const photos = mediaPhotos(p);
-  const source = useMediaSource();
   const cover = photos[0] || demoListingPhoto(p);
   return (
     <button className="property-card modern-property-card" type="button" onClick={onSelect}>
-      <div className={'property-photo variant-' + (i % 4)}>
-        <img
-          className={photos.length ? 'property-cover-img' : 'property-demo-cover'}
-          src={cover.demo ? cover.src : source.src(cover, p)}
-          alt={
-            photos.length && !cover.demo
-              ? `${get(p, 'Listing title') || 'Property'} cover`
-              : cover.name
-          }
-          loading="lazy"
+      <div className="property-card-media">
+        <PropertyCardImage
+          property={p}
+          cover={cover}
+          hasPhotos={Boolean(photos.length)}
+          index={i}
         />
         <span className="property-intent-tag">
           {listingIntent(p) === 'Holiday home'
@@ -38,18 +35,9 @@ export function PropertyCard({ property: p, index: i, onSelect }) {
         </span>
       </div>
       <div className="property-content">
-        <div className="property-card-meta">
-          <span>{get(p, 'Property type') || 'Property'}</span>
-          <span>{get(p, 'Ready / off-plan') || 'Ready'}</span>
-          <KeptChip module="Properties" record={p} />
-          {(!photos.length || cover.demo) && (
-            <span className="property-demo-label">Demo photo</span>
-          )}
-          {photos.length > 0 && (
-            <span className="photo-count">
-              <Icon name="image" size={12} /> {photos.length}
-            </span>
-          )}
+        <div className="property-price">
+          <small>ASKING PRICE</small>
+          <strong>{propertyPrice(p)}</strong>
         </div>
         <h3>{get(p, 'Listing title') || 'Untitled listing'}</h3>
         <p>
@@ -80,11 +68,21 @@ export function PropertyCard({ property: p, index: i, onSelect }) {
             </span>
           )}
         </div>
+        <div className="property-card-meta">
+          <span>{get(p, 'Property type') || 'Property'}</span>
+          <span>{get(p, 'Ready / off-plan') || 'Ready'}</span>
+          <KeptChip module="Properties" record={p} />
+          {(!photos.length || cover.demo) && (
+            <span className="property-demo-label">Demo photo</span>
+          )}
+          {photos.length > 0 && (
+            <span className="photo-count">
+              <Icon name="image" size={12} /> {photos.length}
+            </span>
+          )}
+        </div>
         <div className="property-bottom">
-          <div>
-            <small>ASKING PRICE</small>
-            <strong>{propertyPrice(p)}</strong>
-          </div>
+          <span>{t('properties.open')}</span>
           <Icon name="arrow" size={18} />
         </div>
       </div>

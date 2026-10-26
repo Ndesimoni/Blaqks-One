@@ -9,6 +9,9 @@ import { compactDate, today } from '../../lib/dates.js';
 import { AED } from '../../lib/format.js';
 import { get } from '../../lib/records.js';
 import { useRecordAccess } from '../records/useRecordAccess.js';
+import { mediaPhotos } from '../../lib/media.js';
+import { demoListingPhoto } from '../../lib/demoPropertyPhotos.js';
+import { PropertyCardImage } from '../properties/PropertyCardImage.jsx';
 
 /** Curated matches; Shortlist appears only when Shortlist records may be created. */
 export function ClientMatches({ client, matches }) {
@@ -34,8 +37,14 @@ export function ClientMatches({ client, matches }) {
           getKey={(p) => get(p, 'Property ID')}
           label="Matching properties"
           listClassName="match-grid"
-          renderItem={(p, _index, { close }) => (
+          renderItem={(p, index, { close }) => (
             <div className="match-card">
+              <PropertyCardImage
+                property={p}
+                cover={mediaPhotos(p)[0] || demoListingPhoto(p)}
+                hasPhotos={Boolean(mediaPhotos(p).length)}
+                index={index}
+              />
               <div className="match-top">
                 <span className="match-icon">
                   <Icon name="building" size={18} />
@@ -46,6 +55,11 @@ export function ClientMatches({ client, matches }) {
               <div className="match-where">
                 <Icon name="pin" size={14} />
                 {get(p, 'Community')}
+              </div>
+              <div className="match-facts">
+                <span>{get(p, 'Property type') || 'Property'}</span>
+                <span>{get(p, 'Bedrooms') ? `${get(p, 'Bedrooms')} beds` : 'Bedrooms —'}</span>
+                <span>{get(p, 'Area sq ft') ? `${get(p, 'Area sq ft')} sq ft` : 'Area —'}</span>
               </div>
               <div className="match-foot">
                 <strong>{AED(get(p, 'Price / annual rent AED'))}</strong>

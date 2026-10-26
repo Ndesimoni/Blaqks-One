@@ -69,6 +69,31 @@
 :root[data-theme] .connected-desk .match-foot button:hover {
   background: var(--accent-subtle);
 }
+:root[data-theme] .connected-desk .match-card {
+  overflow: hidden;
+  padding: 0;
+}
+:root[data-theme] .connected-desk .match-card > :not(.property-photo) {
+  margin-right: 14px;
+  margin-left: 14px;
+}
+:root[data-theme] .connected-desk .match-card > .property-photo {
+  height: 132px;
+}
+:root[data-theme] .connected-desk .match-top {
+  margin-top: 14px;
+}
+:root[data-theme] .connected-desk .match-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 10px;
+  color: var(--muted-dark);
+  font-size: 11px;
+}
+:root[data-theme] .connected-desk .match-foot {
+  margin-bottom: 14px;
+}
 @media (max-width: 750px) {
   :root[data-theme] .connected-desk .match-foot button {
     min-height: 44px;

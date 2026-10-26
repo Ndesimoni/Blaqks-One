@@ -1,6 +1,5 @@
-import React, { useEffect, useId, useState } from 'react';
-import { Icon } from '../../components/ui/Icon.jsx';
-import { useMediaQuery } from '../../hooks/useMediaQuery.js';
+import React from 'react';
+import { useI18n } from '../../i18n/useI18n.js';
 
 const fields = [
   ['Property type', 'type', 'Property type'],
@@ -10,35 +9,30 @@ const fields = [
   ['Bedrooms', 'bedrooms', 'Bedrooms'],
 ];
 
-export function PropertyFilters({ f, fieldValues, updateFilter, resetFilters, activeCount }) {
-  const mobile = useMediaQuery('(max-width: 750px)');
-  const [expanded, setExpanded] = useState(!mobile);
-  const panelId = useId();
-  useEffect(() => setExpanded(!mobile), [mobile]);
+export function PropertyFilters({
+  f,
+  fieldValues,
+  updateFilter,
+  resetFilters,
+  activeCount,
+  expanded,
+  panelId,
+}) {
+  const { t } = useI18n();
   return (
     <section className="inventory-filters" aria-label="Property filters">
-      <div className="inventory-filter-heading">
-        <button
-          type="button"
-          className="property-filter-toggle"
-          aria-expanded={expanded}
-          aria-controls={panelId}
-          onClick={() => setExpanded(!expanded)}
-        >
-          <Icon name="filter" size={18} />
-          Filter properties{activeCount > 0 && <span>{activeCount} active</span>}
-          <Icon name="down" className="filter-toggle-chevron" size={14} />
-        </button>
-        <button
-          type="button"
-          className="inventory-reset"
-          onClick={resetFilters}
-          disabled={!activeCount && f.purpose === 'All'}
-        >
-          Clear all filters
-        </button>
-      </div>
       <div id={panelId} hidden={!expanded}>
+        <div className="inventory-filter-heading">
+          <strong>{t('properties.refine')}</strong>
+          <button
+            type="button"
+            className="inventory-reset"
+            onClick={resetFilters}
+            disabled={!activeCount && f.purpose === 'All'}
+          >
+            {t('properties.clearAll')}
+          </button>
+        </div>
         <div className="inventory-filter-grid">
           {fields.map(([label, key, source]) => (
             <label className="inventory-field" key={key}>

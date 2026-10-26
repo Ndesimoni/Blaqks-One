@@ -1,42 +1,37 @@
-import React from 'react';
-import { Button } from '../../components/ui/Button.jsx';
-import { N } from '../../lib/format.js';
+import React, { useId, useState } from 'react';
 import { RecordTable } from '../records/RecordTable.jsx';
-import { useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
-import { useRecordAccess } from '../records/useRecordAccess.js';
+import { useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { RecordDirectoryHead } from '../records/RecordDirectoryHead.jsx';
 import { usePropertyDirectory } from './usePropertyDirectory.js';
-import { PropertyPurposes } from './PropertyPurposes.jsx';
 import { PropertyToolbar } from './PropertyToolbar.jsx';
 import { PropertyFilters } from './PropertyFilters.jsx';
 import { PropertyResults } from './PropertyResults.jsx';
+import { PropertyActiveFilters } from './PropertyActiveFilters.jsx';
+import './property-directory.css';
 
 export function PropertyDirectory({ toolbarExtras = null }) {
   const directory = usePropertyDirectory();
   const { all, f, result, activeCount } = directory;
   const { viewMode } = useWorkspaceView();
-  const { add } = useWorkspaceActions();
-  const can = useRecordAccess();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersId = useId();
   return (
     <div className="page-stack inventory-page">
-      <section className="directory-top" aria-label="Portfolio summary">
-        <div className="directory-count">
-          <div className="large-count">{N(all.length)}</div>
-          <div>
-            <strong>Total properties</strong>
-            <p>Manage your listings and availability.</p>
-          </div>
-        </div>
-        {can('Properties', 'create') && (
-          <Button icon="plus" onClick={() => add('Properties')}>
-            Add property
-          </Button>
-        )}
-      </section>
-      <PropertyPurposes all={all} purpose={f.purpose} updateFilter={directory.updateFilter} />
-      <PropertyToolbar result={result} f={f} activeCount={activeCount} extras={toolbarExtras} />
-      <PropertyFilters {...directory} />
+      <RecordDirectoryHead module="Properties" noun="property" />
+      <PropertyToolbar
+        all={all}
+        f={f}
+        activeCount={activeCount}
+        extras={toolbarExtras}
+        filtersId={filtersId}
+        filtersOpen={filtersOpen}
+        setFiltersOpen={setFiltersOpen}
+        updateFilter={directory.updateFilter}
+      />
+      <PropertyFilters {...directory} expanded={filtersOpen} panelId={filtersId} />
+      <PropertyActiveFilters {...directory} />
       {viewMode === 'table' ? (
-        <RecordTable module="Properties" arr={result} />
+        <RecordTable module="Properties" arr={result} sortInHeading />
       ) : (
         <PropertyResults {...directory} />
       )}
