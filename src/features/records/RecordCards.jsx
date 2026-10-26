@@ -6,7 +6,7 @@ import { KeptChip } from './KeptChip.jsx';
 import { RecordRowActions } from './RecordRowActions.jsx';
 import './cards.css';
 
-const stageName = /stage|status|tier|priority/i;
+const stageName = /stage|status|tier|priority|contact type/i;
 const strongName = /Full name|Listing title|Next action|Community/i;
 
 /**

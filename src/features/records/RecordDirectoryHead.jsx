@@ -25,21 +25,22 @@ function plural(noun) {
 /**
  * Directory heading slot: one authorized count and the page's single primary action. The shell
  * still owns the `h1`, so this repeats neither the title nor its description (UI3, B-02).
+ * `noun` and `onAdd` let a view of another collection (Leads over Clients) keep its own words.
  */
-export function RecordDirectoryHead({ module }) {
+export function RecordDirectoryHead({ module, noun: nounProp, onAdd, accessModule = module }) {
   const { data } = useRecords();
   const { add } = useWorkspaceActions();
   const can = useRecordAccess();
   const count = data[module]?.length || 0;
-  const noun = nouns[module] || 'record';
+  const noun = nounProp || nouns[module] || 'record';
   return (
     <div className="record-directory-head">
       <p className="record-count">
         <span className="record-count-number">{N(count)}</span>
         <span className="record-count-word">{count === 1 ? noun : plural(noun)}</span>
       </p>
-      {can(module, 'create') && (
-        <Button icon="plus" onClick={() => add(module)}>
+      {can(accessModule, 'create') && (
+        <Button icon="plus" onClick={onAdd || (() => add(module))}>
           Add {noun}
         </Button>
       )}

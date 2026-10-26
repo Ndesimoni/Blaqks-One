@@ -1,16 +1,15 @@
 import { OPTIONS } from '../../config/fields.js';
 import { get } from '../../lib/records.js';
 
+/** One directory row reads source, stage, contact method, campaign and the next task (UI4a). */
 export const leadColumns = [
   'Client ID',
   'Full name',
-  'Lead source',
   'Lead stage',
+  'Lead source',
   'Phone',
-  'Email',
   'Campaign reference',
-  'Priority',
-  'Date added',
+  'Next follow-up auto',
 ];
 
 const key = (value) => value.toLowerCase();

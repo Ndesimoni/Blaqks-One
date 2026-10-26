@@ -17,6 +17,7 @@ function RecordTable({
   limit = true,
   columnNames,
   tableLabel,
+  pageLabel,
   emptyTitle = 'No matching records',
   emptyDetail,
   emptyAction,
@@ -78,7 +79,7 @@ function RecordTable({
         total={arr.length}
         page={currentPage}
         pageSize={perPage}
-        label={`${module} pages`}
+        label={`${pageLabel || module} pages`}
         onChange={setPage}
       />
     </div>

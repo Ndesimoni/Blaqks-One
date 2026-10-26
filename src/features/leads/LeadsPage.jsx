@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { useRecordSearch } from '../../hooks/useRecordSearch.js';
+import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { today } from '../../lib/dates.js';
+import { RecordDirectoryHead } from '../records/RecordDirectoryHead.jsx';
 import { RecordTable } from '../records/RecordTable.jsx';
 import { LeadSourceFilters } from './LeadSourceFilters.jsx';
-import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
-import { useRecordAccess } from '../records/useRecordAccess.js';
-import { useRecordSearch } from '../../hooks/useRecordSearch.js';
-import { N } from '../../lib/format.js';
-import { today } from '../../lib/dates.js';
 import {
   leadColumns,
   leadStageOptions,
@@ -15,11 +14,13 @@ import {
   selectLeadSources,
 } from './selectors.js';
 
-/** Leads and clients share one profile throughout the enquiry and transaction lifecycle. */
+/**
+ * Leads are a view over Clients (UI4a): one count, one primary action and a compact source chip
+ * row replace the former summary card and "Where your leads come from" panel.
+ */
 export function LeadsPage({ toolbarExtras = null }) {
   const { data } = useRecords();
   const { add } = useWorkspaceActions();
-  const canAdd = useRecordAccess()('Leads', 'create');
   const { query, setQuery, setPage } = useWorkspaceView();
   const [source, setSource] = useState('');
   const [stage, setStage] = useState('');
@@ -30,6 +31,7 @@ export function LeadsPage({ toolbarExtras = null }) {
   if (source && !sources.some((item) => item.label.toLowerCase() === source.toLowerCase())) {
     sources.push({ label: source, count: 0 });
   }
+  const filtered = Boolean(source || stage || query);
   const filterSource = (value) => {
     setSource(value);
     setPage(0);
@@ -43,32 +45,18 @@ export function LeadsPage({ toolbarExtras = null }) {
 
   return (
     <div className="page-stack leads-page">
-      <div className="directory-top">
-        <div className="directory-count">
-          <div className="large-count">{N(data.Clients.length)}</div>
-          <div>
-            <strong>Total leads</strong>
-            <p>Keep contact details, sources, and enquiry progress together.</p>
-          </div>
-        </div>
-        {canAdd && (
-          <Button icon="plus" onClick={addLead}>
-            Add lead
-          </Button>
-        )}
-      </div>
-      <section className="panel lead-sources" aria-labelledby="lead-sources-heading">
-        <div className="lead-sources-heading">
-          <h2 id="lead-sources-heading">Where your leads come from</h2>
-          <p>Totals across all leads. Choose a source to filter the list.</p>
-        </div>
+      <RecordDirectoryHead module="Clients" noun="lead" accessModule="Leads" onAdd={addLead} />
+      <div className="lead-source-bar">
+        <span className="lead-source-label" aria-hidden="true">
+          Source
+        </span>
         <LeadSourceFilters
           sources={sources}
           selectedSource={source}
           total={data.Clients.length}
           onChange={filterSource}
         />
-      </section>
+      </div>
       <div className="lead-filters" role="group" aria-label="Lead filters">
         <label className="lead-stage-filter">
           <span>Lead stage</span>
@@ -99,7 +87,7 @@ export function LeadsPage({ toolbarExtras = null }) {
         </div>
         <Button
           variant="light"
-          disabled={!source && !stage && !query}
+          disabled={!filtered}
           onClick={() => {
             setSource('');
             setStage('');
@@ -116,11 +104,12 @@ export function LeadsPage({ toolbarExtras = null }) {
         arr={records}
         columnNames={leadColumns}
         tableLabel="Leads"
+        pageLabel="Leads"
         emptyTitle="No matching leads"
         emptyDetail={
-          canAdd
-            ? 'Clear the filters or add a lead to start tracking an enquiry.'
-            : 'Clear the filters to show every lead.'
+          filtered
+            ? 'Clear the filters to show every lead.'
+            : 'Add a lead to start tracking an enquiry.'
         }
         emptyAction={
           <Button icon="plus" onClick={addLead}>

@@ -7,8 +7,8 @@ import { RecordTable } from './RecordTable.jsx';
 import { matchesRecordTab, recordTabs } from './selectors.js';
 
 /**
- * Desktop columns for the Clients pilot: identity, requirement, stage, budget, quality and next
- * follow-up fit beside the action cell at 1280, so nothing is clipped (UI3 §5.4, B-01).
+ * Desktop columns for the reviewed directories: identity, role or requirement, stage and next
+ * task fit beside the action cell at 1280, so nothing is clipped (UI3 §5.4, UI4a).
  */
 const pilotColumns = {
   Clients: [
@@ -19,6 +19,15 @@ const pilotColumns = {
     'Maximum budget AED',
     'Lead quality score / 100',
     'Next follow-up auto',
+  ],
+  Contacts: [
+    'Contact ID',
+    'Full name',
+    'Contact type',
+    'Phone',
+    'Email',
+    'Company',
+    'Building / project',
   ],
 };
 

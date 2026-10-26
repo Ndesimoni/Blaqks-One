@@ -1,15 +1,15 @@
-.lead-sources {
-  padding: 20px;
+/* Compact source chips above the lead toolbar (UI4a); the old summary panel is gone. */
+.lead-source-bar {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px 14px;
 }
-.lead-sources-heading h2 {
-  margin: 0 0 5px;
-  color: var(--ink);
-  font-size: 16px;
-}
-.lead-sources-heading p {
-  margin: 0;
-  color: var(--muted);
+.lead-source-label {
+  color: var(--muted-dark);
   font-size: 12px;
+  font-weight: 600;
+  line-height: 34px;
 }
 .lead-source-options,
 .lead-source-filter-list {
@@ -18,7 +18,8 @@
   gap: 8px;
 }
 .lead-source-options {
-  margin-top: 16px;
+  flex: 1;
+  min-width: 0;
 }
 .lead-source-filter-list {
   min-width: 0;
@@ -26,8 +27,8 @@
 .lead-source-options button {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
+  gap: 8px;
+  padding: 7px 11px;
   border: 1px solid var(--line);
   border-radius: 9px;
   background: var(--panel);
@@ -129,6 +130,9 @@
   gap: 12px;
 }
 @media (max-width: 750px) {
+  .lead-source-label {
+    display: none;
+  }
   .lead-filters {
     align-items: stretch;
   }
@@ -138,6 +142,6 @@
     min-width: 0;
   }
   .lead-filters > .btn {
-    width: 100%;
+    align-self: flex-start;
   }
 }
