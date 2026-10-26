@@ -1,31 +1,41 @@
 import React from 'react';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { formatValue } from '../../lib/crm.js';
-import { get } from '../../lib/records.js';
+import { clName, get, prName } from '../../lib/records.js';
 import { KeptChip } from './KeptChip.jsx';
 import { RecordRowActions } from './RecordRowActions.jsx';
 import './cards.css';
-
-const stageName = /stage|status|tier|priority|contact type/i;
-const strongName = /Full name|Listing title|Next action|Community/i;
+import { recordCardFields, workflowColumns } from './workflowPresentation.js';
 
 /**
  * Phone presentation of a record page: one card per record, identity and stage first, then the
- * two most scannable facts, then the same row actions the table offers (UI3, B-01).
+ * two most scannable facts (all linked/date task context for workflows), then row actions.
  */
 export function RecordCards({ module, data, current, pick, readOnly, onOpen }) {
-  const idColumn = pick[0];
-  const titleColumn =
-    pick.find((f) => f !== idColumn && strongName.test(f.name)) || pick[1] || idColumn;
-  const stageColumn = pick.find((f) => stageName.test(f.name));
+  const {
+    id: idColumn,
+    title: titleColumn,
+    state: stageColumn,
+    limit,
+  } = recordCardFields(module, pick);
   const factColumns = pick.filter((f) => f !== idColumn && f !== titleColumn && f !== stageColumn);
-  const value = (record, field) => formatValue(data, module, record, field);
+  const value = (record, field) => {
+    const formatted = formatValue(data, module, record, field);
+    if (!workflowColumns[module] || formatted === '—') return formatted;
+    const name =
+      field.name === 'Client ID'
+        ? clName(data, get(record, field.name))
+        : /^Property ID/.test(field.name)
+          ? prName(data, get(record, field.name))
+          : '';
+    return name && name !== formatted && name !== '—' ? `${name} · ${formatted}` : formatted;
+  };
   const filled = (record, field) => value(record, field) !== '—';
   return (
     <ul className="record-cards" aria-label={`${module} records`}>
       {current.map((record, index) => {
         const id = get(record, idColumn.name);
-        const facts = factColumns.filter((f) => filled(record, f)).slice(0, 2);
+        const facts = factColumns.filter((f) => filled(record, f)).slice(0, limit);
         const stage = stageColumn && filled(record, stageColumn) ? value(record, stageColumn) : '';
         return (
           <li key={id || index} className="record-card">

@@ -1,5 +1,20 @@
 # Handoff for the next coding agent
 
+**UI5 — workflow records (2026-10-26):** explicit presentation configurations now cover
+Follow-ups, Viewings, Shortlist, Interaction log and Client care. Phone cards retain their
+task dates, state and linked-record context rather than truncating to two facts. Linked
+names come only from already scoped records, alongside their IDs. Desktop columns retain
+next-action/channel context and expose the existing follow-up/client-care due alerts.
+Existing filters, schemas, mutations, assignment authority and deferred Calendar remain unchanged.
+
+Verification: 466 unit/smoke tests, build, formatting, English catalogue, boundaries and
+line-size baseline pass (37 existing oversized files remain). Four focused connected browser
+scenarios pass: all five workflow layouts at 390/1280 in both themes, Follow-up permissions,
+Viewing form/reload/link deletion protection, and Lead defaults. The existing workflow tests
+remain intact. Screenshots were generated for all five modules; representative phone-dark
+and desktop-light layouts were visually inspected. Full GitHub CI has not run for UI5:
+the owner permits local commits but explicitly prohibits pushes. Next packet: UI6 finance.
+
 **UI4b — Properties and matching (2026-10-26):** the connected Properties directory now
 uses one count/action heading, a compact purpose/search/filter/view toolbar, initially closed
 advanced filters and removable active-filter chips. Card and table views share the filtered,

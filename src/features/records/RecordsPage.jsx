@@ -5,12 +5,14 @@ import { useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { RecordDirectoryHead } from './RecordDirectoryHead.jsx';
 import { RecordTable } from './RecordTable.jsx';
 import { matchesRecordTab, recordTabs } from './selectors.js';
+import { workflowColumns } from './workflowPresentation.js';
 
 /**
  * Desktop columns for the reviewed directories: identity, role or requirement, stage and next
  * task fit beside the action cell at 1280, so nothing is clipped (UI3 §5.4, UI4a).
  */
 const pilotColumns = {
+  ...workflowColumns,
   Clients: [
     'Client ID',
     'Full name',
