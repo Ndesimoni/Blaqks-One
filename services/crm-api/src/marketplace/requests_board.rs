@@ -19,7 +19,7 @@ pub async fn board_page(
     };
     Ok(sqlx::query_as(&format!(
         "SELECT {COLUMNS},{STAMPS} FROM marketplace.crm_market_requests r \
-         WHERE r.closed_at IS NULL AND r.expires_at > now() \
+         WHERE r.closed_at IS NULL AND r.expires_at > now() AND r.paused_at IS NULL \
            AND ($1::text IS NULL OR r.purpose = $1) \
            AND ($2::text IS NULL OR r.emirate = $2) \
            AND ($3::text IS NULL OR r.property_type = $3) \

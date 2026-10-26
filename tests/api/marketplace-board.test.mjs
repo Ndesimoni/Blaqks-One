@@ -28,6 +28,7 @@ const ALLOWED = [
   'emirate',
   'expiresAt',
   'furnishing',
+  'hasMatches',
   'id',
   'moveIn',
   'openToOtherAreas',
@@ -57,6 +58,7 @@ test('a card carries the request and the broker, never the client or the budget'
   const seen = await board(teams.two, { bedrooms: 2 });
   const card = seen.value.requests[0];
   assert.deepEqual(Object.keys(card).sort(), ALLOWED);
+  assert.equal(typeof card.hasMatches, 'boolean', 'own-inventory alert reveals no stock count');
   assert.equal(card.budgetBand, 'rent_150k');
   assert.equal(card.budgetMaxAed, undefined);
   assert.equal(card.budgetMinAed, undefined);

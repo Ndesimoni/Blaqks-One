@@ -11,6 +11,7 @@ const STAMP: &str = "'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'";
 
 #[derive(Clone, Debug, FromRow)]
 pub struct ShareRow {
+    pub origin: String,
     pub id: Uuid,
     pub workspace_id: String,
     pub source_record_id: Uuid,
@@ -65,7 +66,7 @@ impl ShareRow {
 pub fn select(tail: &str) -> String {
     let at = |column: &str| format!("to_char({column} AT TIME ZONE 'UTC',{STAMP})");
     format!(
-        "SELECT s.id,s.workspace_id,s.source_record_id,s.from_id,s.recipient_workspace_id, \
+        "SELECT s.origin,s.id,s.workspace_id,s.source_record_id,s.from_id,s.recipient_workspace_id, \
          s.to_id,CASE WHEN l.lapsed THEN CASE WHEN s.status='pending' \
          AND s.offer_ends_at<=s.view_ends_at THEN 'expired' ELSE 'ended' END ELSE s.status END \
          AS status,CASE WHEN l.lapsed AND NOT (s.status='pending' \

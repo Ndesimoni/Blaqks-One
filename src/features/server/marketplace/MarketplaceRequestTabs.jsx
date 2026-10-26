@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceBoard } from './MarketplaceBoard.jsx';
 import { MarketplaceRequests } from './MarketplaceRequests.jsx';
+import { MarketplaceNotifications } from './MarketplaceNotifications.jsx';
 
-const TABS = ['board', 'mine'];
+const TABS = ['board', 'mine', 'updates'];
 
 /** Board and My requests, below the member's own profile (packet MK2). */
 export function MarketplaceRequestTabs() {
@@ -23,7 +24,9 @@ export function MarketplaceRequestTabs() {
             className={tab === key ? 'market-tab is-active' : 'market-tab'}
             onClick={() => setTab(key)}
           >
-            {t(`marketplaceRequests.tabs.${key}`)}
+            {key === 'updates'
+              ? t('marketplaceAnswers.notifications')
+              : t(`marketplaceRequests.tabs.${key}`)}
           </button>
         ))}
       </div>
@@ -33,7 +36,13 @@ export function MarketplaceRequestTabs() {
         aria-labelledby={`market-tab-${tab}`}
         className="market-panel"
       >
-        {tab === 'board' ? <MarketplaceBoard /> : <MarketplaceRequests />}
+        {tab === 'board' ? (
+          <MarketplaceBoard />
+        ) : tab === 'mine' ? (
+          <MarketplaceRequests />
+        ) : (
+          <MarketplaceNotifications />
+        )}
       </div>
     </section>
   );

@@ -83,7 +83,13 @@ pub async fn evidence(
         }),
         _ => {
             let reads = matches!(place, Viewer::Agent | Viewer::AgentAdmin);
-            let basic = (reads && row.open() && row.sender_live).then(|| view::basic(&row.facts));
+            let basic = (reads && row.open() && row.sender_live).then(|| {
+                if row.origin == "marketplace" {
+                    super::market_view::basic(&row.facts)
+                } else {
+                    view::basic(&row.facts)
+                }
+            });
             json!({"digest": row.snapshot_digest, "scheme": 1, "basicFacts": basic})
         }
     };

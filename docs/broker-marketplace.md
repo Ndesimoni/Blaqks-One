@@ -1,5 +1,13 @@
 # Broker marketplace (MK)
 
+**MK3 update (owner, 2026-10-26):** implementation follows
+[Marketplace answers](marketplace-answers.md), which overrides older round/lifecycle/chat
+descriptions below: three active offers, rejection frees a slot, no-match broker messaging
+while capacity remains, choosing pauses intake and notifies other participants, and a
+failed deal permits reopening with history preserved. Cross-company conversations belong
+to Marketplace; Team chat remains company-only. Accepted co-broking and exact-unit/contact
+release remain the separate MK4 packet. Redesign work is paused in favor of feature delivery.
+
 Status: decided by the owner on 2026-10-23 after discussion; queued in
 [roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations);
 not built. The summary is in [Product decisions](product-decisions.md) ("Broker

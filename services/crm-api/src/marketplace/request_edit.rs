@@ -39,7 +39,18 @@ pub async fn edit(
     gate::company_open(&mut tx, &workspace).await?;
     gate::joined(&mut tx, user.id).await?;
     let valid = request::validate(edit.request)?;
+    sqlx::query("SELECT id FROM marketplace.crm_market_requests WHERE id=$1 FOR UPDATE")
+        .bind(request_id)
+        .execute(&mut *tx)
+        .await?;
     let existing = requests::own_row(&mut tx, request_id, user.id).await?;
+    if existing.paused_at.is_some()
+        || super::answer_access::active_count(&mut tx, request_id).await? > 0
+    {
+        return Err(ApiError::conflict(
+            "Close active offers before changing this request.",
+        ));
+    }
     if existing.closed_at.is_some() {
         return Err(ApiError::conflict(CLOSED));
     }

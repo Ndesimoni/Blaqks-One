@@ -2,12 +2,13 @@ import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceAvatar } from './MarketplaceAvatar.jsx';
 import { MarketplaceRequestFacts } from './MarketplaceRequestFacts.jsx';
+import { Button } from '../../../components/ui/Button.jsx';
 
 /**
  * One request on the board: the facts, the band as a chip, the dates and the broker (packet
  * MK2). A colleague's request carries a "Your company" chip (owner, 2026-10-24).
  */
-export function MarketplaceBoardCard({ request, onOpenBroker }) {
+export function MarketplaceBoardCard({ request, onOpenBroker, onOpenRequest }) {
   const { t, format } = useI18n();
   const posted = format.date(request.createdAt) || request.createdAt;
   const ends = format.date(request.expiresAt) || request.expiresAt;
@@ -23,6 +24,11 @@ export function MarketplaceBoardCard({ request, onOpenBroker }) {
         </span>
       </div>
       <MarketplaceRequestFacts request={request} />
+      {request.hasMatches === true && (
+        <p className="market-hint" role="status">
+          {t('marketplaceAnswers.matchAlert')}
+        </p>
+      )}
       {request.openToOtherAreas && (
         <p className="market-hint">{t('marketplaceRequests.board.otherAreas')}</p>
       )}
@@ -39,6 +45,13 @@ export function MarketplaceBoardCard({ request, onOpenBroker }) {
           <span>{request.broker.company}</span>
         </span>
       </button>
+      {!request.yourCompany && (
+        <div className="market-actions">
+          <Button variant="light" onClick={onOpenRequest}>
+            {t('marketplaceAnswers.open')}
+          </Button>
+        </div>
+      )}
     </li>
   );
 }

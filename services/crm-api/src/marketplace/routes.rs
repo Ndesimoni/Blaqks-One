@@ -17,6 +17,8 @@ const BASE: &str = "/api/crm/workspaces/{workspace}/marketplace";
 pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(16 * 1024);
     Router::new()
+        .merge(super::interaction_routes::router())
+        .merge(super::answers_routes::router())
         .route(&format!("{BASE}/status"), get(application::status))
         .route(
             &format!("{BASE}/application"),

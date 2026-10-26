@@ -3,7 +3,7 @@
  * state the marketplace defines, whole numbers where numbers are asked for and dates that parse.
  * Anything else is refused rather than half-shown.
  */
-export const requestStates = Object.freeze(['open', 'expired', 'closed']);
+export const requestStates = Object.freeze(['open', 'full', 'paused', 'expired', 'closed']);
 export const purposes = Object.freeze(['buy', 'rent']);
 export const emirateSlugs = Object.freeze([
   'dubai',
@@ -110,6 +110,7 @@ export function readBoard(value) {
     ...readFacts(card),
     broker: readBroker(card.broker),
     yourCompany: card.yourCompany === true,
+    hasMatches: card.hasMatches === true,
   }));
   const nextCursor = value.nextCursor === null ? '' : text(value.nextCursor, 200);
   return { requests, nextCursor };

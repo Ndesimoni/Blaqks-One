@@ -10,18 +10,16 @@
 //! and 3 run as their own task, so a dropped request still attaches or hides what it
 //! reserved; a changed listing copies only files no earlier snapshot holds (R2a security
 //! review M4–M5).
+use super::create_finish::finish;
 use super::{
-    access::{self, Caller},
-    create_checks::{self, Input, CHANGED},
-    read, review, snapshot, snapshot_store, store,
+    access,
+    create_checks::{self, Input},
+    review, snapshot, snapshot_store,
 };
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
-    media::{
-        copies::{self, Reserved},
-        copy_bytes,
-    },
+    media::{copies, copy_bytes},
     records::outside_facts,
     state::AppState,
 };
@@ -43,9 +41,22 @@ pub async fn create(
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     access::writer(&state, &session, &headers, &workspace).await?;
     let input = create_checks::parse(body, OffsetDateTime::now_utc())?;
+    run(state, session.user.id, workspace, input, None).await
+}
+
+pub async fn run(
+    state: AppState,
+    actor: Uuid,
+    workspace: String,
+    input: Input,
+    market: Option<crate::marketplace::answers_send::Context>,
+) -> ApiResult<(StatusCode, Json<Value>)> {
     let mut tx = state.pool.begin().await?;
-    let live = access::live(&mut tx, &workspace, session.user.id).await?;
+    let live = access::live(&mut tx, &workspace, actor).await?;
     let outside = outside_facts::shareable(&mut tx, &workspace, &live, input.record).await?;
+    if let Some(context) = &market {
+        context.check(&mut tx, &live, &outside.facts).await?;
+    }
     let draft = snapshot::draft(&mut tx, &workspace, input.record, outside, input.exact).await?;
     review::sendable(&draft, &input)?;
     create_checks::check(&mut tx, &workspace, &live, &input, false).await?;
@@ -64,7 +75,15 @@ pub async fn create(
     let actor = live.id;
     let task = tokio::spawn(async move {
         copy_bytes::store(&state, &reserved).await?;
-        let finished = finish(&state, actor, &workspace, &input, &reserved).await;
+        let finished = finish(
+            &state,
+            actor,
+            &workspace,
+            &input,
+            &reserved,
+            market.as_ref(),
+        )
+        .await;
         // Whatever was not attached (a refusal, or a parallel share made the snapshot first).
         copy_bytes::discard(&state.pool, &copy_bytes::ids(&reserved)).await?;
         finished
@@ -76,75 +95,4 @@ pub async fn create(
     );
     let share = task.await.map_err(|_| unavailable)??;
     Ok((StatusCode::CREATED, Json(json!({ "share": share }))))
-}
-
-async fn finish(
-    state: &AppState,
-    actor: Uuid,
-    workspace: &str,
-    input: &Input,
-    reserved: &[Reserved],
-) -> ApiResult<Value> {
-    let mut tx = state.pool.begin().await?;
-    let live = access::live(&mut tx, workspace, actor).await?;
-    let outside = outside_facts::shareable(&mut tx, workspace, &live, input.record).await?;
-    let draft = snapshot::draft(&mut tx, workspace, input.record, outside, input.exact).await?;
-    let checked = review::sendable(&draft, input)?;
-    create_checks::check(&mut tx, workspace, &live, input, true).await?;
-    let snapshot: Uuid =
-        match snapshot_store::existing(&mut tx, workspace, input.record, &draft.digest).await? {
-            Some(made) => made,
-            None => {
-                let record = input.record;
-                let mut copy = snapshot_store::reusable(&mut tx, workspace, record, &draft).await?;
-                copy.extend(reserved.iter().map(|copy| (copy.source.id, copy.id)));
-                let plan = draft.plan();
-                if plan
-                    .iter()
-                    .any(|(source, _)| !copy.contains_key(&source.id))
-                {
-                    return Err(ApiError::conflict(CHANGED));
-                }
-                let fresh = copy_bytes::ids(reserved);
-                let owner = (workspace, record, live.id);
-                snapshot_store::insert(&mut tx, owner, &draft, (&copy, &fresh)).await?
-            }
-        };
-    let id = Uuid::new_v4();
-    sqlx::query(
-        "INSERT INTO agreements.crm_listing_shares (id,snapshot_id,workspace_id, \
-         source_record_id,from_id,recipient_workspace_id,to_id,status,note,created_at, \
-         offer_ends_at,view_ends_at) VALUES ($1,$2,$3,$4,$5,$6,$7,'pending',$8,now(), \
-         now() + interval '336 hours',$9::timestamptz)",
-    )
-    .bind(id)
-    .bind(snapshot)
-    .bind(workspace)
-    .bind(input.record)
-    .bind(live.id)
-    .bind(&input.to_workspace)
-    .bind(input.to)
-    .bind(&input.note)
-    .bind(&input.view_ends)
-    .execute(&mut *tx)
-    .await?;
-    store::event(
-        &mut tx,
-        id,
-        "sent",
-        Some((live.id, "sender")),
-        (checked, None),
-    )
-    .await?;
-    let row = store::find(&mut tx, id)
-        .await?
-        .ok_or_else(ApiError::missing)?;
-    let caller = Caller {
-        id: live.id,
-        workspace,
-        admin: live.role == "admin",
-    };
-    let share = read::one_view(&mut tx, &row, &caller).await?;
-    tx.commit().await?;
-    Ok(share)
 }

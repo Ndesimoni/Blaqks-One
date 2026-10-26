@@ -19,7 +19,7 @@ pub async fn edit(
          open_to_other_areas=$7,property_type=$8,bedrooms=$9,budget_min_aed=$10, \
          budget_max_aed=$11,budget_band=$12,ready=$13,furnishing=$14,cheques=$15, \
          building_age=$16,move_in=$17,updated_at=now(),version=version+1 \
-         WHERE id=$1 AND member_id=$2 AND version=$3 AND closed_at IS NULL \
+         WHERE id=$1 AND member_id=$2 AND version=$3 AND closed_at IS NULL AND paused_at IS NULL \
          RETURNING {COLUMNS},{STAMPS}"
     ))
     .bind(id)
@@ -52,7 +52,7 @@ pub async fn renew(
     Ok(sqlx::query_as(&format!(
         "UPDATE marketplace.crm_market_requests SET expires_at=now()+interval '30 days', \
          updated_at=now(),version=version+1 \
-         WHERE id=$1 AND member_id=$2 AND closed_at IS NULL \
+         WHERE id=$1 AND member_id=$2 AND closed_at IS NULL AND paused_at IS NULL \
            AND expires_at > now()-interval '30 days' \
          RETURNING {COLUMNS},{STAMPS}"
     ))

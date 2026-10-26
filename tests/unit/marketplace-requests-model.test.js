@@ -42,6 +42,12 @@ test('a board page reads its cards and its cursor', () => {
   assert.equal(page.requests[0].yourCompany, false);
   const own = readBoard({ requests: [{ ...facts, broker, yourCompany: true }], nextCursor: null });
   assert.equal(own.requests[0].yourCompany, true);
+  const matched = readBoard({
+    requests: [{ ...facts, broker, hasMatches: true }],
+    nextCursor: null,
+  });
+  assert.equal(matched.requests[0].hasMatches, true);
+  assert.equal(page.requests[0].hasMatches, false);
 });
 
 test('a card may not carry the client or the exact budget', () => {

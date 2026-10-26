@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 fn row(status: &str) -> ShareRow {
     ShareRow {
+        origin: "direct".into(),
         id: Uuid::new_v4(),
         workspace_id: "a".into(),
         source_record_id: Uuid::new_v4(),
@@ -48,6 +49,9 @@ const NAMES: Companies = Companies {
     from: None,
     to: None,
 };
+
+#[path = "market_tests.rs"]
+mod market_tests;
 
 #[test]
 fn the_agent_sees_twelve_facts_until_accepting_and_nothing_after_the_end() {

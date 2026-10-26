@@ -16,10 +16,11 @@ pub(super) const STAMPS: &str =
      to_char(expires_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS expires_at, \
      to_char(closed_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') AS closed_at, \
      to_char(created_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"') AS cursor_at, \
-     close_reason, closed_at IS NULL AND expires_at <= now() AS expired, \
+    close_reason, paused_at::text AS paused_at, closed_at IS NULL AND expires_at <= now() AS expired, \
      closed_at IS NULL AND expires_at > now() - interval '30 days' AS renewable";
 #[derive(Debug, sqlx::FromRow)]
 pub struct Row {
+    pub paused_at: Option<String>,
     pub id: Uuid,
     pub workspace_id: String,
     pub member_id: Uuid,
@@ -54,6 +55,8 @@ pub fn state(row: &Row) -> &'static str {
         "closed"
     } else if row.expired {
         "expired"
+    } else if row.paused_at.is_some() {
+        "paused"
     } else {
         "open"
     }

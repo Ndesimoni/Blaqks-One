@@ -1,5 +1,53 @@
 # Handoff for the next coding agent
 
+**MK3 implemented locally (2026-10-26):** [Marketplace answers](marketplace-answers.md)
+now has server matching and private own-inventory alerts, reviewed property offers with three
+active slots, rejection/replacement, participant-only no-match broker conversations, selection
+pause/notices, reopening with original expiry and history, and closing paused requests.
+Migrations 0078–0079 add offer origin, answers, conversations/messages and generic notices.
+They were applied only to disposable test databases, not the development database.
+Listing shares keep exact locations, contact details and media sealed from recipients;
+generic direct-share routes cannot bypass the marketplace lifecycle. **Next: MK4 accepted
+co-broking and private-detail release**, not another redesign packet.
+
+Verification: 468 frontend unit/smoke tests, production build, 323 Rust library tests,
+all 39 database-backed contracts, Rust format/Clippy, English catalogue, boundaries and
+formatting pass. Across the focused API runs, 42 distinct HTTP scenarios pass, including
+existing direct-share/co-broking regressions. Final supplemental tests cover cross-company
+capacity races, rejected/replacement offers, board expiry reconciliation and paused closure.
+The new complete MK3 browser flow and existing MK2 flow both pass; four screenshots cover
+390/1280 in light/dark and representative layouts were inspected. Source security re-review
+found no remaining concrete high/medium blocker in the reviewed paths. The full line check
+still reports 37 existing oversized files; the baseline passes with none new or growing.
+No push or hosted CI was triggered; local commits only as the owner requested.
+
+**Marketplace lifecycle confirmed by owner (2026-10-26):** when the requesting agent
+chooses a property to proceed with, pause the request so it accepts no new property offers
+or new broker-message initiations. Notify the other participating brokers that the requester
+is proceeding with another property, without revealing the client, selected property's
+private details or a reason. Selection is not deal completion. If the deal falls through,
+the requester may reopen or repost the request and receive offers again. Include this in
+MK3/MK4 design and security review, with explicit state transitions, notification recipients,
+slot handling and duplicate/retry protection; preserve existing agreement evidence.
+
+**MK3 owner clarification (2026-10-26):** a client request permits at most three active
+property offers at a time. A rejected property frees capacity for another offer. A broker
+without a matching property may privately message the request poster when the request has
+fewer than three active offers, including when nobody has a matching property or rejection
+has opened capacity. This is a broker-to-broker conversation, not client contact access.
+Carry this into the MK3 design/security review: reconcile active-slot replacement with the
+older per-round limits, define qualifying offer states and gate messaging on the server.
+Do not claim an exhaustive search of other brokers' private inventory or expose that inventory.
+
+**Owner priority change (2026-10-26):** pause the remaining UI redesign packets and return
+to implementing the product roadmap. Retain the completed UI work; UI6 is not the next
+active packet. Local commits are permitted; pushes require an explicit owner request.
+The next independent feature packet is **MK3, marketplace answers and matching**, following
+the built MK1/MK2 foundation. Start with its required bounded design and security review
+because answers interact with private listing shares. MK4 choosing/co-broking follows MK3;
+MK5 still needs the platform console and legal review. Real SendGrid verification and
+WhatsApp remain dependent on owner/provider setup and outstanding decisions.
+
 **UI5 — workflow records (2026-10-26):** explicit presentation configurations now cover
 Follow-ups, Viewings, Shortlist, Interaction log and Client care. Phone cards retain their
 task dates, state and linked-record context rather than truncating to two facts. Linked

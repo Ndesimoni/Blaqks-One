@@ -5,6 +5,7 @@ import { MarketplaceBoardCard } from './MarketplaceBoardCard.jsx';
 import { MarketplaceBoardFilters } from './MarketplaceBoardFilters.jsx';
 import { MarketplaceProfileDialog } from './MarketplaceProfileDialog.jsx';
 import { useBoard } from './useRequests.js';
+import { MarketplaceRequestActivity } from './MarketplaceRequestActivity.jsx';
 
 const noFilters = Object.freeze({
   purpose: '',
@@ -20,6 +21,7 @@ export function MarketplaceBoard() {
   const [filters, setFilters] = useState(noFilters);
   const board = useBoard(filters);
   const [broker, setBroker] = useState('');
+  const [requestId, setRequestId] = useState('');
   return (
     <div className="market-board">
       <MarketplaceBoardFilters filters={filters} onChange={setFilters} />
@@ -36,7 +38,12 @@ export function MarketplaceBoard() {
       )}
       <ul className="market-board-list">
         {board.requests.map((request) => (
-          <MarketplaceBoardCard key={request.id} request={request} onOpenBroker={setBroker} />
+          <MarketplaceBoardCard
+            key={request.id}
+            request={request}
+            onOpenBroker={setBroker}
+            onOpenRequest={() => setRequestId(request.id)}
+          />
         ))}
       </ul>
       {board.nextCursor && (
@@ -47,6 +54,13 @@ export function MarketplaceBoard() {
         </Button>
       )}
       {broker && <MarketplaceProfileDialog memberId={broker} onClose={() => setBroker('')} />}
+      {requestId && (
+        <MarketplaceRequestActivity
+          requestId={requestId}
+          onClose={() => setRequestId('')}
+          onChanged={board.retry}
+        />
+      )}
     </div>
   );
 }

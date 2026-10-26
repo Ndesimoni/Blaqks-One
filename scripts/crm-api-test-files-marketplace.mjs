@@ -1,5 +1,10 @@
 /** Marketplace contracts (broker marketplace MK1 and MK2), in dependency order. */
 export const marketplaceTestFiles = [
+  'tests/api/marketplace-offers.test.mjs',
+  'tests/api/marketplace-offer-capacity.test.mjs',
+  'tests/api/market-offer-access.test.mjs',
+  'tests/api/marketplace-lifecycle.test.mjs',
+  'tests/api/marketplace-conversations.test.mjs',
   'tests/api/marketplace-eligibility.test.mjs',
   'tests/api/marketplace-guards.test.mjs',
   'tests/api/marketplace-join.test.mjs',

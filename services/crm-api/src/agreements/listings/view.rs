@@ -60,6 +60,9 @@ fn media(row: &ShareRow, kind: &str) -> Vec<Value> {
 }
 
 pub fn view(row: &ShareRow, viewer: Viewer, companies: &Companies) -> Value {
+    if row.origin == "marketplace" && viewer != Viewer::Sender {
+        return super::market_view::view(row, viewer, companies);
+    }
     let sender = viewer == Viewer::Sender;
     let sending_side = sender || viewer == Viewer::Introducer;
     let paused = row.paused() && !sending_side;
@@ -105,9 +108,9 @@ pub fn view(row: &ShareRow, viewer: Viewer, companies: &Companies) -> Value {
         "allowed": {
             "accept": viewer == Viewer::Agent && pending && !paused,
             "decline": viewer == Viewer::Agent && pending && !paused,
-            "withdraw": sender && pending,
-            "stop": sender && row.status == "accepted",
-            "extend": sender && row.status == "accepted",
+            "withdraw": row.origin=="direct" && sender && pending,
+            "stop": row.origin=="direct" && sender && row.status == "accepted",
+            "extend": row.origin=="direct" && sender && row.status == "accepted",
             "evidence": true,
         },
     })

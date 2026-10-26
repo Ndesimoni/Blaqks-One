@@ -5,12 +5,24 @@
 //! live membership and names, and `media` for profile photos.
 pub mod accept;
 pub mod acceptances;
+pub mod activity;
+pub mod answer_access;
+pub mod answers_post;
+pub mod answers_preview;
+pub mod answers_read;
+pub mod answers_reject;
+pub mod answers_routes;
+pub mod answers_send;
 pub mod application;
 pub mod bands;
 pub mod board;
 pub mod board_filters;
 pub mod board_limits;
 pub mod company;
+pub mod conversation_access;
+pub mod conversation_routes;
+pub mod conversation_start;
+pub mod conversation_store;
 pub mod decision;
 pub mod decisions;
 pub mod eligibility;
@@ -18,10 +30,15 @@ pub mod errors;
 pub mod events;
 pub mod free_text;
 pub mod gate;
+pub mod interaction_routes;
 pub mod join;
 pub mod leave;
+pub mod lifecycle_routes;
+pub mod lifecycle_store;
 pub mod limits;
+pub mod matching;
 pub mod me;
+pub mod notices;
 pub mod photo;
 pub mod profile;
 pub mod profile_read;
@@ -46,6 +63,8 @@ pub mod terms;
 pub mod terms_read;
 pub mod visibility;
 
+#[cfg(test)]
+mod matching_tests;
 #[cfg(test)]
 mod profile_tests;
 #[cfg(test)]

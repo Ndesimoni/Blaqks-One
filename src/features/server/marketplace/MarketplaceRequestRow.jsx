@@ -11,7 +11,7 @@ const renewSoon = (request) => {
 };
 
 /** One of the poster's own requests, with what they may do next (packet MK2). */
-export function MarketplaceRequestRow({ request, busy, onEdit, onRenew, onClose }) {
+export function MarketplaceRequestRow({ request, busy, onEdit, onRenew, onClose, onActivity }) {
   const { t, format } = useI18n();
   const ends = format.date(request.expiresAt) || request.expiresAt;
   const renewable = renewSoon(request);
@@ -34,7 +34,18 @@ export function MarketplaceRequestRow({ request, busy, onEdit, onRenew, onClose 
         {t(`marketplaceRequests.band.${request.budgetBand}`)}
       </p>
       <p className="market-hint">{t('marketplaceRequests.mine.ends', { date: ends })}</p>
-      <p className="market-hint">{t('marketplaceRequests.mine.noAnswers')}</p>
+      <div className="market-actions">
+        <Button variant="light" onClick={onActivity}>
+          {t('marketplaceAnswers.open')}
+        </Button>
+      </div>
+      {request.state === 'paused' && (
+        <div className="market-actions">
+          <Button variant="light" onClick={onClose} disabled={Boolean(busy)}>
+            {t('marketplaceRequests.mine.close')}
+          </Button>
+        </div>
+      )}
       {request.state === 'open' && (
         <div className="market-actions">
           <Button variant="light" onClick={onEdit} disabled={Boolean(busy)}>

@@ -60,6 +60,8 @@ export default {
   'mine.client': 'For {name}',
   'mine.clientGone': 'Client no longer available',
   'mine.state.open': 'Open',
+  'mine.state.full': 'Three active offers',
+  'mine.state.paused': 'Proceeding with a property',
   'mine.state.expired': 'Expired',
   'mine.state.closed': 'Closed',
   'mine.ends': 'Ends {date}',

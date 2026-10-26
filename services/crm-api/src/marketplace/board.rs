@@ -26,7 +26,7 @@ pub async fn board(
     Path(workspace): Path<String>,
     Query(query): Query<Board>,
 ) -> ApiResult<Json<Value>> {
-    gate::reader(&state, &session, &workspace).await?;
+    let user = gate::reader(&state, &session, &workspace).await?;
     let filters = filters(&query)?;
     let mut after = match query.cursor.as_deref() {
         Some(text) => Some(board_limits::parsed(text)?),
@@ -37,7 +37,17 @@ pub async fn board(
     gate::joined(&mut tx, session.user.id).await?;
     // Counted after the company and membership checks, so only a joined member spends the budget.
     board_limits::consume(&state, session.user.id, &workspace).await?;
-    let (items, next) = page(&mut tx, &workspace, &filters, &mut after).await?;
+    let listings = crate::records::market_listings::held(&mut tx, &user).await?;
+    let facts: Vec<_> = listings
+        .iter()
+        .map(|(_, payload)| crate::records::outside_facts::read(payload).facts)
+        .collect();
+    let own = if facts.len() > 1000 {
+        None
+    } else {
+        Some(facts.as_slice())
+    };
+    let (items, next) = page(&mut tx, &workspace, &filters, &mut after, own).await?;
     tx.commit().await?;
     Ok(Json(json!({ "requests": items, "nextCursor": next })))
 }
@@ -48,6 +58,7 @@ async fn page(
     workspace: &str,
     filters: &requests::Filters,
     after: &mut Option<(String, Uuid)>,
+    own: Option<&[serde_json::Map<String, Value>]>,
 ) -> ApiResult<(Vec<Value>, Option<String>)> {
     let mut items: Vec<Value> = Vec::new();
     for _ in 0..ROUNDS {
@@ -79,6 +90,10 @@ async fn page(
             if !held.contains(client) {
                 continue;
             }
+            // Expired offer capabilities must free capacity before deciding board visibility.
+            if super::answer_access::active_count(tx, row.id).await? >= 3 {
+                continue;
+            }
             let Some(seen) = visibility::visible(tx, row.member_id).await? else {
                 continue;
             };
@@ -88,11 +103,15 @@ async fn page(
                 "company": seen.company,
                 "hasPhoto": seen.row.photo_id.is_some(),
             });
-            items.push(request_view::board(
-                row,
-                broker,
-                row.workspace_id == workspace,
-            ));
+            let has_matches = own.map(|own| {
+                row.workspace_id != workspace
+                    && own
+                        .iter()
+                        .any(|facts| super::matching::checklist(row, facts)["matches"] == true)
+            });
+            let mut item = request_view::board(row, broker, row.workspace_id == workspace);
+            item["hasMatches"] = json!(has_matches);
+            items.push(item);
             kept = Some((row.cursor_at.clone(), row.id));
             if items.len() as i64 == PAGE {
                 tail = index + 1 < rows.len();

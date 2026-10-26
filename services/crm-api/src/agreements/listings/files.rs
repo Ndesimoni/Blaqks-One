@@ -34,7 +34,7 @@ pub async fn file(
         .ok_or_else(ApiError::missing)?;
     let allowed = match places::one(&mut tx, &row, &caller).await? {
         Some(Viewer::Sender) => true,
-        Some(Viewer::Agent) => row.shown_to_agent(),
+        Some(Viewer::Agent) => row.origin == "direct" && row.shown_to_agent(),
         _ => false,
     };
     let named = row.media.as_array().into_iter().flatten().any(|entry| {

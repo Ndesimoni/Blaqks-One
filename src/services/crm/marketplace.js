@@ -4,11 +4,14 @@
  * profiles. The platform routes are the Super Admin's alone, and everyone else receives the
  * same "not found".
  */
+import { marketplaceActivityRoutes } from './marketplaceActivity.js';
+
 const segment = (value) => encodeURIComponent(value);
 
 export function marketplaceRoutes({ request, scope }) {
   const base = (workspace) => `${scope(workspace)}/marketplace`;
   return {
+    ...marketplaceActivityRoutes({ request, scope }),
     marketplaceStatus: (workspace, signal) => request(`${base(workspace)}/status`, { signal }),
     applyToMarketplace: (workspace) =>
       request(`${base(workspace)}/application`, { method: 'POST' }),

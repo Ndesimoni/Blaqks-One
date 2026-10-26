@@ -7,6 +7,7 @@ import { MarketplaceRequestEdit } from './MarketplaceRequestEdit.jsx';
 import { MarketplaceRequestPost } from './MarketplaceRequestPost.jsx';
 import { MarketplaceRequestRow } from './MarketplaceRequestRow.jsx';
 import { useMyRequests } from './useRequests.js';
+import { MarketplaceRequestActivity } from './MarketplaceRequestActivity.jsx';
 
 /** The poster's own requests: post, edit, renew and close (packet MK2). */
 export function MarketplaceRequests() {
@@ -77,9 +78,17 @@ export function MarketplaceRequests() {
             onEdit={() => setDialog({ name: 'edit', id: request.id })}
             onClose={() => setDialog({ name: 'close', id: request.id })}
             onRenew={() => renew(request)}
+            onActivity={() => setDialog({ name: 'activity', id: request.id })}
           />
         ))}
       </ul>
+      {dialog.name === 'activity' && editing && (
+        <MarketplaceRequestActivity
+          requestId={editing.id}
+          onClose={() => setDialog({ name: '' })}
+          onChanged={list.retry}
+        />
+      )}
       {dialog.name === 'post' && (
         <MarketplaceRequestPost
           onClose={() => setDialog({ name: '' })}

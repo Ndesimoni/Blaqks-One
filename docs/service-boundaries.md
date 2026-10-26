@@ -162,6 +162,23 @@ Core CRM (records, assignments, imports and finance) stays together. Splitting i
 
 New entries state the coupling, the reason, the alternative considered and the removal path.
 
+### MK3 owner APIs (2026-10-26)
+
+Marketplace owns `crm_market_answers`, `crm_market_conversations`, `crm_market_messages`
+and `crm_market_notices` in its schema (migrations 0078–0079). It stores listing and share
+IDs without cross-domain foreign keys. Records owns `market_listings::held`; matching
+never reads another company's CRM inventory. Agreements owns marketplace-origin listing
+share creation, safe summaries, liveness/reconciliation and termination. The final share
+transaction attaches its marketplace answer through a validated callback; failures clean up
+reserved copies. This extends the existing transactional owner-API pattern, not table access.
+
+Selection and reopen write marketplace-owned, deduplicated notice rows in the same transaction;
+these rows are the durable in-app notification projection, with no external delivery side effect.
+Private conversations are marketplace-owned and do not expand Team chat's company boundary.
+Alternative considered: cross-company Team chat rooms and direct reads of listing-share tables;
+both were rejected to preserve domain ownership and conversation privacy. If extracted,
+replace the share callback with durable domain commands/events and preserve idempotency keys.
+
 ## Owner decisions (2026-10-15)
 
 - **Own PostgreSQL schema for new large modules.** Agreements, messaging/integrations, public catalogue/enquiries and lead agents each get their own schema from their first migration, in the same database. Existing tables stay where they are.

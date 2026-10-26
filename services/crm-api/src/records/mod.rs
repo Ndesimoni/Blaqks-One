@@ -19,6 +19,7 @@ pub mod listing_fields;
 pub mod listing_holders;
 pub mod lookup;
 pub mod market_activity;
+pub mod market_listings;
 pub mod market_requirements;
 pub mod market_requirements_communities;
 pub mod market_requirements_read;

@@ -37,7 +37,7 @@ pub async fn attach(
             .await?
         }
     };
-    let allowed = named && row.shown_to_agent() && found.is_none();
+    let allowed = named && row.origin == "direct" && row.shown_to_agent() && found.is_none();
     view["allowed"]["coBroking"] = json!(allowed);
     view["coBroking"] = found.map_or(Value::Null, |(id, state)| json!({"id": id, "state": state}));
     view["coBrokingProperty"] = match allowed {

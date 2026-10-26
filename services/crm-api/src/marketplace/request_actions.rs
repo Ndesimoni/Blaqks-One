@@ -82,6 +82,9 @@ async fn command(
     let Some(row) = row else {
         return Err(ApiError::conflict(refusal));
     };
+    if action == "request_closed" {
+        super::lifecycle_store::end_offers(&mut tx, row.id, user.id).await?;
+    }
     events::append(&mut tx, workspace, user.id, user.id, action).await?;
     let client = sources::client_of(&mut tx, row.id).await?;
     tx.commit().await?;

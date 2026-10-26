@@ -90,6 +90,11 @@ pub async fn open<'t>(
     if viewer.is_none() {
         return Err(ApiError::missing());
     }
+    if row.origin == "marketplace" {
+        return Err(ApiError::conflict(
+            "Use the marketplace to manage this offer.",
+        ));
+    }
     let admin = caller.admin;
     let step = Step {
         tx,
