@@ -27,7 +27,7 @@ test('assigned-only staff see only their records in lists, totals, pickers and r
     await expect(page.getByText(/Visible (admin|two) client/)).toHaveCount(0);
     await expect(page.getByRole('group', { name: 'Assignment' })).toHaveCount(0);
     await page.goto('/#/leads');
-    await expect(page.locator('.large-count').first()).toHaveText('1');
+    await expect(page.locator('.record-count-number').first()).toHaveText('1');
     await expect(page.getByRole('button', { name: 'All sources 1' })).toBeVisible();
     await page.goto('/#/properties');
     await expect(page.getByText(/Hidden tower/)).toHaveCount(0);
