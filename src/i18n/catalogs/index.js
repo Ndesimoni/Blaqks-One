@@ -49,6 +49,7 @@ import enNavigation from './en/navigation.js';
 import enProfile from './en/profile.js';
 import enRecordKeeps from './en/recordKeeps.js';
 import enRecordShares from './en/recordShares.js';
+import enRecordSorting from './en/recordSorting.js';
 import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
 import enSignupSetup from './en/signupSetup.js';
@@ -76,6 +77,7 @@ export const catalogs = Object.freeze({
     handoverReview: enHandoverReview,
     recordKeeps: enRecordKeeps,
     recordShares: enRecordShares,
+    recordSorting: enRecordSorting,
     listingShares: enListingShares,
     listingShareViews: enListingShareViews,
     inboxSend: enInboxSend,

@@ -5,6 +5,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { schema } from '../../lib/schema.js';
 import { RecordCards } from './RecordCards.jsx';
+import { RecordSort } from './RecordSort.jsx';
 import { RecordTableEmpty } from './RecordTableEmpty.jsx';
 import { RecordTableView } from './RecordTableView.jsx';
 
@@ -16,6 +17,7 @@ function RecordTable({
   arr,
   limit = true,
   columnNames,
+  sortInHeading = false,
   tableLabel,
   pageLabel,
   emptyTitle = 'No matching records',
@@ -39,50 +41,57 @@ function RecordTable({
   const start = currentPage * perPage;
   const current = arr.slice(start, start + perPage);
   return (
-    <div className="table-shell">
-      {cards ? (
-        <RecordCards
-          module={module}
-          data={data}
-          current={current}
-          pick={pick}
-          readOnly={readOnly}
-          onOpen={(record) => dispatchRow(module, record)}
-        />
-      ) : (
-        <RecordTableView
-          module={module}
-          data={data}
-          current={current}
-          pick={pick}
-          columns={columns}
-          sort={sort}
-          setSort={setSort}
-          setPage={setPage}
-          dispatchRow={dispatchRow}
-          readOnly={readOnly}
-          tableLabel={tableLabel}
-        />
+    <>
+      {cards && !sortInHeading && (
+        <div className="record-sort-fallback">
+          <RecordSort module={module} columnNames={columnNames} />
+        </div>
       )}
-      {!arr.length && (
-        <RecordTableEmpty
-          module={module}
-          title={emptyTitle}
-          detail={emptyDetail}
-          action={emptyAction}
-          query={query}
-          readOnly={readOnly}
+      <div className="table-shell">
+        {cards ? (
+          <RecordCards
+            module={module}
+            data={data}
+            current={current}
+            pick={pick}
+            readOnly={readOnly}
+            onOpen={(record) => dispatchRow(module, record)}
+          />
+        ) : (
+          <RecordTableView
+            module={module}
+            data={data}
+            current={current}
+            pick={pick}
+            columns={columns}
+            sort={sort}
+            setSort={setSort}
+            setPage={setPage}
+            dispatchRow={dispatchRow}
+            readOnly={readOnly}
+            tableLabel={tableLabel}
+          />
+        )}
+        {!arr.length && (
+          <RecordTableEmpty
+            module={module}
+            title={emptyTitle}
+            detail={emptyDetail}
+            action={emptyAction}
+            query={query}
+            readOnly={readOnly}
+          />
+        )}
+        <Pagination
+          variant="table"
+          total={arr.length}
+          page={currentPage}
+          pageSize={perPage}
+          label={`${pageLabel || module} pages`}
+          onChange={setPage}
         />
-      )}
-      <Pagination
-        variant="table"
-        total={arr.length}
-        page={currentPage}
-        pageSize={perPage}
-        label={`${pageLabel || module} pages`}
-        onChange={setPage}
-      />
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -46,7 +46,7 @@ function RecordsPage({
 
   return (
     <div className="page-stack record-directory">
-      <RecordDirectoryHead module={module} />
+      <RecordDirectoryHead module={module} columnNames={pilotColumns[module]} />
       <div className="filters-toolbar">
         <div className="tabs" role="group" aria-label={`Filter ${module}`}>
           {tabs.map((t) => (
@@ -84,6 +84,7 @@ function RecordsPage({
         arr={arr}
         emptyDetail={emptyDetail}
         columnNames={pilotColumns[module]}
+        sortInHeading
       />
     </div>
   );

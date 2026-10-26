@@ -1,5 +1,18 @@
 # Handoff for the next coding agent
 
+**UI review repairs (2026-10-26):** reviewed the UI1–UI4a changes and restored two
+regressions: record cards now expose the desktop sort field/direction on phones,
+and Settings navigation retains its distinct profile, team, channel and rule icons.
+Mobile sorting shares the existing workspace state, resets pagination and preserves
+keyboard order, Escape focus restoration and desktop sort continuity. It changes no
+permissions or record data. The new sorting controls use the English catalogue;
+the existing mobile first-record layout assertion remains unchanged.
+
+Verification: 464 unit/smoke tests, the production build, formatting, the line-size
+baseline and the English catalogue check pass. Six directory/sorting browser
+scenarios pass, including pagination reset, desktop resize, focus restoration and
+320/390px popup bounds. The three navigation/responsive scenarios also pass.
+
 **CI repair (2026-10-26):** on `feature/connected-crm`, update Vite to 6.4.5 and
 both Rust lockfiles to rustls-webpki 0.103.16, Tokio 1.53.3 and webpki-roots
 1.0.10. These address the npm audit and RUSTSEC-2026-0381/0382/0386 findings;

@@ -45,7 +45,13 @@ export function LeadsPage({ toolbarExtras = null }) {
 
   return (
     <div className="page-stack leads-page">
-      <RecordDirectoryHead module="Clients" noun="lead" accessModule="Leads" onAdd={addLead} />
+      <RecordDirectoryHead
+        module="Clients"
+        noun="lead"
+        accessModule="Leads"
+        onAdd={addLead}
+        columnNames={leadColumns}
+      />
       <div className="lead-source-bar">
         <span className="lead-source-label" aria-hidden="true">
           Source
@@ -103,6 +109,7 @@ export function LeadsPage({ toolbarExtras = null }) {
         module="Clients"
         arr={records}
         columnNames={leadColumns}
+        sortInHeading
         tableLabel="Leads"
         pageLabel="Leads"
         emptyTitle="No matching leads"

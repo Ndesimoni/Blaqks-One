@@ -4,6 +4,10 @@ import { canManageTeam, canOpenSection } from './access.js';
 /** Existing route names keep their icons; connected-only destinations reuse a related icon. */
 const sharedIcons = Object.fromEntries(nav.flatMap((group) => group.items));
 const extraIcons = {
+  'My profile': 'person',
+  'Team & access': 'shield',
+  Channels: 'chat',
+  'Inbox rules': 'sliders',
   'My mailbox': 'note',
   'My activity': 'clock',
   'Team activity': 'clock',

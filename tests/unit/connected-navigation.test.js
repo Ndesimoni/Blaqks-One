@@ -1,11 +1,24 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { connectedGroups, navLabel } from '../../src/features/server/connectedNav.js';
+import {
+  connectedGroups,
+  displayGroups,
+  navIcons,
+  navLabel,
+} from '../../src/features/server/connectedNav.js';
 
 const modules = ['relationships', 'properties', 'schedule', 'finance', 'reports', 'exports'];
 const full = Object.fromEntries(modules.map((name) => [name, true]));
 const names = (groups) => groups.flatMap((group) => group.items);
 const itemsOf = (groups, key) => groups.find((group) => group.key === key)?.items || [];
+
+test('every standard navigation entry has an icon instead of falling back to the dashboard', () => {
+  for (const name of new Set(names(displayGroups))) {
+    if (name === 'Inbox' || name === 'Team chat') continue;
+    assert.equal(typeof navIcons[name], 'string', `${name} must keep its own icon`);
+    if (name !== 'Dashboard') assert.notEqual(navIcons[name], 'grid', name);
+  }
+});
 
 test('connected groups separate daily work from account and administration, once per route', () => {
   const admin = {
