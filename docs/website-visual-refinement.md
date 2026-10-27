@@ -1,6 +1,8 @@
 # Public website visual refinement and motion direction
 
-Date: **2026-10-28**. Status: proposed design brief; the owner's canvas overview has been inspected, while detailed references remain unavailable. This is not an implemented website, completed mockup or performance test.
+Date: **2026-10-28**. Status: design brief with a separate interactive review prototype; the owner's canvas overview has been inspected, while detailed references remain unavailable. The production website is not built and field performance is untested.
+
+**Prototype checkpoint:** the [complete design preview](website-design-preview.md) now provides rendered, clickable review screens based on this direction and the revised structure. It is separate from production; the performance budgets below are still targets rather than measured field results.
 
 **Structure update:** the owner explicitly requested a better structure, rather than preserving the screenshot layouts. Follow the [website structure blueprint](website-structure-blueprint.md) for navigation, homepage sequence, results/detail journeys and grouped settings. It supersedes the earlier layout-preservation recommendations below; the brand, publication/privacy rules and performance requirements still apply.
 

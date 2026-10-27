@@ -1,0 +1,121 @@
+.results-layout {
+  display: grid;
+  grid-template-columns: 235px minmax(0, 1fr);
+  gap: 34px;
+  align-items: start;
+}
+.filter-panel {
+  border-right: 1px solid var(--line);
+  padding-right: 24px;
+}
+.filter-panel form {
+  display: grid;
+  gap: 19px;
+}
+.filter-panel .section-heading {
+  align-items: center;
+  margin-bottom: 0;
+  gap: 8px;
+}
+.filter-panel h2 {
+  font-size: 23px;
+}
+.filter-panel .section-heading a {
+  font-size: 11px;
+}
+.results-content {
+  min-width: 0;
+}
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.sort-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sort-label select {
+  min-width: 140px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.chip {
+  display: inline-flex;
+  padding: 6px 10px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  border-radius: 4px;
+}
+.pagination {
+  display: flex;
+  gap: 10px;
+  margin-top: 35px;
+  justify-content: center;
+}
+.page-number {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.page-number.active {
+  color: var(--on-green);
+  background: var(--green);
+}
+.empty {
+  text-align: center;
+  padding: 80px 30px;
+  border: 1px dashed var(--line);
+}
+.empty > span {
+  font-size: 50px;
+  color: var(--gold);
+}
+.empty p {
+  max-width: 450px;
+  margin: 20px auto;
+  color: var(--muted);
+}
+.mobile-filter {
+  display: none;
+}
+.theme-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 35px;
+}
+.screen-index {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.index-group {
+  padding: 26px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+.index-group h2 {
+  font-size: 29px;
+}
+.index-group > a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}

@@ -1,0 +1,52 @@
+.enquiry-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 55px;
+  align-items: start;
+}
+.form-surface {
+  display: grid;
+  gap: 22px;
+  border: 1px solid var(--line);
+  padding: 35px;
+  background: var(--panel);
+  border-radius: 5px;
+}
+.form-context {
+  padding: 20px 0;
+}
+.form-context > img {
+  aspect-ratio: 1.4;
+  width: 100%;
+  margin-bottom: 25px;
+  border-radius: 4px;
+}
+.form-context .avatar {
+  display: flex;
+  margin-top: 25px;
+}
+.form-context h2 {
+  font-size: 30px;
+}
+.form-context p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.confirmation {
+  padding: 50px 0;
+  text-align: center;
+}
+.confirmation .page-heading {
+  margin-inline: auto;
+}
+.confirmation-mark {
+  display: inline-grid;
+  place-items: center;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--green);
+  font-size: 32px;
+  margin-bottom: 35px;
+}

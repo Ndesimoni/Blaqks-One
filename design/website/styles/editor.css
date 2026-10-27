@@ -1,0 +1,127 @@
+.editor-layout {
+  display: grid;
+  grid-template-columns: 205px minmax(0, 1fr) 275px;
+  gap: 32px;
+  padding: 35px 3vw 65px;
+  max-width: 1700px;
+  margin: auto;
+}
+.editor-rail {
+  border-right: 1px solid var(--line);
+  padding-right: 22px;
+}
+.editor-rail h2 {
+  font-size: 27px;
+}
+.editor-rail nav {
+  display: grid;
+  gap: 6px;
+  margin: 30px 0;
+}
+.editor-rail nav a {
+  padding: 12px 15px;
+  font-size: 13px;
+  border-radius: 4px;
+}
+.editor-rail nav a.active {
+  color: var(--on-green);
+  background: var(--green);
+}
+.editor-rail > .button {
+  font-size: 11px;
+  padding: 10px;
+}
+.editor-main {
+  min-width: 0;
+}
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: start;
+}
+.editor-header h1 {
+  font-size: 43px;
+}
+.editor-header .page-heading {
+  margin-bottom: 10px;
+}
+.editor-header .page-heading p {
+  font-size: 12px;
+}
+.status-pill {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 10px;
+  margin: 3px;
+}
+.editor-header > div:last-child {
+  display: grid;
+}
+.editor-form {
+  display: grid;
+  gap: 22px;
+}
+.editor-form h2 {
+  font-size: 33px;
+  margin-bottom: 0;
+}
+.editor-form h3 {
+  margin-bottom: 0;
+}
+.editor-form p {
+  margin-bottom: 0;
+}
+.editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.editor-actions > span {
+  font-size: 11px;
+}
+.editor-preview {
+  padding-top: 8px;
+}
+.preview-window {
+  border: 7px solid #192d26;
+  border-radius: 12px;
+  background: #fffefa;
+  color: #123d32;
+  overflow: hidden;
+}
+.mini-nav {
+  padding: 12px;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+}
+.mini-hero {
+  padding: 30px 12px;
+  background: #123d32;
+  color: white;
+}
+.mini-hero h3 {
+  font-size: 25px;
+}
+.mini-search {
+  padding: 15px;
+  font-size: 9px;
+  background: #eeeee5;
+}
+.mini-content {
+  padding: 18px 12px;
+}
+.mini-content h3 {
+  font-size: 21px;
+}
+.mini-content > div {
+  height: 70px;
+  margin-top: 12px;
+  background: #ddd8c8;
+}

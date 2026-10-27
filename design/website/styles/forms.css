@@ -1,0 +1,143 @@
+.button {
+  display: inline-flex;
+  min-height: 46px;
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: var(--on-green);
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  gap: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  text-decoration: none;
+  transition:
+    background 160ms,
+    box-shadow 160ms;
+}
+.button:hover {
+  text-decoration: none;
+  box-shadow: 0 2px 8px #072b2220;
+}
+.button.quiet {
+  background: transparent;
+  color: var(--green);
+  border-color: var(--line);
+}
+label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 4px;
+  color: var(--ink);
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 400;
+}
+textarea {
+  resize: vertical;
+}
+input[type='checkbox'],
+input[type='radio'] {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  accent-color: var(--green);
+}
+.search-box {
+  padding: 22px;
+  background: var(--panel);
+  border-radius: 5px;
+  box-shadow: 0 15px 38px #0c30251f;
+}
+.purpose {
+  border: 0;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex;
+  gap: 3px;
+}
+.purpose label {
+  position: relative;
+  flex: 0 1 140px;
+  cursor: pointer;
+}
+.purpose input {
+  position: absolute;
+  opacity: 0;
+}
+.purpose span {
+  padding: 10px 14px;
+  border-radius: 3px;
+  text-align: center;
+  font-size: 12px;
+  background: var(--paper);
+}
+.purpose input:checked + span {
+  background: var(--green);
+  color: var(--on-green);
+}
+.purpose input:focus-visible + span {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+.search-fields {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr auto;
+  align-items: start;
+  gap: 16px;
+}
+.search-fields .button {
+  margin-top: 26px;
+}
+.search-fields small {
+  font-size: 9px;
+  font-weight: 400;
+}
+.directory-search {
+  display: flex;
+  align-items: end;
+  gap: 18px;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.grow {
+  flex: 1;
+}
+.check {
+  display: flex;
+  align-items: start;
+  font-weight: 400;
+  gap: 12px;
+}
+.check input {
+  flex-shrink: 0;
+}
+.notice {
+  background: var(--soft);
+  color: var(--ink);
+  padding: 16px 18px;
+  border-left: 3px solid var(--gold);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.form-error {
+  color: #a03123;
+  font-size: 13px;
+}
+.form-error:empty {
+  display: none;
+}

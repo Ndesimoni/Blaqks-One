@@ -1,6 +1,8 @@
 # Website structure blueprint
 
-Date: **2026-10-28**. Status: proposed structure for review, not implemented screens.
+Date: **2026-10-28**. Status: interactive structure prototype available for review; production website screens are not built.
+
+**Interactive review checkpoint:** the [complete design preview](website-design-preview.md) now supplies a separate clickable prototype of this page system, with 57 linked page/state examples and four company themes. The production Next.js screens and public backend remain unimplemented.
 
 **Owner correction:** improve the structure itself, rather than preserve the existing screenshot layouts and only polish them. This supersedes the earlier preserve-the-layout recommendation in the [visual refinement brief](website-visual-refinement.md). Retain the brand, the two website types, four company theme choices and established publication/enquiry rules. Reorganise navigation, page hierarchy, section order and interactions around visitor tasks.
 
