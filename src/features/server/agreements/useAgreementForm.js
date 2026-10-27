@@ -14,7 +14,13 @@ const STEPS = {
 
 const firstDraft = (mode, detail) => {
   if (mode === 'create') return emptyDraft();
-  if (mode === 'share') return shareDraft(detail.share);
+  if (mode === 'share')
+    return {
+      ...shareDraft(detail.share),
+      ...(detail.marketplaceRequestId
+        ? { clientName: 'Marketplace client', shareContact: false, contact: '' }
+        : {}),
+    };
   return draftFromTerms(detail.agreement.kind, detail.revision.terms);
 };
 
@@ -29,7 +35,9 @@ async function save(api, workspaceId, { mode, detail, draft, recipient, terms })
     return agreement.id;
   }
   if (mode === 'share') {
-    const { agreement } = await api.proposeCoBroking(workspaceId, detail.share.id, terms);
+    const { agreement } = detail.marketplaceRequestId
+      ? await api.proposeMarketplaceAgreement(workspaceId, detail.marketplaceRequestId, terms)
+      : await api.proposeCoBroking(workspaceId, detail.share.id, terms);
     return agreement.id;
   }
   const { id, version } = detail.agreement;

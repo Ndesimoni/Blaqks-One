@@ -6,6 +6,9 @@
 pub mod accept;
 pub mod acceptances;
 pub mod activity;
+pub mod agreement_access;
+pub mod agreement_routes;
+pub mod agreement_view;
 pub mod answer_access;
 pub mod answers_post;
 pub mod answers_preview;
@@ -59,6 +62,7 @@ pub mod requests_post;
 pub mod routes;
 pub mod sources;
 pub mod state;
+pub mod stats;
 pub mod terms;
 pub mod terms_read;
 pub mod visibility;

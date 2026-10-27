@@ -45,6 +45,9 @@ async fn answer(
         accepted_digest: accepted.then_some(revision.digest.as_str()),
     };
     ledger::respond(tx, &response).await?;
+    if accepted {
+        super::listings::market_release::accept(tx, id, revision.id, &revision.digest).await?;
+    }
     let extra = if accepted {
         json!({ "digest": revision.digest })
     } else {

@@ -45,12 +45,13 @@ pub async fn read(
         .bind(id).bind(poster).bind(user.id).fetch_all(&mut *tx).await?;
     let mut answers = Vec::new();
     for (id, member, share, state, checklist) in rows {
+        let (agreement, release) = super::agreement_view::answer(&mut tx, share, &user).await?;
         let name = visibility::visible(&mut tx, member)
             .await?
             .map(|v| v.name)
             .unwrap_or_default();
         answers.push(json!({"id":id,"memberId":member,"name":name,"shareId":share,
-            "state":state,"checklist":checklist,"listing":listings::marketplace::summary(&mut tx,share,&user).await?}));
+            "state":state,"checklist":checklist,"agreement":agreement,"release":release,"listing":listings::marketplace::summary(&mut tx,share,&user).await?}));
     }
     let matches = if poster || requests::state(&row) != "open" {
         vec![]
@@ -75,8 +76,17 @@ pub async fn read(
         && requests::state(&row) == "open"
         && active < 3
         && matches.is_empty();
+    let draft = super::agreement_view::draft(&mut tx, row.id, &user).await?;
+    let can_reopen = poster
+        && requests::state(&row) == "paused"
+        && !answers.iter().any(|answer| {
+            matches!(
+                answer["agreement"]["state"].as_str(),
+                Some("accepted" | "completed")
+            )
+        });
     tx.commit().await?;
     Ok(Json(
-        json!({"request":{"id":id,"state":requests::state(&row),"isPoster":poster,"version":row.version,"activeOffers":active,"canOffer":can_offer,"canMessage":can_message},"answers":answers,"matches":matches}),
+        json!({"request":{"id":id,"state":requests::state(&row),"isPoster":poster,"version":row.version,"activeOffers":active,"canOffer":can_offer,"canMessage":can_message,"canReopen":can_reopen,"canProposeAgreement":!draft.is_null(),"agreementDraft":draft},"answers":answers,"matches":matches}),
     ))
 }

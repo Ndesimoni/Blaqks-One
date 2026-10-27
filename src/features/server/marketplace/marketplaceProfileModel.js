@@ -1,3 +1,5 @@
+import { readMarketplaceStats } from './marketplaceStatsModel.js';
+
 /**
  * The member side of the marketplace, read strictly (packet MK1b): the current terms, the
  * caller's own profile and what another joined member may see. Unknown shapes are refused.
@@ -95,5 +97,6 @@ export function readProfile(value) {
     joinedAt: stamp(profile.joinedAt),
     hasPhoto: flag(profile.hasPhoto),
     declared: flag(profile.declared),
+    stats: readMarketplaceStats(profile.stats),
   };
 }

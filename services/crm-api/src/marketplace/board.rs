@@ -102,6 +102,7 @@ async fn page(
                 "name": seen.name,
                 "company": seen.company,
                 "hasPhoto": seen.row.photo_id.is_some(),
+                "stats": super::stats::read(tx,row.member_id).await?,
             });
             let has_matches = own.map(|own| {
                 row.workspace_id != workspace

@@ -32,7 +32,10 @@
       "crm_listing_share_events",
       "crm_listing_shares_lapse",
       "crm_listing_shares_end",
-      "crm_listing_share_taken"
+      "crm_listing_share_taken",
+      "crm_market_releases",
+      "crm_market_releases_immutable",
+      "crm_market_release_guard"
     ],
     "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
     "records": ["crm_records", "crm_activity", "crm_record_keeps", "crm_record_shares"],

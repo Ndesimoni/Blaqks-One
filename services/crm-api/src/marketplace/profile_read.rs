@@ -43,6 +43,7 @@ pub async fn read(
         "joinedAt": row.joined_at,
         "hasPhoto": row.photo_id.is_some(),
         "declared": true,
+        "stats": super::stats::read(&mut tx,id).await?,
     });
     tx.commit().await?;
     Ok(Json(json!({ "profile": profile })))

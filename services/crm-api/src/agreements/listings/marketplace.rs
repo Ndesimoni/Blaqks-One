@@ -49,7 +49,23 @@ pub async fn end(tx: &mut Transaction<'_, Postgres>, id: Uuid, actor: Uuid) -> A
     if !row.open() {
         return Ok(());
     }
-    sqlx::query("UPDATE agreements.crm_listing_shares SET status='declined',decided_at=now(),closed_at=now(),closed_by=$2 WHERE id=$1")
-        .bind(id).bind(actor).execute(&mut **tx).await?;
-    store::event(tx, id, "declined", Some((actor, "recipient")), (None, None)).await
+    if super::market_release::standing(tx, id).await? {
+        return Ok(());
+    }
+    let (status, action) = if row.status == "accepted" {
+        ("stopped", "stopped")
+    } else {
+        ("declined", "declined")
+    };
+    sqlx::query("UPDATE agreements.crm_listing_shares SET status=$3,decided_at=CASE WHEN status='pending' THEN now() ELSE decided_at END,closed_at=now(),closed_by=$2 WHERE id=$1")
+        .bind(id).bind(actor).bind(status).execute(&mut **tx).await?;
+    store::event(tx, id, action, Some((actor, "recipient")), (None, None)).await
+}
+
+pub fn caller(user: &crate::auth::profile::UserRow) -> super::access::Caller<'_> {
+    super::access::Caller {
+        id: user.id,
+        workspace: &user.workspace_id,
+        admin: user.role == "admin",
+    }
 }

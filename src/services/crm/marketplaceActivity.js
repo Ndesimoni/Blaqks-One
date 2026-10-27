@@ -7,6 +7,8 @@ export function marketplaceActivityRoutes({ request, scope }) {
     marketplaceActivity: (workspace, signal) => request(`${base(workspace)}/activity`, { signal }),
     marketplaceOffers: (workspace, id, signal) =>
       request(`${item(workspace, id)}/offers`, { signal }),
+    proposeMarketplaceAgreement: (workspace, id, terms) =>
+      request(`${item(workspace, id)}/agreement`, { method: 'POST', body: { terms } }),
     previewMarketplaceOffer: (workspace, id, recordId) =>
       request(`${item(workspace, id)}/offers/preview`, { method: 'POST', body: { recordId } }),
     sendMarketplaceOffer: (workspace, id, body) =>

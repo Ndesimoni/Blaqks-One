@@ -1,3 +1,5 @@
+import { readMarketplaceStats } from './marketplaceStatsModel.js';
+
 /**
  * The client requests' answers, read strictly (packet MK2): a known purpose, emirate and band, a
  * state the marketplace defines, whole numbers where numbers are asked for and dates that parse.
@@ -100,6 +102,7 @@ function readBroker(value) {
     name: text(value.name, 120),
     company: text(value.company, 120),
     hasPhoto: value.hasPhoto === true,
+    stats: readMarketplaceStats(value.stats),
   };
 }
 

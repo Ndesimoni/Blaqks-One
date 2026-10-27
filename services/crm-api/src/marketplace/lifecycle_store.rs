@@ -3,6 +3,22 @@ use crate::{agreements::listings, error::ApiResult};
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
+pub async fn ensure_reopen(tx: &mut Transaction<'_, Postgres>, request: Uuid) -> ApiResult<()> {
+    let shares: Vec<Uuid> = sqlx::query_scalar(
+        "SELECT share_id FROM marketplace.crm_market_answers WHERE request_id=$1 ORDER BY id",
+    )
+    .bind(request)
+    .fetch_all(&mut **tx)
+    .await?;
+    if listings::market_release::lock_standing(tx, &shares).await? {
+        return Err(crate::error::ApiError::conflict("Cancel the accepted co-broking agreement with the other broker before reopening this request."));
+    }
+    for share in shares {
+        listings::marketplace::live(tx, share).await?;
+    }
+    Ok(())
+}
+
 pub async fn end_offers(
     tx: &mut Transaction<'_, Postgres>,
     request: Uuid,

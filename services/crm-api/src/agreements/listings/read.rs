@@ -48,7 +48,10 @@ pub async fn views(
             from: names[&row.workspace_id].clone(),
             to: names[&row.recipient_workspace_id].clone(),
         };
-        out.push(view::view(row, place, &companies));
+        out.push(
+            super::market_disclosure::attach(tx, row, caller, view::view(row, place, &companies))
+                .await?,
+        );
     }
     Ok(out)
 }

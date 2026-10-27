@@ -37,7 +37,16 @@ pub fn bound(
     introduction: &Value,
     now: OffsetDateTime,
 ) -> ApiResult<BuiltTerms> {
-    let mut built = terms::build_with(kind, input, Some(property), now)?;
+    let mut safe = input.clone();
+    if introduction["marketplace"] == true {
+        safe.as_object_mut()
+            .ok_or_else(|| ApiError::invalid("Provide valid agreement terms."))?
+            .insert(
+                "client".into(),
+                json!({"displayName":"Marketplace client","contact":null}),
+            );
+    }
+    let mut built = terms::build_with(kind, &safe, Some(property), now)?;
     if built.value["money"]["collectingParty"].is_null() {
         return Err(ApiError::invalid("Choose the company collecting the fee."));
     }

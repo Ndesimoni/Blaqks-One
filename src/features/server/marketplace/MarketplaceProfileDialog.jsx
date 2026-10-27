@@ -5,6 +5,7 @@ import { FinanceDialog } from '../finance/FinanceDialog.jsx';
 import { MarketplacePerson } from './MarketplaceAvatar.jsx';
 import { MarketplaceFacts } from './MarketplaceFacts.jsx';
 import { readProfile } from './marketplaceProfileModel.js';
+import { MarketplaceStats } from './MarketplaceStats.jsx';
 
 /**
  * "Preview how others see me" (packet MK1b): the profile through the same read another company
@@ -42,6 +43,7 @@ export function MarketplaceProfileDialog({ memberId, onClose }) {
             src={profile.hasPhoto ? api.marketplacePhotoUrl(user.workspaceId, memberId) : ''}
           />
           <MarketplaceFacts profile={profile} />
+          <MarketplaceStats stats={profile.stats} />
         </div>
       )}
     </FinanceDialog>

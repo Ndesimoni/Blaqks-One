@@ -9,6 +9,10 @@ import { MarketplaceConversations } from './MarketplaceConversations.jsx';
 import { useMarketActivity } from './useMarketActivity.js';
 import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
 import { requestActivityCapabilities } from './marketActivityModel.js';
+import { MarketplaceDecisionDialog } from './MarketplaceDecisionDialog.jsx';
+import { ShareCoBroking } from '../listingShares/ShareCoBroking.jsx';
+import { applyMarketplaceDecision } from './marketplaceDecision.js';
+import { MarketplaceReopen } from './MarketplaceReopen.jsx';
 import './marketplace-answers.css';
 
 /** One request's offers and private conversations, including paused off-board requests. */
@@ -24,6 +28,7 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
   const [dirty, setDirty] = useState(false);
   const [messageBusy, setMessageBusy] = useState(false);
   const [offerBusy, setOfferBusy] = useState(false);
+  const [agreement, setAgreement] = useState(null);
   const pending = busy || messageBusy || offerBusy;
   useUnsavedChanges(dirty, pending);
   const close = () => {
@@ -46,17 +51,7 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
     setBusy(true);
     setError('');
     try {
-      if (decision.action === 'reject')
-        await api.rejectMarketplaceOffer(user.workspaceId, requestId, decision.id);
-      if (decision.action === 'select')
-        await api.selectMarketplaceAnswer(
-          user.workspaceId,
-          requestId,
-          decision.id,
-          request.version,
-        );
-      if (decision.action === 'reopen')
-        await api.reopenMarketplaceRequest(user.workspaceId, requestId, request.version);
+      await applyMarketplaceDecision(api, user.workspaceId, request, decision);
       setDecision(null);
       changed();
     } catch (failure) {
@@ -66,19 +61,26 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
       setBusy(false);
     }
   };
+  if (agreement)
+    return (
+      <ShareCoBroking
+        view={agreement}
+        onView={setAgreement}
+        onClose={() => {
+          setAgreement(null);
+          changed();
+        }}
+      />
+    );
   if (decision)
     return (
-      <FinanceDialog
-        title={k(`${decision.action}Title`)}
-        intro={k(`${decision.action}Text`)}
+      <MarketplaceDecisionDialog
+        decision={decision}
         busy={busy}
-        message={error}
+        error={error}
         onClose={() => setDecision(null)}
         onSubmit={save}
-        submitLabel={k('submit')}
-      >
-        <p className="market-hint">{k('privacy')}</p>
-      </FinanceDialog>
+      />
     );
   return (
     <FinanceDialog title={k('title')} onClose={close} busy={pending} wide>
@@ -92,14 +94,22 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
       {request && (
         <div className="market-request-activity">
           <p>{k('capacity', { count: active })}</p>
-          <p className="market-hint">{k('privacy')}</p>
+          <p className="market-hint">
+            {answers.some((answer) => answer.release?.released === true)
+              ? t('marketplaceAgreement.releasedPrivacy')
+              : k('privacy')}
+          </p>
           {request.state === 'paused' && <p role="status">{k('paused')}</p>}
           <MarketplaceOffers
             answers={answers}
+            request={request}
             isPoster={request.isPoster}
             open={open}
             busy={pending}
             onDecision={confirmDecision}
+            onAgreement={(value) => {
+              if (!pending && (!dirty || window.confirm(k('discard')))) setAgreement(value);
+            }}
           />
           {canOffer && (
             <MarketplaceOfferSend
@@ -109,11 +119,11 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
               onBusy={setOfferBusy}
             />
           )}
-          {request.isPoster && request.state === 'paused' && (
-            <Button variant="light" onClick={() => confirmDecision('reopen')}>
-              {k('reopen')}
-            </Button>
-          )}
+          <MarketplaceReopen
+            request={request}
+            busy={pending}
+            onReopen={() => confirmDecision('reopen')}
+          />
           <MarketplaceConversations
             requestId={requestId}
             canMessage={canMessage}

@@ -3,6 +3,7 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceAvatar } from './MarketplaceAvatar.jsx';
 import { MarketplaceRequestFacts } from './MarketplaceRequestFacts.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
+import { MarketplaceStats } from './MarketplaceStats.jsx';
 
 /**
  * One request on the board: the facts, the band as a chip, the dates and the broker (packet
@@ -45,6 +46,7 @@ export function MarketplaceBoardCard({ request, onOpenBroker, onOpenRequest }) {
           <span>{request.broker.company}</span>
         </span>
       </button>
+      <MarketplaceStats stats={request.broker.stats} compact />
       {!request.yourCompany && (
         <div className="market-actions">
           <Button variant="light" onClick={onOpenRequest}>

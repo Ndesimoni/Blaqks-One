@@ -113,6 +113,7 @@ pub async fn reopen(
             "Only a current paused request can be reopened. Refresh or post a new request.",
         ));
     }
+    super::lifecycle_store::ensure_reopen(&mut tx, row.id).await?;
     super::lifecycle_store::end_offers(&mut tx, row.id, session.user.id).await?;
     sqlx::query("UPDATE marketplace.crm_market_requests SET paused_at=NULL,selected_answer_id=NULL,round=round+1,version=version+1,updated_at=now() WHERE id=$1")
         .bind(row.id).execute(&mut *tx).await?;

@@ -51,5 +51,6 @@ pub async fn read(
         "proposal": proposal,
         "lifecycle": lifecycle,
         "deal": deal,
+        "marketplace": revision.terms["introduction"]["marketplace"]==true,
     })))
 }

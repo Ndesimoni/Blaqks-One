@@ -11,7 +11,7 @@ import { PropertyFacts } from './AgreementTerms.jsx';
  * sender switches it on. Co-broking from a listing share shows the share's property as
  * fixed facts: the server adds them, whatever the form holds.
  */
-export function FormSubject({ form }) {
+export function FormSubject({ form, detail }) {
   const { t } = useI18n();
   const { draft } = form;
   const field = (name) => t(`agreementForm.field.${name}`);
@@ -27,7 +27,13 @@ export function FormSubject({ form }) {
       ) : (
         <PropertyFields form={form} field={field} />
       )}
-      <ClientFields form={form} field={field} />
+      {detail?.marketplaceRequestId ||
+      detail?.marketplace === true ||
+      detail?.revision?.terms?.introduction?.marketplace === true ? (
+        <p className="market-hint">{t('marketplaceAgreement.clientPrivacy')}</p>
+      ) : (
+        <ClientFields form={form} field={field} />
+      )}
     </>
   );
 }

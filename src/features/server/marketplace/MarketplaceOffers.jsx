@@ -4,6 +4,7 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { ListingView } from '../finance/ListingView.jsx';
 import { toProperty } from '../listingShares/listingShareLinks.js';
 import { MarketplaceMatchChecklist } from './MarketplaceMatchChecklist.jsx';
+import { MarketplaceAgreement } from './MarketplaceAgreement.jsx';
 
 const states = {
   waiting: 'awaitingReview',
@@ -14,7 +15,15 @@ const states = {
 };
 
 /** Only safe structured offer facts from the server are rendered before agreement acceptance. */
-export function MarketplaceOffers({ answers, isPoster, open, busy, onDecision }) {
+export function MarketplaceOffers({
+  answers,
+  request,
+  isPoster,
+  open,
+  busy,
+  onDecision,
+  onAgreement,
+}) {
   const { t } = useI18n();
   const k = (key, vars) => t(`marketplaceAnswers.${key}`, vars);
   return (
@@ -38,6 +47,14 @@ export function MarketplaceOffers({ answers, isPoster, open, busy, onDecision })
               <summary>{k('checklist')}</summary>
               <MarketplaceMatchChecklist checklist={answer.checklist} />
             </details>
+            {(answer.state === 'chosen' || answer.agreement) && (
+              <MarketplaceAgreement
+                answer={answer}
+                request={request}
+                busy={busy}
+                onOpen={onAgreement}
+              />
+            )}
             {isPoster && open && answer.state === 'waiting' && (
               <div className="market-actions">
                 <Button onClick={() => onDecision('select', answer.id)} disabled={busy}>

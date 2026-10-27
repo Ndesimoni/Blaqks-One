@@ -10,6 +10,10 @@ const BASE: &str = "/api/crm/workspaces/{workspace}/marketplace";
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
+            &format!("{BASE}/requests/{{id}}/agreement"),
+            post(super::agreement_routes::propose),
+        )
+        .route(
             &format!("{BASE}/requests/{{id}}/conversations"),
             get(chat::list).post(conversation_start::start),
         )
