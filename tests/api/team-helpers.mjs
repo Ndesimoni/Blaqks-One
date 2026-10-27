@@ -30,7 +30,7 @@ export async function inviteExact(owner, suffix, overrides = {}) {
 let superAdmin;
 
 /** Ten more seats for a full company, through the real Super Admin route. */
-async function addSeats(workspace) {
+export async function addSeats(workspace) {
   const [limit, version] = query(
     `SELECT member_limit||'|'||version FROM crm_company_profiles WHERE workspace_id='${workspace}'`,
   ).split('|');

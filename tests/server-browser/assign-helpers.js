@@ -62,9 +62,9 @@ export async function setTheme(page, theme) {
 }
 
 export async function noPageOverflow(page) {
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
-    true,
-  );
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1))
+    .toBe(true);
 }
 
 export { saveRecordForm };

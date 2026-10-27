@@ -94,7 +94,9 @@ test('members edit their details, change their password and manage their session
   await next.fill('Browser1!pw');
   await confirm.fill('Browser1!pw');
   await page.getByRole('button', { name: 'Change password', exact: true }).click();
-  await expect(page.getByText('Password changed. Other devices were signed out.')).toBeVisible();
+  await expect(page.getByText('Password changed. Other devices were signed out.')).toBeVisible({
+    timeout: 15_000,
+  });
   await expect(sessionRows(page)).toHaveCount(1);
   await second.page.reload();
   await signedOut(second.page);

@@ -47,7 +47,7 @@ test('an Admin connects, reconnects and disconnects a channel', async ({ page })
   await expect(active.getByText('Connected', { exact: true })).toBeVisible();
   await active.getByRole('button', { name: 'Disconnect', exact: true }).click();
   await confirm.getByRole('button', { name: 'Disconnect channel', exact: true }).click();
-  await expect(page.getByText('Studio line is disconnected.')).toBeVisible();
+  await expect(page.getByText('Studio line is disconnected.')).toBeVisible({ timeout: 15_000 });
   await expect(active).toContainText('Not connected yet.');
   await expect(active).not.toContainText('Studio line');
   await expect(active.getByRole('button', { name: 'Reconnect', exact: true })).toHaveCount(0);

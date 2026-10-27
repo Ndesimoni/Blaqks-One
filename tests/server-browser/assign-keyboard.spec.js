@@ -44,6 +44,7 @@ test('the hand-off dialog and Assigned to filter work by keyboard in both themes
         await page.keyboard.press('Enter');
         const dialog = page.getByRole('dialog', { name: `Reassign ${id}` });
         await expect(dialog.getByRole('heading', { name: `Reassign ${id}` })).toBeFocused();
+        await expect(dialog.getByLabel('New assignee')).toBeEnabled();
         const order = [
           dialog.getByRole('button', { name: 'Close reassignment' }),
           dialog.getByLabel('New assignee'),

@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { teamPath } from '../api/team-helpers.mjs';
+import { addSeats, teamPath } from '../api/team-helpers.mjs';
 import { FINANCE } from '../api/permission-helpers.mjs';
 import { closeInvitation, finishInvitation, startInvitation } from './team-helpers.js';
 import { editTeammate, memberPage, teamFinance, ticks } from './team-finance-fixtures.js';
@@ -10,6 +10,7 @@ test('turning the Finance module off removes the row; invitations never offer th
   browser,
 }) => {
   const team = await teamFinance('tfinvite');
+  await addSeats(team.admin.user.workspaceId);
   const admin = await memberPage(browser, team.people.admin.email);
   const { page } = admin;
   try {

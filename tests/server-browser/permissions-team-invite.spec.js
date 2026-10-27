@@ -2,7 +2,7 @@ import { test, expect } from './fixtures.js';
 import { memberPage } from './assign-helpers.js';
 import { session, signIn } from './helpers.js';
 import { closeInvitation, openTeam, startInvitation } from './team-helpers.js';
-import { findMember } from '../api/team-helpers.mjs';
+import { addSeats, findMember } from '../api/team-helpers.mjs';
 import { FINANCE } from '../api/permission-helpers.mjs';
 import { assignTeam, editTeammate, LABELS, ticks } from './permissions-fixtures.js';
 
@@ -12,6 +12,7 @@ test('the invitation form offers action ticks but never the delete-main ticks', 
   browser,
 }) => {
   const team = await assignTeam('pinvite');
+  await addSeats(team.admin.user.workspaceId);
   const admin = await memberPage(browser, team.people.admin.email);
   const { page } = admin;
   try {
