@@ -117,4 +117,6 @@ test('expired shares reconcile before response and persistently free capacity', 
     query(`SELECT state FROM marketplace.crm_market_answers WHERE share_id='${freshShare.id}'`),
     'ended',
   );
+  const closed = await market(teams.one, `/requests/${request.id}/close`, { method: 'POST' });
+  assert.equal(closed.status, 200, JSON.stringify(closed.value));
 });
