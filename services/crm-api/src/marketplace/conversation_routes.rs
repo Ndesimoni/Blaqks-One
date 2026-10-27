@@ -30,13 +30,7 @@ pub async fn list(
     gate::company_open(&mut tx, &workspace).await?;
     gate::joined(&mut tx, session.user.id).await?;
     let row = access::request(&mut tx, limits::missing_id(&id)?).await?;
-    let items = store::list(
-        &mut tx,
-        row.id,
-        session.user.id,
-        row.member_id == session.user.id,
-    )
-    .await?;
+    let items = store::list(&mut tx, row.id, session.user.id, row.member_id).await?;
     tx.commit().await?;
     Ok(Json(json!({"conversations":items})))
 }

@@ -41,14 +41,16 @@ pub async fn list(
     tx: &mut Transaction<'_, Postgres>,
     request: Uuid,
     actor: Uuid,
-    owner: bool,
+    requester: Uuid,
 ) -> ApiResult<Vec<Value>> {
+    let owner = actor == requester;
     let rows: Vec<(Uuid, Uuid, String)> = sqlx::query_as("SELECT id,broker_id,updated_at::text FROM marketplace.crm_market_conversations WHERE request_id=$1 AND ($3 OR broker_id=$2) ORDER BY updated_at DESC,id DESC LIMIT 50")
         .bind(request).bind(actor).bind(owner).fetch_all(&mut **tx).await?;
     let mut items = Vec::new();
     for (id, broker, at) in rows {
-        if let Some(profile) = super::visibility::visible(tx, broker).await? {
-            items.push(json!({"id":id,"brokerId":broker,"brokerName":profile.name,"updatedAt":at}));
+        let participant = if owner { broker } else { requester };
+        if let Some(profile) = super::visibility::visible(tx, participant).await? {
+            items.push(json!({"id":id,"participantId":participant,"participantName":profile.name,"updatedAt":at}));
         }
     }
     Ok(items)

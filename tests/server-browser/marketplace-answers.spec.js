@@ -2,6 +2,7 @@ import { expect, test } from './fixtures.js';
 import { client, postHeld, requestTeams } from '../api/marketplace-request-helpers.mjs';
 import { held } from '../api/record-sharing-helpers.mjs';
 import { memberPage, noPageOverflow, openSection } from './assign-helpers.js';
+import { expectMarketplaceProfiles } from './marketplace-profile-helpers.js';
 
 test('brokers offer a property, message without a match, and reopen after selection', async ({
   browser,
@@ -60,7 +61,6 @@ test('brokers offer a property, message without a match, and reopen after select
     await expect(
       boardCard(asking.page).getByRole('button', { name: 'Offers and messages' }),
     ).toBeFocused();
-
     await boardCard(broker.page).getByRole('button', { name: 'Offers and messages' }).click();
     dialog = broker.page.getByRole('dialog');
     await dialog.getByRole('combobox', { name: 'Choose a property' }).selectOption(property.id);
@@ -75,6 +75,7 @@ test('brokers offer a property, message without a match, and reopen after select
     await poster.page.getByRole('button', { name: 'Offers and messages' }).click();
     dialog = poster.page.getByRole('dialog');
     await expect(dialog.getByText('PRIVATE-UNIT-MK3')).toHaveCount(0);
+    await expectMarketplaceProfiles(poster.page, dialog, [teams.agent, teams.colleague]);
     await dialog.getByRole('button', { name: 'Not a match', exact: true }).click();
     await poster.page
       .getByRole('dialog')

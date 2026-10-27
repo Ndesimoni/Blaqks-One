@@ -37,6 +37,18 @@
   width: 100%;
   resize: vertical;
 }
+.market-conversation-row {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.market-conversation-row .market-broker {
+  flex: 1;
+  margin-top: 0;
+}
 .market-request-activity button {
   min-height: 44px;
 }

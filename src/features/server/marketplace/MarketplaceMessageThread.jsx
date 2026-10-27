@@ -5,7 +5,14 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { useMarketActivity } from './useMarketActivity.js';
 
 /** Plain-text broker conversation. No private CRM records are read or attached here. */
-export function MarketplaceMessageThread({ conversationId, paused, onSent, onDirty, onBusy }) {
+export function MarketplaceMessageThread({
+  conversationId,
+  participantName,
+  paused,
+  onSent,
+  onDirty,
+  onBusy,
+}) {
   const { api, user } = useSession();
   const { t, format } = useI18n();
   const k = (key) => t(`marketplaceAnswers.${key}`);
@@ -43,7 +50,9 @@ export function MarketplaceMessageThread({ conversationId, paused, onSent, onDir
       <ol className="market-message-list" aria-label={k('messages')}>
         {(thread.value?.messages || []).map((message) => (
           <li key={message.id}>
-            <strong>{message.authorId === user.id ? k('you') : k('broker')}</strong>
+            <strong>
+              {message.authorId === user.id ? k('you') : participantName || k('broker')}
+            </strong>
             <time dateTime={message.createdAt}>{format.date(message.createdAt)}</time>
             <p>{message.body}</p>
           </li>

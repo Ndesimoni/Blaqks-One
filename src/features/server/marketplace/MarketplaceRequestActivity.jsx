@@ -13,9 +13,8 @@ import { MarketplaceDecisionDialog } from './MarketplaceDecisionDialog.jsx';
 import { ShareCoBroking } from '../listingShares/ShareCoBroking.jsx';
 import { applyMarketplaceDecision } from './marketplaceDecision.js';
 import { MarketplaceReopen } from './MarketplaceReopen.jsx';
+import { MarketplaceProfileDialog } from './MarketplaceProfileDialog.jsx';
 import './marketplace-answers.css';
-
-/** One request's offers and private conversations, including paused off-board requests. */
 export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
   const { api, user } = useSession();
   const { t } = useI18n();
@@ -29,6 +28,7 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
   const [messageBusy, setMessageBusy] = useState(false);
   const [offerBusy, setOfferBusy] = useState(false);
   const [agreement, setAgreement] = useState(null);
+  const [broker, setBroker] = useState('');
   const pending = busy || messageBusy || offerBusy;
   useUnsavedChanges(dirty, pending);
   const close = () => {
@@ -37,11 +37,8 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
   const confirmDecision = (action, id) => {
     if (!pending && (!dirty || window.confirm(k('discard')))) setDecision({ action, id });
   };
-  const detail = view.value;
-  const request = detail?.request;
-  const answers = detail?.answers || [];
-  const matches = detail?.matches || [];
-  const { active, open, canOffer, canMessage } = requestActivityCapabilities(detail);
+  const { request, answers = [], matches = [] } = view.value || {};
+  const { active, open, canOffer, canMessage } = requestActivityCapabilities(view.value);
   const changed = () => {
     setNotice(k('saved'));
     view.reload();
@@ -83,66 +80,71 @@ export function MarketplaceRequestActivity({ requestId, onClose, onChanged }) {
       />
     );
   return (
-    <FinanceDialog title={k('title')} onClose={close} busy={pending} wide>
-      {view.loading && <p role="status">{k('loading')}</p>}
-      {view.error && (
-        <p className="field-error" role="alert">
-          {view.error}
-        </p>
-      )}
-      {notice && <p role="status">{notice}</p>}
-      {request && (
-        <div className="market-request-activity">
-          <p>{k('capacity', { count: active })}</p>
-          <p className="market-hint">
-            {answers.some((answer) => answer.release?.released === true)
-              ? t('marketplaceAgreement.releasedPrivacy')
-              : k('privacy')}
+    <>
+      <FinanceDialog title={k('title')} onClose={close} busy={pending} wide>
+        {view.loading && <p role="status">{k('loading')}</p>}
+        {view.error && (
+          <p className="field-error" role="alert">
+            {view.error}
           </p>
-          {request.state === 'paused' && <p role="status">{k('paused')}</p>}
-          <MarketplaceOffers
-            answers={answers}
-            request={request}
-            isPoster={request.isPoster}
-            open={open}
-            busy={pending}
-            onDecision={confirmDecision}
-            onAgreement={(value) => {
-              if (!pending && (!dirty || window.confirm(k('discard')))) setAgreement(value);
-            }}
-          />
-          {canOffer && (
-            <MarketplaceOfferSend
-              requestId={requestId}
-              matches={matches}
-              onSent={changed}
-              onBusy={setOfferBusy}
+        )}
+        {notice && <p role="status">{notice}</p>}
+        {request && (
+          <div className="market-request-activity">
+            <p>{k('capacity', { count: active })}</p>
+            <p className="market-hint">
+              {answers.some((answer) => answer.release?.released === true)
+                ? t('marketplaceAgreement.releasedPrivacy')
+                : k('privacy')}
+            </p>
+            {request.state === 'paused' && <p role="status">{k('paused')}</p>}
+            <MarketplaceOffers
+              answers={answers}
+              request={request}
+              isPoster={request.isPoster}
+              open={open}
+              busy={pending}
+              onDecision={confirmDecision}
+              onAgreement={(value) => {
+                if (!pending && (!dirty || window.confirm(k('discard')))) setAgreement(value);
+              }}
+              onOpenBroker={setBroker}
             />
-          )}
-          <MarketplaceReopen
-            request={request}
-            busy={pending}
-            onReopen={() => confirmDecision('reopen')}
-          />
-          <MarketplaceConversations
-            requestId={requestId}
-            canMessage={canMessage}
-            paused={['closed', 'expired'].includes(request.state)}
-            onChanged={changed}
-            onDirty={setDirty}
-            onBusy={setMessageBusy}
-          />
-          <Button
-            variant="light"
-            onClick={() => {
-              if (!dirty || window.confirm(k('discard'))) view.reload();
-            }}
-            disabled={view.loading || pending}
-          >
-            {k('refresh')}
-          </Button>
-        </div>
-      )}
-    </FinanceDialog>
+            {canOffer && (
+              <MarketplaceOfferSend
+                requestId={requestId}
+                matches={matches}
+                onSent={changed}
+                onBusy={setOfferBusy}
+              />
+            )}
+            <MarketplaceReopen
+              request={request}
+              busy={pending}
+              onReopen={() => confirmDecision('reopen')}
+            />
+            <MarketplaceConversations
+              requestId={requestId}
+              canMessage={canMessage}
+              paused={['closed', 'expired'].includes(request.state)}
+              onChanged={changed}
+              onDirty={setDirty}
+              onBusy={setMessageBusy}
+              onOpenBroker={setBroker}
+            />
+            <Button
+              variant="light"
+              onClick={() => {
+                if (!dirty || window.confirm(k('discard'))) view.reload();
+              }}
+              disabled={view.loading || pending}
+            >
+              {k('refresh')}
+            </Button>
+          </div>
+        )}
+      </FinanceDialog>
+      {broker && <MarketplaceProfileDialog memberId={broker} onClose={() => setBroker('')} />}
+    </>
   );
 }

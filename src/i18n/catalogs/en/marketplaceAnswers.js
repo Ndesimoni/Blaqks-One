@@ -38,6 +38,7 @@ export default {
   message: 'Message',
   send: 'Send message',
   conversation: 'Conversation with {name}',
+  openConversation: 'Open conversation',
   you: 'You',
   broker: 'Broker',
   refresh: 'Refresh activity',

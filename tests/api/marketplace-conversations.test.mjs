@@ -14,6 +14,7 @@ before(async () => {
 const start = (session, body = 'Could we discuss the preferred move-in month?') =>
   market(session, `/requests/${request.id}/conversations`, { method: 'POST', body: { body } });
 const messages = (session, id) => market(session, `/conversations/${id}/messages`);
+const conversations = (session) => market(session, `/requests/${request.id}/conversations`);
 
 test('a no-match broker starts a private request conversation without arbitrary recipients', async () => {
   const result = await start(teams.agent);
@@ -22,6 +23,22 @@ test('a no-match broker starts a private request conversation without arbitrary 
   const received = await messages(teams.one, room);
   assert.equal(received.status, 200, JSON.stringify(received.value));
   assert.equal(received.value.messages[0].body, 'Could we discuss the preferred move-in month?');
+  const posterList = await conversations(teams.one);
+  assert.deepEqual(
+    posterList.value.conversations.map(({ participantId, participantName }) => ({
+      participantId,
+      participantName,
+    })),
+    [{ participantId: teams.agent.user.id, participantName: teams.agent.user.name }],
+  );
+  const brokerList = await conversations(teams.agent);
+  assert.deepEqual(
+    brokerList.value.conversations.map(({ participantId, participantName }) => ({
+      participantId,
+      participantName,
+    })),
+    [{ participantId: teams.one.user.id, participantName: teams.one.user.name }],
+  );
   assert.equal(
     (await messages(teams.admin, room)).status,
     404,

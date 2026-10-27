@@ -5,6 +5,7 @@ import { ListingView } from '../finance/ListingView.jsx';
 import { toProperty } from '../listingShares/listingShareLinks.js';
 import { MarketplaceMatchChecklist } from './MarketplaceMatchChecklist.jsx';
 import { MarketplaceAgreement } from './MarketplaceAgreement.jsx';
+import { MarketplaceAvatar } from './MarketplaceAvatar.jsx';
 
 const states = {
   waiting: 'awaitingReview',
@@ -23,6 +24,7 @@ export function MarketplaceOffers({
   busy,
   onDecision,
   onAgreement,
+  onOpenBroker,
 }) {
   const { t } = useI18n();
   const k = (key, vars) => t(`marketplaceAnswers.${key}`, vars);
@@ -33,7 +35,17 @@ export function MarketplaceOffers({
       <ul className="market-offer-list">
         {answers.map((answer) => (
           <li className="market-card" key={answer.id}>
-            <h4>{answer.name}</h4>
+            <h4>
+              <button
+                type="button"
+                className="market-broker"
+                onClick={() => onOpenBroker(answer.memberId)}
+                aria-label={t('marketplaceRequests.board.viewBroker', { name: answer.name })}
+              >
+                <MarketplaceAvatar name={answer.name} src="" />
+                <strong>{answer.name}</strong>
+              </button>
+            </h4>
             <p>{k('state', { state: k(states[answer.state] || 'ended') })}</p>
             {answer.listing ? (
               <ListingView

@@ -4,6 +4,7 @@ import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useMarketActivity } from './useMarketActivity.js';
 import { MarketplaceMessageThread } from './MarketplaceMessageThread.jsx';
+import { MarketplaceAvatar } from './MarketplaceAvatar.jsx';
 
 /** Only the poster and each named broker receive their private conversation. */
 export function MarketplaceConversations({
@@ -13,6 +14,7 @@ export function MarketplaceConversations({
   onChanged,
   onDirty,
   onBusy,
+  onOpenBroker,
 }) {
   const { api, user } = useSession();
   const { t } = useI18n();
@@ -63,19 +65,34 @@ export function MarketplaceConversations({
       {canMessage && !paused && <p className="market-hint">{k('noMatches')}</p>}
       <div className="market-actions">
         {conversations.map((conversation) => (
-          <Button
-            key={conversation.id}
-            variant="light"
-            aria-pressed={selected === conversation.id}
-            onClick={() => {
-              if (!threadBusy && ((!body.trim() && !threadDirty) || window.confirm(k('discard')))) {
-                setBody('');
-                setSelected(conversation.id);
-              }
-            }}
-          >
-            {k('conversation', { name: conversation.brokerName })}
-          </Button>
+          <div className="market-conversation-row" key={conversation.id}>
+            <button
+              type="button"
+              className="market-broker"
+              onClick={() => onOpenBroker(conversation.participantId)}
+              aria-label={t('marketplaceRequests.board.viewBroker', {
+                name: conversation.participantName,
+              })}
+            >
+              <MarketplaceAvatar name={conversation.participantName} src="" />
+              <strong>{conversation.participantName}</strong>
+            </button>
+            <Button
+              variant="light"
+              aria-pressed={selected === conversation.id}
+              onClick={() => {
+                if (
+                  !threadBusy &&
+                  ((!body.trim() && !threadDirty) || window.confirm(k('discard')))
+                ) {
+                  setBody('');
+                  setSelected(conversation.id);
+                }
+              }}
+            >
+              {k('openConversation')}
+            </Button>
+          </div>
         ))}
         {canMessage && !paused && !conversations.length && (
           <Button variant="light" onClick={() => setComposing(true)}>
@@ -114,6 +131,9 @@ export function MarketplaceConversations({
           paused={paused}
           onDirty={setThreadDirty}
           onBusy={setThreadBusy}
+          participantName={
+            conversations.find((conversation) => conversation.id === selected)?.participantName
+          }
         />
       )}
     </section>
