@@ -79,7 +79,10 @@ jobs:
   api-and-browser:
     name: API and connected browser tests
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The full API suite takes about 30 minutes and the 144 serial browser stories need
+    # another 35–45 minutes on GitHub's shared runners. Keep one disposable database per
+    # command while allowing enough time for both commands and container cleanup.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

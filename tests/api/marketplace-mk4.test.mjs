@@ -110,4 +110,5 @@ test('reopening an unaccepted agreement stops its share and keeps the proposal a
     'stopped',
   );
   assert.equal((await detail(teams.one, draft.id)).agreement.state, 'sent');
+  ok(await market(teams.one, `/requests/${request.id}/close`, { method: 'POST' }));
 });
