@@ -219,6 +219,16 @@ There is **one general Blaqks One website** with every company's approved listin
 | Limits        | Confirmed by the owner 2026-10-20: "2 live listings per team" applies on company sites; "2 teams per property" applies only to the general site.                                                               |
 | Themes        | The 4 themes are designed and reviewed with the owner before they are built.                                                                                                                                   |
 
+## Website scope, structure and motion (decided 2026-10-28)
+
+The owner clarified that websites are **the general Blaqks One website and company websites only**. Individual agents have approved profiles/listings within those websites, not standalone websites. Keep the planned shared Next.js public application separate from the React/Vite CRM and Rust/Axum private backend.
+
+The owner requested a better page/navigation structure, rather than only cosmetic changes to the supplied Claude design. The [website structure blueprint](website-structure-blueprint.md) records the proposed task-led layouts and six grouped company-settings areas; final rendered theme designs still need visual review.
+
+The owner accepted **subtle lightweight depth for the initial website**, with one restrained homepage hero effect and stable search, text and enquiry controls. Phones and reduced-motion visitors get a polished static presentation. Full interactive 3D is deferred until it has a clear purpose and measured performance benefit/tradeoff; genuine property tours load separately when opened. See the [visual and performance brief](website-visual-refinement.md). Numerical budgets remain proposed acceptance targets, not tested guarantees.
+
+This checkpoint authorises saving/pushing the planning updates. It does not establish that a Next.js website, public publication backend or hosting has been implemented, and it does not settle the remaining commercial/domain/legal choices in the [settings plan](website-settings-plan.md#17-owner-decisions-to-settle).
+
 ## Messaging design (decided 2026-10-20)
 
 The owner approved the [messaging design](messaging-design.md) (packet X0) after its [security review](messaging-security.md), taking the recommended answers:

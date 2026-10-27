@@ -4,6 +4,12 @@ Status: **planned, not started** (owner, 2026-10-20). This plan builds the publi
 
 ## What the owner decided
 
+**Settings planning update (2026-10-28):** the owner clarified that there are only two website types: the general Blaqks One website and company websites. Individual agents have public profiles/listings inside those websites, not standalone websites. See the [complete website settings proposal](website-settings-plan.md) for settings, permissions, approvals, domains, enquiries, lifecycle and delivery criteria. Proposed defaults there remain subject to owner review.
+
+The [structure blueprint](website-structure-blueprint.md) supersedes the suggestion to preserve the old screenshot layouts. The [visual brief](website-visual-refinement.md) records the accepted initial lightweight-depth approach: one restrained hero effect, static phone/reduced-motion fallback and deferred full interactive 3D. These documents finalise the planning checkpoint; Next.js screens and public backend implementation remain future work.
+
+**Listing-limit clarification:** the public-listing decision specifies two listings **of the same property per team**. The later “2 live listings per team” shorthand below is ambiguous; the settings proposal preserves the explicit per-property interpretation and flags confirmation before implementation. Do not infer a cap of two total properties from that shorthand.
+
 - **One general website** lists every company's approved listings. A company may add its **own website** as a paid add-on or a higher-plan feature.
 - A company site uses a **Blaqks One subdomain** by default, or the company **connects its own domain** with automatic SSL. We do not buy domains for companies yet.
 - Each company chooses **one of 4 themes**, its **logo** and **one brand colour**. Fixed pages: Home, Listings, Listing detail, About, Contact. Companies may **add their own pages**.
