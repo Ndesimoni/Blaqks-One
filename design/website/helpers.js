@@ -1,4 +1,7 @@
 import { companies, companyBy, areaBy, agentBy, properties } from './data.js';
+import { agentContactLinks } from './contact.js';
+import { developerBy } from './developer-data.js';
+import { bedroomLabel } from './property-options.js';
 export const esc = (v = '') =>
   String(v).replace(
     /[&<>"']/g,
@@ -26,7 +29,11 @@ export const heading = (eyebrow, title, text = '') =>
   `<div class="page-heading"><span class="eyebrow">${eyebrow}</span><h1>${title}</h1>${text ? `<p class="muted">${text}</p>` : ''}</div>`;
 export const notice = (text) => `<p class="notice">${text}</p>`;
 export function select(label, name, options, current = '') {
-  return `<label>${label}<select name="${name}">${options.map(([value, text]) => `<option value="${esc(value)}"${current === value ? ' selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
+  const choices =
+    current && !options.some(([value]) => value === current)
+      ? [...options, [current, 'Unavailable selection']]
+      : options;
+  return `<label>${label}<select name="${name}" aria-label="${esc(label)}">${choices.map(([value, text]) => `<option value="${esc(value)}"${current === value ? ' selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
 }
 export const companyOptions = () => [
   ['', 'All companies'],
@@ -35,6 +42,12 @@ export const companyOptions = () => [
 export const listingCount = (company, agent) =>
   properties.filter((p) => (!company || p.company === company) && (!agent || p.agent === agent))
     .length;
+export function contactActions(agent, property, note = false) {
+  const links = agentContactLinks(agent, property);
+  if (!links.length) return '';
+  const context = property ? ` about ${property.title}` : '';
+  return `<div class="agent-contact"><div class="contact-actions" role="group" aria-label="Contact ${esc(agent.name)}${esc(context)}">${links.map((item) => `<a class="button quiet contact-${item.channel}" href="${esc(item.href)}" aria-label="${item.label} ${esc(agent.name)}${esc(context)}${item.external ? ' (opens a new tab)' : ''}"${item.external ? ' target="_blank" rel="noopener noreferrer"' : ''}>${item.label}</a>`).join('')}</div>${note ? '<small class="contact-note">Fictional sample contacts. Opens WhatsApp or your email app; nothing is sent automatically.</small>' : ''}</div>`;
+}
 export function propertyCard(p, scope = {}) {
   const agent = agentBy(p.agent),
     company = companyBy(p.company),
@@ -44,8 +57,10 @@ export function propertyCard(p, scope = {}) {
     <div class="card-content"><strong class="price">${money(p)}</strong>
       ${link(`<h3>${esc(p.title)}</h3>`, 'property', { id: p.id }, scope)}
       <p class="muted">${esc(area.name)}, ${esc(area.city)}</p>
-      <div class="facts"><span>${p.bedrooms ? `${p.bedrooms} beds` : 'Office'}</span><span>${p.bathrooms} baths</span><span>${p.size.toLocaleString()} sqft</span></div>
+      ${p.developer ? `<p class="property-developer">${link(esc(developerBy(p.developer)?.name || 'Developer'), 'developer', { id: p.developer }, scope)}${p.developerIllustrative ? ' · Illustrative association' : ''}</p>` : ''}
+      <div class="facts"><span>${bedroomLabel(p)}</span><span>${p.bathrooms} ${p.bathrooms === 1 ? 'bath' : 'baths'}</span><span>${p.size.toLocaleString()} sqft</span></div>
       <div class="card-person">${avatar(agent.name)}<span>${link(esc(agent.name), 'agent', { id: agent.id }, scope)}<small>${link(esc(company.name), 'company', { id: company.id }, scope)}</small></span><span class="arrow">→</span></div>
+      ${contactActions(agent, p)}
     </div></article>`;
 }
 export const grid = (items, scope = {}, cls = '') =>

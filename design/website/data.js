@@ -1,3 +1,4 @@
+import { extraPropertyData } from './property-samples.js';
 export const images = {
   villa: 'assets/villa-exterior.jpg',
   apartment: 'assets/apartment-interior.jpg',
@@ -31,6 +32,7 @@ export const areas = [
     id: 'marina',
     name: 'Dubai Marina',
     city: 'Dubai',
+    emirate: 'dubai',
     image: images.apartment,
     note: 'Waterfront walks and a lively city setting.',
   },
@@ -38,6 +40,7 @@ export const areas = [
     id: 'hills',
     name: 'Dubai Hills Estate',
     city: 'Dubai',
+    emirate: 'dubai',
     image: images.villa,
     note: 'Open spaces and a quieter residential rhythm.',
   },
@@ -45,6 +48,7 @@ export const areas = [
     id: 'saadiyat',
     name: 'Saadiyat Island',
     city: 'Abu Dhabi',
+    emirate: 'abu-dhabi',
     image: images.villa,
     note: 'Coastal living and places to explore.',
   },
@@ -56,21 +60,30 @@ export const agents = [
   ['omar', 'Omar Ellis', 'cedar', 'Apartments'],
   ['sara', 'Sara Lane', 'dune', 'Villas and townhouses'],
   ['james', 'James Hart', 'dune', 'Commercial property'],
-].map(([id, name, company, specialty]) => ({ id, name, company, specialty }));
+].map(([id, name, company, specialty], index) => ({
+  id,
+  name,
+  company,
+  specialty,
+  publicWhatsApp: `+44770090000${index + 1}`,
+  publicEmail: `${id}@${company}.example`,
+}));
 export const properties = Array.from({ length: 18 }, (_, i) => {
   const agent = agents[i % agents.length];
   const area = areas[i % areas.length];
   const purpose = ['buy', 'rent', 'holiday'][Math.floor(i / 6)];
-  const type = ['Apartment', 'Villa', 'Townhouse', 'Apartment', 'Villa', 'Office'][i % 6];
+  const baseType = ['Apartment', 'Villa', 'Townhouse', 'Apartment', 'Villa', 'Office'][i % 6];
+  const type = purpose === 'holiday' && baseType === 'Office' ? 'Apartment' : baseType;
   return {
     id: String(i + 1),
     agent: agent.id,
     company: agent.company,
+    developer: ['emaar', 'sobha', 'aldar', 'nakheel', 'azizi', 'reportage'][i % 6],
+    developerIllustrative: true,
     area: area.id,
     title: `${type === 'Office' ? 'Light-filled office' : ['Waterfront residence', 'A home with room to grow', 'Considered contemporary living'][i % 3]} in ${area.name}`,
     type,
     purpose,
-    bedrooms: type === 'Office' ? 0 : (i % 4) + 1,
     bathrooms: (i % 3) + 1,
     size: 1100 + i * 130,
     price:
@@ -81,7 +94,7 @@ export const properties = Array.from({ length: 18 }, (_, i) => {
           : 750 + i * 30,
     image:
       type === 'Office' ? images.office : type === 'Apartment' ? images.apartment : images.villa,
-    ready: i % 4 === 0 ? 'off-plan' : 'ready',
+    ...extraPropertyData(i, type, area),
   };
 });
 export const themeNames = ['Signature', 'Modern', 'Editorial', 'Nocturne'];

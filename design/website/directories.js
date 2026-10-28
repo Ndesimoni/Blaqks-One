@@ -8,7 +8,7 @@ export function directories(ctx) {
   const items = (
     isCompany ? companies : agents.filter((a) => !s.site || a.company === s.site)
   ).filter((v) => v.name.toLowerCase().includes(needle));
-  return `<section class="section page-top">${heading('PEOPLE BEHIND YOUR NEXT MOVE', isCompany ? 'Find your property company.' : 'Meet your property people.', 'Explore public profiles and the properties they represent. No performance statistics.')}<form class="directory-search" data-form="directory"><input type="hidden" name="destination" value="${mode}"><input type="hidden" name="site" value="${esc(s.site || '')}"><input type="hidden" name="theme" value="${esc(s.theme || '')}"><label class="grow">${isCompany ? 'Company' : 'Agent'} name<input name="q" value="${esc(ctx.query.get('q') || '')}" placeholder="Search ${mode}"></label><button class="button" type="submit">Search →</button></form><p class="muted">${items.length} ${mode} · Counts include only this preview's public listings.</p><div class="${isCompany ? 'company-grid' : 'people-grid'}">${items.map((v) => (isCompany ? companyCard(v) : agentCard(v, s))).join('')}</div>${!items.length ? '<div class="empty"><h2>No matching profiles</h2><p>Try another name.</p></div>' : ''}</section>`;
+  return `<section class="section page-top">${heading('PEOPLE BEHIND YOUR NEXT MOVE', isCompany ? 'Find your property company.' : s.site ? 'Good property starts<br>with good people.' : 'Meet your property people.', s.site ? `Meet the people representing ${esc(companyBy(s.site).name)} and explore their public properties.` : 'Explore public profiles and the properties they represent. No performance statistics.')}<form class="directory-search" data-form="directory"><input type="hidden" name="destination" value="${mode}"><input type="hidden" name="site" value="${esc(s.site || '')}"><input type="hidden" name="theme" value="${esc(s.theme || '')}"><label class="grow">${isCompany ? 'Company' : 'Agent'} name<input name="q" value="${esc(ctx.query.get('q') || '')}" placeholder="Search ${mode}"></label><button class="button" type="submit">Search →</button></form><p class="muted">${items.length} ${mode} · Counts include only this preview's public listings.</p><div class="${isCompany ? 'company-grid' : 'people-grid'}">${items.map((v) => (isCompany ? companyCard(v) : agentCard(v, s))).join('')}</div>${!items.length ? '<div class="empty"><h2>No matching profiles</h2><p>Try another name.</p></div>' : ''}</section>`;
 }
 function companyCard(c) {
   const count = agents.filter((a) => a.company === c.id && listingCount(null, a.id) > 0).length;
@@ -41,6 +41,17 @@ export function areaPages(ctx) {
     return `<section class="section page-top">${heading('EXPLORE THE NEIGHBOURHOOD', area.name, area.note)}<img class="area-banner" src="${area.image}" alt="Illustrative area image"><div class="section-heading"><h2>Find your place here.</h2>${link('Refine this search →', 'properties', { area: area.id }, s)}</div>${grid(
       properties.filter((p) => p.area === area.id && (!s.site || p.company === s.site)),
       s,
-    )}</section>`;
-  return `<section class="section page-top">${heading('A SENSE OF PLACE', 'Where will your next chapter begin?', 'Explore locations and the public properties available in each.')}<div class="area-grid">${areas.map((a) => link(`<img src="${a.image}" alt="Illustrative property image"><span><h2>${a.name}</h2><p>${a.note}</p></span>`, 'area', { id: a.id }, s, 'area-card')).join('')}</div></section>`;
+    )}${!properties.some((p) => p.area === area.id && (!s.site || p.company === s.site)) ? `<div class="empty"><h2>No properties in this collection yet.</h2><p>There are no sample listings in ${esc(area.name)} on this website.</p>${button('View all properties', 'properties', {}, s)}</div>` : ''}</section>`;
+  return `<section class="section page-top">${heading('A SENSE OF PLACE', 'Where will your next chapter begin?', 'Explore locations and the public properties available in each.')}<div class="area-grid">${areas
+    .filter((a) => !s.site || properties.some((p) => p.company === s.site && p.area === a.id))
+    .map((a) =>
+      link(
+        `<img src="${a.image}" alt="Illustrative property image"><span><h2>${a.name}</h2><p>${a.note}</p></span>`,
+        'area',
+        { id: a.id },
+        s,
+        'area-card',
+      ),
+    )
+    .join('')}</div></section>`;
 }

@@ -2,6 +2,8 @@
 
 Date: **2026-10-28**. Status: interactive structure prototype available for review; production website screens are not built.
 
+**Publication update:** the owner [removed separate website approval](product-decisions.md#direct-website-publishing-decided-2026-10-28). Use scoped direct Publish after validation on both website types; older approval/review-stage language below and in prototype screens is superseded. Drafts, privacy, eligibility, history and takedown remain.
+
 **Interactive review checkpoint:** the [complete design preview](website-design-preview.md) now supplies a separate clickable prototype of this page system, with 57 linked page/state examples and four company themes. The production Next.js screens and public backend remain unimplemented.
 
 **Owner correction:** improve the structure itself, rather than preserve the existing screenshot layouts and only polish them. This supersedes the earlier preserve-the-layout recommendation in the [visual refinement brief](website-visual-refinement.md). Retain the brand, the two website types, four company theme choices and established publication/enquiry rules. Reorganise navigation, page hierarchy, section order and interactions around visitor tasks.
@@ -166,11 +168,11 @@ Replace an undifferentiated list of eleven equally prominent settings destinatio
 | Enquiries  | Form presentation, routing explanation, response hours, notification settings and permitted aggregates | Understand and configure enquiry handling |
 | Settings   | Domain/SSL, search/SEO, privacy/consent, collaborators/history and site pause                          | Manage the site's operating configuration |
 
-Desktop editor: compact section rail, readable editing canvas and optional contextual preview. Show the actual company and independent Draft, Review and Live status. Preview controls can switch page and phone/desktop size without losing edits. Narrow screens use a section selector and a dedicated preview rather than squeezing two columns.
+Desktop editor: compact section rail, readable editing canvas and optional contextual preview. Show the actual company and Draft, Publishing, Published, Sync failed or Withdrawn status. Preview controls can switch page and phone/desktop size without losing edits. Narrow screens use a section selector and a dedicated preview rather than squeezing two columns.
 
-Use **Save draft**, **Preview**, **Submit for review** and **View live** with distinct outcomes. No universal Save and publish button that bypasses approval. Field groups validate locally and on the server. Confirm only consequential changes such as site pause/domain removal; avoid confirmation dialogs for every harmless edit.
+Use **Save draft**, **Preview**, **Publish / Save & publish** and **View live** with distinct outcomes. Publishing is direct for authorised users after local/server validation; no separate approver is required. Confirm only consequential changes such as site pause/domain removal; avoid confirmation dialogs for every harmless edit.
 
-Platform Websites has a separate hierarchy: **General site**, **Review queue**, **Company sites**, **Policies & access**, **Health & recovery**. General-site content uses the editor; cross-company review uses submitted public snapshots; operational recovery uses restricted metadata. Do not mix private CRM lead records into platform website settings.
+Platform Websites has a separate hierarchy: **General site**, **Publications**, **Company sites**, **Policies & access**, **Health & recovery**. General-site content uses the editor; Publications shows live/sync status, history and exceptional takedowns; operational recovery uses restricted metadata. Do not mix private CRM lead records into platform website settings.
 
 ## 9. How the structure supports the visual effect
 

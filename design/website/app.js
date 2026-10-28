@@ -1,4 +1,5 @@
 import { home } from './home.js';
+import { developerDirectory, developerProfile } from './developers.js';
 import { results } from './results.js';
 import { directories, companyProfile, areaPages } from './directories.js';
 import { propertyDetail, agentProfile } from './property.js';
@@ -30,6 +31,8 @@ function body(ctx) {
   const p = ctx.page;
   if (p === 'home') return home(ctx);
   if (p === 'properties') return results(ctx);
+  if (p === 'developers') return developerDirectory(ctx);
+  if (p === 'developer') return developerProfile(ctx);
   if (['companies', 'agents'].includes(p)) return directories(ctx);
   if (p === 'company') return companyProfile(ctx);
   if (p === 'agent') return agentProfile(ctx);
@@ -46,13 +49,26 @@ export function render(restore = false) {
   const ctx = context();
   if (previous && !restore) state.scroll[previous] = window.scrollY;
   document.body.dataset.theme = ctx.scope.site ? ctx.theme : '1';
+  document.body.dataset.site = companyBy(ctx.scope.site) ? ctx.scope.site : '';
+  document.body.dataset.page = ctx.page;
   document.body.classList.toggle('admin-preview', ['editor', 'platform'].includes(ctx.page));
+  document.body.classList.toggle(
+    'company-site',
+    Boolean(companyBy(ctx.scope.site)) && !['editor', 'platform'].includes(ctx.page),
+  );
   const content = body(ctx) || system(ctx, 'notfound');
   document.querySelector('#app').innerHTML =
     `${header(ctx)}<main id="main" tabindex="-1">${content}</main>${footer(ctx)}${reviewBar(ctx)}<dialog class="gallery-dialog" id="gallery"><button class="close-button" data-action="close-gallery" aria-label="Close gallery">×</button><img alt="Enlarged fictional property image"><p>Illustrative sample image · Not a live listing</p></dialog>`;
   document.title = `${ctx.page === 'index' ? 'All screens' : ctx.page[0].toUpperCase() + ctx.page.slice(1)} · Blaqks One design preview`;
   bindInteractions(ctx, state, render);
-  requestAnimationFrame(() => window.scrollTo(0, restore ? state.scroll[location.hash] || 0 : 0));
+  requestAnimationFrame(() => {
+    const title = document.querySelector('main h1');
+    if (title) {
+      title.tabIndex = -1;
+      title.focus({ preventScroll: true });
+    }
+    window.scrollTo(0, restore ? state.scroll[location.hash] || 0 : 0);
+  });
   previous = location.hash;
 }
 window.addEventListener('hashchange', () => render(true));

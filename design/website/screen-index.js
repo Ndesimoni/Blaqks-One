@@ -9,6 +9,13 @@ export const screens = [
       ['Buy', 'properties', { purpose: 'buy' }],
       ['Rent', 'properties', { purpose: 'rent' }],
       ['Holiday homes', 'properties', { purpose: 'holiday' }],
+      ['Emirate search', 'properties', { emirate: 'dubai' }],
+      ['Budget range', 'properties', { purpose: 'rent', minPrice: '150000', maxPrice: '165000' }],
+      [
+        'Rooms and features',
+        'properties',
+        { purpose: 'buy', bedrooms: 'studio', amenities: 'gym' },
+      ],
       ['Property detail', 'property', { id: '1' }],
       ['Companies directory', 'companies', {}],
       ['Company profile', 'company', { id: 'harbour' }],
@@ -19,6 +26,9 @@ export const screens = [
       ['Agent profile', 'agent', { id: 'maya' }],
       ['Areas directory', 'areas', {}],
       ['Area detail', 'area', { id: 'marina' }],
+      ['Developers directory', 'developers', {}],
+      ['Developer profile', 'developer', { id: 'emaar' }],
+      ['Developer with no listings', 'developer', { id: 'binghatti' }],
     ],
   ],
   [
@@ -40,11 +50,28 @@ export const screens = [
     [
       ['Company homepage', 'home', { site: 'harbour' }],
       ['Company listings', 'properties', { site: 'harbour' }],
+      ['Company emirate search', 'properties', { site: 'harbour', emirate: 'abu-dhabi' }],
+      [
+        'Company advanced filters',
+        'properties',
+        {
+          site: 'harbour',
+          purpose: 'buy',
+          emirate: 'dubai',
+          minPrice: '2000000',
+          maxPrice: '3000000',
+          bedrooms: 'studio',
+          amenities: 'gym',
+        },
+      ],
       ['Company property detail', 'property', { site: 'harbour', id: '1' }],
       ['Company About', 'about', { site: 'harbour' }],
       ['Company Contact', 'contact', { site: 'harbour' }],
       ['Company team', 'agents', { site: 'harbour' }],
       ['Company agent profile', 'agent', { site: 'harbour', id: 'maya' }],
+      ['Company developers', 'developers', { site: 'harbour' }],
+      ['Company developer profile', 'developer', { site: 'harbour', id: 'emaar' }],
+      ['Developer absent from company stock', 'developer', { site: 'harbour', id: 'azizi' }],
     ],
   ],
   [
@@ -78,8 +105,14 @@ export const screens = [
     'Empty, error & system states',
     [
       ['No matching properties', 'properties', { q: 'no-such-sample' }],
+      [
+        'Invalid budget range',
+        'properties',
+        { purpose: 'buy', minPrice: '3000000', maxPrice: '2000000' },
+      ],
       ['No matching companies', 'companies', { q: 'no-such-sample' }],
       ['No matching agents', 'agents', { q: 'no-such-sample' }],
+      ['No matching developers', 'developers', { q: 'no-such-sample' }],
       ['Listing unavailable', 'system', { state: 'unavailable' }],
       ['Company site unavailable', 'system', { state: 'site' }],
       ['Site setup pending', 'system', { state: 'setup' }],
@@ -90,5 +123,5 @@ export const screens = [
   ],
 ];
 export function screenIndex() {
-  return `<section class="section page-top">${heading('BLAQKS ONE · COMPLETE DESIGN PREVIEW', 'Every page.<br>One considered experience.', 'Explore the public journey and the website editor. All people, properties and companies are fictional; no live services are connected.')}<div class="theme-links">${themeNames.map((name, i) => link(`Theme ${i + 1} · ${name} →`, 'home', { site: 'harbour', theme: String(i + 1) }, {}, 'button quiet')).join('')}</div><div class="screen-index">${screens.map(([group, items]) => `<section class="index-group"><span class="eyebrow">${items.length} SCREENS / STATES</span><h2>${group}</h2>${items.map(([title, path, q]) => link(`${title}<span>→</span>`, path, q)).join('')}</section>`).join('')}</div><p class="notice">Design coverage is not production implementation. Legal copy is a placeholder; forms and approval/domain controls are demonstrations only. Published inventory counts are derived from the fictional sample data.</p></section>`;
+  return `<section class="section page-top">${heading('BLAQKS ONE · COMPLETE DESIGN PREVIEW', 'Every page.<br>One considered experience.', 'Explore the public journey and the website editor. Agencies, agents and properties are fictional. Developer names refer to real organisations; their sample property associations are illustrative. No live services are connected.')}<div class="theme-links">${themeNames.map((name, i) => link(`Theme ${i + 1} · ${name} →`, 'home', { site: 'harbour', theme: String(i + 1) }, {}, 'button quiet')).join('')}</div><div class="screen-index">${screens.map(([group, items]) => `<section class="index-group"><span class="eyebrow">${items.length} SCREENS / STATES</span><h2>${group}</h2>${items.map(([title, path, q]) => link(`${title}<span>→</span>`, path, q)).join('')}</section>`).join('')}</div><p class="notice">Design coverage is not production implementation. Legal copy is a placeholder; forms and approval/domain controls are demonstrations only. Published inventory counts are derived from the fictional sample data.</p></section>`;
 }

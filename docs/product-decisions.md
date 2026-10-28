@@ -184,6 +184,8 @@ See [Team activity design](team-activity-design.md).
 
 ## Public listings (decided 2026-10-12)
 
+**Superseded in part on 2026-10-28:** the [direct website publishing decision](#direct-website-publishing-decided-2026-10-28) removes the human approval/submission gate below. Listing limits, private/public separation and eligibility requirements remain.
+
 | Topic                           | Decision                                                                                                                                                                                                                                                               |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Who can be a listing agent      | **Any staff member the Admin grants listing permission to.** No separate professional-credential gate in the product. Publication still requires exact-version Super Admin approval.                                                                                   |
@@ -204,6 +206,8 @@ See [Team activity design](team-activity-design.md).
 | Unassigned or orphaned enquiries | If the agent is unavailable, suspended or removed, their open enquiries move to their own team's Admin queue. Attribution history is preserved; enquiries are never moved to another Admin's team automatically. |
 
 ## Company websites (decided 2026-10-20)
+
+**Publication update:** the [direct website publishing decision](#direct-website-publishing-decided-2026-10-28) replaces the approval requirement below for listings and website content on both website types.
 
 There is **one general Blaqks One website** with every company's approved listings. A company may also have its **own private website**, served by the same public website application and data. Each site reads only approved public listing versions, never private CRM records. See the [public website plan](public-website-plan.md).
 
@@ -228,6 +232,19 @@ The owner requested a better page/navigation structure, rather than only cosmeti
 The owner accepted **subtle lightweight depth for the initial website**, with one restrained homepage hero effect and stable search, text and enquiry controls. Phones and reduced-motion visitors get a polished static presentation. Full interactive 3D is deferred until it has a clear purpose and measured performance benefit/tradeoff; genuine property tours load separately when opened. See the [visual and performance brief](website-visual-refinement.md). Numerical budgets remain proposed acceptance targets, not tested guarantees.
 
 This checkpoint authorises saving/pushing the planning updates. It does not establish that a Next.js website, public publication backend or hosting has been implemented, and it does not settle the remaining commercial/domain/legal choices in the [settings plan](website-settings-plan.md#17-owner-decisions-to-settle).
+
+## Direct website publishing (decided 2026-10-28)
+
+The owner removed the separate approving step from CRM-managed website publishing. This supersedes earlier mandatory Super Admin review/approval of public listing, profile, company-site, page and content revisions on **both the general Blaqks One website and company websites**. No routine submission, waiting-for-approval or approve/reject stage is required.
+
+- Flow: **Edit → Save draft / Preview → Publish**. Authorised publishers may use **Save & publish** directly; drafts and previews remain available. Private CRM saves alone do not publish anything.
+- Company Admins publish their own company website content; staff need an explicit scoped publishing grant. Listing publication still requires the member's listing permission and access to the source record. Platform editors manage the general website's branding/editorial pages; companies publish their own eligible listings to selected destinations without platform preapproval.
+- A Publish command validates the selected public snapshot and permissions, then records an immutable public version and synchronises the selected websites. Subsequent edits can be published directly too. Show Publishing or Sync failed honestly; do not claim a website has updated before catalogue/cache work succeeds.
+- Preserve field allowlists, deliberately selected public contacts/media, member consent, community-only public maps, licence/permit eligibility, same-property listing limits, entitlement/domain checks and original-company enquiry routing. Removing editorial approval does not expose whole private CRM records or grant new cross-company access.
+- Reserve listing capacity atomically at publication/activation, including in-flight publication reservations; release on failure/cancellation. There is no pending-human-approval reservation state. Recheck eligibility on activation; one publication on both sites still uses one slot.
+- Keep audit/version history, withdrawal, site pause and operator takedown. Restoring a version revalidates current permission/eligibility and cannot revive suspended or withdrawn material through a stale job.
+
+This changes the website publication plan only. Finance approvals, marketplace applications, agreements and other unrelated approval workflows remain in place. The existing design prototype still contains older review controls; production publication and Next.js integration are not yet built. Update those screens when implementing the new direct-publishing flow; do not present simulated controls as working publication.
 
 ## Messaging design (decided 2026-10-20)
 

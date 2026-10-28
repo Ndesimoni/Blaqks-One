@@ -1,5 +1,7 @@
 # Public website plan
 
+**Latest owner decision (2026-10-28):** [Direct website publishing](product-decisions.md#direct-website-publishing-decided-2026-10-28) supersedes every mandatory Super Admin publication approval/submission stage in this older plan, including WEB2/WEB6/WEB9. Authorised users publish validated public versions directly on both website types. Keep permission/consent, private/public separation, eligibility, listing limits, history and takedown. Older review screens are not the current target flow; production publishing remains unimplemented.
+
 Status: **planned, not started** (owner, 2026-10-20). This plan builds the public side of Blaqks One: one general website with every company's approved listings, and optional company websites. It follows the [platform system design](platform-system-design.md), the [public listings decisions](product-decisions.md#public-listings-decided-2026-10-12), the [company website decisions](product-decisions.md#company-websites-decided-2026-10-20) and [service boundaries](service-boundaries.md). Packets WEB1–WEB9 replace the website rows W1–W4 in [roadmap §14](claude-implementation-roadmap.md#concrete-work-packets). The messaging packets with the same letter (W1 for WhatsApp) are unaffected.
 
 ## What the owner decided

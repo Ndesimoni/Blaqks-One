@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { screens } from './screen-index.js';
 import { url } from './helpers.js';
-import { checkDesignRules } from './check-design-rules.mjs';
+import { checkFlows } from './check-flows.mjs';
 
 const base = 'http://127.0.0.1:4178/';
 const root = fileURLToPath(new URL('.', import.meta.url));
@@ -108,7 +108,7 @@ try {
   await expect(page.getByText('Submitted for review', { exact: true })).toBeVisible();
   await page.goto(base + '#/index');
   await expect(page.locator('.index-group')).toHaveCount(6);
-  const contrasts = await checkDesignRules(page, base);
+  const flowChecks = await checkFlows(page, base, root);
   await page.goto(`${base}dist/review.html#/companies`);
   await expect(page.getByRole('heading', { name: 'Find your property company.' })).toBeVisible();
   const remoteRequests = [];
@@ -132,7 +132,7 @@ try {
     failures,
     interactions: 'passed',
     standalone: 'passed',
-    darkThemeContrast: contrasts,
+    ...flowChecks,
   };
   await writeFile(`${root}dist/check-results.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report));

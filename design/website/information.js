@@ -1,8 +1,10 @@
 import { companyBy, images } from './data.js';
 import { heading, button, link, esc, notice } from './helpers.js';
+import { companyInformation } from './company-pages.js';
 export function information(ctx) {
   const c = companyBy(ctx.scope.site),
     s = ctx.scope;
+  if (c && ['about', 'contact'].includes(ctx.page)) return companyInformation(ctx, c);
   if (ctx.page === 'legal') return legal(ctx);
   if (ctx.page === 'plans')
     return `<section class="section page-top">${heading('FOR PROPERTY BUSINESSES', 'A place for your business to grow.', 'Company websites are planned as an optional add-on or higher-plan feature.')}<div class="two-columns"><article class="feature-card"><span class="eyebrow">CONNECTED CRM</span><h2>Your work, in one place.</h2><p>Relationships, properties and the workflows that connect them.</p>${button('About the platform', 'business')}</article><article class="feature-card dark-panel"><span class="eyebrow">COMPANY WEBSITE</span><h2>Your identity.<br>A considered website.</h2><p>Four themes, approved public listings and your company domain.</p><strong>Plans and prices are not yet set.</strong>${button('Ask about company websites', 'contact', {}, {}, true)}</article></div>${notice('Design information only. No checkout, subscription purchase or billing is available.')}</section>`;

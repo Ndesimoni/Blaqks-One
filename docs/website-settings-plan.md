@@ -2,6 +2,8 @@
 
 Planning date: **2026-10-28**. Status: **proposal for owner review; no website implementation or public launch**.
 
+**Latest owner decision — direct publication:** [2026-10-28](product-decisions.md#direct-website-publishing-decided-2026-10-28) removes separate Super Admin approval for website content, profiles and listings on both websites. The current flow is Edit → Save draft / Preview → Publish. Earlier approval/submission language elsewhere in this plan is superseded; “approved public” describes deliberately selected, validated public content, not a required human review. Private data, scoped grants, eligibility and listing limits remain enforced. The existing prototype's review screens are historical and need redesign; no live publishing is implemented.
+
 Final planning checkpoint: two website types, improved structural direction and lightweight initial depth are recorded in [Product decisions](product-decisions.md#website-scope-structure-and-motion-decided-2026-10-28). The planned public application is shared Next.js; the CRM remains React/Vite. Full interactive 3D is deferred. Open detailed business choices in section 17 remain explicitly unsettled.
 
 The owner requested a complete settings plan and clarified the scope: **only the Blaqks One general website and company websites**. There are no separate individual-agent websites. Agents have approved profiles and listings within these websites. Existing company-site and public-listing decisions remain authoritative; proposed defaults below are not new owner decisions.
@@ -44,7 +46,7 @@ This is a review of repository code and product documentation, not an inspection
 ## 3. Confirmed rules to carry forward
 
 - English only; AED prices with explicit sale, annual-rental or nightly basis; dates/times use Asia/Dubai where relevant.
-- Super Admin approval of the **exact public listing revision** is required before it appears anywhere publicly. Company website settings cannot bypass it.
+- Authorised publishers publish an **exact public revision** directly after validation; no separate Super Admin approval is required on either website.
 - Company sites are optional paid add-ons or higher-plan features. Exact names/prices are undecided. The existing plan allows operator-controlled entitlement until billing exists.
 - A company site may go live without a verified licence; public property listings still require verified licensing/permit eligibility. Proposed profile rule: an approved informational agent profile may appear without verified licensing, with accurate declared/verified labels; any associated public listing still requires the separate verified licensing/permit gate. Confirm this profile rule before implementing it.
 - Four owner-reviewed themes, logo and one brand colour; fixed Home, Listings, Listing detail, About and Contact pages, with extra structured pages planned.
@@ -54,7 +56,7 @@ This is a review of repository code and product documentation, not an inspection
 
 ### Listing-limit wording requiring care
 
-The explicit 12 October public-listing rule is **at most two live listings of the same physical property per Admin team**, with at most two Admin teams for that property on the general site. Submitted and approved-awaiting-activation listings also reserve capacity. It is not a cap of two total properties in the company's inventory.
+The explicit 12 October public-listing rule is **at most two live listings of the same physical property per Admin team**, with at most two Admin teams for that property on the general site. In-flight publication reservations also hold capacity atomically until activation or failure/cancellation; there is no human-approval reservation state. It is not a cap of two total properties in the company's inventory.
 
 The 20 October company-site decision shortens this to “2 live listings per team,” creating ambiguity. Recommended interpretation: preserve the per-property team limit across all destinations; apply the two-company limit only to the general site. Owner confirmation is needed before implementing any different total-inventory cap. Website plan quotas, if introduced later, must be separate, explicitly priced settings.
 
@@ -64,17 +66,17 @@ Showing the same approved agent listing on the general and company websites coun
 
 Add **Website** for company Admins and delegated website staff, and **Platform → Websites** for the operator. Eligible staff access their approved **Public profile** through company-publication controls, without a My website menu. Put listing preparation/status in **Properties → Public listings**, with links from Website; do not mix content settings with everyday private property editing.
 
-| Action                                 | Platform operator                                     | Company Admin                                      | Delegated company website manager                                          | Listing agent                                          |
-| -------------------------------------- | ----------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------ |
-| General-site branding/pages/navigation | Yes                                                   | No                                                 | No                                                                         | No                                                     |
-| Grant company-site entitlement         | Yes, audited platform operation                       | Request/view own entitlement                       | View if permitted                                                          | No default access                                      |
-| Company theme/content/pages            | Review public submissions; no routine company editing | Own company                                        | Explicit `site.manage` in own company                                      | Only if explicitly delegated                           |
-| Draft professional public profile      | Review submitted snapshot                             | Coordinate opted-in members                        | Explicit profile-content grant                                             | Own profile draft, consent and submission if permitted |
-| Connect/remove company domain          | Operator emergency removal                            | Own company                                        | Separate `site.domain.manage`, off by default                              | No default authority                                   |
-| Draft/submit public listing            | No new private-record access                          | Own permitted records                              | Requires publication grants and record scope in addition to website access | Eligible records plus representation/submission grant  |
-| Approve public listing/content         | Super Admin only                                      | Company endorsement is not final platform approval | No                                                                         | No                                                     |
-| Read enquiries                         | Platform enquiries only; restricted recovery metadata | Own company                                        | Only if separately granted CRM lead/inbox access                           | Own assigned enquiries                                 |
-| Pause/withdraw public material         | Operator across public surfaces, with reason/history  | Own company material                               | Explicit scoped withdrawal grant                                           | Publications only with withdrawal grant                |
+| Action                                 | Platform operator                                     | Company Admin                                    | Delegated company website manager                                          | Listing agent                                          |
+| -------------------------------------- | ----------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------ |
+| General-site branding/pages/navigation | Yes                                                   | No                                               | No                                                                         | No                                                     |
+| Grant company-site entitlement         | Yes, audited platform operation                       | Request/view own entitlement                     | View if permitted                                                          | No default access                                      |
+| Company theme/content/pages            | Review public submissions; no routine company editing | Own company                                      | Explicit `site.manage` in own company                                      | Only if explicitly delegated                           |
+| Draft professional public profile      | Review submitted snapshot                             | Coordinate opted-in members                      | Explicit profile-content grant                                             | Own profile draft, consent and submission if permitted |
+| Connect/remove company domain          | Operator emergency removal                            | Own company                                      | Separate `site.domain.manage`, off by default                              | No default authority                                   |
+| Draft/submit public listing            | No new private-record access                          | Own permitted records                            | Requires publication grants and record scope in addition to website access | Eligible records plus representation/submission grant  |
+| Publish public listing/content         | General-site editorial content; no new private access | Own company content and eligible scoped listings | Explicit scoped publication grant                                          | Eligible records with listing/publication permission   |
+| Read enquiries                         | Platform enquiries only; restricted recovery metadata | Own company                                      | Only if separately granted CRM lead/inbox access                           | Own assigned enquiries                                 |
+| Pause/withdraw public material         | Operator across public surfaces, with reason/history  | Own company material                             | Explicit scoped withdrawal grant                                           | Publications only with withdrawal grant                |
 
 Proposed permission names are planning contracts, not existing permissions. Website editing must not grant record visibility, inbox access, financial access, sending authority or staff administration. Add domain-management and publication capabilities explicitly; positions only suggest defaults. Staff grants start off.
 
@@ -106,9 +108,9 @@ Use the current CRM forest-green/neutral/gold design and shared controls. The pu
 
 ### First setup and recurring work
 
-Company setup is a stepper: entitlement check → public company details → theme/branding → pages/contact → address/domain → phone/desktop preview → submit for review. Listings have their own checklist and can follow later; a site can launch with an honest empty Listings page. Domain setup can be completed after the platform subdomain is live. Avoid forcing an Admin to buy a domain or add an unapproved property to finish setup.
+Company setup is a stepper: entitlement check → public company details → theme/branding → pages/contact → address/domain → phone/desktop preview → Publish. Listings have their own checklist and can follow later; a site can launch with an honest empty Listings page. Domain setup can be completed after the platform subdomain is live. Avoid forcing an Admin to buy a domain or add a property to finish setup.
 
-Returning Admins land on Overview, which shows the live version, any newer draft and outstanding issues. Editing About does not require restarting setup. Company staff see only sections their explicit grants allow. The platform reviewer sees the submitted public version, changes and decision history in a focused approval queue.
+Returning Admins land on Overview, which shows the live version, any newer draft and outstanding issues. Editing About does not require restarting setup. Company staff see only sections their explicit grants allow. Platform operators manage publication health, history and exceptional takedowns without a routine approval queue.
 
 Recommended validation contracts to finalise in WEB6: public display name up to 100 characters, tagline 160, short description 500, page title 100, menu label 40 and SEO description 160. Character counts should guide good copy; metadata lengths are editorial targets, not search-engine guarantees. Use bounded page/block counts and upload-byte/pixel limits from the media contract. Require alt text for meaningful images, allow safe HTTPS links only, strip image metadata, and reject executable/SVG uploads unless an explicitly reviewed processing path supports them. Office addresses/maps and public contacts are optional individually, but a Contact page needs at least one approved usable contact method or durable enquiry form.
 
@@ -122,7 +124,7 @@ Platform sections cover:
 2. **Public pages:** home/search, results, listing detail, company directory/profile, agent directory/profile, platform About/Contact, privacy, terms and unavailable/not-found pages. CRM product/pricing/help pages sit in a distinct navigation group with accurate capability claims.
 3. **Discovery:** controlled UAE emirate/community taxonomy, sale/rent/holiday bases, residential/commercial subtype, readiness and primary/secondary fields, bedrooms, price bounds and sorting. Do not merge off-plan with primary or nightly with annual prices. Never show private stock totals.
 4. **Editorial home sections:** selected locations, approved listings and approved agents/companies. Editorial selection changes placement only; it cannot approve a listing or bypass eligibility. Label paid placement if introduced; paid ranking and pricing require separate approval.
-5. **Publication review:** public profile/site/listing/page queues with frozen preview, diff, permit verification state, approve/reject/change-request reason, withdrawals and emergency public takedown. Publication rules are operational policy, not an arbitrary switch editors can weaken.
+5. **Publication management:** public profile/site/listing/page status, version preview/diff, validation and permit eligibility, sync health, history, withdrawals and emergency public takedown. No prepublication approval queue.
 6. **Site directory/entitlements:** site type, company, responsible Admin/editor, plan feature, enabled/paused/lapsed status, renewal date if known and reason history. No customer business-record browsing from here.
 7. **Platform contact intake:** separate categories for platform sales, customer support and website/report-listing concerns. Proposed destination is a platform support queue; property-specific requests always remain company enquiries. Do not distribute general visitors to paying agencies without an explicit routing/consent policy.
 8. **Search and trust:** generated sitemaps, redirects, canonical policy, index health, privacy/terms versions and approved advertising disclosures. A manually typed licence is never displayed as verified.
@@ -162,7 +164,7 @@ Property enquiries follow the listing's approved agent. General company-page enq
 
 Profiles contain deliberately approved professional name, title, photo/text fallback, short bio, experience, service areas, specialties, optional permitted credentials and professional contact methods. Existing My profile or Marketplace content may prefill a draft after explicit field review; it is never automatically public or kept linked to mutable private account fields.
 
-A profile is approved as an exact public version with consent from the represented member. A company can nominate directory members, but cannot turn internal staff contact information into public content merely by selecting a checkbox. Public listing representation remains an explicit Admin grant; staff titles do not grant it.
+A profile is published as an exact public version with consent from the represented member and scoped publishing authority, without a separate approval stage. A company can nominate directory members, but cannot turn internal staff contact information into public content merely by selecting a checkbox. Public listing representation remains an explicit Admin grant; staff titles do not grant it.
 
 General-site profiles show that agent's eligible publications selected for the general site. Company-site profiles show that agent's eligible company-destination publications in that company. Shared view-only records, marketplace offers and colleagues' private listings are not added to either public profile automatically. No separate site editor, domains, billing or individual website portability is needed.
 
@@ -178,25 +180,23 @@ Private by default: unit reference/exact access instructions, landlord/contact I
 
 Recommended location default is emirate + community + permitted building/project, with approximate map location. Exact address/pin and advertising permit/QR display must be settled against applicable advertising requirements before listing launch. The website cannot rely on marketplace contact-release rules as public approval: MK4 release is participant-only.
 
-Each public profile/contact change gets a new public revision. Agent/company name, photo or contact changes must identify dependent live listings and obtain approval of the revised public snapshot; an urgent incorrect contact is removed promptly while correction is reviewed. Never silently mutate approved versions.
+Each public profile/contact change gets a new public revision. Publishing an agent/company name, photo or contact change identifies and updates dependent live public snapshots after validation, without a separate approval. An urgent incorrect contact can be removed promptly. Draft/private profile edits never silently mutate published versions.
 
-## 10. Save, review, preview and publishing
+## 10. Save, preview and direct publishing
 
-Separate **entitlement**, **site lifecycle**, **content revision**, **publication eligibility**, **domain/SSL**, and **catalogue sync** status. A site may be live on a subdomain while its custom domain is still pending, or have a new draft while its older approved content remains live.
+Separate **entitlement**, **site lifecycle**, **content revision**, **publication eligibility**, **domain/SSL**, and **catalogue sync** status. A site may be live on a subdomain while its custom domain is still pending, or have a new draft while its older published content remains live.
 
-| User action             | Result                                                                                                                        |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Save draft              | Private version saved; visitors see no change                                                                                 |
-| Preview                 | Authenticated, non-indexed preview of a specific draft/site/viewport; no public cache or CRM cookies on visitor domains       |
-| Submit for review       | Freeze content/media/contact version; show exact changes and affected destinations                                            |
-| Changes requested       | Keep review comments and editable next draft; do not replace the live version                                                 |
-| Approve                 | Operator approves that exact version; activation rechecks live membership, entitlement and destination rules                  |
-| Publish / activate      | Make the approved version available; show syncing until catalogue/edge confirms                                               |
-| Pause site              | Stop that site's public exposure and intake; show effect on company-only listings before confirming                           |
-| Withdraw listing        | Stop enquiries immediately and remove it across all selected destinations                                                     |
-| Restore earlier version | Create/revalidate a new activation of still-eligible approved content; never undo legal withdrawal/suspension with a rollback |
+| User action              | Result                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| Save draft               | Private version saved; visitors see no change                                                                                  |
+| Preview                  | Authenticated, non-indexed preview of a specific draft/site/viewport; no public cache or CRM cookies on visitor domains        |
+| Publish / Save & publish | Validate scoped authority, public content, media, eligibility and capacity; freeze a public version and sync selected websites |
+| Publishing / Sync failed | Show actual catalogue/cache progress; retain draft and recovery action on failure; never claim premature success               |
+| Pause site               | Stop that site's public exposure and intake; show effect on company-only listings before confirming                            |
+| Withdraw listing         | Stop enquiries immediately and remove it across all selected destinations                                                      |
+| Restore earlier version  | Publish a new revalidated version of still-eligible content; never undo withdrawal/suspension with a rollback                  |
 
-Logo, text, public contacts, hero media, extra pages, profile and SEO copy require public review. Theme choice and safe brand colour need no editorial approval, as already planned, but apply through an explicit preview/apply action and normal version/history checks. Navigation cannot expose unapproved pages. A theme change never changes property approval.
+Logo, text, public contacts, hero media, extra pages, profiles, SEO, theme and safe brand colour publish directly through explicit scoped commands and validation/version/history checks. Navigation cannot expose draft pages. Private CRM record saves remain separate from public publishing; a theme change does not change listing destinations or eligibility.
 
 Recommend a short-lived preview served from a dedicated authenticated preview boundary with protected assets. Do not place public draft tokens in normal analytics, indexing or referrers. An expired/foreign preview shows a generic unavailable state. Preview enquiry submits are disabled or use an explicitly labelled synthetic test flow.
 
@@ -272,7 +272,7 @@ Keep WEB1–WEB9 dependencies from the existing plan, extended rather than repla
 
 1. **Planning/WEB4 design:** settle section 17 decisions; prototype the two settings contexts and four public theme compositions for owner review. No hosting/provider changes are implied.
 2. **WEB1 public media readiness:** explicit selected derivatives, image processing, immutable ownership and revocation.
-3. **WEB2 publication foundation:** approved public profiles, listing revisions, capacity/licence/permit rules, submission and Super Admin public review.
+3. **WEB2 publication foundation:** consented public profiles, immutable listing revisions, scoped direct Publish commands, capacity/licence/permit rules and withdrawal; no human approval queue.
 4. **WEB3 catalogue and enquiries:** projections/host contract, durable intake and original-company lead routing; general enquiries get an explicit destination.
 5. **WEB5 general site:** useful discovery, details/public profiles, form, SEO and takedown; launch gates remain separate.
 6. **WEB6–WEB7 company settings/sites:** entitlement, versioned content, subdomains, safe themes, contact/pages and lapse.
@@ -282,11 +282,11 @@ Keep WEB1–WEB9 dependencies from the existing plan, extended rather than repla
 Minimum acceptance scenarios:
 
 - Company A's manager and marketer have separate approved public listings; company B's records and enquiries never appear in A's settings or public projection.
-- Company editors and listing agents cannot approve themselves or access hidden record pickers/totals by gaining a website grant.
+- Company editors and listing agents can publish only with the appropriate scoped grants; website access cannot expose hidden record pickers/totals or grant private CRM access.
 - Agent profile pages list only the approved representative publications eligible for that host; received shares and private coworker inventory never leak.
 - One publication on both websites reserves one slot; simultaneous same-property submissions enforce existing team/general-site limits without revealing rival records.
 - Private client, landlord, exact access, finance, original media and authentication fields are absent from public HTML, JSON, SEO, image metadata and errors.
-- Draft/old approval/profile/contact/media edits never mutate the live approved version. Emergency withdrawal overrides queued activation and rollback.
+- Draft/private profile/contact/media edits never mutate a live public version; explicit Publish creates its successor. Emergency withdrawal overrides queued activation and rollback.
 - Listing, company-contact and optional agent-profile contact forms route from trusted publication/site/company relationships; repeated taps produce one durable enquiry and response work item.
 - Departure removes ineligible agent representation and future intake; prior leads remain with their original company.
 - Unknown/forged host, foreign preview, expired token and domain reuse cannot show another site's content. CRM cookies never reach public hosts.

@@ -30,6 +30,34 @@ const html = source
   );
 await mkdir(`${root}dist`, { recursive: true });
 await writeFile(`${root}dist/review.html`, html);
+await writeFile(
+  `${root}dist/company-preview.html`,
+  html.replace(
+    '<head>',
+    '<head><script>if (!location.hash) location.hash = "/home?site=harbour&theme=1";</script>',
+  ),
+);
+await writeFile(
+  `${root}dist/developers-preview.html`,
+  html.replace(
+    '<head>',
+    '<head><script>if (!location.hash) location.hash = "/developers";</script>',
+  ),
+);
+await writeFile(
+  `${root}dist/maps-preview.html`,
+  html.replace(
+    '<head>',
+    '<head><script>if (!location.hash) location.hash = "/property?id=1";</script>',
+  ),
+);
+await writeFile(
+  `${root}dist/filters-preview.html`,
+  html.replace(
+    '<head>',
+    '<head><script>if (!location.hash) location.hash = "/properties?purpose=buy&emirate=dubai&minPrice=2000000&maxPrice=3000000&bedrooms=studio&amenities=gym";</script>',
+  ),
+);
 console.log(
-  `Created standalone design/website/dist/review.html (${Math.round(Buffer.byteLength(html) / 1024)} KB).`,
+  `Created general, company, developer, filter and map previews (${Math.round(Buffer.byteLength(html) / 1024)} KB each).`,
 );

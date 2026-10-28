@@ -1,15 +1,16 @@
 import { url } from './helpers.js';
+import { bindPropertyFilters } from './property-filter-interactions.js';
 export function bindForms(ctx, state) {
   document.querySelectorAll('form[data-form]').forEach((form) => {
     const kind = form.dataset.form;
+    if (['search', 'filters'].includes(kind)) {
+      bindPropertyFilters(form, ctx);
+      return;
+    }
     if (kind === 'editor') restoreEditorValues(form, state);
     form.onsubmit = (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form));
-      if (['search', 'filters'].includes(kind)) {
-        location.hash = url('properties', clean(data));
-        return;
-      }
       if (kind === 'directory') {
         const { destination, ...q } = data;
         location.hash = url(destination, clean(q));
@@ -51,45 +52,6 @@ export function bindForms(ctx, state) {
       form.addEventListener('input', () => {
         form.dataset.dirty = 'true';
         state.saved = false;
-      });
-    if (kind === 'filters')
-      form.addEventListener('change', (event) => {
-        if (event.target.name !== 'purpose') return;
-        const purpose = event.target.value;
-        form.elements.budget.value = '';
-        form.elements.budget.disabled = !purpose;
-        form.querySelector('[data-budget-label]').textContent =
-          `Maximum ${purpose === 'rent' ? 'annual rent' : purpose === 'holiday' ? 'nightly rate' : 'sale price'} (AED)`;
-      });
-    if (kind === 'search')
-      form.addEventListener('change', (e) => {
-        if (e.target.name !== 'purpose') return;
-        const purpose = e.target.value,
-          budget = form.elements.budget;
-        const values =
-          purpose === 'buy'
-            ? [
-                [3000000, '3 million'],
-                [5000000, '5 million'],
-              ]
-            : purpose === 'rent'
-              ? [
-                  [150000, '150,000 / year'],
-                  [250000, '250,000 / year'],
-                ]
-              : [
-                  [1000, '1,000 / night'],
-                  [1500, '1,500 / night'],
-                ];
-        budget.innerHTML =
-          '<option value="">Any budget</option>' +
-          values.map(([v, t]) => `<option value="${v}">Up to AED ${t}</option>`).join('');
-        budget.nextElementSibling.textContent =
-          purpose === 'buy'
-            ? 'Sale price'
-            : purpose === 'rent'
-              ? 'Annual rental price'
-              : 'Nightly price';
       });
   });
 }

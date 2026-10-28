@@ -1,5 +1,7 @@
 import { bindForms, saveEditorValues } from './form-interactions.js';
 import { url } from './helpers.js';
+import { bindNavigation, toggleDisclosure } from './navigation-interactions.js';
+import { bindPropertyLocation } from './property-location-interactions.js';
 export function bindInteractions(ctx, state, render) {
   document.querySelector('.skip').onclick = (e) => {
     e.preventDefault();
@@ -16,6 +18,12 @@ export function bindInteractions(ctx, state, render) {
   );
   document.querySelectorAll('[data-action]').forEach((el) => {
     const action = el.dataset.action;
+    if (action === 'company-theme') {
+      el.onchange = () => {
+        location.hash = url(ctx.page, { ...Object.fromEntries(ctx.query), theme: el.value });
+      };
+      return;
+    }
     if (action === 'sort') {
       el.onchange = () => {
         const q = Object.fromEntries(ctx.query);
@@ -25,12 +33,7 @@ export function bindInteractions(ctx, state, render) {
     }
     el.onclick = () => {
       if (action === 'menu' || action === 'filters') {
-        const target =
-          action === 'menu'
-            ? document.getElementById('nav')
-            : document.getElementById('filter-panel');
-        const open = target.classList.toggle('open');
-        el.setAttribute('aria-expanded', String(open));
+        toggleDisclosure(el);
         return;
       }
       if (action === 'gallery') {
@@ -68,6 +71,8 @@ export function bindInteractions(ctx, state, render) {
     };
   });
   bindForms(ctx, state);
+  bindNavigation();
+  bindPropertyLocation();
   const editorForm = document.querySelector('[data-form="editor"]');
   if (editorForm)
     editorForm.querySelectorAll('[name="theme"]').forEach((input) =>
