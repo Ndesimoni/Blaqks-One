@@ -275,9 +275,14 @@ stored records). Test on the disposable database with synthetic records.
   with the owner's answers in [Product decisions](product-decisions.md). Next: build R2,
   then A6 (live use needs a Blaqks One platform sender). P1 waits until the owner says.
 
-### N4 — WhatsApp (blocked on the owner)
+### N4 — WhatsApp against a local Twilio stand-in (queued 2026-10-29)
 
-Needs decisions D1, D2 and D6, a Twilio account and approved templates; see
+The owner decided that each member connects their own WhatsApp number, with the owner
+keeping their current number (D2 and D3, 2026-10-29), and asked for every social channel to be
+built and tested locally against simulated providers first: W1/W2 WhatsApp, then S1 Facebook
+and Instagram, then T1 TikTok ([product decisions](product-decisions.md#messaging-design-decided-2026-10-20)).
+The build needs no owner setup; the live check needs D6, a Twilio account, approved
+templates and coexistence support; see
 [Connecting platforms](connecting-platforms.md#whatsapp-through-twilio-w1-w2).
 
 ### Smaller follow-ups already recorded

@@ -12,19 +12,19 @@ Design reference: the **CRM Inbox design** canvas (8 screens, https://claude.ai/
 
 ## 1. Decisions
 
-| #   | Decision                          | Status (20 Oct 2026)                                                                                                           |
-| --- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.                |
-| D2  | WhatsApp number                   | Open: keep the current number (only if Twilio supports coexistence in the UAE) or a new dedicated number.                      |
-| D3  | One number per company            | Recommended yes; each company connects its own number through its own Twilio subaccount.                                       |
-| D4  | Business email system             | **SendGrid first (owner, revised 2026-10-21)**, packet E3; the built Google adapter (E1) stays an option, too. Needs a domain. |
-| D5  | Social platforms first            | Facebook Page and Instagram first; **TikTok added to the Channels registry by the owner on 2026-10-20** (messaging in T1).     |
-| D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies.             |
-| D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                                     |
-| D9  | TikTok messaging access           | Open: TikTok Business Account plus Business Messaging API approval; confirm UAE eligibility. Blocks T1 only.                   |
-| D8  | AI sorting of messages            | Not now. Needs an owner data-handling decision first; rules plus staff review are used until then.                             |
+| #   | Decision                          | Status (20 Oct 2026)                                                                                                                                                                                           |
+| --- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | WhatsApp provider                 | **Twilio first** (recommended, agreed in discussion). Meta direct can replace it later behind the same adapter.                                                                                                |
+| D2  | WhatsApp number                   | **Owner keeps their current number (2026-10-29)** through Business app coexistence; confirm Twilio and UAE support before the live check.                                                                      |
+| D3  | Whose number                      | **Each member connects their own number (owner, 2026-10-29)** under the company's Twilio account; a company number may follow ([product decisions](product-decisions.md#messaging-design-decided-2026-10-20)). |
+| D4  | Business email system             | **SendGrid first (owner, revised 2026-10-21)**, packet E3; the built Google adapter (E1) stays an option, too. Needs a domain.                                                                                 |
+| D5  | Social platforms first            | Facebook Page and Instagram first; **TikTok added to the Channels registry by the owner on 2026-10-20** (messaging in T1).                                                                                     |
+| D6  | Meta Business Portfolio and Page  | Owner to create; verification can run in parallel and is needed for higher limits and for serving other companies.                                                                                             |
+| D7  | Public HTTPS address for webhooks | Secure tunnel for development; production depends on the hosting decision.                                                                                                                                     |
+| D9  | TikTok messaging access           | Open: TikTok Business Account plus Business Messaging API approval; confirm UAE eligibility. Blocks T1 only.                                                                                                   |
+| D8  | AI sorting of messages            | Not now. Needs an owner data-handling decision first; rules plus staff review are used until then.                                                                                                             |
 
-Nothing in this plan sends to real clients during development. Every provider is proved first with a local stub, then the provider's sandbox or test number.
+Nothing in this plan sends to real clients during development. Every provider is proved first with a local stub, then the provider's sandbox or test number. **Owner, 2026-10-29:** W1, W2, S1 and T1 are built and tested against local stand-ins of Twilio, Meta and TikTok in that order; D6, D9 and coexistence support block only each channel's live check, not the build.
 
 ## 2. Product rules (apply to every packet)
 
@@ -48,7 +48,7 @@ Nothing in this plan sends to real clients during development. Every provider is
    - Provider access tokens are encrypted at rest.
    - The CRM reads only client conversations and replies to CRM emails, never a whole mailbox.
    - Internal notes are never delivered to clients.
-8. **Permissions:** only the company Admin connects or disconnects channels and edits lead rules. Replying uses the existing separate WhatsApp and email permissions (`channel_access`). Staff without them can read but not reply. The Super Admin manages platform settings and does not read company conversations.
+8. **Permissions:** only the company Admin connects or disconnects company channels and edits lead rules; a member connects their own mailbox or WhatsApp number when the Admin has granted that channel (D3, 2026-10-29). Replying uses the existing separate WhatsApp and email permissions (`channel_access`). Staff without them can read but not reply. The Super Admin manages platform settings and does not read company conversations.
 
 ## 3. Packet order
 
@@ -144,7 +144,7 @@ other companies or personal Gmail join.
 
 ### W1 — WhatsApp sending through Twilio (after D1, D2, D6)
 
-1. Twilio adapter behind the provider interface; one Twilio subaccount per company; credentials in the connection record.
+1. Twilio adapter behind the provider interface; one Twilio account per company, with each member's own number registered as a sender and connected as that member's connection (D3, 2026-10-29); credentials in the connection record.
 2. Template sync (approved/pending/rejected) and template sending with variables filled from the client record; free-form only inside the 24-hour window.
 3. Consent per client and channel (opt-in time and source); opt-out keywords (STOP and Arabic equivalent) honoured automatically.
 4. Status callbacks update Queued → Sent → Delivered → Read / Failed with a plain reason.

@@ -7,7 +7,9 @@ status rules, retention and authorization that packets X1–S1 implement.
 Status: X0, X1, X1a and X2 are built (X2: verified webhook intake with the local stub provider, sealed staging, the outbox and the `messaging_worker` process). **Approved by the owner on 20 October 2026**, after the separate
 [security review](messaging-security.md). Its two High findings (provider-proven account
 ownership and re-sending after lease expiry) are closed in this text, and the design
-decisions O1–O6 in §13 are decided. Product decisions D2 (WhatsApp number), D4 (mailbox
+decisions O1–O6 in §13 are decided. Product decision D2 (WhatsApp numbers) was decided on
+2026-10-29: each member connects their own number, so WhatsApp connections carry
+`owner_member_id` like mailboxes. D4 (mailbox
 system), D5–D7 (social accounts, webhook address) and D8 (AI sorting) remain open where
 they block later packets.
 
@@ -488,14 +490,14 @@ Public: `POST /api/integrations/webhooks/{provider}` (§7).
 
 Blocking the named packet:
 
-| ID  | Decision                                                                                        | Blocks |
-| --- | ----------------------------------------------------------------------------------------------- | ------ |
-| D2  | Keep the current WhatsApp number or buy a dedicated one                                         | W1     |
-| D4  | Revised 2026-10-21: SendGrid first (E3); Google Workspace adapter (E1) built and kept           | E3     |
-| D5  | Facebook Page and Instagram first                                                               | S1     |
-| D6  | Meta Business Portfolio, Page and app verification                                              | S1     |
-| D7  | Public HTTPS address for webhooks                                                               | W2     |
-| D9  | TikTok Business Account and Business Messaging API access (TikTok approval and UAE eligibility) | T1     |
+| ID  | Decision                                                                                        | Blocks        |
+| --- | ----------------------------------------------------------------------------------------------- | ------------- |
+| D2  | Decided 2026-10-29: each member connects their own number; the owner keeps theirs (coexistence) | W1 live check |
+| D4  | Revised 2026-10-21: SendGrid first (E3); Google Workspace adapter (E1) built and kept           | E3            |
+| D5  | Facebook Page and Instagram first                                                               | S1            |
+| D6  | Meta Business Portfolio, Page and app verification                                              | S1            |
+| D7  | Public HTTPS address for webhooks                                                               | W2            |
+| D9  | TikTok Business Account and Business Messaging API access (TikTok approval and UAE eligibility) | T1            |
 
 Design decisions (decided by the owner 2026-10-20, following the review's recommendations):
 

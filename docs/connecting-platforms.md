@@ -12,7 +12,7 @@ document: type it into the CRM's Connections screen or the `.env` file yourself.
 | --------------------------- | ------------------- | ---------------------- | ----------------------------------------- |
 | Email (company domain)      | Twilio SendGrid     | Connection built (E3a) | Domain and SendGrid account, below        |
 | Email (Google Workspace)    | Google              | Built (E1)             | [Google mail setup](google-mail-setup.md) |
-| WhatsApp                    | Twilio              | Planned (W1, W2)       | Decisions D2 and D6 first                 |
+| WhatsApp                    | Twilio              | Planned (W1, W2)       | Member numbers (D2, D3); D6 first         |
 | Facebook Page and Instagram | Meta                | Planned (S1)           | Meta business setup and app review        |
 | TikTok direct messages      | TikTok for Business | Planned (T1)           | Business Messaging access (D9)            |
 
@@ -55,12 +55,19 @@ to the domain keeps going to SendGrid and is lost.
 
 ## WhatsApp through Twilio (W1, W2)
 
-- Decide D2: keep the current WhatsApp number (only if Twilio supports moving it while you
-  keep using the WhatsApp Business app in the UAE) or use a new dedicated number.
+- **Each member connects their own WhatsApp number (D2 and D3, decided 2026-10-29);** the
+  owner keeps their current number. Members should use a work number, not a personal one.
+  Numbers stay usable in the WhatsApp Business app on the phone through coexistence. Before
+  connecting, confirm in Twilio's current documentation that it onboards an existing
+  Business app number with coexistence for UAE numbers. A number on the ordinary WhatsApp
+  app moves to the WhatsApp Business app first. If coexistence is not offered, decide again:
+  move numbers fully to the API (the phone app stops working for them) or use new numbers.
 - Create a **Meta Business Portfolio** for the company (D6) and start business verification;
   WhatsApp senders are registered under it.
-- Create a **Twilio account** (one per company, D3), add billing and register the WhatsApp
-  sender in Twilio's console. Twilio and Meta both charge per conversation or message.
+- Create a **Twilio account** (one per company), add billing and register each member's
+  number as a WhatsApp sender in Twilio's console. Twilio and Meta charge per number and per
+  conversation or message, paid by the company. Meta limits how many numbers one business
+  can register until it is verified (D6).
 - Message templates for contacting clients first are approved by Meta; we prepare the wording.
 
 ## Facebook Page and Instagram (S1)
