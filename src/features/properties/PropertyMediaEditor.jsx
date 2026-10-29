@@ -7,6 +7,7 @@ import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { useMediaSource } from '../../lib/mediaSource.js';
 import { usePropertyMediaEditor } from './usePropertyMediaEditor.js';
 import { PropertyAmenityPicker } from './PropertyAmenityPicker.jsx';
+import { useI18n } from '../../i18n/useI18n.js';
 
 export function PropertyMediaEditor({
   form,
@@ -16,6 +17,7 @@ export function PropertyMediaEditor({
   storageMode = 'browser',
 }) {
   const source = useMediaSource();
+  const { t } = useI18n();
   const { mediaError, addMedia, removeMedia } = usePropertyMediaEditor({
     form,
     setForm,
@@ -67,7 +69,11 @@ export function PropertyMediaEditor({
           <label className="media-upload-tile">
             <Icon name="image" size={22} />
             <strong>{uploading ? 'Processing...' : 'Add photos'}</strong>
-            <small>JPG, PNG, WebP · up to 8</small>
+            <small>
+              {source.stored
+                ? t('properties.photoLimit', { limit: 20 })
+                : 'JPG, PNG, WebP · up to 8'}
+            </small>
             <input
               aria-label="Upload property photos"
               type="file"

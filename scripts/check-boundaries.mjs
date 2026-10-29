@@ -13,7 +13,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = join(root, 'services/crm-api/src');
 const mapPath = join(root, 'scripts/boundaries.json');
 // Messaging and media modules' tables live in their own file to keep each map small.
-const extraPaths = [join(root, 'scripts/boundaries-messaging.json')];
+const extraPaths = [
+  join(root, 'scripts/boundaries-messaging.json'),
+  join(root, 'scripts/boundaries-website.json'),
+];
 
 async function rustFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

@@ -14,6 +14,7 @@ import { integrationRoutes } from './integrations.js';
 import { marketplaceRoutes } from './marketplace.js';
 import { performanceRoutes } from './performance.js';
 import { recordShareRoutes } from './recordShares.js';
+import { websiteRoutes } from './websites.js';
 
 export function scopedRoutes({ request, scope }) {
   return {
@@ -28,5 +29,6 @@ export function scopedRoutes({ request, scope }) {
     ...marketplaceRoutes({ request, scope }),
     ...importRoutes({ request, scope }),
     ...recordShareRoutes({ request, scope }),
+    ...websiteRoutes({ request, scope }),
   };
 }

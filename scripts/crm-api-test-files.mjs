@@ -1,10 +1,12 @@
 import { agreementTestFiles } from './crm-api-test-files-agreements.mjs';
 import { marketplaceTestFiles } from './crm-api-test-files-marketplace.mjs';
 import { messagingTestFiles } from './crm-api-test-files-messaging.mjs';
+import { websiteTestFiles, websiteNextTestFile } from './crm-api-test-files-websites.mjs';
 
 /** API suites run in order against one isolated database (see test-crm-api.mjs). */
 export const apiTestFiles = [
   'tests/api/auth.test.mjs',
+  ...websiteTestFiles,
   'tests/api/auth-foundation.test.mjs',
   'tests/api/company-profile.test.mjs',
   'tests/api/company-access.test.mjs',
@@ -141,7 +143,8 @@ export function selectedApiTestFiles(filter = process.env.API_TEST_FILES) {
     .map((name) => name.trim())
     .filter(Boolean);
   if (!wanted.length) return apiTestFiles;
-  const unknown = wanted.filter((name) => !apiTestFiles.includes(name));
+  const selectable = [...apiTestFiles, websiteNextTestFile];
+  const unknown = wanted.filter((name) => !selectable.includes(name));
   if (unknown.length) throw Error(`Unknown API_TEST_FILES entries: ${unknown.join(', ')}`);
-  return apiTestFiles.filter((name) => wanted.includes(name));
+  return selectable.filter((name) => wanted.includes(name));
 }

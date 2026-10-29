@@ -1,4 +1,5 @@
 export default {
+  photoLimit: 'JPG, PNG, WebP · up to {limit}',
   filters: 'Filters',
   refine: 'Refine properties',
   clearAll: 'Clear all filters',

@@ -1,18 +1,20 @@
 # Public website plan
 
-**Latest owner decision (2026-10-28):** [Direct website publishing](product-decisions.md#direct-website-publishing-decided-2026-10-28) supersedes every mandatory Super Admin publication approval/submission stage in this older plan, including WEB2/WEB6/WEB9. Authorised users publish validated public versions directly on both website types. Keep permission/consent, private/public separation, eligibility, listing limits, history and takedown. Older review screens are not the current target flow; production publishing remains unimplemented.
+**Implementation checkpoint (2026-10-29):** the owner subsequently authorised Codex to build the backend. Native Next.js general/company pages now have Rust `sites`, `publications`, `catalogue` and `enquiries` modules for private site/profile controls, versioned drafts/direct publication, selected public media/catalogue and targeted enquiries saved as CRM leads. See the [implemented backend guide](website-backend.md), [public contract](website-api-contract.md) and [frontend run instructions](../apps/website/README.md). Migrations are tested only with disposable synthetic databases; no development/production migration or hosted deployment is implied. CRM Website management UI, complete blocks, general-platform unscoped enquiry ownership, domain operations, scaling and launch checks remain. The historical WEB1–WEB9 plan below is not an assertion all packets are complete.
 
-Status: **planned, not started** (owner, 2026-10-20). This plan builds the public side of Blaqks One: one general website with every company's approved listings, and optional company websites. It follows the [platform system design](platform-system-design.md), the [public listings decisions](product-decisions.md#public-listings-decided-2026-10-12), the [company website decisions](product-decisions.md#company-websites-decided-2026-10-20) and [service boundaries](service-boundaries.md). Packets WEB1–WEB9 replace the website rows W1–W4 in [roadmap §14](claude-implementation-roadmap.md#concrete-work-packets). The messaging packets with the same letter (W1 for WhatsApp) are unaffected.
+**Latest owner decision (2026-10-28):** [Direct website publishing](product-decisions.md#direct-website-publishing-decided-2026-10-28) supersedes every mandatory Super Admin publication approval/submission stage in this older plan, including WEB2/WEB6/WEB9. Authorised users publish validated public versions directly on both website types. Keep permission/consent, private/public separation, eligibility, listing limits, history and takedown. Older review screens are not the current target flow; direct publication now has a local backend; its CRM management screens and launch operation remain unfinished.
+
+Original planning baseline (owner, 2026-10-20), superseded for implemented scope by the checkpoint above. This plan builds the public side of Blaqks One: one general website with eligible companies' deliberately published listings, and optional company websites. It follows the [platform system design](platform-system-design.md), the [public listings decisions](product-decisions.md#public-listings-decided-2026-10-12), the [company website decisions](product-decisions.md#company-websites-decided-2026-10-20) and [service boundaries](service-boundaries.md). Packets WEB1–WEB9 replace the website rows W1–W4 in [roadmap §14](claude-implementation-roadmap.md#concrete-work-packets). The messaging packets with the same letter (W1 for WhatsApp) are unaffected.
 
 ## What the owner decided
 
 **Settings planning update (2026-10-28):** the owner clarified that there are only two website types: the general Blaqks One website and company websites. Individual agents have public profiles/listings inside those websites, not standalone websites. See the [complete website settings proposal](website-settings-plan.md) for settings, permissions, approvals, domains, enquiries, lifecycle and delivery criteria. Proposed defaults there remain subject to owner review.
 
-The [structure blueprint](website-structure-blueprint.md) supersedes the suggestion to preserve the old screenshot layouts. The [visual brief](website-visual-refinement.md) records the accepted initial lightweight-depth approach: one restrained hero effect, static phone/reduced-motion fallback and deferred full interactive 3D. These documents finalise the planning checkpoint; Next.js screens and public backend implementation remain future work.
+The [structure blueprint](website-structure-blueprint.md) supersedes the suggestion to preserve the old screenshot layouts. The [visual brief](website-visual-refinement.md) records the accepted initial lightweight-depth approach: one restrained hero effect, static phone/reduced-motion fallback and deferred full interactive 3D. These documents finalise the planning checkpoint; their native Next.js and initial public backend implementation are now local; launch operations remain future work.
 
 **Listing-limit clarification:** the public-listing decision specifies two listings **of the same property per team**. The later “2 live listings per team” shorthand below is ambiguous; the settings proposal preserves the explicit per-property interpretation and flags confirmation before implementation. Do not infer a cap of two total properties from that shorthand.
 
-- **One general website** lists every company's approved listings. A company may add its **own website** as a paid add-on or a higher-plan feature.
+- **One general website** lists eligible companies' published listings. A company may add its **own website** as a paid add-on or a higher-plan feature.
 - A company site uses a **Blaqks One subdomain** by default, or the company **connects its own domain** with automatic SSL. We do not buy domains for companies yet.
 - Each company chooses **one of 4 themes**, its **logo** and **one brand colour**. Fixed pages: Home, Listings, Listing detail, About, Contact. Companies may **add their own pages**.
 - **No licence check** for a site to go live. Publishing a listing still needs a verified licence and Super Admin approval of the exact version.
@@ -47,13 +49,13 @@ Each new module owns its own PostgreSQL schema ([service boundaries](service-bou
 | `catalogue/`    | Public read tables filled from the outbox: active listings, agent profiles, site settings, host map                        | Only its own tables; may later run as a separate process with a read-only database role    |
 | `enquiries/`    | Durable, idempotent enquiry intake with the source site and listing revision                                               | A lead-creation command in the destination workspace; `outbox` for notifications           |
 
-Publications store each listing's channel choice: `general_and_company` or `company_only`. "Company only" is offered only while the company has an active site. If the site lapses, those listings stop showing, and the company is told it can move them to the general site, which needs no new approval because the approved content is unchanged. Moving a listing from company-only to the general site uses the general-site slot rules at that moment. A rejection never names the other teams.
+Publications store each listing's channel choice: `general_and_company` or `company_only`. "Company only" is offered only while the company has an active site. If the site lapses, those listings stop showing, and the company is told it can move them to the general site, through a fresh direct Publish with current eligibility/capacity checks. Moving a listing from company-only to the general site uses the general-site slot rules at that moment. A rejection never names the other teams.
 
 ## Company site lifecycle
 
 1. **Entitlement.** The site is a plan feature. Until billing exists, the Super Admin turns the feature on per company as a plan setting with immutable history, like the current seat limit. It gives no access to company business data.
 2. **Setup in the CRM.** An Admin (or staff with a new `site.manage` grant, off by default) opens a **Website** screen and chooses a slug, a theme, the logo, the brand colour and the About/Contact text.
-3. **Review.** Logo, About text and company pages are public content, so they are frozen as a version and approved by the Super Admin, like listings. Theme and colour are picked from safe options and need no approval. The colour is checked for contrast in both themes and adjusted automatically if text would be unreadable.
+3. **Publish.** Public content is saved as a version and published by an authorised user after validation, with no mandatory Super Admin content review. Theme and colour choices use safe options. Planned configurable colours must pass contrast checks; arbitrary colour editing/automatic adjustment is not implemented in the initial backend.
 4. **Live.** The site goes live on its subdomain at once. A licence is not needed.
 5. **Lapse.** If the plan ends or the company is archived, the site shows a short "no longer available" page for 14 days, then returns `404`. Custom domains are removed from our edge immediately so a dangling DNS record cannot be taken over. The company's listings stay on the general site where they were marked for it.
 
@@ -76,11 +78,11 @@ A listing can appear on the general site and on its company's site. Each listing
 
 ## Company pages
 
-Companies build extra pages from **structured blocks**: heading, text, image, image gallery, listing grid (their own published listings, filtered), team members with approved public profiles, and contact form. There is no free HTML, script or embed, so a company page cannot attack visitors or break the theme. Pages are versioned and approved like other public content. Limit: 10 extra pages per site at first, with a slug and a navigation position.
+Companies build extra pages from **structured blocks**: heading, text, image, image gallery, listing grid (their own published listings, filtered), team members with consented public profiles, and contact form. There is no free HTML, script or embed, so a company page cannot attack visitors or break the theme. Planned extra pages will be versioned and published directly like other public content; the structured extra-page editor is not yet implemented. Limit: 10 extra pages per site at first, with a slug and a navigation position.
 
 ## Enquiries
 
-Enquiries work as already decided: the server routes them from the publication to the approved agent, then to that team's Admin queue. The enquiry also records the **source site**. An enquiry form on a company page (not about a listing) goes to that company's Admin queue. General enquiries on the general site stay an open decision ([platform design](platform-system-design.md#decisions-still-needed-before-implementation)).
+Enquiries work as already decided: the server routes them from the publication to its current eligible representative, then to that team's Admin queue. The enquiry also records the **source site**. An enquiry form on a company page (not about a listing) goes to that company's Admin queue. General enquiries on the general site stay an open decision ([platform design](platform-system-design.md#decisions-still-needed-before-implementation)).
 
 ## Security and reliability checks
 
@@ -95,17 +97,17 @@ Enquiries work as already decided: the server routes them from the publication t
 
 Each packet is one bounded cycle with its own design, security review where marked, tests and owner check. Order follows dependencies; design packets can run alongside backend work.
 
-| Packet | Scope                                                                                                                                         | Depends on     | Review                     |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | -------------------------- |
-| WEB1   | Private media storage and processed public derivatives (was W1)                                                                               | Hosting choice | Security                   |
-| WEB2   | `publications/`: public agent profiles, frozen listing revisions, channel choice, slot limits, Super Admin approval queue in the CRM (was W2) | WEB1           | Architecture, security     |
-| WEB3   | `catalogue/` and `enquiries/`: public API, host map, outbox projections, idempotent enquiry intake with source site (was W3)                  | WEB2, outbox   | Security                   |
-| WEB4   | Design: the general site and the 4 company themes, as design canvases for owner approval                                                      | None           | Owner, product designer    |
-| WEB5   | General website: home/search, results, listing detail, agent pages, enquiry form, SEO, sitemaps, takedown (was W4)                            | WEB3, WEB4     | Accessibility, performance |
-| WEB6   | `sites/` and the CRM Website screen: entitlement, slug, theme/logo/colour, About/Contact approval, subdomain routing, lapse handling          | WEB3, WEB4     | Security                   |
-| WEB7   | The 4 company themes built on one shared component set, with canonical rules and per-host sitemaps                                            | WEB5, WEB6     | Accessibility, owner       |
-| WEB8   | Custom domains through Cloudflare for SaaS: connect flow, verification job, status screen, redirect, removal on lapse                         | WEB6, hosting  | Security, DevOps           |
-| WEB9   | Company pages from structured blocks, with versioning and approval                                                                            | WEB7           | Security                   |
+| Packet | Scope                                                                                                                                                      | Depends on     | Review                     |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | -------------------------- |
+| WEB1   | Private media storage and processed public derivatives (was W1)                                                                                            | Hosting choice | Security                   |
+| WEB2   | `publications/`: public agent profiles, frozen listing revisions, channel choice, slot limits, scoped direct Publish/withdraw controls in the CRM (was W2) | WEB1           | Architecture, security     |
+| WEB3   | `catalogue/` and `enquiries/`: public API, host map, outbox projections, idempotent enquiry intake with source site (was W3)                               | WEB2, outbox   | Security                   |
+| WEB4   | Design: the general site and the 4 company themes, as design canvases for owner approval                                                                   | None           | Owner, product designer    |
+| WEB5   | General website: home/search, results, listing detail, agent pages, enquiry form, SEO, sitemaps, takedown (was W4)                                         | WEB3, WEB4     | Accessibility, performance |
+| WEB6   | `sites/` and the CRM Website screen: entitlement, slug, theme/logo/colour, direct About/Contact publication, subdomain routing, lapse handling             | WEB3, WEB4     | Security                   |
+| WEB7   | The 4 company themes built on one shared component set, with canonical rules and per-host sitemaps                                                         | WEB5, WEB6     | Accessibility, owner       |
+| WEB8   | Custom domains through Cloudflare for SaaS: connect flow, verification job, status screen, redirect, removal on lapse                                      | WEB6, hosting  | Security, DevOps           |
+| WEB9   | Company pages from structured blocks, with versioning and direct Publish                                                                                   | WEB7           | Security                   |
 
 WEB1–WEB5 deliver the general site; WEB6–WEB7 deliver company sites on subdomains; WEB8 and WEB9 can ship later without blocking the launch. Real domains, SSL and Cloudflare need the hosted environment (roadmap P10 and O1); until then everything is tested locally with `*.localhost` hosts.
 

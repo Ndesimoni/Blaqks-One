@@ -1,0 +1,145 @@
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 24px;
+}
+.property-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 0;
+}
+.property-image {
+  display: block;
+  position: relative;
+  aspect-ratio: 1.5;
+  overflow: hidden;
+}
+.property-image img {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.25s ease;
+}
+.property-image:hover img {
+  transform: scale(1.025);
+}
+.property-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 10px;
+  padding: 5px 9px;
+}
+.card-content {
+  padding: 22px;
+}
+.price {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 12px;
+}
+.property-card h3 {
+  font-size: 16px;
+  margin-bottom: 9px;
+}
+.property-card .muted {
+  font-size: 12px;
+}
+.property-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  padding-block: 13px;
+  margin-bottom: 12px;
+  border-block: 1px solid var(--line);
+}
+.property-facts span::before {
+  content: '·';
+  padding-right: 10px;
+}
+.listing-agent {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  font-size: 12px;
+}
+.property-card .contact-links {
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+}
+.property-card .contact-links a {
+  flex: 1;
+  border-bottom: 0;
+}
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.person-card {
+  padding: 30px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  min-width: 0;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+.avatar.large {
+  width: 90px;
+  height: 90px;
+  font-size: 30px;
+}
+.person-card .eyebrow {
+  font-size: 9px;
+  margin-bottom: 9px;
+}
+.person-card h3 {
+  font-size: 23px;
+  font-family: Georgia, 'Times New Roman', serif;
+  margin-bottom: 10px;
+}
+.person-card p {
+  font-size: 12px;
+}
+.person-card > a:last-child {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 12px;
+  margin-top: 14px;
+}
+.developer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.developer-card {
+  padding: 32px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.developer-card h2 {
+  font-size: 28px;
+  letter-spacing: -0.025em;
+}
+.developer-card > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 12px;
+}

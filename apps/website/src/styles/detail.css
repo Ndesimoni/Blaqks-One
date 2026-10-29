@@ -1,0 +1,115 @@
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 64px;
+  align-items: start;
+  margin-bottom: 70px;
+}
+.detail-title {
+  font-size: clamp(34px, 4vw, 50px);
+}
+.detail-price {
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+}
+.detail-facts {
+  display: flex;
+  gap: 45px;
+  padding-block: 24px;
+  border-block: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.detail-facts span {
+  display: grid;
+  color: var(--muted);
+  font-size: 12px;
+}
+.detail-facts b {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 400;
+}
+.detail-quick-contact {
+  display: none;
+}
+.anchor-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.anchor-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+}
+.detail-section {
+  padding-block: 36px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 24px;
+}
+.detail-section h2 {
+  font-size: 34px;
+}
+.amenities {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+.amenities li::before {
+  content: '✓';
+  margin-right: 12px;
+  color: var(--gold);
+}
+.key-values {
+  margin: 0;
+}
+.key-values > div {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 20px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.key-values dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+.key-values dd {
+  font-size: 13px;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.key-values small {
+  margin-top: 6px;
+  color: var(--muted);
+}
+.enquiry-panel {
+  position: sticky;
+  top: 24px;
+  padding: 28px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.enquiry-panel h2 {
+  font-size: 28px;
+}
+.enquiry-panel p {
+  font-size: 13px;
+}
+.enquiry-panel .button {
+  width: 100%;
+}
+.enquiry-panel .contact-links {
+  margin-block: 14px;
+}
+.enquiry-panel > a:last-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 12px;
+}

@@ -13,6 +13,7 @@ mod jpeg;
 pub mod naming;
 pub mod neutral;
 pub mod owned;
+pub mod public_assets;
 mod request;
 pub mod routes;
 pub mod s3;

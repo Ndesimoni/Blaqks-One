@@ -96,7 +96,11 @@
       "outbox",
       "sample",
       "media",
-      "marketplace"
+      "marketplace",
+      "sites",
+      "publications",
+      "catalogue",
+      "enquiries"
     ]
   },
   "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],

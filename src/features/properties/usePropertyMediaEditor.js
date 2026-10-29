@@ -10,7 +10,7 @@ export function usePropertyMediaEditor({ form, setForm, setUploading }) {
     const selected = Array.from(input.files || []);
     if (!selected.length) return;
     const field = kind === 'photo' ? 'media_photos' : 'media_floorplans';
-    const max = kind === 'photo' ? 8 : 3;
+    const max = kind === 'photo' ? (source.stored ? 20 : 8) : 3;
     const current = Array.isArray(form[field]) ? form[field] : [];
     if (current.length + selected.length > max) {
       setMediaError(`Maximum ${max} ${kind === 'photo' ? 'photos' : 'floor plans'} per property.`);

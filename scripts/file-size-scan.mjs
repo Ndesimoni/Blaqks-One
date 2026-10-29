@@ -34,6 +34,7 @@ const generatedDirectories = new Set([
   'test-results-server',
   'target',
   '.vite',
+  '.next',
   '__pycache__',
   '.claude',
 ]);

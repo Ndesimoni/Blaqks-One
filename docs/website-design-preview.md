@@ -1,5 +1,7 @@
 # Complete website design preview
 
+**Native implementation:** the approved public designs now have an initial Next.js frontend in [`apps/website`](../apps/website/README.md), with a [public API handoff](website-api-contract.md). This document continues to describe the older portable HTML prototype, not live publication or the production backend.
+
 **Workflow update (owner, 2026-10-28):** [direct website publishing](product-decisions.md#direct-website-publishing-decided-2026-10-28) replaces mandatory approval. The existing prototype's Submit for review and platform Review queue controls depict the older design and are not the current publication target. They need replacement with direct Publish, sync status and publication management in the next UI implementation packet. No live publishing exists yet.
 
 Date: **2026-10-28**. Status: **interactive design prototype; not a production website or public backend**.

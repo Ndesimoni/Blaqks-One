@@ -15,3 +15,5 @@ backend/target/
 backend/data/
 services/crm-api/target/
 *.enc
+.next/
+*.tsbuildinfo

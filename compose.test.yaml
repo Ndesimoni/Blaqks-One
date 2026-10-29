@@ -28,7 +28,7 @@ services:
       - source: storage
         target: /etc/s3.json
     healthcheck:
-      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:8333/healthz']
+      test: ['CMD-SHELL', 'wget -Y off -q -O /dev/null http://127.0.0.1:8333/healthz']
       interval: 2s
       timeout: 3s
       retries: 40

@@ -80,8 +80,14 @@ against the item the file belongs to.
   Accepted: the files are labelled, not yet scanned (M1); **scanning (ClamAV or the storage
   provider) is required before hosting**. Not covered by an automated test: a put that
   fails is hidden and counted (storage would have to fail on cue).
-- **F4 — public photos:** approved, re-encoded copies for the public website through the
-  CDN, only for listings the Super Admin has approved.
+- **F4 — public publication copies (local implementation 2026-10-29):** the owner removed
+  content approval. `media::public_assets` reserves neutral-named JPEG/PNG/WebP copies from
+  deliberately selected, already processed property gallery media and attaches them as
+  `public_snapshot` to an immutable publication revision. Public catalogue media checks
+  current host/site/publication eligibility on every access. Original private documents,
+  outside-share copies and PDF floor plans are not exposed; public PDF conversion and CDN
+  operations remain future work. Connected photo selection now permits 20 photos and up to
+  3 floor-plan images; the frozen browser demo retains eight photos. See [website backend](website-backend.md).
 
 ## F2 backfill as built (2026-10-22)
 
