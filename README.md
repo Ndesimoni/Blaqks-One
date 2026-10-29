@@ -2,7 +2,7 @@
 
 Real estate CRM v1.2, built with React 18 and Vite. The application covers the 17 worksheets in the original workbook, including clients, properties, viewings, deals, commissions, and reports.
 
-The separate **Next.js public websites** are in [`apps/website`](apps/website/README.md), serving the general and company websites. The [website backend](docs/website-backend.md) now implements direct publishing, public discovery and targeted enquiries saved into the CRM, with an [implemented API contract](docs/website-api-contract.md). Local sample mode stays explicitly labelled and separate. CRM Website management screens and hosted launch setup remain unfinished.
+The separate **Next.js public websites** are in [`apps/website`](apps/website/README.md), serving the general and company websites. The [website backend](docs/website-backend.md) now implements direct publishing, public discovery and targeted enquiries saved into the CRM, with an [implemented API contract](docs/website-api-contract.md). Local sample mode stays explicitly labelled and separate. Connected Company settings → Website and Platform administration → Platform website now provide [content editing, private drafts and direct publishing](docs/website-content-settings.md). Public profile/listing/enquiry management screens and hosted launch setup remain unfinished.
 
 ## Run locally
 

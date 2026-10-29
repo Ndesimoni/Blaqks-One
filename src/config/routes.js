@@ -16,6 +16,8 @@ export const settingsRoutes = [
 ];
 /** Connected-only sections outside the shared navigation (the frozen demo never links here). */
 export const connectedRoutes = [
+  { name: 'Website', path: '/website' },
+  { name: 'Platform website', path: '/platform-website' },
   { name: 'Inbox', path: '/inbox' },
   { name: 'Team chat', path: '/team-chat' },
   { name: 'Inbox rules', path: '/inbox-rules' },

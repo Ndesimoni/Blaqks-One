@@ -3,6 +3,8 @@ import { descriptions } from '../../config/navigation.js';
 import { connectedCollections } from './records.js';
 
 const connectedSections = new Set([
+  'Website',
+  'Platform website',
   ...connectedCollections,
   'Leads',
   'Team & access',

@@ -2,7 +2,7 @@
 
 Date: 2026-10-29. The owner authorised building the backend after the Next.js frontend. This implements local website configuration, public profiles, direct property publication, host-scoped public discovery/media and durable targeted enquiries in `services/crm-api`. The public consumer contract is [website API v1](website-api-contract.md). No content approval stage is required.
 
-This work has not provisioned hosting, applied migrations to development/production data, verified real domains/licences/advertising permits, connected provider delivery or completed the CRM Website settings screens. Test results belong in the current [handoff](handoff.md); sample-mode screenshots do not prove backend operation.
+This work has not provisioned hosting, applied migrations to development/production data, verified real domains/licences/advertising permits, connected provider delivery or completed every CRM Website management screen. Company/platform content settings are implemented; profile, listing and enquiry management screens remain. Test results belong in the current [handoff](handoff.md); sample-mode screenshots do not prove backend operation.
 
 ## Ownership and storage
 
@@ -35,11 +35,11 @@ All paths below start `/api/crm`. Mutations use the existing session/Origin/CSRF
 | `GET/PUT /platform/websites/general/draft`, `POST /platform/websites/general/publish` | Live Super Admin; same draft/version semantics for general site                                                                                          |
 | `PUT /platform/websites/companies/{workspace}/eligibility`                            | Live Super Admin; versioned entitlement/licence flags and optional externally verified host                                                              |
 
-The private browser client is `src/services/crm/websites.js`, composed into the existing scoped client. It is ready for CRM settings UI binding; adding a client function does not create a settings screen.
+The private browser client is `src/services/crm/websites.js`, composed into the existing scoped client. Company/platform content controls are bound through `src/features/server/website`; see [content settings](website-content-settings.md). Profile, listing and enquiry client functions still need their management screens.
 
 ## Content and draft behaviour
 
-Site fields are a name, theme 1–4, active state, public company mark/area/note and selected plain-text CMS fields: tagline, hero title/subtitle, About, services, Contact text and SEO title/description. Unknown fields and HTML are refused. This is a bounded initial CMS, not the planned arbitrary structured-page builder, logo uploader, navigation editor or media library. Hero/About/Contact rendering and page SEO metadata consume the supported published text; consult the frontend for remaining composition fields.
+Site fields are a name, theme 1–4, active state, public company mark/area/note and selected plain-text CMS fields: tagline, hero title/subtitle, About, services, Contact text and SEO title/description. Unknown fields and HTML are refused. This is a bounded initial CMS, not the planned arbitrary structured-page builder, logo uploader, navigation editor or media library. Hero/About/Contact rendering and page SEO metadata consume the supported published text. Services copy appears on About. The CRM content editor handles these fields for both site types.
 
 Direct Save & publish writes a new immutable content version. Save draft writes a separate private body; it remains invisible to public reads. Publishing marks that draft inactive and increments its generation instead of deleting it. GET returns the current generation even when `draft` is null. A later editor must use that generation: reusing zero or a pre-publish generation fails rather than allowing an old browser tab to publish somebody else's new draft. Publication also checks the live site version embedded in the draft.
 
@@ -89,7 +89,7 @@ For a manually configured local API/site, set server-only `WEBSITE_DATA_MODE=api
 
 ## Remaining launch work
 
-- CRM Website settings/profile/publication/enquiry management screens and complete content-block editing; current private APIs and browser client do not provide the full UI.
+- Public profile, publication selection/withdrawal and enquiry management screens, plus richer content-block editing. Company/platform identity, themes, copy, private draft/review and direct Publish screens are implemented.
 - General-platform unscoped enquiry recipient decision and its queue; provider notifications are a separate integration.
 - Actual DNS/SSL/custom-domain proof, hosting, entitlement operations and authoritative licence/advertising permit checks.
 - SQL-backed public pagination/projections and load measurements: reads currently scan at most 1,000 active candidate publications and fail closed above that bound; each media access rechecks eligibility. This is not a scaled public catalogue/cache.

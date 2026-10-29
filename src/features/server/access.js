@@ -15,6 +15,8 @@ export const activityLabel = (user) => (hasTeamFeatures(user) ? 'Team activity' 
 
 export function canOpenSection(user, route) {
   if (!['admin', 'super-admin', 'staff'].includes(user?.roleId)) return false;
+  if (route === 'Website') return user.roleId === 'admin';
+  if (route === 'Platform website') return user.roleId === 'super-admin';
   if (['Team & access', 'Workspaces'].includes(route)) return canManageTeam(user);
   // Only the owning company Admin connects or disconnects channels (design §8).
   if (route === 'Channels') return user?.roleId === 'admin';

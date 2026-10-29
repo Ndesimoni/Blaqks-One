@@ -34,7 +34,6 @@
     "tests/browser/team.spec.js": 436,
     "tests/browser/workspaces.spec.js": 338,
     "tests/deferred/calendar.spec.js": 177,
-    "tests/unit/frontend.test.js": 305,
     "tests/unit/messaging.test.js": 242,
     "tests/unit/team.test.js": 363,
     "tests/unit/workspace.test.js": 161,

@@ -38,6 +38,8 @@ test('Admins can reach the familiar sections while only implemented screens are 
     'Guide',
     'My profile',
     'Team activity',
+    'Website',
+    'Platform website',
   ])
     assert.equal(isConnectedSection(name), true, name);
   for (const name of ['Messages', 'Workspaces', 'Anything'])
@@ -94,4 +96,14 @@ test('unknown identities, routes and missing grants fail closed', () => {
   }
   assert.equal(canOpenSection({ roleId: 'staff' }, 'Clients'), false);
   assert.equal(canOpenSection({ roleId: 'super-admin', permissions: full }, 'Not a screen'), false);
+});
+
+test('website routes separate company Admin content from platform authority', () => {
+  for (const roleId of ['staff', 'admin', 'super-admin']) {
+    assert.equal(canOpenSection({ roleId, permissions: full }, 'Website'), roleId === 'admin');
+    assert.equal(
+      canOpenSection({ roleId, permissions: full }, 'Platform website'),
+      roleId === 'super-admin',
+    );
+  }
 });

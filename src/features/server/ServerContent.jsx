@@ -35,6 +35,7 @@ import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
 import { IncomingShares } from './shares/IncomingShares.jsx';
 import { ShareLinkPage } from './shares/ShareLinkPage.jsx';
 import { SHARE_ROUTE } from './shares/shareModel.js';
+import { ServerWebsite } from './website/ServerWebsite.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -56,6 +57,8 @@ export function ServerContent({ owner }) {
       </section>
     );
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
+  if (['Website', 'Platform website'].includes(route))
+    return <ServerWebsite key={route} platform={route === 'Platform website'} />;
   // The member's own account: independent of the selected workspace's records.
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Channels') return <ServerChannels />;

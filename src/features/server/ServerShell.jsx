@@ -1,41 +1,21 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { labels } from '../../config/navigation.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useNavigation, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { ServerContent } from './ServerContent.jsx';
 import { ServerDialogs } from './ServerDialogs.jsx';
 import { ServerHeader } from './ServerHeader.jsx';
-import { ServerImportAction } from './ServerImportAction.jsx';
 import { ServerNavigation } from './ServerNavigation.jsx';
+import { ServerPageHeading } from './ServerPageHeading.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
-import { ViewOnlyChip } from './ViewOnlyChip.jsx';
-import { activityLabel } from './access.js';
-import { isRecordSection, sectionDescription } from './sectionStatus.js';
-
-/** Connected headings that differ from the shared labels (messaging is not part of My profile). */
-const headings = { 'My profile': 'My profile' };
-/** Sections built on the language foundation take their heading from the catalogues. */
-const translated = {
-  Inbox: 'inbox',
-  'Team chat': 'chat',
-  Channels: 'channels',
-  'Inbox rules': 'inboxRules',
-  'My mailbox': 'mailbox',
-  'Google sign-in': 'mailbox',
-  Agreements: 'agreements',
-  'Shared record': 'recordShares',
-};
 
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();
   const { t } = useI18n();
   const { route } = useNavigation();
-  const supported = isRecordSection(route);
-  const team = route === 'Team & access';
-  const title = route === 'Team activity' ? activityLabel(user) : route;
+  const platform = route === 'Platform website';
   // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
   const fullHeight = ['Inbox', 'Team chat'].includes(route);
   const { toast, setToast } = useWorkspaceView();
@@ -61,11 +41,11 @@ export function ServerShell({ owner, workspaces }) {
       </a>
       <ServerNavigation />
       <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
-        <ServerHeader owner={owner} />
+        <ServerHeader owner={platform ? { name: t('websites.platformTitle') } : owner} />
         <main className="main-content" id="main-content" tabIndex={-1}>
           {/* Members see their company in the top bar; the panel is only for the Super Admin,
               who switches companies, and for archived (read-only) workspaces. */}
-          {(user.roleId === 'super-admin' || owner.status === 'archived') && (
+          {!platform && (user.roleId === 'super-admin' || owner.status === 'archived') && (
             <section className="workspace-banner" aria-label="Active workspace">
               <Icon name="shield" size={20} />
               <div>
@@ -92,34 +72,7 @@ export function ServerShell({ owner, workspaces }) {
             </section>
           )}
           {/* The full-height tools keep accessible headings of their own. */}
-          {!fullHeight && (
-            <div className="page-heading">
-              <div className="heading-left">
-                <h1>
-                  {team
-                    ? 'Team'
-                    : translated[title]
-                      ? t(`${translated[title]}.title`)
-                      : headings[title] || labels[title] || title || 'Your CRM workspace'}
-                </h1>
-                <p>
-                  {team
-                    ? owner.status === 'archived'
-                      ? 'Review saved accounts and access history.'
-                      : 'Manage people and access within this workspace.'
-                    : translated[title]
-                      ? t(`${translated[title]}.description`)
-                      : sectionDescription(title)}
-                </p>
-              </div>
-              <div className="heading-actions">
-                {supported && <ViewOnlyChip module={route} />}
-                {(supported || team) && (
-                  <ServerImportAction owner={owner} workspaces={workspaces} />
-                )}
-              </div>
-            </div>
-          )}
+          {!fullHeight && <ServerPageHeading owner={owner} workspaces={workspaces} />}
           <ServerContent owner={owner} />
           {!fullHeight && (
             <footer className="main-footer">

@@ -90,6 +90,7 @@ test('Next.js uses the real public API, renders public media/CMS updates, and sa
             heroTitle: 'Changed through the CRM backend',
             seoTitle: 'Published company search title',
             seoDescription: 'Published company search description.',
+            services: 'Synthetic property advice.\nSynthetic relocation support.',
           },
           company: { mark: 'WC', area: 'Dubai', note: 'Public note' },
         },
@@ -110,6 +111,11 @@ test('Next.js uses the real public API, renders public media/CMS updates, and sa
       'content',
       'Published company search description.',
     );
+    await page.goto(`${origin}/about`);
+    await expect(page.getByRole('heading', { name: 'Our services.', exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Synthetic property advice. Synthetic relocation support.', { exact: true }),
+    ).toBeVisible();
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
     await page.screenshot({
       path: 'apps/website/screenshots/connected-published-home-mobile.png',

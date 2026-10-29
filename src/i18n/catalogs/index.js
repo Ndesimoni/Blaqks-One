@@ -1,7 +1,6 @@
 /**
- * Every translation catalogue, by language and namespace (docs/i18n.md). A feature adds
- * `en/<namespace>.js` and `ar/<namespace>.js` with the same keys and registers both here;
- * `npm run check:i18n` fails when files, keys or placeholders differ.
+ * Translation catalogues by language and namespace (docs/i18n.md). New features add
+ * English catalogues; the older Arabic preview remains frozen by owner decision.
  */
 import arCalculators from './ar/calculators.js';
 import arChannels from './ar/channels.js';
@@ -57,6 +56,7 @@ import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
 import enSignupSetup from './en/signupSetup.js';
 import enTeamSeats from './en/teamSeats.js';
+import enWebsites from './en/websites.js';
 
 export const catalogs = Object.freeze({
   en: {
@@ -98,6 +98,7 @@ export const catalogs = Object.freeze({
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,
     teamSeats: enTeamSeats,
+    websites: enWebsites,
   },
   ar: {
     calculators: arCalculators,

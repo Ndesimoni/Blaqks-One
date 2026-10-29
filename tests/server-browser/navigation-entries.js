@@ -37,4 +37,5 @@ export const entries = [
   'Team activity',
   'Workspaces',
   'Marketplace applications',
+  'Platform website',
 ];

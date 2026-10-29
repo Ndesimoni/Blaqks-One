@@ -102,6 +102,12 @@ export function InfoPage({ page, site, catalogue }: PageData) {
               </Link>
             </div>
           </div>
+          {site.content?.services && (
+            <section className="prose" aria-labelledby="published-services-title">
+              <h2 id="published-services-title">Our services.</h2>
+              <p style={{ whiteSpace: 'pre-line' }}>{site.content.services}</p>
+            </section>
+          )}
           <div className="values-grid">
             <div>
               <h3>Find your setting.</h3>

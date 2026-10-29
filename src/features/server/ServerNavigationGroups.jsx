@@ -15,7 +15,14 @@ function NavEntry({ name, user, route, onSelect, t }) {
   const icon = navIcons[name];
   if (name === 'Inbox') return <InboxNavItem route={route} onSelect={onSelect} />;
   if (name === 'Team chat') return <TeamChatNavItem route={route} onSelect={onSelect} />;
-  const label = name === 'Team activity' ? activityLabel(user) : navLabel(user, name);
+  const label =
+    name === 'Website'
+      ? t('websites.title')
+      : name === 'Platform website'
+        ? t('websites.platformTitle')
+        : name === 'Team activity'
+          ? activityLabel(user)
+          : navLabel(user, name);
   if (waitingSources[name])
     return (
       <WaitingNavItem

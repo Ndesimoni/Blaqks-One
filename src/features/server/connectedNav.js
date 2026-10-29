@@ -4,6 +4,8 @@ import { canManageTeam, canOpenSection } from './access.js';
 /** Existing route names keep their icons; connected-only destinations reuse a related icon. */
 const sharedIcons = Object.fromEntries(nav.flatMap((group) => group.items));
 const extraIcons = {
+  Website: 'home',
+  'Platform website': 'building',
   'My profile': 'person',
   'Team & access': 'shield',
   Channels: 'chat',
@@ -48,9 +50,13 @@ export const displayGroups = [
   {
     key: 'company',
     pinned: true,
-    items: ['Team & access', 'Team activity', 'Channels', 'Inbox rules', 'Workspaces'],
+    items: ['Team & access', 'Team activity', 'Channels', 'Inbox rules', 'Website', 'Workspaces'],
   },
-  { key: 'platform', pinned: true, items: ['Workspaces', 'Marketplace applications'] },
+  {
+    key: 'platform',
+    pinned: true,
+    items: ['Workspaces', 'Marketplace applications', 'Platform website'],
+  },
 ];
 
 const isAllowed = (user, name, groupKey) => {

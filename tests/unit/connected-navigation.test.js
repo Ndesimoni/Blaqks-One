@@ -44,6 +44,8 @@ test('connected groups separate daily work from account and administration, once
   assert.equal(names(groups).filter((name) => name === 'Team activity').length, 1);
   assert.ok(itemsOf(groups, 'company').includes('Workspaces'));
   assert.ok(itemsOf(groups, 'company').includes('Team activity'));
+  assert.ok(itemsOf(groups, 'company').includes('Website'));
+  assert.ok(!names(groups).includes('Platform website'));
   assert.ok(!names(groups).includes('Messages'), 'Inbox replaces the demo preview');
   assert.ok(!names(groups).includes('Marketplace applications'));
 });
@@ -62,16 +64,22 @@ test('staff see their own activity under personal account and no company setting
   assert.equal(navLabel(staff, 'Team activity'), 'My activity');
   assert.equal(navLabel({ roleId: 'admin' }, 'Team activity'), 'Team activity');
   assert.ok(!names(groups).includes('Channels'));
+  assert.ok(!names(groups).includes('Website'));
+  assert.ok(!names(groups).includes('Platform website'));
 });
 
 test('the Super Admin keeps one administration group and no company conversations', () => {
   const owner = { roleId: 'super-admin', permissions: full };
   const groups = connectedGroups(owner);
-  assert.deepEqual(itemsOf(groups, 'platform'), ['Workspaces', 'Marketplace applications']);
+  assert.deepEqual(itemsOf(groups, 'platform'), [
+    'Workspaces',
+    'Marketplace applications',
+    'Platform website',
+  ]);
   assert.deepEqual(itemsOf(groups, 'company'), ['Team & access', 'Team activity']);
   assert.equal(names(groups).filter((name) => name === 'Workspaces').length, 1);
   assert.ok(names(groups).includes('Messages'));
-  for (const name of ['Inbox', 'Team chat', 'Agreements', 'Marketplace'])
+  for (const name of ['Inbox', 'Team chat', 'Agreements', 'Marketplace', 'Website'])
     assert.ok(!names(groups).includes(name), name);
   assert.equal(navLabel(owner, 'Team activity'), 'Team activity');
 });
