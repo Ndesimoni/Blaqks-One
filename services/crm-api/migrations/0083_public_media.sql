@@ -2,7 +2,7 @@
 ALTER TABLE media.crm_media_objects DROP CONSTRAINT crm_media_objects_owner_kind_check;
 ALTER TABLE media.crm_media_objects ADD CONSTRAINT crm_media_objects_owner_kind_check
  CHECK (owner_kind IS NULL OR owner_kind IN ('chat','record','inbox_message',
- 'listing_snapshot','public_snapshot'));
+ 'listing_snapshot','market_profile','public_snapshot'));
 ALTER TABLE media.crm_media_objects DROP CONSTRAINT crm_media_objects_copy_owner;
 ALTER TABLE media.crm_media_objects ADD CONSTRAINT crm_media_objects_copy_owner
  CHECK (origin <> 'copy' OR owner_kind IS NULL OR owner_kind IN ('listing_snapshot','public_snapshot'));
