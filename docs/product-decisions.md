@@ -284,6 +284,10 @@ A board inside Blaqks One where brokers post what their clients are looking for 
 | Terms          | Decided 2026-10-24: a placeholder terms version, marked for UAE lawyer review, is used for development and testing; launch needs the lawyer's text.                                                                                                                                                                                                                                                                               |
 | Eligibility    | Decided 2026-10-24: a company may use the marketplace once it is 7 days old, shows real use of the CRM (5 listings, 5 clients or leads, 3 contacts, 3 follow-ups, 1 viewing, activity in the last 30 days; Deals and Agreements do not count), and Blaqks One approves its application (seeing counts only, never records). A declined company may apply again after 3 days. See [broker marketplace](broker-marketplace.md) §15. |
 
+## Repository layout (decided 2026-10-30, queued)
+
+The owner accepted the recommended layout: the CRM frontend moves from the repository root to `apps/crm/`; the retained Calendar companion moves from `backend/` to `services/calendar-companion/`; `apps/website/` and `services/crm-api/` stay where they are; `docs/`, `scripts/`, `design/` and the Compose files stay shared at the root. The general website and the company websites remain **one** Next.js app, which chooses the site from the web address and shares its pages; it may be grouped into platform and company folders inside `apps/website/` if it grows. The website backend stays inside `crm-api` as separately owned modules until hosting needs the split planned in [Service boundaries](service-boundaries.md). The move runs as its own packet only once GitHub Actions runs again and no other branch or agent worktree has work in progress.
+
 ## Still open
 
 Business mail provider, WhatsApp number ownership, social account ownership, Super Admin communication visibility, marketing campaigns, calling, hosting/retention region and public languages remain open; see roadmap section 17. They do not block P1.

@@ -285,6 +285,14 @@ The build needs no owner setup; the live check needs D6, a Twilio account, appro
 templates and coexistence support; see
 [Connecting platforms](connecting-platforms.md#whatsapp-through-twilio-w1-w2).
 
+### RL1 — Repository layout move (queued 2026-10-30)
+
+Move the CRM frontend to `apps/crm/` and `backend/` to `services/calendar-companion/`; the
+website and `crm-api` stay ([roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations)).
+Waits until GitHub Actions runs again (blocked by account billing on 2026-10-29) and no
+other branch or agent worktree has work in progress; run it before starting new packets
+that would conflict.
+
 ### Smaller follow-ups already recorded
 
 - Virus scanning of files from clients before hosting (F3b review M1).
