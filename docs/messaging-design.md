@@ -8,8 +8,8 @@ Status: X0, X1, X1a and X2 are built (X2: verified webhook intake with the local
 [security review](messaging-security.md). Its two High findings (provider-proven account
 ownership and re-sending after lease expiry) are closed in this text, and the design
 decisions O1–O6 in §13 are decided. Product decision D2 (WhatsApp numbers) was decided on
-2026-10-29: each member connects their own number, so WhatsApp connections carry
-`owner_member_id` like mailboxes. D4 (mailbox
+2026-10-29: each member uses their own number; the [WhatsApp design](whatsapp-design.md)
+(2026-10-30) keeps one company Twilio connection and gives each member a number in it. D4 (mailbox
 system), D5–D7 (social accounts, webhook address) and D8 (AI sorting) remain open where
 they block later packets.
 

@@ -285,6 +285,12 @@ The build needs no owner setup; the live check needs D6, a Twilio account, appro
 templates and coexistence support; see
 [Connecting platforms](connecting-platforms.md#whatsapp-through-twilio-w1-w2).
 
+**Design and security review done (2026-10-30):** [WhatsApp design](whatsapp-design.md). The
+review's High finding (a member's account phone cannot prove a number, because members edit
+their own phone) is answered by WQ3: the Admin gives each number to a member. The owner
+chose the recommended option for WQ1–WQ3 (2026-10-30). Next: W1a (stand-in, company Twilio
+account, numbers, hooks including the E1a workspace fix, screens).
+
 ### RL1 — Repository layout move (queued 2026-10-30)
 
 Move the CRM frontend to `apps/crm/` and `backend/` to `services/calendar-companion/`; the
