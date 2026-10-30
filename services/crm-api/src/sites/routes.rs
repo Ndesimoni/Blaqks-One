@@ -29,6 +29,10 @@ pub fn router() -> Router<AppState> {
             get(handlers::config).put(handlers::update),
         )
         .route(
+            "/api/crm/workspaces/{workspace}/website/profiles",
+            get(profiles::list),
+        )
+        .route(
             "/api/crm/workspaces/{workspace}/website/profiles/{member}",
             get(profiles::get).put(profiles::update),
         )
@@ -39,6 +43,10 @@ pub fn router() -> Router<AppState> {
         .route(
             "/api/crm/platform/websites/general",
             get(handlers::platform_config).put(handlers::platform),
+        )
+        .route(
+            "/api/crm/platform/websites/companies",
+            get(handlers::companies),
         )
         .route(
             "/api/crm/platform/websites/companies/{workspace}/eligibility",

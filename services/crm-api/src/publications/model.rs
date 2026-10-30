@@ -20,6 +20,9 @@ pub struct Publication {
     pub photos: Vec<Uuid>,
     pub floor_plans: Vec<Uuid>,
     pub revision: Uuid,
+    /// Read only by the private list; other queries leave it out.
+    #[sqlx(default)]
+    pub published_at: Option<String>,
 }
 impl Publication {
     pub fn listing(&self) -> Value {

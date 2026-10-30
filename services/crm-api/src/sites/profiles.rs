@@ -17,6 +17,25 @@ use axum::{
 use serde_json::{json, Value};
 use uuid::Uuid;
 
+/// Every public profile in the company, for the owning Admin's Team tab.
+pub async fn list(
+    State(state): State<AppState>,
+    session: Session,
+    Path(workspace): Path<String>,
+) -> ApiResult<Json<Value>> {
+    let mut tx = state.pool.begin().await?;
+    access::owner(&mut tx, &workspace, session.user.id).await?;
+    let rows: Vec<ProfileRow> = sqlx::query_as(
+        "SELECT id,workspace,member,body,consent,can_publish,active,version \
+         FROM sites.crm_website_profiles WHERE workspace=$1 ORDER BY member LIMIT 500",
+    )
+    .bind(&workspace)
+    .fetch_all(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(Json(json!({ "profiles": rows })))
+}
+
 pub async fn get(
     State(state): State<AppState>,
     session: Session,
@@ -45,7 +64,7 @@ pub async fn update(
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     let live = access::member(&mut tx, &workspace, session.user.id).await?;
-    if live.id != member && (live.role != "admin" || input.consent) {
+    if live.id != member && live.role != "admin" {
         return Err(ApiError::forbidden());
     }
     if access::live_profile_member(&mut tx, &workspace, member)
@@ -63,6 +82,10 @@ pub async fn update(
         return Err(ApiError::stale(
             "The public profile has changed. Reload and try again.",
         ));
+    }
+    // Only the member gives or withdraws consent; an Admin's edit keeps it as it is.
+    if live.id != member && input.consent != previous.as_ref().is_some_and(|p| p.consent) {
+        return Err(ApiError::forbidden());
     }
     let id = previous.as_ref().map_or_else(Uuid::new_v4, |p| p.id);
     let body = json!({"id":id,"company":company.id,"name":input.name,"specialty":input.specialty,"publicWhatsApp":input.public_whats_app,"publicEmail":input.public_email});

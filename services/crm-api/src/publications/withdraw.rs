@@ -25,9 +25,9 @@ pub async fn list(
     if !live.can_collection("Properties") {
         return Err(ApiError::forbidden());
     }
-    let rows:Vec<Publication>=sqlx::query_as(&format!("SELECT {COLUMNS} FROM publications.crm_website_listings WHERE workspace=$1 AND ($2 OR member=$3) ORDER BY published_at DESC LIMIT 501"))
+    let rows:Vec<Publication>=sqlx::query_as(&format!("SELECT {COLUMNS},published_at::text AS published_at FROM publications.crm_website_listings WHERE workspace=$1 AND ($2 OR member=$3) ORDER BY published_at DESC LIMIT 501"))
         .bind(&workspace).bind(live.role=="admin").bind(live.id).fetch_all(&mut *tx).await?;
-    let rows:Vec<_>=rows.into_iter().map(|p|json!({"id":p.id,"recordId":p.record,"agentProfileId":p.profile,"version":p.version,"sourceVersion":p.source_version,"active":p.active,"snapshot":p.snapshot["listing"]})).collect();
+    let rows:Vec<_>=rows.into_iter().map(|p|json!({"id":p.id,"recordId":p.record,"agentProfileId":p.profile,"version":p.version,"sourceVersion":p.source_version,"active":p.active,"destination":p.destination,"publishedAt":p.published_at,"snapshot":p.snapshot["listing"]})).collect();
     tx.commit().await?;
     Ok(Json(json!({"publications":rows})))
 }

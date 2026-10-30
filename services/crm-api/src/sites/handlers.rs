@@ -71,6 +71,26 @@ pub async fn platform_config(
     tx.commit().await?;
     Ok(Json(json!({"site":row})))
 }
+/// Company websites with their trusted setup flags, for the Super Admin's eligibility
+/// screen. Metadata only: no draft, content or member data.
+pub async fn companies(State(state): State<AppState>, session: Session) -> ApiResult<Json<Value>> {
+    let mut tx = state.pool.begin().await?;
+    access::operator(&mut tx, session.user.id).await?;
+    let rows: Vec<SiteRow> = sqlx::query_as(&format!(
+        "SELECT {COLUMNS} FROM sites.crm_website_sites WHERE kind='company' ORDER BY name, id LIMIT 500"
+    ))
+    .fetch_all(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    let sites: Vec<Value> = rows
+        .iter()
+        .map(|row| {
+            json!({"workspace":row.workspace,"name":row.name,"host":row.host,"active":row.active,
+                "entitled":row.entitled,"licenceVerified":row.licence_verified,"version":row.version})
+        })
+        .collect();
+    Ok(Json(json!({ "sites": sites })))
+}
 pub async fn eligibility(
     State(state): State<AppState>,
     session: Session,
