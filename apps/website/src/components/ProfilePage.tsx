@@ -4,7 +4,7 @@ import { AgentCard, PropertyGrid } from './Cards';
 import { ProfileLinks } from './ProfileLinks';
 import { Empty, Heading, initials } from './ui';
 
-export function ProfilePage({ page, entity, catalogue }: PageData) {
+export function ProfilePage({ page, entity, catalogue, site }: PageData) {
   const id = entity!.id;
   const agent = page === 'agent' ? (entity as Agent) : undefined;
   const company =
@@ -68,7 +68,14 @@ export function ProfilePage({ page, entity, catalogue }: PageData) {
           {page === 'company' && company?.publicAgentCount !== undefined && (
             <p>{company.publicAgentCount} agents with public listings</p>
           )}
-          <ProfileLinks page={page} id={id} agent={agent} company={company} developer={developer} />
+          <ProfileLinks
+            page={page}
+            id={id}
+            agent={agent}
+            company={company}
+            developer={developer}
+            sample={site.sample}
+          />
         </div>
         <div className="profile-copy">
           <p className="eyebrow">PROPERTIES & PERSPECTIVE</p>

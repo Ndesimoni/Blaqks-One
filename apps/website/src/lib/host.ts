@@ -1,5 +1,6 @@
 import type { Site } from './types.ts';
 import { sampleCompanies } from './sample-people.ts';
+import { sampleSiteSocial } from './sample-social.ts';
 
 export function normalizeHost(value: string): string | null {
   if (!value || value.length > 253 || /[\s/@\\?#,]/.test(value)) return null;
@@ -19,6 +20,7 @@ export function sampleSite(host: string): Site | null {
       company: null,
       theme: '1',
       sample: true,
+      social: sampleSiteSocial.platform,
     };
   const themes: Record<string, Site['theme']> = {
     'harbour.localhost': '1',
@@ -38,5 +40,6 @@ export function sampleSite(host: string): Site | null {
     company: company.id,
     theme: themes[host],
     sample: true,
+    social: sampleSiteSocial[company.id],
   };
 }

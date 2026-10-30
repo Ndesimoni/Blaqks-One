@@ -1,6 +1,7 @@
 import type { Catalogue, Listing, Site } from './types.ts';
 import { sampleCompanies, sampleAgents, sampleAreas } from './sample-people.ts';
 import { sampleDevelopers } from './sample-developers.ts';
+import { dropMemberWebsites } from './social-links.ts';
 
 const listings: Listing[] = Array.from({ length: 18 }, (_, i) => {
   const agent = sampleAgents[i % 6],
@@ -56,6 +57,10 @@ const listings: Listing[] = Array.from({ length: 18 }, (_, i) => {
 export function sampleCatalogue(site: Site): Catalogue {
   const companies = sampleCompanies.filter((c) => !site.company || c.id === site.company);
   const stock = listings.filter((p) => !site.company || p.company === site.company);
+  const agents = sampleAgents
+    .filter((a) => !site.company || a.company === site.company)
+    .map((a) => ({ ...a, publicListingCount: stock.filter((p) => p.agent === a.id).length }));
+  if (site.kind === 'platform') dropMemberWebsites(agents);
   return {
     listings: stock,
     companies: companies.map((c) => ({
@@ -63,9 +68,7 @@ export function sampleCatalogue(site: Site): Catalogue {
       publicListingCount: stock.filter((p) => p.company === c.id).length,
       publicAgentCount: new Set(stock.filter((p) => p.company === c.id).map((p) => p.agent)).size,
     })),
-    agents: sampleAgents
-      .filter((a) => !site.company || a.company === site.company)
-      .map((a) => ({ ...a, publicListingCount: stock.filter((p) => p.agent === a.id).length })),
+    agents,
     areas: sampleAreas
       .filter((area) => !site.company || stock.some((p) => p.area === area.id))
       .map((a) => ({ ...a, publicListingCount: stock.filter((p) => p.area === a.id).length })),

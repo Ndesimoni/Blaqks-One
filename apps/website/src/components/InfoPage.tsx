@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { PageData } from '../lib/types';
 import { Heading } from './ui';
+import { SocialLinkList } from './SocialLinkList';
 
 export function InfoPage({ page, site, catalogue }: PageData) {
   const legal = page === 'privacy' || page === 'terms';
@@ -64,6 +65,14 @@ export function InfoPage({ page, site, catalogue }: PageData) {
             ) : (
               <p className="muted">Choose a representative to discuss your enquiry.</p>
             )}
+            <SocialLinkList
+              links={site.social}
+              owner={site.name}
+              label={`${site.name} on social media`}
+              title="FOLLOW US"
+              labelled
+              sample={site.sample}
+            />
           </div>
           <img
             src="/property/apartment-interior.jpg"

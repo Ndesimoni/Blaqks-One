@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Site } from '../lib/types';
 import { initials } from './ui';
 import { MobileMenu } from './MobileMenu';
+import { SocialLinkList } from './SocialLinkList';
 
 export function SiteHeader({ site }: { site: Site }) {
   const links = [
@@ -54,6 +55,7 @@ export function SiteFooter({ site }: { site: Site }) {
           <br />
           People to guide you.
         </p>
+        <SocialLinkList links={site.social} owner={site.name} sample={site.sample} />
       </div>
       <div>
         <p className="eyebrow">EXPLORE</p>

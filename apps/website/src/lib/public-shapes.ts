@@ -1,6 +1,7 @@
 import type { Agent, Area, Catalogue, Company, Developer, Listing, Site } from './types.ts';
 import { isPublicMedia } from './public-assets.ts';
 import { publicContent } from './public-content.ts';
+import { publicSocial } from './social-links.ts';
 
 export function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -82,8 +83,11 @@ export function decodeEntity(kind: string, value: unknown): Company | Agent | Ar
   if (row.publicListingCount != null) result.publicListingCount = number(row, 'publicListingCount');
   if (kind === 'companies' && row.publicAgentCount != null)
     result.publicAgentCount = number(row, 'publicAgentCount');
-  if (kind === 'agents')
+  if (kind === 'agents') {
     for (const key of ['publicWhatsApp', 'publicEmail']) result[key] = text(row, key, true);
+    const social = publicSocial(row.social);
+    if (social) result.social = social;
+  }
   if (kind === 'developers') {
     const website = text(row, 'website', true);
     result.website = website && new URL(website).protocol === 'https:' ? website : '';
@@ -111,6 +115,8 @@ export function decodeSite(value: unknown): Site {
     throw Error('Invalid public site.');
   const company = row.company === null ? null : text(row, 'company');
   if ((row.kind === 'company') !== Boolean(company)) throw Error('Invalid site company.');
+  const content = publicContent(row.content);
+  const social = publicSocial((row.content as Record<string, unknown> | null)?.social);
   return {
     id: text(row, 'id'),
     name: text(row, 'name'),
@@ -118,6 +124,7 @@ export function decodeSite(value: unknown): Site {
     company,
     theme: row.theme as Site['theme'],
     sample: false,
-    content: publicContent(row.content),
+    content,
+    ...(social && { social }),
   };
 }

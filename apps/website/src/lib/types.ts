@@ -8,7 +8,11 @@ export type Site = {
   theme: '1' | '2' | '3' | '4';
   sample: boolean;
   content?: Record<string, string>;
+  social?: SocialLinks;
 };
+export type SocialField =
+  'instagram' | 'facebook' | 'tiktok' | 'linkedin' | 'youtube' | 'x' | 'website';
+export type SocialLinks = Partial<Record<SocialField, string>>;
 export type Company = {
   id: string;
   name: string;
@@ -26,6 +30,7 @@ export type Agent = {
   publicWhatsApp?: string;
   publicEmail?: string;
   publicListingCount?: number;
+  social?: SocialLinks;
 };
 export type Area = {
   id: string;

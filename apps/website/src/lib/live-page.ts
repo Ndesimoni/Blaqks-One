@@ -5,6 +5,7 @@ import { decodeCatalogue, decodeEntity, decodeListing, object } from './public-s
 import { collections, validateCatalogueScope } from './page-model.ts';
 import { first, queryParams } from './query.ts';
 import { bindPublicAssets } from './public-assets.ts';
+import { dropMemberWebsites } from './social-links.ts';
 
 function pagination(value: unknown) {
   const row = object(value);
@@ -78,6 +79,7 @@ export async function livePage(
     });
   }
   validateCatalogueScope(catalogue, site);
+  if (site.kind === 'platform') dropMemberWebsites(catalogue.agents);
   if (page === 'enquiry' && data.entity) {
     const relatedCompany = 'company' in data.entity ? data.entity.company : data.entity.id;
     if (first(query, 'company') && relatedCompany !== first(query, 'company'))

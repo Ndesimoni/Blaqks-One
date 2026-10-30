@@ -1,4 +1,5 @@
 import type { Company, Agent, Area } from './types.ts';
+import { sampleAgentSocial } from './sample-social.ts';
 
 export const sampleCompanies: Company[] = [
   {
@@ -37,6 +38,7 @@ export const sampleAgents: Agent[] = [
   specialty,
   publicWhatsApp: `+44770090000${i + 1}`,
   publicEmail: `${id}@${company}.example`,
+  ...(Object.hasOwn(sampleAgentSocial, id) && { social: sampleAgentSocial[id] }),
 }));
 export const sampleAreas: Area[] = [
   {

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Agent, Company, Developer } from '../lib/types';
 import { ContactLinks } from './ui';
+import { SocialLinkList } from './SocialLinkList';
 
 export function ProfileLinks({
   page,
@@ -8,12 +9,14 @@ export function ProfileLinks({
   agent,
   company,
   developer,
+  sample,
 }: {
   page: string;
   id: string;
   agent?: Agent;
   company?: Company;
   developer?: Developer;
+  sample: boolean;
 }) {
   return (
     <>
@@ -26,6 +29,12 @@ export function ProfileLinks({
         <>
           <p>{company?.name}</p>
           <ContactLinks agent={agent} />
+          <SocialLinkList
+            links={agent.social}
+            owner={agent.name}
+            label={`${agent.name} on social media`}
+            sample={sample}
+          />
           <Link className="button quiet" href={`/enquiry?agent=${encodeURIComponent(agent.id)}`}>
             Send an enquiry →
           </Link>

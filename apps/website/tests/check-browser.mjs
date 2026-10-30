@@ -107,6 +107,15 @@ try {
   await page.keyboard.press('Escape');
   await expect(page.locator('.mobile-menu')).not.toHaveAttribute('open', '');
   await expect(menu).toBeFocused();
+  const harbour = base.replace('localhost', 'harbour.localhost');
+  await page.goto(harbour + '/contact');
+  await expect(page.locator('footer .social-item')).toHaveCount(7);
+  await expect(page.locator('main .social-links')).toContainText('example.com');
+  await page.goto(base + '/agents/maya');
+  await expect(page.locator('main .social-item')).toHaveCount(2);
+  await page.goto(harbour + '/agents/maya');
+  await expect(page.locator('main .social-item')).toHaveCount(3);
+  await expect(page.locator('.social-links a')).toHaveCount(0);
   const context = await browser.newContext({ javaScriptEnabled: false });
   const staticPage = await context.newPage();
   const response = await staticPage.goto(base + '/properties?purpose=buy');
