@@ -54,7 +54,7 @@ test('agent links are decoded, null is accepted and bad links never fail the cat
   assert.ok(!('social' in catalogue.agents[0]));
 });
 
-test('sample links are valid, fictional and keep member websites off the general site', () => {
+test('sample links are valid home pages and keep member websites off the general site', () => {
   const all: SocialLinks[] = [];
   for (const host of ['localhost', 'harbour.localhost', 'cedar.localhost', 'dune.localhost']) {
     const sample = sampleSite(host)!;
@@ -65,7 +65,10 @@ test('sample links are valid, fictional and keep member websites off the general
   for (const links of all) {
     assert.deepEqual(publicSocial(links), links);
     for (const url of Object.values(links))
-      assert.match(url!, /[/@]blaqks-sample-|^https:\/\/www\.example\.com\//);
+      assert.match(
+        url!,
+        /^https:\/\/(www\.(instagram|facebook|tiktok|linkedin|youtube|example)\.com|x\.com)\/$/,
+      );
   }
   const general = sampleCatalogue(sampleSite('localhost')!).agents;
   assert.ok(general.every((agent) => !agent.social?.website));

@@ -5,7 +5,7 @@ import { SocialIcon } from './SocialIcons';
 
 // Social media links (docs/website-social-links.md): network icons with full accessible
 // names, the Other website by its host name, and plain text only, never inserted HTML. Sample
-// links are illustrative and shown without links (review SOC1 L4).
+// links open each network's home page and are labelled as samples (review SOC1 L4).
 export function SocialLinkList({
   links,
   owner,
@@ -33,24 +33,20 @@ export function SocialLinkList({
           {website ? websiteHost(url) : SOCIAL_NAMES[field]}
         </span>
         <span className="sr-only">
-          {sample ? ' (illustrative sample, not a link)' : ' (opens in a new tab)'}
+          {sample ? ' (sample link, opens in a new tab)' : ' (opens in a new tab)'}
         </span>
       </>
     );
     return (
       <li key={field}>
-        {sample ? (
-          <span className="social-item">{content}</span>
-        ) : (
-          <a
-            className="social-item"
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer nofollow ugc"
-          >
-            {content}
-          </a>
-        )}
+        <a
+          className="social-item"
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer nofollow ugc"
+        >
+          {content}
+        </a>
       </li>
     );
   });
@@ -59,17 +55,13 @@ export function SocialLinkList({
       {title && <p className="eyebrow">{title}</p>}
       <ul>{items}</ul>
       {sample && (
-        <small className="social-note">Illustrative sample links, not real accounts.</small>
+        <small className="social-note">Sample links: they open each network's home page.</small>
       )}
     </>
   );
   const className = labelled ? 'social-links labelled' : 'social-links';
-  return sample ? (
-    <div className={className} role="group" aria-label={`${label} (illustrative sample)`}>
-      {body}
-    </div>
-  ) : (
-    <nav className={className} aria-label={label}>
+  return (
+    <nav className={className} aria-label={sample ? `${label} (sample)` : label}>
       {body}
     </nav>
   );

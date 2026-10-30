@@ -1,26 +1,23 @@
-// Illustrative social links for the fictional sample sites (review SOC1 L4). The handles are
-// invented and the "Other website" uses the reserved example.com domain; sample mode shows
-// them without links, so a preview never sends a visitor to a stranger's account.
+// Sample social links for the fictional sample sites (review SOC1 L4). Each opens the
+// network's own home page and the "Other website" the reserved example.com, so a preview
+// never sends a visitor to a stranger's account (owner asked for clickable samples).
 import type { SocialField, SocialLinks } from './types.ts';
 
 type Network = Exclude<SocialField, 'website'>;
-const profile: Record<Network, string> = {
+const home: Record<Network, string> = {
   instagram: 'https://www.instagram.com/',
   facebook: 'https://www.facebook.com/',
-  tiktok: 'https://www.tiktok.com/@',
-  linkedin: 'https://www.linkedin.com/company/',
-  youtube: 'https://www.youtube.com/@',
+  tiktok: 'https://www.tiktok.com/',
+  linkedin: 'https://www.linkedin.com/',
+  youtube: 'https://www.youtube.com/',
   x: 'https://x.com/',
 };
 
-function sample(slug: string, networks: Network[], website = false, person = false) {
+// `_slug` and `_person` keep the call sites readable; every sample opens a home page.
+function sample(_slug: string, networks: Network[], website = false, _person = false) {
   const links: SocialLinks = {};
-  for (const network of networks)
-    links[network] =
-      person && network === 'linkedin'
-        ? `https://www.linkedin.com/in/blaqks-sample-${slug}`
-        : `${profile[network]}blaqks-sample-${slug}`;
-  if (website) links.website = `https://www.example.com/${slug}`;
+  for (const network of networks) links[network] = home[network];
+  if (website) links.website = 'https://www.example.com/';
   return links;
 }
 
