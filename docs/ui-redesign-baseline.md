@@ -21,14 +21,14 @@ migration or database record was modified, and nothing was committed or pushed.
 
 ## 2. Environment
 
-| Item               | Value                                                                                                                                                                                                                                                                    |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Branch / HEAD      | `feature/connected-crm` at `ab4b029` ("Show your own company's requests on the marketplace board, marked 'Your company'")                                                                                                                                                |
-| Frontend           | React 18 + Vite, `createHashRouter`, connected mode `VITE_CRM_MODE=server`                                                                                                                                                                                               |
-| Backend            | Rust/Axum + sqlx + PostgreSQL 17, disposable project per browser run                                                                                                                                                                                                     |
-| Harness            | `PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only <specs>`                                                                                                                                                                                         |
-| Capture date       | Same working day as this document; every image listed below was produced by the runs in §3                                                                                                                                                                               |
-| Owner working tree | Five uncommitted paths belonging to another agent (`docs/deepseek-delivery-plan.md`, `docs/handoff.md`, `src/i18n/catalogs/index.js`, `src/i18n/catalogs/en/marketplaceBoard.js`, `docs/deepseek-prompts/UI0-ui-redesign.md`). UI0 did not modify, stage or revert them. |
+| Item               | Value                                                                                                                                                                                                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Branch / HEAD      | `feature/connected-crm` at `ab4b029` ("Show your own company's requests on the marketplace board, marked 'Your company'")                                                                                                                                                                  |
+| Frontend           | React 18 + Vite, `createHashRouter`, connected mode `VITE_CRM_MODE=server`                                                                                                                                                                                                                 |
+| Backend            | Rust/Axum + sqlx + PostgreSQL 17, disposable project per browser run                                                                                                                                                                                                                       |
+| Harness            | `PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only <specs>`                                                                                                                                                                                                           |
+| Capture date       | Same working day as this document; every image listed below was produced by the runs in §3                                                                                                                                                                                                 |
+| Owner working tree | Five uncommitted paths belonging to another agent (`docs/deepseek-delivery-plan.md`, `docs/handoff.md`, `apps/crm/src/i18n/catalogs/index.js`, `apps/crm/src/i18n/catalogs/en/marketplaceBoard.js`, `docs/deepseek-prompts/UI0-ui-redesign.md`). UI0 did not modify, stage or revert them. |
 
 ## 3. Evidence index
 
@@ -66,7 +66,7 @@ Total: 96 images. Every image is reproducible with the command in its run row.
 - **Deep links** bypass navigation: `#/shares/{id}` (`SHARE_ROUTE`) and
   `#/listing-shares/{id}` (`LISTING_SHARE_ROUTE`), both server-authorised.
 - **Page guard**: `canOpenSection(user, route)` with `routePermissions` from
-  `src/config/team.js:71`; an unauthorised route renders the "Access is restricted" panel rather
+  `apps/crm/src/config/team.js:71`; an unauthorised route renders the "Access is restricted" panel rather
   than redirecting.
 - **Not-connected fallback**: any route without a connected implementation renders
   `ServerUnavailableSection` ("NOT CONNECTED YET").
@@ -74,7 +74,7 @@ Total: 96 images. Every image is reproducible with the command in its run row.
 
 ## 5. Route manifest
 
-`src/config/routes.js` composes three tables into `routes` (33 entries). `Dashboard` maps to `/`,
+`apps/crm/src/config/routes.js` composes three tables into `routes` (33 entries). `Dashboard` maps to `/`,
 every other CRM name to kebab-case. Row 0 status: **C** = connected screen, **P** = connected
 preview/panel, **U** = unavailable section, **D** = demo-only preview retained for company members.
 
@@ -160,14 +160,14 @@ use, **S3** polish. `rendered` = seen in an image below; `source` = read in code
 | B-14 | S2  | rendered | Team permission editing is a dense tick matrix with no grouping by module (`team-ticks-enabled-1280-*.png`).                                                                                                                                                                                                                                                                    |
 | B-15 | S2  | rendered | My profile mixes identity, preferences, sender connections and signed-in devices in one undifferentiated column; the baseline run showed an empty signed-in-device list (`profile-1280-*.png`, `profile-sessions-failure-1280.png`).                                                                                                                                            |
 | B-16 | S3  | rendered | The marketplace join/status screens place membership terms and commitments above the membership state, so a member cannot see at a glance whether they are approved (`marketplace-approved-390-*.png`).                                                                                                                                                                         |
-| B-17 | S2  | source   | Cascade fragmentation: `src/styles/index.css` imports 18 sheets which fan out to 85 sheets (3,669 lines); components import a further 115 sheets (10,614 lines). Selectors such as `.panel`, `.card` and `.eyebrow` are redefined across both sets, so a visual change needs duplicate edits.                                                                                   |
+| B-17 | S2  | source   | Cascade fragmentation: `apps/crm/src/styles/index.css` imports 18 sheets which fan out to 85 sheets (3,669 lines); components import a further 115 sheets (10,614 lines). Selectors such as `.panel`, `.card` and `.eyebrow` are redefined across both sets, so a visual change needs duplicate edits.                                                                          |
 
 ## 9. Implementation impact map
 
-- **Single ordered entry point.** `src/index.css` → `src/styles/index.css` → 18 imports
+- **Single ordered entry point.** `src/index.css` → `apps/crm/src/styles/index.css` → 18 imports
   (foundation, workspace, responsive, property-collection, theme, property-responsive,
   listing-media, frontend, leads, calendar, auth, team, messaging, overflow, workspaces, system,
-  demo-photos, i18n). Every one of the 85 sheets in `src/styles/` is reachable through a nested
+  demo-photos, i18n). Every one of the 85 sheets in `apps/crm/src/styles/` is reachable through a nested
   `@import` (verified: zero unreferenced sheets). Order matters and must be preserved while
   splitting.
 - **Feature sheets** (115 files, 10,614 lines) are imported by the component that owns the screen
@@ -180,15 +180,15 @@ use, **S3** polish. `rendered` = seen in an image below; `source` = read in code
 - **Structure to respect**, not rewrite: `.shell` grid, `.sidebar` (dark green), `.topbar`,
   `.content`, `.footer`, `.panel`, `.card`, `.eyebrow`, `.page-head`, `.toolbar`, `.table-*`.
   New patterns should extend these names rather than introduce a parallel system.
-- **Oversized files** encountered while planning: `src/styles/workspace.css` and
-  `src/styles/foundation.css` exceed the 150-line rule and are already tracked by
+- **Oversized files** encountered while planning: `apps/crm/src/styles/workspace.css` and
+  `apps/crm/src/styles/foundation.css` exceed the 150-line rule and are already tracked by
   `check:lines:ci`. A packet that must edit one splits it along the pattern boundaries defined in
   the pattern specification and reports the split.
 - **Prospective write sets** (refined by each packet, not authorised here): UI1 owns the shell
   (`ServerShell`, `ServerNavigation*`, `ServerHeader`, `navigation.css`, `workspace.css` chrome
   rules and the footer string); UI2 owns `RecordsPage` + Clients/Leads directory chrome and the
   `view-only-clients` browser spec; UI3 owns `PropertyDirectory`. Every packet re-runs
-  `tests/server-browser/navigation.spec.js`, `responsive.spec.js` and `permissions-visual.spec.js`
+  `apps/crm/tests/server-browser/navigation.spec.js`, `responsive.spec.js` and `permissions-visual.spec.js`
   plus the specs it touches.
 
 ## 10. Baseline checks

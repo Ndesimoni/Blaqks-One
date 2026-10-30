@@ -1,4 +1,4 @@
-# cargo-deny policy for both Rust crates (services/crm-api and backend).
+# cargo-deny policy for both Rust crates (services/crm-api and services/calendar-companion).
 # CI runs: cargo deny --all-features --config deny.toml check advisories licenses bans sources
 
 [advisories]

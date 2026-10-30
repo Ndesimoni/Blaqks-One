@@ -52,23 +52,23 @@ Save source changes to see Vite update the browser. For Chrome debugging, choose
 
 ## Where to work
 
-| Change                                      | Location                                               |
-| ------------------------------------------- | ------------------------------------------------------ |
-| Application composition                     | `src/app/App.jsx`                                      |
-| Workspace orchestration                     | `src/app/WorkspaceProvider.jsx`                        |
-| Record actions and file handlers            | `src/hooks/useRecordActions.js`                        |
-| Routes and feature loading                  | `src/app/FeatureRoutes.jsx` and `src/config/routes.js` |
-| Record and preference persistence hooks     | `src/hooks/`                                           |
-| Browser storage reads and writes            | `src/services/storage/`                                |
-| A specific screen                           | Its folder under `src/features/`                       |
-| Header or sidebar                           | `src/components/layout/`                               |
-| Shared visual control                       | `src/components/ui/`                                   |
-| Field options or navigation                 | `src/config/`                                          |
-| Workbook field mapping                      | `src/data/schemas.js`                                  |
-| Fictional demo records                      | `src/data/demo.js`                                     |
-| Business calculations or file import/export | `src/lib/`                                             |
-| Theme, spacing, or responsive styles        | Ordered files imported by `src/styles/index.css`       |
-| Favicon or downloadable workbook            | `public/`                                              |
+| Change                                      | Location                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------ |
+| Application composition                     | `apps/crm/src/app/App.jsx`                                               |
+| Workspace orchestration                     | `apps/crm/src/app/WorkspaceProvider.jsx`                                 |
+| Record actions and file handlers            | `apps/crm/src/hooks/useRecordActions.js`                                 |
+| Routes and feature loading                  | `apps/crm/src/app/FeatureRoutes.jsx` and `apps/crm/src/config/routes.js` |
+| Record and preference persistence hooks     | `apps/crm/src/hooks/`                                                    |
+| Browser storage reads and writes            | `apps/crm/src/services/storage/`                                         |
+| A specific screen                           | Its folder under `apps/crm/src/features/`                                |
+| Header or sidebar                           | `apps/crm/src/components/layout/`                                        |
+| Shared visual control                       | `apps/crm/src/components/ui/`                                            |
+| Field options or navigation                 | `apps/crm/src/config/`                                                   |
+| Workbook field mapping                      | `apps/crm/src/data/schemas.js`                                           |
+| Fictional demo records                      | `apps/crm/src/data/demo.js`                                              |
+| Business calculations or file import/export | `apps/crm/src/lib/`                                                      |
+| Theme, spacing, or responsive styles        | Ordered files imported by `apps/crm/src/styles/index.css`                |
+| Favicon or downloadable workbook            | `apps/crm/public/`                                                       |
 
 Read [Architecture](architecture.md) for the full module map.
 
@@ -85,7 +85,7 @@ PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only
 
 `test:api` and `test:server:e2e` use their own disposable Docker database and a test API on port 8790; they never touch your development data. Run the browser suite with `--browser-only` so it starts on a fresh database; without it the API suites run first and their fixtures share the browser suite's database. `PLAYWRIGHT_CHANNEL=chrome` uses your installed Google Chrome (or run `npx playwright install chromium` once). Do not run the frozen demo suite (`npm run test:e2e`) as a routine check.
 
-To diagnose a failure quickly, `API_TEST_FILES=tests/api/a.test.mjs,tests/api/b.test.mjs npm run test:api` runs only those suites, in their usual order (the restart check is skipped). On a Mac, a run whose tests suddenly take minutes and then fail with 503 `database_unavailable` usually means the Docker VM stalled under memory pressure: check swap (`sysctl vm.swapusage`), close heavy apps and avoid running suites, builds or browsers at the same time.
+To diagnose a failure quickly, `API_TEST_FILES=apps/crm/tests/api/a.test.mjs,apps/crm/tests/api/b.test.mjs npm run test:api` runs only those suites, in their usual order (the restart check is skipped). On a Mac, a run whose tests suddenly take minutes and then fail with 503 `database_unavailable` usually means the Docker VM stalled under memory pressure: check swap (`sysctl vm.swapusage`), close heavy apps and avoid running suites, builds or browsers at the same time.
 
 ## Continuous integration
 

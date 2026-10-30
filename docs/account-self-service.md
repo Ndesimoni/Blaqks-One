@@ -115,7 +115,7 @@ The new table `crm_account_events` has:
 
 ## Frontend
 
-- **Location:** a connected page under `src/features/server/profile/`. The frozen demo profile page stays untouched.
+- **Location:** a connected page under `apps/crm/src/features/server/profile/`. The frozen demo profile page stays untouched.
 - **Sections:**
   - Account details: email (read-only, "Contact your Admin to change"), role, positions, team and a permission summary.
   - Edit details: name and phone.

@@ -1,7 +1,7 @@
 //! The pure commission calculation (finance-design §3, §13 L-F3). All values are
 //! integers: money in fils (1 AED = 100 fils), rates and shares in basis points.
 //! Intermediate products use checked `i128`; the server is authoritative and the
-//! frontend preview mirrors this file against `tests/fixtures/finance-golden.json`.
+//! frontend preview mirrors this file against `apps/crm/tests/fixtures/finance-golden.json`.
 
 /// AED 100bn, the storage cap for any money column.
 pub const MAX_FILS: i64 = 10_000_000_000_000;

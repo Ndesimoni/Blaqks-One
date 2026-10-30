@@ -14,19 +14,19 @@ proposals to be proven in the pilot, not approved values.
 
 ## 1. Verified current measurements
 
-| Surface            | Current                                                  | Source                                                          | Target                                                   |
-| ------------------ | -------------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------- |
-| Sidebar            | 255px fixed, `main-area` offset 255px                    | `src/styles/layout/sidebar-brand.css`, `topbar.css`             | 240–256px (already met; UI2 changes grouping, not width) |
-| Top bar            | 79px                                                     | `src/styles/layout/topbar.css`                                  | 60–64px                                                  |
-| Content frame      | `max-width: 1650px`, padding `30px 37px 19px`            | `src/styles/layout/topbar.css`                                  | keep max width; gutters 32/24/16                         |
-| Page heading       | `.page-heading` flex, 9px eyebrow, `margin: 3px 0 26px`  | `src/styles/layout/page-heading.css`                            | one `h1`, no repeated eyebrow                            |
-| Desktop navigation | sidebar above 1050px; `Drawer` below                     | `ServerNavigation.jsx` (`useMediaQuery('(max-width: 1050px)')`) | unchanged breakpoint                                     |
-| Phone treatment    | 750px (`dialog` full screen, stacked controls)           | `src/styles/ui/dialog-behavior.css`, `system/responsive*.css`   | unchanged breakpoint                                     |
-| Inbox panes        | 1440+ / 900–1439 / under 900                             | `src/features/server/inbox/inbox-layout.css`                    | unchanged                                                |
-| Dialog             | 840×800 standard, 1040×900 wide, full screen under 750px | `src/styles/ui/dialog-behavior.css`                             | keep; retire the dead `545px` width                      |
-| Motion             | `--duration: 160ms`, `--ease`                            | `src/styles/foundation.css`                                     | keep; reduced-motion honoured                            |
+| Surface            | Current                                                  | Source                                                                 | Target                                                   |
+| ------------------ | -------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------- |
+| Sidebar            | 255px fixed, `main-area` offset 255px                    | `apps/crm/src/styles/layout/sidebar-brand.css`, `topbar.css`           | 240–256px (already met; UI2 changes grouping, not width) |
+| Top bar            | 79px                                                     | `apps/crm/src/styles/layout/topbar.css`                                | 60–64px                                                  |
+| Content frame      | `max-width: 1650px`, padding `30px 37px 19px`            | `apps/crm/src/styles/layout/topbar.css`                                | keep max width; gutters 32/24/16                         |
+| Page heading       | `.page-heading` flex, 9px eyebrow, `margin: 3px 0 26px`  | `apps/crm/src/styles/layout/page-heading.css`                          | one `h1`, no repeated eyebrow                            |
+| Desktop navigation | sidebar above 1050px; `Drawer` below                     | `ServerNavigation.jsx` (`useMediaQuery('(max-width: 1050px)')`)        | unchanged breakpoint                                     |
+| Phone treatment    | 750px (`dialog` full screen, stacked controls)           | `apps/crm/src/styles/ui/dialog-behavior.css`, `system/responsive*.css` | unchanged breakpoint                                     |
+| Inbox panes        | 1440+ / 900–1439 / under 900                             | `apps/crm/src/features/server/inbox/inbox-layout.css`                  | unchanged                                                |
+| Dialog             | 840×800 standard, 1040×900 wide, full screen under 750px | `apps/crm/src/styles/ui/dialog-behavior.css`                           | keep; retire the dead `545px` width                      |
+| Motion             | `--duration: 160ms`, `--ease`                            | `apps/crm/src/styles/foundation.css`                                   | keep; reduced-motion honoured                            |
 
-`.detail-drawer { width: 545px }` in `src/styles/ui/drawer.css` is overridden by
+`.detail-drawer { width: 545px }` in `apps/crm/src/styles/ui/drawer.css` is overridden by
 `.modal-centered > .drawer` today. Do not build a new layout on that class; either delete it in
 the packet that touches drawer CSS or give detail and editor drawers an explicit size contract.
 
@@ -120,8 +120,8 @@ shell footer; a settings page is one surface with section navigation, not one lo
 
 ## 4. Tokens and both-theme guidance
 
-Reuse the semantic palette in `src/styles/foundation.css` (light) and
-`src/styles/theme/surfaces.css` (dark). Do not copy literals into feature CSS.
+Reuse the semantic palette in `apps/crm/src/styles/foundation.css` (light) and
+`apps/crm/src/styles/theme/surfaces.css` (dark). Do not copy literals into feature CSS.
 
 | Intent          | Light                                     | Dark                       |
 | --------------- | ----------------------------------------- | -------------------------- |
@@ -353,13 +353,13 @@ staff with assigned-only read-only clients, and a Super Admin viewing another co
 
 ### 9.1 Ownership map
 
-| Area                        | Single owner                                | Notes                                                                                                 |
-| --------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Shared primitives           | one coordinator across `src/components/ui/` | serves the frozen demo too; `npm run build` plus one demo screen smoke check                          |
-| Shared styles               | same coordinator                            | `src/styles/index.css` order, `styles/system/*`, `styles/records/*`, `styles/layout/*`, `styles/ui/*` |
-| Connected navigation config | shell packet                                | new connected-only definition; keep `config/navigation.js` for the demo                               |
-| Catalogue registration      | same coordinator                            | `src/i18n/catalogs/index.js`; flat dotted keys in `src/i18n/catalogs/en/*.js`                         |
-| Feature presentation        | each feature packet                         | only the folders listed in its allowlist                                                              |
+| Area                        | Single owner                                         | Notes                                                                                                          |
+| --------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Shared primitives           | one coordinator across `apps/crm/src/components/ui/` | serves the frozen demo too; `npm run build` plus one demo screen smoke check                                   |
+| Shared styles               | same coordinator                                     | `apps/crm/src/styles/index.css` order, `styles/system/*`, `styles/records/*`, `styles/layout/*`, `styles/ui/*` |
+| Connected navigation config | shell packet                                         | new connected-only definition; keep `config/navigation.js` for the demo                                        |
+| Catalogue registration      | same coordinator                                     | `apps/crm/src/i18n/catalogs/index.js`; flat dotted keys in `apps/crm/src/i18n/catalogs/en/*.js`                |
+| Feature presentation        | each feature packet                                  | only the folders listed in its allowlist                                                                       |
 
 ### 9.2 Oversized-file strategy
 
@@ -367,35 +367,35 @@ staff with assigned-only read-only clients, and a Super Admin viewing another co
 files. Split a touched oversized file along these boundaries before adding rules, preserving
 cascade order:
 
-| File                                 | Split by                                          |
-| ------------------------------------ | ------------------------------------------------- |
-| `src/styles/workspace.css`           | shell chrome / page heading / toolbar / states    |
-| `src/styles/foundation.css`          | tokens / reset / base typography                  |
-| `src/styles/team.css`                | member directory / roles and grants / invitations |
-| `src/styles/property-collection.css` | summary / toolbar / filters / results             |
-| `src/styles/responsive.css`          | layout reflow / control reflow                    |
+| File                                          | Split by                                          |
+| --------------------------------------------- | ------------------------------------------------- |
+| `apps/crm/src/styles/workspace.css`           | shell chrome / page heading / toolbar / states    |
+| `apps/crm/src/styles/foundation.css`          | tokens / reset / base typography                  |
+| `apps/crm/src/styles/team.css`                | member directory / roles and grants / invitations |
+| `apps/crm/src/styles/property-collection.css` | summary / toolbar / filters / results             |
+| `apps/crm/src/styles/responsive.css`          | layout reflow / control reflow                    |
 
 No numbered fragments, no compression, no blanket `!important`.
 
 ### 9.3 UI1 — foundations
 
-- Write: selected `src/components/ui/*.jsx` (Button, Badge, Pagination, Empty, TitleSection,
-  Metric, LabelValue, `OverflowList` only if a proven gap), matching `src/styles/system/*.css`,
-  `src/styles/ui/*.css`, new/changed English catalogue files and registration, focused tests.
+- Write: selected `apps/crm/src/components/ui/*.jsx` (Button, Badge, Pagination, Empty, TitleSection,
+  Metric, LabelValue, `OverflowList` only if a proven gap), matching `apps/crm/src/styles/system/*.css`,
+  `apps/crm/src/styles/ui/*.css`, new/changed English catalogue files and registration, focused tests.
 - Do not: touch shell, page layouts, routes, data hooks, services or the demo's behaviour.
 - Tests: `npm test`, `npm run build`, `npm run check:i18n`, `npm run check:lines:ci`,
-  `npm run check:boundaries`, `tests/unit/overflow.test.js`, `tests/unit/i18n-*.test.js`.
+  `npm run check:boundaries`, `apps/crm/tests/unit/overflow.test.js`, `apps/crm/tests/unit/i18n-*.test.js`.
 - Acceptance: controls render in both themes, focus visible, no visual regression on one demo
   screen, no new dependency.
 
 ### 9.4 UI2 — connected shell
 
-- Write: `src/features/server/ServerShell.jsx`, `ServerHeader.jsx`, `ServerNavigation*.jsx`,
+- Write: `apps/crm/src/features/server/ServerShell.jsx`, `ServerHeader.jsx`, `ServerNavigation*.jsx`,
   `navigation.css`, `shell.css` chrome rules, one new connected navigation definition, footer
   copy, catalogue strings, related tests.
 - Do not: change route names/paths, `canOpenSection`, workspace resolution, badges' data sources,
   full-height pane behaviour or the demo navigation.
-- Tests: `tests/unit/server-navigation.test.js`, `tests/server-browser/navigation.spec.js`,
+- Tests: `apps/crm/tests/unit/server-navigation.test.js`, `apps/crm/tests/server-browser/navigation.spec.js`,
   `responsive.spec.js`, `permissions-visual.spec.js`, `dashboard-scope.spec.js`, plus
   `npm run check:lines:ci` and `check:boundaries`.
 - Acceptance: the four role examples in §2.4 render as specified; deep links and `?workspace=`
@@ -403,17 +403,17 @@ No numbered fragments, no compression, no blanket `!important`.
 
 ### 9.5 UI3 — Clients pilot
 
-- Write: `src/features/records/RecordsPage.jsx`, `RecordTable.jsx`, `RecordTableEmpty.jsx`,
+- Write: `apps/crm/src/features/records/RecordsPage.jsx`, `RecordTable.jsx`, `RecordTableEmpty.jsx`,
   `RecordDetails.jsx`, `RecordDetailFields.jsx`, `RecordEditor*.jsx`, `RecordReview.jsx`,
   `formSections.js`, `kept-chip.css`, the connected adapter call site in
-  `src/features/server/ServerContent.jsx`, `src/styles/records/directory.css`,
-  `src/styles/records/table.css`, `src/styles/system/records.css`, catalogue strings.
+  `apps/crm/src/features/server/ServerContent.jsx`, `apps/crm/src/styles/records/directory.css`,
+  `apps/crm/src/styles/records/table.css`, `apps/crm/src/styles/system/records.css`, catalogue strings.
 - Read-only: `useRecordAccess.js`, `useRecordEditor.js`, services, schemas, storage.
 - Do not: change field lists/order, validation rules, permissions, versions, storage keys or
   export formats; do not restyle Contacts, Leads or workflow records beyond shared primitives.
-- Tests: `tests/server-browser/persistence.spec.js`, `conflicts.spec.js`,
+- Tests: `apps/crm/tests/server-browser/persistence.spec.js`, `conflicts.spec.js`,
   `permissions-view-only.spec.js`, `permissions-visual.spec.js`, `assign-keyboard.spec.js`,
-  `tests/unit/overflow.test.js`, plus `npm test`, `npm run build`, `check:i18n`, `check:lines:ci`.
+  `apps/crm/tests/unit/overflow.test.js`, plus `npm test`, `npm run build`, `check:i18n`, `check:lines:ci`.
 - Acceptance: §7 in full, with before/after evidence at the four required viewports.
 
 Later packets reuse these contracts; UI4–UI11 are assigned in
@@ -458,9 +458,9 @@ consumer needed a call-site edit. Package version and dependencies unchanged.
 | Pagination | Zero-based `page`, default 12-item size, `collection`/`table` variants and range maths unchanged; `aria-label` falls back to `<itemLabel> pagination`; the table pager keeps `n / m` visually and exposes `Page n of m`; disabled arrows are native-disabled and styled; wrapping pager at 320–390px |
 | Empty      | Props and custom action preserved; default detail is neutral (`No records to show here.`) instead of promising record creation; title 15px and detail 13px on tokenised surfaces                                                                                                                     |
 
-Files: `src/components/ui/{Button,Badge,Pagination,Empty}.jsx`,
-`src/styles/ui/{buttons,badges,pagination-empty,accessibility}.css`,
-`src/styles/system/controls.css`, and `tests/unit/ui-foundations.test.js`.
+Files: `apps/crm/src/components/ui/{Button,Badge,Pagination,Empty}.jsx`,
+`apps/crm/src/styles/ui/{buttons,badges,pagination-empty,accessibility}.css`,
+`apps/crm/src/styles/system/controls.css`, and `apps/crm/tests/unit/ui-foundations.test.js`.
 
 ### 12.2 Measured contrast
 
@@ -481,8 +481,8 @@ Normal text target ≥4.5:1; values computed from the sRGB hex pairs actually us
 | Empty detail light `--muted` on `--panel` | 5.12  |
 | Empty detail dark `--muted` on `--panel`  | 7.62  |
 
-The badge tones previously defined in `src/styles/system/records.css` and
-`src/styles/theme/collections.css` are outside this packet's allowlist. The primitive now carries
+The badge tones previously defined in `apps/crm/src/styles/system/records.css` and
+`apps/crm/src/styles/theme/collections.css` are outside this packet's allowlist. The primitive now carries
 the same measured values with higher specificity, so appearance is unchanged; removing the older
 duplicates is a later cleanup.
 
@@ -504,16 +504,16 @@ packet should capture an empty and a filtered-empty directory.
 
 ### 12.4 Checks
 
-| Command                                         | Result                                         |
-| ----------------------------------------------- | ---------------------------------------------- |
-| `node --test tests/unit/ui-foundations.test.js` | 7 passed                                       |
-| `npm test`                                      | 460 passed                                     |
-| `npm run build`                                 | passed (existing chunk-size advisory only)     |
-| `npm run check:i18n`                            | passed (33 namespaces, 1787 keys)              |
-| `npm run check:lines:ci`                        | passed; 37 baselined oversized files unchanged |
-| `npm run check:boundaries`                      | passed                                         |
-| `npx prettier --check` on every changed file    | passed                                         |
-| `git diff --check`                              | clean                                          |
+| Command                                                  | Result                                         |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| `node --test apps/crm/tests/unit/ui-foundations.test.js` | 7 passed                                       |
+| `npm test`                                               | 460 passed                                     |
+| `npm run build`                                          | passed (existing chunk-size advisory only)     |
+| `npm run check:i18n`                                     | passed (33 namespaces, 1787 keys)              |
+| `npm run check:lines:ci`                                 | passed; 37 baselined oversized files unchanged |
+| `npm run check:boundaries`                               | passed                                         |
+| `npx prettier --check` on every changed file             | passed                                         |
+| `git diff --check`                                       | clean                                          |
 
 `npm run check:lines` was not used to claim a repository pass; the baselined oversized inventory
 is unchanged.
@@ -534,19 +534,19 @@ predicates, workspace resolution, badges and full-height messaging are unchanged
 
 ### 13.1 What changed
 
-| Area                | Built behaviour                                                                                                                                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Navigation model    | New `src/features/server/connectedNav.js`: nine display groups in fixed order, icons reused from the existing route map, `connectedGroups(user)` filters with the same access predicates         |
-| One entry per route | `Workspaces` appears once (Company settings for an Admin, Platform administration for the Super Admin); `Team activity` appears once (Company settings for managers, Personal account for staff) |
-| Work group          | Members see Inbox and Team chat; the Super Admin keeps the existing `Messages` preview in the same group. No new destinations                                                                    |
-| Pinned groups       | Personal account, Company settings and Platform administration are separated from daily work by a hairline and spacing                                                                           |
-| Shell copy          | Removed the repeated "YOUR BUSINESS, CONNECTED" eyebrow (one title per page) and the false footer sentence claiming messaging is not connected                                                   |
-| Sidebar legend      | Removed the availability legend; the truthful "Not connected" chip stays on the two unavailable entries                                                                                          |
+| Area                | Built behaviour                                                                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Navigation model    | New `apps/crm/src/features/server/connectedNav.js`: nine display groups in fixed order, icons reused from the existing route map, `connectedGroups(user)` filters with the same access predicates |
+| One entry per route | `Workspaces` appears once (Company settings for an Admin, Platform administration for the Super Admin); `Team activity` appears once (Company settings for managers, Personal account for staff)  |
+| Work group          | Members see Inbox and Team chat; the Super Admin keeps the existing `Messages` preview in the same group. No new destinations                                                                     |
+| Pinned groups       | Personal account, Company settings and Platform administration are separated from daily work by a hairline and spacing                                                                            |
+| Shell copy          | Removed the repeated "YOUR BUSINESS, CONNECTED" eyebrow (one title per page) and the false footer sentence claiming messaging is not connected                                                    |
+| Sidebar legend      | Removed the availability legend; the truthful "Not connected" chip stays on the two unavailable entries                                                                                           |
 
-Files: `src/features/server/{connectedNav.js,ServerNavigationGroups.jsx,ServerNavigation.jsx,
-ServerShell.jsx,navigation.css}`, `src/i18n/catalogs/en/navigation.js`,
-`src/i18n/catalogs/index.js`, `ServerNavigationSettings.jsx` deleted,
-`tests/unit/connected-navigation.test.js` (new), `tests/server-browser/navigation.spec.js`.
+Files: `apps/crm/src/features/server/{connectedNav.js,ServerNavigationGroups.jsx,ServerNavigation.jsx,
+ServerShell.jsx,navigation.css}`, `apps/crm/src/i18n/catalogs/en/navigation.js`,
+`apps/crm/src/i18n/catalogs/index.js`, `ServerNavigationSettings.jsx` deleted,
+`apps/crm/tests/unit/connected-navigation.test.js` (new), `apps/crm/tests/server-browser/navigation.spec.js`.
 
 ### 13.2 Verified role rendering
 
@@ -567,7 +567,7 @@ Personal account and no Company settings or Platform administration.
 
 | Command                                                                                                                                   | Result                                         |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| `node --test tests/unit/connected-navigation.test.js tests/unit/server-navigation.test.js`                                                | 6 passed                                       |
+| `node --test apps/crm/tests/unit/connected-navigation.test.js apps/crm/tests/unit/server-navigation.test.js`                              | 6 passed                                       |
 | `npm test`                                                                                                                                | 463 passed                                     |
 | `npm run build`                                                                                                                           | passed (existing chunk-size advisory only)     |
 | `npm run check:i18n`                                                                                                                      | passed (34 namespaces, 1796 keys)              |
@@ -614,9 +614,9 @@ contract changed.
 | Row opening       | The card's Open action dispatches the same row handler as a desktop row click; the desktop path is unchanged                                                                                                                                                               |
 | Empty card facts  | Empty stage values and empty facts are omitted instead of printing an em dash                                                                                                                                                                                              |
 
-Files: `src/features/records/{RecordsPage.jsx,RecordDirectoryHead.jsx,RecordTable.jsx,
+Files: `apps/crm/src/features/records/{RecordsPage.jsx,RecordDirectoryHead.jsx,RecordTable.jsx,
 RecordTableView.jsx,RecordCards.jsx,RecordRowActions.jsx,cards.css}`,
-`src/styles/records/directory.css`, `tests/server-browser/clients-pilot.spec.js` (new).
+`apps/crm/src/styles/records/directory.css`, `apps/crm/tests/server-browser/clients-pilot.spec.js` (new).
 
 ### 14.2 Pilot acceptance (§7)
 

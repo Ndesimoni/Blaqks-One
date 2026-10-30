@@ -10,7 +10,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkLanguage, checkRegistry } from './i18n-rules.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const directory = join(root, 'src/i18n/catalogs');
+const directory = join(root, 'apps/crm/src/i18n/catalogs');
 const CHECKED = 'en';
 
 async function loadLanguage(language) {

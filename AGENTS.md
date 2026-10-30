@@ -1,10 +1,10 @@
 <!-- # Development guidance
 
 - The active application is React 18 + Vite under `src/`. Start with `README.md` and `docs/architecture.md`.
-- Keep feature-specific pages in `src/features`, shared UI in `src/components/ui`, layout in `src/components/layout`, and non-React business logic in `src/lib`.
+- Keep feature-specific pages in `apps/crm/src/features`, shared UI in `apps/crm/src/components/ui`, layout in `apps/crm/src/components/layout`, and non-React business logic in `apps/crm/src/lib`.
 - Use the focused hooks in `hooks/useWorkspace.js` for records, actions, navigation, view state, and preferences. Define React components at module scope.
 - Preserve browser storage keys, workbook field keys/column mappings, and JSON backup formats unless a requested change includes a migration.
-- Root `public/` contains static assets for Vite. `legacy/offline/` is an independent archived implementation; only change it when the request concerns that edition.
+- `apps/crm/public/` contains static assets for Vite. `legacy/offline/` is an independent archived implementation; only change it when the request concerns that edition.
 - Historical Python scripts in `legacy/offline/tests` are reference material. Active tests are in root `tests/`.
 - Use the existing Prettier and EditorConfig settings.
 - Validate structural and business-logic changes with `npm test` and `npm run build`. Use `npm run test:e2e` for UI flows and component wiring.
@@ -53,23 +53,26 @@ Professional real estate CRM focused on the UAE market.
 
 ## Current Project Structure
 
-- src/app/ — Application composition, React Router routes, and focused workspace contexts
-- src/features/ — CRM pages and feature-specific components
-- src/components/ — Shared UI and layout components
-- src/hooks/ — Workspace access, data persistence, and preferences hooks
-- src/services/storage/ — Validated browser storage repositories
-- src/services/files/ — Backup validation and browser downloads
-- src/services/crm/ — Same-origin API client; cookie sessions and in-memory CSRF
-- src/features/server/ — Connected shell, identity and asynchronous scoped record hooks
-- src/lib/ — Business rules, selectors, media, and Excel utilities
-- src/config/ — Navigation, table columns, field options (split under src/config/fields/), themes, and storage constants
-- src/styles/index.css — Ordered stylesheet imports; maintain the cascade when editing the imported files
-- src/data/schemas.js — Workbook data definitions, re-exported from per-sheet modules in src/data/schemas/ (column letters derived in order; append new workbook columns at the end)
-- src/data/demo.js — Demo records
-- src/main.jsx — React entry point
-- tests/ — Active unit, storage contract, browser, and offline smoke checks
+The CRM frontend lives in `apps/crm/` (an npm workspace); run every `npm run` command from the repository root, which keeps the shared `.env`.
+
+- apps/crm/src/app/ — Application composition, React Router routes, and focused workspace contexts
+- apps/crm/src/features/ — CRM pages and feature-specific components
+- apps/crm/src/components/ — Shared UI and layout components
+- apps/crm/src/hooks/ — Workspace access, data persistence, and preferences hooks
+- apps/crm/src/services/storage/ — Validated browser storage repositories
+- apps/crm/src/services/files/ — Backup validation and browser downloads
+- apps/crm/src/services/crm/ — Same-origin API client; cookie sessions and in-memory CSRF
+- apps/crm/src/features/server/ — Connected shell, identity and asynchronous scoped record hooks
+- apps/crm/src/lib/ — Business rules, selectors, media, and Excel utilities
+- apps/crm/src/config/ — Navigation, table columns, field options (split under apps/crm/src/config/fields/), themes, and storage constants
+- apps/crm/src/styles/index.css — Ordered stylesheet imports; maintain the cascade when editing the imported files
+- apps/crm/src/data/schemas.js — Workbook data definitions, re-exported from per-sheet modules in apps/crm/src/data/schemas/ (column letters derived in order; append new workbook columns at the end)
+- apps/crm/src/data/demo.js — Demo records
+- apps/crm/src/main.jsx — React entry point
+- apps/crm/tests/ — Active unit, storage contract, API, browser, and offline smoke checks
+- apps/website/ — Next.js general website and company websites
 - docs/architecture-audit.md — Architecture findings and staged refactoring plan
-- backend/ — Retained local Rust/Axum Google Calendar companion: `api/` handlers, `google/` transport, `store/` encrypted storage, `sync.rs` worker
+- services/calendar-companion/ — Retained local Rust/Axum Google Calendar companion: `api/` handlers, `google/` transport, `store/` encrypted storage, `sync.rs` worker
 - services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI; see [module map](docs/backend-foundation.md#module-map). Add new backend domains as sibling modules under `src/`; group a module into subfolders once it holds several workflows
 - compose.yaml / compose.test.yaml — Persistent development PostgreSQL and disposable test PostgreSQL
 - docs/google-calendar.md — Account setup, syncing behavior, and integration verification
@@ -95,7 +98,7 @@ Act as a senior software engineer and UI/UX designer.
 - Normal account deletion archives identity and data without removing saved records. Only the Super Admin can archive accounts; archiving an Admin archives their whole team and freezes that workspace. Keep archived accounts out of current lists and expose their data only through Super Admin read-only views. Revoke sessions/invitations transactionally, check live membership after workspace locks, and never allow an edit/renewal to restore an archive. Hard deletion is a separate future feature requiring explicit permanent-loss review.
 - Browser/backup imports require the live Super Admin, explicit source/destination review and an atomic add-only commit. Organisation sources stay in the organisation workspace; personal sources require an explicitly selected server member UUID. Preserve every source collection in full backups; only the eight connected collections currently migrate. See [Data migration](docs/data-migration.md).
 - Demo listing photos must stay labelled. Display fallbacks never alter stored browser records; imports may embed deterministic sample assets only for empty galleries. Preserve actual photos and floor plans. See [Demo property photos](docs/demo-property-photos.md).
-- Follow [Service boundaries](docs/service-boundaries.md): each table has one owning backend module and other modules use its functions, not its tables; new cross-domain foreign keys, triggers or shared-table writes need a decision-log entry; build new large features (agreements, messaging/integrations, public catalogue, lead agents) as separately owned modules with their own tables, routes and `src/services/crm/` client file.
+- Follow [Service boundaries](docs/service-boundaries.md): each table has one owning backend module and other modules use its functions, not its tables; new cross-domain foreign keys, triggers or shared-table writes need a decision-log entry; build new large features (agreements, messaging/integrations, public catalogue, lead agents) as separately owned modules with their own tables, routes and `apps/crm/src/services/crm/` client file.
 - New work keeps the current colour theme and follows [Premium polish for new work](docs/design-standards.md#premium-polish-for-new-work-owner-2026-10-16) (owner, 2026-10-16).
 - **Everything is in English** ([English only](docs/product-decisions.md#english-only-decided-2026-10-22), owner 2026-10-22): write no Arabic text, Arabic translations, right-to-left layouts or Arabic-specific handling. New interface text goes in the English catalogue through `useI18n()` (`npm run check:i18n` checks English only). The existing Arabic catalogue and its preview stay in place, frozen and switched off: do not update or delete them without a separate owner decision.
 - Prefer reusable components and custom hooks.
@@ -128,7 +131,7 @@ The user has authorised backend development. The first local CRM backend slice i
 
 **Connected-only development (owner decision 2026-10-14).** The connected version is the product. The browser-local demo is **frozen**: do not add demo-specific features, demo data or demo browser tests, and do not run `npm run test:e2e` as a routine check. Keep demo code in place (shared components still serve both modes) and do not delete or deliberately break it without a separate owner decision. Verify work with `npm test`, `npm run build`, `npm run test:api`, `npm run test:server:e2e`, `npm run check:lines` and `npm run check:boundaries`; GitHub Actions CI (`.github/workflows/ci.yml`) runs these on every pull request and push to `main`. Where real data is missing, use clearly fictional synthetic data: tests seed their own records in the disposable Docker database, and developers may fill a local workspace with the sample-data command; never use real client data for testing.
 
-Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `tests/deferred/` and are excluded from the active suite.
+Calendar navigation, connection controls and background sync remain removed from the active frontend; retain scheduling metadata and the companion for a later phase. Default demo browser tests start only Vite; connected browser tests use their own API and isolated Docker database. Historical Calendar browser scenarios are in `apps/crm/tests/deferred/` and are excluded from the active suite.
 
 Follow the owner's [product decisions](docs/product-decisions.md) (record visibility, assignment, listing limits and enquiry routing); they override the roadmap's suggested defaults. The current plan is the [implementation roadmap](docs/claude-implementation-roadmap.md); start each new session with the [handoff](docs/handoff.md), which lists the latest finished work, the next packets and how a packet is run. See the proposed [CRM, website and mobile platform design](docs/platform-system-design.md). The owner removed mandatory website publication approval on 2026-10-28: follow [direct website publishing](docs/product-decisions.md#direct-website-publishing-decided-2026-10-28), with scoped Publish permission and validation rather than a human approval queue. Keep private CRM data separate from deliberately published public versions and preserve enquiry ownership. The owner subsequently authorised website backend development: the [local website backend](docs/website-backend.md) implements public catalogue, direct publishing and targeted enquiries. CRM Website management screens, deployment and the documented launch work remain; social-provider delivery is separate later work.
 

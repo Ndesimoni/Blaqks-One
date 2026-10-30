@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { readSecret } from './terminal-secret.mjs';
-import { meetsPasswordPolicy, weakPasswordMessage } from '../src/lib/passwordPolicy.js';
+import { meetsPasswordPolicy, weakPasswordMessage } from '../apps/crm/src/lib/passwordPolicy.js';
 
 if (!process.stdin.isTTY) {
   console.error('Run this account setup command in an interactive terminal.');

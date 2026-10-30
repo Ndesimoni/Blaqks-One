@@ -1,11 +1,11 @@
-//! Golden cases G1–G10 and edge cases from `tests/fixtures/finance-golden.json`, shared
+//! Golden cases G1–G10 and edge cases from `apps/crm/tests/fixtures/finance-golden.json`, shared
 //! with the JS preview so both implementations agree exactly.
 use super::*;
 use serde_json::{json, Value};
 
 pub const GOLDEN: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../tests/fixtures/finance-golden.json"
+    "/../../apps/crm/tests/fixtures/finance-golden.json"
 ));
 
 pub fn fixture() -> Value {

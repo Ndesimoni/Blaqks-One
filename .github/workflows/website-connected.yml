@@ -6,7 +6,7 @@ on:
       [
         'apps/website/**',
         'services/crm-api/**',
-        'tests/api/website-*.mjs',
+        'apps/crm/tests/api/website-*.mjs',
         'compose.test.yaml',
         '.github/workflows/website-connected.yml',
       ]
@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 30
     env:
       NEXT_TELEMETRY_DISABLED: 1
-      API_TEST_FILES: tests/api/website-next.test.mjs
+      API_TEST_FILES: apps/crm/tests/api/website-next.test.mjs
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

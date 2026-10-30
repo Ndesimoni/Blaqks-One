@@ -96,7 +96,7 @@ Build one calculator per packet so formula review remains clear.
 
 ### Q2 — commission preview
 
-1. Locate the current Rust finance calculation and `src/lib/finance/commission.js` mirror.
+1. Locate the current Rust finance calculation and `apps/crm/src/lib/finance/commission.js` mirror.
 2. Extract shared client selectors rather than copying formulas into the component.
 3. Place an accessible live preview beside Deal commission and share fields.
 4. Show gross commission, brokerage share, agent share, referral/co-broker share, VAT and net amount.

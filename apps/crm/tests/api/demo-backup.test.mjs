@@ -8,7 +8,7 @@ let owner;
 before(async () => ({ owner } = await fixtures()));
 
 test('the complete generated demo backup imports all supported records and labelled photos', async () => {
-  const path = 'public/demo/demo-workspace-backup.json';
+  const path = 'apps/crm/public/demo/demo-workspace-backup.json';
   const raw = await readFile(path, 'utf8');
   const backup = JSON.parse(raw);
   assert.equal(backup.demo, true);

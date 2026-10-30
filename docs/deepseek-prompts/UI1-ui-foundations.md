@@ -35,20 +35,20 @@ identity. Do not add dependencies, a component library, new fonts or new icons.
 
 ### Exact write allowlist
 
-- `src/components/ui/Button.jsx`
-- `src/components/ui/Badge.jsx`
-- `src/components/ui/Pagination.jsx`
-- `src/components/ui/Empty.jsx`
-- `src/styles/ui/buttons.css`
-- `src/styles/ui/badges.css`
-- `src/styles/ui/pagination-empty.css`
-- `src/styles/ui/accessibility.css`
-- `src/styles/system/controls.css`
-- New `tests/unit/ui-foundations.test.js`
+- `apps/crm/src/components/ui/Button.jsx`
+- `apps/crm/src/components/ui/Badge.jsx`
+- `apps/crm/src/components/ui/Pagination.jsx`
+- `apps/crm/src/components/ui/Empty.jsx`
+- `apps/crm/src/styles/ui/buttons.css`
+- `apps/crm/src/styles/ui/badges.css`
+- `apps/crm/src/styles/ui/pagination-empty.css`
+- `apps/crm/src/styles/ui/accessibility.css`
+- `apps/crm/src/styles/system/controls.css`
+- New `apps/crm/tests/unit/ui-foundations.test.js`
 - New screenshots only under `docs/screenshots/ui-redesign/ui1/`
 - A short `UI1 as built` addition to `docs/ui-pattern-spec.md`
 
-Do not edit `src/styles/index.css`: all allowed styles are already imported. Do not edit the
+Do not edit `apps/crm/src/styles/index.css`: all allowed styles are already imported. Do not edit the
 English catalogue unless you first find a genuinely new user-facing string that cannot remain a
 component prop; report that finding instead of expanding the allowlist.
 
@@ -114,23 +114,23 @@ formatting. Split no unrelated file and do not compress formatting to meet the l
 Run focused checks first, then the packet checks:
 
 ```sh
-node --test tests/unit/ui-foundations.test.js
+node --test apps/crm/tests/unit/ui-foundations.test.js
 npm test
 npm run build
 npm run check:i18n
 npm run check:lines:ci
 npm run check:boundaries
 npx prettier --check \
-  src/components/ui/Button.jsx \
-  src/components/ui/Badge.jsx \
-  src/components/ui/Pagination.jsx \
-  src/components/ui/Empty.jsx \
-  src/styles/ui/buttons.css \
-  src/styles/ui/badges.css \
-  src/styles/ui/pagination-empty.css \
-  src/styles/ui/accessibility.css \
-  src/styles/system/controls.css \
-  tests/unit/ui-foundations.test.js \
+  apps/crm/src/components/ui/Button.jsx \
+  apps/crm/src/components/ui/Badge.jsx \
+  apps/crm/src/components/ui/Pagination.jsx \
+  apps/crm/src/components/ui/Empty.jsx \
+  apps/crm/src/styles/ui/buttons.css \
+  apps/crm/src/styles/ui/badges.css \
+  apps/crm/src/styles/ui/pagination-empty.css \
+  apps/crm/src/styles/ui/accessibility.css \
+  apps/crm/src/styles/system/controls.css \
+  apps/crm/tests/unit/ui-foundations.test.js \
   docs/ui-pattern-spec.md
 git diff --check
 ```

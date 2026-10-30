@@ -190,7 +190,7 @@ address (D7) or a development tunnel.
   same transaction.
 - Local stand-in `scripts/fake-sendgrid.mjs` (`npm run dev:sendgrid`, keys `SG.<kind>.<domain>`)
   behind `CRM_SENDGRID_ENDPOINT`, refused outside local development. API suites:
-  `tests/api/sendgrid.test.mjs`, `tests/api/sendgrid-addresses.test.mjs`.
+  `apps/crm/tests/api/sendgrid.test.mjs`, `apps/crm/tests/api/sendgrid-addresses.test.mjs`.
 - Google sign-in is refused at its start, before consent, when the company uses SendGrid.
 - Code security review (2026-10-21): no High findings. Fixed: exact scope allowlist (M1),
   refusal before Google consent (L1), wider display-name and role-address checks (L3, L4),
@@ -239,7 +239,7 @@ address (D7) or a development tunnel.
 - Not yet: spam reports and unsubscribes recording an email opt-out (with the consents
   table, W1), the Connections screen showing whether delivery updates are on (E3d).
 - Stand-in: `scripts/fake-sendgrid-mail.mjs` and `scripts/fake-sendgrid-events.mjs`; API
-  suites `tests/api/sendgrid-send.test.mjs` and `tests/api/sendgrid-events.test.mjs`.
+  suites `apps/crm/tests/api/sendgrid-send.test.mjs` and `apps/crm/tests/api/sendgrid-events.test.mjs`.
 - Code security review (2026-10-21): no High findings, nothing cross-company or leaked.
   Fixed: a late `unknown` or `failed` from the worker never overwrites a Delivered or
   Failed set by a signed event, so a delivered message is never offered for Send again
@@ -291,7 +291,7 @@ address (D7) or a development tunnel.
 - **In the request.** Intake is database work only, so it runs in the request (not the
   staging queue of §7): a database failure answers 503 and SendGrid posts again; replays
   are absorbed by a hashed provider message ID per connection.
-- Stand-in: `scripts/fake-sendgrid-parse.mjs`; suite `tests/api/sendgrid-inbound.test.mjs`.
+- Stand-in: `scripts/fake-sendgrid-parse.mjs`; suite `apps/crm/tests/api/sendgrid-inbound.test.mjs`.
 - Code security review (2026-10-21): no High findings, nothing blocking. Fixed: a slot is
   taken only after the cheap checks and the key lookup, two per connection and eight in
   all, and a post must arrive within 30 seconds, so one company's slow posts cannot hold
@@ -328,12 +328,12 @@ themes, with English and Arabic text and logical CSS.
   Active or Kept for a former member; add (only members who may email and have no
   address, a suggested local part, the full address previewed), rename, and keep for a
   former member with a confirmation. The browser mirrors the server's rules
-  (`addressModel.js`, `tests/unit/sending-addresses.test.js`); the server still decides.
+  (`addressModel.js`, `apps/crm/tests/unit/sending-addresses.test.js`); the server still decides.
 - **My mailbox:** the member's company address, or "Ask your Admin for a sending address",
   or a reconnect warning; Google sign-in is not offered while the company uses SendGrid.
 - API additions: the Channels list gives a SendGrid row's full `domain`,
   `deliveryUpdates` and `incomingMail`; `GET /mailbox` gives `companyEmail`.
-- Browser suite `tests/server-browser/channels-sendgrid.spec.js`. Not yet: a right-to-left
+- Browser suite `apps/crm/tests/server-browser/channels-sendgrid.spec.js`. Not yet: a right-to-left
   screenshot pass, and address changes in Team activity.
 - **Removing an unused address (owner, 2026-10-21):** `POST /email-addresses/{id}/remove`
   lets the Admin remove an address given by mistake, freeing its name, but only while it

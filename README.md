@@ -26,55 +26,58 @@ The demo frontend opens with email/password sign-in. Initially, use `aidah@keysw
 ## Project structure
 
 ```text
-src/
-  app/                  Application shell, routed feature pages, and focused contexts
-  components/
-    layout/             Header, sidebar, page heading, and branding
-    ui/                 Shared buttons, badges, icons, and display components
-  config/               Navigation, field options, theme, and storage constants
-  data/                 Original workbook schemas and fictional demo records
-  features/
-    auth/               Frontend sign-in, session routes, and admin profile controls
-    calendar/           Local schedule helpers and deferred Google integration source
-    clients/            Client desk and property matching
-    dashboard/          Overview and KPIs
-    guide/              In-app workflow guide
-    insights/           CRM intelligence
-    properties/         Property directory, media editor/gallery, and selectors
-    records/            Shared tables/forms, validation, and record commands
-    server/             Opt-in connected shell, sessions and asynchronous scoped records
-    reports/            Date search and performance targets
-    team/               Owner setup, invitations, roles, profiles and access rules
-    workspaces/         Personal CRM scopes and Super Admin workspace directory
-    activity/           Scoped action history, filters and attribution
-    messaging/          Single/bulk client composers and staff message previews
-  hooks/                Focused state access, actions, navigation, and persistence
-  lib/                  Business rules, workspace selectors, media, and Excel
-  services/
-    auth/               Demo credential adapter, replaceable with server authentication
-    crm/                Same-origin cookie/CSRF API client
-    files/              Backup validation and browser downloads
-    storage/            Browser workspace and preference repositories
-  styles/               Ordered foundation, workspace, responsive, theme, and media styles
-  main.jsx              React entry point
-public/                 Favicon and original downloadable workbook
-tests/
-  api/                  Real HTTP/PostgreSQL tests against an isolated Docker database
-  browser/              Playwright tests for the default demo
-  server-browser/       Browser-to-API-to-PostgreSQL connected scenarios
-  fixtures/             Sample files used by tests
-  smoke/                Offline edition smoke checks
-  unit/                 Business, selector, and storage contract tests
+apps/
+  crm/                  CRM frontend (React/Vite, npm workspace)
+    src/
+      app/                  Application shell, routed feature pages, and focused contexts
+      components/
+        layout/             Header, sidebar, page heading, and branding
+        ui/                 Shared buttons, badges, icons, and display components
+      config/               Navigation, field options, theme, and storage constants
+      data/                 Original workbook schemas and fictional demo records
+      features/
+        auth/               Frontend sign-in, session routes, and admin profile controls
+        calendar/           Local schedule helpers and deferred Google integration source
+        clients/            Client desk and property matching
+        dashboard/          Overview and KPIs
+        guide/              In-app workflow guide
+        insights/           CRM intelligence
+        properties/         Property directory, media editor/gallery, and selectors
+        records/            Shared tables/forms, validation, and record commands
+        server/             Opt-in connected shell, sessions and asynchronous scoped records
+        reports/            Date search and performance targets
+        team/               Owner setup, invitations, roles, profiles and access rules
+        workspaces/         Personal CRM scopes and Super Admin workspace directory
+        activity/           Scoped action history, filters and attribution
+        messaging/          Single/bulk client composers and staff message previews
+      hooks/                Focused state access, actions, navigation, and persistence
+      lib/                  Business rules, workspace selectors, media, and Excel
+      services/
+        auth/               Demo credential adapter, replaceable with server authentication
+        crm/                Same-origin cookie/CSRF API client
+        files/              Backup validation and browser downloads
+        storage/            Browser workspace and preference repositories
+      styles/               Ordered foundation, workspace, responsive, theme, and media styles
+      main.jsx              React entry point
+    public/                 Favicon and original downloadable workbook
+    tests/
+      api/                  Real HTTP/PostgreSQL tests against an isolated Docker database
+      browser/              Playwright tests for the default demo
+      server-browser/       Browser-to-API-to-PostgreSQL connected scenarios
+      fixtures/             Sample files used by tests
+      smoke/                Offline edition smoke checks
+      unit/                 Business, selector, and storage contract tests
+  website/              Next.js general website and company websites
 scripts/                Local CRM setup/account/test commands and offline build
 docs/                   Setup, architecture, product guide, and screenshots
 legacy/offline/         Preserved independent offline prototype
-backend/                Retained Rust/Axum Google Calendar companion
+services/calendar-companion/  Retained Rust/Axum Google Calendar companion
 services/crm-api/       Rust/Axum private CRM service and PostgreSQL migrations
 compose.yaml           Persistent local Docker PostgreSQL
 compose.test.yaml      Disposable isolated test PostgreSQL
 ```
 
-The entry point [`src/main.jsx`](src/main.jsx) selects the default demo in `src/app/App.jsx` or connected mode in `src/features/server/ServerApp.jsx`. Read [Architecture](docs/architecture.md) before adding a feature.
+The entry point [`apps/crm/src/main.jsx`](apps/crm/src/main.jsx) selects the default demo in `apps/crm/src/app/App.jsx` or connected mode in `apps/crm/src/features/server/ServerApp.jsx`. Read [Architecture](docs/architecture.md) before adding a feature.
 
 All UI work follows the [Product design standards](docs/design-standards.md) and agent rules in [AGENTS.md](AGENTS.md). Hand-written code files have a maximum of 150 formatted lines. `npm run check:lines` reports outstanding violations; existing oversized files must be split when they are changed.
 

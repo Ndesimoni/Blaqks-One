@@ -4,7 +4,7 @@ import { mkdir, readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { test } from 'node:test';
 import { chromium, expect } from '@playwright/test';
-import { ensurePortFree, stop } from '../../scripts/crm-test-processes.mjs';
+import { ensurePortFree, stop } from '../../../../scripts/crm-test-processes.mjs';
 import { ok, property, publish, put, setup, websitePath } from './website-helpers.mjs';
 
 test('Next.js uses the real public API, renders public media/CMS updates, and saves an enquiry in the CRM', async () => {

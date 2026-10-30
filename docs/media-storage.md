@@ -59,7 +59,7 @@ against the item the file belongs to.
 - **F3 — email attachments:** see the F3 design below. **F3a (sending) is built** (2026-10-21):
   migration 0048, `media/contents.rs` and `naming.rs`, `inbox/send/files.rs` and
   `domain_files.rs`, Attach files in the reply box and New email, files on messages; suites
-  `tests/api/sendgrid-attachments.test.mjs` and `tests/server-browser/inbox-attachments.spec.js`.
+  `apps/crm/tests/api/sendgrid-attachments.test.mjs` and `apps/crm/tests/server-browser/inbox-attachments.spec.js`.
   Code security review (2026-10-21): no High findings. Fixed: the file reads (8 s) and the
   SendGrid call (at most 20 s) now fit the outbox's 30-second call budget, so slow storage
   retries instead of turning Unknown (M1); a Send again chain too long to follow fails
@@ -72,7 +72,7 @@ against the item the file belongs to.
   `inbound_store.rs` (store after the commit), `inbox/intake_files.rs`,
   `integrations/sendgrid/inbound_files.rs`; the thread shows kept files with a "Files from
   outside the company" note and counts the rest. Suites
-  `tests/api/sendgrid-inbound-files.test.mjs` and `sendgrid-inbound-files-guards.test.mjs`.
+  `apps/crm/tests/api/sendgrid-inbound-files.test.mjs` and `sendgrid-inbound-files-guards.test.mjs`.
   Code security review (2026-10-22): no High findings. Fixed: storing runs apart from the
   request and holds the connection's slot, so SendGrid hanging up cannot lose files (L1);
   mail without a spam score counted as spam (L2; revised 2026-10-22, as SendGrid scores only mail up to 2.5 MB, [SendGrid design §14](sendgrid-design.md#14-preflight-against-sendgrids-documentation-2026-10-22)); the sender budget key is tied to the
@@ -176,7 +176,7 @@ IDs and record UUIDs are named: never file names, bytes, data URLs or record con
 
 Tests: unit tests in `records/backfill/inline_tests.rs`, `plan_tests.rs`, `rewrite_tests.rs`
 and `options.rs`; the database-backed `apply_tests.rs` (a record saved meanwhile is skipped
-and its reserved files hidden); API suites `tests/api/media-backfill.test.mjs` (dry run with
+and its reserved files hidden); API suites `apps/crm/tests/api/media-backfill.test.mjs` (dry run with
 nothing reserved, apply, served files without photo metadata, repeat run, items left
 inline, another company untouched, a member save afterwards) and
 `media-backfill-guards.test.mjs` (unreachable storage, archived company). Not covered

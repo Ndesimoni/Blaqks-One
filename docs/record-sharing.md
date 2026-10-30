@@ -181,16 +181,16 @@ closedAt|null, allowed: {accept, decline, withdraw, stop}}`.
   a test that sorts every workbook field; `records/keeps_list.rs` reads keeps by reason.
   Departure calls `end_for_member` before `keeps::forget`; a hand-over ends a colleague's
   share before it locks the listing or writes its own keep.
-- **Screens** (`src/features/server/shares/`): the Sharing panel in a record's details
+- **Screens** (`apps/crm/src/features/server/shares/`): the Sharing panel in a record's details
   (holder or Admin: Share, Copy link, Share on WhatsApp, the record's shares with Withdraw
   or Stop sharing), the "Shared with you" panel on Leads, Clients, Properties and Contacts,
   sidebar counts from one `GET /shares/waiting` poll, and the `#/shares/{uuid}` link page
   (the only shape honoured after sign-in). Copies read "View only. Shared with you by
   {name} on {date}." with the chip; contacts copies show on the Contacts page.
-- **Tests.** `tests/api/record-sharing-{contract,security,lifecycle,copies}.test.mjs`
+- **Tests.** `apps/crm/tests/api/record-sharing-{contract,security,lifecycle,copies}.test.mjs`
   with `record-sharing-helpers.mjs`; Rust tests in `share_fields_tests.rs` and `view.rs`;
-  `tests/unit/record-shares.test.js`, `share-badges.test.js` and the colleague cases in
-  `kept-records.test.js`; the browser flow `tests/server-browser/record-sharing.spec.js`.
+  `apps/crm/tests/unit/record-shares.test.js`, `share-badges.test.js` and the colleague cases in
+  `kept-records.test.js`; the browser flow `apps/crm/tests/server-browser/record-sharing.spec.js`.
 - **Built with help.** Part of the server and the first API suites were written by Codex
   while the specialists were at their usage limit; the primary agent reviewed them against
   the amendments.
@@ -245,7 +245,7 @@ snapshots cross, never a live read of another company's `crm_records`.
   guest links. One evidence module stays one extraction unit (service boundaries,
   extraction candidate 3). New code goes in `agreements/listings/` and
   `agreements/referrals/`; routes stay under `/agreements/...`; the frontend clients are
-  `src/services/crm/agreementListings.js` and `agreementReferrals.js`.
+  `apps/crm/src/services/crm/agreementListings.js` and `agreementReferrals.js`.
 - **Records** owns what reads or writes `crm_records`: the allowlisted listing and lead
   facts (`records::outside_facts`), the new lead an accepted referral creates
   (`records::referrals::receive`), its badge table, and the triggers that end shares when
@@ -640,7 +640,7 @@ workspaces. Every route refuses the Super Admin (`access::ensure_reader`).
   - the location and contact fingerprints recompute from the salt;
   - `display_name`;
   - the steps the guards allow.
-- **API** (`tests/api/outside-sharing-{contract,security,lifecycle,files,referrals,guards}.test.mjs`
+- **API** (`apps/crm/tests/api/outside-sharing-{contract,security,lifecycle,files,referrals,guards}.test.mjs`
   with two seeded companies):
   - only the holder or the Admin sends (403 or 404 as in R1);
   - a recipient in the same company, an inactive member or the Super Admin is refused;
@@ -671,7 +671,7 @@ workspaces. Every route refuses the Super Admin (`access::ensure_reader`).
     backstop, deletes refused, the contact only erased, released once.
 - **Unit:** the allowed-action models, link parsing (only the three exact shapes) and the
   WhatsApp text (no title, price, area or client).
-- **Browser:** `tests/server-browser/outside-sharing.spec.js`, with two companies:
+- **Browser:** `apps/crm/tests/server-browser/outside-sharing.spec.js`, with two companies:
   - share a listing, accept it through the link, see the photos, propose co-broking;
   - refer a lead, accept it, and see the new lead with its badge.
 
@@ -721,8 +721,8 @@ workspaces. Every route refuses the Super Admin (`access::ensure_reader`).
 
 Listing sharing with one named agent at another company. Code: `agreements/listings/`
 (routes under `/agreements/listing-shares`), `records::outside_facts`, `media::copies` and
-`media::copy_bytes`; screens in `src/features/server/listingShares/` and the client
-`src/services/crm/agreementListings.js`. Migrations: **0067** (snapshots, shares, events),
+`media::copy_bytes`; screens in `apps/crm/src/features/server/listingShares/` and the client
+`apps/crm/src/services/crm/agreementListings.js`. Migrations: **0067** (snapshots, shares, events),
 **0068** (the share guard and the functions that end shares), **0069** (media copies) and
 **0070** (the records triggers, decision D12). Migration numbers moved by one from the draft
 reservation because the rules needed their own file. The security review fixes took 0071 and
@@ -766,8 +766,8 @@ co-broking from a share 0072; the next free number is 0073.
   (five years, photo copies after 90 days) is not built yet: nothing deletes evidence.
 - **Not in R2a:** Propose co-broking from a share, lead referrals (R2b), the retention job.
 - **Tests:** Rust (allowlist sort, digests, Dubai days, response matrix, contact warning),
-  `tests/api/outside-sharing-{contract,security,lifecycle,endings,guards}.test.mjs` (22),
-  `tests/unit/listing-shares.test.js` and `tests/server-browser/outside-sharing.spec.js`.
+  `apps/crm/tests/api/outside-sharing-{contract,security,lifecycle,endings,guards}.test.mjs` (22),
+  `apps/crm/tests/unit/listing-shares.test.js` and `apps/crm/tests/server-browser/outside-sharing.spec.js`.
 
 ### R2a security review (2026-10-23)
 
@@ -856,8 +856,8 @@ snapshotDigest, sharedAt, acceptedAt}`, so every revision's digest names the sha
   its state, such as "Co-broking: Offer sent". The product designer reviewed the screens at
   390 and 1280 px in both themes; the eight fixes asked for are in. Everyone else, both Admins included, sees no co-broking and
   gets the shared not-found from the route.
-- **Tests:** `tests/api/outside-sharing-co-broking.test.mjs`, `tests/unit/co-broking.test.js`
-  and `tests/server-browser/outside-co-broking.spec.js`.
+- **Tests:** `apps/crm/tests/api/outside-sharing-co-broking.test.mjs`, `apps/crm/tests/unit/co-broking.test.js`
+  and `apps/crm/tests/server-browser/outside-co-broking.spec.js`.
 
 ### Co-broking code review follow-up (2026-10-24)
 
@@ -872,7 +872,7 @@ Browser verification also exposed two integration fixes: the agreement review ha
 recipient without a company display name, and introduction labels read the existing
 `coBroking` English catalogue rather than missing keys in the `agreements` namespace.
 
-`tests/api/outside-sharing-co-broking-guards.test.mjs` checks rejected edits and counters
+`apps/crm/tests/api/outside-sharing-co-broking-guards.test.mjs` checks rejected edits and counters
 leave versions/revisions unchanged, opposite-party simultaneous sends allow exactly one
 standing offer, and accepted amendments preserve the server-derived listing and
 introduction. The original API and connected browser flows remain part of verification;

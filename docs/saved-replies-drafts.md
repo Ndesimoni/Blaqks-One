@@ -122,15 +122,15 @@ invisible marks).
 
 - Server: migration 0051, `inbox/saved_replies.rs` (+ `saved_replies_change.rs`,
   `saved_reply_input.rs`), `inbox/drafts.rs` (+ `draft_input.rs`); the reply route empties
-  the writer's draft (`drafts::sent`). Suites `tests/api/saved-replies.test.mjs` and
-  `tests/api/inbox-drafts.test.mjs`.
-- Screens: `src/features/server/inbox/saved/` (button, picker, manage dialog, form, model),
+  the writer's draft (`drafts::sent`). Suites `apps/crm/tests/api/saved-replies.test.mjs` and
+  `apps/crm/tests/api/inbox-drafts.test.mjs`.
+- Screens: `apps/crm/src/features/server/inbox/saved/` (button, picker, manage dialog, form, model),
   `ReplyForm.jsx` with `useDraft.js` and `DraftStatus.jsx`, the composer's `tools` slot
-  (`composer-tools.css`), and `src/services/crm/inboxSaved.js`. The picker is a native popover
+  (`composer-tools.css`), and `apps/crm/src/services/crm/inboxSaved.js`. The picker is a native popover
   inside the form, so it works inside New email's dialog; the manage dialog is rendered on
   the page body and its form never submits the reply. Unit tests
-  `tests/unit/saved-replies-model.test.js`; browser suite
-  `tests/server-browser/saved-replies.spec.js`.
+  `apps/crm/tests/unit/saved-replies-model.test.js`; browser suite
+  `apps/crm/tests/server-browser/saved-replies.spec.js`.
 - Also fixed: after a reload the composer opened on Internal note, because it chose its tab
   before the mailbox loaded; it now opens on Reply once sending is possible, unless the
   member already picked a tab.

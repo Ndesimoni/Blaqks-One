@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { catalogs } from '../../src/i18n/catalogs/index.js';
-import { checkCatalogs, checkLanguage, checkRegistry } from '../../scripts/i18n-rules.mjs';
+import { checkCatalogs, checkLanguage, checkRegistry } from '../../../../scripts/i18n-rules.mjs';
 
 // Arabic is frozen (owner, 2026-10-22): only the English catalogue must be complete.
 test('the shipped English catalogue is complete and every file registered', () => {

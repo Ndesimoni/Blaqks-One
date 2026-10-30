@@ -31,7 +31,7 @@ export function testEnv() {
     // Random, and meets the new-password policy that the account CLI enforces.
     CRM_FIXTURE_PASSWORD: `Fx1!${randomBytes(24).toString('hex')}`,
     VITE_CRM_MODE: 'server',
-    // Offers Arabic in My profile for tests/server-browser/language.spec.js; English stays default.
+    // Offers Arabic in My profile for apps/crm/tests/server-browser/language.spec.js; English stays default.
     VITE_I18N_PREVIEW: 'true',
     CRM_API_PROXY: 'http://127.0.0.1:8790',
   };

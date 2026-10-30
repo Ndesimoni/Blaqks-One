@@ -17,14 +17,14 @@ Scope: finish the audited frontend foundations for the existing browser-local CR
 ## Proposed boundaries
 
 ```text
-src/app/                    Routing, providers, application shell
-src/hooks/                  Focused context access, orchestration, persistence
-src/features/*/selectors.js Feature-specific business selection
-src/features/records/       Reusable editor/details/table + validation/commands
-src/services/files/         Backup parsing and browser downloads
-src/services/storage/       Validated record-envelope persistence
-src/components/ui/          Drawer, error boundary, reusable controls
-src/styles/                 Ordered original styles + new frontend styles
+apps/crm/src/app/                    Routing, providers, application shell
+apps/crm/src/hooks/                  Focused context access, orchestration, persistence
+apps/crm/src/features/*/selectors.js Feature-specific business selection
+apps/crm/src/features/records/       Reusable editor/details/table + validation/commands
+apps/crm/src/services/files/         Backup parsing and browser downloads
+apps/crm/src/services/storage/       Validated record-envelope persistence
+apps/crm/src/components/ui/          Drawer, error boundary, reusable controls
+apps/crm/src/styles/                 Ordered original styles + new frontend styles
 ```
 
 React Router 7.18.4 runs with the existing React 18 application. Node 20 or later is now required; Node 22 is recommended. Vite is updated to 6.4.3. The updates resolve the dependency advisories discovered during this phase, and npm reports zero vulnerabilities. Hash routes provide refresh/history support on static hosting, and the data router supports blocking navigation while edits are unsaved. Drawers follow the [WAI modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) for initial focus, Tab containment, Escape, and focus return.

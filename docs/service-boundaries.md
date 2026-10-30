@@ -4,7 +4,7 @@ Status: architecture guidance, 2026-10-15. Evidence is from `feature/connected-c
 
 ## Summary
 
-The connected CRM is a **modular monolith**: one Rust/Axum crate (`services/crm-api`), one PostgreSQL database with one migration sequence, and one frontend data layer (`src/services/crm/`) that reaches the API only through same-origin `/api/crm/...` paths. The retained Google Calendar companion (`backend/`) is already a separate deployable on `/api/calendar`, and the Vite proxy routes the two prefixes to different processes (`vite.config.js`).
+The connected CRM is a **modular monolith**: one Rust/Axum crate (`services/crm-api`), one PostgreSQL database with one migration sequence, and one frontend data layer (`apps/crm/src/services/crm/`) that reaches the API only through same-origin `/api/crm/...` paths. The retained Google Calendar companion (`services/calendar-companion/`) is already a separate deployable on `/api/calendar`, and the Vite proxy routes the two prefixes to different processes (`vite.config.js`).
 
 Splitting into microservices now is not recommended. The domains share invariants that PostgreSQL enforces inside one transaction: the per-workspace lock, live-membership checks, redacted activity committed with every mutation, and same-workspace links between records. A split would replace these with distributed coordination before any traffic, team or reliability need exists. The aim is to keep a later split cheap: every table has one owner, modules talk through functions rather than each other's tables, and new large features are built as separately owned modules.
 
@@ -53,19 +53,19 @@ Natural service groupings if a split ever happens: **identity and tenancy** (aut
 
 ### Split readiness
 
-| Domain                              | Readiness                          | Why                                                                                                                                                                   |
-| ----------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Calendar companion (`backend/`)     | Already separate                   | Own process, storage and `/api/calendar` prefix                                                                                                                       |
-| Public catalogue and enquiry intake | Easy if the rules are followed     | Local owner APIs and immutable publication projections exist; W1 synchronous guards and transactional lead creation require durable events/commands before extraction |
-| Messaging, integrations and worker  | Easy                               | Greenfield; the roadmap already specifies an outbox and a separately runnable worker                                                                                  |
-| Cross-company agreements            | Easy if built as its own module    | Greenfield; must not take foreign keys into `crm_deals` or `crm_records`; stores references plus a frozen snapshot                                                    |
-| AI lead agents                      | Easy                               | Asynchronous consumer that creates leads through a CRM command, not the database                                                                                      |
-| `imports/`                          | Moderate, no reason to split       | A capability of records; writes through records helpers                                                                                                               |
-| `team/`                             | Moderate                           | Writes member columns, sessions and workspaces; runs departure across domains in one transaction; belongs with identity and tenancy                                   |
-| `auth/` and `workspaces/`           | Hard                               | Every module and six triggers read `crm_user_profiles`; per-request session lookup; shared advisory lock. Extract last, if ever                                       |
-| `records/` and `assignments/`       | Hard apart, moderate as one unit   | Shared `assignee_id`, visibility predicate and history writes; keep together                                                                                          |
-| `finance/`                          | Hard today, moderate after phase 1 | Foreign keys both ways with records, records-hosted visibility helpers, shared history, departure transaction and identity triggers                                   |
-| `sample/`                           | Not a service                      | Development tool; retarget per service if a split happens                                                                                                             |
+| Domain                                              | Readiness                          | Why                                                                                                                                                                   |
+| --------------------------------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Calendar companion (`services/calendar-companion/`) | Already separate                   | Own process, storage and `/api/calendar` prefix                                                                                                                       |
+| Public catalogue and enquiry intake                 | Easy if the rules are followed     | Local owner APIs and immutable publication projections exist; W1 synchronous guards and transactional lead creation require durable events/commands before extraction |
+| Messaging, integrations and worker                  | Easy                               | Greenfield; the roadmap already specifies an outbox and a separately runnable worker                                                                                  |
+| Cross-company agreements                            | Easy if built as its own module    | Greenfield; must not take foreign keys into `crm_deals` or `crm_records`; stores references plus a frozen snapshot                                                    |
+| AI lead agents                                      | Easy                               | Asynchronous consumer that creates leads through a CRM command, not the database                                                                                      |
+| `imports/`                                          | Moderate, no reason to split       | A capability of records; writes through records helpers                                                                                                               |
+| `team/`                                             | Moderate                           | Writes member columns, sessions and workspaces; runs departure across domains in one transaction; belongs with identity and tenancy                                   |
+| `auth/` and `workspaces/`                           | Hard                               | Every module and six triggers read `crm_user_profiles`; per-request session lookup; shared advisory lock. Extract last, if ever                                       |
+| `records/` and `assignments/`                       | Hard apart, moderate as one unit   | Shared `assignee_id`, visibility predicate and history writes; keep together                                                                                          |
+| `finance/`                                          | Hard today, moderate after phase 1 | Foreign keys both ways with records, records-hosted visibility helpers, shared history, departure transaction and identity triggers                                   |
+| `sample/`                                           | Not a service                      | Development tool; retarget per service if a split happens                                                                                                             |
 
 ## Coupling inventory and migration paths
 
@@ -86,7 +86,7 @@ Natural service groupings if a split ever happens: **identity and tenancy** (aut
 
 Strengths to keep:
 
-- One API prefix, with one client file per domain in `src/services/crm/`.
+- One API prefix, with one client file per domain in `apps/crm/src/services/crm/`.
 - The finance pattern: its own router merged with one line, its own error-code range and its own history table.
 - `workspace_id` on every row and UUID server IDs.
 - One `{message, code}` error shape.
@@ -118,7 +118,7 @@ Strengths to keep:
 10. **Stable API surface.**
     - Private CRM paths stay under `/api/crm/workspaces/{ws}/<domain>/...`.
     - Public and guest surfaces get their own prefixes (for example `/api/public/...` or `/api/agreements/links/...`) so a gateway can route them separately, and never use CRM cookies.
-    - Frontend code reaches the API only through `src/services/crm/`, one file per domain.
+    - Frontend code reaches the API only through `apps/crm/src/services/crm/`, one file per domain.
 11. **Cross-tenant features never read another workspace's private tables.** Agreements, the public catalogue and enquiry routing use their own platform-level tables and approved projections.
 12. **Automated check.** `npm run check:boundaries` (`scripts/check-boundaries.mjs`) scans `services/crm-api/src` for `crm_*` names outside comments and fails when:
     - a name has no owner in `scripts/boundaries.json` or, for the messaging and media modules (`integrations`, `inbox`, `outbox`, `chat`, `media`), `scripts/boundaries-messaging.json` (add the owner with the migration, rule 1);

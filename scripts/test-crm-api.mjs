@@ -96,7 +96,7 @@ try {
     await stop(server);
     server = spawn(binary, [], { env, stdio: 'inherit' });
     await waitForApi(`${env.CRM_TEST_API}/health`, server);
-    await run('node', ['--test', 'tests/api/restart.test.mjs'], {
+    await run('node', ['--test', 'apps/crm/tests/api/restart.test.mjs'], {
       ...env,
       CRM_RESTART_COOKIE: cookie,
     });
@@ -124,7 +124,7 @@ try {
       .filter((argument) => !['--browser', '--browser-only'].includes(argument));
     await run(
       'npx',
-      ['playwright', 'test', '--config', 'playwright.server.config.js', ...filters],
+      ['playwright', 'test', '--config', 'apps/crm/playwright.server.config.js', ...filters],
       env,
     );
   }

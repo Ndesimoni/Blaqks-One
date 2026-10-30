@@ -1,5 +1,7 @@
 # Handoff for the next coding agent
 
+**Repository layout move RL1 built locally (2026-10-30):** the CRM frontend now lives in `apps/crm/` and the Calendar companion in `services/calendar-companion/`; run every command from the root as before. API test file names gained the `apps/crm/` prefix. See [RL1](#rl1--repository-layout-move-built-2026-10-30). Next: WhatsApp W1a from the [WhatsApp design](whatsapp-design.md).
+
 **Website content settings implemented locally (2026-10-29):** connected Company settings → Website (`/#/website`) now gives the owning live Admin public identity/setup, four company themes, eight CMS fields, visibility, private Save draft, text-only Review content and direct Save & publish / Publish saved draft. Platform administration → Platform website (`/#/platform-website`) gives the Super Admin separate general-site content controls, independent of the selected company. Draft generations/site versions remain distinct, failed edits stay in the form, stale drafts need explicit recovery, and unsaved navigation is guarded. Services content now renders on the public About page. See [content settings guide](website-content-settings.md). Profiles, property publication selection/withdrawal, enquiry management and trusted eligibility/domain management screens remain the next packets.
 
 Verification: 477 root unit/smoke tests and production build pass; eight new connected Website scenarios plus both existing navigation regressions pass across focused runs. Coverage includes draft/public separation, exact publishing and next generation, recovery/retry, scope denial without forbidden reads, native keyboard themes and 390/1280 light/dark screenshots. The updated real Next.js/API/storage browser flow passes, including published Services on About; 15 website model tests + one consumer integration, Next typecheck/build and all 39 disposable database contracts pass. English catalogue, formatting, boundaries and size baseline pass. Splitting the touched frontend test file preserved all 13 existing scenarios and reduced the strict size backlog from 37 to 36; strict audit still fails on those older files. Source security review found no concrete high/medium auth/privacy issue in this packet. No production/development migrations or deployment for this packet. The owner requested committing and pushing the content settings changes to `feature/connected-crm` on 2026-10-29, following website/backend checkpoint `f8675f9`. Hosted CI results must be checked separately.
@@ -10,7 +12,7 @@ Lifecycle revocation is durable: source/identity/licence changes withdraw public
 
 **Current packet verification:** 13 focused website API scenarios, all 39 disposable database contracts and 335 Rust unit tests pass. Native website 15 model/shape tests + one public-consumer integration, typecheck/build and existing 471 CRM tests/build/English checks pass. The production Next.js browser flow against disposable API/database/storage passes: public image rendering, enquiry-to-CRM receipt/lead, private draft isolation, published hero/SEO updates and cross-origin rejection. Rust formatting/Clippy, repository formatting and boundary checks pass. The size baseline passes with the same 37 older oversized files; the strict repository size audit still fails on that backlog. No hosted GitHub jobs, deployment or production data verification is implied. Earlier sample-mode browser baseline covered 68 page/layout combinations, gallery focus and sampled contrast; that predates connected verification. External map tiles remain unverified in this environment.
 
-**Remaining website work:** public profile consent/grant screens, listing selection/withdrawal and enquiry management around `src/services/crm/websites.js`, then richer content blocks and launch setup. Company/platform content controls are now implemented in the newer packet above. Generic platform enquiries without a selected listing/company/agent stay disabled pending the owner's recipient choice. DNS/SSL and authoritative licence/permit verification, canonical/sitemaps/indexing, production storage/CSP, trusted-edge client identity and scaling remain incomplete. Public reads currently scan at most 1,000 active candidate publications and fail closed above that bound; Next-relayed intake shares a conservative socket-derived budget. The owner requested committing and pushing this packet to `feature/connected-crm` on 2026-10-29; hosted workflow results must be checked separately. No deployment occurred in this packet. The old `design/website` prototype review controls are historical and must not restore approval.
+**Remaining website work:** public profile consent/grant screens, listing selection/withdrawal and enquiry management around `apps/crm/src/services/crm/websites.js`, then richer content blocks and launch setup. Company/platform content controls are now implemented in the newer packet above. Generic platform enquiries without a selected listing/company/agent stay disabled pending the owner's recipient choice. DNS/SSL and authoritative licence/permit verification, canonical/sitemaps/indexing, production storage/CSP, trusted-edge client identity and scaling remain incomplete. Public reads currently scan at most 1,000 active candidate publications and fail closed above that bound; Next-relayed intake shares a conservative socket-derived budget. The owner requested committing and pushing this packet to `feature/connected-crm` on 2026-10-29; hosted workflow results must be checked separately. No deployment occurred in this packet. The old `design/website` prototype review controls are historical and must not restore approval.
 
 **Direct website publishing (owner, 2026-10-28):** owner removed the approving step for both website types. [New authoritative decision](product-decisions.md#direct-website-publishing-decided-2026-10-28) supersedes prior mandatory Super Admin content/listing approval. Use Edit → Save draft / Preview → Publish, with scoped publisher permissions, immutable public versions and honest sync status. Preserve privacy, eligibility, listing limits, enquiry ownership and withdrawal/takedown; unrelated finance/marketplace approvals remain. Planning documents are updated; the older prototype review screens still need replacement when implementing this flow. No runtime implementation, commit or push in this decision packet.
 
@@ -190,7 +192,7 @@ development database. The Board also lists the caller's own company, marked "You
 | Archiving a company                 | Archiving an Admin disconnects every company channel in the same transaction                                                                                                                           | `1acdb49`                                  | [SendGrid design](sendgrid-design.md) §10                                             |
 | Sending from the Inbox              | Inbox sends from the SendGrid address (not Google); labelled New email; the Admin can give themselves an address; an address never used can be removed                                                 | `705e9ba`, `8528d8d`, `e1f4e01`, `519c1c5` | [SendGrid design](sendgrid-design.md) §13                                             |
 | Email attachments (F3)              | Sending photos and PDFs with an email (F3a); keeping the photos and PDFs clients email in, labelled "from outside the company", with daily budgets (F3b)                                               | `ea30219`, `68d9311`, `377a6a2`, `20955d8` | [Media storage](media-storage.md) F3                                                  |
-| Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `src/features/server/composer/`                                                       |
+| Conversation layout                 | Messenger-style: the thread fills the screen, one-line message box growing with the text, `+` outside the box, files inside it                                                                         | `f2b3c8e`, `a857aa7`, `d135e2a`, `e112de9` | `apps/crm/src/features/server/composer/`                                              |
 
 Migrations then ran through `0066` (now `0072`, see the checkpoint above). **Evidence limit:** all of this is proven against the local
 SendGrid stand-in only; nothing has been tried with a real SendGrid account yet, and files
@@ -291,7 +293,11 @@ their own phone) is answered by WQ3: the Admin gives each number to a member. Th
 chose the recommended option for WQ1–WQ3 (2026-10-30). Next: W1a (stand-in, company Twilio
 account, numbers, hooks including the E1a workspace fix, screens).
 
-### RL1 — Repository layout move (queued 2026-10-30)
+### RL1 — Repository layout move (built 2026-10-30)
+
+**Built 2026-10-30:** the CRM is the npm workspace `apps/crm/` (its own `package.json`; the root keeps one lockfile, the shared `.env` through Vite's `envDir` and every `npm run` command), and the companion is `services/calendar-companion/`. API test paths are now `apps/crm/tests/api/…`, including `API_TEST_FILES` values.
+
+Original plan:
 
 Move the CRM frontend to `apps/crm/` and `backend/` to `services/calendar-companion/`; the
 website and `crm-api` stay ([roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations)).
@@ -351,8 +357,8 @@ npm run dev                           # http://localhost:5173
 
 cd services/crm-api && cargo fmt --check && cargo clippy --offline --all-targets -- -D warnings && cargo test --offline
 npm test && npm run build && npm run check:lines:ci && npm run check:i18n && npm run check:boundaries
-API_TEST_FILES="tests/api/a.test.mjs,tests/api/b.test.mjs" npm run test:api
-PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only tests/server-browser/x.spec.js
+API_TEST_FILES="apps/crm/tests/api/a.test.mjs,apps/crm/tests/api/b.test.mjs" npm run test:api
+PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only apps/crm/tests/server-browser/x.spec.js
 ```
 
 CI runs the full `npm run test:api` and `npm run test:server:e2e`. The test harness uses
@@ -370,6 +376,6 @@ ports 8790–8792 and 5175; development uses 8788, 5173 and 8793.
 - The outbox gives each provider call 30 seconds; storage reads and the send must fit
   inside it (F3a review M1).
 - Inbound files are stored after the commit in a background task; tests wait with
-  `filesStored` in `tests/api/sendgrid-inbound-helpers.mjs`.
+  `filesStored` in `apps/crm/tests/api/sendgrid-inbound-helpers.mjs`.
 - Browser suites get flaky when the machine is loaded (other Docker projects); every spec
   passes alone, so retry when the load drops before suspecting the code.

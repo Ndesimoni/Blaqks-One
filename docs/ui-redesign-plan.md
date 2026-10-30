@@ -46,45 +46,45 @@ The architecture review ran `npm run check:lines`: **37 of 2,337 checked files e
 
 `npm run check:lines` exits 1 for the following existing files. This documentation-only packet changes none of them. Several belong to the frozen demo or deferred Calendar edition; their presence is not permission to expand this redesign into those editions.
 
-| File                                         | Physical lines |
-| -------------------------------------------- | -------------: |
-| `src/styles/team.css`                        |            777 |
-| `src/data/demo.js`                           |            620 |
-| `tests/browser/messaging.spec.js`            |            567 |
-| `src/features/team/model.js`                 |            548 |
-| `tests/browser/team.spec.js`                 |            436 |
-| `src/styles/property-collection.css`         |            428 |
-| `src/styles/messaging.css`                   |            416 |
-| `tests/browser/overflow.spec.js`             |            408 |
-| `src/styles/auth.css`                        |            399 |
-| `tests/unit/team.test.js`                    |            363 |
-| `src/features/team/TeamPage.jsx`             |            351 |
-| `src/styles/calendar.css`                    |            347 |
-| `tests/browser/workspaces.spec.js`           |            338 |
-| `tests/browser/leads.spec.js`                |            329 |
-| `src/styles/responsive.css`                  |            313 |
-| `tests/unit/frontend.test.js`                |            305 |
-| `src/features/calendar/CalendarPage.jsx`     |            289 |
-| `src/features/team/TeamFields.jsx`           |            285 |
-| `src/features/team/AccountPreviewPages.jsx`  |            272 |
-| `src/lib/excel.js`                           |            270 |
-| `src/hooks/useRecordActions.js`              |            269 |
-| `tests/browser/crm.spec.js`                  |            267 |
-| `src/features/auth/SignInPage.jsx`           |            249 |
-| `tests/unit/messaging.test.js`               |            242 |
-| `src/styles/overflow.css`                    |            233 |
-| `src/features/activity/TeamActivityPage.jsx` |            225 |
-| `src/features/messaging/MessageAudience.jsx` |            204 |
-| `src/features/team/ProfilePage.jsx`          |            204 |
-| `src/styles/workspaces.css`                  |            182 |
-| `tests/deferred/calendar.spec.js`            |            177 |
-| `src/features/calendar/selectors.js`         |            168 |
-| `tests/unit/workspaces.test.js`              |            167 |
-| `src/features/team/TeamWizard.jsx`           |            164 |
-| `tests/unit/workspace.test.js`               |            161 |
-| `src/features/team/MemberManager.jsx`        |            160 |
-| `src/lib/crm.js`                             |            156 |
-| `src/styles/property-responsive.css`         |            153 |
+| File                                                  | Physical lines |
+| ----------------------------------------------------- | -------------: |
+| `apps/crm/src/styles/team.css`                        |            777 |
+| `apps/crm/src/data/demo.js`                           |            620 |
+| `apps/crm/tests/browser/messaging.spec.js`            |            567 |
+| `apps/crm/src/features/team/model.js`                 |            548 |
+| `apps/crm/tests/browser/team.spec.js`                 |            436 |
+| `apps/crm/src/styles/property-collection.css`         |            428 |
+| `apps/crm/src/styles/messaging.css`                   |            416 |
+| `apps/crm/tests/browser/overflow.spec.js`             |            408 |
+| `apps/crm/src/styles/auth.css`                        |            399 |
+| `apps/crm/tests/unit/team.test.js`                    |            363 |
+| `apps/crm/src/features/team/TeamPage.jsx`             |            351 |
+| `apps/crm/src/styles/calendar.css`                    |            347 |
+| `apps/crm/tests/browser/workspaces.spec.js`           |            338 |
+| `apps/crm/tests/browser/leads.spec.js`                |            329 |
+| `apps/crm/src/styles/responsive.css`                  |            313 |
+| `apps/crm/tests/unit/frontend.test.js`                |            305 |
+| `apps/crm/src/features/calendar/CalendarPage.jsx`     |            289 |
+| `apps/crm/src/features/team/TeamFields.jsx`           |            285 |
+| `apps/crm/src/features/team/AccountPreviewPages.jsx`  |            272 |
+| `apps/crm/src/lib/excel.js`                           |            270 |
+| `apps/crm/src/hooks/useRecordActions.js`              |            269 |
+| `apps/crm/tests/browser/crm.spec.js`                  |            267 |
+| `apps/crm/src/features/auth/SignInPage.jsx`           |            249 |
+| `apps/crm/tests/unit/messaging.test.js`               |            242 |
+| `apps/crm/src/styles/overflow.css`                    |            233 |
+| `apps/crm/src/features/activity/TeamActivityPage.jsx` |            225 |
+| `apps/crm/src/features/messaging/MessageAudience.jsx` |            204 |
+| `apps/crm/src/features/team/ProfilePage.jsx`          |            204 |
+| `apps/crm/src/styles/workspaces.css`                  |            182 |
+| `apps/crm/tests/deferred/calendar.spec.js`            |            177 |
+| `apps/crm/src/features/calendar/selectors.js`         |            168 |
+| `apps/crm/tests/unit/workspaces.test.js`              |            167 |
+| `apps/crm/src/features/team/TeamWizard.jsx`           |            164 |
+| `apps/crm/tests/unit/workspace.test.js`               |            161 |
+| `apps/crm/src/features/team/MemberManager.jsx`        |            160 |
+| `apps/crm/src/lib/crm.js`                             |            156 |
+| `apps/crm/src/styles/property-responsive.css`         |            153 |
 
 </details>
 
@@ -118,7 +118,7 @@ Mobile uses the existing accessible navigation dialog with the same destinations
 
 Filter every destination with existing `canOpenSection` rules and omit empty groups. Preserve exact unread/waiting badge meanings and authorized count endpoints. Never fetch hidden records or conversations merely to decorate a sidebar. Marketplace application review and company marketplace participation remain different privileges. Super Admin navigation must not imply access to company Inbox, private chat or agreement terms.
 
-**Verified during UI0:** `Workspaces` is authorized for both an Admin and the Super Admin by `canManageTeam` (`src/features/server/access.js`), so the target navigation must render it once per viewer — Company settings for an Admin, Platform administration for the Super Admin — not twice. Company members already see Inbox/Team chat in the shared `Messages` slot; the Super Admin keeps the frozen demo preview there. Whether that preview entry stays in connected navigation is a pilot-review question in the [pattern specification](ui-pattern-spec.md#11-open-items-for-pilot-review).
+**Verified during UI0:** `Workspaces` is authorized for both an Admin and the Super Admin by `canManageTeam` (`apps/crm/src/features/server/access.js`), so the target navigation must render it once per viewer — Company settings for an Admin, Platform administration for the Super Admin — not twice. Company members already see Inbox/Team chat in the shared `Messages` slot; the Super Admin keeps the frozen demo preview there. Whether that preview entry stays in connected navigation is a pilot-review question in the [pattern specification](ui-pattern-spec.md#11-open-items-for-pilot-review).
 
 Navigation grouping must not change authority: staff retain their own activity, Admins retain the currently allowed Workspaces destination/status, and only Super Admin retains cross-company workspace switching. The current connected header has no global search; preserve existing module searches and query links, but do not add a global search feature as part of the shell redesign.
 
@@ -318,15 +318,15 @@ UI0 is documentation/evidence only: check documentation formatting, links, sourc
 
 For application packets, use the [token-efficient delivery protocol](token-efficient-delivery.md): focused checks during development, then `npm test`, `npm run build`, applicable `check:i18n`, `check:boundaries`, `check:lines:ci`, full `check:lines` inventory and changed-file formatting. Existing oversized files remain reported backlog, not a claimed pass. A changed file must meet the 150-line limit regardless of the legacy baseline.
 
-| Area                           | Existing focused evidence to reuse/extend                                                                                                                                              |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shell/navigation/roles         | `tests/unit/server-navigation.test.js`; connected `navigation.spec.js`, `responsive.spec.js`, `permissions-view-only.spec.js`, `permissions-visual.spec.js`, `dashboard-scope.spec.js` |
-| Records/pilot/properties       | Connected `persistence.spec.js`, `conflicts.spec.js`, `properties.spec.js`, `property-links-layout.spec.js`, `contacts-location-layout.spec.js`, `assign-keyboard.spec.js`             |
-| Overview                       | Connected dashboard layout/count/scope specifications; existing calculator/insights tests selected from manifest                                                                       |
-| Finance                        | Existing finance and hand-over specifications selected per actual affected workflows; verify totals and approval roles, not just styling                                               |
-| Messaging                      | Connected `inbox-layout.spec.js`, `messenger-size.spec.js`, `saved-replies.spec.js`, `team-chat.spec.js`, `team-chat-groups.spec.js`; attachment/rule/access specs as relevant         |
-| Agreements/sharing/marketplace | Connected `agreements-lifecycle.spec.js`, `record-sharing.spec.js`, `outside-co-broking.spec.js`, `marketplace-apply.spec.js`, `marketplace-requests.spec.js`                          |
-| Identity/admin/imports         | Connected `profile.spec.js`, `signup.spec.js`, `team-responsive.spec.js`, `import-backup.spec.js`, `import-workspaces.spec.js`; role/archive tests as relevant                         |
+| Area                           | Existing focused evidence to reuse/extend                                                                                                                                                       |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shell/navigation/roles         | `apps/crm/tests/unit/server-navigation.test.js`; connected `navigation.spec.js`, `responsive.spec.js`, `permissions-view-only.spec.js`, `permissions-visual.spec.js`, `dashboard-scope.spec.js` |
+| Records/pilot/properties       | Connected `persistence.spec.js`, `conflicts.spec.js`, `properties.spec.js`, `property-links-layout.spec.js`, `contacts-location-layout.spec.js`, `assign-keyboard.spec.js`                      |
+| Overview                       | Connected dashboard layout/count/scope specifications; existing calculator/insights tests selected from manifest                                                                                |
+| Finance                        | Existing finance and hand-over specifications selected per actual affected workflows; verify totals and approval roles, not just styling                                                        |
+| Messaging                      | Connected `inbox-layout.spec.js`, `messenger-size.spec.js`, `saved-replies.spec.js`, `team-chat.spec.js`, `team-chat-groups.spec.js`; attachment/rule/access specs as relevant                  |
+| Agreements/sharing/marketplace | Connected `agreements-lifecycle.spec.js`, `record-sharing.spec.js`, `outside-co-broking.spec.js`, `marketplace-apply.spec.js`, `marketplace-requests.spec.js`                                   |
+| Identity/admin/imports         | Connected `profile.spec.js`, `signup.spec.js`, `team-responsive.spec.js`, `import-backup.spec.js`, `import-workspaces.spec.js`; role/archive tests as relevant                                  |
 
 Use the existing connected harness, for example:
 

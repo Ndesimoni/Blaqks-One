@@ -35,7 +35,7 @@ All paths below start `/api/crm`. Mutations use the existing session/Origin/CSRF
 | `GET/PUT /platform/websites/general/draft`, `POST /platform/websites/general/publish` | Live Super Admin; same draft/version semantics for general site                                                                                          |
 | `PUT /platform/websites/companies/{workspace}/eligibility`                            | Live Super Admin; versioned entitlement/licence flags and optional externally verified host                                                              |
 
-The private browser client is `src/services/crm/websites.js`, composed into the existing scoped client. Company/platform content controls are bound through `src/features/server/website`; see [content settings](website-content-settings.md). Profile, listing and enquiry client functions still need their management screens.
+The private browser client is `apps/crm/src/services/crm/websites.js`, composed into the existing scoped client. Company/platform content controls are bound through `apps/crm/src/features/server/website`; see [content settings](website-content-settings.md). Profile, listing and enquiry client functions still need their management screens.
 
 ## Content and draft behaviour
 
@@ -75,12 +75,12 @@ Use the existing CRM [backend setup](backend-foundation.md), Docker PostgreSQL/S
 # Repository root, with Rust 1.89+ and Node 24 available
 npm ci
 npm --prefix apps/website ci
-API_TEST_FILES=tests/api/website-publication.test.mjs,tests/api/website-enquiries.test.mjs,tests/api/website-lifecycle.test.mjs,tests/api/website-settings.test.mjs npm run test:api
+API_TEST_FILES=apps/crm/tests/api/website-publication.test.mjs,apps/crm/tests/api/website-enquiries.test.mjs,apps/crm/tests/api/website-lifecycle.test.mjs,apps/crm/tests/api/website-settings.test.mjs npm run test:api
 npm --prefix apps/website test
 npm --prefix apps/website run typecheck
 npm --prefix apps/website run build
 # Production Next.js + real disposable API/database/storage browser flow
-API_TEST_FILES=tests/api/website-next.test.mjs npm run test:api
+API_TEST_FILES=apps/crm/tests/api/website-next.test.mjs npm run test:api
 ```
 
 Install the root Playwright Chromium once, or set `PLAYWRIGHT_BROWSERS_PATH` to its installed location, before the connected browser flow. Website suites are in the default API set; the Next browser integration is explicitly selectable and has its own CI workflow so the normal CRM harness does not require a Next build. A focused CI definition is not evidence a hosted run passed.

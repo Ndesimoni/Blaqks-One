@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { checkBoundaries, moduleOf, namesIn, stripComment } from '../../scripts/boundary-rules.mjs';
+import { checkBoundaries, moduleOf, namesIn, stripComment } from '../../../../scripts/boundary-rules.mjs';
 
 const map = {
   owners: {
@@ -50,7 +50,7 @@ test('unlisted cross-module access, unowned names and domain paths fail', () => 
 });
 
 test('the repository map names an owner for every module it allowlists', async () => {
-  const url = new URL('../../scripts/boundaries.json', import.meta.url);
+  const url = new URL('../../../../scripts/boundaries.json', import.meta.url);
   const repository = JSON.parse(await readFile(url, 'utf8'));
   const modules = new Set([...Object.keys(repository.owners), 'root']);
   for (const module of Object.keys(repository.allowed)) assert.ok(modules.has(module), module);

@@ -52,7 +52,7 @@ The browser harness creates disposable synthetic database/storage projects. The 
 
 ```bash
 npm --prefix apps/website run build
-API_TEST_FILES=tests/api/website-next.test.mjs npm run test:api
+API_TEST_FILES=apps/crm/tests/api/website-next.test.mjs npm run test:api
 ```
 
 Public profile consent/grants, property publication selection/withdrawal and enquiry management screens come next. Rich content blocks, logo/media editing, eligibility/custom-domain operations and production launch work remain separate. Generic platform enquiries still require the owner's recipient decision. No new migration, provider delivery or deployment is introduced by this UI packet.

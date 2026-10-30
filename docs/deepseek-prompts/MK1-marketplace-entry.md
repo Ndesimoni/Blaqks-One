@@ -135,8 +135,8 @@ registered in `routes.rs` `DOMAIN_CODES`), `gate.rs`, `eligibility.rs`,
 ### MK1a screens
 
 - New **Marketplace** screen for company members: add `{ name: 'Marketplace', path:
-'/marketplace' }` to `src/config/routes.js`, a case in `src/features/server/ServerContent.jsx`,
-  an access rule in `src/features/server/access.js` (company members only, never the Super
+'/marketplace' }` to `apps/crm/src/config/routes.js`, a case in `apps/crm/src/features/server/ServerContent.jsx`,
+  an access rule in `apps/crm/src/features/server/access.js` (company members only, never the Super
   Admin), and a navigation item in the `SALES & RELATIONSHIPS` group after Agreements
   (follow `withAgreements` in `ServerNavigationGroups.jsx`).
 - Screen states: not applied (checklist with ✓/✗ per line and the age; **Apply** for the
@@ -148,30 +148,30 @@ registered in `routes.rs` `DOMAIN_CODES`), `gate.rs`, `eligibility.rs`,
   navigation item (follow `ServerNavigationSettings.jsx`): pending first, each with the
   counts, **Approve**, **Decline** (reason required, confirmation dialog) and, for approved
   companies, **Revoke** (reason required).
-- Client: `src/services/crm/marketplace.js`, composed into `src/services/crm/client.js` like
-  `agreements.js`. Frontend code in `src/features/server/marketplace/`. English text in a new
-  catalogue `src/i18n/catalogs/en/marketplace.js` registered in `catalogs/index.js`.
+- Client: `apps/crm/src/services/crm/marketplace.js`, composed into `apps/crm/src/services/crm/client.js` like
+  `agreements.js`. Frontend code in `apps/crm/src/features/server/marketplace/`. English text in a new
+  catalogue `apps/crm/src/i18n/catalogs/en/marketplace.js` registered in `catalogs/index.js`.
 - Follow `docs/design-standards.md`: current green/gold theme, light and dark, phone width
   first (390 px), 16px gutters, existing components (`Button`, `FinanceDialog`, `Drawer`,
   `FormStepper`), empty, loading and failed states.
 
 ### MK1a tests (all must pass)
 
-- `tests/api/marketplace-eligibility.test.mjs`: a fresh company is `not_applied` with the
+- `apps/crm/tests/api/marketplace-eligibility.test.mjs`: a fresh company is `not_applied` with the
   failing lines; backdate the company with `query("UPDATE crm_workspaces SET created_at=now()-interval '8 days' WHERE id='…'")`
   and add records with `add()` from `assignment-helpers.mjs` until `met`; staff cannot
   apply; apply → `pending`; Super Admin approves → `approved`; decline with reason →
   `canApplyFrom` is 3 days later and an early apply is 409; revoke works only when approved.
-- `tests/api/marketplace-guards.test.mjs`: the Super Admin, another company's member and a
+- `apps/crm/tests/api/marketplace-guards.test.mjs`: the Super Admin, another company's member and a
   bad workspace get the same 404 body on every member route; non-Super-Admins get the same
   404 on platform routes; CSRF is required on every POST/PUT; a stale `expectedVersion` is
   409; a direct SQL `UPDATE`/`DELETE` on each insert-only table fails.
 - Put the new API files in a new `scripts/crm-api-test-files-marketplace.mjs` and spread it
   into `scripts/crm-api-test-files.mjs` (as `crm-api-test-files-agreements.mjs` is).
 - Rust unit tests for the state rules (pending vs latest decision, the 3-day date).
-- One browser spec `tests/server-browser/marketplace-apply.spec.js`: the Admin sees the
+- One browser spec `apps/crm/tests/server-browser/marketplace-apply.spec.js`: the Admin sees the
   checklist, applies, the Super Admin approves in "Marketplace applications", the Admin
-  sees the switch. Take screenshots with `shots()` from `tests/server-browser/agreements-helpers.js`.
+  sees the switch. Take screenshots with `shots()` from `apps/crm/tests/server-browser/agreements-helpers.js`.
 
 **Commit MK1a** after every check in "Checks" passes.
 
@@ -248,16 +248,16 @@ registered in `routes.rs` `DOMAIN_CODES`), `gate.rs`, `eligibility.rs`,
 
 ### MK1b tests (all must pass)
 
-- `tests/api/marketplace-join.test.mjs`: join with all ticks; missing tick, missing consent,
+- `apps/crm/tests/api/marketplace-join.test.mjs`: join with all ticks; missing tick, missing consent,
   stale version or digest → refused; edit with `expectedVersion`; leave then the profile and
   photo are 404; rejoin needs consent and terms again; a newer terms row (insert one in the
   test) blocks edits until accepted.
-- `tests/api/marketplace-profiles.test.mjs`: a member of another approved company reads a
+- `apps/crm/tests/api/marketplace-profiles.test.mjs`: a member of another approved company reads a
   profile, never email or phone; the profile hides when the member is suspended, the company
   is switched off, revoked or not approved; the Super Admin and members of unapproved
   companies get the shared 404; a PDF or a 3 MB image as photo → 400; the photo serves to an
   approved member and is 404 after leave; read limits return 429 (pre-fill the throttle row
-  as `tests/api/outside-sharing-follow-ups.test.mjs` does).
+  as `apps/crm/tests/api/outside-sharing-follow-ups.test.mjs` does).
 - Rust unit tests: input validation (communities, licence, contact-like text), the terms
   digest, the commitments count.
 - Unit tests for the frontend model readers (strict, like `listingShareModel.js`).
@@ -273,12 +273,12 @@ registered in `routes.rs` `DOMAIN_CODES`), `gate.rs`, `eligibility.rs`,
   are declared, `services/crm-api/src/records/market_activity.rs` and `records/mod.rs`, a
   narrow new function in `auth` for the visibility rule if none exists, a re-export of
   `looks_like_contact` if needed, `services/crm-api/migrations/0073…0075`.
-- `src/features/server/marketplace/` (new), `src/services/crm/marketplace.js` and
-  `client.js`, `src/config/routes.js`, `src/features/server/{ServerContent,access,
-ServerNavigationGroups,ServerNavigationSettings}.jsx|js`, `src/i18n/catalogs/en/
+- `apps/crm/src/features/server/marketplace/` (new), `apps/crm/src/services/crm/marketplace.js` and
+  `client.js`, `apps/crm/src/config/routes.js`, `apps/crm/src/features/server/{ServerContent,access,
+ServerNavigationGroups,ServerNavigationSettings}.jsx|js`, `apps/crm/src/i18n/catalogs/en/
 marketplace.js` and `catalogs/index.js`.
-- `tests/api/marketplace-*.test.mjs`, `tests/api/marketplace-helpers.mjs`,
-  `tests/unit/marketplace-*.test.js`, `tests/server-browser/marketplace-*.spec.js`,
+- `apps/crm/tests/api/marketplace-*.test.mjs`, `apps/crm/tests/api/marketplace-helpers.mjs`,
+  `apps/crm/tests/unit/marketplace-*.test.js`, `apps/crm/tests/server-browser/marketplace-*.spec.js`,
   `scripts/crm-api-test-files*.mjs`, `scripts/boundaries.json` (owners for the new tables
   and functions).
 - Docs, once built: `docs/broker-marketplace.md` (add "MK1 as built"),
@@ -299,9 +299,9 @@ catalogue; anything for MK2 (requests, the board, matching).
 npm run db:up
 cd services/crm-api && cargo fmt --check && cargo clippy --offline --all-targets -- -D warnings && cargo test --offline --lib && cd ../..
 npm test && npm run build && npm run check:lines:ci && npm run check:i18n && npm run check:boundaries && npm run format:check
-API_TEST_FILES="$(ls tests/api/marketplace-*.test.mjs | paste -sd, -)" npm run test:api
-API_TEST_FILES="$(ls tests/api/outside-sharing-*.test.mjs tests/api/agreements*.test.mjs tests/api/team*.test.mjs | paste -sd, -)" npm run test:api
-PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only tests/server-browser/marketplace-*.spec.js
+API_TEST_FILES="$(ls apps/crm/tests/api/marketplace-*.test.mjs | paste -sd, -)" npm run test:api
+API_TEST_FILES="$(ls apps/crm/tests/api/outside-sharing-*.test.mjs apps/crm/tests/api/agreements*.test.mjs apps/crm/tests/api/team*.test.mjs | paste -sd, -)" npm run test:api
+PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only apps/crm/tests/server-browser/marketplace-*.spec.js
 ```
 
 The full suites run in CI after the owner pushes. If a browser spec is flaky under machine

@@ -150,7 +150,7 @@ company has posted is blocked without saying who; 30 days, renewable.
 ## 10. Build shape (for the architecture review)
 
 - **A new `marketplace/` module** in `services/crm-api/src` with its own tables, routes
-  under `/marketplace/...` and the client `src/services/crm/marketplace.js`
+  under `/marketplace/...` and the client `apps/crm/src/services/crm/marketplace.js`
   ([service boundaries](service-boundaries.md): large features are separately owned
   modules).
 - It calls `records` for client requirements and property facts, Agreements for listing
@@ -185,8 +185,8 @@ later packet gets its own short design before it is built.
 
 - **Module `marketplace/`** in `services/crm-api/src`, owning the PostgreSQL schema
   `marketplace` and the routes under `/api/crm/workspaces/{workspace}/marketplace/...`.
-  Frontend: `src/features/server/marketplace/` and the client
-  `src/services/crm/marketplace.js`. A new **Marketplace** screen in the navigation.
+  Frontend: `apps/crm/src/features/server/marketplace/` and the client
+  `apps/crm/src/services/crm/marketplace.js`. A new **Marketplace** screen in the navigation.
 - It calls `auth` for live membership and names, `workspaces` for company names, `media` for
   the profile photo, `records` (from MK2) for client requirements and property facts, and
   Agreements (from MK3) for listing shares and co-broking. It never reads another module's
@@ -414,8 +414,8 @@ Migrations **0073–0075**; module `services/crm-api/src/marketplace/`, schema `
 - **Screens.** Marketplace (checklist, application states, switch, join stepper, my profile,
   preview, leave) and the Super Admin's "Marketplace applications" settings screen; English
   catalogue `marketplace` and `marketplaceJoin`.
-- **Tests.** `tests/api/marketplace-{eligibility,guards,join,profiles}.test.mjs` (21),
-  `tests/unit/marketplace-model.test.js`, `tests/server-browser/marketplace-apply.spec.js`, and
+- **Tests.** `apps/crm/tests/api/marketplace-{eligibility,guards,join,profiles}.test.mjs` (21),
+  `apps/crm/tests/unit/marketplace-model.test.js`, `apps/crm/tests/server-browser/marketplace-apply.spec.js`, and
   Rust tests for the state rules, the 3-day wait, the digest, the profile validation and the
   commitments count.
 - **Review and fixes (Claude, 2026-10-24).** DeepSeek built MK1 and stopped before committing,
@@ -430,7 +430,7 @@ Migrations **0073–0075**; module `services/crm-api/src/marketplace/`, schema `
   recomputed from the row on every read; leaving needs a profile; staff see ticks, not counts,
   and cannot use up the Admin's application tries; reads take no workspace lock and a frozen
   company gets the shared not-found; a profile shows only while its owner accepted the
-  current terms. Tests: `tests/api/marketplace-review{,-access}.test.mjs`. Not done: a
+  current terms. Tests: `apps/crm/tests/api/marketplace-review{,-access}.test.mjs`. Not done: a
   licence format per authority (the formats are not known; one format for all).
 - **Screens (designer review, 2026-10-24).** The join form's emirate and property-type ticks
   had no labels or styles (wrong text group; the themed field rule sized them as fields) and
@@ -521,8 +521,8 @@ and a UAE lawyer's review.
   board sat below the whole profile; the budget filter was labelled "The board shows {band}." and
   every card carried an "Ends {date}" fact (texts used without their values; a scan now finds
   none left on the marketplace screens); and the review before posting left out cheques and the
-  move-in month (it now reuses the card's wording, which shows the month as "November 2026"). Tests: `tests/api/marketplace-requests-fixes.test.mjs`,
-  `tests/unit/marketplace-request-options.test.js`, a budget case in
+  move-in month (it now reuses the card's wording, which shows the month as "November 2026"). Tests: `apps/crm/tests/api/marketplace-requests-fixes.test.mjs`,
+  `apps/crm/tests/unit/marketplace-request-options.test.js`, a budget case in
   `records::market_requirements` tests, and a browser check that the board card (not the
   viewer's own profile) shows the request and never the client's name. Not changed: board cards
   show initials, not photos, because broker photos are served `no-store` and each one counts

@@ -38,7 +38,7 @@ const generatedDirectories = new Set([
   '__pycache__',
   '.claude',
 ]);
-const inactivePaths = new Set(['legacy', 'backend/data']);
+const inactivePaths = new Set(['legacy', 'services/calendar-companion/data']);
 const generatedFiles = new Set([
   'package-lock.json',
   'Cargo.lock',

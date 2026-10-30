@@ -18,7 +18,7 @@ For this specific UI assignment, the owner's latest request assigns work to Deep
 ### Start safely
 
 - Record current branch/HEAD, `git status --short` and a compact diff summary. Preserve existing edits; a dirty worktree is not permission to reset it or a reason to discard unrelated work.
-- At plan preparation, `src/i18n/catalogs/index.js` was modified and `src/i18n/catalogs/en/marketplaceBoard.js` was untracked. These are existing work, not yours. Recheck current state; do not edit, stage or revert them.
+- At plan preparation, `apps/crm/src/i18n/catalogs/index.js` was modified and `apps/crm/src/i18n/catalogs/en/marketplaceBoard.js` was untracked. These are existing work, not yours. Recheck current state; do not edit, stage or revert them.
 - You are not alone in the codebase. Own only the allowed documentation/evidence below. Coordinate a genuine overlapping conflict; continue unaffected read-only work.
 - Use synthetic data only. Never print credentials/tokens or capture real client information. Do not migrate/reseed the development database or restart the owner's running services.
 

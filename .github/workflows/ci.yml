@@ -60,7 +60,7 @@ jobs:
         with:
           workspaces: |
             services/crm-api -> target
-            backend -> target
+            services/calendar-companion -> target
       - name: CRM API formatting
         run: cargo fmt --manifest-path services/crm-api/Cargo.toml --check
       - name: CRM API Clippy
@@ -70,10 +70,10 @@ jobs:
       - name: CRM API tests
         run: cargo test --manifest-path services/crm-api/Cargo.toml --locked
       - name: Calendar companion formatting
-        run: cargo fmt --manifest-path backend/Cargo.toml --check
+        run: cargo fmt --manifest-path services/calendar-companion/Cargo.toml --check
       - name: Calendar companion Clippy
         run: >-
-          cargo clippy --manifest-path backend/Cargo.toml
+          cargo clippy --manifest-path services/calendar-companion/Cargo.toml
           --all-targets --locked -- -D warnings
 
   api-and-browser:
@@ -118,7 +118,7 @@ jobs:
         with:
           name: connected-browser-results
           path: |
-            test-results-server/
-            playwright-report/
+            apps/crm/test-results-server/
+            apps/crm/playwright-report/
           if-no-files-found: ignore
           retention-days: 7

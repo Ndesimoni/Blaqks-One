@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { after, before, test } from 'node:test';
 import { seededDatabase } from './assignment-db.mjs';
 import { login, query } from './helpers.mjs';
-import { FIXTURE_SEATS } from '../../scripts/crm-test-fixtures.mjs';
+import { FIXTURE_SEATS } from '../../../../scripts/crm-test-fixtures.mjs';
 import { emptyCompany, events, readCompany, systemCompany } from './company-helpers.mjs';
 
 const db = seededDatabase('kws_company_0022', '0023');

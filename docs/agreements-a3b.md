@@ -83,14 +83,14 @@ Verify keyboard access and 390px/1280px layouts in both themes.
   `closure.rs` (complete, cancel), `archive.rs`, `payment_model.rs`, `payment_store.rs`,
   `payment_read.rs`, `payment_write.rs` (the rules), `payment_routes.rs`, `term_money.rs`,
   `lifecycle_view.rs`, `certificate.rs` and `certificate_store.rs`.
-- **Screens** (`src/features/server/agreements/`): proposal review and decisions,
+- **Screens** (`apps/crm/src/features/server/agreements/`): proposal review and decisions,
   completion, two-sided cancellation, archive, the payments panel and form, and the
   certificate window with Print / Save PDF and the evidence download; co-broking offers
   name the side that collects the fee.
-- **Tests:** `tests/api/agreements-a3b-{lifecycle,payments,certificate,guards}.test.mjs`
+- **Tests:** `apps/crm/tests/api/agreements-a3b-{lifecycle,payments,certificate,guards}.test.mjs`
   (the certificate suite recomputes every revision digest from the certificate alone),
   the updated agreement draft unit tests and the browser flow
-  `tests/server-browser/agreements-lifecycle.spec.js` (payment recorded and confirmed,
+  `apps/crm/tests/server-browser/agreements-lifecycle.spec.js` (payment recorded and confirmed,
   certificate, completion; 1280 and 390 px in both themes).
 - **Built by** Codex, which stopped before the certificate; Claude finished the
   certificate, moved archiving into its own file and fixed its check order (the Deals
@@ -100,7 +100,7 @@ Verify keyboard access and 390px/1280px layouts in both themes.
 - **Found on the way:** two API client methods were both named `createAgreement` since the
   A2 screens, so adding a team commission agreement in Finance settings posted to the
   cross-company route and failed. The cross-company one is now `createDealAgreement`, and
-  `tests/unit/crm-client-names.test.js` refuses duplicate method names.
+  `apps/crm/tests/unit/crm-client-names.test.js` refuses duplicate method names.
 - **Reviews:** the design review is above; the primary agent reviewed the code (payer and
   payee checks, the agreement lock before totals, one answer per entry, no stand-in for a
   departed participant, the origin lock, the certificate's read rule and headers). A
@@ -114,7 +114,7 @@ identified. One Medium financial-read consistency finding was fixed: the ledger 
 now uses a repeatable-read, read-only transaction, so entries, effective terms and totals
 come from the same committed snapshot during concurrent amendments and payments.
 
-The controlled regression `tests/api/agreements-payment-snapshot.test.mjs` pauses a ledger
+The controlled regression `apps/crm/tests/api/agreements-payment-snapshot.test.mjs` pauses a ledger
 read after its agreement snapshot, commits a payment from another transaction, and checks
 that the pending response stays wholly before the payment while a fresh read sees it.
 The specialist confirmed the correction by inspection; runtime results are recorded in

@@ -8,7 +8,7 @@ Status: security design approved by the owner on 2026-10-16. The decisions are r
 - **`crm_activity`** stores the actor, workspace, collection, record UUID, action and source.
 - **`crm_team_activity`** stores the member, action and, for access changes, a name only.
 - **`crm_finance_events.changes`** holds amounts and reasons, and `crm_assignment_notes` hold business text. Neither may enter this feed.
-- **Frontend:** Team activity is gated by `canManageTeam` in `src/features/server/access.js`.
+- **Frontend:** Team activity is gated by `canManageTeam` in `apps/crm/src/features/server/access.js`.
 
 ## Who sees what
 
@@ -54,7 +54,7 @@ Added by packet X1a (2026-10-20, messaging design decision O4). `integrations::a
 
 - Unfiltered feeds and `kind=channel` include them; `kind=record`, `kind=team` and any `collection` filter exclude them.
 - The UI reads "You connected WhatsApp" under a Channels section. The Type filter offers **Channel changes** to the Admin only. Its words come from the `channels` language catalogue.
-- Tests: `tests/api/activity-channels.test.mjs`, `tests/unit/activity-channels.test.js` and the Team activity scenario in `tests/server-browser/channels.spec.js`.
+- Tests: `apps/crm/tests/api/activity-channels.test.mjs`, `apps/crm/tests/unit/activity-channels.test.js` and the Team activity scenario in `apps/crm/tests/server-browser/channels.spec.js`.
 
 ## Endpoint
 

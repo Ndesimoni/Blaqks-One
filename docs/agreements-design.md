@@ -14,7 +14,7 @@ They are a separately owned module, as the boundary rules require:
   schema (owner decision 2026-10-15);
 - routes under `/api/crm/workspaces/{ws}/agreements/...` for members and under a
   separate guest prefix for outside recipients (A6);
-- frontend client `src/services/crm/agreements.js`, one file per domain.
+- frontend client `apps/crm/src/services/crm/agreements.js`, one file per domain.
 
 Non-goals: replacing Deals, moving money, exposing private CRM records across
 companies, attachments (deferred until private media storage), real-time chat
@@ -229,7 +229,7 @@ amend, cancel, complete, archive, certificate. Each mutation takes an explicit
 - Not built yet: amend, cancel, complete, archive, certificate and dispute export; the
   same-subject overlap conflict; the Super Admin metadata view; the retention job; and the
   frontend client.
-- Tests: `tests/api/agreements.test.mjs`, `tests/api/agreements-guards.test.mjs` and the
+- Tests: `apps/crm/tests/api/agreements.test.mjs`, `apps/crm/tests/api/agreements-guards.test.mjs` and the
   module's unit tests, including evidence digests.
 
 ## 13. Screens as built (2026-10-22)
@@ -274,10 +274,10 @@ connected sidebar (after Deals); the Super Admin does not, matching the routes' 
     `events` (action, party, revision number and time; no actor IDs). A draft belongs to
     the sending company (§9), so the receiving company sees only revisions that were
     offered (sent or countered) and no `created` or `revised` events.
-- Code: `src/services/crm/agreements.js`, `src/features/server/agreements/`, the
+- Code: `apps/crm/src/services/crm/agreements.js`, `apps/crm/src/features/server/agreements/`, the
   `agreements` and `agreementForm` English catalogues. Tests:
-  `tests/unit/agreements-model.test.js`, `tests/unit/agreements-draft.test.js`,
-  `tests/api/agreements-screens.test.mjs`, `tests/server-browser/agreements.spec.js`.
+  `apps/crm/tests/unit/agreements-model.test.js`, `apps/crm/tests/unit/agreements-draft.test.js`,
+  `apps/crm/tests/api/agreements-screens.test.mjs`, `apps/crm/tests/server-browser/agreements.spec.js`.
 - Still not built: amend, cancel, complete, archive, certificate, dispute export, guest
   links, the Super Admin metadata view, a rate limit on the recipient lookup, and
   same-subject overlap conflicts.
@@ -487,10 +487,10 @@ where they differ.
   shows both sides as the caller's company, names the referral and the receiver's share,
   and points to Deals instead of offering commands. The form's referral maximum follows the
   server (99.99%), with the company limit explained in the hint.
-- **Tests.** `tests/api/agreements-handovers.test.mjs`, `agreements-handover-closes.test.mjs`
+- **Tests.** `apps/crm/tests/api/agreements-handovers.test.mjs`, `agreements-handover-closes.test.mjs`
   (with `agreements-handover-helpers.mjs`), Rust unit tests in `agreements/handover_tests.rs`
   and `limits.rs`, the updated finance and agreements suites, and the browser flow in
-  `tests/server-browser/finance-deals-handover.spec.js`.
+  `apps/crm/tests/server-browser/finance-deals-handover.spec.js`.
 - **Code security review (2026-10-22): no High findings.** Fixed: clearing sample data
   withdraws the agreements of open in-app offers before deleting their hand-overs
   (Medium); an Admin revise of an earned deal respects the pending-offer freeze; actions
@@ -696,7 +696,7 @@ furnishing}` (text or `null`).
   Agreements badges, refreshed every 15 seconds. Agreements words an approval as "Approved
   by the company Admin" or "Approved by the chosen approver", adding "in place of the
   agent's acceptance" only when the revision has no acceptance.
-- **Tests.** `tests/api/finance-handover-*.test.mjs` (preview access and content, approval
+- **Tests.** `apps/crm/tests/api/finance-handover-*.test.mjs` (preview access and content, approval
   steps, approver rules, hand-overs to the Admin, waiting counts and the review fixes),
   Rust unit tests in `agreements/approval_tests.rs` and `handover_tests.rs`, and the browser
   flows `finance-deals-handover.spec.js` and `finance-deals-approval.spec.js`.
@@ -823,7 +823,7 @@ reassignment.
   record list reloads after a decision that moves a deal.
 - **Tests.** `finance-handover-records.test.mjs` (moves, conversations, keeps, a shared
   listing, decline, departure), `finance-handover-photos.test.mjs`, the updated H2 suites
-  (each deal has its own client now), unit tests in `tests/unit/kept-records.test.js` and
+  (each deal has its own client now), unit tests in `apps/crm/tests/unit/kept-records.test.js` and
   the listing allowlist test in Rust; the browser flow checks the sender's badge.
 - **Review status.** The design review was done by the primary agent (the specialist
   stopped at its usage limit); the specialist code security review followed (below). Not
@@ -857,13 +857,13 @@ agreement both show **Client and listing**: the client's name, phone (`tel:`) an
 **Open client** and **Open listing** (the usual record details, with every field).
 
 - Read live from the caller's own records and view-only copies
-  (`src/features/server/finance/DealParties.jsx`), so it shows exactly what the caller may
+  (`apps/crm/src/features/server/finance/DealParties.jsx`), so it shows exactly what the caller may
   already see: the receiver after accepting, the sender through their kept copy, the Admin.
 - The agreement's evidence still holds no contact. `GET /agreements/{id}` adds
   `deal: {dealId, clientId, propertyId}` for `deal_handover` agreements, read through the
   finance function `finance::deals::handover_refs::of_agreement` (agreements never reads
   finance tables).
-- Tests: `tests/server-browser/deal-parties.spec.js`.
+- Tests: `apps/crm/tests/server-browser/deal-parties.spec.js`.
 
 ## 19. A6 design: outside agents by recipient-locked link (2026-10-23)
 
@@ -1207,7 +1207,7 @@ anything.
 **Screens** (English catalogue, light and dark, phone first since most links open from
 WhatsApp; premium polish within the current theme; product designer review):
 
-- **Guest pages** (`src/features/guest/`, no CRM shell, Blaqks One brand as on sign-up):
+- **Guest pages** (`apps/crm/src/features/guest/`, no CRM shell, Blaqks One brand as on sign-up):
   envelope with **Send code**; the code step (one input, `autocomplete="one-time-code"`,
   resend countdown, plain errors); the offer (terms, both parties with the unverified-name
   labels, history) with **Accept**, **Decline** and **Make a counter-offer** (the existing
@@ -1222,7 +1222,7 @@ WhatsApp; premium polish within the current theme; product designer review):
   (Not opened, Opened, Code confirmed, Revoked) with **New link** and **Revoke link**, and
   guest evidence worded as in the certificate. Every agreement gets Copy link and Share on
   WhatsApp; claimed ones show "From a link".
-- Client files: `src/services/crm/guest.js` (the guest prefix) and the agreements client.
+- Client files: `apps/crm/src/services/crm/guest.js` (the guest prefix) and the agreements client.
 
 **Tests.**
 
@@ -1244,7 +1244,7 @@ WhatsApp; premium polish within the current theme; product designer review):
   offers only, start and resend responses unchanged, the claimant acts as recipient, their
   Admin does not see it, a claim into the sending company is refused); `guest-retention`.
   A scan confirms no token, code or address in agreement tables, events, jobs or logs.
-- Browser `tests/server-browser/agreements-guest.spec.js`: the sender makes a guest offer
+- Browser `apps/crm/tests/server-browser/agreements-guest.spec.js`: the sender makes a guest offer
   and copies the link; a second browser context opens it, reads the code from the database,
   accepts and downloads the certificate; the sender sees "Email verified"; 390 px and
   1280 px in both themes.

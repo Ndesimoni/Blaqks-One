@@ -22,7 +22,7 @@ visibility rule, free-text rules, events, error codes and screens.
    from commit `6609603` or later on `feature/connected-crm`.
 2. **Read first:** `AGENTS.md`, `docs/handoff.md` §3–§5, `docs/broker-marketplace.md`,
    `docs/service-boundaries.md`, `docs/design-standards.md`, and the MK1 code in
-   `services/crm-api/src/marketplace/` and `src/features/server/marketplace/`.
+   `services/crm-api/src/marketplace/` and `apps/crm/src/features/server/marketplace/`.
 3. **150 lines per hand-written file** after formatting. Split by responsibility; never
    compress code. `npm run check:lines:ci` must pass.
 4. **English only.** New text goes in the English catalogue through `useI18n()`, as **flat
@@ -75,7 +75,7 @@ visibility rule, free-text rules, events, error codes and screens.
   - `communities jsonb` (0–12 `{name,key}`, same rules as MK1 profiles)
   - `open_to_other_areas boolean NOT NULL DEFAULT false`
   - `property_type text` (one of the Property type options in
-    `src/config/fields/stageAndListingOptions.js`, stored as the label)
+    `apps/crm/src/config/fields/stageAndListingOptions.js`, stored as the label)
   - `bedrooms smallint NULL CHECK (bedrooms BETWEEN 0 AND 20)` (NULL = any; 0 = studio)
   - `budget_min_aed bigint NULL`, `budget_max_aed bigint NOT NULL`, CHECK min ≤ max, max > 0
   - `budget_band text NOT NULL` (computed by the server, see below)
@@ -116,7 +116,7 @@ answers), reads the client's payload and returns **only**: `buy_rent` → purpos
 invalid names are dropped, never sent), `property_type`, `bedrooms`, `minimum_budget_aed`,
 `maximum_budget_aed` (numbers may be stored as JSON numbers or numeric strings), `target_date`
 → month. Every other Clients field is never returned. Add a Rust test that lists **every**
-Clients workbook field (`src/data/schemas/people.js` order) as used or never sent, so a new
+Clients workbook field (`apps/crm/src/data/schemas/people.js` order) as used or never sent, so a new
 field fails the build until it is classified (like `records::outside_facts` tests do).
 
 Also `pub async fn still_held(tx, items: &[(String, Uuid, Uuid)]) -> ApiResult<HashSet<Uuid>>`:
@@ -153,7 +153,7 @@ All require a joined member who accepted the current terms in an approved, switc
   read time; nothing else changes their stored state.
 - Errors use the MK1 `P0M` prefix for any new database check.
 
-## Screens (`src/features/server/marketplace/`)
+## Screens (`apps/crm/src/features/server/marketplace/`)
 
 - The joined member's Marketplace screen gets two tabs below "My marketplace profile":
   **Board** and **My requests** (`role="tablist"`, as the Agreements screen does).
@@ -168,44 +168,44 @@ All require a joined member who accepted the current terms in an approved, switc
 - **My requests:** each request with its state, ends on, **Edit**, **Renew** (shown when 7
   days or fewer are left, or expired), **Close** (confirmation dialog sized like the MK1 leave
   dialog); "No answers yet" note (answers arrive in MK3); empty state with **Post a request**.
-- Client: extend `src/services/crm/marketplace.js`. New text in a new catalogue
-  `src/i18n/catalogs/en/marketplaceRequests.js` (flat keys), registered in `catalogs/index.js`.
+- Client: extend `apps/crm/src/services/crm/marketplace.js`. New text in a new catalogue
+  `apps/crm/src/i18n/catalogs/en/marketplaceRequests.js` (flat keys), registered in `catalogs/index.js`.
 
 ## Tests (all must pass)
 
-- `tests/api/marketplace-requests.test.mjs`: draft pre-fill returns only the allowed fields
+- `apps/crm/tests/api/marketplace-requests.test.mjs`: draft pre-fill returns only the allowed fields
   (scan the whole response for the client's name, phone and email: absent); post needs the
   consent tick; 5 open per member (6th 409); 1 per client (2nd 409); edit with a stale
   version 409; renew and close; leaving closes open requests; a reassigned client closes the
   request on the poster's next My requests read.
-- `tests/api/marketplace-board.test.mjs`: the board lists another company's request and never
+- `apps/crm/tests/api/marketplace-board.test.mjs`: the board lists another company's request and never
   your own company's; filters; paging with `nextCursor` and no totals; the response never
   contains the client's name, phone, email, record ID or exact budget; requests hide when the
   poster's company is switched off, revoked, the poster is suspended, left, or no longer
   holds the client; expired and closed requests never appear; read limits return 429
-  (pre-fill the throttle row as `tests/api/outside-sharing-follow-ups.test.mjs` does); the
+  (pre-fill the throttle row as `apps/crm/tests/api/outside-sharing-follow-ups.test.mjs` does); the
   Super Admin, another company's member on your workspace path and unapproved companies get
   the one shared 404 on every new route.
 - Rust unit tests: budget bands and their edges, request validation, the requirements
   allowlist sort, community splitting.
 - Frontend unit tests for the new model readers (strict, like `marketplaceModel.js`).
 - Add the new API files to `scripts/crm-api-test-files-marketplace.mjs`.
-- Browser spec `tests/server-browser/marketplace-requests.spec.js`: two approved companies; a
+- Browser spec `apps/crm/tests/server-browser/marketplace-requests.spec.js`: two approved companies; a
   member posts a request from a client; a member of the other company sees it on the board,
   filters, opens the broker's profile; the poster renews and closes it. Screenshots with
-  `shots()` (`tests/server-browser/agreements-helpers.js`) of the form, the board and My
-  requests. Use `jpegPhoto()` from `tests/api/media-helpers.mjs` for any photo.
+  `shots()` (`apps/crm/tests/server-browser/agreements-helpers.js`) of the form, the board and My
+  requests. Use `jpegPhoto()` from `apps/crm/tests/api/media-helpers.mjs` for any photo.
 
 ## Allowed writes
 
 - `services/crm-api/src/marketplace/` (new files and the hooks: `mod.rs`, `routes.rs`,
   `leave.rs`), `services/crm-api/src/records/market_requirements.rs` and `records/mod.rs`,
   `services/crm-api/migrations/0077_marketplace_requests.sql`, `scripts/boundaries.json`.
-- `src/features/server/marketplace/` (new files and the MK1 screen files you extend),
-  `src/services/crm/marketplace.js`, `src/i18n/catalogs/en/marketplaceRequests.js` and
+- `apps/crm/src/features/server/marketplace/` (new files and the MK1 screen files you extend),
+  `apps/crm/src/services/crm/marketplace.js`, `apps/crm/src/i18n/catalogs/en/marketplaceRequests.js` and
   `catalogs/index.js`.
-- `tests/api/marketplace-*`, `tests/unit/marketplace-*`,
-  `tests/server-browser/marketplace-requests.spec.js`,
+- `apps/crm/tests/api/marketplace-*`, `apps/crm/tests/unit/marketplace-*`,
+  `apps/crm/tests/server-browser/marketplace-requests.spec.js`,
   `scripts/crm-api-test-files-marketplace.mjs`.
 - Docs once built: `docs/broker-marketplace.md` (add "§18 MK2 as built"),
   `docs/claude-implementation-roadmap.md` §15 (status), `docs/handoff.md` (checkpoint),
@@ -224,10 +224,10 @@ npm run db:up
 cd services/crm-api && cargo fmt --check && cargo clippy --offline --all-targets -- -D warnings && cargo test --offline --lib && cd ../..
 npm test && npm run build && npm run check:lines:ci && npm run check:i18n && npm run check:boundaries && npm run format:check
 API_TEST_FILES="$(node -e "import('./scripts/crm-api-test-files-marketplace.mjs').then(m=>console.log(m.marketplaceTestFiles.join(',')))")" npm run test:api
-PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only tests/server-browser/marketplace-apply.spec.js tests/server-browser/marketplace-requests.spec.js
+PLAYWRIGHT_CHANNEL=chrome node scripts/test-crm-api.mjs --browser-only apps/crm/tests/server-browser/marketplace-apply.spec.js apps/crm/tests/server-browser/marketplace-requests.spec.js
 ```
 
-**Key scan** (every static `t('namespace.key')` in `src/features/server/marketplace/` must
+**Key scan** (every static `t('namespace.key')` in `apps/crm/src/features/server/marketplace/` must
 exist): adapt the snippet Claude used for MK1 (load the `en` catalogues, regex
 `t\(\s*'([a-zA-Z]+)\.([^']+)'`, report missing keys) and list every template-literal key with
 the values it can take, and check those too. Paste the result.

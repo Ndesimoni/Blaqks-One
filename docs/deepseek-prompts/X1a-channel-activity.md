@@ -27,7 +27,7 @@ Read first:
 - services/crm-api/src/team/audit.rs and services/crm-api/src/records/activity.rs
   (the two existing `page` sources — copy their pattern exactly)
 - services/crm-api/src/integrations/ (model.rs, store.rs, store_write.rs)
-- src/features/server/activity/ (activityVocabulary.js, activityModel.js,
+- apps/crm/src/features/server/activity/ (activityVocabulary.js, activityModel.js,
   activityFilters.js, ActivityRow.jsx, ActivityFilters.jsx)
 
 Allowed writes:
@@ -36,10 +36,10 @@ Allowed writes:
 - services/crm-api/src/activity/handlers.rs, query.rs, window.rs, query_tests.rs, and a
   new sibling file under services/crm-api/src/activity/ if a split is needed for the
   150-line limit (handlers.rs is already 140 lines; query.rs is 146)
-- src/features/server/activity/ (only the files needed for the new kind, labels and filter)
-- src/i18n/catalogs/en/channels.js and src/i18n/catalogs/ar/channels.js
-- tests/api/activity-channels.test.mjs (new), scripts/crm-api-test-files.mjs
-- tests/server-browser/channels.spec.js (one added scenario)
+- apps/crm/src/features/server/activity/ (only the files needed for the new kind, labels and filter)
+- apps/crm/src/i18n/catalogs/en/channels.js and apps/crm/src/i18n/catalogs/ar/channels.js
+- apps/crm/tests/api/activity-channels.test.mjs (new), scripts/crm-api-test-files.mjs
+- apps/crm/tests/server-browser/channels.spec.js (one added scenario)
 - scripts/boundaries.json (only if the boundary check needs it)
 - docs/service-boundaries.md (new decision-log row D11), docs/team-activity-design.md,
   docs/messaging-integrations-plan.md (status line only)
@@ -104,7 +104,7 @@ Required tests (synthetic data, disposable PostgreSQL only):
 
 - Rust (query_tests.rs or a new tests file): `kind=channel` and the four actions parse;
   unknown kind/action rejected; `Item` without a channel serialises with no `channel` key.
-- API (tests/api/activity-channels.test.mjs, registered in scripts/crm-api-test-files.mjs):
+- API (apps/crm/tests/api/activity-channels.test.mjs, registered in scripts/crm-api-test-files.mjs):
   1. Admin connects, reconnects and disconnects a stub WhatsApp connection; the feed shows
      the three events newest first with `kind: "channel"`, `channel: "whatsapp"`, the
      actor and no `record`/`member`.
@@ -118,7 +118,7 @@ Required tests (synthetic data, disposable PostgreSQL only):
      a `collection` filter excludes them.
   7. Paging with `limit=1` across a mix of record, team and channel events returns each
      event exactly once.
-- Browser (one scenario in tests/server-browser/channels.spec.js): after connecting and
+- Browser (one scenario in apps/crm/tests/server-browser/channels.spec.js): after connecting and
   disconnecting, Team activity filtered to Channels shows both rows; check 390px and
   1280px and both themes as the existing scenarios do.
 
@@ -129,7 +129,7 @@ Required checks:
 - npm test, npm run build, npm run check:lines (no changed file over 150 lines),
   npm run check:boundaries, npm run check:i18n, npm run format:check
 - npm run test:api, then
-  PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only tests/server-browser/channels.spec.js
+  PLAYWRIGHT_CHANNEL=chrome npm run test:server:e2e -- --browser-only apps/crm/tests/server-browser/channels.spec.js
 - Do not run npm run test:e2e (frozen demo).
 
 Output:

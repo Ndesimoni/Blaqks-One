@@ -1,7 +1,7 @@
 const fs = require('fs');
 const assert = require('assert');
 const path = require('path');
-const root = path.resolve(__dirname, '../..');
+const root = path.resolve(__dirname, '../../../..');
 const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 const schema = read('legacy/offline/public/schema.js');
 const jsx = read('legacy/offline/src/App.jsx');

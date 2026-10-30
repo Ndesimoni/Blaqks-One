@@ -59,7 +59,7 @@ npm run build
 `npm test` includes model/decoder checks and a public API consumer against an isolated synthetic HTTP fixture. For the real Rust API + disposable PostgreSQL/storage + production Next.js browser flow, build this app and run from the root:
 
 ```bash
-API_TEST_FILES=tests/api/website-next.test.mjs npm run test:api
+API_TEST_FILES=apps/crm/tests/api/website-next.test.mjs npm run test:api
 ```
 
 That optional integration creates synthetic data and never uses a real company database. For production-rendered browser checks, build and run `WEBSITE_DATA_MODE=sample npm start` in one terminal. From the repository root, with its existing Playwright tooling installed:
