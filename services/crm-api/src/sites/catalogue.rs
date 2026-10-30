@@ -36,10 +36,12 @@ pub async fn catalogue(tx: &mut Transaction<'_, Postgres>, site: &SiteRow) -> Ap
             if member.role != "admin" && !profile.can_publish {
                 continue;
             }
-            let mut body = profile.body;
-            body["id"] = json!(profile.id);
-            body["company"] = json!(row.id);
-            agents.push(body);
+            // An explicit public projection; links are re-checked as they are served (SOC1).
+            let body = &profile.body;
+            agents.push(json!({"id":profile.id,"company":row.id,"name":body["name"],
+                "specialty":body["specialty"],"publicWhatsApp":body["publicWhatsApp"],
+                "publicEmail":body["publicEmail"],
+                "social":super::social::public(body.get("social"),site.workspace.is_none())}));
         }
     }
     Ok(json!({"companies":companies,"agents":agents,"areas":[],"developers":[],"listings":[]}))

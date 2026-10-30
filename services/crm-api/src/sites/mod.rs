@@ -8,6 +8,8 @@ pub mod profile_rules;
 pub mod profiles;
 pub mod read;
 pub mod routes;
+pub mod social;
+mod social_hosts;
 pub mod store;
 pub mod validation;
 pub use catalogue::catalogue;

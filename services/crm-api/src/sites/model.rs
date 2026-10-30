@@ -23,8 +23,16 @@ pub struct SiteRow {
 }
 impl SiteRow {
     pub fn dto(&self) -> Value {
+        // Published links are re-checked as they are served (docs/website-social-links.md).
+        let mut content = self.content.clone();
+        if let Some(fields) = content.as_object_mut() {
+            match super::social::public(fields.get("social"), false) {
+                Some(links) => fields.insert("social".into(), links),
+                None => fields.remove("social"),
+            };
+        }
         json!({"id":self.id,"kind":self.kind,"name":self.name,"theme":self.theme,
-            "company":self.workspace.as_ref().map(|_|self.id),"content":self.content})
+            "company":self.workspace.as_ref().map(|_|self.id),"content":content})
     }
 }
 #[derive(Clone, Debug, FromRow, Serialize)]
@@ -72,6 +80,9 @@ pub struct ProfileInput {
     pub specialty: String,
     pub public_whats_app: Option<String>,
     pub public_email: Option<String>,
+    /// The member's own social links (docs/website-social-links.md).
+    #[serde(default)]
+    pub social: Option<Value>,
     pub consent: bool,
     pub active: bool,
 }

@@ -1,5 +1,6 @@
 //! Who may change which part of a public profile (owner decisions 2026-10-30): only the
-//! member gives or withdraws consent and chooses their public WhatsApp and email; an
+//! member gives or withdraws consent and chooses their public WhatsApp, email and social
+//! links (SOC1); an
 //! Admin may correct another member's name and specialty, and only the Admin hides or
 //! shows a staff member, so staff cannot undo a Hide (WEB-UI2 security review).
 use super::model::{ProfileInput, ProfileRow};
@@ -20,9 +21,18 @@ pub fn allowed(
             .and_then(|row| row.body.get(key))
             .and_then(Value::as_str)
     };
+    // No links, `null` and `{}` all mean the member has none.
+    let links = |value: Option<&Value>| {
+        value
+            .filter(|v| v.as_object().is_some_and(|o| !o.is_empty()))
+            .cloned()
+    };
     input.consent == previous.is_some_and(|row| row.consent)
         && input.public_whats_app.as_deref() == contact("publicWhatsApp")
         && input.public_email.as_deref() == contact("publicEmail")
+        && (input.social.is_none()
+            || links(input.social.as_ref())
+                == links(previous.and_then(|row| row.body.get("social"))))
 }
 
 #[cfg(test)]
@@ -38,6 +48,7 @@ mod tests {
             specialty: "Homes".into(),
             public_whats_app: None,
             public_email: email.map(str::to_owned),
+            social: None,
             consent,
             active,
         }
@@ -75,6 +86,23 @@ mod tests {
         ));
         assert!(!allowed(&input(true, true, None), None, false, true));
         assert!(allowed(&input(false, true, None), None, false, true));
+        let mut linked = row(true, true, None);
+        linked.body["social"] = json!({"instagram": "https://instagram.com/me"});
+        // Leaving links out keeps the member's own; sending other links is refused.
+        let mut changed = input(true, true, None);
+        assert!(allowed(&changed, Some(&linked), false, true));
+        changed.social = Some(json!({"instagram": "https://instagram.com/other"}));
+        assert!(!allowed(&changed, Some(&linked), false, true));
+        changed.social = Some(json!({}));
+        assert!(!allowed(&changed, Some(&linked), false, true));
+        changed.social = Some(json!({"instagram": "https://instagram.com/me"}));
+        assert!(allowed(&changed, Some(&linked), false, true));
+        assert!(allowed(
+            &input(true, true, None),
+            Some(&row(true, true, None)),
+            false,
+            true
+        ));
     }
 
     #[test]

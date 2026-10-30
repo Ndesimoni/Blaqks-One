@@ -48,6 +48,11 @@ fn content(value: &Value) -> ApiResult<()> {
         ));
     };
     for (key, value) in object {
+        // Company and platform social links (docs/website-social-links.md).
+        if key == "social" {
+            super::social::check(Some(value))?;
+            continue;
+        }
         if ![
             "tagline",
             "about",
@@ -117,6 +122,7 @@ pub fn profile(input: &ProfileInput) -> ApiResult<()> {
     {
         return Err(ApiError::invalid("Enter valid public contact methods."));
     }
+    super::social::check(input.social.as_ref())?;
     Ok(())
 }
 #[cfg(test)]

@@ -32,7 +32,8 @@ All paths below start `/sites/{siteId}` and require `?host=...`.
 The exact field types consumed today are in [`types.ts`](../apps/website/src/lib/types.ts); [`public-shapes.ts`](../apps/website/src/lib/public-shapes.ts) projects those fields and drops all extra properties.
 
 - **Company:** `id,name,mark,area,note,publicListingCount?,publicAgentCount?`. The agent count is distinct public agents with eligible listings on this host, never the private staff total.
-- **Agent:** `id,name,company,specialty,publicWhatsApp?,publicEmail?,publicListingCount?`. Only deliberately public, consented contacts; never infer from account/login/provider fields.
+- **Agent:** `id,name,company,specialty,publicWhatsApp?,publicEmail?,social?,publicListingCount?`. Only deliberately public, consented contacts; never infer from account/login/provider fields.
+- **Social links:** site `content.social` (company and general site) and agent `social` hold any of `instagram,facebook,tiktok,linkedin,youtube,x,website` as https strings, re-checked by the API as served; consumers drop any link that fails the [link rules](website-social-links.md#3-link-rules-server-and-website-both-check) one at a time and never fail the response. A member's `website` is omitted on the general site.
 - **Area:** `id,name,city,emirate,image,note,publicListingCount?`.
 - **Developer:** `id,name,emirate,website?,publicListingCount?`. An association must be factual; sample associations are explicitly illustrative. Do not imply agency partnerships.
 - **Listing:** `id,agent,company,developer,area,title,type,purpose,emirate,category,bedrooms,bathrooms,size,price,image,photos,floorPlans,description,ready,furnishing,market,parking,amenities,guests,minimumStay,publishedAt,reference,advertisingPermit?`.

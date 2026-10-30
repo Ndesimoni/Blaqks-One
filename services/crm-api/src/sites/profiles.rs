@@ -98,7 +98,8 @@ pub async fn update(
         return Err(ApiError::forbidden());
     }
     let id = previous.as_ref().map_or_else(Uuid::new_v4, |p| p.id);
-    let body = json!({"id":id,"company":company.id,"name":input.name,"specialty":input.specialty,"publicWhatsApp":input.public_whats_app,"publicEmail":input.public_email});
+    let body = json!({"id":id,"company":company.id,"name":input.name,"specialty":input.specialty,"publicWhatsApp":input.public_whats_app,"publicEmail":input.public_email,
+        "social":super::social::stored(own,input.social.as_ref(),previous.as_ref().and_then(|p|p.body.get("social")))});
     let row:ProfileRow=sqlx::query_as("INSERT INTO sites.crm_website_profiles(id,workspace,member,body,consent,active) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(workspace,member) DO UPDATE SET body=EXCLUDED.body,consent=EXCLUDED.consent,active=EXCLUDED.active,version=sites.crm_website_profiles.version+1,updated_at=now() RETURNING id,workspace,member,body,consent,can_publish,active,version")
         .bind(id).bind(&workspace).bind(member).bind(body).bind(input.consent).bind(input.active).fetch_one(&mut *tx).await?;
     if !row.active || !row.consent {
