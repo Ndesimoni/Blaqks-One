@@ -32,8 +32,18 @@ pub async fn list(
     .bind(&workspace)
     .fetch_all(&mut *tx)
     .await?;
+    // Suspended, archived or departed members stay out of the current list.
+    let mut live = Vec::with_capacity(rows.len());
+    for row in rows {
+        if access::live_profile_member(&mut tx, &workspace, row.member)
+            .await?
+            .is_some()
+        {
+            live.push(row);
+        }
+    }
     tx.commit().await?;
-    Ok(Json(json!({ "profiles": rows })))
+    Ok(Json(json!({ "profiles": live })))
 }
 
 pub async fn get(
@@ -83,8 +93,8 @@ pub async fn update(
             "The public profile has changed. Reload and try again.",
         ));
     }
-    // Only the member gives or withdraws consent; an Admin's edit keeps it as it is.
-    if live.id != member && input.consent != previous.as_ref().is_some_and(|p| p.consent) {
+    let own = live.id == member;
+    if !super::profile_rules::allowed(&input, previous.as_ref(), own, live.role == "admin") {
         return Err(ApiError::forbidden());
     }
     let id = previous.as_ref().map_or_else(Uuid::new_v4, |p| p.id);

@@ -19,9 +19,11 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
     const own = staff.page.getByRole('region', { name: 'Website profile', exact: true });
     await expect(own).toContainText('Not on the website yet');
     await expect(own).toContainText('Ask your Admin for publishing access');
-    await expect(own.getByLabel('Public name')).toHaveValue(name);
-    await own.getByLabel('Specialty').fill('Synthetic marina apartments');
-    await own.getByLabel('Public WhatsApp').fill('+971501234567');
+    await expect(own.getByRole('textbox', { name: 'Public name', exact: true })).toHaveValue(name);
+    await own
+      .getByRole('textbox', { name: 'Specialty', exact: true })
+      .fill('Synthetic marina apartments');
+    await own.getByRole('textbox', { name: 'Public WhatsApp', exact: true }).fill('+971501234567');
     await own.getByRole('checkbox', { name: /^I agree that my name, specialty/ }).check();
     await own.getByRole('button', { name: 'Save website profile', exact: true }).click();
     await expect(own.getByText('Your website profile was saved.')).toBeVisible();
@@ -57,7 +59,9 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
   const dialog = page.getByRole('dialog', { name: 'Edit website profile' });
   await expect(dialog.getByText(`Only ${name} can agree to this, from My profile.`)).toBeVisible();
   await expect(dialog.getByRole('checkbox')).toHaveCount(0);
-  await dialog.getByLabel('Specialty').fill('Synthetic Palm villas');
+  await dialog
+    .getByRole('textbox', { name: 'Specialty', exact: true })
+    .fill('Synthetic Palm villas');
   await dialog.getByRole('button', { name: 'Save profile', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(page.getByText(`${name}’s website profile was saved.`)).toBeVisible();
