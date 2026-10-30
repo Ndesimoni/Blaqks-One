@@ -1,0 +1,109 @@
+/* Publish dialog photos, floor plans, review and loading. After website-publish.css. */
+.website-media {
+  display: grid;
+  gap: 10px;
+}
+.website-media-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.website-media-head p {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.website-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+  max-height: 22rem;
+  margin: 0;
+  padding: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+.website-photo-grid li {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+.website-photo-toggle {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease);
+}
+.website-photo-toggle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+  transition: opacity var(--duration) var(--ease);
+}
+.website-photo-toggle[aria-pressed='true'] {
+  border-color: var(--primary);
+}
+.website-photo-toggle[aria-pressed='true'] img {
+  opacity: 1;
+}
+.website-photo-mark {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: inline-flex;
+  align-items: center;
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+.website-photo-mark:empty {
+  display: none;
+}
+.website-photo-cover {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.website-photo-toggle:focus-visible,
+.website-photo-cover:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.website-plan-private {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.website-plan-private span {
+  display: grid;
+  gap: 2px;
+}

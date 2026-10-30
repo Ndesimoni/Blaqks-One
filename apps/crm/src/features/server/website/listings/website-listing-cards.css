@@ -1,0 +1,71 @@
+/* Website listing cards (phones) and loading rows. After website-listings.css. */
+.website-listing-cards {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.website-listing-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.website-listing-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.website-listing-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+.website-listing-facts dt {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.website-listing-facts dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.website-listing-card .btn {
+  min-height: 44px;
+}
+.website-skeleton-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 80px;
+  gap: 16px;
+  padding: 14px 0;
+}
+.website-skeleton-row + .website-skeleton-row {
+  border-top: 1px solid var(--line);
+}
+.website-skeleton {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-subtle), var(--hover), var(--surface-subtle));
+  background-size: 200% 100%;
+  animation: website-shimmer 1.4s ease-in-out infinite;
+}
+.website-skeleton-chip {
+  height: 22px;
+  border-radius: 999px;
+}
+@keyframes website-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .website-skeleton {
+    animation: none;
+  }
+}

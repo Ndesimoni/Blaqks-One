@@ -1,0 +1,100 @@
+/* Website → Properties tab and the property "Website" panel. Theme tokens only. */
+.website-listings {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.website-listings-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+.website-listings-head h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.website-listings-head p,
+.website-listings-count {
+  max-width: 640px;
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.website-listings-notice {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.website-listings-filters .tabs button {
+  min-height: 40px;
+}
+.website-listings-search {
+  min-width: min(100%, 260px);
+}
+.website-listings-table {
+  min-width: 880px;
+}
+.website-listings-table td,
+.website-listings-table th[scope='row'] {
+  vertical-align: middle;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+.website-listing-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: start;
+  font-weight: 400;
+}
+.website-listing-title strong,
+.website-listing-title h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.website-listing-title small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.website-listing-price {
+  color: var(--ink);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.website-listing-status,
+.website-listing-actions,
+.property-website-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.website-listing-actions .btn,
+.property-website-actions .btn {
+  min-height: 40px;
+  white-space: nowrap;
+}
+.property-website-panel {
+  margin-top: 12px;
+}
+.property-website-actions {
+  margin-top: 12px;
+  padding-inline-start: 48px;
+}
+@media (max-width: 750px) {
+  .property-website-actions {
+    padding-inline-start: 0;
+  }
+}

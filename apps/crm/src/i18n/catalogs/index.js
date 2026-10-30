@@ -59,6 +59,8 @@ import enTeamSeats from './en/teamSeats.js';
 import enWebsiteCompanies from './en/websiteCompanies.js';
 import enWebsiteEnquiries from './en/websiteEnquiries.js';
 import enWebsites from './en/websites.js';
+import enWebsiteListings from './en/websiteListings.js';
+import enWebsitePublish from './en/websitePublish.js';
 import enWebsiteTeam from './en/websiteTeam.js';
 
 export const catalogs = Object.freeze({
@@ -104,6 +106,8 @@ export const catalogs = Object.freeze({
     websiteCompanies: enWebsiteCompanies,
     websiteEnquiries: enWebsiteEnquiries,
     websites: enWebsites,
+    websiteListings: enWebsiteListings,
+    websitePublish: enWebsitePublish,
     websiteTeam: enWebsiteTeam,
   },
   ar: {
