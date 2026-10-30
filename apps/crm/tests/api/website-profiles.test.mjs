@@ -24,6 +24,19 @@ test('an Admin edit keeps the member consent and cannot change it either way', a
   assert.deepEqual([profile.active, profile.consent], [false, true]);
 });
 
+test('staff cannot undo a Hide and an Admin cannot change their public contacts', async () => {
+  const path = websitePath(t.admin, `/profiles/${t.one.user.id}`);
+  const hidden = ok(await t.admin.request(path)).profile;
+  const body = { ...fields, version: hidden.version, consent: true };
+  assert.equal((await own({ ...body, active: true })).status, 403);
+  const mine = ok(await own({ ...body, active: false, publicEmail: 'one@public.example' })).profile;
+  const edit = { ...fields, version: mine.version, consent: true, active: false };
+  assert.equal((await byAdmin({ ...edit, publicEmail: 'private@one.example' })).status, 403);
+  assert.equal((await byAdmin(edit)).status, 403);
+  const kept = { ...edit, publicEmail: 'one@public.example', specialty: 'Offices' };
+  assert.equal(ok(await byAdmin(kept)).profile.body.specialty, 'Offices');
+});
+
 test('only the owning Admin lists the company profiles', async () => {
   const { profiles } = ok(await t.admin.request(websitePath(t.admin, '/profiles')));
   const members = profiles.map((profile) => profile.member).sort();

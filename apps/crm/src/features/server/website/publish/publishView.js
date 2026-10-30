@@ -15,6 +15,11 @@ const COMMERCIAL = [
   'building',
 ];
 const text = (record, key) => String(record?.[key] ?? '').trim();
+const list = (value) =>
+  (Array.isArray(value) ? value : String(value ?? '').split(/[,;|]/))
+    .map((item) => String(item).trim())
+    .filter(Boolean)
+    .join(', ');
 
 /**
  * The public facts as the server projects them, for the review's "What visitors will see".
@@ -40,6 +45,10 @@ export function publicFacts(record) {
     ready: text(record, 'ready_off_plan'),
     furnishing: text(record, 'furnishing'),
     description: text(record, 'property_description'),
+    parking: text(record, 'parking_spaces'),
+    amenities: list(record?.amenities),
+    guests: purposeOf(record) === 'holiday' ? text(record, 'maximum_guests') : '',
+    minimumStay: purposeOf(record) === 'holiday' ? text(record, 'minimum_stay_nights') : '',
   };
 }
 

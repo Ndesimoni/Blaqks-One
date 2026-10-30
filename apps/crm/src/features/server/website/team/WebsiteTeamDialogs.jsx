@@ -47,6 +47,8 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
         inputs={inputs}
         onChange={change}
         t={t}
+        locked={row.own ? [] : ['publicWhatsApp', 'publicEmail']}
+        lockedHint={t('websiteTeam.contacts.others', { name: row.member.name })}
       />
       <section className="wt-consent-note" aria-labelledby="wt-dialog-consent">
         <h3 id="wt-dialog-consent">{t('websiteTeam.dialog.consent')}</h3>

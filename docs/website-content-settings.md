@@ -55,4 +55,16 @@ npm --prefix apps/website run build
 API_TEST_FILES=apps/crm/tests/api/website-next.test.mjs npm run test:api
 ```
 
-Public profile consent/grants, property publication selection/withdrawal and enquiry management screens come next. Rich content blocks, logo/media editing, eligibility/custom-domain operations and production launch work remain separate. Generic platform enquiries still require the owner's recipient decision. No new migration, provider delivery or deployment is introduced by this UI packet.
+Rich content blocks, logo/media editing, eligibility/custom-domain operations and production launch work remain separate. Generic platform enquiries still require the owner's recipient decision. No new migration, provider delivery or deployment is introduced by this UI packet.
+
+## Management screens (WEB-UI2, 2026-10-30)
+
+The Website page now has tabs; the content editor above stays as the **Content** tab and keeps unsaved drafts while other tabs are open.
+
+- **Team** (company Admin): every live member's public profile status (Not set up, Waiting for consent, Public, Hidden), publishing permission for staff (Allow / Stop publishing, with the number of live listings that leave the website), Edit profile and Hide/Show. An Admin may correct another member's public name and specialty; only the member gives consent and chooses their public WhatsApp and email (owner, 2026-10-30).
+- **Website profile** in **My profile** (Admin and staff with Properties access): public name, specialty, optional public WhatsApp and email, and the consent checkbox. Turning consent off asks first, because it takes the person's live listings off the website.
+- **Properties** (company Admin; staff see their own listings in each property's panel): published listings with Live, Withdrawn and "Changes not public" states, Republish and Withdraw, and **Publish a property**. Each property's details also show a **Website** panel. Publishing is a five-step flow: property readiness, agent and destination, photos and floor plans, advertising permit and market, then a review that separates what visitors will see from what stays private.
+- **Enquiries** (company Admin with Clients access): website enquiries, 50 per page, each with its message, source site and the lead it created.
+- **Companies** on **Platform website** (Super Admin): every company website with its address, visibility, entitlement and licence verification, edited with a warning when turning a flag off removes listings.
+
+Backend reads added for these screens: `GET /platform/websites/companies`, `GET /workspaces/{ws}/website/profiles`, and `destination`/`publishedAt` on the private listing list; see [website backend](website-backend.md#private-controls). Browser coverage: `website-companies`, `website-team` and `website-listings` specs alongside the settings specs.

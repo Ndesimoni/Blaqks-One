@@ -13,13 +13,16 @@ const FIELDS = [
  * The public profile inputs shared by My profile and the Admin's Edit profile dialog. Errors
  * are catalogue keys; `inputs` collects the elements so the form can focus the first invalid.
  */
-export function WebsiteProfileFields({ idPrefix, form, errors, busy, inputs, onChange, t }) {
+export function WebsiteProfileFields(props) {
+  const { idPrefix, form, errors, busy, inputs, onChange, t, locked = [], lockedHint } = props;
   return (
     <div className="wt-fields">
       {FIELDS.map(([field, label, hint, required, type, autoComplete, max]) => {
         const id = `${idPrefix}-${field}`;
         const error = errors[field];
-        const described = [hint && !error ? `${id}-hint` : '', error ? `${id}-error` : '']
+        const fixed = locked.includes(field);
+        const note = fixed ? lockedHint : hint && t(`websiteTeam.${hint}`);
+        const described = [note && !error ? `${id}-hint` : '', error ? `${id}-error` : '']
           .filter(Boolean)
           .join(' ');
         return (
@@ -44,13 +47,14 @@ export function WebsiteProfileFields({ idPrefix, form, errors, busy, inputs, onC
               required={required}
               value={form[field]}
               disabled={busy}
+              readOnly={fixed}
               aria-invalid={Boolean(error)}
               aria-describedby={described || undefined}
               onChange={(event) => onChange(field, event.target.value)}
             />
-            {hint && !error && (
+            {note && !error && (
               <small className="wt-hint" id={`${id}-hint`}>
-                {t(`websiteTeam.${hint}`)}
+                {note}
               </small>
             )}
             {error && (

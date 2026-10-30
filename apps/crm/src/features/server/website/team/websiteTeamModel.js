@@ -111,13 +111,14 @@ export function profileErrors(form) {
 }
 
 /**
- * The PUT body. Only the member changes their own consent (`self`); anyone else's edit sends
- * the saved consent unchanged, as the server requires. Visibility stays as saved unless the
- * caller sets `active` (the Admin's Hide/Show).
+ * The PUT body. Only the member changes their own consent and public contacts (`self`);
+ * anyone else's edit sends the saved values unchanged, as the server requires (owner,
+ * 2026-10-30). Visibility stays as saved unless the caller sets `active` (Hide/Show).
  */
 export function profileBody(form, profile, { self = false, active } = {}) {
-  const phone = form.publicWhatsApp.trim();
-  const email = form.publicEmail.trim();
+  const contacts = self ? form : profileForm(profile, '');
+  const phone = contacts.publicWhatsApp.trim();
+  const email = contacts.publicEmail.trim();
   return {
     version: profile?.version ?? 0,
     name: form.name.trim(),

@@ -37,11 +37,10 @@ function TeamPanel({ api, user, t }) {
     setDialog(null);
     setDone(t(`websiteTeam.done.${doneKey}`, { name }));
   };
-  const visible = (target, active) =>
-    team.save(
-      target.member.id,
-      profileBody(profileForm(target.profile), target.profile, { active }),
-    );
+  // Edits and Hide/Show keep another member's consent and contacts (owner, 2026-10-30).
+  const save = (target, form, options) =>
+    team.save(target.member.id, profileBody(form, target.profile, options));
+  const visible = (target, active) => save(target, profileForm(target.profile), { active });
   const actions = {
     busy: team.busy,
     edit: (target) => open('edit', target),
@@ -89,9 +88,7 @@ function TeamPanel({ api, user, t }) {
         <WebsiteProfileDialog
           {...common}
           onMyProfile={actions.myProfile}
-          onSave={(form) =>
-            act(row, team.save(row.member.id, profileBody(form, row.profile)), 'saved')
-          }
+          onSave={(form) => act(row, save(row, form, { self: row.own }), 'saved')}
         />
       )}
       {row && dialog.kind === 'stop' && (

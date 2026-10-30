@@ -56,3 +56,16 @@ test('the public preview projects allowlisted facts only', () => {
     assert.equal(JSON.stringify(facts).includes(secret), false);
   assert.equal(publicFacts({ ...ready, property_type: 'Office' }).bedrooms, '');
 });
+
+test('the review shows parking and amenities, and guests and stay for holiday homes only', () => {
+  const extras = { parking_spaces: '2', amenities: 'Pool; Gym', maximum_guests: '6' };
+  const facts = publicFacts({ ...ready, ...extras, minimum_stay_nights: '3' });
+  assert.deepEqual([facts.parking, facts.amenities, facts.guests], ['2', 'Pool, Gym', '']);
+  const stay = publicFacts({
+    ...ready,
+    ...extras,
+    sale_rental: 'Holiday',
+    minimum_stay_nights: '3',
+  });
+  assert.deepEqual([stay.guests, stay.minimumStay], ['6', '3']);
+});

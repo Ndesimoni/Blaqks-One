@@ -25,6 +25,7 @@ export default {
   'consent.none': 'No profile yet',
   'consent.own': 'Change in My profile',
   'consent.others': 'Only {name} can agree to this, from My profile.',
+  'contacts.others': 'Only {name} changes their public WhatsApp and email, from My profile.',
   'publishing.admin': 'Admin · always',
   'publishing.allowed': 'Allowed',
   'publishing.notAllowed': 'Not allowed',

@@ -41,12 +41,12 @@ test('a new profile starts at version 0, from the account name, without blank co
     consent: false,
     active: true,
   });
-  const contacts = model.profileBody(
-    { ...form, publicWhatsApp: ' +971501234567 ', publicEmail: 'agent@company.ae' },
-    null,
-  );
+  const typed = { ...form, publicWhatsApp: ' +971501234567 ', publicEmail: 'agent@company.ae' };
+  const contacts = model.profileBody(typed, null, { self: true });
   assert.equal(contacts.publicWhatsApp, '+971501234567');
   assert.equal(contacts.publicEmail, 'agent@company.ae');
+  // Only the member chooses public contacts: someone else's edit sends the saved ones.
+  assert.equal(model.profileBody(typed, null).publicWhatsApp, undefined);
   assert.equal(model.formChanged({ ...form, name: ' Synthetic Account Name ' }, form), false);
   assert.equal(model.formChanged({ ...form, consent: true }, form), true);
 });
@@ -89,4 +89,22 @@ test('refused saves map stale versions, a missing website and lost access to the
   assert.equal(model.profileFailure(failure(409, 'conflict')), 'noSite');
   assert.equal(model.profileFailure(failure(404, 'not_found')), 'noAccess');
   assert.equal(model.profileFailure(failure(403, 'forbidden')), '');
+});
+
+test('an edit of another member keeps their saved public contacts', () => {
+  const saved = profile('amy', {
+    consent: true,
+    body: {
+      name: 'Amy',
+      specialty: 'Homes',
+      publicWhatsApp: '+971500000001',
+      publicEmail: 'a@b.ae',
+    },
+  });
+  const form = { ...model.profileForm(saved), publicEmail: 'private@b.ae', specialty: 'Villas' };
+  const body = model.profileBody(form, saved);
+  assert.deepEqual(
+    [body.publicWhatsApp, body.publicEmail, body.specialty],
+    ['+971500000001', 'a@b.ae', 'Villas'],
+  );
 });
