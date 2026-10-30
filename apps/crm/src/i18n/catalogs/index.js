@@ -57,6 +57,7 @@ import enSignupErrors from './en/signupErrors.js';
 import enSignupSetup from './en/signupSetup.js';
 import enTeamSeats from './en/teamSeats.js';
 import enWebsites from './en/websites.js';
+import enWebsiteTeam from './en/websiteTeam.js';
 
 export const catalogs = Object.freeze({
   en: {
@@ -99,6 +100,7 @@ export const catalogs = Object.freeze({
     signupSetup: enSignupSetup,
     teamSeats: enTeamSeats,
     websites: enWebsites,
+    websiteTeam: enWebsiteTeam,
   },
   ar: {
     calculators: arCalculators,

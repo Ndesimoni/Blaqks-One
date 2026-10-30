@@ -20,10 +20,11 @@ import { SessionsPanel } from './SessionsPanel.jsx';
 import { SettingsSection } from './SettingsSection.jsx';
 import { useAccount } from './useAccount.js';
 import { useSessions } from './useSessions.js';
+import { WebsiteProfileSection } from './WebsiteProfileSection.jsx';
 /**
  * Connected My profile (docs/account-self-service.md): the member's own account, name and phone,
- * language, password and sign-in sessions. It never reads workspace records and grants no
- * extra powers. Only the Language section uses translation catalogues so far (docs/i18n.md).
+ * language, website profile, password and sign-in sessions. It never reads CRM records (the
+ * website section counts only live listings) and grants no extra powers (docs/i18n.md).
  */
 export function ServerProfile() {
   const { api, user, company, replaceUser, replaceCompany } = useSession();
@@ -86,6 +87,7 @@ export function ServerProfile() {
             <ProfileDetailsForm api={api} account={account} onSaved={onSaved} onReload={reload} />
           </div>
         </SettingsSection>
+        <WebsiteProfileSection api={api} user={user} />
         {languages.length > 1 && (
           <SettingsSection
             id="language"

@@ -11,6 +11,7 @@ export function websiteRoutes({ request, scope }) {
       request(site(workspace, '/draft'), { method: 'PUT', body }),
     publishWebsiteDraft: (workspace, version) =>
       request(site(workspace, '/publish'), { method: 'POST', body: { version } }),
+    websiteProfiles: (workspace, signal) => request(site(workspace, '/profiles'), { signal }),
     publicProfile: (workspace, id, signal) => request(member(workspace, id), { signal }),
     updatePublicProfile: (workspace, id, body) =>
       request(member(workspace, id), { method: 'PUT', body }),
