@@ -12,7 +12,8 @@ import './website-publish-review.css';
 /**
  * The last step keeps the two sides apart: "What visitors will see" (eye icon, the public
  * facts and selected photos, as ListingView shows a listing) and "Stays private" (lock icon,
- * named in words). Publishing is immediate; later edits stay private until republished.
+ * named in words), side by side on wide screens. The note that publishing is immediate (later
+ * edits stay private until republished) comes first, so it is read before Publish now.
  */
 export function PublishReviewStep({ flow, publishers }) {
   const { t, format } = useI18n();
@@ -54,6 +55,9 @@ export function PublishReviewStep({ flow, publishers }) {
   ].filter((row) => row && row[1] !== '' && row[1] !== null && row[1] !== undefined);
   return (
     <div className="website-review-split">
+      <p className="website-publish-note website-review-note" role="note">
+        {k('immediateNote')}
+      </p>
       <section className="website-review-public" aria-labelledby={`${id}-public`}>
         <p className="website-review-eyebrow">
           <Icon name="eye" size={16} />
@@ -88,9 +92,6 @@ export function PublishReviewStep({ flow, publishers }) {
           ))}
         </ul>
       </section>
-      <p className="website-publish-note" role="note">
-        {k('immediateNote')}
-      </p>
     </div>
   );
 }

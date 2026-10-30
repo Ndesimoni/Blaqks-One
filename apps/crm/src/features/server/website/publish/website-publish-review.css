@@ -3,6 +3,20 @@
   display: grid;
   gap: 16px;
 }
+.website-review-note {
+  grid-column: 1 / -1;
+}
+/* Wide screens: "Stays private" beside the facts, in view while they scroll. */
+@media (min-width: 900px) {
+  .website-review-split {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+    align-items: start;
+  }
+  .website-review-private {
+    position: sticky;
+    top: 0;
+  }
+}
 .website-review-public,
 .website-review-private {
   display: grid;
@@ -41,13 +55,16 @@
 .website-review-photos li {
   position: relative;
   flex: 0 0 120px;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--surface-subtle);
 }
 .website-review-photos img {
   display: block;
-  width: 120px;
-  aspect-ratio: 4 / 3;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 8px;
 }
 .website-review-private ul {
   display: grid;

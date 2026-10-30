@@ -60,7 +60,7 @@ export function EnquiryRows({ rows, mobile, context, actions }) {
           <tbody>
             {views.map(([enquiry, view]) => (
               <tr key={enquiry.id} data-enquiry={enquiry.id}>
-                <td>
+                <td className="website-list-nowrap">
                   <Received instant={view.instant} format={format} />
                 </td>
                 <td>
@@ -69,7 +69,7 @@ export function EnquiryRows({ rows, mobile, context, actions }) {
                   </div>
                 </td>
                 <td>{view.about}</td>
-                <td>{view.site}</td>
+                <td className="website-list-nowrap">{view.site}</td>
                 <td>{view.assignee}</td>
                 <td>
                   <EnquiryActions enquiry={enquiry} view={view} k={k} {...actions} />

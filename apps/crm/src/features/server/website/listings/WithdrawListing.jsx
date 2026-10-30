@@ -24,7 +24,6 @@ export function WithdrawListing({ title, publication, listings, onClose }) {
     <FinanceDialog
       eyebrow={k('withdrawEyebrow')}
       title={k('withdrawTitle')}
-      intro={k('withdrawBody', { title: title || k('thisListing') })}
       busy={listings.busy}
       message={message}
       danger
@@ -32,6 +31,10 @@ export function WithdrawListing({ title, publication, listings, onClose }) {
       onSubmit={confirm}
       submitLabel={k('withdrawConfirm')}
       className="website-withdraw-dialog"
-    />
+    >
+      <p className="website-withdraw-text">
+        {k('withdrawBody', { title: title || k('thisListing') })}
+      </p>
+    </FinanceDialog>
   );
 }

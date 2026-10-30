@@ -53,6 +53,8 @@ export function WebsiteListings({ site }) {
     error: listings.error || records.error,
     retry: listings.error ? listings.reload : records.retry,
   };
+  // With no listings at all the empty state carries the one Publish action.
+  const publishInHead = !state.loading && Boolean(state.error || rows.length);
   const actions = {
     busy: listings.busy,
     onOpen: (row) => dispatchRow('Properties', row.entry.record),
@@ -68,7 +70,7 @@ export function WebsiteListings({ site }) {
         count={filtered.length}
         busy={readOnly}
         onFilters={changeFilters}
-        onPublish={() => setPublishing({})}
+        onPublish={publishInHead ? () => setPublishing({}) : null}
       />
       <ListingsResults
         state={state}

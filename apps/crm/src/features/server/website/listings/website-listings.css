@@ -14,7 +14,8 @@
 .website-listings-head h2 {
   margin: 0 0 4px;
   color: var(--ink);
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 650;
   letter-spacing: -0.02em;
 }
 .website-listings-head p,
@@ -39,21 +40,12 @@
 .website-listings-search {
   min-width: min(100%, 260px);
 }
-.website-listings-table {
-  min-width: 880px;
-}
-.website-listings-table td,
-.website-listings-table th[scope='row'] {
-  vertical-align: middle;
-  padding-top: 14px;
-  padding-bottom: 14px;
-}
 .website-listing-title {
   display: grid;
+  justify-items: start;
   gap: 2px;
   min-width: 0;
   text-align: start;
-  font-weight: 400;
 }
 .website-listing-title strong,
 .website-listing-title h3 {
@@ -86,15 +78,34 @@
   min-height: 40px;
   white-space: nowrap;
 }
+/* Spaced and laid out like its sibling panels: actions at the row's end, full width on phones. */
 .property-website-panel {
-  margin-top: 12px;
+  margin: 0 0 18px;
 }
 .property-website-actions {
-  margin-top: 12px;
-  padding-inline-start: 48px;
+  flex: none;
 }
-@media (max-width: 750px) {
+/* Sized to its content on wider screens; phones keep the shared full-screen layout. */
+.website-withdraw-dialog {
+  --dialog-width: 560px;
+}
+.website-withdraw-text {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.55;
+}
+@media (min-width: 751px) {
+  .modal-centered > .drawer.website-withdraw-dialog {
+    height: auto;
+  }
+}
+@media (max-width: 650px) {
   .property-website-actions {
-    padding-inline-start: 0;
+    width: 100%;
+  }
+  .property-website-actions .btn {
+    flex: 1 1 0;
+    min-height: 44px;
   }
 }

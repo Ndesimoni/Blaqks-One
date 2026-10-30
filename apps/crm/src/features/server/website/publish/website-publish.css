@@ -4,6 +4,10 @@
   padding: 0 0 14px;
   background: transparent;
 }
+/* Cancel on its own; Back sits beside Next. */
+.website-publish-dialog .drawer-footer > .btn:nth-child(2) {
+  margin-inline-start: auto;
+}
 .website-publish-fields {
   display: grid;
   gap: 18px;

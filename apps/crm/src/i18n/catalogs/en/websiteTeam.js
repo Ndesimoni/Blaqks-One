@@ -24,6 +24,7 @@ export default {
   'consent.missing': 'Not given',
   'consent.none': 'No profile yet',
   'consent.own': 'Change in My profile',
+  'consent.ownSetUp': 'Set up in My profile',
   'consent.others': 'Only {name} can agree to this, from My profile.',
   'contacts.others': 'Only {name} changes their public WhatsApp and email, from My profile.',
   'publishing.admin': 'Admin · always',
@@ -77,6 +78,7 @@ export default {
   'field.whatsApp': 'Public WhatsApp',
   'field.email': 'Public email',
   'field.optional': 'Optional. Leave blank to keep it private.',
+  'field.notShown': 'Not shown',
   'own.title': 'Website profile',
   'own.description': 'How you appear on your company website and the Blaqks One website.',
   'own.consent':

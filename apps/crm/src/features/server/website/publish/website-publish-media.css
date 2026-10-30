@@ -46,6 +46,11 @@
   cursor: pointer;
   transition: border-color var(--duration) var(--ease);
 }
+/* A photo that cannot load leaves a plain placeholder; its alt text stays for assistive tech. */
+:is(.website-photo-toggle, .website-review-photos) img {
+  background: var(--surface-subtle);
+  color: transparent;
+}
 .website-photo-toggle img {
   display: block;
   width: 100%;

@@ -46,7 +46,7 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
   await expect(row).toContainText('0 live listings');
   const adminRow = table.getByRole('row').filter({ hasText: team.admin.user.name });
   await expect(adminRow).toContainText('Admin · always');
-  await expect(adminRow.getByRole('button', { name: 'Change in My profile' })).toBeVisible();
+  await expect(adminRow.getByRole('button', { name: 'Set up in My profile' })).toBeVisible();
 
   // Allow publishing takes effect at once.
   await row.getByRole('button', { name: `Allow publishing for ${name}`, exact: true }).click();

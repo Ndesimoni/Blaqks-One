@@ -11,8 +11,9 @@ function siteNotice(site) {
 }
 
 /**
- * Title, the one primary action (Publish a property), a site notice when publishing cannot
- * succeed yet, the Live/Withdrawn/All filter, title search and the active-filter summary.
+ * Title, the one primary action (Publish a property; without `onPublish` the empty state
+ * offers it instead), a site notice when publishing cannot succeed yet, the Live/Withdrawn/All
+ * filter, title search and the active-filter summary.
  */
 export function ListingsToolbar({ titleId, site, filters, count, busy, onFilters, onPublish }) {
   const { t } = useI18n();
@@ -26,9 +27,11 @@ export function ListingsToolbar({ titleId, site, filters, count, busy, onFilters
           <h2 id={titleId}>{k('title')}</h2>
           <p>{k('intro')}</p>
         </div>
-        <Button icon="plus" disabled={busy} onClick={onPublish}>
-          {k('publish')}
-        </Button>
+        {onPublish && (
+          <Button icon="plus" disabled={busy} onClick={onPublish}>
+            {k('publish')}
+          </Button>
+        )}
       </div>
       {notice && (
         <p className="website-listings-notice" role="note">

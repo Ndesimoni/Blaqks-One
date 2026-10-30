@@ -4,6 +4,10 @@
   gap: 2px;
   min-width: 0;
 }
+/* Room for a typical email address on one line in the table. */
+.website-list-table .website-enquiry-from {
+  min-width: 12rem;
+}
 .website-enquiry-from strong {
   color: var(--ink);
   overflow-wrap: anywhere;
@@ -33,7 +37,7 @@
 }
 .website-enquiry-facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 12px 18px;
   margin: 0;
 }

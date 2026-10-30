@@ -36,24 +36,44 @@ export function ListingDate({ value }) {
   return <time dateTime={value}>{format.date(value)}</time>;
 }
 
+/** The table's listing title: opens the CRM property while that record is still visible. */
+export function ListingTitle({ row, busy, onOpen }) {
+  const { t } = useI18n();
+  if (!row.entry) return <strong>{row.title}</strong>;
+  return (
+    <button
+      type="button"
+      className="website-listing-open"
+      disabled={busy}
+      aria-label={t('websiteListings.openNamed', { title: row.title })}
+      onClick={() => onOpen(row)}
+    >
+      {row.title}
+    </button>
+  );
+}
+
 /**
  * Open property and Republish need the CRM record (still visible to the caller); Withdraw
  * appears only for live rows. Names include the title so each row's buttons are distinct.
+ * The table opens the property from its title instead (`withOpen={false}`).
  */
-export function ListingActions({ row, busy, onOpen, onRepublish, onWithdraw }) {
+export function ListingActions({ row, busy, onOpen, onRepublish, onWithdraw, withOpen = true }) {
   const { t } = useI18n();
   const k = (key, vars) => t(`websiteListings.${key}`, vars);
   const title = row.title;
   return (
     <div className="website-listing-actions">
-      <Button
-        variant="light"
-        disabled={busy || !row.entry}
-        aria-label={k('openNamed', { title })}
-        onClick={() => onOpen(row)}
-      >
-        {k('open')}
-      </Button>
+      {withOpen && (
+        <Button
+          variant="light"
+          disabled={busy || !row.entry}
+          aria-label={k('openNamed', { title })}
+          onClick={() => onOpen(row)}
+        >
+          {k('open')}
+        </Button>
+      )}
       <Button
         variant="light"
         disabled={busy || !row.entry}

@@ -36,18 +36,30 @@
   font-size: 13px;
   font-weight: 600;
 }
-.wt-table {
-  min-width: 940px;
+/* Cells wrap so every column, Actions included, stays in view beside the sidebar. */
+:root[data-theme] .wt-table {
+  min-width: 860px;
+  white-space: normal;
 }
-.wt-table th {
-  font-size: 12px;
-}
-.wt-table :is(td, tbody th) {
+:root[data-theme] .wt-table :is(td, tbody th) {
   padding-top: 16px;
   padding-bottom: 16px;
   font-weight: 400;
   text-align: left;
   vertical-align: top;
+}
+/* The person cell is a row header, not a column header: no header band or capitals. */
+:root[data-theme] .wt-table tbody th {
+  min-width: 200px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  border-bottom: 1px solid var(--line);
+}
+:root[data-theme] .wt-table tbody tr:last-child th {
+  border-bottom: 0;
 }
 .wt-name {
   display: block;
@@ -74,7 +86,7 @@
   flex-wrap: wrap;
   gap: 8px;
 }
-.wt-table .btn {
+.wt-table :is(.btn, .wt-consent, .wt-link, .wt-live) {
   white-space: nowrap;
 }
 .wt-cards {

@@ -5,6 +5,9 @@ import { FinanceDialog } from '../../finance/FinanceDialog.jsx';
 import { WebsiteProfileFields } from './WebsiteProfileFields.jsx';
 import { PROFILE_FIELDS, formChanged, profileErrors, profileForm } from './websiteTeamModel.js';
 
+// Another member's public contacts: shown as text, saved unchanged (owner, 2026-10-30).
+const CONTACTS = ['publicWhatsApp', 'publicEmail'];
+
 /**
  * The Admin edits a person's public details. Consent is read-only here: only that person
  * agrees, from My profile, so the save always sends their saved consent unchanged.
@@ -14,6 +17,7 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
   const [form, setForm] = useState(initial);
   const [errors, setErrors] = useState({});
   const inputs = useRef({});
+  const locked = row.own ? [] : CONTACTS;
   useUnsavedChanges(formChanged(form, initial), busy);
   const change = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -21,6 +25,7 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
   };
   const submit = () => {
     const found = profileErrors(form);
+    locked.forEach((field) => delete found[field]);
     setErrors(found);
     const first = PROFILE_FIELDS.find((field) => found[field]);
     if (first) return inputs.current[first]?.focus();
@@ -47,7 +52,7 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
         inputs={inputs}
         onChange={change}
         t={t}
-        locked={row.own ? [] : ['publicWhatsApp', 'publicEmail']}
+        locked={locked}
         lockedHint={t('websiteTeam.contacts.others', { name: row.member.name })}
       />
       <section className="wt-consent-note" aria-labelledby="wt-dialog-consent">
@@ -58,7 +63,7 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
         </p>
         {row.own ? (
           <button type="button" className="wt-link" disabled={busy} onClick={onMyProfile}>
-            {t('websiteTeam.consent.own')}
+            {t(row.profile ? 'websiteTeam.consent.own' : 'websiteTeam.consent.ownSetUp')}
           </button>
         ) : (
           <p className="wt-hint">{t('websiteTeam.consent.others', { name: row.member.name })}</p>

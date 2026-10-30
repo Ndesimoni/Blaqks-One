@@ -59,8 +59,12 @@
   vertical-align: middle;
   overflow-wrap: anywhere;
 }
-.website-list-table :is(.badge, .btn, time) {
+.website-list-table :is(.badge, .btn, time, .website-list-nowrap) {
   white-space: nowrap;
+}
+/* Room for a typical website address on one line; longer ones still wrap. */
+.website-list-table .website-list-address {
+  min-width: 15rem;
 }
 .website-list-sub {
   display: block;

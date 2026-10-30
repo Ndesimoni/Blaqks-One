@@ -43,7 +43,7 @@ export function TeamConsent({ row, actions, t }) {
       </span>
       {row.own && (
         <button type="button" className="wt-link" onClick={actions.myProfile}>
-          {t('websiteTeam.consent.own')}
+          {t(row.profile ? 'websiteTeam.consent.own' : 'websiteTeam.consent.ownSetUp')}
         </button>
       )}
     </div>

@@ -49,6 +49,8 @@ export function PropertyWebsitePanel({ module, record }) {
   const blocked = staff && !own.loading && !own.error && !own.eligible.length;
   const checking = listings.loading || (staff && own.loading);
   const error = listings.error || (staff && own.error);
+  const ready = !checking && !error;
+  const listed = website.status !== 'none';
   const status = {
     none: k('panelNone'),
     live: publishedAt(website.publication)
@@ -65,38 +67,36 @@ export function PropertyWebsitePanel({ module, record }) {
         <div className="assignment-current">
           <h3 id={headingId}>{k('panelTitle')}</h3>
           <strong>{checking ? k('panelChecking') : error ? k('panelError') : status}</strong>
-          {!checking && !error && website.live.length > 1 && (
+          {ready && website.live.length > 1 && (
             <small>{k('panelLiveCount', { count: website.live.length })}</small>
           )}
-          {!checking && !error && blocked && <small>{k('panelBlocked')}</small>}
-          {!checking && !error && !blocked && website.status === 'none' && (
-            <small>{k('panelHint')}</small>
-          )}
+          {ready && blocked && <small>{k('panelBlocked')}</small>}
+          {ready && !blocked && !listed && <small>{k('panelHint')}</small>}
         </div>
         {error && (
           <Button variant="light" onClick={listings.error ? listings.reload : own.retry}>
             {k('retry')}
           </Button>
         )}
+        {ready && (!blocked || listed) && (
+          <div className="property-website-actions">
+            {!blocked && (
+              <Button variant="light" disabled={listings.busy} onClick={() => setPublishing(true)}>
+                {k(listed ? 'republish' : 'publishOnWebsite')}
+              </Button>
+            )}
+            {listed && (
+              <Button
+                variant="danger-light"
+                disabled={listings.busy}
+                onClick={() => setWithdrawing(true)}
+              >
+                {k('withdraw')}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
-      {!checking && !error && (
-        <div className="property-website-actions">
-          {!blocked && (
-            <Button variant="light" disabled={listings.busy} onClick={() => setPublishing(true)}>
-              {k(website.status === 'none' ? 'publishOnWebsite' : 'republish')}
-            </Button>
-          )}
-          {website.status !== 'none' && (
-            <Button
-              variant="danger-light"
-              disabled={listings.busy}
-              onClick={() => setWithdrawing(true)}
-            >
-              {k('withdraw')}
-            </Button>
-          )}
-        </div>
-      )}
       {publishing && (
         <PublishDialog
           entry={entry}

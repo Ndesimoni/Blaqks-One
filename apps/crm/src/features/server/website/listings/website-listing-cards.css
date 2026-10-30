@@ -14,11 +14,12 @@
   border-radius: 12px;
   background: var(--panel);
 }
+/* Status always sits under the title, whatever the title's length. */
 .website-listing-card-head {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 .website-listing-facts {
   display: grid;
@@ -36,6 +37,7 @@
   overflow-wrap: anywhere;
 }
 .website-listing-card .btn {
+  flex: 1 1 auto;
   min-height: 44px;
 }
 .website-skeleton-row {

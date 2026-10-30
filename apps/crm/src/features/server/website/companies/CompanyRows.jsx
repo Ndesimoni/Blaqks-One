@@ -89,7 +89,7 @@ export function CompanyRows({ rows, mobile, onEdit }) {
                     <strong>{row.company}</strong>
                   </td>
                   <td>{row.name}</td>
-                  <td>{cell.address}</td>
+                  <td className="website-list-address">{cell.address}</td>
                   <td>{cell.visibility}</td>
                   <td>{cell.entitled}</td>
                   <td>{cell.licence}</td>

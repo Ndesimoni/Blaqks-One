@@ -16,6 +16,8 @@ export function PublishPhotos({ flow }) {
   const { draft, change, errors } = flow;
   const record = flow.entry?.record;
   const photos = photoChoices(record);
+  // Photos added in the editor but not yet saved have no stored file to publish.
+  const unsaved = (record?.media_photos || []).length > photos.length;
   const name = (number, position) =>
     k(position === 0 ? 'photoCover' : position > 0 ? 'photoSelected' : 'photoUnselected', {
       number,
@@ -62,7 +64,7 @@ export function PublishPhotos({ flow }) {
       ) : (
         <p className="website-publish-note">{k('noPhotos')}</p>
       )}
-      <small className="finance-hint">{k('unsavedPhotos')}</small>
+      {unsaved && <small className="finance-hint">{k('unsavedPhotos')}</small>}
       {errors.photos && (
         <p className="field-error" role="alert">
           {k('photosRequired')}
