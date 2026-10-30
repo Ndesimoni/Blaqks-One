@@ -33,6 +33,7 @@ export function websiteRoutes({ request, scope }) {
     savePlatformWebsiteDraft: (body) => request(`${platform}/draft`, { method: 'PUT', body }),
     publishPlatformWebsiteDraft: (version) =>
       request(`${platform}/publish`, { method: 'POST', body: { version } }),
+    websiteCompanies: (signal) => request(`/platform/websites/companies`, { signal }),
     websiteEligibility: (workspace, body) =>
       request(`/platform/websites/companies/${encodeURIComponent(workspace)}/eligibility`, {
         method: 'PUT',

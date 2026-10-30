@@ -1,0 +1,33 @@
+/* Shared accessible tab row: the segmented `.tabs` look, one line that scrolls sideways
+   on narrow screens, touch-sized tabs and an optional count. */
+.ui-tabs {
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+:root[data-theme] .ui-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 13px;
+}
+:root[data-theme] .ui-tabs button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.ui-tab-count {
+  min-inline-size: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.ui-tabs button.active .ui-tab-count {
+  background: var(--surface-subtle);
+}

@@ -56,6 +56,8 @@ import enSignup from './en/signup.js';
 import enSignupErrors from './en/signupErrors.js';
 import enSignupSetup from './en/signupSetup.js';
 import enTeamSeats from './en/teamSeats.js';
+import enWebsiteCompanies from './en/websiteCompanies.js';
+import enWebsiteEnquiries from './en/websiteEnquiries.js';
 import enWebsites from './en/websites.js';
 import enWebsiteTeam from './en/websiteTeam.js';
 
@@ -99,6 +101,8 @@ export const catalogs = Object.freeze({
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,
     teamSeats: enTeamSeats,
+    websiteCompanies: enWebsiteCompanies,
+    websiteEnquiries: enWebsiteEnquiries,
     websites: enWebsites,
     websiteTeam: enWebsiteTeam,
   },
