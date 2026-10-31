@@ -27,6 +27,8 @@ const shots = async (page, testInfo, name) => {
 };
 
 test('connect a Google mailbox, start an email and see it sent', async ({ page }, testInfo) => {
+  // Waits for the mail worker and takes eight screenshots: about 50 s alone, more under load.
+  test.setTimeout(120000);
   await signIn(page);
   const identity = await session(page);
   const workspace = identity.user.workspaceId;

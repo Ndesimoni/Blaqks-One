@@ -45,8 +45,10 @@ test('members edit their details, change their password and manage their session
   await page.getByRole('button', { name: 'Save changes' }).click();
   await expect(page.getByText('Your details were saved.')).toBeVisible();
   await expect(page.getByLabel('Full name *')).toHaveValue('Browser Profile Edited');
-  // The signed-in identity shows the saved name straight away.
-  await expect(page.locator('.side-footer strong')).toHaveText('Browser Profile Edited');
+  // The signed-in identity (the account menu on the initials) shows the saved name at once.
+  await expect(
+    page.getByRole('button', { name: 'Account menu, Browser Profile Edited', exact: true }),
+  ).toBeVisible();
 
   // Sessions list and signing out other devices.
   const other = await memberPage(browser, invited.email);
