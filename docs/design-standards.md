@@ -47,13 +47,13 @@ When an intentional redesign changes this baseline, update the shared rules and 
 
 Follow [Clean collection and option browsing](option-overflow.md) and the shared `OverflowList` modes.
 
-| Context                                      | Required pattern                                                                            |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Main property directory                      | One grid or table, 12 records per page, clear totals and pagination                         |
-| Searchable contacts, recipients and activity | One bounded scrolling list with useful search/filter controls                               |
-| Compact chips, tags and summaries            | Show up to six; More replaces the preview with one scrollable list containing **all** items |
-| Photos and form step navigation              | Horizontal scrolling with visible selection and keyboard access                             |
-| Small complete page sections                 | Natural page scrolling without an unnecessary disclosure                                    |
+| Context                                      | Required pattern                                                                                                                                                      |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Main property directory                      | One grid or table, 12 records per page, clear totals and pagination                                                                                                   |
+| Searchable contacts, recipients and activity | One bounded scrolling list with useful search/filter controls                                                                                                         |
+| Compact chips, tags and summaries            | Show up to six; More replaces the preview with one scrollable list containing **all** items                                                                           |
+| Photos and form step navigation              | Horizontal scrolling with visible selection and keyboard access                                                                                                       |
+| Small complete page sections                 | Natural page scrolling without an unnecessary disclosure                                                                                                              |
 | Pipelines (Leads; Deals next)                | Kanban: one column per stage, a remembered Kanban/List switch, cards moved by dragging or each card's ⋯ list, twenty cards per column then Show all (NAV, 2026-10-31) |
 
 - Expanded More views contain the initial items and the remaining items. Show one close control; avoid duplicate lists, a lingering More button or a second Show more action inside.

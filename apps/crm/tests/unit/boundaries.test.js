@@ -1,7 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { checkBoundaries, moduleOf, namesIn, stripComment } from '../../../../scripts/boundary-rules.mjs';
+import {
+  checkBoundaries,
+  moduleOf,
+  namesIn,
+  stripComment,
+} from '../../../../scripts/boundary-rules.mjs';
 
 const map = {
   owners: {
