@@ -48,6 +48,7 @@ import enMarketplaceJoin from './en/marketplaceJoin.js';
 import enMarketplaceRequests from './en/marketplaceRequests.js';
 import enMyWhatsapp from './en/myWhatsapp.js';
 import enNavigation from './en/navigation.js';
+import enProducts from './en/products.js';
 import enProfile from './en/profile.js';
 import enProperties from './en/properties.js';
 import enRecordKeeps from './en/recordKeeps.js';
@@ -104,6 +105,7 @@ export const catalogs = Object.freeze({
     marketplaceRequests: enMarketplaceRequests,
     myWhatsapp: enMyWhatsapp,
     navigation: enNavigation,
+    products: enProducts,
     signup: enSignup,
     signupErrors: enSignupErrors,
     signupSetup: enSignupSetup,

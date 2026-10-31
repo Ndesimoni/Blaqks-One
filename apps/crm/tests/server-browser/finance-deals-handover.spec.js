@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { openPage } from './product-nav.js';
 import {
   checkLayout,
   createDeal,
@@ -104,10 +105,7 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   await holder.page.keyboard.press('Escape');
   // The accepted hand-over is kept under Agreements, decided only from Deals.
   await details.getByRole('button', { name: 'Close deal details' }).click();
-  await receiver.page
-    .getByRole('navigation', { name: 'CRM sections' })
-    .getByRole('button', { name: 'Agreements', exact: true })
-    .click();
+  await openPage(receiver.page, 'Agreements');
   await receiver.page
     .getByRole('button', { name: /In-company/ })
     .first()

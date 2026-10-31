@@ -11,15 +11,17 @@ export function ServerNavigationItem({
   label: shown,
   badge,
   badgeLabel,
+  active: activeOverride,
 }) {
   const label = shown || (name === 'Team & access' ? 'Team' : name);
   const connected = isConnectedSection(name);
+  const active = activeOverride ?? route === name;
   return (
     <button
       type="button"
-      className={'nav-item connected-nav-item' + (route === name ? ' active' : '')}
+      className={'nav-item connected-nav-item' + (active ? ' active' : '')}
       aria-label={badgeLabel ? `${label}, ${badgeLabel}` : label}
-      aria-current={route === name ? 'page' : undefined}
+      aria-current={active ? 'page' : undefined}
       title={connected ? label : `${label} · Not connected yet`}
       onClick={() => onSelect(name)}
     >

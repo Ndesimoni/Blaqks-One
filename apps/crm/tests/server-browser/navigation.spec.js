@@ -1,7 +1,8 @@
 import { labels } from '../../src/config/navigation.js';
 import { expect, test } from './fixtures.js';
 import { signIn } from './helpers.js';
-import { entries, groups } from './navigation-entries.js';
+import { entries } from './navigation-entries.js';
+import { openPage, rail, sectionButton, sectionNav, sectionTabs } from './product-nav.js';
 
 test('connected Admin navigation restores every group and unfinished routes never show demo records or forms', async ({
   page,
@@ -19,12 +20,23 @@ test('connected Admin navigation restores every group and unfinished routes neve
     ),
   );
   await signIn(page, 'owner');
-  const sidebar = page.getByRole('navigation', { name: 'CRM sections', exact: true });
-  for (const label of groups) await expect(sidebar.getByText(label, { exact: true })).toBeVisible();
-  for (const name of entries)
-    await expect(sidebar.getByRole('button', { name, exact: true })).toHaveCount(1);
+  // The Super Admin's rail: the CRM, Messages (the preview), Platform and Settings only.
+  for (const name of ['CRM', 'Messages', 'Platform', 'Settings'])
+    await expect(rail(page).getByRole('button', { name, exact: true })).toBeVisible();
+  for (const name of ['Websites', 'Marketplace'])
+    await expect(rail(page).getByRole('button', { name, exact: true })).toHaveCount(0);
+  // Every destination is reachable through product, section and tab, and marked current.
+  for (const name of entries) {
+    await openPage(page, name);
+    const tabs = sectionTabs(page);
+    if (await tabs.count())
+      await expect(tabs.getByRole('button', { name, exact: true })).toHaveAttribute(
+        'aria-current',
+        'page',
+      );
+  }
   for (const name of ['Messages']) {
-    await sidebar.getByRole('button', { name, exact: true }).click();
+    await openPage(page, name);
     await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
     await expect(page.getByRole('region', { name: `${name} connection status` })).toContainText(
       'NOT CONNECTED YET',
@@ -45,38 +57,32 @@ test('connected Admin navigation restores every group and unfinished routes neve
     ['Interaction log', 'Add conversation'],
     ['Client care', 'Add touchpoint'],
   ]) {
-    await sidebar.getByRole('button', { name, exact: true }).click();
+    await openPage(page, name);
     await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
     // An empty list repeats its Add action in the empty state.
     await expect(page.getByRole('button', { name: action, exact: true }).first()).toBeVisible();
     await expect(page.getByRole('region', { name: `${name} connection status` })).toHaveCount(0);
     await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);
   }
-  await sidebar.getByRole('button', { name: 'Dashboard', exact: true }).click();
+  await openPage(page, 'Dashboard');
   await expect(page).toHaveURL(/#\/dashboard$/);
   await page.reload();
   // A restored session opens the workspace before the shell renders; allow for that.
   await expect(page.locator('.page-heading h1')).toHaveText('Overview', { timeout: 20000 });
   await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
-  // Finance is connected (F2 Deals, F3 Payments and Expenses), then Performance and insights.
-  const live = [
-    ...['Dashboard', 'Client desk', 'Deals', 'Payments', 'Expenses', 'Performance'],
-    ...['Date search', 'Guide', 'My profile'],
-  ];
-  for (const name of [...live, 'CRM insights'])
-    await expect(
-      sidebar.getByRole('button', { name, exact: true }).locator('.connected-nav-status'),
-    ).toHaveCount(0);
+  // Only the Messages preview still says it is not connected.
+  await expect(sectionNav(page).locator('.connected-nav-status')).toHaveCount(0);
+  await openPage(page, 'Messages');
   await expect(
-    sidebar.getByRole('button', { name: 'Messages', exact: true }).locator('.connected-nav-status'),
+    sectionButton(page, 'messages', 'Inbox').locator('.connected-nav-status'),
   ).toHaveText('Not connected');
-  await sidebar.getByRole('button', { name: 'Clients', exact: true }).click();
+  await openPage(page, 'Clients');
   await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
-  await expect(sidebar.getByRole('button', { name: 'Clients', exact: true })).toHaveAttribute(
-    'aria-current',
-    'page',
-  );
+  await expect(sectionButton(page, 'crm', 'Clients')).toHaveAttribute('aria-current', 'page');
+  await expect(
+    sectionTabs(page).getByRole('button', { name: 'Clients', exact: true }),
+  ).toHaveAttribute('aria-current', 'page');
   expect(errors).toEqual([]);
 });
 
@@ -90,17 +96,14 @@ test('restored navigation scrolls its active link into view and stays usable on 
     if ((await page.locator('html').getAttribute('data-theme')) !== theme)
       await page.getByRole('button', { name: `Switch to ${theme} mode` }).click();
     await page.goto('/#/performance');
-    await expect(
-      page
-        .getByRole('navigation', { name: 'CRM sections' })
-        .getByRole('button', { name: 'Performance', exact: true }),
-    ).toBeInViewport();
+    await expect(sectionButton(page, 'crm', 'Reports')).toBeInViewport();
+    await expect(sectionTabs(page).getByRole('button', { name: 'Performance' })).toBeInViewport();
     await page.screenshot({ path: testInfo.outputPath(`navigation-desktop-${theme}.png`) });
     await page.setViewportSize({ width: 390, height: 844 });
     const opener = page.getByRole('button', { name: 'Toggle navigation' });
     await opener.click();
     const dialog = page.getByRole('dialog', { name: 'CRM navigation' });
-    const current = dialog.getByRole('button', { name: 'Performance', exact: true });
+    const current = dialog.getByRole('button', { name: 'Reports', exact: true });
     await expect(current).toBeInViewport();
     await current.focus();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(

@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { sectionNav } from './product-nav.js';
 import {
   checkLayout,
   createDeal,
@@ -10,8 +11,9 @@ import {
   openDeals,
 } from './finance-deals-fixtures.js';
 
-const sidebar = (page) => page.getByRole('navigation', { name: 'CRM sections' });
-const waiting = (count) => `Deals, ${count} hand-over${count === 1 ? '' : 's'} waiting for you`;
+const sidebar = (page) => sectionNav(page);
+const waiting = (count) =>
+  `Deals & money, ${count} hand-over${count === 1 ? '' : 's'} waiting for you`;
 
 test('a hand-over that needs approval moves only after the receiver accepts and the Admin approves', async ({
   browser,
@@ -58,7 +60,7 @@ test('a hand-over that needs approval moves only after the receiver accepts and 
   await expect(review).toHaveCount(0);
   await expect(incoming).toContainText(`Waiting for ${admin.name} to approve`);
   await expect(
-    sidebar(receiver.page).getByRole('button', { name: 'Deals', exact: true }),
+    sidebar(receiver.page).getByRole('button', { name: 'Deals & money', exact: true }),
   ).toBeVisible();
   await expect(receiver.page.getByRole('heading', { name: 'No deals yet' })).toBeVisible();
 
@@ -80,7 +82,7 @@ test('a hand-over that needs approval moves only after the receiver accepts and 
   await expect(approval).toHaveCount(0);
   await expect(queue).toHaveCount(0);
   await expect(
-    sidebar(owner.page).getByRole('button', { name: 'Deals', exact: true }),
+    sidebar(owner.page).getByRole('button', { name: 'Deals & money', exact: true }),
   ).toBeVisible();
 
   await receiver.page.reload();

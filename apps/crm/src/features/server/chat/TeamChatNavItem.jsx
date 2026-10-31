@@ -11,7 +11,7 @@ const NAV_POLL_MS = 15_000;
  * The sidebar's Team chat entry with its badge, polled while the page is visible: `@count`
  * when colleagues mentioned you (packet C3), otherwise the unread count.
  */
-export function TeamChatNavItem({ route, onSelect }) {
+export function TeamChatNavItem({ route, onSelect, active, label: shown }) {
   const { api, user } = useSession();
   const { t } = useI18n();
   const [counts, setCounts] = useState({ unread: 0, mentions: 0 });
@@ -44,7 +44,8 @@ export function TeamChatNavItem({ route, onSelect }) {
       icon="users"
       route={route}
       onSelect={onSelect}
-      label={t('chat.title')}
+      label={shown || t('chat.title')}
+      active={active}
       badge={mentions ? `@${badge(mentions)}` : badge(unread)}
       badgeLabel={label}
     />

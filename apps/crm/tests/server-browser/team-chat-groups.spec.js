@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { openPage, rail, sectionNav } from './product-nav.js';
 import { login } from '../api/helpers.mjs';
 import { activate, invite } from '../api/team-helpers.mjs';
 import { signIn } from './helpers.js';
@@ -84,14 +85,14 @@ test('a group is started, a colleague is mentioned and sees the mention', async 
   await expect(addDialog).toHaveCount(0);
   await expect(page.getByText('only its 4 members can read it')).toBeVisible();
   const newest = await memberPage(browser, invitedC.email);
-  await newest.page.getByRole('button', { name: /^Team chat/ }).click();
+  await openPage(newest.page, 'Team chat');
   await newest.page.getByRole('button', { name: /Marina viewings/ }).click();
   await expect(newest.page.getByText('Please call')).toBeVisible();
   await newest.context.close();
   // The mentioned colleague sees @1 on the sidebar and on the group, then reads it.
   const other = await memberPage(browser, invitedA.email);
-  const nav = other.page.getByRole('navigation', { name: 'CRM sections', exact: true });
-  const chatNav = nav.getByRole('button', { name: /^Team chat/ });
+  await rail(other.page).getByRole('button', { name: 'Messages', exact: true }).click();
+  const chatNav = sectionNav(other.page, 'messages').getByRole('button', { name: /^Team chat/ });
   await expect(chatNav).toHaveAccessibleName(/1 mention of you/);
   await expect(chatNav.locator('.connected-nav-badge')).toHaveText('@1');
   await chatNav.click();

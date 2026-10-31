@@ -4,6 +4,7 @@ import { activate, invite } from '../api/team-helpers.mjs';
 import { signIn, session } from './helpers.js';
 import { noPageOverflow, signInMember } from './assign-helpers.js';
 import { clearInbox, seedConversation } from './inbox-fixtures.js';
+import { rail } from './product-nav.js';
 
 test('arrow keys move through the list and Enter opens a conversation', async ({ page }) => {
   await signIn(page);
@@ -45,7 +46,8 @@ test('a staff member reads their Inbox in Arabic, right to left', async ({ page 
   await page.goto('/#/my-profile');
   await page.getByRole('radio', { name: /العربية/ }).check();
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-  // Staff without any reply permission still reach the Inbox from the sidebar.
+  // Staff without any reply permission still reach the Inbox: Messages, then its sidebar.
+  await rail(page).getByRole('button', { name: 'Messages', exact: true }).click();
   await page
     .getByRole('button', { name: /^صندوق الوارد، |^صندوق الوارد, |^صندوق الوارد$/ })
     .click();

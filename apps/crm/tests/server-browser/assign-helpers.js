@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { session } from './helpers.js';
 import { saveRecordForm } from '../browser/helpers/record-form.js';
+import { openPage } from './product-nav.js';
 
 export const password = 'Team123!';
 
@@ -42,9 +43,7 @@ export async function memberPage(browser, email) {
 }
 
 export async function openSection(page, name) {
-  const sidebar = page.getByRole('navigation', { name: 'CRM sections', exact: true });
-  if (!(await sidebar.isVisible())) await page.getByRole('button', { name: /menu/i }).click();
-  await sidebar.getByRole('button', { name, exact: true }).click();
+  await openPage(page, name);
 }
 
 /** Opens record details from the current list by its visible ID. */

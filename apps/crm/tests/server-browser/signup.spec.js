@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { test, expect } from './fixtures.js';
+import { openPage } from './product-nav.js';
 import { query } from '../api/helpers.mjs';
 import { codeFor, resetSignup } from '../api/signup-helpers.mjs';
 
@@ -60,7 +61,7 @@ test('an account creates its company and opens the three-seat Team page', async 
         `(SELECT id FROM crm_users WHERE email='${email}'))`,
     ),
   ).toBe('brokerage:Synthetic Horizon Realty:dubai:3');
-  await page.getByRole('button', { name: 'Team', exact: true }).click();
+  await openPage(page, 'Team & access');
   await expect(page.getByText('Free plan', { exact: true })).toBeVisible();
   await expect(page.getByText('1 of 3 seats used', { exact: true })).toBeVisible();
 });

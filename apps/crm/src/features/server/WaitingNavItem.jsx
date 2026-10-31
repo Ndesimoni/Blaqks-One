@@ -13,7 +13,7 @@ const NAV_POLL_MS = 15_000;
  * chat: on every route change and every 15 seconds while the page is visible. A failed read
  * keeps the last count; the Super Admin, who decides no hand-overs, is never polled.
  */
-export function WaitingNavItem({ name, icon, label, route, onSelect }) {
+export function WaitingNavItem({ name, icon, label, route, onSelect, active }) {
   const { api, user } = useSession();
   const { t } = useI18n();
   const source = waitingSources[name];
@@ -48,6 +48,7 @@ export function WaitingNavItem({ name, icon, label, route, onSelect }) {
       label={label}
       route={route}
       onSelect={onSelect}
+      active={active}
       badge={badge(count)}
       badgeLabel={count ? t(source.labelKey, { count }) : ''}
     />

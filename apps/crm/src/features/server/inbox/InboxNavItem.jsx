@@ -7,7 +7,7 @@ import { useInboxSummary } from './useInboxSummary.js';
 const NAV_POLL_MS = 30_000;
 
 /** The sidebar's Inbox entry with the unread badge, polled while the page is visible. */
-export function InboxNavItem({ route, onSelect }) {
+export function InboxNavItem({ route, onSelect, active, label }) {
   const { api, user } = useSession();
   const { t } = useI18n();
   const { unread } = useInboxSummary(api, user.workspaceId, NAV_POLL_MS);
@@ -18,7 +18,8 @@ export function InboxNavItem({ route, onSelect }) {
       icon="chat"
       route={route}
       onSelect={onSelect}
-      label={t('inbox.title')}
+      label={label || t('inbox.title')}
+      active={active}
       badge={badge}
       badgeLabel={badge ? t('inbox.nav.unread', { count: unread }) : ''}
     />

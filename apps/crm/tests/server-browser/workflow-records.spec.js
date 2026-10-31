@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { openPage } from './product-nav.js';
 import { addClient, saveRecordForm, session, signIn } from './helpers.js';
 
 test('a connected viewing links to a client, survives reload and protects that client', async ({
@@ -8,8 +9,7 @@ test('a connected viewing links to a client, survives reload and protects that c
   page.on('pageerror', (error) => errors.push(error.message));
   await signIn(page);
   await addClient(page, 'BROWSER-WF-CLIENT', 'Workflow Client');
-  const sidebar = page.getByRole('navigation', { name: 'CRM sections', exact: true });
-  await sidebar.getByRole('button', { name: 'Viewings', exact: true }).click();
+  await openPage(page, 'Viewings');
   await page.getByRole('button', { name: 'Add viewing', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Viewing ID').fill('BROWSER-WF-VIEW');
@@ -25,7 +25,7 @@ test('a connected viewing links to a client, survives reload and protects that c
   );
   expect(viewing.record.client_id).toBe('BROWSER-WF-CLIENT');
 
-  await sidebar.getByRole('button', { name: 'Clients', exact: true }).click();
+  await openPage(page, 'Clients');
   await page.getByLabel('Search Clients', { exact: true }).fill('BROWSER-WF-CLIENT');
   await page.getByRole('button', { name: 'Open record BROWSER-WF-CLIENT', exact: true }).click();
   page.once('dialog', (prompt) => prompt.accept());
@@ -44,8 +44,7 @@ test('a lead added from Leads is saved as a connected client with lead defaults'
   page,
 }) => {
   await signIn(page);
-  const sidebar = page.getByRole('navigation', { name: 'CRM sections', exact: true });
-  await sidebar.getByRole('button', { name: 'Leads', exact: true }).click();
+  await openPage(page, 'Leads');
   await page.getByRole('button', { name: 'Add lead', exact: true }).click();
   await page.getByLabel('Client ID').fill('BROWSER-WF-LEAD');
   await page.getByLabel('Full name').fill('Workflow Lead');

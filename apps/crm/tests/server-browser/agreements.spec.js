@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { openPage } from './product-nav.js';
 import { login } from '../api/helpers.mjs';
 import { activate, invite } from '../api/team-helpers.mjs';
 import { allowReferrals, command, createAgreement, terms } from '../api/agreements-helpers.mjs';
@@ -29,10 +30,7 @@ test('company A sends a co-broking offer that a member of company B accepts', as
   const outsider = (await newCompany(`agreement-c-${stamp}`)).admin;
   const listing = `AG-UI-${stamp.toString(36).toUpperCase()}`;
   await signIn(page);
-  await page
-    .getByRole('navigation', { name: 'CRM sections' })
-    .getByRole('button', { name: 'Agreements', exact: true })
-    .click();
+  await openPage(page, 'Agreements');
   await expect(page.getByRole('heading', { level: 1, name: 'Agreements' })).toBeVisible();
   await draftCoBroking(page, {
     email: member.email,

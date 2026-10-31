@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { openPage, rail, sectionButton, sectionNav } from './product-nav.js';
 import {
   activityTeam,
   busyDay,
@@ -20,7 +21,8 @@ test('an Admin reviews team activity with filters in the URL and Load more', asy
   const team = await activityTeam(prefix);
   busyDay(team, 55);
   const { page, context } = await memberPage(browser, team.people.admin.email);
-  const nav = page.getByRole('navigation', { name: 'CRM sections', exact: true });
+  await rail(page).getByRole('button', { name: 'Settings', exact: true }).click();
+  const nav = sectionNav(page, 'settings');
   await expect(nav.getByRole('button', { name: 'Team activity', exact: true })).toBeVisible();
   const feed = await openActivity(page, 'Team activity');
   await expect(feed.getByRole('heading', { name: /^Today/ })).toBeVisible();
@@ -87,7 +89,8 @@ test('staff read My activity: only their own actions, with unavailable records',
   const prefix = `act-own${testInfo.retry ? `-r${testInfo.retry}` : ''}`;
   const team = await activityTeam(prefix);
   const { page, context } = await memberPage(browser, team.people.agent.email);
-  const nav = page.getByRole('navigation', { name: 'CRM sections', exact: true });
+  await rail(page).getByRole('button', { name: 'Settings', exact: true }).click();
+  const nav = sectionNav(page, 'settings');
   await expect(nav.getByRole('button', { name: 'My activity', exact: true })).toBeVisible();
   await expect(nav.getByRole('button', { name: 'Team activity', exact: true })).toHaveCount(0);
   const feed = await openActivity(page, 'My activity');

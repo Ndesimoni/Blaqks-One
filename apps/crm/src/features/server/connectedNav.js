@@ -64,7 +64,7 @@ export const displayGroups = [
   },
 ];
 
-const isAllowed = (user, name, groupKey) => {
+export const isAllowed = (user, name, groupKey) => {
   if (!canOpenSection(user, name)) return false;
   // Members see the Inbox where the Super Admin keeps the messaging preview.
   if (name === 'Messages') return !canOpenSection(user, 'Inbox');

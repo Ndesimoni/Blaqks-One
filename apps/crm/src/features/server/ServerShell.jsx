@@ -10,11 +10,14 @@ import { ServerHeader } from './ServerHeader.jsx';
 import { ServerNavigation } from './ServerNavigation.jsx';
 import { ServerPageHeading } from './ServerPageHeading.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
+import { SectionTabs } from './products/SectionTabs.jsx';
+import { useProductNav } from './products/useProductNav.js';
 
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();
   const { t } = useI18n();
-  const { route } = useNavigation();
+  const { route, navigate } = useNavigation();
+  const nav = useProductNav(user, route, navigate);
   const platform = route === 'Platform website';
   // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
   const fullHeight = ['Inbox', 'Team chat'].includes(route);
@@ -28,7 +31,9 @@ export function ServerShell({ owner, workspaces }) {
     go({ pathname: location.pathname, search: `?${params}` });
   };
   return (
-    <div className="app-shell connected-shell">
+    <div
+      className={'app-shell connected-shell has-rail' + (nav.sidebarOpen ? '' : ' sections-hidden')}
+    >
       <a
         className="skip-link"
         href="#main-content"
@@ -39,9 +44,14 @@ export function ServerShell({ owner, workspaces }) {
       >
         Skip to main content
       </a>
-      <ServerNavigation />
+      <ServerNavigation nav={nav} />
       <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
-        <ServerHeader owner={platform ? { name: t('websites.platformTitle') } : owner} />
+        <ServerHeader
+          owner={platform ? { name: t('websites.platformTitle') } : owner}
+          sidebarOpen={nav.sidebarOpen}
+          onToggleSidebar={nav.toggleSidebar}
+        />
+        <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
         <main className="main-content" id="main-content" tabIndex={-1}>
           {/* Members see their company in the top bar; the panel is only for the Super Admin,
               who switches companies, and for archived (read-only) workspaces. */}

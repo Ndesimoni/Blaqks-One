@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js';
+import { rail } from './product-nav.js';
 import { put, ok, websitePath } from '../api/website-helpers.mjs';
 import {
   companyInput,
@@ -27,10 +28,7 @@ test('a competing draft keeps local edits and navigation requires discarding the
   await expect(headline).toHaveValue('Unsaved local headline');
   await expectPublicHero(team.company, 'Published company introduction');
   page.once('dialog', (dialog) => dialog.dismiss());
-  await page
-    .getByRole('navigation', { name: 'CRM sections' })
-    .getByRole('button', { name: 'Clients', exact: true })
-    .click();
+  await rail(page).getByRole('button', { name: 'CRM', exact: true }).click();
   await expect(page).toHaveURL(/#\/website$/);
   await expect(headline).toHaveValue('Unsaved local headline');
   page.once('dialog', (dialog) => dialog.accept());

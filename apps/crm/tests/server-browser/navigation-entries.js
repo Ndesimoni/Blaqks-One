@@ -1,16 +1,4 @@
-/** Display groups and entries the connected navigation must render, in order. */
-export const groups = [
-  'Overview',
-  'Relationships',
-  'Inventory & collaboration',
-  'Work & communication',
-  'Finance & reporting',
-  'Resources',
-  'Personal account',
-  'Company settings',
-  'Platform administration',
-];
-
+/** Every destination the connected navigation offers the Super Admin, by route name (NAV). */
 export const entries = [
   'Dashboard',
   'Client desk',
@@ -33,7 +21,7 @@ export const entries = [
   'Calculators',
   'Guide',
   'My profile',
-  'Team',
+  'Team & access',
   'Team activity',
   'Workspaces',
   'Marketplace applications',
