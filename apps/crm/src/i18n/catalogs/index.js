@@ -46,6 +46,7 @@ import enMarketplaceAgreement from './en/marketplaceAgreement.js';
 import enMarketplaceBoard from './en/marketplaceBoard.js';
 import enMarketplaceJoin from './en/marketplaceJoin.js';
 import enMarketplaceRequests from './en/marketplaceRequests.js';
+import enMyWhatsapp from './en/myWhatsapp.js';
 import enNavigation from './en/navigation.js';
 import enProfile from './en/profile.js';
 import enProperties from './en/properties.js';
@@ -63,6 +64,8 @@ import enWebsiteListings from './en/websiteListings.js';
 import enWebsitePublish from './en/websitePublish.js';
 import enWebsiteSocial from './en/websiteSocial.js';
 import enWebsiteTeam from './en/websiteTeam.js';
+import enWhatsappAccount from './en/whatsappAccount.js';
+import enWhatsappNumbers from './en/whatsappNumbers.js';
 
 export const catalogs = Object.freeze({
   en: {
@@ -99,6 +102,7 @@ export const catalogs = Object.freeze({
     marketplaceJoin: enMarketplaceJoin,
     marketplaceBoard: enMarketplaceBoard,
     marketplaceRequests: enMarketplaceRequests,
+    myWhatsapp: enMyWhatsapp,
     navigation: enNavigation,
     signup: enSignup,
     signupErrors: enSignupErrors,
@@ -111,6 +115,8 @@ export const catalogs = Object.freeze({
     websitePublish: enWebsitePublish,
     websiteSocial: enWebsiteSocial,
     websiteTeam: enWebsiteTeam,
+    whatsappAccount: enWhatsappAccount,
+    whatsappNumbers: enWhatsappNumbers,
   },
   ar: {
     calculators: arCalculators,

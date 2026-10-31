@@ -12,8 +12,8 @@ import { safeExternalUrl } from '../../src/lib/validation.js';
 test('20 CRM sections, six account/workspace screens and the connected-only pages have unique stable routes and safe external links', () => {
   assert.equal(crmRoutes.length, 20);
   assert.equal(settingsRoutes.length, 6);
-  assert.equal(routes.length, 35);
-  assert.equal(new Set(routes.map((route) => route.path)).size, 35);
+  assert.equal(routes.length, 36);
+  assert.equal(new Set(routes.map((route) => route.path)).size, 36);
   assert.equal(routePath('Messages'), '/messages');
   assert.equal(
     routes.some((route) => route.name === 'Calendar'),

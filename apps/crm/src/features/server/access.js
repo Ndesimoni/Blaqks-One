@@ -35,6 +35,12 @@ export function canOpenSection(user, route) {
   // Each member's own mailbox: the Admin, and staff the Admin gave email (decision O8).
   if (route === 'My mailbox' || route === 'Google sign-in')
     return user?.roleId === 'admin' || (user?.roleId === 'staff' && user.channelAccess?.email);
+  // The member's own WhatsApp number: the Admin, and staff the Admin gave WhatsApp (WQ3).
+  if (route === 'My WhatsApp')
+    return (
+      user?.roleId === 'admin' ||
+      (user?.roleId === 'staff' && user.channelAccess?.whatsapp === true)
+    );
   if (['Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'].includes(route))
     return true;
   if (route === 'Messages')

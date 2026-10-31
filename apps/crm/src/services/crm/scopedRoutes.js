@@ -15,6 +15,7 @@ import { marketplaceRoutes } from './marketplace.js';
 import { performanceRoutes } from './performance.js';
 import { recordShareRoutes } from './recordShares.js';
 import { websiteRoutes } from './websites.js';
+import { whatsappNumberRoutes } from './whatsappNumbers.js';
 
 export function scopedRoutes({ request, scope }) {
   return {
@@ -30,5 +31,6 @@ export function scopedRoutes({ request, scope }) {
     ...importRoutes({ request, scope }),
     ...recordShareRoutes({ request, scope }),
     ...websiteRoutes({ request, scope }),
+    ...whatsappNumberRoutes({ request, scope }),
   };
 }

@@ -3,9 +3,10 @@ import { Button } from '../../../components/ui/Button.jsx';
 
 /**
  * Inline confirmation; focuses Cancel and closes with Escape. Disconnect copy by default;
- * `title`, `body` and `action` reuse it for other lasting changes.
+ * `title`, `body`, `action` and `cancel` reuse it for other lasting changes.
  */
-export function ConfirmDisconnect({ label, t, busy, onConfirm, onCancel, title, body, action }) {
+export function ConfirmDisconnect(props) {
+  const { label, t, busy, onConfirm, onCancel, title, body, action, cancel } = props;
   const confirmText = action ?? t('channels.confirmDisconnect');
   const group = useRef(null);
   useEffect(() => group.current?.querySelector('[data-cancel]')?.focus(), []);
@@ -28,7 +29,7 @@ export function ConfirmDisconnect({ label, t, busy, onConfirm, onCancel, title, 
           {confirmText}
         </Button>
         <Button variant="light" data-cancel disabled={busy} onClick={onCancel}>
-          {t('channels.cancel')}
+          {cancel ?? t('channels.cancel')}
         </Button>
       </div>
     </div>

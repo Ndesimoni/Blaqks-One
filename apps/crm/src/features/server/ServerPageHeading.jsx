@@ -15,6 +15,7 @@ const translated = {
   'Inbox rules': 'inboxRules',
   'My mailbox': 'mailbox',
   'Google sign-in': 'mailbox',
+  'My WhatsApp': 'myWhatsapp',
   Agreements: 'agreements',
   'Shared record': 'recordShares',
   Website: 'websites',

@@ -28,6 +28,7 @@ import { GoogleReturn } from './mailbox/GoogleReturn.jsx';
 import { ServerMailbox } from './mailbox/ServerMailbox.jsx';
 import { ServerMarketplace } from './marketplace/ServerMarketplace.jsx';
 import { ServerMarketplaceApplications } from './marketplace/ServerMarketplaceApplications.jsx';
+import { ServerMyWhatsapp } from './myWhatsapp/ServerMyWhatsapp.jsx';
 import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { ServerProfile } from './profile/ServerProfile.jsx';
 import { isConnectedSection } from './sectionStatus.js';
@@ -69,6 +70,7 @@ export function ServerContent({ owner }) {
   if (route === 'Marketplace applications') return <ServerMarketplaceApplications />;
   if (route === 'My mailbox') return <ServerMailbox />;
   if (route === 'Google sign-in') return <GoogleReturn />;
+  if (route === 'My WhatsApp') return <ServerMyWhatsapp />;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
   if (loading) return <p role="status">Loading workspace records…</p>;
   if (error)

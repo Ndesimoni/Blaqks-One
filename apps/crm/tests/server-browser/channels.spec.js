@@ -2,7 +2,6 @@ import { test, expect } from './fixtures.js';
 import { signIn, session } from './helpers.js';
 import { noPageOverflow, setTheme } from './assign-helpers.js';
 import { query } from '../api/helpers.mjs';
-import { twilioSid, twilioToken } from '../api/channels-helpers.mjs';
 
 const card = (page, name) => page.getByRole('article', { name, exact: true });
 
@@ -21,29 +20,28 @@ test('an Admin connects, reconnects and disconnects a channel', async ({ page })
   await page.goto('/#/channels');
   await expect(page.locator('.page-heading h1')).toHaveText('Channels');
   await expect(page.getByRole('article')).toHaveCount(5);
-  const whatsapp = card(page, 'WhatsApp');
-  await whatsapp.getByRole('button', { name: 'Connect', exact: true }).click();
-  const form = page.getByRole('form', { name: 'Connect WhatsApp' });
+  // The generic form; WhatsApp now connects a Twilio account (whatsapp-numbers.spec.js).
+  const facebook = card(page, 'Facebook Page');
+  await facebook.getByRole('button', { name: 'Connect', exact: true }).click();
+  const form = page.getByRole('form', { name: 'Connect Facebook Page' });
   await form.getByLabel('Display label').fill('Studio line');
-  // The company's Twilio account (W1a), proven by the loopback Twilio stand-in.
-  const token = twilioToken();
-  await form.getByLabel('Account ID or address').fill(twilioSid('0777'));
-  await form.getByLabel('Credential or access token').fill(token);
+  await form.getByLabel('Account ID or address').fill('page-synthetic-0777');
+  await form.getByLabel('Credential or access token').fill('synthetic-browser-secret');
   await form.getByRole('button', { name: 'Connect account' }).click();
   await expect(page.getByText('Studio line is connected.')).toBeVisible();
-  await expect(whatsapp.getByText('Connected', { exact: true })).toBeVisible();
-  await expect(whatsapp).toContainText('Account ending 0777');
-  await expect(whatsapp).not.toContainText(token);
+  await expect(facebook.getByText('Connected', { exact: true })).toBeVisible();
+  await expect(facebook).toContainText('Account ending 0777');
+  await expect(facebook).not.toContainText('synthetic-browser-secret');
   await page.reload();
-  await expect(card(page, 'WhatsApp')).toContainText('Studio line');
+  await expect(card(page, 'Facebook Page')).toContainText('Studio line');
 
-  await card(page, 'WhatsApp').getByRole('button', { name: 'Reconnect', exact: true }).click();
-  const renew = page.getByRole('form', { name: 'Reconnect WhatsApp' });
-  await renew.getByLabel('Credential or access token').fill(twilioToken());
+  await card(page, 'Facebook Page').getByRole('button', { name: 'Reconnect', exact: true }).click();
+  const renew = page.getByRole('form', { name: 'Reconnect Facebook Page' });
+  await renew.getByLabel('Credential or access token').fill('another-synthetic-secret');
   await renew.getByRole('button', { name: 'Save credential' }).click();
   await expect(page.getByText('Studio line is reconnected.')).toBeVisible();
 
-  const active = card(page, 'WhatsApp');
+  const active = card(page, 'Facebook Page');
   await active.getByRole('button', { name: 'Disconnect', exact: true }).click();
   const confirm = page.getByRole('group', { name: 'Disconnect channel' });
   await confirm.getByRole('button', { name: 'Cancel', exact: true }).click();
@@ -64,11 +62,11 @@ test('channels remain usable at 390px and 1280px in both themes', async ({ page 
     headers: { Origin: 'http://localhost:5175', 'X-CSRF-Token': identity.csrfToken },
     data: {
       connection: {
-        channel: 'whatsapp',
-        provider: 'twilio',
+        channel: 'facebook',
+        provider: 'meta',
         label: 'Responsive line',
-        externalAccountId: twilioSid('0888'),
-        credential: twilioToken(),
+        externalAccountId: 'page-synthetic-0888',
+        credential: 'synthetic-responsive-secret',
       },
     },
   });
@@ -83,7 +81,7 @@ test('channels remain usable at 390px and 1280px in both themes', async ({ page 
     await page.setViewportSize({ width, height: 900 });
     for (const theme of ['dark', 'light']) {
       await setTheme(page, theme);
-      await expect(card(page, 'WhatsApp')).toContainText('Responsive line');
+      await expect(card(page, 'Facebook Page')).toContainText('Responsive line');
       await expect(card(page, 'Email')).toBeVisible();
       await noPageOverflow(page);
       await page.screenshot({ path: testInfo.outputPath(`channels-${width}-${theme}.png`) });

@@ -3,11 +3,13 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { ChannelForm } from './ChannelForm.jsx';
 import { ConnectionRow } from './ConnectionRow.jsx';
+import { TwilioForm } from './TwilioForm.jsx';
 
 /**
  * One channel with its live connections, form and disconnect confirmation. A channel
  * holds one live connection per company (email: per member), so Connect appears only
- * when none is live; disconnected rows stay as server history and are not listed.
+ * when none is live; disconnected rows stay as server history and are not listed. Each
+ * handler resolves to '' on success or the reason it failed.
  */
 export function ChannelCard({ entry, connections, t, busy, onConnect, onReconnect, onDisconnect }) {
   const [form, setForm] = useState(null);
@@ -18,10 +20,12 @@ export function ChannelCard({ entry, connections, t, busy, onConnect, onReconnec
     setConfirm(null);
   };
   const submit = async (body) => {
-    const done =
+    const failure =
       form === 'connect' ? await onConnect(entry.channel, body) : await onReconnect(form, body);
-    if (done) close();
+    if (!failure) close();
+    return failure;
   };
+  const ConnectForm = entry.provider === 'twilio' ? TwilioForm : ChannelForm;
   const handlers = { setForm, setConfirm, submit, close, onDisconnect };
   return (
     <article className="channel-card" aria-labelledby={`channel-${entry.channel}`}>
@@ -53,7 +57,7 @@ export function ChannelCard({ entry, connections, t, busy, onConnect, onReconnec
         </ul>
       )}
       {form === 'connect' ? (
-        <ChannelForm
+        <ConnectForm
           mode="connect"
           channel={entry.channel}
           provider={entry.provider}

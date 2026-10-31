@@ -11,6 +11,7 @@ const extraIcons = {
   Channels: 'chat',
   'Inbox rules': 'sliders',
   'My mailbox': 'note',
+  'My WhatsApp': 'smartphone',
   'My activity': 'clock',
   'Team activity': 'clock',
   'Team chat': 'users',
@@ -46,7 +47,11 @@ export const displayGroups = [
     items: ['Deals', 'Payments', 'Expenses', 'Performance', 'Date search', 'CRM insights'],
   },
   { key: 'resources', items: ['Calculators', 'Guide'] },
-  { key: 'personal', pinned: true, items: ['My profile', 'My mailbox', 'Team activity'] },
+  {
+    key: 'personal',
+    pinned: true,
+    items: ['My profile', 'My mailbox', 'My WhatsApp', 'Team activity'],
+  },
   {
     key: 'company',
     pinned: true,

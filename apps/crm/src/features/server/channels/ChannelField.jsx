@@ -1,7 +1,7 @@
 import React from 'react';
 
-/** One labelled form control with optional helper text, shared by the channel forms. */
-export function ChannelField({ id, label, hint, children, suffix, preview }) {
+/** One labelled form control with optional helper text and error, shared by the channel forms. */
+export function ChannelField({ id, label, hint, error, children, suffix, preview }) {
   return (
     <div className="channel-field">
       <label htmlFor={id}>{label}</label>
@@ -21,9 +21,20 @@ export function ChannelField({ id, label, hint, children, suffix, preview }) {
         </small>
       )}
       {hint && <small id={`${id}-hint`}>{hint}</small>}
+      {error && (
+        <p id={`${id}-error`} className="field-error channel-field-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
 
-/** Text input props that keep an input tied to its helper text. */
-export const described = (id, hint) => (hint ? { 'aria-describedby': `${id}-hint` } : {});
+/** Input props that tie a control to its helper text and, when invalid, its error. */
+export const described = (id, hint, error) => {
+  const ids = [hint ? `${id}-hint` : '', error ? `${id}-error` : ''].filter(Boolean).join(' ');
+  return {
+    ...(ids ? { 'aria-describedby': ids } : {}),
+    ...(error ? { 'aria-invalid': true } : {}),
+  };
+};

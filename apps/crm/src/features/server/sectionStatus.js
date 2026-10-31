@@ -35,6 +35,8 @@ const connectedSections = new Set([
   // `/mailbox`: each member's own Google mailbox (packets E1a, E1d).
   'My mailbox',
   'Google sign-in',
+  // `/whatsapp-numbers`: the member's own WhatsApp number (packet W1a).
+  'My WhatsApp',
   // `/agreements`: cross-company deal agreements (packet A2 screens).
   'Agreements',
   // `/marketplace`: company eligibility, the switch and the platform's decisions (MK1).
