@@ -10,6 +10,8 @@ export default {
     one: 'Open Team chat, {count} unread',
     other: 'Open Team chat, {count} unread',
   },
+  inboxBox: 'Client inbox',
+  teamBox: 'Team chat',
   switch: 'Messenger',
   fullPage: 'Open full page',
   close: 'Close the messenger',

@@ -18,12 +18,13 @@ test('the slide-in messenger opens Team chat and the Inbox over any page', async
   expect(page.url()).toBe(address);
 
   await panel.getByRole('button', { name: 'Client inbox', exact: true }).click();
-  const inbox = page.getByRole('dialog', { name: 'Inbox' });
+  const inbox = page.getByRole('dialog', { name: 'Client inbox' });
   await expect(inbox.getByRole('region', { name: 'Inbox' })).toBeVisible();
   await noPageOverflow(page);
   await page.keyboard.press('Escape');
   await expect(inbox).toHaveCount(0);
-  await expect(page.getByRole('button', { name: /^Open the Client inbox/ })).toBeFocused();
+  // Focus returns to the button that opened the panel, even after switching boxes.
+  await expect(page.getByRole('button', { name: /^Open Team chat/ })).toBeFocused();
 
   await page.getByRole('button', { name: /^Open the Client inbox/ }).click();
   await page.getByRole('button', { name: 'Open full page', exact: true }).click();

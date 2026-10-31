@@ -9,9 +9,10 @@ import { ServerTeamChat } from '../../chat/ServerTeamChat.jsx';
 import { ServerInbox } from '../../inbox/ServerInbox.jsx';
 import './messenger.css';
 
+// The approved mockup names the boxes Client inbox and Team chat.
 const boxes = [
-  ['inbox', 'Inbox', 'inbox.title'],
-  ['team', 'Team chat', 'chat.title'],
+  ['inbox', 'Inbox', 'messenger.inboxBox'],
+  ['team', 'Team chat', 'messenger.teamBox'],
 ];
 
 /**
@@ -43,7 +44,7 @@ export function MessengerPanel({ owner, box, onBox, onClose }) {
       <div className="messenger-panel">
         <header className="messenger-head">
           <h2 id="messenger-title">
-            {t(allowed.find(([key]) => key === box)?.[2] || 'inbox.title')}
+            {t(allowed.find(([key]) => key === box)?.[2] || 'messenger.inboxBox')}
           </h2>
           <button type="button" className="messenger-full" onClick={fullPage}>
             {t('messenger.fullPage')}
