@@ -111,6 +111,11 @@ async fn suspend(tx: &mut Transaction<'_, Postgres>, target: &Target) -> Outcome
         departure::release(tx, workspace, *id, &ASSIGNABLE, target.owner, "departure")
             .await
             .map_err(failed)?;
+        // Their mailbox, address and WhatsApp number end too (W1a review L2).
+        let leaving = crate::integrations::Leaving::ALL;
+        crate::integrations::departure(tx, workspace, &[*id], leaving, target.owner)
+            .await
+            .map_err(failed)?;
         sqlx::query("DELETE FROM crm_sessions WHERE user_id=$1")
             .bind(id)
             .execute(&mut **tx)

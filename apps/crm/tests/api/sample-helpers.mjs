@@ -102,11 +102,12 @@ export const sampleRows = (workspace) =>
 export const loginStatus = async (email, password) =>
   (await request('/auth/login', { method: 'POST', body: { email, password } })).status;
 
-// The test Google, SendGrid and file-storage stand-ins, and the plain-http public address,
-// are refused outside local development.
+// The test Google, SendGrid, Twilio and file-storage stand-ins, and the plain-http public
+// address, are refused outside local development.
 const standIns = [
   'GOOGLE_ENDPOINT',
   'SENDGRID_ENDPOINT',
+  'TWILIO_ENDPOINT',
   'PUBLIC_URL',
   'MEDIA_ENDPOINT',
   'MEDIA_BUCKET',

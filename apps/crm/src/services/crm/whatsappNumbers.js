@@ -15,7 +15,7 @@ export function whatsappNumberRoutes({ request, scope }) {
     disconnectWhatsappNumber: (workspace, number) =>
       request(`${base(workspace)}/${encodeURIComponent(number.id)}/disconnect`, {
         method: 'POST',
-        body: { version: number.version },
+        body: { expectedVersion: number.version },
       }),
   };
 }

@@ -26,8 +26,9 @@ pub fn unavailable() -> ApiError {
 
 fn failure(failure: Failure) -> ApiError {
     match failure {
-        Failure::Refused => ApiError::invalid(REFUSED),
-        Failure::Unavailable | Failure::Invalid => unavailable(),
+        // An unknown account or a refused token both mean the details are wrong.
+        Failure::Refused | Failure::Invalid => ApiError::invalid(REFUSED),
+        Failure::Unavailable => unavailable(),
     }
 }
 

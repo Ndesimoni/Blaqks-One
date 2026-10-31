@@ -367,7 +367,7 @@ opens the same Account SID.
     must be live in the company with `channel_access.whatsapp` (the Admin may choose
     themselves); the phone must be an available `ONLINE` sender; one active number per member;
     "This number is already connected" never names the other company.
-  - `POST /whatsapp-numbers/{id}/disconnect` `{version}` → `{number}`; the owning Admin for any
+  - `POST /whatsapp-numbers/{id}/disconnect` `{expectedVersion}` → `{number}`; the owning Admin for any
     number, a member for their own.
 - Hooks in one transaction: disconnecting the company Twilio connection disconnects its
   numbers; archiving, suspending or removing a member's WhatsApp grant disconnects their number;
@@ -397,3 +397,21 @@ opens the same Account SID.
   you a WhatsApp number from the company's Twilio account", and Disconnect for their own.
 - Client functions in `apps/crm/src/services/crm/` next to the integrations client; English
   catalogue; 390/1280 in both themes; browser specs for connect, give, disconnect and staff view.
+
+## 17. W1a as built and its security review (2026-10-31)
+
+Built as §16 with these differences: the disconnect body is `{expectedVersion}` like every
+other integrations route; `integrations::departure` takes which channels end (`Leaving`), so
+losing only the WhatsApp grant ends only the number while archive and suspension end every
+channel; all two-workspace paths (archive, sign-up release, the Super Admin editing an Admin)
+lock through `workspaces::lock_all`, organisation first (W-M1); migration 0087.
+
+Separate security review of the diff: no High or Medium findings. Fixed before commit: **L1**
+only Twilio's 401 marks the company account for reconnecting (`twilio/status.rs`); a rate
+limit or server error is temporary and other 4xx answers ("senders not enabled") leave the
+account healthy; **L2** clearing sample data now ends the sample staff's channels. Carried
+forward: **L3** a number moved to another company's Twilio account stays active for the first
+company until disconnected; recheck it when sends fail (21606/63007) or the senders list is
+read, and give the Super Admin a release action (W1b/W2a). **L4** an API test that losing only
+the WhatsApp grant keeps the member's mailbox (the code is correct). **L5** tie a number's
+`connection_id` to its workspace with a composite foreign key.

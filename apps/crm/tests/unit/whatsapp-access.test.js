@@ -62,7 +62,7 @@ test('WhatsApp number calls use scoped, encoded paths and CSRF on every change',
   });
   assert.equal(off.url, `${base}/n%201/disconnect`);
   assert.equal(off.options.method, 'POST');
-  assert.deepEqual(JSON.parse(off.options.body), { version: 3 });
+  assert.deepEqual(JSON.parse(off.options.body), { expectedVersion: 3 });
   for (const read of [list, senders]) assert.equal(read.options.headers['X-CSRF-Token'], undefined);
   for (const change of [give, off])
     assert.equal(change.options.headers['X-CSRF-Token'], 'anti-forgery');

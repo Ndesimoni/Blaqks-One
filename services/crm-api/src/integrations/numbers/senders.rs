@@ -22,6 +22,8 @@ use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
 pub const NO_TWILIO: &str = "Connect the company's Twilio account first.";
+const NOT_LISTED: &str =
+    "Twilio did not list this account's WhatsApp senders. Check that WhatsApp is enabled for the account in Twilio.";
 pub const RECONNECT: &str =
     "Twilio no longer accepts the company's Auth Token. Reconnect the Twilio account.";
 
@@ -73,6 +75,8 @@ pub async fn read(
             tx.commit().await?;
             Err(ApiError::invalid(RECONNECT))
         }
+        // Senders not enabled or not listed: the account stays healthy (review L1).
+        Err(Failure::Invalid) => Err(ApiError::invalid(NOT_LISTED)),
         Err(_) => Err(twilio::connect::unavailable()),
     }
 }

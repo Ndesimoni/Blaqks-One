@@ -73,6 +73,17 @@ export const channelActions = {
     icon: 'close',
     tone: 'danger',
   },
+  // A member's WhatsApp number (W1a); the event names neither the number nor the member.
+  number_connected: {
+    labelKey: 'channels.activity.action.number_connected',
+    icon: 'link',
+    tone: 'positive',
+  },
+  number_disconnected: {
+    labelKey: 'channels.activity.action.number_disconnected',
+    icon: 'close',
+    tone: 'danger',
+  },
 };
 
 const fallback = { label: 'Changed', verb: 'changed', icon: 'info', tone: 'neutral' };

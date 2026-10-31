@@ -5,7 +5,7 @@
 //! check the SID and token shapes first, so neither can alter a URL.
 use crate::{
     config::twilio_settings::TwilioConfig,
-    integrations::google::oauth::{bounded, client, read, Failure},
+    integrations::google::oauth::{bounded, client, Failure},
 };
 use serde::{de::DeserializeOwned, Deserialize};
 
@@ -51,7 +51,7 @@ pub async fn account(config: &TwilioConfig, sid: &str, token: &str) -> Result<Ac
         .basic_auth(sid, Some(token))
         .send()
         .await;
-    read(sent).await
+    large(sent).await
 }
 
 /// The account's WhatsApp senders, following Twilio's next-page links for at most
@@ -98,18 +98,13 @@ pub fn same_list(config: &TwilioConfig, next: &str) -> bool {
         && next.fragment().is_none()
 }
 
-/// As `oauth::read`, with room for a full page: 4xx is `Refused`, anything else unusable
-/// is `Unavailable`.
+/// As `oauth::read`, with room for a full page; failures follow [`status::failure`].
 async fn large<T: DeserializeOwned>(
     sent: Result<reqwest::Response, reqwest::Error>,
 ) -> Result<T, Failure> {
     let response = sent.map_err(|_| Failure::Unavailable)?;
-    let status = response.status();
-    if status.is_client_error() {
-        return Err(Failure::Refused);
-    }
-    if !status.is_success() {
-        return Err(Failure::Unavailable);
+    if let Some(failure) = super::status::failure(response.status()) {
+        return Err(failure);
     }
     serde_json::from_slice(&bounded(response, MAX_PAGE_BYTES).await?)
         .map_err(|_| Failure::Unavailable)

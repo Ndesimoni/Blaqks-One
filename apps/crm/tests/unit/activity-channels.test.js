@@ -3,7 +3,10 @@ import test from 'node:test';
 import { readFilters, requestParams } from '../../src/features/server/activity/activityFilters.js';
 import { groupRepeats } from '../../src/features/server/activity/activityGrouping.js';
 import { describe } from '../../src/features/server/activity/activityModel.js';
-import { actionOptions } from '../../src/features/server/activity/activityVocabulary.js';
+import {
+  actionOptions,
+  channelActions,
+} from '../../src/features/server/activity/activityVocabulary.js';
 import { readActivityPage } from '../../src/features/server/activity/useActivityFeed.js';
 import { isConnectedSection } from '../../src/features/server/sectionStatus.js';
 import { catalogs } from '../../src/i18n/catalogs/index.js';
@@ -42,7 +45,7 @@ test('a channel event reads as the actor, the action and the channel name only',
   assert.equal(other.verb, 'disconnected');
   assert.equal(other.object, 'TikTok');
   assert.equal(other.tone, 'danger');
-  for (const action of ['connected', 'reconnected', 'reconnect_required', 'disconnected']) {
+  for (const action of Object.keys(channelActions)) {
     assert.notEqual(t(`channels.activity.verb.${action}`), `channels.activity.verb.${action}`);
   }
 });
@@ -65,6 +68,8 @@ test('channel filters exist only for the company Admin and never send a section'
     'reconnected',
     'reconnect_required',
     'disconnected',
+    'number_connected',
+    'number_disconnected',
   ]);
   assert.ok(values(actionOptions('', true, true)).includes('reconnect_required'));
   assert.ok(!values(actionOptions('', true, false)).includes('reconnect_required'));
