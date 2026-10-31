@@ -56,8 +56,11 @@ pub async fn archive(
     .execute(&mut *transaction)
     .await?;
     sessions::revoke_all(&mut transaction, &ids).await?;
-    // Their mailboxes end with their accounts (messaging design §3, review M1).
-    crate::integrations::departure(&mut transaction, &scope.target_workspace, &ids, actor).await?;
+    // Their mailboxes, addresses and WhatsApp numbers end with their accounts (messaging
+    // design §3, review M1; WhatsApp design §4), in their own company workspace (W-M1).
+    let leaving = crate::integrations::Leaving::ALL;
+    let target = &scope.target_workspace;
+    crate::integrations::departure(&mut transaction, target, &ids, leaving, actor).await?;
     // An Admin archive also ends the company's channels, releasing its domain and numbers.
     if admin {
         crate::integrations::company_archived(&mut transaction, &scope.target_workspace, actor)

@@ -63,7 +63,7 @@ pub async fn read<T: DeserializeOwned>(
 }
 
 /// The body in chunks, so one without a length can never grow past the limit (L1).
-pub(super) async fn bounded(
+pub(in crate::integrations) async fn bounded(
     mut response: reqwest::Response,
     max: usize,
 ) -> Result<Vec<u8>, Failure> {

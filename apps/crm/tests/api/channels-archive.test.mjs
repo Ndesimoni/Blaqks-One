@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { archive, archiveReview } from './archive-helpers.mjs';
-import { connect } from './channels-helpers.mjs';
+import { connect, twilioSid } from './channels-helpers.mjs';
 import { login, query } from './helpers.mjs';
 import { connectSendgrid, freshAdmin } from './sendgrid-helpers.mjs';
 import { findMember } from './team-helpers.mjs';
@@ -12,9 +12,9 @@ test('archiving an Admin disconnects every company channel and releases its acco
   const admin = await freshAdmin('channels-archive-admin');
   const workspace = admin.user.workspaceId;
   const domain = 'archive-release.example.test';
-  const number = '+971500004545';
+  const account = twilioSid('4545');
   assert.equal((await connectSendgrid(admin, domain)).status, 201);
-  const line = await connect(admin, { externalAccountId: number });
+  const line = await connect(admin, { externalAccountId: account });
   assert.equal(line.status, 201, JSON.stringify(line.value));
   const owner = await login('owner');
   const review = await archiveReview(owner, owner, await findMember(owner, admin.user.id));
@@ -30,9 +30,9 @@ test('archiving an Admin disconnects every company channel and releases its acco
      WHERE workspace_id='${workspace}' AND action='disconnected' AND actor_id='${owner.user.id}'`,
   );
   assert.equal(history, '2', 'each disconnect is recorded with the Super Admin as actor');
-  // The domain and the number are free for the company that really owns them.
+  // The domain and the Twilio account are free for the company that really owns them.
   const next = await freshAdmin('channels-archive-next');
   assert.equal((await connectSendgrid(next, domain)).status, 201);
-  const again = await connect(next, { externalAccountId: number });
+  const again = await connect(next, { externalAccountId: account });
   assert.equal(again.status, 201, JSON.stringify(again.value));
 });

@@ -1,5 +1,5 @@
-/** The messaging API suites (chat, media, mailboxes, SendGrid, channels, Inbox), run in
- * this order after the CRM suites in crm-api-test-files.mjs. */
+/** The messaging API suites (chat, media, mailboxes, SendGrid, channels, WhatsApp, Inbox),
+ * run in this order after the CRM suites in crm-api-test-files.mjs. */
 export const messagingTestFiles = [
   'apps/crm/tests/api/chat.test.mjs',
   'apps/crm/tests/api/chat-groups.test.mjs',
@@ -26,6 +26,10 @@ export const messagingTestFiles = [
   'apps/crm/tests/api/channels-lifecycle.test.mjs',
   'apps/crm/tests/api/activity-channels.test.mjs',
   'apps/crm/tests/api/webhooks.test.mjs',
+  'apps/crm/tests/api/whatsapp-account.test.mjs',
+  'apps/crm/tests/api/whatsapp-numbers.test.mjs',
+  'apps/crm/tests/api/whatsapp-number-access.test.mjs',
+  'apps/crm/tests/api/whatsapp-hooks.test.mjs',
   'apps/crm/tests/api/inbox.test.mjs',
   'apps/crm/tests/api/inbox-assign.test.mjs',
   'apps/crm/tests/api/inbox-triage.test.mjs',

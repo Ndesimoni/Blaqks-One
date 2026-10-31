@@ -1,7 +1,8 @@
-//! Disconnecting a mailbox and owing its revocation to the provider (security review M1,
-//! L3). Every disconnect, by the member, the Admin, or because the member left or lost the
-//! email grant, clears the connection in the caller's transaction and queues the sealed
-//! token unchanged. `drain` revokes after commit and the messaging worker retries.
+//! Disconnecting a connection and owing a mailbox's revocation to the provider (security
+//! review M1, L3). Every disconnect, by the member, the Admin, or because the member left
+//! or lost the email grant (`departure.rs`), clears the connection in the caller's
+//! transaction and queues the sealed token unchanged. `drain` revokes after commit and the
+//! messaging worker retries.
 use super::{crypto, google::oauth, model::ConnectionRow, store_write};
 use crate::{
     config::{google_settings::GoogleConfig, messaging_settings::MessagingKey},
@@ -32,6 +33,10 @@ pub async fn disconnect(
     .bind(row.id)
     .execute(&mut **tx)
     .await?;
+    // The company's Twilio account takes every member's number with it (W1a, §4.5).
+    if row.provider == "twilio" {
+        super::numbers::write::end_connection(tx, &row.workspace_id, row.id, actor).await?;
+    }
     let updated = store_write::set_disconnected(tx, &row.workspace_id, row.id, actor).await?;
     store_write::event(tx, &row.workspace_id, row.id, "disconnected", actor).await?;
     Ok(updated)
@@ -50,21 +55,6 @@ pub async fn cancel_for(tx: &mut Transaction<'_, Postgres>, address: &str) -> Ap
     .execute(&mut **tx)
     .await?;
     Ok(())
-}
-
-/// The members' live mailboxes end with their access: archive, suspension or losing the
-/// email grant. Called by `team` inside its own transaction (service boundaries).
-pub async fn departure(
-    tx: &mut Transaction<'_, Postgres>,
-    workspace: &str,
-    members: &[Uuid],
-    actor: Uuid,
-) -> ApiResult<()> {
-    let rows = super::store::member_mailboxes(tx, workspace, members).await?;
-    for row in &rows {
-        disconnect(tx, row, actor).await?;
-    }
-    super::addresses::write::reserve_members(tx, workspace, members, actor).await
 }
 
 /// Revokes what is due. A row that cannot be opened (an unknown key version) is dropped,

@@ -43,12 +43,7 @@ pub async fn release(
     let Some((workspace, target_workspace)) = scope else {
         return Ok(false);
     };
-    let mut workspace_ids = vec![&workspace, &target_workspace];
-    workspace_ids.sort_unstable();
-    workspace_ids.dedup();
-    for workspace_id in workspace_ids {
-        workspaces::lock(transaction, workspace_id).await?;
-    }
+    workspaces::lock_all(transaction, &[&workspace, &target_workspace]).await?;
     let eligible: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM crm_users u JOIN crm_team_invitations i ON i.user_id=u.id \
          WHERE u.id=$1 AND u.email=$2 AND u.role IN ('staff','admin') AND NOT u.active \

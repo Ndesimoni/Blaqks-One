@@ -28,8 +28,8 @@ pub async fn update(
     let mut transaction = state.pool.begin().await?;
     workspaces::lock(&mut transaction, &workspace).await?;
     workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None, None).await?;
-    // A suspended company keeps its seats as they are. The owner row lock serialises with
-    // a suspension, which takes the Super Admin's workspace lock, not this one.
+    // A suspended company keeps its seats as they are. A suspension takes the Super Admin's
+    // workspace lock and then this one (W-M1); the owner row lock serialises with it too.
     let company_owner = workspaces::owner_of(&mut transaction, &workspace).await?;
     accounts::lock_active_admin(&mut transaction, company_owner).await?;
     let current = company::get(&mut *transaction, &workspace).await?;

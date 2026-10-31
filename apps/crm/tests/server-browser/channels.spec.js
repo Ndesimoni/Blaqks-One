@@ -2,6 +2,7 @@ import { test, expect } from './fixtures.js';
 import { signIn, session } from './helpers.js';
 import { noPageOverflow, setTheme } from './assign-helpers.js';
 import { query } from '../api/helpers.mjs';
+import { twilioSid, twilioToken } from '../api/channels-helpers.mjs';
 
 const card = (page, name) => page.getByRole('article', { name, exact: true });
 
@@ -24,19 +25,21 @@ test('an Admin connects, reconnects and disconnects a channel', async ({ page })
   await whatsapp.getByRole('button', { name: 'Connect', exact: true }).click();
   const form = page.getByRole('form', { name: 'Connect WhatsApp' });
   await form.getByLabel('Display label').fill('Studio line');
-  await form.getByLabel('Account ID or address').fill('+971500000777');
-  await form.getByLabel('Credential or access token').fill('synthetic-browser-secret');
+  // The company's Twilio account (W1a), proven by the loopback Twilio stand-in.
+  const token = twilioToken();
+  await form.getByLabel('Account ID or address').fill(twilioSid('0777'));
+  await form.getByLabel('Credential or access token').fill(token);
   await form.getByRole('button', { name: 'Connect account' }).click();
   await expect(page.getByText('Studio line is connected.')).toBeVisible();
   await expect(whatsapp.getByText('Connected', { exact: true })).toBeVisible();
   await expect(whatsapp).toContainText('Account ending 0777');
-  await expect(whatsapp).not.toContainText('synthetic-browser-secret');
+  await expect(whatsapp).not.toContainText(token);
   await page.reload();
   await expect(card(page, 'WhatsApp')).toContainText('Studio line');
 
   await card(page, 'WhatsApp').getByRole('button', { name: 'Reconnect', exact: true }).click();
   const renew = page.getByRole('form', { name: 'Reconnect WhatsApp' });
-  await renew.getByLabel('Credential or access token').fill('another-synthetic-secret');
+  await renew.getByLabel('Credential or access token').fill(twilioToken());
   await renew.getByRole('button', { name: 'Save credential' }).click();
   await expect(page.getByText('Studio line is reconnected.')).toBeVisible();
 
@@ -64,8 +67,8 @@ test('channels remain usable at 390px and 1280px in both themes', async ({ page 
         channel: 'whatsapp',
         provider: 'twilio',
         label: 'Responsive line',
-        externalAccountId: '+971500000888',
-        credential: 'synthetic-responsive-secret',
+        externalAccountId: twilioSid('0888'),
+        credential: twilioToken(),
       },
     },
   });

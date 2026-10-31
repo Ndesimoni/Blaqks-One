@@ -38,18 +38,22 @@ test('a writer authenticated before owner suspension rechecks the live owner aft
   const before = snapshot(workspace);
   const member = await findMember(owner, admin.user.id);
   const release = await holdWorkspaceLock(workspace);
-  let writing;
+  let suspending, writing;
   try {
-    writing = putCompany(admin, companyBody());
-    await waitForWorkspaceQueue(1);
-    const suspended = await owner.request(teamPath(owner, member.id), {
+    // Suspending an Admin also takes their company lock, after the organisation's (WhatsApp
+    // design W-M1), so the suspension queues first and the authenticated write behind it.
+    suspending = owner.request(teamPath(owner, member.id), {
       method: 'PATCH',
       body: memberUpdate(member, { active: false }),
     });
-    assert.equal(suspended.status, 200, JSON.stringify(suspended.value));
+    await waitForWorkspaceQueue(1);
+    writing = putCompany(admin, companyBody());
+    await waitForWorkspaceQueue(2);
   } finally {
     await release();
   }
+  const suspended = await suspending;
+  assert.equal(suspended.status, 200, JSON.stringify(suspended.value));
   assert.equal((await writing).status, 403);
   assert.equal(snapshot(workspace), before);
   assert.equal((await admin.request(`/workspaces/${workspace}/company`)).status, 401);

@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
 import { add } from './assignment-helpers.mjs';
 import { activityPath, activityTeams, allPages, assertShape, feed } from './activity-helpers.mjs';
-import { channelPath, connect } from './channels-helpers.mjs';
+import { channelPath, connect, twilioSid, twilioToken } from './channels-helpers.mjs';
 import { login } from './helpers.mjs';
 
-const ACCOUNT = '+971500000431';
+const ACCOUNT = twilioSid('0431');
 const LABEL = 'Activity studio line';
-const SECRET = 'activity-synthetic-secret';
+const SECRET = twilioToken();
+const RENEWED = twilioToken();
 let teams;
 let events;
 
@@ -23,7 +24,7 @@ before(async () => {
   const item = channelPath(admin, `/${made.value.connection.id}`);
   const renewed = await admin.request(`${item}/reconnect`, {
     method: 'POST',
-    body: { expectedVersion: 1, credential: `${SECRET}-2` },
+    body: { expectedVersion: 1, credential: RENEWED },
   });
   assert.equal(renewed.status, 200, JSON.stringify(renewed.value));
   const gone = await admin.request(item, { method: 'DELETE', body: { expectedVersion: 2 } });
@@ -58,7 +59,9 @@ test('the Admin sees redacted channel events newest first', () => {
     assert.equal(item.collection, null);
   }
   const text = JSON.stringify(events);
-  for (const secret of [ACCOUNT, '0431', LABEL, SECRET]) assert.ok(!text.includes(secret), secret);
+  for (const secret of [ACCOUNT, '0431', LABEL, SECRET, RENEWED]) {
+    assert.ok(!text.includes(secret), secret);
+  }
 });
 
 test('the unfiltered feed merges channel, team and record events once each', async () => {

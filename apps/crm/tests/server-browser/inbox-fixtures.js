@@ -1,12 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import { query } from '../api/helpers.mjs';
+import { twilioToken } from '../api/channels-helpers.mjs';
 
 /** Removes a workspace's conversations (messages, notes and reads cascade). */
 export function clearInbox(workspace) {
   query(`DELETE FROM inbox.crm_inbox_conversations WHERE workspace_id='${workspace}'`);
 }
 
-/** A live stub WhatsApp connection for the workspace, made through the Channels API. */
+/**
+ * A live WhatsApp connection for the workspace, made through the Channels API with a
+ * synthetic Twilio Account SID (`account`) that the loopback Twilio stand-in proves.
+ */
 export async function connectWhatsapp(page, identity, account) {
   const workspace = identity.user.workspaceId;
   query(`UPDATE integrations.crm_channel_connections
@@ -21,7 +25,7 @@ export async function connectWhatsapp(page, identity, account) {
         provider: 'twilio',
         label: 'Inbox test line',
         externalAccountId: account,
-        credential: 'synthetic-inbox-secret',
+        credential: twilioToken(),
       },
     },
   });

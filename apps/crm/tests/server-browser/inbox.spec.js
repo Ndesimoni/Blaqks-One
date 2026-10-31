@@ -2,6 +2,7 @@ import { test, expect } from './fixtures.js';
 import { signIn, session } from './helpers.js';
 import { noPageOverflow, setTheme } from './assign-helpers.js';
 import { clearInbox, connectWhatsapp, seedConversation } from './inbox-fixtures.js';
+import { twilioSid } from '../api/channels-helpers.mjs';
 
 let ids;
 let me;
@@ -12,7 +13,7 @@ test.beforeEach(async ({ page }) => {
   const workspace = identity.user.workspaceId;
   me = identity.user.id;
   clearInbox(workspace);
-  await connectWhatsapp(page, identity, '+971500000466');
+  await connectWhatsapp(page, identity, twilioSid('0466'));
   ids = {
     enquiry: seedConversation(workspace, {
       suggested: true,

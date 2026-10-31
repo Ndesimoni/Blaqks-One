@@ -21,6 +21,21 @@ pub async fn lock(
     Ok(())
 }
 
+/// Locks several workspaces in the one order every caller uses, so no two transactions
+/// can deadlock: the organisation first, then the others by ID (WhatsApp design §4 W-M1).
+pub async fn lock_all(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspaces: &[&str],
+) -> ApiResult<()> {
+    let mut ordered = workspaces.to_vec();
+    ordered.sort_unstable_by_key(|workspace| (*workspace != ORGANISATION, *workspace));
+    ordered.dedup();
+    for workspace in ordered {
+        lock(transaction, workspace).await?;
+    }
+    Ok(())
+}
+
 /// Creates workspace `id` owned by `owner` inside the caller's transaction; workspaces
 /// owns `crm_workspaces` (service-boundaries C5).
 pub async fn create(

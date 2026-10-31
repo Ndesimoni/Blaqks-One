@@ -1,5 +1,12 @@
 //! Sign-up settings read by `Config::from_env` (packets R1 and R2).
-use super::TurnstileConfig;
+
+#[derive(Clone)]
+pub struct TurnstileConfig {
+    pub secret: String,
+    pub site_key: String,
+    pub hostname: String,
+    pub endpoint: String,
+}
 
 const DEV_SECRET: &str = "local-development-digest-secret";
 const SITEVERIFY: &str = "https://challenges.cloudflare.com/turnstile/v0/siteverify";

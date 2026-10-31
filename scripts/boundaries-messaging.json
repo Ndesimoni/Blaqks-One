@@ -16,7 +16,12 @@
       "crm_sendgrid_addresses",
       "crm_sendgrid_addresses_local",
       "crm_sendgrid_addresses_member",
-      "crm_sendgrid_webhooks"
+      "crm_sendgrid_webhooks",
+      "crm_channel_connections_twilio_company",
+      "crm_whatsapp_numbers",
+      "crm_whatsapp_numbers_phone",
+      "crm_whatsapp_numbers_member",
+      "crm_whatsapp_numbers_connection"
     ],
     "chat": [
       "crm_chat_rooms",

@@ -40,18 +40,22 @@ test('a queued limit write rechecks the company owner after suspension', async (
   const before = snapshot(workspace);
   const member = await findMember(owner, admin.user.id);
   const release = await holdWorkspaceLock(workspace);
-  let changing;
+  let suspending, changing;
   try {
-    changing = changeLimit(owner, workspace, 4, 1);
-    await waitForWorkspaceQueue(1);
-    const suspended = await owner.request(teamPath(owner, member.id), {
+    // Suspending an Admin also takes their company lock, after the organisation's (WhatsApp
+    // design W-M1), so the suspension queues first and the limit write behind it.
+    suspending = owner.request(teamPath(owner, member.id), {
       method: 'PATCH',
       body: memberUpdate(member, { active: false }),
     });
-    assert.equal(suspended.status, 200, JSON.stringify(suspended.value));
+    await waitForWorkspaceQueue(1);
+    changing = changeLimit(owner, workspace, 4, 1);
+    await waitForWorkspaceQueue(2);
   } finally {
     await release();
   }
+  const suspended = await suspending;
+  assert.equal(suspended.status, 200, JSON.stringify(suspended.value));
   assert.equal((await changing).status, 403);
   assert.equal(snapshot(workspace), before);
 });

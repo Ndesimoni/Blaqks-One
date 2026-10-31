@@ -3,11 +3,10 @@ import { resolve } from 'node:path';
 import { checkExpiredSignupRemoved, seedExpiredSignup } from './check-signup-cleanup.mjs';
 import { checkSignupOff } from './check-signup-off.mjs';
 import { selectedApiTestFiles } from './crm-api-test-files.mjs';
-import { FAKE_GOOGLE_PORT, FAKE_SENDGRID_PORT, testEnv } from './crm-test-env.mjs';
+import { testEnv } from './crm-test-env.mjs';
 import { createFixtures, raiseFixtureSeats } from './crm-test-fixtures.mjs';
-import { startFakeGoogle } from './fake-google.mjs';
-import { startFakeSendgrid } from './fake-sendgrid.mjs';
-import { ensurePortFree, run, startWorker, stop, waitForApi } from './crm-test-processes.mjs';
+import { run, startWorker, stop, waitForApi } from './crm-test-processes.mjs';
+import { startStandins } from './crm-test-standins.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
 // Optional API_TEST_FILES (comma-separated) narrows the API suites; see crm-api-test-files.mjs.
@@ -16,8 +15,7 @@ const { project, env } = testEnv();
 const compose = ['compose', '-f', 'compose.test.yaml', '-p', project];
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 let server;
-let google;
-let sendgrid;
+let standins;
 let worker;
 let containerStarted = false;
 try {
@@ -40,16 +38,7 @@ try {
   });
   env.CRM_MEDIA_ENDPOINT = `http://127.0.0.1:${storage.split(':').at(-1)}`;
   await createFixtures(binary, env);
-  await ensurePortFree('127.0.0.1', 8790);
-  await ensurePortFree('127.0.0.1', FAKE_GOOGLE_PORT);
-  await ensurePortFree('127.0.0.1', FAKE_SENDGRID_PORT);
-  sendgrid = await startFakeSendgrid({ port: FAKE_SENDGRID_PORT });
-  google = await startFakeGoogle({
-    port: FAKE_GOOGLE_PORT,
-    clientId: env.CRM_GOOGLE_CLIENT_ID,
-    clientSecret: env.CRM_GOOGLE_CLIENT_SECRET,
-    redirectUri: `${env.CRM_APP_ORIGIN}/api/crm/integrations/google/callback`,
-  });
+  standins = await startStandins(env);
   await checkSignupOff(binary, env);
   seedExpiredSignup(compose);
   server = spawn(binary, [], { env, stdio: 'inherit' });
@@ -134,8 +123,7 @@ try {
 } finally {
   await stop(worker);
   await stop(server);
-  await google?.close();
-  await sendgrid?.close();
+  await standins?.close();
   if (containerStarted) {
     try {
       await run('docker', [...compose, 'down'], env);

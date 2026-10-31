@@ -13,12 +13,17 @@ pub mod media_settings;
 #[path = "config_sendgrid.rs"]
 pub mod sendgrid_settings;
 
+#[path = "config_twilio.rs"]
+pub mod twilio_settings;
+
 use google_settings::GoogleConfig;
 use media_settings::MediaConfig;
 use messaging_settings::{messaging_key, MessagingKey};
 use sendgrid_settings::SendgridConfig;
+pub use signup_settings::TurnstileConfig;
 use signup_settings::{client_secret, turnstile_config, worker_enabled};
 use std::{env, net::SocketAddr};
+use twilio_settings::TwilioConfig;
 use url::Url;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -47,14 +52,8 @@ pub struct Config {
     pub media: Option<MediaConfig>,
     /// SendGrid's API address (E3); each company brings its own key.
     pub sendgrid: SendgridConfig,
-}
-
-#[derive(Clone)]
-pub struct TurnstileConfig {
-    pub secret: String,
-    pub site_key: String,
-    pub hostname: String,
-    pub endpoint: String,
+    /// Twilio's hosts (WhatsApp W1); each company brings its own account and token.
+    pub twilio: TwilioConfig,
 }
 
 impl Config {
@@ -90,6 +89,7 @@ impl Config {
         let google = google_settings::from_env(&origin, !secure_cookie)?;
         let media = media_settings::from_env(!secure_cookie)?;
         let sendgrid = sendgrid_settings::from_env(!secure_cookie)?;
+        let twilio = twilio_settings::from_env(!secure_cookie)?;
         Ok(Self {
             database_url,
             origin,
@@ -105,6 +105,7 @@ impl Config {
             google,
             media,
             sendgrid,
+            twilio,
         })
     }
 }

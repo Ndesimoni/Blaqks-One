@@ -1,5 +1,6 @@
 //! `POST /channels` (docs/messaging-integrations-plan.md §4 X1): connect an account
-//! through the local stub, or a SendGrid account (E3a); the list is in `listing.rs`.
+//! through the local stub, a SendGrid account (E3a) or a Twilio account (W1a); the list
+//! is in `listing.rs`.
 use super::{
     access, crypto,
     model::{Channel, Provider},
@@ -72,18 +73,24 @@ pub async fn connect(
     let label = wire::text(wire::node(&connection, "label")?, 80)?;
     let external = wire::text(wire::node(&connection, "externalAccountId")?, 160)?;
     let credential = wire::secret(wire::node(&connection, "credential")?, 4096)?;
-    // A SendGrid account proves its key and domain with SendGrid (E3a); others use the stub.
-    let account = if provider == Provider::Sendgrid {
-        let config = &state.config.sendgrid;
-        super::sendgrid::connect::account(config, &label, &external, &credential).await?
-    } else {
-        provider::adapter(channel)
+    // SendGrid proves its key and domain (E3a), Twilio its Account SID and Auth Token
+    // (W1a), both with the provider; others use the stub.
+    let account = match provider {
+        Provider::Sendgrid => {
+            let config = &state.config.sendgrid;
+            super::sendgrid::connect::account(config, &label, &external, &credential).await?
+        }
+        Provider::Twilio => {
+            let config = &state.config.twilio;
+            super::twilio::connect::account(config, &label, &external, &credential).await?
+        }
+        _ => provider::adapter(channel)
             .connect(&ConnectInput {
                 label: &label,
                 external_account_id: &external,
                 credential: &credential,
             })
-            .map_err(ApiError::invalid)?
+            .map_err(ApiError::invalid)?,
     };
     let id = Uuid::new_v4();
     let aad = crypto::aad(

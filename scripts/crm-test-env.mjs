@@ -1,9 +1,11 @@
 // The isolated test run's environment (see test-crm-api.mjs). Every secret is random per
-// run; Google and SendGrid point at the loopback stand-ins in scripts/fake-*.mjs.
+// run; Google, SendGrid and Twilio point at the loopback stand-ins in scripts/fake-*.mjs.
 import { randomBytes } from 'node:crypto';
 
 export const FAKE_GOOGLE_PORT = 8791;
 export const FAKE_SENDGRID_PORT = 8792;
+// Beside the local development stand-ins on 8793 (SendGrid) and 8794 (Twilio).
+export const FAKE_TWILIO_PORT = 8795;
 export const TEST_ORIGIN = 'http://localhost:5175';
 
 export function testEnv() {
@@ -48,6 +50,9 @@ export function testEnv() {
     CRM_TEST_GOOGLE: `http://127.0.0.1:${FAKE_GOOGLE_PORT}`,
     CRM_SENDGRID_ENDPOINT: `http://127.0.0.1:${FAKE_SENDGRID_PORT}`,
     CRM_TEST_SENDGRID: `http://127.0.0.1:${FAKE_SENDGRID_PORT}`,
+    // Every Twilio host (account, senders) is the loopback stand-in; nothing reaches Twilio.
+    CRM_TWILIO_ENDPOINT: `http://127.0.0.1:${FAKE_TWILIO_PORT}`,
+    CRM_TEST_TWILIO: `http://127.0.0.1:${FAKE_TWILIO_PORT}`,
     // Where the SendGrid stand-in posts signed delivery events: the test API itself.
     CRM_PUBLIC_URL: 'http://127.0.0.1:8790',
   });

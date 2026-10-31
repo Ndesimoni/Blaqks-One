@@ -9,12 +9,15 @@ use crate::{
 use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
-/// Every action `crm_integration_events` records (migration 0031).
-pub const ACTIONS: [&str; 4] = [
+/// Every action `crm_integration_events` records (migrations 0031 and 0087). Number events
+/// name the company's WhatsApp connection, never the number or its member.
+pub const ACTIONS: [&str; 6] = [
     "connected",
     "reconnected",
     "reconnect_required",
     "disconnected",
+    "number_connected",
+    "number_disconnected",
 ];
 
 #[derive(FromRow)]

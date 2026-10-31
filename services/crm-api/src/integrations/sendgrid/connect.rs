@@ -6,12 +6,10 @@ use super::{account, api};
 use crate::{
     config::sendgrid_settings::SendgridConfig,
     error::{ApiError, ApiResult},
-    integrations::{google::oauth::Failure, provider::ConnectedAccount, store},
-    state::AppState,
+    integrations::{google::oauth::Failure, provider::ConnectedAccount},
 };
 use axum::http::StatusCode;
 use sqlx::{Postgres, Transaction};
-use uuid::Uuid;
 
 const REFUSED: &str = "SendGrid did not accept this key. Check it and try again.";
 const UNAVAILABLE: &str = "SendGrid could not be reached. Try again in a moment.";
@@ -53,25 +51,6 @@ pub async fn account(
         label: label.to_owned(),
         external_account_id: prove(config, domain, key).await?,
     })
-}
-
-/// Reconnect: a new key must still open the connection's own domain. `None` for other
-/// providers, and for a row that is missing here (the locked re-read then refuses it).
-pub async fn reconnect_proof(
-    state: &AppState,
-    workspace: &str,
-    id: Uuid,
-    key: &str,
-) -> ApiResult<Option<String>> {
-    let mut tx = state.pool.begin().await?;
-    let row = store::load(&mut tx, workspace, id).await?;
-    tx.commit().await?;
-    match row.filter(|row| row.provider == "sendgrid") {
-        Some(row) => Ok(Some(
-            prove(&state.config.sendgrid, &row.external_account_id, key).await?,
-        )),
-        None => Ok(None),
-    }
 }
 
 /// Refuses a second email system in the company, under the caller's workspace lock.

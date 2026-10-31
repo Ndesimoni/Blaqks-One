@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
-import { connect, connection, channelPath as path } from './channels-helpers.mjs';
+import {
+  connect,
+  connection,
+  channelPath as path,
+  twilioSid,
+  twilioToken,
+} from './channels-helpers.mjs';
 import { login, query, request } from './helpers.mjs';
 import { activate, invite } from './team-helpers.mjs';
 
@@ -9,6 +15,9 @@ let adminB;
 let superAdmin;
 let staff;
 let id;
+// The company's Twilio account (W1a): an Account SID and Auth Token the stand-in accepts.
+const SID = twilioSid('0001');
+const TOKEN = twilioToken();
 
 before(async () => {
   adminA = await login('admin-a');
@@ -18,7 +27,7 @@ before(async () => {
 });
 
 test('an Admin connects an account and the credential is sealed at rest', async () => {
-  const response = await connect(adminA);
+  const response = await connect(adminA, { externalAccountId: SID, credential: TOKEN });
   assert.equal(response.status, 201, JSON.stringify(response.value));
   id = response.value.connection.id;
   const view = response.value.connection;
@@ -29,11 +38,11 @@ test('an Admin connects an account and the credential is sealed at rest', async 
   assert.equal(view.ownerMemberId, null);
   assert.equal(view.accountHint, '••••0001');
   const text = JSON.stringify(response.value);
-  assert.ok(!text.includes('+971500000001'));
-  assert.ok(!text.includes('synthetic-credential'));
+  assert.ok(!text.includes(SID));
+  assert.ok(!text.includes(TOKEN));
   const stored = query(
     `SELECT count(*)||'|'||bool_and(credential_sealed IS NOT NULL)::text||'|'||
-       bool_and(position('synthetic-credential' IN encode(credential_sealed,'escape'))=0)::text
+       bool_and(position('${TOKEN}' IN encode(credential_sealed,'escape'))=0)::text
      FROM integrations.crm_channel_connections WHERE id='${id}'`,
   );
   assert.equal(stored, '1|true|true');
@@ -54,7 +63,7 @@ test('only the owning Admin can read or change connections', async () => {
   assert.equal((await superAdmin.request(path(adminA))).status, 403);
   const staffWrite = await staff.request(path(staff), {
     method: 'POST',
-    body: { connection: connection({ externalAccountId: '+971500000009' }) },
+    body: { connection: connection() },
   });
   assert.equal(staffWrite.status, 403);
   const foreign = await adminB.request(path(adminB, `/${id}`), {
@@ -65,16 +74,18 @@ test('only the owning Admin can read or change connections', async () => {
   const noCsrf = await request(path(adminA), {
     method: 'POST',
     cookie: adminA.cookie,
-    body: { connection: connection({ externalAccountId: '+971500000009' }) },
+    body: { connection: connection() },
   });
   assert.equal(noCsrf.status, 403);
 });
 
 test('an account and a channel cannot be connected twice', async () => {
-  const acrossCompanies = await connect(adminB, { externalAccountId: '+971500000001' });
+  // Twilio proves the second company's token too, so only a unique index stops it (the
+  // exact message is checked with fresh companies in whatsapp-account.test.mjs).
+  const acrossCompanies = await connect(adminB, { externalAccountId: SID });
   assert.equal(acrossCompanies.status, 409);
   assert.equal(acrossCompanies.value.code, 'conflict');
-  const sameChannel = await connect(adminA, { externalAccountId: '+971500000002' });
+  const sameChannel = await connect(adminA);
   assert.equal(sameChannel.status, 409, JSON.stringify(sameChannel.value));
   assert.equal(sameChannel.value.code, 'conflict');
 });

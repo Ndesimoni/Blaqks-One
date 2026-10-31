@@ -38,9 +38,8 @@ pub async fn reconnect(
     let expected = wire::version(&map)?;
     let credential = wire::secret(wire::node(&map, "credential")?, 4096)?;
     let id = access::id(&id)?;
-    // SendGrid proves a new key over the network, so before the workspace lock (E3a).
-    let proven =
-        super::sendgrid::connect::reconnect_proof(&state, &workspace, id, &credential).await?;
+    // SendGrid and Twilio prove a new credential over the network, before the lock.
+    let proven = super::proof::reconnect(&state, &workspace, id, &credential).await?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
     access::live_admin(&mut tx, &workspace, session.user.id).await?;
@@ -57,7 +56,7 @@ pub async fn reconnect(
             "Reconnect a Google mailbox with Google sign-in.",
         ));
     }
-    if row.provider == "sendgrid" {
+    if super::proof::proved(&row.provider) {
         if proven.as_deref() != Some(row.external_account_id.as_str()) {
             return Err(ApiError::stale(RELOAD));
         }
