@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { session } from './helpers.js';
+import { landWhereTestsBegin, session } from './helpers.js';
 import { saveRecordForm } from '../browser/helpers/record-form.js';
 import { openPage } from './product-nav.js';
 
@@ -32,7 +32,7 @@ export async function signInMember(page, email) {
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
+  await landWhereTestsBegin(page);
 }
 
 export async function memberPage(browser, email) {

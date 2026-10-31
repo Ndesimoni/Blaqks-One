@@ -15,7 +15,7 @@ export function ServerSignOut() {
     if (started.current) return;
     started.current = true;
     signOut()
-      .then(() => go('/clients', { replace: true }))
+      .then(() => go('/start', { replace: true }))
       .catch((failure) => setError(failure.message));
   }, [signOut, go, attempt]);
   return (

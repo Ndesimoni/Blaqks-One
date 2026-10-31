@@ -29,14 +29,8 @@ export function ServerDirectory() {
     return () => controller.abort();
   }, [api, attempt]);
   if (location.pathname === '/sign-out') return <ServerSignOut />;
-  if (location.pathname === '/') {
-    const first = user.permissions?.relationships
-      ? '/clients'
-      : user.permissions?.properties
-        ? '/properties'
-        : '/workspace';
-    return <Navigate to={`${first}${location.search}`} replace />;
-  }
+  // Every member lands on the start page (NAV1b, owner 2026-10-31).
+  if (location.pathname === '/') return <Navigate to={`/start${location.search}`} replace />;
   if (error)
     return (
       <ServerStatus

@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { landWhereTestsBegin } from './helpers.js';
 
 export async function openTeam(page) {
   await page.goto('/#/team-access');
@@ -38,6 +39,7 @@ export async function activateInNewContext(browser, link, email, password = 'Tea
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await landWhereTestsBegin(page);
   return { context, page };
 }
 

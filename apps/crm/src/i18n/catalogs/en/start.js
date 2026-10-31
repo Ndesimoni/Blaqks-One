@@ -1,0 +1,20 @@
+/** The start page after sign-in (NAV1b). Keys are referenced as `start.<key>`. */
+export default {
+  morning: 'Good morning',
+  afternoon: 'Good afternoon',
+  evening: 'Good evening',
+  greeting: '{greeting}, {name}',
+  intro: 'Choose where to work today.',
+  dueTasks: { one: 'follow-up due', other: 'follow-ups due' },
+  openLeads: { one: 'open lead', other: 'open leads' },
+  viewings: { one: 'upcoming viewing', other: 'upcoming viewings' },
+  'about.web': 'Your company website, with its listings, team profiles and enquiries.',
+  'about.market': 'Client requests from other brokers, your offers and your agreements.',
+  'about.platform': 'Companies, seat limits, marketplace applications and the Blaqks One site.',
+  open: 'Open {product}',
+  continue: 'Continue where you left off',
+  continueAction: 'Continue',
+  account: 'Account menu, {name}',
+  signOut: 'Sign out',
+  home: 'Home',
+};

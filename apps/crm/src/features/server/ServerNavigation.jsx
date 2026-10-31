@@ -20,7 +20,7 @@ export function ServerNavigation({ nav }) {
   const { mobileNav, setMobileNav } = useWorkspaceView();
   const mobile = useMediaQuery('(max-width: 1050px)');
   const products = visibleProducts(user);
-  const current = nav.here?.product || products[0]?.key;
+  const current = nav.here?.product || null;
   const select = (name) => {
     navigate(name);
     setMobileNav(false);
@@ -34,10 +34,12 @@ export function ServerNavigation({ nav }) {
         <ProductRail
           products={products}
           current={current}
-          sidebarOpen={nav.sidebarOpen}
+          sidebarOpen={nav.sectionsVisible}
+          home={route === 'Start'}
+          onHome={() => navigate('Start')}
           onOpen={nav.openProduct}
         />
-        {nav.sidebarOpen && sidebar}
+        {nav.sectionsVisible && sidebar}
       </>
     );
   if (!mobileNav) return null;
@@ -54,10 +56,12 @@ export function ServerNavigation({ nav }) {
       <ProductRail
         products={products}
         current={current}
+        home={route === 'Start'}
+        onHome={() => select('Start')}
         sidebarOpen
         onOpen={(key) => key !== current && nav.openProduct(key)}
       />
-      {sidebar}
+      {current && sidebar}
       <button
         className="navigation-close"
         aria-label="Close navigation"

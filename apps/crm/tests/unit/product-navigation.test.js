@@ -52,3 +52,13 @@ test('a product reopens on its remembered route only while that route is still a
   assert.equal(productEntry(staff, 'crm', 'Deals'), 'Dashboard');
   assert.equal(productEntry(admin, 'unknown'), null);
 });
+
+test('the start page greets by the time of day and the first name', async () => {
+  const { firstName, greetingKey } =
+    await import('../../src/features/server/products/startModel.js');
+  assert.equal(greetingKey(8), 'start.morning');
+  assert.equal(greetingKey(12), 'start.afternoon');
+  assert.equal(greetingKey(18), 'start.evening');
+  assert.equal(firstName('  Aidah  Simoni '), 'Aidah');
+  assert.equal(firstName(''), '');
+});

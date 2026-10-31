@@ -12,8 +12,34 @@ export async function signIn(page, account = 'admin-a') {
     page.getByRole('button', { name: 'Sign in', exact: true }).click(),
   ]);
   expect(response.status()).toBe(200);
+  // Everyone lands on the start page (NAV1b); these tests then work in Clients.
+  await expect(
+    page.getByRole('heading', { level: 1, name: /^Good (morning|afternoon|evening)/ }),
+  ).toBeVisible();
+  await page.goto('/#/clients');
   await expect(page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
+}
+
+/**
+ * Members land on the start page (NAV1b); the member tests always began on their first list,
+ * so this continues there: Clients, else Properties, else the workspace.
+ */
+export async function landWhereTestsBegin(page) {
+  await expect(page.getByRole('button', { name: /^Account menu/ })).toBeVisible();
+  const { user } = await session(page);
+  const first = user.permissions?.relationships
+    ? '/clients'
+    : user.permissions?.properties
+      ? '/properties'
+      : '/workspace';
+  await page.goto(`/#${first}`);
+}
+
+/** Signs out through the account menu on the person's initials (NAV1b). */
+export async function signOut(page) {
+  await page.getByRole('button', { name: /^Account menu/ }).click();
+  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
 }
 
 export async function addClient(page, id, name) {

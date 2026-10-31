@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { landWhereTestsBegin } from './helpers.js';
 
 export function teamCard(page, name) {
   return page.locator('[data-member-id]').filter({
@@ -31,6 +32,7 @@ export async function signInActivatedMember(page, email) {
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Team123!');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await landWhereTestsBegin(page);
   await expect(page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
 }
 

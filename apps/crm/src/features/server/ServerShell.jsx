@@ -32,7 +32,9 @@ export function ServerShell({ owner, workspaces }) {
   };
   return (
     <div
-      className={'app-shell connected-shell has-rail' + (nav.sidebarOpen ? '' : ' sections-hidden')}
+      className={
+        'app-shell connected-shell has-rail' + (nav.sectionsVisible ? '' : ' sections-hidden')
+      }
     >
       <a
         className="skip-link"
@@ -48,8 +50,8 @@ export function ServerShell({ owner, workspaces }) {
       <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
         <ServerHeader
           owner={platform ? { name: t('websites.platformTitle') } : owner}
-          sidebarOpen={nav.sidebarOpen}
-          onToggleSidebar={nav.toggleSidebar}
+          sidebarOpen={nav.sectionsVisible}
+          onToggleSidebar={nav.here ? nav.toggleSidebar : null}
         />
         <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
         <main className="main-content" id="main-content" tabIndex={-1}>
@@ -82,7 +84,9 @@ export function ServerShell({ owner, workspaces }) {
             </section>
           )}
           {/* The full-height tools keep accessible headings of their own. */}
-          {!fullHeight && <ServerPageHeading owner={owner} workspaces={workspaces} />}
+          {!fullHeight && route !== 'Start' && (
+            <ServerPageHeading owner={owner} workspaces={workspaces} />
+          )}
           <ServerContent owner={owner} />
           {!fullHeight && (
             <footer className="main-footer">

@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { signIn, addClient, session } from './helpers.js';
+import { signIn, addClient, session, signOut } from './helpers.js';
 import { teamCard } from './team-status-helpers.js';
 import { assignInBrowser } from './assign-helpers.js';
 import {
@@ -58,7 +58,7 @@ test('Admin invites a colleague with multiple positions who signs in to the shar
   await page.reload();
   await page.getByLabel('Search team').fill('Browser shared-staff');
   await expect(teamCard(page, 'Browser shared-staff')).toContainText('Active');
-  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await signOut(page);
   await expect(page.getByLabel('Email address')).toBeVisible();
   await signIn(page, 'admin-b');
   await openTeam(page);

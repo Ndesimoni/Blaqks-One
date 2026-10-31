@@ -41,7 +41,7 @@ export function canOpenSection(user, route) {
       user?.roleId === 'admin' ||
       (user?.roleId === 'staff' && user.channelAccess?.whatsapp === true)
     );
-  if (['Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'].includes(route))
+  if (['Start', 'Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'].includes(route))
     return true;
   if (route === 'Messages')
     return (

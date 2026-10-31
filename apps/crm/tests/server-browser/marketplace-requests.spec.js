@@ -16,7 +16,7 @@ import { expect, test } from './fixtures.js';
 async function openMember(browser, email) {
   const context = await browser.newContext();
   const page = await context.newPage();
-  const signOut = page.getByRole('button', { name: 'Sign out', exact: true });
+  const signOut = page.getByRole('button', { name: /^Account menu/ });
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await page.goto('/');
     try {

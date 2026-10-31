@@ -8,7 +8,7 @@ import { BOTTOM_PRODUCT } from './productModel.js';
  * The slim product rail (NAV): one button per product this person may open, Settings at the
  * bottom. The current product's button also hides or shows its section sidebar.
  */
-export function ProductRail({ products, current, sidebarOpen, onOpen }) {
+export function ProductRail({ products, current, sidebarOpen, onOpen, home, onHome }) {
   const { t } = useI18n();
   const button = (product) => {
     const here = product.key === current;
@@ -35,6 +35,15 @@ export function ProductRail({ products, current, sidebarOpen, onOpen }) {
       <div className="rail-brand" aria-hidden="true">
         <BrandMark />
       </div>
+      <button
+        type="button"
+        className={'rail-item' + (home ? ' active' : '')}
+        aria-current={home ? 'page' : undefined}
+        onClick={onHome}
+      >
+        <Icon name="home" size={20} />
+        <span>{t('start.home')}</span>
+      </button>
       {products.filter((product) => product.key !== BOTTOM_PRODUCT).map(button)}
       <span className="rail-spacer" />
       {bottom && button(bottom)}

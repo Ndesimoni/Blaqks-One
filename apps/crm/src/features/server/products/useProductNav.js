@@ -1,5 +1,6 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { locate, productEntry } from './productModel.js';
+import { rememberRoute } from './startModel.js';
 
 const SIDEBAR_KEY = 'kws-nav-sidebar';
 
@@ -29,6 +30,10 @@ export function useProductNav(user, route, navigate) {
   const lastRoute = useRef({});
   const here = locate(user, route);
   if (here) lastRoute.current[here.product] = route;
+  const inProduct = Boolean(here);
+  useEffect(() => {
+    if (inProduct) rememberRoute(route);
+  }, [inProduct, route]);
 
   const toggleSidebar = useCallback(() => {
     setSidebarOpen((open) => {
@@ -49,5 +54,12 @@ export function useProductNav(user, route, navigate) {
     [here?.product, navigate, toggleSidebar, user],
   );
 
-  return { here, sidebarOpen, toggleSidebar, openProduct };
+  // The start page has no sections, so the sidebar shows only inside a product.
+  return {
+    here,
+    sidebarOpen,
+    sectionsVisible: sidebarOpen && inProduct,
+    toggleSidebar,
+    openProduct,
+  };
 }

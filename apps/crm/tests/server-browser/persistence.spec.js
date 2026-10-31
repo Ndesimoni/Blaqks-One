@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { addClient, session, signIn } from './helpers.js';
+import { addClient, session, signIn, signOut } from './helpers.js';
 import { selectWorkspace } from './workspace-helpers.js';
 
 test('a client survives reload and another browser but remains private to its admin', async ({
@@ -17,7 +17,7 @@ test('a client survives reload and another browser but remains private to its ad
   await signIn(other);
   await other.getByLabel('Search Clients', { exact: true }).fill('BROWSER-PERSIST');
   await expect(other.getByRole('button', { name: 'Open record BROWSER-PERSIST' })).toBeVisible();
-  await other.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await signOut(other);
   await expect(other.getByLabel('Email address')).toBeVisible();
   await signIn(other, 'admin-b');
   await other.getByLabel('Search Clients', { exact: true }).fill('BROWSER-PERSIST');

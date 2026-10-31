@@ -37,6 +37,7 @@ import { IncomingShares } from './shares/IncomingShares.jsx';
 import { ShareLinkPage } from './shares/ShareLinkPage.jsx';
 import { SHARE_ROUTE } from './shares/shareModel.js';
 import { ServerWebsite } from './website/ServerWebsite.jsx';
+import { StartPage } from './products/StartPage.jsx';
 
 export function ServerContent({ owner }) {
   const { user } = useSession();
@@ -57,6 +58,7 @@ export function ServerContent({ owner }) {
         <p>Reports and messaging connections are still being developed.</p>
       </section>
     );
+  if (route === 'Start') return <StartPage />;
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
   if (['Website', 'Platform website'].includes(route))
     return <ServerWebsite key={route} platform={route === 'Platform website'} />;

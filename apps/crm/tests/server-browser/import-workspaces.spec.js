@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { signIn } from './helpers.js';
+import { signIn, signOut } from './helpers.js';
 import {
   migrationData,
   savedSource,
@@ -38,7 +38,7 @@ test('personal browser records require explicit owner mapping and are never copi
   expect(
     (await serverRecords(page)).Clients.some(({ record }) => record.client_id === 'PERSONAL-CL'),
   ).toBe(false);
-  await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await signOut(page);
   await signIn(page, 'admin-b');
   expect((await page.request.get(`/api/crm/workspaces/${target}/records`)).status()).toBe(403);
   await expect(page.getByRole('button', { name: 'Import saved records' })).toHaveCount(0);
