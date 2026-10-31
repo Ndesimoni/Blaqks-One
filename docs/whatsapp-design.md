@@ -337,3 +337,63 @@ connection-override and Senders API documentation. Findings and where they are a
 - **Low:** W-L1 signature details, §6; W-L2 token rotation, §4; W-L3 disconnect keeps the
   token for the webhook reset, §4; W-L4 a separate digest key and locking, §3 and §7; W-L5
   stand-in hosts, numbers and page, §9; W-L6 grant and suspension hooks, §4.
+
+## 16. W1a build plan (2026-10-31)
+
+Scope change: W1a does **not** point any sender's webhooks at the CRM, because the inbound
+route arrives in W2a and pointing a live number at a missing route would lose messages.
+Sender webhook setup, takeover confirmation, the disconnect reset (W-L3) and the next-token
+rotation for signature checks (W-L2) move to W2a. W1a reconnect simply proves a new token
+opens the same Account SID.
+
+**Backend (`integrations`).**
+
+- `config_twilio.rs`: `CRM_TWILIO_ENDPOINT`, loopback `http://` and local development only,
+  replacing the `api`, `messaging` and `content` Twilio hosts in one setting; refused otherwise.
+- `integrations/twilio/`: shape checks (`AC` + 32 lower-case hex SID, 32-hex token), the account
+  proof `GET /2010-04-01/Accounts/{sid}.json` (`200`, same `sid`, `status=active`), and the
+  senders list `GET /v2/Channels/Senders?Channel=whatsapp&PageSize=50` (at most 10 pages)
+  returning canonical E.164 phones with their status. Fixed messages, never Twilio's text.
+- The generic connect and reconnect for `provider = twilio` use this proof (as SendGrid does);
+  `external_account_id` is the SID; the sealed credential is the token.
+- Migration 0087: `integrations.crm_whatsapp_numbers` (§3) and the check
+  `provider <> 'twilio' OR (channel = 'whatsapp' AND owner_member_id IS NULL)`.
+- API, all under `/api/crm/workspaces/{ws}`, CSRF on writes, workspace lock, live checks:
+  - `GET /whatsapp-numbers` → `{numbers:[{id, memberId, phone, state, version, createdAt}]}`;
+    the owning Admin sees the company's active numbers, staff see only their own.
+  - `GET /whatsapp-numbers/senders` (owning Admin) → `{senders:[{phone, status, available}]}`
+    from Twilio; `available` = `ONLINE` and not active in any company.
+  - `POST /whatsapp-numbers` (owning Admin) `{memberId, phone}` → `201 {number}`; the member
+    must be live in the company with `channel_access.whatsapp` (the Admin may choose
+    themselves); the phone must be an available `ONLINE` sender; one active number per member;
+    "This number is already connected" never names the other company.
+  - `POST /whatsapp-numbers/{id}/disconnect` `{version}` → `{number}`; the owning Admin for any
+    number, a member for their own.
+- Hooks in one transaction: disconnecting the company Twilio connection disconnects its
+  numbers; archiving, suspending or removing a member's WhatsApp grant disconnects their number;
+  archiving an Admin disconnects every number of the company. Each hook acts on the member's own
+  company workspace (W-M1): when the Super Admin edits an Admin, `team` locks the organisation
+  workspace then the company workspace and passes the company workspace to
+  `integrations::departure`, which also fixes the same gap for E1a mailboxes.
+- Redacted integration events: `number_connected`, `number_disconnected` (no phone numbers).
+- Stand-in `scripts/fake-twilio.mjs` (`npm run dev:twilio`, port 8794; tests use their own
+  port): any well-formed SID with a well-formed token is an active account, except tokens
+  starting `0000` (refused) and SIDs ending `dead` (suspended); senders come from a small
+  configurable list of `+999…` numbers per SID, with one `OFFLINE`. The API harness starts it
+  and sets `CRM_TWILIO_ENDPOINT`.
+- Existing tests that connect WhatsApp through the generic route move to real SID/token shapes
+  against the stand-in; the stub webhook route keeps working for W2a's replacement.
+
+**CRM screens (product designer + frontend).**
+
+- Settings → Channels, WhatsApp card: connect the company Twilio account (Account SID, Auth
+  Token, with a short "where to find these in Twilio" hint), health, reconnect with a new token,
+  disconnect with a confirmation naming that every member's number disconnects.
+- Under the card, **Members' numbers** (owning Admin): each number with its member and a
+  Disconnect action; **Give a number** opens a dialog choosing a member with the WhatsApp grant
+  and an available Twilio sender, with plain explanations when none are available (register
+  the number as a WhatsApp sender in Twilio first) or the member lacks the grant.
+- Settings → **My WhatsApp** (each member with the grant): their number, or "Your Admin gives
+  you a WhatsApp number from the company's Twilio account", and Disconnect for their own.
+- Client functions in `apps/crm/src/services/crm/` next to the integrations client; English
+  catalogue; 390/1280 in both themes; browser specs for connect, give, disconnect and staff view.
