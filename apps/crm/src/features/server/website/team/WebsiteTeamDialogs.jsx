@@ -2,15 +2,19 @@ import React, { useRef, useState } from 'react';
 import { Icon } from '../../../../components/ui/Icon.jsx';
 import { useUnsavedChanges } from '../../../../hooks/useUnsavedChanges.js';
 import { FinanceDialog } from '../../finance/FinanceDialog.jsx';
+import { SocialLinkFields } from '../social/SocialLinkFields.jsx';
+import { SocialLinkList } from '../social/SocialLinkList.jsx';
+import { SOCIAL_FIELDS } from '../social/socialModel.js';
 import { WebsiteProfileFields } from './WebsiteProfileFields.jsx';
-import { PROFILE_FIELDS, formChanged, profileErrors, profileForm } from './websiteTeamModel.js';
+import { firstInvalid, formChanged, profileErrors, profileForm } from './websiteTeamModel.js';
 
-// Another member's public contacts: shown as text, saved unchanged (owner, 2026-10-30).
+// Another member's public contacts and links: shown as text, kept as saved (owner, 2026-10-30).
 const CONTACTS = ['publicWhatsApp', 'publicEmail'];
 
 /**
- * The Admin edits a person's public details. Consent is read-only here: only that person
- * agrees, from My profile, so the save always sends their saved consent unchanged.
+ * The Admin edits a person's public details. Consent, contacts and social links are read-only
+ * for someone else: only that person changes them, from My profile. The Admin's own row edits
+ * their own contacts and links here too.
  */
 export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMyProfile, t }) {
   const [initial] = useState(() => profileForm(row.profile, row.member.name));
@@ -23,11 +27,15 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
     setForm((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   };
+  const changeLink = (field, value) => {
+    setForm((current) => ({ ...current, social: { ...current.social, [field]: value } }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+  };
   const submit = () => {
     const found = profileErrors(form);
-    locked.forEach((field) => delete found[field]);
+    if (!row.own) [...CONTACTS, ...SOCIAL_FIELDS].forEach((field) => delete found[field]);
     setErrors(found);
-    const first = PROFILE_FIELDS.find((field) => found[field]);
+    const first = firstInvalid(found);
     if (first) return inputs.current[first]?.focus();
     return onSave(form);
   };
@@ -53,8 +61,21 @@ export function WebsiteProfileDialog({ row, busy, message, onClose, onSave, onMy
         onChange={change}
         t={t}
         locked={locked}
+        lockedExtra={<SocialLinkList values={form.social} title={t('websiteSocial.title')} />}
         lockedHint={t('websiteTeam.contacts.others', { name: row.member.name })}
       />
+      {row.own && (
+        <SocialLinkFields
+          idPrefix="wt-dialog-social"
+          legend={t('websiteSocial.ownLegend')}
+          hint={t('websiteSocial.hint')}
+          values={form.social}
+          errors={errors}
+          disabled={busy}
+          inputs={inputs}
+          onChange={changeLink}
+        />
+      )}
       <section className="wt-consent-note" aria-labelledby="wt-dialog-consent">
         <h3 id="wt-dialog-consent">{t('websiteTeam.dialog.consent')}</h3>
         <p className="wt-consent" data-state={consent ? 'given' : 'missing'}>

@@ -26,7 +26,8 @@ export default {
   'consent.own': 'Change in My profile',
   'consent.ownSetUp': 'Set up in My profile',
   'consent.others': 'Only {name} can agree to this, from My profile.',
-  'contacts.others': 'Only {name} changes their public WhatsApp and email, from My profile.',
+  'contacts.others':
+    'Only {name} changes their public WhatsApp, email and social links, from My profile.',
   'publishing.admin': 'Admin · always',
   'publishing.allowed': 'Allowed',
   'publishing.notAllowed': 'Not allowed',
@@ -82,7 +83,7 @@ export default {
   'own.title': 'Website profile',
   'own.description': 'How you appear on your company website and the Blaqks One website.',
   'own.consent':
-    'I agree that my name, specialty and the contacts above are shown on my company’s website and the Blaqks One website.',
+    'I agree that my name, specialty, contacts and social links above are shown on my company’s website and the Blaqks One website.',
   'own.public': { one: 'Public · {count} live listing', other: 'Public · {count} live listings' },
   'own.notSetUp': 'Not on the website yet',
   'own.waiting': 'Not public until you agree below',

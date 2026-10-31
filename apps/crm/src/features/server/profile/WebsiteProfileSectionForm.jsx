@@ -1,15 +1,16 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
+import { SocialLinkFields } from '../website/social/SocialLinkFields.jsx';
 import { WebsiteProfileFields } from '../website/team/WebsiteProfileFields.jsx';
 import * as model from '../website/team/websiteTeamModel.js';
-import { InlineConfirm } from './InlineConfirm.jsx';
+import { WebsiteProfileSectionFoot } from './WebsiteProfileSectionFoot.jsx';
 import { WebsiteProfileSectionStatus } from './WebsiteProfileSectionStatus.jsx';
 
 /**
- * The member's own public details and consent. Consent is given or withdrawn only here;
- * turning it off asks first, because the server takes the profile and listings down at once.
+ * The member's own public details, social links and consent. Consent is given or withdrawn
+ * only here; turning it off asks first, because the server takes the profile and listings
+ * down at once. Links save with the profile as the member's own (website-social-links.md).
  */
 export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
   const { profile, live } = own;
@@ -32,11 +33,18 @@ export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
   const changed = model.formChanged(form, saved);
   useUnsavedChanges(changed, busy);
   const k = (key, vars) => t(`websiteTeam.own.${key}`, vars);
-  const change = (field, value) => {
-    setForm((current) => ({ ...current, [field]: value }));
+  const edited = (field) => {
     setErrors((current) => ({ ...current, [field]: undefined }));
     setFailure(null);
     setStatus('');
+  };
+  const change = (field, value) => {
+    setForm((current) => ({ ...current, [field]: value }));
+    edited(field);
+  };
+  const changeLink = (field, value) => {
+    setForm((current) => ({ ...current, social: { ...current.social, [field]: value } }));
+    edited(field);
   };
   const reset = () => {
     setForm(saved);
@@ -49,7 +57,7 @@ export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
     if (busy || !changed) return;
     const found = model.profileErrors(form);
     setErrors(found);
-    const first = model.PROFILE_FIELDS.find((field) => found[field]);
+    const first = model.firstInvalid(found);
     if (first) return inputs.current[first]?.focus();
     if (profile?.consent && !form.consent && !confirming) return setConfirming(true);
     setBusy(true);
@@ -79,6 +87,18 @@ export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
           onChange={change}
           t={t}
         />
+        <div className="wp-social">
+          <SocialLinkFields
+            idPrefix="wp-social"
+            legend={t('websiteSocial.ownLegend')}
+            hint={`${t('websiteSocial.ownHint')} ${t('websiteSocial.hint')}`}
+            values={form.social}
+            errors={errors}
+            disabled={busy}
+            inputs={inputs}
+            onChange={changeLink}
+          />
+        </div>
         <label className="wp-consent">
           <input
             type="checkbox"
@@ -99,43 +119,17 @@ export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
           </div>
         )}
       </div>
-      <div className="acct-card-foot">
-        <div className="acct-foot-status">
-          <div aria-live="polite">
-            {status && (
-              <p className="acct-success">
-                <Icon name="check" size={15} />
-                {status}
-              </p>
-            )}
-          </div>
-          {!status && changed && !confirming && <p className="acct-muted">{k('unsaved')}</p>}
-        </div>
-        {confirming ? (
-          <InlineConfirm
-            label={k('offLabel')}
-            prompt={k('offPrompt', { count: live })}
-            confirmLabel={k('offConfirm')}
-            busy={busy}
-            onConfirm={submit}
-            onCancel={() => setConfirming(false)}
-          />
-        ) : (
-          <div className="acct-actions">
-            <Button variant="light" disabled={busy || !changed} onClick={reset}>
-              {k('discard')}
-            </Button>
-            <Button
-              type="submit"
-              className={busy ? 'acct-loading' : ''}
-              disabled={busy || !changed}
-              aria-busy={busy}
-            >
-              {busy ? k('saving') : k('save')}
-            </Button>
-          </div>
-        )}
-      </div>
+      <WebsiteProfileSectionFoot
+        status={status}
+        changed={changed}
+        confirming={confirming}
+        busy={busy}
+        live={live}
+        onConfirm={submit}
+        onCancel={() => setConfirming(false)}
+        onReset={reset}
+        t={t}
+      />
     </form>
   );
 }

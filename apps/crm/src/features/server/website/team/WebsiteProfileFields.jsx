@@ -11,7 +11,7 @@ const FIELDS = [
 ];
 
 /** Saved values someone else may not change: plain text, then one note for the group. */
-function LockedFields({ fields, form, note, t }) {
+function LockedFields({ fields, form, extra, note, t }) {
   return (
     <div className="wt-locked">
       <dl className="wt-locked-list">
@@ -24,6 +24,7 @@ function LockedFields({ fields, form, note, t }) {
           </div>
         ))}
       </dl>
+      {extra}
       {note && (
         <p className="wt-hint wt-locked-note">
           <Icon name="lock" size={14} />
@@ -37,7 +38,8 @@ function LockedFields({ fields, form, note, t }) {
 /**
  * The public profile inputs shared by My profile and the Admin's Edit profile dialog. Errors
  * are catalogue keys; `inputs` collects the elements so the form can focus the first invalid.
- * `locked` fields show their saved value as text with the single `lockedHint`.
+ * `locked` fields show their saved value as text, then `lockedExtra` (such as read-only social
+ * links), then the single `lockedHint`.
  */
 export function WebsiteProfileFields(props) {
   const { idPrefix, form, errors, busy, inputs, onChange, t, locked = [], lockedHint } = props;
@@ -92,7 +94,15 @@ export function WebsiteProfileFields(props) {
           );
         },
       )}
-      {fixed.length > 0 && <LockedFields fields={fixed} form={form} note={lockedHint} t={t} />}
+      {fixed.length > 0 && (
+        <LockedFields
+          fields={fixed}
+          form={form}
+          extra={props.lockedExtra}
+          note={lockedHint}
+          t={t}
+        />
+      )}
     </div>
   );
 }

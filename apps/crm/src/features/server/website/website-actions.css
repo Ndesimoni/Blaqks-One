@@ -45,10 +45,10 @@
   border-radius: var(--radius);
   background: var(--surface-subtle);
 }
-.website-review .drawer-header {
+.website-review .drawer-top {
   align-items: flex-start;
 }
-.website-review .drawer-header p {
+.website-review .drawer-top p {
   max-width: 600px;
   margin: 6px 0 0;
   color: var(--muted-dark);

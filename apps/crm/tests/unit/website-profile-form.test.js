@@ -108,3 +108,31 @@ test('an edit of another member keeps their saved public contacts', () => {
     ['+971500000001', 'a@b.ae', 'Villas'],
   );
 });
+
+test("the member's own save sends their canonical links; anyone else's leaves them out", () => {
+  const links = { instagram: 'https://instagram.com/amy', website: 'https://amy-homes.ae/' };
+  const saved = profile('amy', { body: { name: 'Amy', specialty: 'Homes', social: links } });
+  const form = model.profileForm(saved);
+  assert.equal(form.social.instagram, links.instagram);
+  assert.equal(model.formChanged(form, model.profileForm(saved)), false);
+  const typed = { ...form, social: { ...form.social, x: ' x.com/amy ', website: '' } };
+  assert.equal(model.formChanged(typed, form), true);
+  assert.deepEqual(model.profileBody(typed, saved, { self: true }).social, {
+    instagram: links.instagram,
+    x: 'https://x.com/amy',
+  });
+  // Someone else's edit, Hide or Show omits links so the server keeps the member's own.
+  assert.equal(Object.hasOwn(model.profileBody(typed, saved), 'social'), false);
+  assert.equal(Object.hasOwn(model.profileBody(form, saved, { active: false }), 'social'), false);
+  // Clearing every link on one's own save sends none, which removes them.
+  const cleared = { ...form, social: model.profileForm(null).social };
+  assert.equal(Object.hasOwn(model.profileBody(cleared, saved, { self: true }), 'social'), false);
+});
+
+test('link problems join the profile errors and are focused after the details', () => {
+  const form = { ...model.profileForm(null, 'Agent'), specialty: 'Villas' };
+  form.social = { ...form.social, tiktok: 'https://tiktok.com.evil.ae/@k' };
+  assert.deepEqual(model.profileErrors(form), { tiktok: 'tiktokInvalid' });
+  assert.equal(model.firstInvalid(model.profileErrors(form)), 'tiktok');
+  assert.equal(model.firstInvalid(model.profileErrors({ ...form, name: '' })), 'name');
+});

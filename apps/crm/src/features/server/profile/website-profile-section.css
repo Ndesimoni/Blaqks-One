@@ -1,4 +1,4 @@
-/* My profile → Website profile: status line, consent checkbox and loading placeholder. */
+/* My profile → Website profile: status line, social links, consent and loading placeholder. */
 .wp-status {
   display: flex;
   flex-wrap: wrap;
@@ -6,6 +6,10 @@
   gap: 8px 14px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--line);
+}
+.wp-social {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }
 .wp-consent {
   display: flex;

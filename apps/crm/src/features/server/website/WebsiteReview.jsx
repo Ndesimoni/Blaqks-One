@@ -1,12 +1,14 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Drawer } from '../../../components/ui/Drawer.jsx';
+import { SocialLinkList } from './social/SocialLinkList.jsx';
+import { toSocial } from './social/socialModel.js';
 import { CONTENT_KEYS } from './websiteModel.js';
 
 export function WebsiteReview({ form, dirty, saved, published, platform, onClose, t }) {
   return (
     <Drawer titleId="website-review-title" onClose={onClose} className="website-review" size="wide">
-      <header className="drawer-header">
+      <header className="drawer-top">
         <div>
           <h2 id="website-review-title">{t('websites.reviewTitle')}</h2>
           <p>{t('websites.reviewHint')}</p>
@@ -50,6 +52,10 @@ export function WebsiteReview({ form, dirty, saved, published, platform, onClose
               <dd>{form.content[key] || t('websites.reviewEmpty')}</dd>
             </React.Fragment>
           ))}
+          <dt>{t('websiteSocial.title')}</dt>
+          <dd>
+            <SocialLinkList values={toSocial(form.social)} />
+          </dd>
         </dl>
       </div>
       <footer className="drawer-footer">

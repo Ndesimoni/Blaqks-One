@@ -1,5 +1,7 @@
 # Social media links on the websites (packet SOC1)
 
+Status: **built 2026-10-31** (SOC1a backend, SOC1b CRM fields, SOC1c websites); 23 website API tests, 17 website/profile browser specs, 522 CRM unit tests and the website's tests pass.
+
 Owner request and decisions, 2026-10-30: users add their social media links and they show on
 the websites. **Whose:** the company (entered by its Admin), each member (entered by the member,
 covered by their own website consent) and Blaqks One for the general site (Super Admin).

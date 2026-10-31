@@ -1,8 +1,11 @@
 import React from 'react';
 import { SettingsSection } from '../profile/SettingsSection.jsx';
 import { WebsiteField } from './WebsiteField.jsx';
+import { WebsiteSocial } from './WebsiteSocial.jsx';
 
-export function WebsiteCopy({ form, change, platform, t }) {
+/** Website content, then its social links, then search details. */
+export function WebsiteCopy({ editor, platform, t }) {
+  const { form, change } = editor;
   const field = (key, multiline = false) => (
     <WebsiteField
       key={key}
@@ -31,6 +34,7 @@ export function WebsiteCopy({ form, change, platform, t }) {
           {field('services', true)}
         </div>
       </SettingsSection>
+      <WebsiteSocial editor={editor} platform={platform} t={t} />
       <SettingsSection
         id="website-search"
         title={t('websites.seo')}

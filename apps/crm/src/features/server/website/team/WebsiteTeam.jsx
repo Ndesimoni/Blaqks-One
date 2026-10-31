@@ -37,10 +37,12 @@ function TeamPanel({ api, user, t }) {
     setDialog(null);
     setDone(t(`websiteTeam.done.${doneKey}`, { name }));
   };
-  // Edits and Hide/Show keep another member's consent and contacts (owner, 2026-10-30).
+  // Edits and Hide/Show keep another member's consent, contacts and links (owner, 2026-10-30);
+  // the Admin's own Hide/Show repeats their saved links, since leaving them out clears them.
   const save = (target, form, options) =>
     team.save(target.member.id, profileBody(form, target.profile, options));
-  const visible = (target, active) => save(target, profileForm(target.profile), { active });
+  const visible = (target, active) =>
+    save(target, profileForm(target.profile), { self: target.own, active });
   const actions = {
     busy: team.busy,
     edit: (target) => open('edit', target),

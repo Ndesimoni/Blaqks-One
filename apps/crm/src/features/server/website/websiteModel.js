@@ -1,3 +1,5 @@
+import { fromSocial, toSocial } from './social/socialModel.js';
+
 /** Public website content only; identity contacts, eligibility and private records stay out. */
 export const CONTENT_KEYS = [
   'heroTitle',
@@ -29,10 +31,13 @@ export function websiteForm(site, platform, draft) {
         }
       : {}),
     content: Object.fromEntries(CONTENT_KEYS.map((key) => [key, source.content?.[key] || ''])),
+    social: fromSocial(source.content?.social),
   };
 }
 
+/** The draft body; social links go inside content, left out entirely when there are none. */
 export function websitePayload(form, platform) {
+  const social = toSocial(form.social);
   return {
     version: form.version,
     name: form.name.trim(),
@@ -52,9 +57,12 @@ export function websitePayload(form, platform) {
           },
         }
       : {}),
-    content: Object.fromEntries(
-      CONTENT_KEYS.map((key) => [key, form.content[key].trim()]).filter(([, value]) => value),
-    ),
+    content: {
+      ...Object.fromEntries(
+        CONTENT_KEYS.map((key) => [key, form.content[key].trim()]).filter(([, value]) => value),
+      ),
+      ...(social ? { social } : {}),
+    },
   };
 }
 

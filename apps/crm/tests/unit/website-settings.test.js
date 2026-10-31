@@ -70,3 +70,17 @@ test('company controls require their own live Admin scope while platform control
   assert.ok(websiteAccess({ roleId: 'super-admin' }, { status: 'archived' }, true));
   assert.ok(!websiteAccess({ roleId: 'super-admin' }, owner, false));
 });
+
+test('social links travel inside content as canonical links and are left out when empty', () => {
+  const linked = { ...site, content: { ...site.content, social: { x: 'https://x.com/pc' } } };
+  const form = websiteForm(linked, false);
+  assert.equal(form.social.x, 'https://x.com/pc');
+  assert.equal(form.social.instagram, '');
+  form.social.instagram = ' instagram.com/pc ';
+  assert.deepEqual(websitePayload(form, false).content.social, {
+    instagram: 'https://instagram.com/pc',
+    x: 'https://x.com/pc',
+  });
+  const empty = websitePayload(websiteForm(site, true), true);
+  assert.equal(Object.hasOwn(empty.content, 'social'), false);
+});

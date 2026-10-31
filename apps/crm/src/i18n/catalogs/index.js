@@ -61,6 +61,7 @@ import enWebsiteEnquiries from './en/websiteEnquiries.js';
 import enWebsites from './en/websites.js';
 import enWebsiteListings from './en/websiteListings.js';
 import enWebsitePublish from './en/websitePublish.js';
+import enWebsiteSocial from './en/websiteSocial.js';
 import enWebsiteTeam from './en/websiteTeam.js';
 
 export const catalogs = Object.freeze({
@@ -108,6 +109,7 @@ export const catalogs = Object.freeze({
     websites: enWebsites,
     websiteListings: enWebsiteListings,
     websitePublish: enWebsitePublish,
+    websiteSocial: enWebsiteSocial,
     websiteTeam: enWebsiteTeam,
   },
   ar: {

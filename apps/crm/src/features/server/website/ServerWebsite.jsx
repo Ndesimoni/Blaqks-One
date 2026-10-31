@@ -64,7 +64,7 @@ function WebsiteEditor({ api, user, workspace, platform, t }) {
                 t={t}
               />
             )}
-            <WebsiteCopy form={form} change={change} platform={platform} t={t} />
+            <WebsiteCopy editor={editor} platform={platform} t={t} />
           </fieldset>
           <WebsiteActions editor={editor} onReview={() => setReview(true)} t={t} />
         </form>

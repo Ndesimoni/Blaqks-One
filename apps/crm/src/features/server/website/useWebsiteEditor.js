@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
+import { SOCIAL_FIELDS, socialErrors } from './social/socialModel.js';
 import { websiteApi, websiteForm, websitePayload } from './websiteModel.js';
 
 export function useWebsiteEditor(api, workspace, platform, t) {
@@ -11,7 +12,9 @@ export function useWebsiteEditor(api, workspace, platform, t) {
   const [busy, setBusy] = useState(false);
   const [conflict, setConflict] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [invalid, setInvalid] = useState({});
   const running = useRef(false);
+  const inputs = useRef({});
   const dirty = Boolean(form && state && JSON.stringify(form) !== JSON.stringify(state.baseline));
   const needsRecovery = Boolean(form && state && form.version !== (state.site?.version ?? 0));
   useUnsavedChanges(dirty, busy, t('websites.discardChanges'));
@@ -31,6 +34,7 @@ export function useWebsiteEditor(api, workspace, platform, t) {
         const baseline = websiteForm(live.site, platform, drafts.draft?.site);
         setState({ site: live.site, version: drafts.version, draft: drafts.draft, baseline });
         setForm(baseline);
+        setInvalid({});
         setConflict(false);
       })
       .catch((failure) => {
@@ -50,18 +54,25 @@ export function useWebsiteEditor(api, workspace, platform, t) {
         ? { ...current, [group]: { ...current[group], [key]: value } }
         : { ...current, [key]: value },
     );
+    if (group === 'social') setInvalid((current) => ({ ...current, [key]: undefined }));
     setNotice('');
   };
   const recover = () => {
     if (running.current || conflict || !state?.site || !window.confirm(t('websites.replaceDraft')))
       return;
     setForm(websiteForm(state.site, platform));
+    setInvalid({});
     setNotice(t('websites.publishedLoaded'));
     setError('');
   };
   const run = async (intent) => {
     if (running.current || conflict || !state || !form || (intent === 'publish' && needsRecovery))
       return;
+    // Social links are checked here; the server re-checks them (sites/social.rs).
+    const found = socialErrors(form.social);
+    setInvalid(found);
+    const first = SOCIAL_FIELDS.find((field) => found[field]);
+    if (first) return inputs.current[first]?.focus();
     running.current = true;
     setBusy(true);
     setError('');
@@ -103,6 +114,8 @@ export function useWebsiteEditor(api, workspace, platform, t) {
     notice,
     conflict,
     needsRecovery,
+    invalid,
+    inputs,
     change,
     run,
     reload,

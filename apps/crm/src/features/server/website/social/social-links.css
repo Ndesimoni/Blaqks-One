@@ -1,0 +1,89 @@
+/* Social links: the editable group (Content tab, My profile, Team dialog) and read-only list. */
+.social-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.social-legend {
+  padding: 0;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+}
+.social-hint {
+  max-width: 640px;
+  margin: 0 0 16px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
+/* Six networks in pairs, then Other website across the full width. */
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  align-items: start;
+}
+.social-field-website {
+  grid-column: 1 / -1;
+}
+:root[data-theme] .social-field {
+  gap: 6px;
+  min-width: 0;
+}
+:root[data-theme] .social-field .field-error {
+  margin: 0;
+  font-size: 13px;
+}
+:root[data-theme] .social-field input::placeholder {
+  color: var(--muted-dark);
+  opacity: 0.75;
+}
+.website-form-card .social-field label {
+  font-weight: 600;
+}
+.social-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.social-list-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+.social-list dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+.social-list dl > div {
+  display: grid;
+  grid-template-columns: minmax(96px, max-content) minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+}
+.social-list dt {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+.social-list dd {
+  margin: 0;
+  font-size: 14px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.social-list-empty {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 14px;
+}
+@media (max-width: 650px) {
+  .social-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
