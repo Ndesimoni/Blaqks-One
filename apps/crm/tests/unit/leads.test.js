@@ -5,6 +5,14 @@ import {
   matchesLeadFilters,
   selectLeadSources,
 } from '../../src/features/leads/selectors.js';
+import {
+  canPersistStage,
+  changesStage,
+  leadBudget,
+  leadColumns,
+  leadNeed,
+  stageTone,
+} from '../../src/features/leads/boardModel.js';
 import { selectRecords } from '../../src/lib/workspace.js';
 
 const records = [
@@ -57,4 +65,35 @@ test('stage choices retain closed/lost history and unknown imported stages', () 
     assert.ok(stages.includes(stage));
   assert.equal(stages.filter((stage) => stage === 'New').length, 1);
   assert.ok(leadStageOptions([], 'Imported stage').includes('Imported stage'));
+});
+
+test('the lead board groups every filtered record once and preserves custom stages', () => {
+  const columns = leadColumns(records);
+  assert.deepEqual(columns.find((column) => column.key === 'New').items, [records[0]]);
+  assert.deepEqual(columns.find((column) => column.key === 'Imported stage').items, [records[2]]);
+  assert.equal(columns.flatMap((column) => column.items).length, records.length);
+  assert.equal(stageTone('Qualified'), 'green');
+  assert.equal(stageTone('Unknown'), 'muted');
+  assert.equal(changesStage(records[0], 'NEW'), false);
+  assert.equal(changesStage(records[0], 'Qualified'), true);
+  assert.equal(changesStage(records[0], 'Not recorded'), false);
+  assert.equal(canPersistStage('Not recorded'), false);
+  assert.equal(columns.find((column) => column.key === 'Not recorded').acceptsMove, false);
+  const filtered = leadColumns([records[0]], records);
+  assert.ok(filtered.some((column) => column.key === 'Imported stage'));
+  assert.equal(filtered.flatMap((column) => column.items).length, 1);
+});
+
+test('lead board summaries use existing fields without mutating a record', () => {
+  const record = {
+    buy_rent: 'Buy',
+    property_type: 'Apartment',
+    preferred_communities: 'Dubai Marina',
+    maximum_budget_aed: '2500000',
+  };
+  const before = structuredClone(record);
+  assert.equal(leadNeed(record), 'Buy · Apartment · Dubai Marina');
+  assert.equal(leadBudget(record), 2500000);
+  assert.equal(leadBudget({ maximum_budget_aed: 'unknown' }), null);
+  assert.deepEqual(record, before);
 });

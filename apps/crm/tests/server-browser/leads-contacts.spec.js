@@ -68,8 +68,23 @@ test('Leads read as one directory with a compact source filter and one primary a
   await expect(page.locator('.record-count-word')).toHaveText(leadCount === 1 ? 'lead' : 'leads');
   await expect(page.getByText(/^Total leads$/)).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Add lead', exact: true })).toHaveCount(1);
-  const pager = page.getByRole('navigation', { name: 'Leads pages' });
-  await expect(pager).toContainText(/of \d+ (records|leads)/);
+  const views = page.getByRole('group', { name: 'View', exact: true });
+  await expect(views.getByRole('button', { name: 'Kanban', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.getByRole('region', { name: 'Leads pipeline' })).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Move Pilot lead Alpha to another stage', exact: true })
+    .click();
+  await page.getByRole('button', { name: 'Contacted', exact: true }).click();
+  await expect(page.locator('.toast')).toContainText('Pilot lead Alpha moved to Contacted');
+  await expect(
+    page
+      .locator('.kanban-column')
+      .filter({ hasText: /^Contacted/ })
+      .getByText('Pilot lead Alpha'),
+  ).toBeVisible();
 
   const sources = page.getByRole('group', { name: 'Filter leads by source', exact: true });
   const notRecorded = sources.getByRole('button', { name: /^Not recorded \d+$/ });
@@ -84,6 +99,15 @@ test('Leads read as one directory with a compact source filter and one primary a
   await clear.click();
   await expect(clear).toBeDisabled();
   await expect(stage).toHaveValue('');
+
+  await views.getByRole('button', { name: 'List', exact: true }).click();
+  const pager = page.getByRole('navigation', { name: 'Leads pages' });
+  await expect(pager).toContainText(/of \d+ (records|leads)/);
+  await page.reload();
+  await expect(views.getByRole('button', { name: 'List', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 
   await capture(page, testInfo, 'leads-admin');
 });

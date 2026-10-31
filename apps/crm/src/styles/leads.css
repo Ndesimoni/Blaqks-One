@@ -21,6 +21,9 @@
   flex: 1;
   min-width: 0;
 }
+.lead-source-bar .segmented-view-switch {
+  flex: 0 0 auto;
+}
 .lead-source-filter-list {
   min-width: 0;
 }

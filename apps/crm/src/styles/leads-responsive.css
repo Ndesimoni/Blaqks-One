@@ -5,6 +5,9 @@
   .lead-filters {
     align-items: stretch;
   }
+  .lead-source-bar .segmented-view-switch {
+    margin-inline-start: auto;
+  }
   .lead-stage-filter {
     flex-basis: 100%;
     min-width: 0;

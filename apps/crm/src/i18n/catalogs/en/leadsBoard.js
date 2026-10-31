@@ -1,0 +1,16 @@
+/** The Leads pipeline and its view switch (NAV). Keys are `leadsBoard.<key>`. */
+export default {
+  label: 'Leads pipeline',
+  view: 'View',
+  kanban: 'Kanban',
+  list: 'List',
+  open: 'Open {name}',
+  move: 'Move {name} to another stage',
+  moved: '{name} moved to {stage}',
+  incomplete: '{name} is missing required details. Open the lead, complete them, then move it.',
+  failed: '{name} could not be moved. Try again.',
+  budget: 'Up to {amount}',
+  next: 'Next follow-up {date}',
+  hot: 'Hot',
+  priority: 'High priority',
+};

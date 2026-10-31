@@ -54,6 +54,7 @@ Follow [Clean collection and option browsing](option-overflow.md) and the shared
 | Compact chips, tags and summaries            | Show up to six; More replaces the preview with one scrollable list containing **all** items |
 | Photos and form step navigation              | Horizontal scrolling with visible selection and keyboard access                             |
 | Small complete page sections                 | Natural page scrolling without an unnecessary disclosure                                    |
+| Pipelines (Leads; Deals next)                | Kanban: one column per stage, a remembered Kanban/List switch, cards moved by dragging or each card's ⋯ list, twenty cards per column then Show all (NAV, 2026-10-31) |
 
 - Expanded More views contain the initial items and the remaining items. Show one close control; avoid duplicate lists, a lingering More button or a second Show more action inside.
 - Return to the compact view on Close or Escape. Dismiss a floating selector on outside interaction and after a single choice; keep multi-select pickers open while adding choices.

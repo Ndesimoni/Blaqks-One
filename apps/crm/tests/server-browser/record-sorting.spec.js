@@ -59,6 +59,7 @@ test('phone sorting changes record order, resets pagination and survives desktop
   await expect(table.locator('tbody tr').first()).toContainText('Sort fixture 01');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/#/leads');
+  await page.getByRole('button', { name: 'List', exact: true }).click();
   await page.getByRole('textbox', { name: 'Search leads' }).fill('Sort fixture');
   controls = await sortControls(page);
   await controls
