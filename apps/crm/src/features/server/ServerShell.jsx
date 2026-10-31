@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useSession } from '../../hooks/useSession.js';
@@ -12,16 +12,20 @@ import { ServerPageHeading } from './ServerPageHeading.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
 import { SectionTabs } from './products/SectionTabs.jsx';
 import { useProductNav } from './products/useProductNav.js';
+import { MessengerPanel } from './products/messenger/MessengerPanel.jsx';
+import { BottomBar } from './products/BottomBar.jsx';
+import { visibleProducts } from './products/productModel.js';
 
 export function ServerShell({ owner, workspaces }) {
   const { user } = useSession();
   const { t } = useI18n();
   const { route, navigate } = useNavigation();
   const nav = useProductNav(user, route, navigate);
+  const [messenger, setMessenger] = useState(null);
   const platform = route === 'Platform website';
   // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
   const fullHeight = ['Inbox', 'Team chat'].includes(route);
-  const { toast, setToast } = useWorkspaceView();
+  const { toast, setToast, setMobileNav } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
   const location = useLocation();
   const go = useNavigate();
@@ -33,7 +37,8 @@ export function ServerShell({ owner, workspaces }) {
   return (
     <div
       className={
-        'app-shell connected-shell has-rail' + (nav.sectionsVisible ? '' : ' sections-hidden')
+        'app-shell connected-shell has-rail has-bottom-bar' +
+        (nav.sectionsVisible ? '' : ' sections-hidden')
       }
     >
       <a
@@ -52,6 +57,7 @@ export function ServerShell({ owner, workspaces }) {
           owner={platform ? { name: t('websites.platformTitle') } : owner}
           sidebarOpen={nav.sectionsVisible}
           onToggleSidebar={nav.here ? nav.toggleSidebar : null}
+          onMessenger={setMessenger}
         />
         <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
         <main className="main-content" id="main-content" tabIndex={-1}>
@@ -95,7 +101,23 @@ export function ServerShell({ owner, workspaces }) {
           )}
         </main>
       </div>
+      <BottomBar
+        products={visibleProducts(user)}
+        current={nav.here?.product || null}
+        route={route}
+        onOpen={nav.openProduct}
+        onHome={() => navigate('Start')}
+        onSections={() => setMobileNav(true)}
+      />
       <ServerDialogs />
+      {messenger && (
+        <MessengerPanel
+          owner={owner}
+          box={messenger}
+          onBox={setMessenger}
+          onClose={() => setMessenger(null)}
+        />
+      )}
       {toast && (
         <div className="toast" role="status">
           <Icon name="info" size={17} />

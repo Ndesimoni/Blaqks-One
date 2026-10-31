@@ -13,30 +13,14 @@ import { useConversation } from './useConversation.js';
 import { useInboxList } from './useInboxList.js';
 import { useInboxSummary } from './useInboxSummary.js';
 import { useMembers } from './useMembers.js';
-import './inbox-layout.css';
-import './inbox-list.css';
-import './inbox-rows.css';
-import './inbox-states.css';
-import './inbox-head.css';
-import './inbox-thread.css';
-import './inbox-panel.css';
-import './inbox-triage.css';
-import '../chat/chat-files.css';
-import './inbox-list-start.css';
-import './inbox-send.css';
-import './inbox-attach.css';
-import './inbox-start.css';
-import './saved-picker.css';
-import './saved-picker-phone.css';
-import './saved-manager.css';
-import './inbox-responsive.css';
+import './inboxStyles.js';
 
 /**
  * The shared Inbox (plan U1, design Main/MobileList/States): list, conversation and client
  * panel side by side on desktop, separate screens on a phone. The open conversation lives
  * in the URL (`?conversation=`), so Back and reload keep it.
  */
-export function ServerInbox({ owner }) {
+export function ServerInbox({ owner, selection }) {
   const { api, user } = useSession();
   const { t } = useI18n();
   const location = useLocation();
@@ -45,16 +29,24 @@ export function ServerInbox({ owner }) {
   const [filters, setFilters] = useState({ channel: '', state: '' });
   const [query, setQuery] = useState('');
   const [panel, setPanel] = useState(null);
-  const selectedId = new URLSearchParams(location.search).get('conversation') || '';
+  // In the slide-in messenger (NAV3) the panel holds the open conversation, not the URL.
+  const selectedId = selection
+    ? selection.id
+    : new URLSearchParams(location.search).get('conversation') || '';
   const select = useCallback(
     (id) => {
+      if (selection) {
+        setPanel(null);
+        selection.open(id);
+        return;
+      }
       const params = new URLSearchParams(location.search);
       if (id) params.set('conversation', id);
       else params.delete('conversation');
       setPanel(null);
       go({ pathname: location.pathname, search: params.size ? `?${params}` : '' });
     },
-    [go, location.pathname, location.search],
+    [go, location.pathname, location.search, selection],
   );
   const summary = useInboxSummary(api, owner.id, POLL_MS);
   const params = useMemo(() => listParams(tab, filters), [tab, filters]);

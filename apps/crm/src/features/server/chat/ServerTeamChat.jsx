@@ -20,18 +20,23 @@ import './chat-phone.css';
  * open room on the right; one pane at a time on a phone. The open room lives in the URL
  * (`?room=`).
  */
-export function ServerTeamChat() {
+export function ServerTeamChat({ selection }) {
   const { api, user } = useSession();
   const { owner } = useWorkspaceScope();
   const { t } = useI18n();
   const location = useLocation();
   const go = useNavigate();
   const chat = useChat(api, owner.id);
-  const selectedId = new URLSearchParams(location.search).get('room') || '';
+  // In the slide-in messenger (NAV3) the panel holds the open room, not the URL.
+  const selectedId = selection
+    ? selection.id
+    : new URLSearchParams(location.search).get('room') || '';
   const open = useCallback(
     (id) =>
-      go({ pathname: location.pathname, search: id ? `?room=${encodeURIComponent(id)}` : '' }),
-    [go, location.pathname],
+      selection
+        ? selection.open(id)
+        : go({ pathname: location.pathname, search: id ? `?room=${encodeURIComponent(id)}` : '' }),
+    [go, location.pathname, selection],
   );
   const room = chat.rooms.find((item) => item.id === selectedId);
   if (chat.status === 'loading') return <p role="status">{t('chat.loading')}</p>;

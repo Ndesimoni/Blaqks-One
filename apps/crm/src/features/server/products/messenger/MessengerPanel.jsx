@@ -1,0 +1,84 @@
+import React, { useState } from 'react';
+import { Drawer } from '../../../../components/ui/Drawer.jsx';
+import { Icon } from '../../../../components/ui/Icon.jsx';
+import { useSession } from '../../../../hooks/useSession.js';
+import { useNavigation } from '../../../../hooks/useWorkspace.js';
+import { useI18n } from '../../../../i18n/useI18n.js';
+import { canOpenSection } from '../../access.js';
+import { ServerTeamChat } from '../../chat/ServerTeamChat.jsx';
+import { ServerInbox } from '../../inbox/ServerInbox.jsx';
+import './messenger.css';
+
+const boxes = [
+  ['inbox', 'Inbox', 'inbox.title'],
+  ['team', 'Team chat', 'chat.title'],
+];
+
+/**
+ * The slide-in messenger (NAV3, Bitrix24's pattern): Client inbox and Team chat from the
+ * right edge over any page, one pane at a time like the phone layout. The open conversation
+ * lives in the panel, not the address bar, so the page behind keeps its own address.
+ */
+export function MessengerPanel({ owner, box, onBox, onClose }) {
+  const { t } = useI18n();
+  const { user } = useSession();
+  const { navigate } = useNavigation();
+  const [open, setOpen] = useState({ inbox: '', team: '' });
+  const allowed = boxes.filter(([, route]) => canOpenSection(user, route));
+  const selection = {
+    id: open[box],
+    open: (id) => setOpen((current) => ({ ...current, [box]: id })),
+  };
+  const fullPage = () => {
+    onClose();
+    navigate(box === 'team' ? 'Team chat' : 'Inbox');
+  };
+  return (
+    <Drawer
+      className="messenger-drawer"
+      placement="side"
+      titleId="messenger-title"
+      onClose={onClose}
+    >
+      <div className="messenger-panel">
+        <header className="messenger-head">
+          <h2 id="messenger-title">
+            {t(allowed.find(([key]) => key === box)?.[2] || 'inbox.title')}
+          </h2>
+          <button type="button" className="messenger-full" onClick={fullPage}>
+            {t('messenger.fullPage')}
+          </button>
+          <button
+            type="button"
+            className="icon-btn messenger-close"
+            aria-label={t('messenger.close')}
+            onClick={onClose}
+          >
+            <Icon name="close" size={18} />
+          </button>
+          {allowed.length > 1 && (
+            <div className="messenger-switch" role="group" aria-label={t('messenger.switch')}>
+              {allowed.map(([key, , label]) => (
+                <button
+                  type="button"
+                  key={key}
+                  aria-pressed={key === box}
+                  onClick={() => onBox(key)}
+                >
+                  {t(label)}
+                </button>
+              ))}
+            </div>
+          )}
+        </header>
+        <div className="messenger-body">
+          {box === 'team' ? (
+            <ServerTeamChat selection={selection} />
+          ) : (
+            <ServerInbox owner={owner} selection={selection} />
+          )}
+        </div>
+      </div>
+    </Drawer>
+  );
+}

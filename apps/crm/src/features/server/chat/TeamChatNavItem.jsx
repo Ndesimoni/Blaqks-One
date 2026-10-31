@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { usePoll } from '../inbox/usePoll.js';
 import { ServerNavigationItem } from '../ServerNavigationItem.jsx';
 import { badge } from './chatModel.js';
-
-const NAV_POLL_MS = 15_000;
+import { useChatCounts } from './useChatCounts.js';
 
 /**
  * The sidebar's Team chat entry with its badge, polled while the page is visible: `@count`
@@ -14,24 +12,7 @@ const NAV_POLL_MS = 15_000;
 export function TeamChatNavItem({ route, onSelect, active, label: shown }) {
   const { api, user } = useSession();
   const { t } = useI18n();
-  const [counts, setCounts] = useState({ unread: 0, mentions: 0 });
-  const load = useCallback(
-    (signal) =>
-      api
-        .chatSummary(user.workspaceId, signal)
-        .then((value) =>
-          setCounts({ unread: Number(value?.unread) || 0, mentions: Number(value?.mentions) || 0 }),
-        )
-        .catch(() => {}),
-    [api, user.workspaceId],
-  );
-  useEffect(() => {
-    const controller = new AbortController();
-    load(controller.signal);
-    return () => controller.abort();
-  }, [load, route]);
-  usePoll(load, NAV_POLL_MS, Boolean(user.workspaceId));
-  const { unread, mentions } = counts;
+  const { unread, mentions } = useChatCounts(api, user.workspaceId, route);
   const label = [
     unread ? t('chat.nav.unread', { count: unread }) : '',
     mentions ? t('chat.nav.mentions', { count: mentions }) : '',

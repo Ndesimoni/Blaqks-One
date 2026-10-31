@@ -2,11 +2,12 @@ import React from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useI18n } from '../../i18n/useI18n.js';
 import { AccountMenu } from './products/AccountMenu.jsx';
+import { HeaderMessages } from './products/messenger/HeaderMessages.jsx';
 import { ServerTheme } from './ServerTheme.jsx';
 import { useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 
 /** The top bar names the member's company, so no workspace panel is needed on each page. */
-export function ServerHeader({ owner, sidebarOpen, onToggleSidebar }) {
+export function ServerHeader({ owner, sidebarOpen, onToggleSidebar, onMessenger }) {
   const { t } = useI18n();
   const { mobileNav, setMobileNav } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
@@ -37,6 +38,7 @@ export function ServerHeader({ owner, sidebarOpen, onToggleSidebar }) {
         <strong className="topbar-workspace">{owner?.name || 'Connected CRM'}</strong>
       </div>
       <div className="top-actions">
+        <HeaderMessages onOpen={onMessenger} />
         <ServerTheme />
         <AccountMenu busy={busy} />
       </div>
