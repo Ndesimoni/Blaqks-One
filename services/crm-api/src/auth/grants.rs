@@ -1,13 +1,14 @@
 //! What one profile may do with each connected collection (action-permissions §3, §12).
 //! The frontend reads `recordActions` and never re-derives these rules.
-use super::{actions::Actions, actions_wire::Wire, permissions::Module, profile::UserRow};
-use crate::{
-    error::{ApiError, ApiResult},
-    records::{
-        collections::COLLECTIONS,
-        visibility::{ASSIGNABLE, PARENTS},
-    },
+//! Collection facts come from `policy`, so auth imports no business domain.
+use super::{
+    actions::Actions,
+    actions_wire::Wire,
+    permissions::Module,
+    policy::{self, ASSIGNABLE, COLLECTIONS, PARENTS},
+    profile::UserRow,
 };
+use crate::error::{ApiError, ApiResult};
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
@@ -48,7 +49,7 @@ impl UserRow {
     /// their stored grants normalised against modules and scope, any other role nothing.
     pub fn effective_actions(&self) -> Actions {
         match self.role.as_str() {
-            "admin" | "super-admin" => Actions::full(),
+            "admin" | "super-admin" => Actions::full(&self.role),
             "staff" => Actions::from_stored(&self.actions.0)
                 .normalised(&self.permissions.0, self.has_team_scope()),
             _ => Actions::default(),
@@ -72,12 +73,14 @@ impl UserRow {
 
     /// M-C: every collection that can link to `collection` must be visible too, so a
     /// foreign-key refusal never reveals records in a module the caller cannot see.
+    /// Finance references (L-F2, owner Q9) also need team finance.
     pub fn covers_references(&self, collection: &str) -> bool {
         let permissions = self.effective_permissions();
-        COLLECTIONS
-            .iter()
-            .filter(|linking| linking.links.iter().any(|link| link.target == collection))
-            .all(|linking| permissions.collection(linking.name))
+        let finance = !policy::finance_referenced(collection) || self.finance_access().team_view;
+        finance
+            && policy::linked_from(collection)
+                .iter()
+                .all(|linking| permissions.collection(linking))
     }
 
     /// `can(collection, action)`: false without the module; parents need team scope,
@@ -117,8 +120,7 @@ impl UserRow {
     pub fn record_actions(&self) -> BTreeMap<&'static str, RecordActions> {
         COLLECTIONS
             .iter()
-            .map(|collection| {
-                let name = collection.name;
+            .map(|&name| {
                 let actions = RecordActions {
                     create: self.can(name, Action::Create),
                     edit: self.can(name, Action::Edit),

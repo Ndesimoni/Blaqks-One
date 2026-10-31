@@ -6,7 +6,7 @@ use super::{
     accounts::{self, Member},
     credentials, data,
     dates::Calendar,
-    existing, failed, mark_source,
+    existing, failed, finance, mark_source,
     staff::SPECS,
     target::{Target, UNCHANGED},
     Outcome,
@@ -25,12 +25,14 @@ pub struct Seeded {
     pub counts: existing::Counts,
     pub members: Vec<Member>,
     pub generated: Vec<Option<String>>,
+    pub finance: finance::Seeded,
 }
 
 pub async fn seed(pool: &PgPool, target: &Target, staff: bool) -> Outcome<Seeded> {
     let count = if staff { SPECS.len() } else { 0 };
     let credentials = credentials::credentials(count).await?;
-    let records = data::records(&Calendar::now());
+    let calendar = Calendar::now();
+    let records = data::records(&calendar);
     let mut tx = pool.begin().await.map_err(failed)?;
     let workspace = target.workspace.as_str();
     workspaces::lock(&mut tx, workspace).await.map_err(failed)?;
@@ -63,6 +65,7 @@ pub async fn seed(pool: &PgPool, target: &Target, staff: bool) -> Outcome<Seeded
     for member in &members {
         assign(&mut tx, target, member, &inserted).await?;
     }
+    let finance = finance::seed(&mut tx, target, &calendar).await?;
     tx.commit().await.map_err(failed)?;
     let generated = members
         .iter()
@@ -76,6 +79,7 @@ pub async fn seed(pool: &PgPool, target: &Target, staff: bool) -> Outcome<Seeded
         counts,
         members,
         generated,
+        finance,
     })
 }
 

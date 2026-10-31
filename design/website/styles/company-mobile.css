@@ -1,0 +1,136 @@
+@media (max-width: 1100px) {
+  .company-site {
+    padding-bottom: 85px;
+  }
+  .company-site .review-bar {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+  }
+  .company-header {
+    gap: 20px;
+  }
+  .company-header nav {
+    gap: 18px;
+  }
+  .company-wordmark {
+    font-size: 20px;
+  }
+  .company-footer-grid {
+    gap: 35px;
+  }
+}
+@media (max-width: 760px) {
+  .company-site {
+    padding-bottom: 120px;
+  }
+  .company-header {
+    min-height: 84px;
+  }
+  .company-wordmark {
+    font-size: 19px;
+    max-width: calc(100% - 55px);
+    gap: 10px;
+  }
+  .company-seal {
+    width: 38px;
+    height: 46px;
+    font-size: 20px;
+  }
+  .company-wordmark small {
+    font-size: 7px;
+    letter-spacing: 0.12em;
+  }
+  .company-site .section {
+    padding-block: 44px;
+  }
+  .company-site .section-heading h2 {
+    font-size: 38px;
+  }
+  .company-site[data-theme] .company-hero {
+    display: block;
+    min-height: 0;
+    margin: 0 12px;
+  }
+  .company-site[data-theme] .company-hero-copy {
+    max-width: none;
+    padding: 70px 22px 80px;
+    min-height: 450px;
+  }
+  .company-site[data-theme] .company-hero h1 {
+    font-size: clamp(40px, 10vw, 58px);
+  }
+  .company-hero-copy p {
+    font-size: 13px;
+  }
+  .company-hero-foot {
+    left: 22px;
+    bottom: 24px;
+    font-size: 8px;
+  }
+  .company-hero-foot span:last-child {
+    display: none;
+  }
+  .company-photo-caption {
+    font-size: 8px;
+    top: 12px;
+    right: 12px;
+  }
+  .company-search-wrap {
+    margin-top: 0;
+    padding-inline: 20px;
+  }
+  .company-search-wrap .search-box {
+    padding: 20px 0;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    box-shadow: none;
+  }
+  .company-search-wrap .search-fields {
+    gap: 14px;
+  }
+  .company-story,
+  .company-closing,
+  .company-about-heading,
+  .company-contact-heading,
+  .company-about-story,
+  .company-contact-layout,
+  .company-principles,
+  .company-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .company-closing > .eyebrow {
+    margin-bottom: -20px;
+  }
+  .company-site .company-story-photo {
+    order: 0;
+    padding: 0 20px 20px 0;
+  }
+  .story-caption {
+    font-size: 22px;
+    padding: 18px;
+  }
+  .company-site .property-grid.two-card {
+    grid-template-columns: 1fr;
+  }
+  .company-about-image,
+  .company-contact-office > img {
+    height: 280px;
+  }
+  .company-about-story {
+    padding-block: 40px;
+  }
+  .company-site .detail-gallery {
+    height: 260px;
+  }
+  .company-site .agent-profile h1 {
+    font-size: 46px;
+  }
+  .company-principles article > span {
+    margin-bottom: 15px;
+  }
+  .company-footer {
+    padding-block: 40px 25px;
+  }
+}

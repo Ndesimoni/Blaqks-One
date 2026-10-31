@@ -1,0 +1,63 @@
+.profile-intro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  padding-bottom: 48px;
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--line);
+}
+.profile-intro .page-heading {
+  margin-bottom: 20px;
+}
+.profile-intro .page-heading h1 {
+  font-size: clamp(40px, 5vw, 60px);
+}
+.profile-intro .contact-links {
+  margin-bottom: 20px;
+}
+.profile-copy {
+  padding-top: 40px;
+}
+.profile-copy h2 {
+  font-size: 40px;
+}
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.contact-layout > img {
+  width: 100%;
+  height: 480px;
+}
+.contact-layout .button {
+  margin-block: 16px 24px;
+}
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 60px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+.values-grid h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 25px;
+}
+.values-grid p {
+  color: var(--muted);
+  font-size: 13px;
+}
+.enquiry-content {
+  border-top: 1px solid var(--line);
+  padding-top: 32px;
+  max-width: 620px;
+}
+.enquiry-content .contact-links {
+  margin-block: 24px;
+}
+.enquiry-content > .button {
+  margin-bottom: 24px;
+}

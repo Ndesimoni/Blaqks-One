@@ -1,5 +1,6 @@
 //! The staff position catalogue. Each row grants module views; positions never grant
-//! channels, exports, full-team scope or deleteMain.
+//! channels, exports, full-team scope, deleteMain or finance approve/teamView. Property
+//! Agents get own-view finance (finance-design §11 Q12); Accountants finance and reports.
 
 /// `(id, label, [relationships, properties, schedule, finance, reports])`.
 pub const TABLE: [(&str, &str, [bool; 5]); 8] = [
@@ -16,7 +17,7 @@ pub const TABLE: [(&str, &str, [bool; 5]); 8] = [
     (
         "property-agent",
         "Property Agent",
-        [true, true, true, false, true],
+        [true, true, true, true, true],
     ),
     (
         "listing-coordinator",

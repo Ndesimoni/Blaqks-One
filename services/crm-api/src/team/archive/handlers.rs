@@ -63,5 +63,6 @@ pub async fn archive(
     let id = Uuid::parse_str(&id).map_err(|_| ApiError::invalid("Invalid member ID."))?;
     let scope = scope::scope(&state, &session, workspace, id).await?;
     let result = store::archive(&state.pool, session.user.id, id, &scope, request).await?;
+    crate::integrations::revoke_soon(&state);
     Ok(Json(result))
 }

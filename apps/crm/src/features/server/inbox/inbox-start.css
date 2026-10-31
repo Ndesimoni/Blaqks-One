@@ -1,0 +1,44 @@
+/* The New email dialog (E1d); phone sizes are in inbox-send.css. */
+.inbox-start-body {
+  display: grid;
+  grid-auto-rows: max-content;
+  align-content: start;
+  gap: 6px;
+}
+.inbox-start-body label {
+  margin-block-start: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.inbox-start-body input {
+  inline-size: 100%;
+  min-block-size: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+}
+.inbox-start-chosen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.inbox-start-chosen span {
+  display: grid;
+  min-inline-size: 0;
+}
+.inbox-start-chosen small {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+/* The message box starts tall, so the email reads like a page. */
+.inbox-start-body .composer-input {
+  min-block-size: 220px;
+}

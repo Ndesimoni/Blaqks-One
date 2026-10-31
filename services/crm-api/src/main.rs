@@ -2,8 +2,10 @@ use kws_crm_api::{
     auth::{password, session},
     bootstrap,
     config::Config,
+    records::backfill,
     routes,
     sample::{self, guard, marker, options::Options},
+    shutdown, signup,
     state::AppState,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -19,11 +21,16 @@ async fn main() {
 }
 
 async fn run() -> Result<(), String> {
+    // Before any command: domain database errors keep their own messages.
+    routes::register_domain_errors();
     let config = Config::from_env()?;
+    if config.messaging.is_none() {
+        eprintln!("Channel connections are disabled: CRM_MESSAGING_KEY is not set.");
+    }
     let command = std::env::args().nth(1);
+    let args: Vec<String> = std::env::args().skip(2).collect();
     let sample_options = match command.as_deref() {
         Some(name @ ("seed-sample" | "clear-sample")) => {
-            let args: Vec<String> = std::env::args().skip(2).collect();
             let options = Options::parse(name, &args)?;
             // Before connecting: never reach a database outside local development.
             guard::ensure_local(!config.secure_cookie, &config.database_url)?;
@@ -31,11 +38,15 @@ async fn run() -> Result<(), String> {
         }
         _ => None,
     };
+    let backfill_options = backfill::options::requested(command.as_deref(), &args)?;
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&config.database_url)
         .await
         .map_err(|_| "CRM database connection failed.")?;
+    if config.signup == kws_crm_api::config::SignupMode::Local {
+        marker::ensure(&pool).await?;
+    }
     if sample_options.is_some() {
         // Before migrations or writes: the database itself must be marked as local.
         marker::ensure(&pool).await?;
@@ -44,10 +55,20 @@ async fn run() -> Result<(), String> {
         .run(&pool)
         .await
         .map_err(|_| "CRM schema migration failed. Check database access and migration history.")?;
+    if config.signup == kws_crm_api::config::SignupMode::Local {
+        signup::cleanup::run(&pool)
+            .await
+            .map_err(|_| "CRM sign-up retention cleanup failed.")?;
+        signup::cleanup::schedule(pool.clone());
+    }
     if let Some(options) = sample_options {
         let database = guard::describe(&config.database_url);
         println!("{}", sample::run(&pool, options, &database).await?);
         return Ok(());
+    }
+    if let Some(options) = backfill_options {
+        let mut out = std::io::stdout();
+        return backfill::run(&pool, config.media.as_ref(), options, &mut out).await;
     }
     if command.as_deref() == Some("migrate") {
         println!("CRM database migrations applied.");
@@ -61,27 +82,61 @@ async fn run() -> Result<(), String> {
         return Ok(());
     }
     if command.is_some() {
-        return Err("Supported commands: create-user, migrate, seed-sample, clear-sample.".into());
+        return Err(
+            "Supported commands: create-user, migrate, media-backfill, seed-sample, clear-sample."
+                .into(),
+        );
     }
     let address = config.address;
+    let signup_worker = config.signup_worker;
+    let local_signup = config.signup == kws_crm_api::config::SignupMode::Local;
     let dummy_hash = password::hash(session::random_token())
         .await
         .map_err(|_| "CRM authentication initialization failed.")?;
+    let signup = Arc::new(signup::Services::new(
+        config.signup,
+        signup::client::ClientKeys::new(
+            &config.trusted_proxies,
+            &config.client_header,
+            &config.client_secret,
+        )?,
+        match &config.turnstile {
+            Some(turnstile) => signup::bot::turnstile(turnstile)
+                .map_err(|error| format!("Turnstile configuration failed: {error}"))?,
+            None => Arc::new(signup::bot::LocalBypass::new(config.signup)),
+        },
+    ));
     let state = AppState {
-        pool,
+        pool: pool.clone(),
         config: Arc::new(config),
         dummy_hash: Arc::new(dummy_hash),
         password_workers: Arc::new(tokio::sync::Semaphore::new(4)),
+        signup: signup.clone(),
+    };
+    let (shutdown_tx, shutdown_rx) = tokio::sync::watch::channel(false);
+    let workers = if local_signup && signup_worker {
+        signup::worker::spawn(pool, signup.delivery.clone(), shutdown_rx)
+    } else {
+        Vec::new()
     };
     let listener = tokio::net::TcpListener::bind(address)
         .await
         .map_err(|_| "CRM listener could not bind. Check CRM_BIND_ADDRESS.")?;
     println!("CRM API listening on {address}");
-    axum::serve(listener, routes::app(state))
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
-        })
-        .await
-        .map_err(|_| "CRM HTTP service failed.")?;
+    let signal_tx = shutdown_tx.clone();
+    let served = axum::serve(
+        listener,
+        routes::app(state).into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .with_graceful_shutdown(async move {
+        shutdown::signal().await;
+        let _ = signal_tx.send(true);
+    })
+    .await;
+    let _ = shutdown_tx.send(true);
+    for worker in workers {
+        let _ = worker.await;
+    }
+    served.map_err(|_| "CRM HTTP service failed.")?;
     Ok(())
 }

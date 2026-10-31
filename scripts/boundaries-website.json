@@ -1,0 +1,29 @@
+{
+  "owners": {
+    "sites": [
+      "crm_website_sites",
+      "crm_website_profiles",
+      "crm_website_site_events",
+      "crm_website_content_versions",
+      "crm_website_content_immutable",
+      "crm_website_drafts"
+    ],
+    "publications": [
+      "crm_website_listings",
+      "crm_website_listing_revisions",
+      "crm_website_revisions_immutable",
+      "crm_website_identity_revoked",
+      "crm_website_record_revoked",
+      "crm_website_lifecycle_events",
+      "crm_website_lifecycle_events_immutable",
+      "crm_website_revoke",
+      "crm_website_site_revoked"
+    ],
+    "enquiries": [
+      "crm_website_enquiries",
+      "crm_website_enquiries_workspace",
+      "crm_website_enquiry_events",
+      "crm_website_enquiry_events_immutable"
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+@media (max-width: 760px) {
+  .detail-gallery {
+    height: 300px;
+    margin-bottom: 28px;
+  }
+  .gallery-side {
+    display: none;
+  }
+  .detail-facts {
+    gap: 28px;
+    padding-block: 20px;
+  }
+  .detail-facts b {
+    font-size: 22px;
+  }
+  .detail-price {
+    font-size: 25px;
+  }
+  .detail-title {
+    font-size: 36px;
+  }
+  .detail-section h2 {
+    font-size: 31px;
+  }
+  .anchor-nav {
+    gap: 20px;
+  }
+  .map-stage {
+    height: 280px;
+  }
+  .map-caption {
+    align-items: start;
+    flex-direction: column;
+    min-height: 128px;
+  }
+  .location-actions > .button {
+    width: 100%;
+  }
+  .photo-dialog {
+    padding: 16px;
+  }
+  .photo-dialog header {
+    top: -16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .profile-copy {
+    padding-top: 0;
+  }
+  .profile-intro {
+    padding-bottom: 32px;
+    margin-bottom: 32px;
+  }
+  .contact-layout > img {
+    height: 320px;
+  }
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

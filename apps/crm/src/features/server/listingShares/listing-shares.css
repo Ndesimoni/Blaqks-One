@@ -1,0 +1,133 @@
+/* Listings shared between companies (record sharing R2). Builds on record-shares.css,
+   handover-listing.css and the Agreements styles; theme tokens only. */
+.outside-sharing {
+  margin-top: 12px;
+}
+.outside-share-check label,
+label.outside-share-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.outside-share-check input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--primary);
+}
+.outside-share-review {
+  display: grid;
+  gap: 16px;
+}
+.outside-share-review h3,
+.outside-share-after summary {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+.outside-share-after summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.outside-share-warnings {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 12px 14px 12px 30px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.outside-share-files {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.outside-share-confirm {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.outside-share-badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.outside-share-steps {
+  display: grid;
+  gap: 12px;
+}
+.outside-share-steps:empty {
+  display: none;
+}
+.outside-share-extend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 12px;
+}
+.outside-share-extend .field {
+  flex: 1 1 180px;
+  margin: 0;
+}
+.outside-share-extend .btn {
+  min-height: 44px;
+}
+.listing-shares-panel {
+  display: grid;
+  gap: 14px;
+}
+.listing-sides {
+  justify-self: start;
+}
+.outside-share-cobroking {
+  display: flex;
+  margin: 0 0 12px;
+}
+.outside-share-hidden {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+.outside-share-blur {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 10px;
+  max-height: 106px;
+  overflow: hidden;
+  filter: blur(5px);
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+.outside-share-blur span {
+  height: 48px;
+  border-radius: 10px;
+  background: var(--line);
+}
+.outside-share-hidden-note {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.outside-share-hidden-note strong {
+  color: var(--ink);
+}

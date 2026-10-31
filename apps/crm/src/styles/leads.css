@@ -1,0 +1,131 @@
+/* Compact source chips above the lead toolbar (UI4a); the old summary panel is gone. */
+.lead-source-bar {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+}
+.lead-source-label {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 34px;
+}
+.lead-source-options,
+.lead-source-filter-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lead-source-options {
+  flex: 1;
+  min-width: 0;
+}
+.lead-source-filter-list {
+  min-width: 0;
+}
+.lead-source-options button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+.lead-source-options button:hover,
+.lead-source-options button[aria-pressed='true'],
+.lead-source-options button[aria-expanded='true'] {
+  background: var(--hover);
+  border-color: var(--gold);
+}
+.lead-source-options span {
+  color: var(--muted-dark);
+  font-variant-numeric: tabular-nums;
+}
+.lead-source-more {
+  position: relative;
+  align-self: flex-start;
+}
+.lead-source-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  max-width: calc(100vw - 32px);
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.lead-source-menu-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  padding-left: 10px;
+  font-size: 12px;
+}
+.lead-source-menu .lead-source-menu-close {
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+  border: 0;
+  background: transparent;
+}
+.lead-source-menu .lead-source-choice {
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.lead-source-menu .lead-source-choice span {
+  flex-shrink: 0;
+}
+.lead-filters {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.lead-stage-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+.lead-stage-filter select {
+  min-width: 190px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+}
+.lead-filters .search-small {
+  flex: 1;
+  height: 40px;
+}
+.lead-filters .search-small input {
+  font-size: 12px;
+}
+.leads-page .table-footer {
+  flex-wrap: wrap;
+  gap: 12px;
+}

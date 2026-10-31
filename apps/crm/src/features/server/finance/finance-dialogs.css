@@ -1,0 +1,140 @@
+/* Deal details, calculation panels and finance dialogs. Loaded after finance.css. */
+.finance-handover-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.finance-handover {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.finance-handover-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.finance-handover-text strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.finance-handover-text small {
+  color: var(--muted-dark);
+}
+.finance-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.finance-action-group .btn,
+.finance-dialog .btn,
+.finance-choice label {
+  min-height: 44px;
+}
+.finance-details-footer {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.finance-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 18px;
+  margin: 0 0 16px;
+}
+.finance-fact {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+.finance-fact.wide {
+  grid-column: 1 / -1;
+}
+.finance-fact dt,
+.finance-total dt {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.finance-fact dd {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.finance-calc,
+.finance-revised {
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.finance-calc-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.finance-calc h3,
+.finance-revised h4 {
+  margin: 0;
+  font-size: 15px;
+}
+.finance-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.finance-chip.estimate {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.finance-rows,
+.finance-totals,
+.finance-compare {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+}
+.finance-row,
+.finance-compare-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: baseline;
+}
+.finance-row dt small {
+  margin-left: 6px;
+  color: var(--muted-dark);
+}
+.finance-row dd,
+.finance-total dd,
+.finance-compare-row dd {
+  margin: 0;
+}
+.finance-row.strong {
+  font-weight: 700;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.finance-calc-notes {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}

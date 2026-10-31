@@ -1,27 +1,22 @@
-import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-import { apiTestFiles } from './crm-api-test-files.mjs';
-import { ensurePortFree, run, stop, waitForApi } from './crm-test-processes.mjs';
+import { checkExpiredSignupRemoved, seedExpiredSignup } from './check-signup-cleanup.mjs';
+import { checkSignupOff } from './check-signup-off.mjs';
+import { selectedApiTestFiles } from './crm-api-test-files.mjs';
+import { testEnv } from './crm-test-env.mjs';
+import { createFixtures, raiseFixtureSeats } from './crm-test-fixtures.mjs';
+import { run, startWorker, stop, waitForApi } from './crm-test-processes.mjs';
+import { startStandins } from './crm-test-standins.mjs';
 import { markDatabase } from './mark-dev-database.mjs';
 
-const project = `kws-crm-test-${randomBytes(6).toString('hex')}`;
-const dbPassword = randomBytes(32).toString('hex');
-const env = {
-  ...process.env,
-  CRM_TEST_DB_PASSWORD: dbPassword,
-  CRM_TEST_PROJECT: project,
-  CRM_APP_ORIGIN: 'http://localhost:5175',
-  CRM_BIND_ADDRESS: '127.0.0.1:8790',
-  CRM_ALLOW_INSECURE_LOCAL: 'true',
-  CRM_TEST_API: 'http://127.0.0.1:8790/api/crm',
-  CRM_FIXTURE_PASSWORD: randomBytes(24).toString('hex'),
-  VITE_CRM_MODE: 'server',
-  CRM_API_PROXY: 'http://127.0.0.1:8790',
-};
+// Optional API_TEST_FILES (comma-separated) narrows the API suites; see crm-api-test-files.mjs.
+const apiTestFiles = selectedApiTestFiles();
+const { project, env } = testEnv();
 const compose = ['compose', '-f', 'compose.test.yaml', '-p', project];
 const binary = resolve('services/crm-api/target/debug/kws-crm-api');
 let server;
+let standins;
+let worker;
 let containerStarted = false;
 try {
   await run(
@@ -37,26 +32,46 @@ try {
   });
   const port = address.split(':').at(-1);
   if (!/^\d+$/.test(port)) throw Error('Docker did not report a PostgreSQL port.');
-  env.CRM_DATABASE_URL = `postgres://kws_crm_test:${dbPassword}@127.0.0.1:${port}/kws_crm_test`;
-  for (const [name, email, role] of [
-    ['Fixture Owner', 'owner@crm-fixture.test', 'super-admin'],
-    ['Fixture Admin A', 'admin-a@crm-fixture.test', 'admin'],
-    ['Fixture Admin B', 'admin-b@crm-fixture.test', 'admin'],
-  ]) {
-    await run(binary, ['create-user'], {
-      ...env,
-      CRM_BOOTSTRAP_NAME: name,
-      CRM_BOOTSTRAP_EMAIL: email,
-      CRM_BOOTSTRAP_PHONE: '+971501234567',
-      CRM_BOOTSTRAP_ROLE: role,
-      CRM_BOOTSTRAP_PASSWORD: env.CRM_FIXTURE_PASSWORD,
-    });
-  }
-  await ensurePortFree('127.0.0.1', 8790);
+  env.CRM_DATABASE_URL = `postgres://kws_crm_test:${env.CRM_TEST_DB_PASSWORD}@127.0.0.1:${port}/kws_crm_test`;
+  const storage = await run('docker', [...compose, 'port', 'storage', '8333'], env, {
+    capture: true,
+  });
+  env.CRM_MEDIA_ENDPOINT = `http://127.0.0.1:${storage.split(':').at(-1)}`;
+  await createFixtures(binary, env);
+  standins = await startStandins(env);
+  await checkSignupOff(binary, env);
+  seedExpiredSignup(compose);
   server = spawn(binary, [], { env, stdio: 'inherit' });
   await waitForApi(`${env.CRM_TEST_API}/health`, server);
+  checkExpiredSignupRemoved(compose);
+  await raiseFixtureSeats(compose, env);
+  if (!process.argv.includes('--browser-only')) {
+    // Database-backed Rust contracts use this same disposable, migrated database.
+    await run(
+      'cargo',
+      [
+        'test',
+        '--locked',
+        '--offline',
+        '--manifest-path',
+        'services/crm-api/Cargo.toml',
+        '--lib',
+        '--',
+        '--ignored',
+        '--test-threads=1',
+      ],
+      env,
+    );
+  }
+  // After the Rust contracts, which create and inspect outbox jobs themselves.
+  worker = startWorker(binary, env);
   if (!process.argv.includes('--browser-only')) {
     await run('node', ['--test', '--test-concurrency=1', ...apiTestFiles], env);
+  }
+  // The restart check reads records the full suite saves, so a filtered run skips it.
+  const filtered = Boolean(process.env.API_TEST_FILES?.trim());
+  if (filtered) console.log('API_TEST_FILES is set: skipping the restart check.');
+  if (!process.argv.includes('--browser-only') && !filtered) {
     const identity = await fetch(`${env.CRM_TEST_API}/auth/login`, {
       method: 'POST',
       headers: { Origin: env.CRM_APP_ORIGIN, 'Content-Type': 'application/json' },
@@ -70,7 +85,7 @@ try {
     await stop(server);
     server = spawn(binary, [], { env, stdio: 'inherit' });
     await waitForApi(`${env.CRM_TEST_API}/health`, server);
-    await run('node', ['--test', 'tests/api/restart.test.mjs'], {
+    await run('node', ['--test', 'apps/crm/tests/api/restart.test.mjs'], {
       ...env,
       CRM_RESTART_COOKIE: cookie,
     });
@@ -98,7 +113,7 @@ try {
       .filter((argument) => !['--browser', '--browser-only'].includes(argument));
     await run(
       'npx',
-      ['playwright', 'test', '--config', 'playwright.server.config.js', ...filters],
+      ['playwright', 'test', '--config', 'apps/crm/playwright.server.config.js', ...filters],
       env,
     );
   }
@@ -106,7 +121,9 @@ try {
   console.error(error.message);
   process.exitCode = 1;
 } finally {
+  await stop(worker);
   await stop(server);
+  await standins?.close();
   if (containerStarted) {
     try {
       await run('docker', [...compose, 'down'], env);

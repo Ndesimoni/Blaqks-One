@@ -1,0 +1,144 @@
+{
+  "owners": {
+    "auth": [
+      "crm_users",
+      "crm_sessions",
+      "crm_login_limits",
+      "crm_account_events",
+      "crm_account_events_immutable",
+      "crm_account_consents",
+      "crm_account_consents_immutable",
+      "crm_user_profiles",
+      "crm_all_user_profiles",
+      "crm_member_profiles"
+    ],
+    "workspaces": [
+      "crm_workspaces",
+      "crm_company_profiles",
+      "crm_company_events",
+      "crm_company_events_immutable",
+      "crm_company_limit_events"
+    ],
+    "signup": ["crm_signup_requests", "crm_signup_outbox"],
+    "agreements": [
+      "crm_agreements",
+      "crm_agreement_participants",
+      "crm_agreement_revisions",
+      "crm_agreement_events",
+      "crm_agreement_actions",
+      "crm_agreement_payments",
+      "crm_listing_snapshots",
+      "crm_listing_shares",
+      "crm_listing_share_events",
+      "crm_listing_shares_lapse",
+      "crm_listing_shares_end",
+      "crm_listing_share_taken",
+      "crm_market_releases",
+      "crm_market_releases_immutable",
+      "crm_market_release_guard"
+    ],
+    "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
+    "records": ["crm_records", "crm_activity", "crm_record_keeps", "crm_record_shares"],
+    "assignments": [
+      "crm_assignments",
+      "crm_assignment_notes",
+      "crm_check_assignee",
+      "crm_records_assignable"
+    ],
+    "finance": [
+      "crm_finance_settings",
+      "crm_commission_agreements",
+      "crm_deals",
+      "crm_deal_snapshots",
+      "crm_deal_commission_lines",
+      "crm_deal_handovers",
+      "crm_payments",
+      "crm_expenses",
+      "crm_finance_events",
+      "crm_deal_approved_fils",
+      "crm_agreement_applies_to_earned"
+    ],
+    "imports": ["crm_import_plans"],
+    "performance": ["crm_targets", "crm_targets_identity_fixed"],
+    "marketplace": [
+      "crm_market_applications",
+      "crm_market_decisions",
+      "crm_market_companies",
+      "crm_market_company_events",
+      "crm_market_events",
+      "crm_market_terms",
+      "crm_market_acceptances",
+      "crm_market_profiles",
+      "crm_market_consents",
+      "crm_market_requests",
+      "crm_market_request_sources",
+      "crm_market_answers",
+      "crm_market_conversations",
+      "crm_market_messages",
+      "crm_market_notices"
+    ],
+    "sample": ["crm_sample_records", "crm_sample_accounts", "crm_sample_finance", "crm_environment"]
+  },
+  "domainFree": {
+    "paths": ["auth/", "workspaces/", "error.rs", "error_tests.rs", "state.rs", "config.rs"],
+    "domains": [
+      "activity",
+      "records",
+      "finance",
+      "team",
+      "assignments",
+      "imports",
+      "performance",
+      "agreements",
+      "inbox",
+      "chat",
+      "integrations",
+      "outbox",
+      "sample",
+      "media",
+      "marketplace",
+      "sites",
+      "publications",
+      "catalogue",
+      "enquiries"
+    ]
+  },
+  "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],
+  "unrestricted": {
+    "sample": "C12: development-only operator tool that seeds and clears every table"
+  },
+  "allowed": {
+    "root": {
+      "crm_users": "bootstrap.rs creates the first accounts (trusted command line)",
+      "crm_records_assignable": "error_tests.rs: a named CHECK constraint stays a generic 503"
+    },
+    "workspaces": {
+      "crm_users": "C2/C8: live membership, owner archive and directory checks"
+    },
+    "team": {
+      "crm_workspaces": "C5: team access reads the workspace owner",
+      "crm_records": "C5: archive snapshot counts the workspace's records"
+    },
+    "records": {
+      "crm_assignments": "C4: records::history is the shared assignment-history writer",
+      "crm_workspaces": "C5: default holder reads the workspace owner",
+      "crm_users": "C9: display-name join in projections"
+    },
+    "assignments": {
+      "crm_records": "C5: assignee_id lives on crm_records; records and assignments stay one unit",
+      "crm_activity": "C4: departure writes assigned activity in one statement",
+      "crm_users": "C9: display names; eligibility locks the member row",
+      "crm_workspaces": "C5: the assignee list reads the workspace owner"
+    },
+    "finance": {
+      "crm_records": "C1/C5: deal client and property links, earn rules and totals",
+      "crm_users": "C9: display names; agreement agent check",
+      "crm_workspaces": "C5: the deal assignee list reads the workspace owner",
+      "crm_assignments": "C4: departure history written in one statement",
+      "crm_activity": "C4: departure activity written in one statement"
+    },
+    "imports": {
+      "crm_records": "C5: import insertion and snapshots (a capability of records)"
+    }
+  }
+}

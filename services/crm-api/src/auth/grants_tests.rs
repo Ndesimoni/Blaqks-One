@@ -39,14 +39,21 @@ fn user(role: &str, scope: &str, permissions: Permissions, actions: Value) -> Us
         channel_access: Json(Default::default()),
         record_scope: scope.into(),
         actions: Json(actions),
+        language: None,
+        guidance_enabled: None,
     }
 }
 
+/// Every module, deleteMain and team finance (L-F2: finance references need teamView).
 fn full_staff(scope: &str) -> UserRow {
-    let all = modules(true, true, true);
+    let all = Permissions {
+        finance: true,
+        ..modules(true, true, true)
+    };
     let mut actions = serde_json::to_value(Actions::preset(&all)).unwrap();
     actions["relationships"]["deleteMain"] = json!(true);
     actions["properties"]["deleteMain"] = json!(true);
+    actions["finance"]["teamView"] = json!(true);
     user("staff", scope, all, actions)
 }
 
@@ -61,7 +68,7 @@ fn admins_can_everything_and_unknown_roles_nothing() {
         }
         assert_eq!(
             admin.profile_actions(),
-            serde_json::to_value(Actions::full()).unwrap()
+            serde_json::to_value(Actions::full(role)).unwrap()
         );
     }
     let full = full_staff("team");
@@ -90,6 +97,15 @@ fn staff_parents_need_team_scope_delete_main_and_reference_coverage() {
     let mut no_properties = team.clone();
     no_properties.permissions.0.properties = false;
     assert!(!no_properties.can("Contacts", Action::Delete));
+    // L-F2 / Q9: deals reference Clients and Properties, so those need team finance.
+    let mut no_finance_view = team.clone();
+    no_finance_view.actions.0["finance"]["teamView"] = json!(false);
+    assert!(!no_finance_view.can("Clients", Action::Delete));
+    assert!(!no_finance_view.can("Properties", Action::Delete));
+    assert!(no_finance_view.can("Contacts", Action::Delete));
+    let mut no_finance = team.clone();
+    no_finance.permissions.0.finance = false;
+    assert!(!no_finance.covers_references("Clients") && no_finance.covers_references("Contacts"));
     assert!(!team.can("Viewings", Action::Assign) && team.can("Follow-ups", Action::Assign));
     assert_eq!(Action::Assign.denied().1, ASSIGN_DENIED);
     assert_eq!(

@@ -1,54 +1,40 @@
+#[path = "routes_support.rs"]
+mod support;
+
 use crate::{
-    assignments,
+    activity, agreements, assignments,
     auth::handlers as auth,
-    error::{ApiError, ApiResult},
-    imports,
+    chat,
+    error::{self, CodeMapper},
+    finance, imports, inbox, integrations, marketplace, media, performance,
     records::handlers as records,
+    signup,
     state::AppState,
     team, workspaces,
 };
 use axum::{
-    extract::{DefaultBodyLimit, Request, State},
-    http::{header, HeaderValue, StatusCode},
-    middleware::{self, Next},
-    response::Response,
+    extract::DefaultBodyLimit,
+    middleware,
     routing::{get, post, put},
-    Json, Router,
+    Router,
 };
-use serde_json::{json, Value};
+use support::{health, response_policy, unknown_route, unsupported_method};
 
-async fn health(State(state): State<AppState>) -> ApiResult<Json<Value>> {
-    sqlx::query_scalar::<_, i32>("SELECT 1")
-        .fetch_one(&state.pool)
-        .await?;
-    Ok(Json(json!({"status": "ok", "service": "kws-crm-api"})))
-}
+const DOMAIN_CODES: &[CodeMapper] = &[
+    finance::errors::mapped,
+    performance::errors::mapped,
+    agreements::errors::mapped,
+    marketplace::errors::mapped,
+];
 
-async fn response_policy(request: Request, next: Next) -> Response {
-    let mut response = next.run(request).await;
-    let headers = response.headers_mut();
-    headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
-    headers.insert(header::PRAGMA, HeaderValue::from_static("no-cache"));
-    headers.insert(
-        "x-content-type-options",
-        HeaderValue::from_static("nosniff"),
-    );
-    response
-}
-
-async fn unknown_route() -> ApiError {
-    ApiError(StatusCode::NOT_FOUND, "API route not found.", "not_found")
-}
-
-async fn unsupported_method() -> ApiError {
-    ApiError(
-        StatusCode::METHOD_NOT_ALLOWED,
-        "HTTP method not allowed.",
-        "method_not_allowed",
-    )
+/// Registers every domain's database error mapping. `app` calls it; command-line paths
+/// that convert database errors call it before running.
+pub fn register_domain_errors() {
+    error::register_codes(DOMAIN_CODES);
 }
 
 pub fn app(state: AppState) -> Router {
+    register_domain_errors();
     Router::new()
         .route("/api/crm/health", get(health))
         .route(
@@ -101,16 +87,16 @@ pub fn app(state: AppState) -> Router {
             get(records::list),
         )
         .route(
-            "/api/crm/workspaces/{workspace}/activity",
-            get(workspaces::handlers::activity),
-        )
-        .route(
             "/api/crm/workspaces/{workspace}/records/{collection}",
             post(records::create),
         )
         .route(
             "/api/crm/workspaces/{workspace}/records/{collection}/{id}",
             axum::routing::patch(records::update).delete(records::delete),
+        )
+        .route(
+            "/api/crm/workspaces/{workspace}/records/{collection}/{id}/files/{file}",
+            get(crate::records::files::file),
         )
         .route(
             "/api/crm/workspaces/{workspace}/records/{collection}/{id}/assignee",
@@ -129,6 +115,26 @@ pub fn app(state: AppState) -> Router {
             post(assignments::bulk::bulk)
                 .layer(DefaultBodyLimit::max(assignments::requests::MAX_BULK_BYTES)),
         )
+        .merge(crate::auth::account::router())
+        .merge(agreements::routes::router())
+        .merge(agreements::listings::routes::router())
+        .merge(marketplace::routes::router())
+        .merge(integrations::routes::router())
+        .merge(integrations::webhooks::router())
+        .merge(inbox::routes::router())
+        .merge(chat::routes::router())
+        .merge(media::routes::router())
+        .merge(finance::routes::router())
+        .merge(performance::routes::router())
+        .merge(activity::routes::router())
+        .merge(crate::records::shares::routes::router())
+        .merge(team::routes::router())
+        .merge(workspaces::routes::router())
+        .merge(crate::sites::routes::router())
+        .merge(crate::publications::routes::router())
+        .merge(crate::catalogue::routes::router())
+        .merge(crate::enquiries::routes::router())
+        .merge(signup::routes::router(state.config.signup))
         .fallback(unknown_route)
         .method_not_allowed_fallback(unsupported_method)
         .layer(DefaultBodyLimit::max(12 * 1024 * 1024 + 1024))

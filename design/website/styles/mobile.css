@@ -1,0 +1,75 @@
+@media (max-width: 1150px) {
+  .header-meta {
+    display: none;
+  }
+  .header nav {
+    gap: 16px;
+  }
+  .editor-layout {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+  .editor-preview {
+    display: none;
+  }
+  .results-content .property-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .detail-layout {
+    gap: 30px;
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+}
+@media (max-width: 760px) {
+  body {
+    font-size: 14px;
+    padding-bottom: 70px;
+  }
+  .header {
+    min-height: 68px;
+    padding: 14px 20px;
+  }
+  .brand {
+    font-size: 12px;
+    max-width: calc(100% - 45px);
+    white-space: normal;
+  }
+  .brand-mark {
+    font-size: 28px;
+  }
+  .menu-button {
+    display: block;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font-size: 23px;
+    width: 44px;
+    height: 44px;
+  }
+  .header nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--panel);
+    padding: 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .header nav.open {
+    display: grid;
+  }
+  .header nav a {
+    padding: 9px 0;
+  }
+  .section {
+    padding: 40px 20px;
+  }
+  .page-top {
+    padding-top: 28px;
+  }
+  .section-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

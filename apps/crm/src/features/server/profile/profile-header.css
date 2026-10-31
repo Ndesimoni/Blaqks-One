@@ -1,0 +1,141 @@
+/* My profile identity card, avatar tones and the account facts list. */
+:root[data-theme] .panel.acct-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+}
+.acct-avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.acct-avatar[data-tone='0'] {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.acct-avatar[data-tone='1'] {
+  background: color-mix(in srgb, var(--primary) 14%, var(--panel));
+  color: var(--primary);
+}
+.acct-avatar[data-tone='2'] {
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+.acct-avatar[data-tone='3'] {
+  background: color-mix(in srgb, var(--gold) 24%, var(--panel));
+  color: var(--ink);
+}
+:root[data-theme] .acct-identity p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+:root[data-theme] .acct-identity .acct-name {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+:root[data-theme] .acct-identity .acct-email {
+  margin: 2px 0 10px;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.acct-header-meta {
+  display: grid;
+  gap: 12px;
+  min-width: 220px;
+  margin: 0;
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+:is(.acct-header-meta, .acct-list) dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 500;
+}
+:is(.acct-header-meta, .acct-list) dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.acct-header-meta dd {
+  font-size: 13px;
+  font-weight: 600;
+}
+.acct-list {
+  margin: 0;
+}
+.acct-item {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 24px;
+}
+.acct-item + .acct-item {
+  border-top: 1px solid var(--line);
+}
+.acct-list dt {
+  font-size: 13px;
+}
+.acct-value {
+  display: block;
+  font-weight: 600;
+}
+.acct-locked,
+.acct-card-foot.acct-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.acct-locked {
+  margin-top: 4px;
+}
+.acct-card-foot.acct-note {
+  flex-wrap: nowrap;
+  gap: 8px;
+  font-size: 13px;
+}
+@media (max-width: 900px) {
+  :root[data-theme] .panel.acct-header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .acct-header-meta {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+}
+@media (max-width: 650px) {
+  :root[data-theme] .panel.acct-header {
+    gap: 16px;
+  }
+  .acct-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+  }
+  .acct-header-meta {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+  }
+  .acct-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding: 12px 16px;
+  }
+}

@@ -25,12 +25,18 @@ pub fn pattern(collection: &str) -> ApiResult<String> {
 }
 
 pub fn format(collection: &str, number: i64) -> ApiResult<String> {
+    numbered(prefix(collection)?, number)
+}
+
+/// `PREFIX-NNN`, or the exhaustion conflict outside `1..=MAX_NUMBER` (also used by
+/// `finance::ids`).
+pub fn numbered(prefix: &str, number: i64) -> ApiResult<String> {
     if !(1..=MAX_NUMBER).contains(&number) {
         return Err(ApiError::conflict(
             "No record IDs are left for this collection. Ask your Admin.",
         ));
     }
-    Ok(format!("{}-{number:03}", prefix(collection)?))
+    Ok(format!("{prefix}-{number:03}"))
 }
 
 /// Issues the next ID for `collection`. Call under the workspace lock: the maximum is

@@ -1,0 +1,150 @@
+/* Team & access → Finance settings (finance-design §7). Loads after team-actions.css. */
+.team-finance {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.team-finance[hidden] {
+  display: none;
+}
+.team-finance-panel {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  min-width: 0;
+}
+.team-finance-heading h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+.team-finance-heading p,
+.team-finance-hint,
+.team-finance-empty {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.team-finance-note {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.team-finance-form {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.team-finance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px 16px;
+}
+.team-finance-form .field {
+  margin: 0;
+}
+.team-finance-form .field input,
+.team-finance-form .field select {
+  min-height: 44px;
+}
+.team-finance-choice {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.team-finance-choice.is-options {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+.team-finance-choice legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+.team-finance-choice > label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background var(--duration) var(--ease);
+}
+.team-finance-choice > label:hover {
+  border-color: var(--focus);
+  background: var(--hover);
+}
+.team-finance-choice > label:has(input:checked) {
+  border-color: var(--focus);
+  background: var(--surface-subtle);
+  font-weight: 600;
+}
+:root[data-theme] .team-finance-choice > label input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--focus);
+}
+.team-finance-choice:not(.is-options) > label {
+  justify-self: start;
+  padding-right: 20px;
+}
+.team-finance-choice .field {
+  max-width: 360px;
+}
+.team-finance-choice:disabled > label {
+  cursor: not-allowed;
+  color: var(--muted);
+}
+.team-finance-form > .team-finance-actions {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.team-finance-fixed {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.team-finance-fixed strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.team-finance-actions,
+.team-finance-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.team-finance-actions .btn,
+.team-finance-recovery .btn,
+.team-agreement-timeline .btn {
+  min-height: 44px;
+}
+.team-finance-status {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.team-finance-status:empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

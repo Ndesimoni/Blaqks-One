@@ -1,0 +1,132 @@
+/* Website → Team tab and the shared public profile fields (also used by My profile). */
+.wt-team {
+  display: grid;
+  gap: 16px;
+}
+.wt-intro h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.wt-intro p,
+.wt-muted {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.wt-intro p {
+  font-size: 13px;
+}
+/* The status region stays in the accessibility tree while empty, without leaving a gap. */
+.wt-feedback:has(.wt-done:empty):not(:has(.field-error)) {
+  height: 0;
+  margin-bottom: -16px;
+  overflow: hidden;
+}
+:root[data-theme] .wt-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+/* Cells wrap so every column, Actions included, stays in view beside the sidebar. */
+:root[data-theme] .wt-table {
+  min-width: 860px;
+  white-space: normal;
+}
+:root[data-theme] .wt-table :is(td, tbody th) {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+/* The person cell is a row header, not a column header: no header band or capitals. */
+:root[data-theme] .wt-table tbody th {
+  min-width: 200px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  border-bottom: 1px solid var(--line);
+}
+:root[data-theme] .wt-table tbody tr:last-child th {
+  border-bottom: 0;
+}
+.wt-name {
+  display: block;
+  margin: 2px 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.wt-stack {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+.wt-strong,
+.wt-live {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.wt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wt-table :is(.btn, .wt-consent, .wt-link, .wt-live) {
+  white-space: nowrap;
+}
+.wt-cards {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-theme] .panel.wt-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+.wt-card h3.wt-name {
+  font-size: 15px;
+}
+.wt-card-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.wt-card-details dt {
+  margin-bottom: 4px;
+  color: var(--muted-dark);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.wt-card-details dd {
+  margin: 0;
+}
+.wt-card-wide {
+  grid-column: 1 / -1;
+}
+.wt-card .wt-actions .btn,
+.wt-card .wt-card-wide .btn {
+  min-height: 44px;
+}

@@ -1,0 +1,54 @@
+/* The platform queue for marketplace applications (packet MK1a): one row per company, the
+   counts behind its checklist and the decision buttons its state allows. */
+.market-applications {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-application {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.market-application-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.market-application-head strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+.market-counts {
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  font-variant-numeric: tabular-nums;
+}
+.market-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.market-decision-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

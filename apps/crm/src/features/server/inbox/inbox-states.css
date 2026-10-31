@@ -1,0 +1,58 @@
+/* Inbox empty, failed and loading states: calm messages and a skeleton, no spinner. */
+.inbox-state {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 24px;
+  color: var(--muted);
+  text-align: center;
+}
+.inbox-state strong {
+  color: var(--ink);
+  font-size: 17px;
+}
+.inbox-state.is-calm svg {
+  color: var(--accent);
+}
+.inbox-skeleton {
+  display: grid;
+  gap: 18px;
+  padding: 16px;
+}
+.inbox-skeleton-row {
+  display: flex;
+  gap: 12px;
+}
+.inbox-skeleton-avatar,
+.inbox-skeleton-lines span {
+  border-radius: 999px;
+  background: var(--hover);
+  animation: inbox-shimmer 1.4s var(--ease) infinite alternate;
+}
+.inbox-skeleton-avatar {
+  inline-size: 40px;
+  block-size: 40px;
+}
+.inbox-skeleton-lines {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+  padding-block-start: 4px;
+}
+.inbox-skeleton-lines span {
+  block-size: 11px;
+}
+@keyframes inbox-shimmer {
+  to {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inbox-skeleton-avatar,
+  .inbox-skeleton-lines span {
+    animation: none;
+  }
+}

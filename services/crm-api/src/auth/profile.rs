@@ -1,4 +1,5 @@
 use super::{
+    finance_access::FinanceAccess,
     grants::RecordActions,
     permissions::{ChannelAccess, Permissions},
 };
@@ -24,6 +25,13 @@ pub struct UserRow {
     pub record_scope: String,
     /// Raw `crm_users.actions`, decoded leniently by `Actions::from_stored`.
     pub actions: Json<Value>,
+    /// Interface language (migration 0021). Only own-account payloads read it; rows from
+    /// views without the column (the team directory) leave it out.
+    #[sqlx(default)]
+    pub language: Option<String>,
+    /// Automatic field hints (migration 0026). Own-account rows only, like `language`.
+    #[sqlx(default)]
+    pub guidance_enabled: Option<bool>,
 }
 
 impl UserRow {
@@ -63,6 +71,7 @@ pub struct Profile {
     pub name: String,
     pub email: String,
     pub phone: String,
+    pub phone_verified: bool,
     pub role: String,
     pub role_id: String,
     pub owner_id: Uuid,
@@ -75,6 +84,13 @@ pub struct Profile {
     pub record_scope: String,
     pub actions: Value,
     pub record_actions: BTreeMap<&'static str, RecordActions>,
+    pub finance_access: FinanceAccess,
+    /// Allowlisted; absent from team payloads, so no one sees another member's choice.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<&'static str>,
+    /// Own-account field hint preference; absent from team payloads like `language`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guidance_enabled: Option<bool>,
 }
 
 impl From<UserRow> for Profile {
@@ -83,11 +99,14 @@ impl From<UserRow> for Profile {
         let record_scope = user.record_scope_label().into();
         let actions = user.profile_actions();
         let record_actions = user.record_actions();
+        let finance_access = user.finance_access();
+        let language = user.language.as_deref().map(super::account::language::code);
         Self {
             id: user.id,
             name: user.name,
             email: user.email,
             phone: user.phone,
+            phone_verified: false,
             role: match user.role.as_str() {
                 "super-admin" => "Super Admin",
                 "admin" => "Admin",
@@ -105,6 +124,9 @@ impl From<UserRow> for Profile {
             record_scope,
             actions,
             record_actions,
+            finance_access,
+            language,
+            guidance_enabled: user.guidance_enabled,
         }
     }
 }

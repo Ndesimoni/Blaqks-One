@@ -46,12 +46,8 @@ pub async fn scope(
 }
 
 pub async fn lock(transaction: &mut Transaction<'_, Postgres>, scope: &Scope) -> ApiResult<()> {
-    let mut workspaces = vec![scope.workspace.as_str(), scope.target_workspace.as_str()];
-    workspaces.sort_unstable();
-    workspaces.dedup();
-    for workspace in workspaces {
-        workspaces::lock(transaction, workspace).await?;
-    }
+    let both = [scope.workspace.as_str(), scope.target_workspace.as_str()];
+    workspaces::lock_all(transaction, &both).await?;
     let available: bool =
         sqlx::query_scalar("SELECT deleted_at IS NULL FROM crm_users WHERE id=$1 FOR SHARE")
             .bind(scope.owner)

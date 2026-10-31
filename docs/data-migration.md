@@ -10,7 +10,7 @@ If connected mode uses the same browser profile and origin, sign in as a live Su
 
 An empty file is not a backup of browser records. Records must be exported from the browser that holds them; the development agent cannot read another browser's local storage. Private backups should stay outside `public/` and source control.
 
-A ready-to-use fictional example is provided at [`public/demo/demo-workspace-backup.json`](../public/demo/demo-workspace-backup.json). It contains 8 Clients, 3 Contacts, 13 Properties with labelled demo photos, plus the remaining original demo collections retained for later migration. It uses organisation ownership. This is a sample file, not an export of your existing browser data. Regenerate it with `npm run demo:backup`; it is a generated artifact excluded from hand-written file-size and formatting checks. Only this fictional file is served publicly.
+A ready-to-use fictional example is provided at [`apps/crm/public/demo/demo-workspace-backup.json`](../apps/crm/public/demo/demo-workspace-backup.json). It contains 8 Clients, 3 Contacts, 13 Properties with labelled demo photos, plus the remaining original demo collections retained for later migration. It uses organisation ownership. This is a sample file, not an export of your existing browser data. Regenerate it with `npm run demo:backup`; it is a generated artifact excluded from hand-written file-size and formatting checks. Only this fictional file is served publicly.
 
 ## Review and import
 

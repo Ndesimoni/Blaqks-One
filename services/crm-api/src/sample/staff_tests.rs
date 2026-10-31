@@ -1,5 +1,5 @@
 use super::*;
-use crate::{records::visibility::ASSIGNABLE, team::validation};
+use crate::{auth::identity_rules as validation, records::visibility::ASSIGNABLE};
 
 #[test]
 fn specs_are_valid_members_with_distinct_grants() {

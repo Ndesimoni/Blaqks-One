@@ -1,0 +1,20 @@
+.market-stats summary {
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 13px;
+}
+.market-stats summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.market-agreement a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+.market-agreement dd a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

@@ -1,0 +1,100 @@
+/* Frozen terms, evidence and history: thin rules, label/value pairs. After agreement-detail.css. */
+.agreement-terms {
+  display: grid;
+  gap: 18px;
+}
+.agreement-facts h3,
+.agreement-evidence h3,
+.agreement-history h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+.agreement-facts dl,
+.agreement-evidence dl,
+.agreement-review-parties {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 0 20px;
+  margin: 0;
+  border-block-start: 1px solid var(--line);
+}
+.agreement-facts dl > div,
+.agreement-evidence dl > div,
+.agreement-review-parties > div {
+  display: grid;
+  gap: 2px;
+  padding-block: 10px;
+  border-block-end: 1px solid var(--line);
+  min-inline-size: 0;
+}
+.agreement-facts .is-wide,
+.agreement-evidence .is-wide {
+  grid-column: 1 / -1;
+}
+.agreement-facts dt,
+.agreement-evidence dt,
+.agreement-review-parties dt {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.agreement-facts dd,
+.agreement-evidence dd,
+.agreement-review-parties dd {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.agreement-facts dd small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.agreement-figure {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.agreement-evidence {
+  display: grid;
+  gap: 8px;
+}
+.agreement-digest {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-all;
+}
+.agreement-history ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-inline-start: 2px solid var(--line);
+}
+.agreement-history li {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding-block: 6px;
+  padding-inline-start: 16px;
+  font-size: 13px;
+}
+.agreement-history li::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: -6px;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+.agreement-history small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}

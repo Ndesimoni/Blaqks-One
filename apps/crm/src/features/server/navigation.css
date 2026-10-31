@@ -1,0 +1,46 @@
+.connected-shell .connected-nav-item {
+  gap: 8px;
+}
+.connected-nav-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+.connected-nav-status {
+  flex-shrink: 0;
+  padding: 2px 4px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+/* Connected groups are named sections, not shouted demo headers. */
+.connected-shell .nav-label,
+.navigation-drawer .nav-label {
+  text-transform: uppercase;
+}
+.nav-group-pinned {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+.connected-shell .nav-groups {
+  overscroll-behavior: contain;
+}
+.navigation-drawer .connected-nav-item {
+  gap: 8px;
+}
+.connected-nav-badge {
+  margin-inline-start: auto;
+  min-inline-size: 20px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--deep);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,68 @@
+.detail-gallery {
+  display: flex;
+  height: 440px;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+.detail-gallery button {
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--soft);
+}
+.gallery-cover {
+  position: relative;
+  flex: 2;
+}
+.detail-gallery img {
+  width: 100%;
+  height: 100%;
+}
+.gallery-cover > span {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 10px 14px;
+  font-size: 12px;
+}
+.gallery-side {
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 0;
+}
+.photo-dialog {
+  max-width: 1000px;
+  width: calc(100vw - 40px);
+  max-height: 90vh;
+  padding: 28px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.photo-dialog::backdrop {
+  background: #071c18d9;
+}
+.photo-dialog header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+  position: sticky;
+  top: -28px;
+  background: var(--paper);
+  padding-block: 16px;
+}
+.photo-dialog h2 {
+  font-size: 26px;
+  margin: 0;
+}
+.photo-dialog img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 16px;
+}

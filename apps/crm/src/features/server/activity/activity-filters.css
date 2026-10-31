@@ -1,0 +1,88 @@
+/* Activity filters: a wrapping row on wide screens; folded behind "Filters" on phones. */
+.activity-filter-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  align-items: end;
+  gap: 12px;
+}
+.activity-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+:root[data-theme] .activity-field label {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+:root[data-theme] .activity-field :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-theme] .activity-field :is(input, select):hover:not(:disabled) {
+  border-color: var(--muted);
+}
+:root[data-theme] .activity-field :is(input, select):focus-visible {
+  border-color: var(--focus);
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+:root[data-theme] .activity-field select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+:root[data-theme] .activity-clear {
+  min-height: 44px;
+  justify-self: start;
+}
+.activity-filter-toggle {
+  display: none;
+}
+.activity-filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+@media (max-width: 720px) {
+  :root[data-theme] .activity-filter-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-height: 44px;
+  }
+  .activity-filter-fields {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+  }
+  .activity-filter-fields.is-open {
+    display: grid;
+  }
+  :root[data-theme] .activity-clear {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+  .activity-toolbar-top {
+    align-items: flex-start;
+  }
+}
+@media (max-width: 380px) {
+  .activity-filter-fields {
+    grid-template-columns: 1fr;
+  }
+}

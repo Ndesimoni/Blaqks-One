@@ -1,0 +1,119 @@
+import React, { useMemo } from 'react';
+import { useSession } from '../../../hooks/useSession.js';
+import { useRecords } from '../../../hooks/useWorkspace.js';
+import { DashboardWelcome } from '../../dashboard/DashboardWelcome.jsx';
+import { PrioritiesPanel } from '../../dashboard/PrioritiesPanel.jsx';
+import { BarListPanel } from '../../dashboard/BarListPanel.jsx';
+import { AssignedToFilter } from '../assignment/AssignedToFilter.jsx';
+import { ConnectedMetrics } from './ConnectedMetrics.jsx';
+import { RecordCountsPanel } from './RecordCountsPanel.jsx';
+import { FinanceWidgets } from './FinanceWidgets.jsx';
+import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
+import { useDashboardWorkload } from './useDashboardWorkload.js';
+import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
+import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
+import { hasTeamFeatures } from '../access.js';
+import { GetStartedChecklist } from './GetStartedChecklist.jsx';
+import '../assignment/assigned-filter.css';
+
+/**
+ * Connected Dashboard: figures from this session's scoped records only, never demo data.
+ * Finance figures come from the workspace's scoped finance overview.
+ */
+export function ServerDashboard({ owner }) {
+  const { user, company } = useSession();
+  // Names use every record the viewer can see; only the figures follow the workload filter.
+  const { data: visible, scope, referenceFor, listingViewings } = useRecords();
+  const workload = useDashboardWorkload();
+  const { data } = workload;
+  const widgets = dashboardWidgets(user);
+  const figures = useMemo(() => selectConnectedDashboard(data), [data]);
+  const ownView = showsListingViewings(workload.filter, workload.me);
+  const upcoming = useMemo(
+    () => upcomingEntries(figures.upcoming, listingViewings, ownView),
+    [figures.upcoming, listingViewings, ownView],
+  );
+  const clientName = (id) => linkedName(visible, referenceFor, 'Clients', id);
+  const propertyName = (id) => linkedName(visible, referenceFor, 'Properties', id);
+  const caption =
+    scope === 'team'
+      ? workload.filter
+        ? 'Figures for the selected workload'
+        : 'Figures from your whole team’s records'
+      : 'Figures from the records assigned to you';
+  return (
+    <div className="page-stack dashboard-page connected-dashboard">
+      <DashboardWelcome />
+      {user.roleId === 'admin' && (
+        <GetStartedChecklist
+          workspaceId={owner.id}
+          data={visible}
+          company={company}
+          firstName={user.name.trim().split(/\s+/)[0]}
+        />
+      )}
+      <div className="subhead-row">
+        <div>
+          <h2>Your business, at a glance</h2>
+          <p>{caption}</p>
+        </div>
+        {workload.module && hasTeamFeatures(user) && (
+          <AssignedToFilter
+            module={workload.module}
+            filter={workload.filter}
+            onChange={workload.setFilter}
+            assignees={workload.assignees}
+            me={workload.me}
+            count={workload.count}
+          />
+        )}
+      </div>
+      <ConnectedMetrics figures={figures} widgets={widgets} />
+      {widgets.finance && owner && <FinanceWidgets owner={owner} />}
+      <div className="split-main">
+        <RecordCountsPanel
+          collections={widgets.collections}
+          counts={figures.counts}
+          caption="Open a list to review or update these records"
+        />
+        {widgets.schedule && (
+          <PrioritiesPanel
+            data={data}
+            summary={{ tasks: figures.tasks, dueTasks: figures.dueTasks }}
+            clientName={clientName}
+          />
+        )}
+      </div>
+      <div className="triple-grid">
+        {widgets.leads && (
+          <>
+            <BarListPanel
+              heading="Lead pipeline"
+              caption="Where your clients stand today"
+              rows={figures.stages}
+              max={figures.maxStage}
+              empty="No lead stages recorded."
+              link={{ label: 'Manage leads', route: 'Leads' }}
+            />
+            <BarListPanel
+              heading="Where leads come from"
+              caption="Top channels bringing clients in"
+              rows={figures.sources.slice(0, 5)}
+              max={figures.maxSource}
+              colorOffset={1}
+              empty="No lead sources recorded."
+              link={{ label: 'Review sources', route: 'Leads' }}
+            />
+          </>
+        )}
+        {widgets.schedule && (
+          <ConnectedUpcomingViewings
+            entries={upcoming}
+            clientName={clientName}
+            propertyName={propertyName}
+          />
+        )}
+      </div>
+    </div>
+  );
+}

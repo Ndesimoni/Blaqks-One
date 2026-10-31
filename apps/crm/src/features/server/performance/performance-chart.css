@@ -1,0 +1,127 @@
+/* Performance 12-month chart: recessive axis and gridlines, thin bars, selected month emphasised. */
+.perf-chart-panel {
+  --perf-bar: color-mix(in srgb, var(--primary) 34%, var(--panel));
+  --perf-bar-hover: color-mix(in srgb, var(--primary) 60%, var(--panel));
+}
+.perf-chart-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin: 0;
+  text-align: right;
+}
+.perf-chart-total span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.perf-chart-total strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.perf-plot {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 10px;
+  margin-top: 8px;
+}
+.perf-axis {
+  position: relative;
+  height: 220px;
+  min-width: 40px;
+}
+.perf-axis span {
+  position: absolute;
+  right: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+.perf-axis span:nth-child(1) {
+  top: 0;
+}
+.perf-axis span:nth-child(2) {
+  top: 50%;
+}
+.perf-axis span:nth-child(3) {
+  top: 100%;
+}
+.perf-bars {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px;
+}
+.perf-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.perf-slot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 220px;
+  background:
+    linear-gradient(var(--line), var(--line)) top / 100% 1px no-repeat,
+    linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat,
+    linear-gradient(var(--muted), var(--muted)) bottom / 100% 1px no-repeat;
+}
+:root[data-theme] .perf-chart-panel .perf-bar {
+  min-height: 0;
+}
+.perf-bar {
+  position: relative;
+  width: min(100%, 28px);
+  border-radius: 4px 4px 0 0;
+  background: var(--perf-bar);
+  transition: background-color var(--duration) var(--ease);
+}
+.perf-bar.is-current {
+  background: var(--primary);
+}
+.perf-bar:hover {
+  background: var(--perf-bar-hover);
+}
+.perf-bar.is-current:hover {
+  background: var(--primary-hover);
+}
+.perf-col small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.perf-col small.is-current {
+  color: var(--ink);
+  font-weight: 700;
+}
+.perf-chart-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+@media (max-width: 750px) {
+  .perf-axis,
+  .perf-slot {
+    height: 180px;
+  }
+  .perf-bars {
+    gap: 2px;
+  }
+  /* Label every other month (ending on the selected one) so names never touch. */
+  .perf-col:nth-child(odd) small {
+    visibility: hidden;
+  }
+  .perf-chart-panel .section-top {
+    flex-wrap: wrap;
+  }
+  .perf-chart-total {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

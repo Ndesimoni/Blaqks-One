@@ -1,0 +1,30 @@
+@media (max-width: 750px) {
+  .lead-source-label {
+    display: none;
+  }
+  .lead-filters {
+    align-items: stretch;
+  }
+  .lead-stage-filter {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+  /* Keep search and reset together without changing their keyboard order. */
+  .lead-filters .search-small {
+    flex-basis: 0;
+    min-width: 0;
+    height: 44px;
+  }
+  .lead-filters > .btn {
+    align-self: flex-start;
+  }
+  /* The connected assignment slot otherwise stacks its label above the select. */
+  .leads-page .lead-filters .assigned-filter label {
+    flex: 0 0 auto;
+  }
+  .leads-page .lead-filters .assigned-filter select {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+  }
+}

@@ -1,4 +1,4 @@
-use crate::team::{access, catalogue};
+use crate::team::{access, account_type::seats, catalogue};
 use crate::{
     auth::{
         profile::{Profile, UserRow},
@@ -95,9 +95,12 @@ pub async fn list(
     .fetch_all(&state.pool)
     .await?;
     let members: Vec<Member> = rows.into_iter().map(Into::into).collect();
-    Ok(Json(
-        json!({"members":members,"roles":catalogue::positions()}),
-    ))
+    let (used, limit, version) = seats::usage(&state.pool, &workspace).await?;
+    Ok(Json(json!({
+        "members":members,
+        "roles":catalogue::positions(),
+        "seats":{"used":used,"limit":limit,"version":version}
+    })))
 }
 
 #[derive(Default, Deserialize)]

@@ -17,6 +17,7 @@ fn task(client: Option<&str>, holds_client: bool) -> Target {
         client_ref: client.map(Into::into),
         property_ref: None,
         referral_ref: None,
+        deal_ref: None,
         holds_client,
     }
 }
@@ -103,6 +104,8 @@ fn staff_without_assign() -> UserRow {
         channel_access: Json(Default::default()),
         record_scope: "team".into(),
         actions: Json(json!({"relationships": {"create": true}})),
+        language: None,
+        guidance_enabled: None,
     }
 }
 

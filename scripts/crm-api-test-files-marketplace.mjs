@@ -1,0 +1,22 @@
+/** Marketplace contracts (broker marketplace MK1 and MK2), in dependency order. */
+export const marketplaceTestFiles = [
+  'apps/crm/tests/api/marketplace-mk4.test.mjs',
+  'apps/crm/tests/api/marketplace-mk4-guards.test.mjs',
+  'apps/crm/tests/api/marketplace-mk4-media.test.mjs',
+  'apps/crm/tests/api/marketplace-offers.test.mjs',
+  'apps/crm/tests/api/marketplace-offer-capacity.test.mjs',
+  'apps/crm/tests/api/market-offer-access.test.mjs',
+  'apps/crm/tests/api/marketplace-lifecycle.test.mjs',
+  'apps/crm/tests/api/marketplace-conversations.test.mjs',
+  'apps/crm/tests/api/marketplace-eligibility.test.mjs',
+  'apps/crm/tests/api/marketplace-guards.test.mjs',
+  'apps/crm/tests/api/marketplace-join.test.mjs',
+  'apps/crm/tests/api/marketplace-profiles.test.mjs',
+  'apps/crm/tests/api/marketplace-requests.test.mjs',
+  'apps/crm/tests/api/marketplace-requests-life.test.mjs',
+  'apps/crm/tests/api/marketplace-board.test.mjs',
+  'apps/crm/tests/api/marketplace-board-hiding.test.mjs',
+  'apps/crm/tests/api/marketplace-review.test.mjs',
+  'apps/crm/tests/api/marketplace-review-access.test.mjs',
+  'apps/crm/tests/api/marketplace-requests-fixes.test.mjs',
+];

@@ -1,0 +1,8 @@
+/* Explicit Turnstile widget (packet R2); logical spacing for right-to-left. */
+:root[data-theme] .signup-turnstile {
+  margin-block: 12px;
+}
+
+:root[data-theme] .signup-turnstile > div:first-child {
+  min-height: 65px;
+}

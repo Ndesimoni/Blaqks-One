@@ -11,7 +11,7 @@ These are public demo details for the frontend preview:
 | Aidah  | aidah@keyswithsimoni.test  | SimoniDemo2026! |
 | Simoni | simoni@keyswithsimoni.test | SimoniDemo2026! |
 
-The email addresses are placeholders until the real addresses are supplied. The password is a public sample, not a password to reuse for a real account. The sign-in page shows these details. Edit `src/config/demoAccounts.js` to change the preview profiles.
+The email addresses are placeholders until the real addresses are supplied. The password is a public sample, not a password to reuse for a real account. The sign-in page shows these details. Edit `apps/crm/src/config/demoAccounts.js` to change the preview profiles.
 
 ## Behavior
 

@@ -1,4 +1,6 @@
+pub mod company;
 pub mod handlers;
+pub mod routes;
 
 use crate::{
     auth::{grants::Action, profile::UserRow, session::Session},
@@ -19,6 +21,50 @@ pub async fn lock(
     Ok(())
 }
 
+/// Locks several workspaces in the one order every caller uses, so no two transactions
+/// can deadlock: the organisation first, then the others by ID (WhatsApp design §4 W-M1).
+pub async fn lock_all(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspaces: &[&str],
+) -> ApiResult<()> {
+    let mut ordered = workspaces.to_vec();
+    ordered.sort_unstable_by_key(|workspace| (*workspace != ORGANISATION, *workspace));
+    ordered.dedup();
+    for workspace in ordered {
+        lock(transaction, workspace).await?;
+    }
+    Ok(())
+}
+
+/// Creates workspace `id` owned by `owner` inside the caller's transaction; workspaces
+/// owns `crm_workspaces` (service-boundaries C5).
+pub async fn create(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    id: &str,
+    owner: uuid::Uuid,
+    actor: uuid::Uuid,
+    company: company::NewCompany,
+) -> ApiResult<()> {
+    sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
+        .bind(id)
+        .bind(owner)
+        .execute(&mut **transaction)
+        .await?;
+    company::create(transaction, id, actor, company).await
+}
+
+/// The owning account of workspace `id`; a missing workspace is refused.
+pub async fn owner_of(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    id: &str,
+) -> ApiResult<uuid::Uuid> {
+    sqlx::query_scalar("SELECT owner_id FROM crm_workspaces WHERE id=$1")
+        .bind(id)
+        .fetch_optional(&mut **transaction)
+        .await?
+        .ok_or_else(ApiError::forbidden)
+}
+
 pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str) -> ApiResult<()> {
     if session.user.role != "super-admin" && workspace != session.user.workspace_id {
         return Err(ApiError::forbidden());
@@ -32,6 +78,23 @@ pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str)
         return Err(ApiError::forbidden());
     }
     Ok(())
+}
+
+/// Whether nothing in `workspace` may change: its owning Admin is archived (which freezes
+/// the whole team's workspace) or the workspace does not exist.
+pub async fn frozen(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    workspace: &str,
+) -> ApiResult<bool> {
+    let writable: bool = sqlx::query_scalar(
+        "SELECT u.deleted_at IS NULL FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
+         WHERE w.id=$1",
+    )
+    .bind(workspace)
+    .fetch_optional(&mut **transaction)
+    .await?
+    .unwrap_or(false);
+    Ok(!writable)
 }
 
 /// Re-reads the caller's live profile for `workspace` inside `transaction` (H4, L3).
@@ -63,15 +126,7 @@ pub async fn ensure_writable(
     collection: Option<&str>,
     action: Option<Action>,
 ) -> ApiResult<UserRow> {
-    let writable: bool = sqlx::query_scalar(
-        "SELECT u.deleted_at IS NULL FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
-         WHERE w.id=$1",
-    )
-    .bind(workspace)
-    .fetch_optional(&mut **transaction)
-    .await?
-    .unwrap_or(false);
-    if !writable {
+    if frozen(transaction, workspace).await? {
         return Err(ApiError::forbidden());
     }
     let user = member(transaction, workspace, actor).await?;

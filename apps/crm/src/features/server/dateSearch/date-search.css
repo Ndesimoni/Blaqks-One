@@ -1,0 +1,88 @@
+/* Connected Date search: filter bar layout, result summary and loading placeholder. */
+.connected-date-search {
+  gap: 16px;
+}
+.ds-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px 16px;
+  align-items: end;
+}
+.ds-controls .field {
+  margin: 0;
+  min-width: 0;
+}
+:root[data-theme] .ds-controls .field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.ds-range-error {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+}
+.ds-results .section-top {
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.ds-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ds-type-badge,
+.ds-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ds-type-badge {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.ds-count {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.ds-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ds-skeleton > span:not(.sr-only) {
+  display: block;
+  height: 52px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--hover) 30%, var(--line) 50%, var(--hover) 70%);
+  background-size: 300% 100%;
+  animation: ds-shimmer 1.4s linear infinite;
+}
+@keyframes ds-shimmer {
+  to {
+    background-position: -150% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-skeleton > span:not(.sr-only) {
+    animation: none;
+  }
+}
+@media (max-width: 750px) {
+  .ds-controls {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .ds-controls .ds-type {
+    grid-column: 1 / -1;
+  }
+}

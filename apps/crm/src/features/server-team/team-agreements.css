@@ -1,0 +1,90 @@
+/* Agent agreement timelines and the Team & access tabs. Loads after team-finance.css. */
+.team-agreement-groups {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.team-agreement-groups h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.team-agreement-timeline {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid var(--line);
+}
+.team-agreement-timeline li {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 44px;
+  padding: 6px 0 6px 18px;
+}
+/* A marker on the rail per agreement; the status badge carries the meaning in text. */
+.team-agreement-timeline li::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--muted-dark);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.team-agreement-timeline li[data-status='current']::before {
+  background: var(--primary);
+}
+.team-agreement-timeline li[data-status='future']::before {
+  background: var(--gold);
+}
+.team-agreement-groups > li {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.team-agreement-share {
+  min-width: 56px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.team-agreement-period {
+  flex: 1 1 200px;
+  min-width: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.team-agreement-timeline li[data-status='closed'] .team-agreement-share {
+  color: var(--muted-dark);
+  font-weight: 600;
+}
+.team-tabs {
+  justify-self: start;
+}
+/* Touch-sized like the other team controls; the shared tabs are 36px tall. */
+:root[data-theme] .team-tabs button {
+  min-height: 44px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-finance-choice > label {
+    transition: none;
+  }
+}
+@media (max-width: 650px) {
+  .team-finance-panel {
+    padding: 16px;
+  }
+  .team-finance-actions .btn {
+    flex: 1 1 auto;
+  }
+}

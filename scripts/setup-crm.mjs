@@ -12,6 +12,13 @@ const contents = [
   'CRM_APP_ORIGIN=http://localhost:5173',
   'CRM_BIND_ADDRESS=127.0.0.1:8788',
   'CRM_ALLOW_INSECURE_LOCAL=true',
+  `CRM_MESSAGING_KEY=${randomBytes(32).toString('base64')}`,
+  'CRM_MESSAGING_KEY_VERSION=1',
+  // Private file storage in Docker (docs/media-storage.md).
+  'CRM_MEDIA_ENDPOINT=http://127.0.0.1:58333',
+  'CRM_MEDIA_BUCKET=crm-media',
+  `CRM_MEDIA_ACCESS_KEY=crm${randomBytes(6).toString('hex')}`,
+  `CRM_MEDIA_SECRET_KEY=${randomBytes(24).toString('hex')}`,
   'VITE_CRM_MODE=server',
   'CRM_API_PROXY=http://127.0.0.1:8788',
   '',

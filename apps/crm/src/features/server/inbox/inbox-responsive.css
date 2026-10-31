@@ -1,0 +1,116 @@
+/* Inbox per-size behaviour: a segmented tab control and one-row header on wider screens,
+   44px touch targets, a full-height conversation and stacked controls on phones. */
+.inbox-panel-head {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 56px;
+  padding: 0 16px;
+  border-block-end: 1px solid var(--line);
+}
+.inbox-panel-head h2 {
+  margin: 0;
+  font-size: 17px;
+}
+.inbox-head-text h2 {
+  unicode-bidi: plaintext;
+}
+@media (min-width: 900px) {
+  .inbox-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border-radius: 10px;
+    background: var(--surface-subtle);
+  }
+  .inbox-tab {
+    justify-content: center;
+    min-block-size: 32px;
+    padding-inline: 6px;
+    border: 0;
+    border-radius: 8px;
+  }
+  .inbox-tab.is-active {
+    border: 0;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    color: var(--ink);
+  }
+  /* Dark mode uses the shared selected surface of the active sidebar item. */
+  :root[data-theme='dark'] .inbox-tab.is-active {
+    background: #354e3f;
+    box-shadow: none;
+  }
+  .inbox-tab.is-active .inbox-tab-count {
+    color: var(--accent);
+  }
+  /* Always one row: the name keeps a readable width, then the controls give way. */
+  .inbox-head {
+    flex-wrap: nowrap;
+  }
+  .inbox-head-text {
+    flex: 1 1 0;
+    min-inline-size: 120px;
+  }
+  .inbox-head-actions {
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    min-inline-size: 0;
+    margin-inline-start: auto;
+  }
+  .inbox-details {
+    order: 3;
+  }
+}
+@media (max-width: 899px) {
+  .inbox-search input,
+  .inbox-tab,
+  .inbox-filters select,
+  .inbox-head-actions select,
+  .inbox-head-actions .btn,
+  .inbox-composer-tab {
+    min-block-size: 44px;
+  }
+  .inbox-icon-button {
+    inline-size: 44px;
+    block-size: 44px;
+  }
+  .inbox-head {
+    padding: 8px 12px;
+  }
+  .inbox-thread,
+  .inbox-composer {
+    padding-inline: 12px;
+  }
+  .inbox-head-text {
+    flex: 1 1 100px;
+  }
+  .inbox-head-actions {
+    display: grid;
+    flex-basis: 100%;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .inbox-head-actions select {
+    max-inline-size: none;
+  }
+  .inbox-head-actions .btn {
+    grid-column: 1 / -1;
+    max-inline-size: none;
+  }
+  .inbox-panel-head {
+    display: flex;
+  }
+  .inbox-panel-section {
+    padding: 16px;
+  }
+}
+@media (min-width: 900px) and (max-width: 1439px) {
+  .inbox-layout.is-details .inbox-panel-head {
+    display: flex;
+  }
+}
+.inbox-panel-head .inbox-back {
+  display: inline-flex;
+}

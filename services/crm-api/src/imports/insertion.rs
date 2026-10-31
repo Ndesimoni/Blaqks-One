@@ -29,6 +29,8 @@ pub async fn insert(
             let record = validation::validate(collection, row.clone())?;
             let id = Uuid::new_v4();
             let assignee = owner.filter(|_| PARENTS.contains(&collection));
+            // deal_ref is deliberately absent: imported deal IDs stay unlinked payload
+            // text ("Linked deal unavailable") and never resolve by matching (L-F7).
             sqlx::query(
                 "INSERT INTO crm_records \
                  (id,workspace_id,collection,legacy_id,payload,contact_id,client_ref,property_ref,\

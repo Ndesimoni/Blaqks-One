@@ -1,0 +1,122 @@
+.company-about-heading,
+.company-contact-heading {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  align-items: end;
+  gap: 50px;
+  margin-bottom: 48px;
+}
+.company-about-heading .page-heading,
+.company-contact-heading .page-heading {
+  margin: 0;
+}
+.company-about-image {
+  width: 100%;
+  height: 480px;
+  object-position: center 60%;
+}
+.company-about-story {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 50px;
+  padding-block: 70px;
+}
+.company-about-story h2 {
+  font-size: clamp(38px, 4vw, 56px);
+}
+.company-about-story p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+  max-width: 650px;
+}
+.company-principles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 50px;
+  padding-block: 40px;
+  border-block: 1px solid var(--line);
+}
+.company-principles article > span {
+  color: var(--gold);
+  font-size: 13px;
+  display: block;
+  margin-bottom: 30px;
+}
+.company-principles h3 {
+  max-width: 240px;
+  font-size: 28px;
+}
+.company-principles p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.9;
+}
+.company-about-areas {
+  padding-top: 50px;
+}
+.company-contact-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 8%;
+  align-items: start;
+}
+.company-contact-office > img {
+  width: 100%;
+  height: 310px;
+  margin-bottom: 35px;
+}
+.company-contact-office h2 {
+  font-size: 34px;
+}
+.company-contact-office p {
+  font-size: 14px;
+  max-width: 420px;
+}
+.company-contact-office > small {
+  margin-top: 20px;
+  max-width: 420px;
+  font-size: 11px;
+}
+.company-contact-person {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 16px;
+  border-top: 1px solid var(--line);
+  padding-block: 28px;
+}
+.company-contact-person h3 {
+  margin-bottom: 8px;
+  font-size: 26px;
+}
+.company-contact-person p {
+  font-size: 12px;
+}
+.company-contact-person > .agent-contact,
+.company-contact-person > .editorial-link {
+  grid-column: 1 / -1;
+}
+.company-contact-person > .editorial-link {
+  justify-self: start;
+}
+.company-site .filter-panel {
+  padding-right: 30px;
+}
+.company-site .detail-gallery {
+  border-radius: 0;
+  height: 490px;
+  gap: 12px;
+}
+.company-site .enquiry-panel {
+  border-radius: 0;
+}
+.company-site .agent-profile {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 50px;
+}
+.company-site .agent-profile .avatar.big {
+  border-radius: 50% 50% 0 0;
+  width: 100px;
+  height: 116px;
+  font-size: 36px;
+}

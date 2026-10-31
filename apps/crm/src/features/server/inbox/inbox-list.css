@@ -1,0 +1,134 @@
+/* Inbox list: search, tabs, filters, rows, avatars and channel chips. */
+:root {
+  --inbox-whatsapp-bg: #e3f2e8;
+  --inbox-whatsapp-ink: #1d6440;
+  --inbox-email-bg: #e6eefb;
+  --inbox-email-ink: #2f5596;
+  --inbox-instagram-bg: #fbe7f3;
+  --inbox-instagram-ink: #8f2a64;
+  --inbox-facebook-bg: #e7ecfb;
+  --inbox-facebook-ink: #2f4a96;
+  --inbox-tiktok-bg: #eeeaf1;
+  --inbox-tiktok-ink: #4a3a57;
+  --inbox-outbound-bg: #e3f2e8;
+  --inbox-outbound-line: #c8e3d2;
+}
+:root[data-theme='dark'] {
+  --inbox-whatsapp-bg: #1f3b2b;
+  --inbox-whatsapp-ink: #7fc29b;
+  --inbox-email-bg: #23324a;
+  --inbox-email-ink: #9fbdf0;
+  --inbox-instagram-bg: #3d2638;
+  --inbox-instagram-ink: #f0a6d6;
+  --inbox-facebook-bg: #22304a;
+  --inbox-facebook-ink: #a9c0ff;
+  --inbox-tiktok-bg: #2c2633;
+  --inbox-tiktok-ink: #e9b8d9;
+  --inbox-outbound-bg: #2c4a38;
+  --inbox-outbound-line: #3d5e4a;
+}
+.inbox-list-tools {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-block-end: 1px solid var(--line);
+}
+.inbox-list-tools > * {
+  min-inline-size: 0;
+}
+.inbox-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  color: var(--muted);
+}
+.inbox-search input {
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 42px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+.inbox-search input:focus-visible {
+  outline: none;
+}
+.inbox-search:focus-within {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.inbox-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.inbox-tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 36px;
+  padding-inline: 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  transition:
+    background var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+.inbox-tab:hover {
+  background: var(--hover);
+}
+.inbox-tab.is-active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+}
+.inbox-tab-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+.inbox-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.inbox-filters select {
+  block-size: 34px;
+  padding-inline: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 13px;
+}
+.inbox-count {
+  margin-inline-start: auto;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 12px;
+}
+.inbox-rows {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.inbox-more {
+  margin: 12px;
+  min-block-size: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+}

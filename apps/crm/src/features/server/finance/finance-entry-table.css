@@ -1,0 +1,144 @@
+/* Payments/expenses table, status chips and phone cards. Loaded after finance-entries.css. */
+.finance-status-chip {
+  gap: 5px;
+}
+.finance-status-chip svg {
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.entry-table {
+  white-space: normal;
+}
+:root[data-theme] .entry-table :is(th, td) {
+  padding-inline: 14px;
+}
+.entry-table td {
+  overflow-wrap: break-word;
+}
+.entry-table .finance-receipt {
+  overflow-wrap: normal;
+}
+.entry-table td.finance-num {
+  font-weight: 600;
+}
+.entry-table td:first-child {
+  white-space: nowrap;
+}
+/* Pending rows carry a restrained gold edge so the approval queue scans at a glance. */
+.entry-table tr[data-status='pending'] td:first-child {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+.entry-table tr[data-status='void'] td.finance-num {
+  color: var(--muted-dark);
+  font-weight: 500;
+  text-decoration: line-through;
+}
+.entry-table tr[data-status='rejected'] td.finance-num {
+  color: var(--muted-dark);
+}
+.entry-status-cell {
+  min-width: 150px;
+}
+.entry-status-cell .finance-reason {
+  display: -webkit-box;
+  max-width: 220px;
+  margin-top: 6px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.entry-actions-head,
+.entry-actions-cell {
+  text-align: right;
+}
+.entry-actions-cell .finance-approval {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+:root[data-theme] .entry-actions-cell .finance-action-group .btn {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.entry-actions-cell .finance-duty {
+  max-width: 200px;
+  margin-left: auto;
+  text-align: right;
+}
+.entry-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.entry-card[data-status='pending'] {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+.deal-card.entry-card > button {
+  gap: 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.deal-card.entry-card > button:hover {
+  background: var(--hover);
+}
+.deal-card.entry-card > button:focus-visible {
+  outline-offset: -3px;
+}
+.entry-card-code {
+  font-size: 14px;
+}
+.entry-card-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.entry-card-amount {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+.entry-card[data-status='void'] .entry-card-amount {
+  color: var(--muted-dark);
+  text-decoration: line-through;
+}
+.entry-card-reason {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface-subtle);
+}
+.entry-card .entry-card-decisions {
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--line);
+}
+.entry-card .entry-card-decisions .finance-action-group {
+  flex-wrap: nowrap;
+}
+.entry-card .finance-duty {
+  max-width: none;
+}
+.finance-queue-count.has-items {
+  background: var(--gold);
+  color: var(--on-primary);
+}
+:root[data-theme='light'] .finance-queue-count.has-items {
+  background: #f8efd9;
+  color: #805b24;
+}
+@media (max-width: 750px) {
+  .finance-page .finance-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .finance-queue-chip {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,150 @@
+.connected-team {
+  display: grid;
+  gap: 20px;
+}
+.connected-team-toolbar,
+.connected-team-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.connected-team-toolbar,
+.connected-team-card {
+  padding: 20px;
+}
+.connected-team h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.connected-team p {
+  line-height: 1.6;
+}
+.connected-team-toolbar p {
+  margin: 0;
+}
+.team-seat-actions {
+  display: grid;
+  min-width: min(100%, 300px);
+  gap: 8px;
+  justify-items: end;
+}
+.team-seat-summary,
+.team-seat-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.team-seat-summary span,
+.team-seat-actions small {
+  color: var(--muted);
+}
+.team-seat-summary span {
+  font-variant-numeric: tabular-nums;
+}
+.team-seat-actions small {
+  max-width: 340px;
+  line-height: 1.5;
+  text-align: end;
+}
+.connected-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+.connected-team-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.connected-team-invitation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.connected-team-search {
+  max-width: 480px;
+}
+.connected-team-form {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+.connected-team-options {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 0 16px;
+}
+.connected-team-options legend {
+  font-weight: 700;
+  padding: 0 4px;
+}
+.connected-team-options label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.connected-team-options label small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+:root[data-theme] .connected-team-options :is(input[type='checkbox'], input[type='radio']) {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--focus);
+}
+.connected-team-role-list .overflow-list-scroll {
+  max-height: 260px;
+}
+.connected-team-role-list .overflow-list-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+}
+.connected-team-role-list label {
+  align-items: center;
+}
+.connected-team-review {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px 20px;
+}
+.connected-team-review dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.connected-team-review dt {
+  color: var(--muted);
+}
+@media (max-width: 650px) {
+  .connected-team-role-list .overflow-list-items {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .connected-team-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .team-seat-actions {
+    width: 100%;
+    justify-items: stretch;
+  }
+  .team-seat-summary,
+  .team-seat-buttons {
+    justify-content: space-between;
+  }
+  .team-seat-buttons .btn {
+    flex: 1;
+  }
+  .team-seat-actions small {
+    text-align: start;
+  }
+}

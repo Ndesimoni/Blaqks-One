@@ -1,0 +1,96 @@
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding: 14px 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.pager {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.pager button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 7px;
+  padding: 8px 12px;
+  min-height: 40px;
+  font-size: 12px;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.pager button:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--muted);
+}
+.pager button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.pager button:active:not(:disabled) {
+  background: var(--surface-subtle);
+}
+.pager button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pager > span {
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 170px;
+  text-align: center;
+  padding: 24px;
+  gap: 8px;
+}
+.empty-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-subtle);
+  color: var(--muted);
+  border-radius: 13px;
+}
+.empty h3 {
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 4px 0 0;
+}
+.empty p {
+  max-width: 320px;
+  margin: 0 0 8px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 13px;
+}
+@media (max-width: 390px) {
+  .table-footer {
+    gap: 8px;
+    padding: 12px;
+    font-size: 11px;
+  }
+  .pager {
+    gap: 8px;
+  }
+  :root[data-theme] .pager button {
+    padding: 8px 10px;
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,106 @@
+/* Team chat messages, the composer and the new conversation form (C2). */
+.chat-message {
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.chat-message:hover {
+  background: var(--surface-subtle);
+}
+.chat-message-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.chat-message-head strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+.chat-message.is-mine .chat-message-head strong {
+  color: var(--primary);
+}
+.chat-body,
+.chat-deleted {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.chat-deleted {
+  color: var(--muted);
+  font-style: italic;
+}
+.chat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-block-start: 4px;
+  font-size: 13px;
+}
+.chat-actions > button {
+  min-block-size: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.chat-edit,
+.chat-composer,
+.chat-new,
+.chat-new form {
+  display: grid;
+  gap: 8px;
+}
+.chat-edit textarea,
+.chat-new input {
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+.chat-edit > div,
+.chat-new-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+.chat-composer {
+  padding: 6px 16px 8px;
+  border-block-start: 1px solid var(--line);
+}
+.chat-new small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.chat-new label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.chat-people {
+  display: grid;
+  gap: 4px;
+}
+.chat-people button {
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+}
+.chat-people button:hover {
+  background: var(--hover);
+}

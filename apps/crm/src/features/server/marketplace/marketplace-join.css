@@ -1,0 +1,54 @@
+/* Ticks in the join and terms steps (broker marketplace MK1): emirates, property types,
+   commitments and the consent, each a row with its label, never a bare field-sized box. */
+.market-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.market-fieldset > legend {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.market-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+  gap: 8px;
+}
+.market-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.market-check:has(input:checked) {
+  border-color: var(--primary);
+}
+.market-check:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* As specific as the themed field rule (system/forms.css), which sizes every field input. */
+.market-check input[type='checkbox'],
+:root[data-theme] .market-check input[type='checkbox'] {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  accent-color: var(--primary);
+}

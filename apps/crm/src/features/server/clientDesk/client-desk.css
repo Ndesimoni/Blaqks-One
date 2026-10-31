@@ -1,0 +1,21 @@
+/* Contact-only clients on the connected Client desk (follow-ups assigned to the member). */
+.task-client-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.task-client-list a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+.task-client-list a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.desk-body .section-top .mini-count {
+  white-space: nowrap;
+}

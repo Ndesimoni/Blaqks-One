@@ -1,0 +1,26 @@
+/* Listing photos in a hand-over review (agreements design §18). After agreement-terms.css. */
+.handover-photo-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.handover-photo-list a {
+  display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+}
+.handover-photo-list a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.handover-photo-list img {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}

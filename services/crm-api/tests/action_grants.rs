@@ -24,6 +24,8 @@ fn member(role: &str, scope: &str, positions: &[&str], permissions: Permissions)
             positions: Json(positions.iter().map(|p| p.to_string()).collect()),
             permissions: Json(permissions),
             channel_access: Json(Default::default()),
+            language: None,
+            guidance_enabled: None,
             record_scope: scope.into(),
             actions: Json(actions),
         },
@@ -50,7 +52,8 @@ fn prepared(current: &MemberRow, body: Value) -> Result<Actions, (u16, &'static 
     prepare(&mut request, current).map_err(|error| (error.0.as_u16(), error.1))?;
     Ok(request
         .actions
-        .expect("staff updates store a complete object"))
+        .expect("staff updates store a complete object")
+        .actions)
 }
 
 fn view_only() -> Value {
@@ -72,7 +75,15 @@ fn positions_never_widen_an_enabled_module_but_preset_a_new_one() {
     assert!(moved.properties.create && moved.properties.delete_activity);
     assert!(!moved.properties.delete_main);
     let narrowed = prepared(&stored, json!({"version":1,"positions":["accountant"]})).unwrap();
-    assert_eq!(narrowed, Actions::default());
+    let modules = Actions {
+        finance: Default::default(),
+        ..narrowed
+    };
+    assert_eq!(modules, Actions::default());
+    assert!(
+        narrowed.finance.create && !narrowed.finance.approve,
+        "finance newly on: preset"
+    );
 }
 
 #[test]

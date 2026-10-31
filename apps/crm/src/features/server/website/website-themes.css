@@ -1,0 +1,114 @@
+.website-theme-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.website-theme-option {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background var(--duration) var(--ease);
+}
+.website-theme-option:is(:hover, .is-selected) {
+  border-color: var(--primary);
+  background: var(--surface-subtle);
+}
+.website-theme-option:focus-within {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.website-theme-option > input {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+.website-theme-option > strong {
+  font-size: 14px;
+}
+.website-theme-option > small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.website-theme-sample {
+  display: grid;
+  gap: 8px;
+  min-height: 106px;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-subtle);
+}
+.website-sample-nav {
+  width: 40%;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--muted-dark);
+}
+.website-sample-hero {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  min-height: 48px;
+  padding: 8px;
+  background: var(--hover);
+}
+.website-sample-hero > i {
+  width: 65%;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+.website-sample-hero > i:last-child {
+  width: 40%;
+  height: 3px;
+  background: var(--muted-dark);
+}
+.website-sample-list {
+  display: flex;
+  gap: 6px;
+}
+.website-sample-list > i {
+  flex: 1;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.website-theme-2 .website-sample-hero {
+  margin-left: 32%;
+}
+.website-theme-3 .website-sample-hero {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+.website-theme-4 .website-sample-hero {
+  background: var(--deep);
+}
+.website-theme-4 .website-sample-hero > i {
+  background: var(--gold-light);
+}
+@media (prefers-reduced-motion: reduce) {
+  .website-theme-option {
+    transition: none;
+  }
+}
+@media (max-width: 400px) {
+  .website-theme-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

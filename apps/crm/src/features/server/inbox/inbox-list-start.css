@@ -1,0 +1,27 @@
+/* The search row and its labelled New email button (E1d, owner feedback 2026-10-21). */
+.inbox-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.inbox-search-row .inbox-search {
+  flex: 1 1 160px;
+  min-inline-size: 0;
+}
+/* The search field shrinks so the labelled New email button always fits beside it. */
+.inbox-search-row .inbox-search input {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+/* A labelled button, so starting an email is easy to find (owner feedback, 2026-10-21). */
+.inbox-start-button {
+  flex: 0 0 auto;
+  block-size: 42px;
+  padding-inline: 14px;
+  white-space: nowrap;
+}
+@media (max-width: 899px) {
+  .inbox-start-button {
+    block-size: 44px;
+  }
+}

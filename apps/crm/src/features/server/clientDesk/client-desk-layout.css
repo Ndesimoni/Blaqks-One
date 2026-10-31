@@ -1,0 +1,111 @@
+/* Connected Client desk refinements over the shared desk styles: the section cards sit
+   directly on the page (no frame around frames), names lead each picker row, and
+   timeline, counts and shortlist controls use readable sizes and touch targets. */
+:root[data-theme] .connected-desk .desk-body {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  gap: 16px;
+}
+:root[data-theme] .connected-desk .desk-client strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+:root[data-theme] .connected-desk .desk-client small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+:root[data-theme] .connected-desk .profile-stats .label-value span {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+:root[data-theme] .connected-desk .profile-stats .label-value strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+:root[data-theme] .connected-desk .desk-list-title span,
+:root[data-theme] .connected-desk .mini-count {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+:root[data-theme] .connected-desk .desk-client:focus-visible,
+:root[data-theme] .connected-desk .match-foot button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+:root[data-theme] .connected-desk .timeline-item {
+  min-height: 0;
+  padding: 12px 0;
+  gap: 12px;
+}
+:root[data-theme] .connected-desk .timeline-item + .timeline-item {
+  border-top: 1px solid var(--line);
+}
+:root[data-theme] .connected-desk .timeline-item strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+:root[data-theme] .connected-desk .timeline-item p {
+  margin: 4px 0 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+:root[data-theme] .connected-desk .timeline-item time {
+  color: var(--muted-dark);
+  font-size: 12px;
+  white-space: nowrap;
+}
+:root[data-theme] .connected-desk .match-foot button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: background-color var(--duration) var(--ease);
+}
+:root[data-theme] .connected-desk .match-foot button:hover {
+  background: var(--accent-subtle);
+}
+:root[data-theme] .connected-desk .match-card {
+  overflow: hidden;
+  padding: 0;
+}
+:root[data-theme] .connected-desk .match-card > :not(.property-photo) {
+  margin-right: 14px;
+  margin-left: 14px;
+}
+:root[data-theme] .connected-desk .match-card > .property-photo {
+  height: 132px;
+}
+:root[data-theme] .connected-desk .match-top {
+  margin-top: 14px;
+}
+:root[data-theme] .connected-desk .match-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 10px;
+  color: var(--muted-dark);
+  font-size: 11px;
+}
+:root[data-theme] .connected-desk .match-foot {
+  margin-bottom: 14px;
+}
+@media (max-width: 750px) {
+  :root[data-theme] .connected-desk .match-foot button {
+    min-height: 44px;
+  }
+  .task-client-list dd a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme] .connected-desk .match-foot button {
+    transition: none;
+  }
+}

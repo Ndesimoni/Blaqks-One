@@ -22,4 +22,5 @@ pub const RESERVED_KEYS: &[&str] = &[
     "references",
     "taskClients",
     "listingViewings",
+    "dealLinks",
 ];

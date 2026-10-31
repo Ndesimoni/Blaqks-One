@@ -1,0 +1,124 @@
+/* The shared message row (owner, 2026-10-22, as in Messenger and WhatsApp): the "+" outside
+   on the start side, the rounded typing box (chosen files inside, above the text), then Send,
+   all aligned to the bottom; a short note sits under the row. Chips: composer-files.css. */
+.composer-group {
+  display: grid;
+  min-inline-size: 0;
+}
+.composer-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-inline-size: 0;
+}
+.composer-box {
+  display: grid;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface-subtle);
+  cursor: text;
+  transition:
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.composer-box:focus-within {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+/* The box shows focus for the text, so the field itself stays borderless. */
+.composer-box .composer-input {
+  display: block;
+  inline-size: 100%;
+  /* One line to start, as tall as Send (owner, 2026-10-22); useAutoGrow follows the text up
+     to about 40% of the conversation panel, then the field scrolls. */
+  min-block-size: 42px;
+  max-block-size: 35vh;
+  max-block-size: 35dvh;
+  overflow-y: auto;
+  margin: 0;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.5;
+  resize: none;
+}
+/* Beats the theme's field outline (system/motion.css) inside the box. */
+.composer-box .composer-input:focus-visible,
+:root[data-theme] .composer-box .composer-input:focus-visible {
+  outline: none;
+}
+.composer-box .composer-input::placeholder {
+  color: var(--muted);
+}
+/* The note under the row, lined up with the text in the box. */
+.composer-meta {
+  min-inline-size: 0;
+  overflow: hidden;
+  padding-inline: 15px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.composer-group.has-attach .composer-meta {
+  padding-inline-start: 63px;
+}
+/* One line that ends in "…" rather than breaking an address mid-word on phones. */
+.composer-meta > * {
+  display: block;
+  margin-block-start: 4px;
+  overflow: hidden;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The "+": a round, quiet icon button beside the box; its native input stays focusable. */
+.composer-attach {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  inline-size: 40px;
+  block-size: 40px;
+  margin-block-end: 2px;
+  border-radius: 50%;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+.composer-attach:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.composer-attach:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+  color: var(--ink);
+}
+.composer-attach.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.composer-attach.is-disabled:hover {
+  background: transparent;
+  color: var(--muted);
+}
+.composer-row > .btn {
+  flex: 0 0 auto;
+  padding-block: 6px;
+  border-radius: 10px;
+}
+/* Send arrows point the way text runs. */
+[dir='rtl'] .composer-row > .btn svg {
+  transform: scaleX(-1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .composer-box,
+  .composer-attach {
+    transition: none;
+  }
+}

@@ -1,11 +1,59 @@
+#[path = "config_signup.rs"]
+mod signup_settings;
+
+#[path = "config_messaging.rs"]
+pub mod messaging_settings;
+
+#[path = "config_google.rs"]
+pub mod google_settings;
+
+#[path = "config_media.rs"]
+pub mod media_settings;
+
+#[path = "config_sendgrid.rs"]
+pub mod sendgrid_settings;
+
+#[path = "config_twilio.rs"]
+pub mod twilio_settings;
+
+use google_settings::GoogleConfig;
+use media_settings::MediaConfig;
+use messaging_settings::{messaging_key, MessagingKey};
+use sendgrid_settings::SendgridConfig;
+pub use signup_settings::TurnstileConfig;
+use signup_settings::{client_secret, turnstile_config, worker_enabled};
 use std::{env, net::SocketAddr};
+use twilio_settings::TwilioConfig;
 use url::Url;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SignupMode {
+    Off,
+    Local,
+}
 
 pub struct Config {
     pub database_url: String,
     pub origin: String,
     pub address: SocketAddr,
     pub secure_cookie: bool,
+    pub signup: SignupMode,
+    /// Local delivery worker; API tests turn it off so they can inspect pending codes.
+    pub signup_worker: bool,
+    pub trusted_proxies: String,
+    pub client_header: String,
+    pub client_secret: String,
+    pub turnstile: Option<TurnstileConfig>,
+    /// Channel credentials are sealed only when this key is configured.
+    pub messaging: Option<MessagingKey>,
+    /// Google Workspace mailboxes (E1); `None` hides the Google connection.
+    pub google: Option<GoogleConfig>,
+    /// Private file storage (F1); `None` turns uploads off.
+    pub media: Option<MediaConfig>,
+    /// SendGrid's API address (E3); each company brings its own key.
+    pub sendgrid: SendgridConfig,
+    /// Twilio's hosts (WhatsApp W1); each company brings its own account and token.
+    pub twilio: TwilioConfig,
 }
 
 impl Config {
@@ -19,12 +67,58 @@ impl Config {
             .parse()
             .map_err(|_| "CRM_BIND_ADDRESS is invalid.")?;
         let secure_cookie = cookie_policy(&origin, insecure, address)?;
+        let signup = signup_mode(env::var("CRM_SIGNUP").ok().as_deref(), secure_cookie)?;
+        let signup_worker = worker_enabled(env::var("CRM_SIGNUP_WORKER").ok().as_deref())?;
+        let trusted_proxies = env::var("CRM_TRUSTED_PROXIES").unwrap_or_default();
+        let client_header =
+            env::var("CRM_TRUSTED_CLIENT_HEADER").unwrap_or_else(|_| "cf-connecting-ip".into());
+        let client_secret =
+            client_secret(env::var("CRM_CLIENT_DIGEST_SECRET").ok(), !secure_cookie)?;
+        let turnstile = turnstile_config(
+            env::var("CRM_TURNSTILE_SECRET").ok(),
+            env::var("CRM_TURNSTILE_SITE_KEY").ok(),
+            env::var("CRM_TURNSTILE_HOSTNAME").ok(),
+            env::var("CRM_TURNSTILE_ENDPOINT").ok(),
+            !secure_cookie,
+        )?;
+        let messaging = messaging_key(
+            env::var("CRM_MESSAGING_KEY").ok(),
+            env::var("CRM_MESSAGING_KEY_VERSION").ok(),
+            !secure_cookie,
+        )?;
+        let google = google_settings::from_env(&origin, !secure_cookie)?;
+        let media = media_settings::from_env(!secure_cookie)?;
+        let sendgrid = sendgrid_settings::from_env(!secure_cookie)?;
+        let twilio = twilio_settings::from_env(!secure_cookie)?;
         Ok(Self {
             database_url,
             origin,
             address,
             secure_cookie,
+            signup,
+            signup_worker,
+            trusted_proxies,
+            client_header,
+            client_secret,
+            turnstile,
+            messaging,
+            google,
+            media,
+            sendgrid,
+            twilio,
         })
+    }
+}
+
+fn signup_mode(value: Option<&str>, secure_cookie: bool) -> Result<SignupMode, String> {
+    match value.unwrap_or("off") {
+        "off" => Ok(SignupMode::Off),
+        "local" if !secure_cookie => Ok(SignupMode::Local),
+        "local" => Err("CRM_SIGNUP=local requires insecure loopback development mode.".into()),
+        "live" => {
+            Err("CRM_SIGNUP=live is unavailable until provider adapters are configured.".into())
+        }
+        _ => Err("CRM_SIGNUP must be off, local or live.".into()),
     }
 }
 

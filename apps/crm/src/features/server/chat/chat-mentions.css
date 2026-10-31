@@ -1,0 +1,99 @@
+/* Mentions in team chat (C3): the @ suggestions above the composer, mentions in the thread
+   and the mention badge on a room. Gold marks what concerns you, as on the sidebar badge. */
+.chat-composer {
+  position: relative;
+}
+/* The placeholder (with the keyboard hint on computers) stays on one line. */
+.chat-composer .composer-input::placeholder {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.chat-mentions {
+  position: absolute;
+  inset-block-end: calc(100% + 4px);
+  inset-inline-start: 16px;
+  z-index: 5;
+  inline-size: min(320px, calc(100% - 32px));
+  max-block-size: 248px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  list-style: none;
+}
+.chat-mentions li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 40px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--duration) var(--ease);
+}
+.chat-mentions li:hover,
+.chat-mentions li.is-active {
+  background: var(--hover);
+}
+.chat-mention-avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+}
+.chat-mention {
+  padding: 0 3px;
+  border-radius: 4px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 600;
+}
+.chat-mention.is-me {
+  background: var(--gold);
+  color: var(--deep);
+}
+.chat-message.is-mentioned {
+  padding-inline-start: 7px;
+  border-inline-start: 3px solid var(--gold);
+  background: var(--accent-subtle);
+}
+.chat-mention-tag {
+  color: var(--accent);
+  font-weight: 600;
+}
+.chat-mention-badge {
+  min-inline-size: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--deep);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-mentions li {
+    transition: none;
+  }
+}
+@media (max-width: 899px) {
+  .chat-mentions {
+    inset-inline-start: 12px;
+    inline-size: calc(100% - 24px);
+  }
+  .chat-mentions li {
+    min-block-size: 44px;
+  }
+}

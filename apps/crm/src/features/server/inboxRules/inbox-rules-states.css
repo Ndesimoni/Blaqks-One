@@ -1,0 +1,48 @@
+/* Inbox rules: the always-on words rule, palette radios and phone touch targets. */
+/* The property-words rule cannot be switched off, so it says so instead of a checkbox. */
+.rules-words-rule {
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--line);
+}
+.rules-always {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--hover);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.rules-modes {
+  min-inline-size: 0;
+}
+.rules-modes input {
+  accent-color: var(--primary);
+}
+@media (max-width: 899px) {
+  .rules-chips li {
+    min-block-size: 36px;
+  }
+  .rules-chips button {
+    inline-size: 44px;
+    block-size: 44px;
+    margin-block: -4px;
+    margin-inline-end: -6px;
+  }
+  .rules-add {
+    flex-wrap: nowrap;
+  }
+  .rules-add input {
+    flex: 1 1 0;
+    inline-size: 0;
+    min-inline-size: 0;
+  }
+  .rules-modes {
+    padding-inline-start: 0;
+  }
+  /* On phones each rule stacks its label above the text, so nothing pushes the page wide. */
+  .rules-words-rule {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

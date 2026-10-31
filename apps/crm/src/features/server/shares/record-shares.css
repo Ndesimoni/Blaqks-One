@@ -1,0 +1,130 @@
+/* Sharing one record with a colleague (record sharing R1). Loaded after assignment.css. */
+.record-sharing {
+  margin-bottom: 18px;
+}
+.record-share-history {
+  display: grid;
+  gap: 8px;
+}
+.record-share-history:not(:empty) {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.record-share-history p {
+  margin: 0;
+  font-size: 13px;
+}
+.record-share-items {
+  display: grid;
+}
+.record-share-item,
+.record-share-offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.record-share-item {
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--surface-subtle);
+}
+.record-share-text {
+  display: grid;
+  flex: 1 1 180px;
+  gap: 2px;
+  min-width: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.record-share-text strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.record-share-text small,
+.record-share-text span {
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.record-share-step,
+.record-share-actions .btn,
+.record-share-links .btn {
+  min-height: 44px;
+}
+.record-share-done {
+  margin: 0;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+.record-share-done:empty {
+  display: none;
+}
+.record-share-empty {
+  margin: 0;
+  color: var(--muted-dark);
+  line-height: 1.5;
+}
+.record-share-dialog .field select,
+.record-share-dialog .field input {
+  width: 100%;
+}
+.record-share-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0;
+}
+.record-share-links a.btn {
+  text-decoration: none;
+}
+.record-shares-incoming {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.record-shares-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.record-shares-head h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.record-shares-count {
+  padding: 2px 9px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+.record-shares-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.record-share-offer {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.record-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 560px) {
+  .record-share-actions,
+  .record-share-actions .btn {
+    flex: 1 1 auto;
+  }
+}

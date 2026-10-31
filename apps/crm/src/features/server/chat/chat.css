@@ -1,0 +1,149 @@
+/* Team chat (C2): rooms beside the open conversation, like the Inbox; phones in chat-phone.css.
+   The page fills the full-height main area (shell.css), so the conversation takes the window. */
+.chat-page {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+}
+.chat-layout {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  min-block-size: 520px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.chat-list {
+  overflow-y: auto;
+  padding: 12px;
+  border-inline-end: 1px solid var(--line);
+}
+.chat-group + .chat-group {
+  margin-block-start: 16px;
+}
+.chat-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 8px;
+}
+.chat-group-head h2 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.chat-add {
+  inline-size: 32px;
+  min-block-size: 32px;
+  padding: 0;
+}
+.chat-list ul,
+.chat-messages,
+.chat-people {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chat-room {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  inline-size: 100%;
+  min-block-size: 40px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+}
+.chat-room:hover,
+.chat-room.is-selected {
+  background: var(--hover);
+}
+.chat-room.is-unread .chat-room-name {
+  font-weight: 700;
+}
+.chat-room-name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-badge {
+  min-inline-size: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--panel);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.chat-room-pane {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+.chat-room-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 56px;
+  padding: 8px 16px;
+  border-block-end: 1px solid var(--line);
+}
+.chat-room-head h2 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.chat-room-head p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 1px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.chat-back {
+  display: none;
+}
+.chat-thread {
+  position: relative;
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: 8px 16px 16px;
+}
+.chat-day {
+  inline-size: fit-content;
+  margin: 14px auto 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--muted);
+  font-size: 12px;
+}
+.chat-muted {
+  color: var(--muted);
+}
+.chat-choose,
+.chat-empty {
+  margin: auto;
+  padding: 24px;
+  text-align: center;
+}
+.chat-earlier {
+  display: block;
+  margin: 0 auto 8px;
+}
