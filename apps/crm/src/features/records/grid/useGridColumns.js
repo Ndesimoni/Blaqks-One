@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { schema } from '../../../lib/schema.js';
+import { useRecords } from '../../../hooks/useWorkspace.js';
 import {
   cleanColumns,
   defaultColumns,
@@ -7,6 +7,7 @@ import {
   sameColumns,
   toggleColumn,
 } from './columnsModel.js';
+import { gridFields } from './gridFields.js';
 
 const storageKey = (viewer, module) => `kws-grid-columns:${viewer || 'viewer'}:${module}`;
 
@@ -33,8 +34,11 @@ function remember(key, columns, fallback) {
  * records, sorting, exports and workbook mappings are unchanged.
  */
 export function useGridColumns(module, viewer) {
-  const fields = useMemo(() => schema(module), [module]);
-  const names = useMemo(() => fields.map((field) => field.name), [fields]);
+  const added = useRecords()?.gridColumns?.[module];
+  const fields = useMemo(() => gridFields(module, added), [module, added]);
+  // Added columns are rebuilt with the records; re-read the choice only when names change.
+  const nameList = fields.map((field) => field.name).join('\n');
+  const names = useMemo(() => nameList.split('\n'), [nameList]);
   const fallback = useMemo(() => defaultColumns(module), [module]);
   // A mockup grid's ID is an ordinary column; other tables keep theirs first.
   const fixed = mockupGrids.has(module) ? null : names[0];

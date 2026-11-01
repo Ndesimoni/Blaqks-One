@@ -7,6 +7,7 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { filterAssignedEntries, isAssignable } from './assignmentModel.js';
 import { withKept } from '../keptRecords.js';
 import { useAssignees } from './useAssignees.js';
+import { agentColumn } from './agentColumn.js';
 import { AssignedToFilter } from './AssignedToFilter.jsx';
 import { BulkReassignDialog } from './BulkReassignDialog.jsx';
 import './assignment.css';
@@ -38,13 +39,20 @@ export function AssignmentPageScope({ module, children }) {
   // Handed-over clients and listings the caller keeps reading (§18), and the clients,
   // listings and contacts colleagues shared with them (record sharing R1), show on their pages.
   const kept = records.keptEntries?.[module];
-  const scoped = useMemo(() => {
+  const base = useMemo(() => {
     if (rows) return { ...records, data: { ...records.data, [module]: rows.map((r) => r.record) } };
     if (!kept?.length) return records;
     const entries = withKept(records.entries, records.keptEntries, [module]);
     const data = { ...records.data, [module]: entries[module].map((entry) => entry.record) };
     return { ...records, entries, data };
   }, [records, rows, module, kept]);
+  // Clients also get the mockup's Agent column (design step 2c).
+  const unassigned = t('recordGrid.unassigned');
+  const scoped = useMemo(() => {
+    if (module !== 'Clients') return base;
+    const agent = agentColumn(records.entries, assignees.people, user, unassigned);
+    return { ...base, gridColumns: { ...base.gridColumns, Clients: [agent] } };
+  }, [base, module, records.entries, assignees.people, user, unassigned]);
   const toolbar = enabled ? (
     <AssignedToFilter
       module={module}

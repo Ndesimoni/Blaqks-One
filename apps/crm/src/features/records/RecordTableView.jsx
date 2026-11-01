@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { formatValue } from '../../lib/crm.js';
 import { get } from '../../lib/records.js';
 import { columnHeading } from './grid/columnHeadings.js';
+import { cellText } from './grid/gridFields.js';
 import { GridCell } from './grid/GridCell.jsx';
 import { SelectPageCell, SelectRowCell } from './grid/GridSelect.jsx';
 import { useWideTable } from './grid/useWideTable.js';
@@ -36,7 +36,7 @@ export function RecordTableView({
   const wide = useWideTable(scroll);
   const idOf = (record) => get(record, columns[0].name);
   const nameOf = (record) => {
-    const value = formatValue(data, module, record, pick[0]);
+    const value = cellText(data, module, record, pick[0]);
     return value === '—' ? idOf(record) : value;
   };
   return (
@@ -51,26 +51,32 @@ export function RecordTableView({
         <thead>
           <tr>
             {selection && <SelectPageCell rows={current} selection={selection} />}
-            {pick.map((f) => (
-              <th key={f.key} scope="col" aria-sort={ariaSort(sort, f)}>
-                <button
-                  type="button"
-                  className="table-sort"
-                  onClick={() => {
-                    setSort((s) => ({
-                      key: f.key,
-                      direction: s.key === f.key && s.direction === 'asc' ? 'desc' : 'asc',
-                    }));
-                    setPage(0);
-                  }}
-                >
-                  {columnHeading(module, f.name)}{' '}
-                  {sort.key === f.key && (
-                    <Icon name={sort.direction === 'asc' ? 'up' : 'down'} size={12} />
-                  )}
-                </button>
-              </th>
-            ))}
+            {pick.map((f) =>
+              f.virtual ? (
+                <th key={f.key} scope="col">
+                  {columnHeading(module, f.name)}
+                </th>
+              ) : (
+                <th key={f.key} scope="col" aria-sort={ariaSort(sort, f)}>
+                  <button
+                    type="button"
+                    className="table-sort"
+                    onClick={() => {
+                      setSort((s) => ({
+                        key: f.key,
+                        direction: s.key === f.key && s.direction === 'asc' ? 'desc' : 'asc',
+                      }));
+                      setPage(0);
+                    }}
+                  >
+                    {columnHeading(module, f.name)}{' '}
+                    {sort.key === f.key && (
+                      <Icon name={sort.direction === 'asc' ? 'up' : 'down'} size={12} />
+                    )}
+                  </button>
+                </th>
+              ),
+            )}
             {!gridRows && (
               <th className="last-th">
                 <span className="sr-only">Open record</span>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { formatValue } from '../../../lib/crm.js';
 import { initials } from '../../../lib/records.js';
 import { KeptChip } from '../KeptChip.jsx';
+import { cellText } from './gridFields.js';
 import './grid-open.css';
 import './grid-person.css';
 
@@ -71,7 +71,7 @@ function OpenCell({ module, record, value, field, id }) {
  * mockup grid (`open`) the button that opens the record.
  */
 export function GridCell({ data, module, record, field, first, open = false, id }) {
-  const value = formatValue(data, module, record, field);
+  const value = cellText(data, module, record, field);
   if (first && open)
     return <OpenCell module={module} record={record} value={value} field={field} id={id} />;
   if (first)

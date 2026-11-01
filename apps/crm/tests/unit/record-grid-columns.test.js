@@ -16,12 +16,14 @@ test("every directory starts on its sheet's columns; mockup grids leave the ID o
   for (const module of ['Clients', 'Contacts', 'Shortlist', 'Client care', 'Follow-ups']) {
     const columns = defaultColumns(module);
     assert.ok(columns.length > 2, module);
-    for (const name of columns) assert.ok(names(module).includes(name), `${module}: ${name}`);
+    // Agent is added by connected Clients from each client's assignment, not stored.
+    for (const name of columns)
+      assert.ok(names(module).includes(name) || name === 'Agent', `${module}: ${name}`);
     const grid = mockupGrids.has(module);
     assert.equal(columns.includes(names(module)[0]), !grid, `${module} ID column`);
   }
-  // The approved mockup's columns: Client, Phone, Last contact; Contact, Role, Phone, Linked to.
-  assert.deepEqual(defaultColumns('Clients'), ['Full name', 'Phone', 'Last contact auto']);
+  // The approved mockup's columns: Client, Phone, Agent, Last contact; Contact, Role, Phone, Linked to.
+  assert.deepEqual(defaultColumns('Clients'), ['Full name', 'Phone', 'Agent', 'Last contact auto']);
   assert.equal(defaultColumns('Contacts').length, 4);
 });
 

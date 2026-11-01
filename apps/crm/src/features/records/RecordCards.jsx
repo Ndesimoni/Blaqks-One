@@ -1,8 +1,8 @@
 import React from 'react';
 import { Badge } from '../../components/ui/Badge.jsx';
-import { formatValue } from '../../lib/crm.js';
 import { clName, get, prName } from '../../lib/records.js';
 import { columnHeading } from './grid/columnHeadings.js';
+import { cellText } from './grid/gridFields.js';
 import { GridPerson, personColumn } from './grid/GridCell.jsx';
 import { KeptChip } from './KeptChip.jsx';
 import { RecordRowActions } from './RecordRowActions.jsx';
@@ -23,7 +23,7 @@ export function RecordCards({ module, data, current, pick, identity, readOnly, o
   } = recordCardFields(module, pick, identity);
   const factColumns = pick.filter((f) => f !== idColumn && f !== titleColumn && f !== stageColumn);
   const value = (record, field) => {
-    const formatted = formatValue(data, module, record, field);
+    const formatted = cellText(data, module, record, field);
     if (!workflowColumns[module] || formatted === '—') return formatted;
     const name =
       field.name === 'Client ID'

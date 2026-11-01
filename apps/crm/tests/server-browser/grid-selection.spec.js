@@ -19,6 +19,9 @@ test('an Admin ticks clients in the grid and moves them together from the select
     // The mockup's row: no ID column or row buttons; the name opens the record.
     await expect(table.getByRole('columnheader', { name: 'Client', exact: true })).toBeVisible();
     await expect(table.getByRole('columnheader', { name: 'Client ID' })).toHaveCount(0);
+    // The mockup's Agent column names each client's holder.
+    const row = (name) => table.getByRole('row').filter({ hasText: name });
+    await expect(row('Grid tick one')).toContainText(one.name);
     await expect(table.getByRole('button', { name: /Start message/ })).toHaveCount(0);
     const bar = page.getByRole('group', { name: 'Selected rows' });
     await expect(bar).toHaveCount(0);
@@ -39,6 +42,8 @@ test('an Admin ticks clients in the grid and moves them together from the select
     await expect(dialog).toHaveCount(0);
     await expect(page.locator('.toast')).toContainText('2 records reassigned');
     await expect(bar).toHaveCount(0);
+    await expect(row('Grid tick one')).toContainText(two.name);
+    await expect(row('Grid left alone')).toContainText(one.name);
 
     await table.getByRole('button', { name: openName(first.record.client_id) }).focus();
     await page.keyboard.press('Enter');

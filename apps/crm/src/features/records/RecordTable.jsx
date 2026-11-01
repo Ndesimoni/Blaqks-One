@@ -4,6 +4,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { get } from '../../lib/records.js';
 import { schema } from '../../lib/schema.js';
+import { gridFields } from './grid/gridFields.js';
 import { GridFoot } from './grid/GridFoot.jsx';
 import { GridSelectionBar } from './grid/GridSelectionBar.jsx';
 import { usePagedRecords } from './grid/usePagedRecords.js';
@@ -37,14 +38,16 @@ function RecordTable({
   gridRows = false,
   selectionActions = null,
 }) {
-  const { data } = useRecords();
+  const records = useRecords();
+  const { data } = records;
   const { setSort, sort, query } = useWorkspaceView();
   const { dispatchRow, readOnly = false } = useWorkspaceActions();
   const cards = useMediaQuery(cardQuery);
 
   const columns = schema(module);
+  const fields = gridFields(module, records.gridColumns?.[module]);
   const pick = (columnNames || preferredCols[module] || [])
-    .map((name) => columns.find((f) => f.name === name))
+    .map((name) => fields.find((f) => f.name === name))
     .filter(Boolean);
   const perPage = limit ? 20 : 500;
   const { current, currentPage, setPage } = usePagedRecords(arr, perPage);

@@ -11,7 +11,7 @@ export const mockupGrids = new Set(['Clients', 'Contacts', 'Shortlist', 'Client 
 /** Default columns; every other column of the sheet stays one tick away in the chooser. */
 const pilotColumns = {
   ...workflowColumns,
-  Clients: ['Full name', 'Phone', 'Last contact auto'],
+  Clients: ['Full name', 'Phone', 'Agent', 'Last contact auto'],
   Contacts: ['Full name', 'Contact type', 'Phone', 'Building / project'],
   Shortlist: ['Client name auto', 'Property title auto', 'Client response'],
   'Client care': ['Client name auto', 'Touchpoint type', 'Next contact', 'Task status'],

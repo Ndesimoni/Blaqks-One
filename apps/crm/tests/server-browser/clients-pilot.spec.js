@@ -32,8 +32,8 @@ async function capture(page, testInfo, role) {
       } else {
         await expect(page.locator('.data-table tbody tr').first()).toBeVisible();
         await expect(page.locator('.record-card')).toHaveCount(0);
-        // Select (Message), Client, Phone, Last contact; no ID column or row buttons.
-        await expect(page.locator('.data-table thead th')).toHaveCount(4);
+        // Select (Message), Client, Phone, Agent, Last contact; no ID column or row buttons.
+        await expect(page.locator('.data-table thead th')).toHaveCount(5);
       }
       await page.screenshot({
         path: testInfo.outputPath(`clients-${role}-${viewport.label}-${theme}.png`),

@@ -24,6 +24,7 @@ export default {
   message: 'Message',
   assign: 'Assign to…',
   clearSelection: 'Clear selection',
+  unassigned: 'Unassigned',
   emptyFiltered: 'Try another filter or search, or clear them to show every record.',
   today: 'Today',
   yesterday: 'Yesterday',
