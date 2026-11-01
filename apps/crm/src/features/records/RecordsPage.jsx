@@ -1,39 +1,25 @@
 import React from 'react';
-import { Icon } from '../../components/ui/Icon.jsx';
 import { useRecordSearch } from '../../hooks/useRecordSearch.js';
+import { useSession } from '../../hooks/useSession.js';
 import { useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { useI18n } from '../../i18n/useI18n.js';
+import { RecordFeed } from './feed/RecordFeed.jsx';
+import { directoryNoun, plural } from './grid/directoryNouns.js';
+import { GridColumnChooser } from './grid/GridColumnChooser.jsx';
+import { GridFilterBar } from './grid/GridFilterBar.jsx';
+import { useGridColumns } from './grid/useGridColumns.js';
 import { RecordDirectoryHead } from './RecordDirectoryHead.jsx';
 import { RecordTable } from './RecordTable.jsx';
 import { matchesRecordTab, recordTabs } from './selectors.js';
-import { workflowColumns } from './workflowPresentation.js';
+
+/** The Interaction log reads as an activity feed (NAV); the other directories are grids. */
+const feedModules = new Set(['Interaction log']);
 
 /**
- * Desktop columns for the reviewed directories: identity, role or requirement, stage and next
- * task fit beside the action cell at 1280, so nothing is clipped (UI3 §5.4, UI4a).
+ * A record directory in the Bitrix24 list pattern (NAV): count and primary action, the filter
+ * bar, then the grid or feed. `toolbarExtras` is an optional slot (connected mode supplies
+ * the "Assigned to" filter).
  */
-const pilotColumns = {
-  ...workflowColumns,
-  Clients: [
-    'Client ID',
-    'Full name',
-    'Lead stage',
-    'Buy / rent',
-    'Maximum budget AED',
-    'Lead quality score / 100',
-    'Next follow-up auto',
-  ],
-  Contacts: [
-    'Contact ID',
-    'Full name',
-    'Contact type',
-    'Phone',
-    'Email',
-    'Company',
-    'Building / project',
-  ],
-};
-
-/** `toolbarExtras` is an optional slot (connected mode supplies the "Assigned to" filter). */
 function RecordsPage({
   module,
   tabs = recordTabs(module),
@@ -41,53 +27,48 @@ function RecordsPage({
   emptyDetail,
   toolbarExtras = null,
 }) {
+  const { t } = useI18n();
+  const { user } = useSession();
   const { tab, setTab, setPage, query, setQuery } = useWorkspaceView();
   const arr = useRecordSearch(module, (record) =>
     matchesTab ? matchesTab(record, tab) : matchesRecordTab(module, record, tab),
   );
-
+  const grid = useGridColumns(module, user?.id);
+  const feed = feedModules.has(module);
+  const detail = emptyDetail ?? (tab !== tabs[0] ? t('recordGrid.emptyFiltered') : undefined);
+  const firstPage = (apply) => (value) => {
+    apply(value);
+    setPage(0);
+  };
   return (
     <div className="page-stack record-directory">
-      <RecordDirectoryHead module={module} columnNames={pilotColumns[module]} />
-      <div className="filters-toolbar">
-        <div className="tabs" role="group" aria-label={`Filter ${module}`}>
-          {tabs.map((t) => (
-            <button
-              key={t}
-              aria-pressed={t === tab}
-              className={t === tab ? 'active' : ''}
-              onClick={() => {
-                setTab(t);
-                setPage(0);
-              }}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        <div className="filter-right">
-          <div className="search-small">
-            <Icon name="search" size={16} />
-            <input
-              aria-label={'Search ' + module}
-              placeholder="Search records..."
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(0);
-              }}
-            />
-          </div>
-        </div>
-        {toolbarExtras}
-      </div>
-      <RecordTable
+      <RecordDirectoryHead module={module} columnNames={grid.columns} sortable={!feed} />
+      <GridFilterBar
         module={module}
-        arr={arr}
-        emptyDetail={emptyDetail}
-        columnNames={pilotColumns[module]}
-        sortInHeading
+        presetLabel={
+          tab === tabs[0]
+            ? t('recordGrid.allPreset', { things: plural(directoryNoun(module)) })
+            : tab
+        }
+        tabs={tabs}
+        tab={tab}
+        onTab={firstPage(setTab)}
+        query={query}
+        onQuery={firstPage(setQuery)}
+        tools={feed ? null : <GridColumnChooser grid={grid} />}
+        extras={toolbarExtras}
       />
+      {feed ? (
+        <RecordFeed module={module} arr={arr} emptyDetail={detail} />
+      ) : (
+        <RecordTable
+          module={module}
+          arr={arr}
+          emptyDetail={detail}
+          columnNames={grid.columns}
+          sortInHeading
+        />
+      )}
     </div>
   );
 }

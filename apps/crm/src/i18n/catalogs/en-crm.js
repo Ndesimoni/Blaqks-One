@@ -13,6 +13,7 @@ import enLeadsBoard from './en/leadsBoard.js';
 import enListingShareViews from './en/listingShareViews.js';
 import enListingShares from './en/listingShares.js';
 import enProperties from './en/properties.js';
+import enRecordGrid from './en/recordGrid.js';
 import enRecordKeeps from './en/recordKeeps.js';
 import enRecordShares from './en/recordShares.js';
 import enRecordSorting from './en/recordSorting.js';
@@ -32,6 +33,7 @@ export const crmCatalogs = {
   listingShares: enListingShares,
   listingShareViews: enListingShareViews,
   properties: enProperties,
+  recordGrid: enRecordGrid,
   recordKeeps: enRecordKeeps,
   recordShares: enRecordShares,
   recordSorting: enRecordSorting,

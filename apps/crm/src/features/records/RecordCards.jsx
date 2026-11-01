@@ -2,9 +2,11 @@ import React from 'react';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { formatValue } from '../../lib/crm.js';
 import { clName, get, prName } from '../../lib/records.js';
+import { GridPerson } from './grid/GridCell.jsx';
 import { KeptChip } from './KeptChip.jsx';
 import { RecordRowActions } from './RecordRowActions.jsx';
 import './cards.css';
+import './grid/grid-cards.css';
 import { recordCardFields, workflowColumns } from './workflowPresentation.js';
 
 /**
@@ -31,19 +33,28 @@ export function RecordCards({ module, data, current, pick, readOnly, onOpen }) {
     return name && name !== formatted && name !== '—' ? `${name} · ${formatted}` : formatted;
   };
   const filled = (record, field) => value(record, field) !== '—';
+  const person = titleColumn?.name === 'Full name';
   return (
     <ul className="record-cards" aria-label={`${module} records`}>
       {current.map((record, index) => {
         const id = get(record, idColumn.name);
         const facts = factColumns.filter((f) => filled(record, f)).slice(0, limit);
         const stage = stageColumn && filled(record, stageColumn) ? value(record, stageColumn) : '';
+        const title = value(record, titleColumn);
+        const identity = (
+          <div className="record-card-identity">
+            <span className="record-card-title">{title}</span>
+            <span className="record-card-id mono">{value(record, idColumn)}</span>
+          </div>
+        );
         return (
           <li key={id || index} className="record-card">
             <div className="record-card-head">
-              <div className="record-card-identity">
-                <span className="record-card-title">{value(record, titleColumn)}</span>
-                <span className="record-card-id mono">{value(record, idColumn)}</span>
-              </div>
+              {person && title !== '—' ? (
+                <GridPerson name={title}>{identity}</GridPerson>
+              ) : (
+                identity
+              )}
               {stage && <Badge>{stage}</Badge>}
             </div>
             {facts.length > 0 && (

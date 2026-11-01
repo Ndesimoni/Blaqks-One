@@ -4,6 +4,11 @@ import { routePath } from '../../src/config/routes.js';
 import { saveRecordForm } from './helpers/record-form.js';
 import { expectRecordOverlay } from './helpers/record-overlay.js';
 
+// Properties are cards and the Interaction log is an activity feed (NAV); the rest are tables.
+const rowSelector = (module) =>
+  ({ Properties: '.modern-property-card', 'Interaction log': '.feed-event' })[module] ||
+  '.data-table tbody tr';
+
 test('all 11 record modules create, edit, reload and delete through centered overlays', async ({
   page,
 }, testInfo) => {
@@ -39,10 +44,7 @@ test('all 11 record modules create, edit, reload and delete through centered ove
       exact: true,
     });
     await search.fill(id);
-    await page
-      .locator(module === 'Properties' ? '.modern-property-card' : '.data-table tbody tr')
-      .first()
-      .click();
+    await page.locator(rowSelector(module)).first().click();
     await expectRecordOverlay(page);
     if (module === 'Clients')
       await page.screenshot({ path: testInfo.outputPath('client-details-overlay-desktop.png') });
@@ -52,10 +54,7 @@ test('all 11 record modules create, edit, reload and delete through centered ove
     await saveRecordForm(page);
     await page.reload();
     await search.fill(id + '-EDIT');
-    await page
-      .locator(module === 'Properties' ? '.modern-property-card' : '.data-table tbody tr')
-      .first()
-      .click();
+    await page.locator(rowSelector(module)).first().click();
     await expectRecordOverlay(page);
     page.once('dialog', (dialog) => dialog.accept());
     await page.getByRole('button', { name: 'Delete', exact: true }).click();

@@ -1,15 +1,18 @@
-import React from 'react';
-import { Badge } from '../../components/ui/Badge.jsx';
+import React, { useRef } from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { formatValue } from '../../lib/crm.js';
 import { get } from '../../lib/records.js';
-import { KeptChip } from './KeptChip.jsx';
+import { GridCell } from './grid/GridCell.jsx';
+import { useWideTable } from './grid/useWideTable.js';
 import { RecordRowActions } from './RecordRowActions.jsx';
 
-const stageName = /stage|status|tier|priority/i;
-const strongName = /Full name|Listing title|Next action|Community/i;
+const ariaSort = (sort, field) =>
+  sort.key === field.key ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none';
 
-/** Desktop directory presentation: the existing sortable table, in a labelled scroll container. */
+/**
+ * Desktop directory presentation: the sortable table inside the grid card. A table that fits
+ * keeps its header row in view while the page scrolls; a wider one scrolls sideways in a
+ * labelled, keyboard-reachable region instead.
+ */
 export function RecordTableView({
   module,
   data,
@@ -23,24 +26,23 @@ export function RecordTableView({
   readOnly,
   tableLabel,
 }) {
+  const scroll = useRef(null);
+  const wide = useWideTable(scroll);
   return (
-    <div className="table-scroll" role="region" aria-label={`${module} records table`} tabIndex={0}>
-      <table className="data-table" aria-label={tableLabel || `${module} records`}>
+    <div
+      ref={scroll}
+      className={'table-scroll grid-scroll' + (wide ? ' is-wide' : '')}
+      role="region"
+      aria-label={`${module} records table`}
+      tabIndex={wide ? 0 : undefined}
+    >
+      <table className="data-table grid-table" aria-label={tableLabel || `${module} records`}>
         <thead>
           <tr>
             {pick.map((f) => (
-              <th
-                key={f.key}
-                scope="col"
-                aria-sort={
-                  sort.key === f.key
-                    ? sort.direction === 'asc'
-                      ? 'ascending'
-                      : 'descending'
-                    : 'none'
-                }
-              >
+              <th key={f.key} scope="col" aria-sort={ariaSort(sort, f)}>
                 <button
+                  type="button"
                   className="table-sort"
                   onClick={() => {
                     setSort((s) => ({
@@ -67,21 +69,16 @@ export function RecordTableView({
             <tr key={get(r, columns[0].name) || i} onClick={() => dispatchRow(module, r)}>
               {pick.map((f) => (
                 <td key={f.key}>
-                  {stageName.test(f.name) ? (
-                    <Badge>{formatValue(data, module, r, f)}</Badge>
-                  ) : f === pick[0] ? (
-                    <>
-                      <span className="mono id-link">{formatValue(data, module, r, f)}</span>
-                      <KeptChip module={module} record={r} />
-                    </>
-                  ) : strongName.test(f.name) ? (
-                    <span className="cell-strong">{formatValue(data, module, r, f)}</span>
-                  ) : (
-                    formatValue(data, module, r, f)
-                  )}
+                  <GridCell
+                    data={data}
+                    module={module}
+                    record={r}
+                    field={f}
+                    first={f === pick[0]}
+                  />
                 </td>
               ))}
-              <td>
+              <td className="grid-actions">
                 <RecordRowActions
                   module={module}
                   record={r}

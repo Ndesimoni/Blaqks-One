@@ -74,6 +74,8 @@ test('workflow cards retain task dates, state and linked records in both themes'
   }
   await signIn(page);
   for (const [module, route, , dateLabel] of scenarios) {
+    // The Interaction log reads as an activity feed at every width (NAV); the rest are grids.
+    const feed = module === 'Interaction log';
     await page.goto(`/#/${route}`);
     await page.getByLabel(`Search ${module}`, { exact: true }).fill('UI5-');
     for (const theme of ['dark', 'light']) {
@@ -82,7 +84,7 @@ test('workflow cards retain task dates, state and linked records in both themes'
         theme,
       );
       await page.setViewportSize({ width: 390, height: 844 });
-      const card = page.locator('.record-card').first();
+      const card = page.locator(feed ? '.feed-event' : '.record-card').first();
       await expect(card).toContainText(dateLabel);
       await expect(card).toContainText('Synthetic workflow');
       await expect(card.getByRole('button', { name: /^Open record/ })).toBeVisible();
@@ -92,7 +94,7 @@ test('workflow cards retain task dates, state and linked records in both themes'
       await page.screenshot({ path: testInfo.outputPath(`${route}-390-${theme}.png`) });
       await page.setViewportSize({ width: 1280, height: 900 });
       await expect(
-        page.getByRole('table', { name: `${module} records`, exact: true }),
+        page.getByRole(feed ? 'region' : 'table', { name: `${module} records`, exact: true }),
       ).toBeVisible();
       await page.screenshot({ path: testInfo.outputPath(`${route}-1280-${theme}.png`) });
     }

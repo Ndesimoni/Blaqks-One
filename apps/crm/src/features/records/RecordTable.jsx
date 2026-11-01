@@ -1,17 +1,23 @@
-import React, { useEffect } from 'react';
-import { Pagination } from '../../components/ui/Pagination.jsx';
+import React from 'react';
 import { preferredCols } from '../../config/navigation.js';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { schema } from '../../lib/schema.js';
+import { GridFoot } from './grid/GridFoot.jsx';
+import { usePagedRecords } from './grid/usePagedRecords.js';
 import { RecordCards } from './RecordCards.jsx';
 import { RecordSort } from './RecordSort.jsx';
 import { RecordTableEmpty } from './RecordTableEmpty.jsx';
 import { RecordTableView } from './RecordTableView.jsx';
+import './grid/grid-card.css';
 
 /** Below this layout breakpoint one card per record replaces the table (UI3 §5.4). */
 const cardQuery = '(max-width: 750px)';
 
+/**
+ * A directory's records in one bordered grid card (Bitrix24 list pattern, NAV): the table or
+ * the phone cards, the empty state, then the footer with the total and the pager.
+ */
 function RecordTable({
   module,
   arr,
@@ -25,7 +31,7 @@ function RecordTable({
   emptyAction,
 }) {
   const { data } = useRecords();
-  const { page, setSort, setPage, sort, query } = useWorkspaceView();
+  const { setSort, sort, query } = useWorkspaceView();
   const { dispatchRow, readOnly = false } = useWorkspaceActions();
   const cards = useMediaQuery(cardQuery);
 
@@ -34,12 +40,7 @@ function RecordTable({
     .map((name) => columns.find((f) => f.name === name))
     .filter(Boolean);
   const perPage = limit ? 12 : 500;
-  const currentPage = Math.min(page, Math.max(0, Math.ceil(arr.length / perPage) - 1));
-  useEffect(() => {
-    if (page !== currentPage) setPage(currentPage);
-  }, [page, currentPage, setPage]);
-  const start = currentPage * perPage;
-  const current = arr.slice(start, start + perPage);
+  const { current, currentPage, setPage } = usePagedRecords(arr, perPage);
   return (
     <>
       {cards && !sortInHeading && (
@@ -47,7 +48,7 @@ function RecordTable({
           <RecordSort module={module} columnNames={columnNames} />
         </div>
       )}
-      <div className="table-shell">
+      <div className="grid-card">
         {cards ? (
           <RecordCards
             module={module}
@@ -82,13 +83,12 @@ function RecordTable({
             readOnly={readOnly}
           />
         )}
-        <Pagination
-          variant="table"
+        <GridFoot
           total={arr.length}
           page={currentPage}
-          pageSize={perPage}
+          perPage={perPage}
           label={`${pageLabel || module} pages`}
-          onChange={setPage}
+          onPage={setPage}
         />
       </div>
     </>
