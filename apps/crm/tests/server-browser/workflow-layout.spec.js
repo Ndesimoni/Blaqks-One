@@ -33,7 +33,8 @@ test('workflow cards retain task dates, state and linked records in both themes'
         appointment_date_time: '2099-01-02 10:00',
         viewing_status: 'Scheduled',
       },
-      'Appointment date & time',
+      // The mockup's heading for Appointment date & time.
+      'When',
     ],
     [
       'Shortlist',

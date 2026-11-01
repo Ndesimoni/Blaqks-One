@@ -7,7 +7,7 @@ import { openName } from './record-open.js';
 
 test('week view preserves dated and unscheduled viewings, navigation and List preference', async ({
   page,
-}) => {
+}, testInfo) => {
   const admin = await login();
   const today = dubaiToday();
   await add(admin, 'Clients', { client_id: 'WK-CLIENT', full_name: 'Synthetic calendar client' });
@@ -36,6 +36,13 @@ test('week view preserves dated and unscheduled viewings, navigation and List pr
   await expect(page.getByRole('button', { name: openName('WK-LATE') })).toBeVisible();
   await expect(page.getByRole('button', { name: openName('WK-NEXT') })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /^Unscheduled/ })).toBeVisible();
+  // The mockup's time grid: 09:00 sits in the 08:00 row, 15:30 in the 14:00 row.
+  const grid = page.getByRole('region', { name: 'Viewings week calendar' });
+  await expect(grid.getByRole('row', { name: /^08:00/ })).toContainText(
+    'Synthetic calendar client',
+  );
+  await expect(grid.getByRole('row', { name: /^14:00/ })).toContainText('15:30');
+  await page.screenshot({ path: testInfo.outputPath('viewings-week.png') });
   await expect(page.getByRole('button', { name: openName('WK-UNDATED') })).toBeVisible();
   await page.getByRole('button', { name: 'Next week', exact: true }).click();
   await expect(page.getByRole('button', { name: openName('WK-NEXT') })).toBeVisible();

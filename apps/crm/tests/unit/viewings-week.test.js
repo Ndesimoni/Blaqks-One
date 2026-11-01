@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { dubaiToday } from '../../src/lib/dubaiDate.js';
 import {
+  bandOf,
   matchesViewingTab,
   orderViewings,
   selectViewingWeek,
   viewingMoment,
+  weekBands,
   weekDays,
   weekStart,
 } from '../../src/features/server/viewings/weekModel.js';
@@ -106,4 +108,16 @@ test('ordering is stable and immutable, with known times before date-only viewin
   assert.deepEqual(records, snapshot);
   assert.equal(selectViewingWeek([], '2026-11-02').count, 0);
   assert.deepEqual(selectViewingWeek([], '2026-11-02').unscheduled, []);
+});
+
+test("the mockup's two-hour rows run 08:00 to 18:00 and widen to fit the week", () => {
+  assert.equal(bandOf('09:00'), 8);
+  assert.equal(bandOf('10:30'), 10);
+  const week = (times) => [{ records: times.map((at, i) => viewing(`V${i}`, at)) }];
+  assert.deepEqual(weekBands(week([])), [8, 10, 12, 14, 16, 18]);
+  assert.deepEqual(
+    weekBands(week(['2026-11-02 07:15', '2026-11-02 21:00'])),
+    [6, 8, 10, 12, 14, 16, 18, 20],
+  );
+  assert.deepEqual(weekBands(week(['2026-11-02'])), [8, 10, 12, 14, 16, 18], 'no time, no row');
 });

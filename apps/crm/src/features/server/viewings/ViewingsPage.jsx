@@ -66,6 +66,7 @@ export function ViewingsPage({ toolbarExtras = null }) {
           emptyDetail={t(filtered ? 'viewings.filtered' : 'viewings.first')}
           columnNames={grid.columns}
           sortInHeading
+          gridRows
         />
       )}
     </div>

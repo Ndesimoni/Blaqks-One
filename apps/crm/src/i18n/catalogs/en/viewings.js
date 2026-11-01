@@ -12,7 +12,8 @@ export default {
   weekCount: { one: '{count} viewing this week', other: '{count} viewings this week' },
   dayCount: { one: '{count} viewing', other: '{count} viewings' },
   calendar: 'Viewings week calendar',
-  noViewings: 'No viewings',
+  time: 'Time',
+  noTime: 'No time',
   noWeekViewings: 'No matching viewings this week. Choose another week or open List.',
   outsideWeek: {
     one: '{count} dated viewing is outside this week. Browse weeks or switch to List.',

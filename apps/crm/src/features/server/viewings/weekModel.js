@@ -66,3 +66,25 @@ export function selectViewingWeek(records, start) {
   const count = days.reduce((total, day) => total + day.records.length, 0);
   return { days, unscheduled, count, outsideCount: records.length - count - unscheduled.length };
 }
+
+/** The two-hour row a viewing time falls in: 09:00 and 10:30 belong to 08:00 and 10:00. */
+export const bandOf = (time) => {
+  const hour = Number(String(time).slice(0, 2));
+  return hour - (hour % 2);
+};
+
+/**
+ * The mockup's two-hour rows for a week: 08:00 to 18:00 at least, widened to the week's
+ * earliest and latest timed viewing so none falls outside the grid.
+ */
+export function weekBands(days) {
+  const bands = days.flatMap(({ records }) =>
+    records
+      .map((record) => viewingMoment(get(record, 'Appointment date & time')).time)
+      .filter(Boolean)
+      .map(bandOf),
+  );
+  const first = Math.min(8, ...bands);
+  const last = Math.max(18, ...bands);
+  return Array.from({ length: (last - first) / 2 + 1 }, (_, index) => first + index * 2);
+}

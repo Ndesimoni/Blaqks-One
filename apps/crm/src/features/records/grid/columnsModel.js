@@ -6,7 +6,7 @@ import { workflowColumns } from '../workflowPresentation.js';
  * default, a select column and the first cell opening the record. Other tables keep their ID
  * first and their row buttons until their own design step.
  */
-export const mockupGrids = new Set(['Clients', 'Contacts', 'Shortlist', 'Client care']);
+export const mockupGrids = new Set(['Clients', 'Contacts', 'Shortlist', 'Client care', 'Viewings']);
 
 /** Default columns; every other column of the sheet stays one tick away in the chooser. */
 const pilotColumns = {
@@ -15,6 +15,7 @@ const pilotColumns = {
   Contacts: ['Full name', 'Contact type', 'Phone', 'Building / project'],
   Shortlist: ['Client name auto', 'Property title auto', 'Client response'],
   'Client care': ['Client name auto', 'Touchpoint type', 'Next contact', 'Task status'],
+  Viewings: ['Appointment date & time', 'Property title auto', 'Client name auto'],
 };
 
 /** The columns a directory shows until its viewer chooses others. */

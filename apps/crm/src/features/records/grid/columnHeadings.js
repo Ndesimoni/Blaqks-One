@@ -10,6 +10,11 @@ const headings = {
     'Property title auto': 'Property',
     'Client response': 'Status',
   },
+  Viewings: {
+    'Appointment date & time': 'When',
+    'Property title auto': 'Viewing',
+    'Client name auto': 'Client',
+  },
   'Client care': {
     'Client name auto': 'Client',
     'Touchpoint type': 'Occasion',
