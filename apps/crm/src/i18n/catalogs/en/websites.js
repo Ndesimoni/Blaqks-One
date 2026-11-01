@@ -52,6 +52,11 @@ export default {
   theme: 'Website theme',
   themeHint:
     'Choose a composition. All themes share property search, profiles and contact features.',
+  preview: 'Preview',
+  previewName: 'Your website name',
+  previewTitle: 'Your homepage headline',
+  previewSubtitle: 'Your homepage introduction appears here.',
+  previewNote: 'A sketch of your homepage as you type. Review shows everything before you publish.',
   theme1: 'Signature',
   theme2: 'Modern',
   theme3: 'Editorial',

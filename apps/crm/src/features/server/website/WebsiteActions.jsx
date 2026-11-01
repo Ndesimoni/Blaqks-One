@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 
-export function WebsiteActions({ editor, onReview, t }) {
+export function WebsiteActions({ editor, form, onReview, t }) {
   const { state, busy, dirty, conflict, needsRecovery, reload, recover, error, notice } = editor;
   return (
     <div className="website-action-area">
@@ -36,6 +36,7 @@ export function WebsiteActions({ editor, onReview, t }) {
           </Button>
           <Button
             type="submit"
+            form={form}
             name="intent"
             value="save"
             variant="light"
@@ -45,6 +46,7 @@ export function WebsiteActions({ editor, onReview, t }) {
           </Button>
           <Button
             type="submit"
+            form={form}
             name="intent"
             value="publish"
             disabled={busy || conflict || needsRecovery}

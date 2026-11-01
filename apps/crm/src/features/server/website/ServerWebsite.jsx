@@ -6,17 +6,20 @@ import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useWebsiteEditor } from './useWebsiteEditor.js';
 import { websiteAccess } from './websiteModel.js';
-import { WebsiteOverview } from './WebsiteOverview.jsx';
 import { WebsiteIdentity } from './WebsiteIdentity.jsx';
 import { WebsiteThemes } from './WebsiteThemes.jsx';
 import { WebsiteCopy } from './WebsiteCopy.jsx';
-import { WebsiteActions } from './WebsiteActions.jsx';
+import { WebsitePreview } from './WebsitePreview.jsx';
+import { WebsitePublishBar } from './WebsitePublishBar.jsx';
 import { WebsiteReview } from './WebsiteReview.jsx';
 import { WebsitePanel, contentTab } from './WebsitePanels.jsx';
 import '../profile/profile.css';
 import './website.css';
 import './website-themes.css';
 import './website-actions.css';
+import './website-publish.css';
+
+const FORM_ID = 'website-content-form';
 
 /**
  * One site's editor and its sections (NAV): the sidebar and header tabs choose `section`. The
@@ -45,27 +48,36 @@ function WebsiteEditor({ api, workspace, platform, section, t }) {
   return (
     <div className="website-page page-stack">
       <div className="website-content page-stack" hidden={tab !== content}>
-        <WebsiteOverview state={state} dirty={editor.dirty} platform={platform} t={t} />
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            run(event.nativeEvent.submitter?.value || 'save');
-          }}
-        >
-          <fieldset className="website-editor-fields" disabled={busy}>
-            <legend className="sr-only">{t('websites.content')}</legend>
-            <WebsiteIdentity editor={editor} platform={platform} t={t} />
-            {!platform && (
-              <WebsiteThemes
-                value={form.theme}
-                onChange={(value) => change('theme', value)}
-                t={t}
-              />
-            )}
-            <WebsiteCopy editor={editor} platform={platform} t={t} />
-          </fieldset>
-          <WebsiteActions editor={editor} onReview={() => setReview(true)} t={t} />
-        </form>
+        <WebsitePublishBar
+          editor={editor}
+          platform={platform}
+          form={FORM_ID}
+          onReview={() => setReview(true)}
+          t={t}
+        />
+        <div className="website-editor-layout">
+          <form
+            id={FORM_ID}
+            onSubmit={(event) => {
+              event.preventDefault();
+              run(event.nativeEvent.submitter?.value || 'save');
+            }}
+          >
+            <fieldset className="website-editor-fields" disabled={busy}>
+              <legend className="sr-only">{t('websites.content')}</legend>
+              <WebsiteIdentity editor={editor} platform={platform} t={t} />
+              {!platform && (
+                <WebsiteThemes
+                  value={form.theme}
+                  onChange={(value) => change('theme', value)}
+                  t={t}
+                />
+              )}
+              <WebsiteCopy editor={editor} platform={platform} t={t} />
+            </fieldset>
+          </form>
+          <WebsitePreview form={form} platform={platform} t={t} />
+        </div>
         {review && (
           <WebsiteReview
             form={form}
