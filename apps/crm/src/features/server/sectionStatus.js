@@ -1,10 +1,10 @@
 import { descriptions } from '../../config/navigation.js';
 
 import { connectedCollections } from './records.js';
+import { WEBSITE_ROUTES } from './website/websiteRoutes.js';
 
 const connectedSections = new Set([
-  'Website',
-  'Platform website',
+  ...Object.keys(WEBSITE_ROUTES),
   ...connectedCollections,
   'Leads',
   'Team & access',

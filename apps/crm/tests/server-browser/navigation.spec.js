@@ -2,7 +2,14 @@ import { labels } from '../../src/config/navigation.js';
 import { expect, test } from './fixtures.js';
 import { signIn } from './helpers.js';
 import { entries } from './navigation-entries.js';
-import { openPage, rail, sectionButton, sectionNav, sectionTabs } from './product-nav.js';
+import {
+  openPage,
+  rail,
+  sectionButton,
+  sectionNav,
+  sectionTabs,
+  tabLabelOf,
+} from './product-nav.js';
 
 test('connected Admin navigation restores every group and unfinished routes never show demo records or forms', async ({
   page,
@@ -30,10 +37,9 @@ test('connected Admin navigation restores every group and unfinished routes neve
     await openPage(page, name);
     const tabs = sectionTabs(page);
     if (await tabs.count())
-      await expect(tabs.getByRole('button', { name, exact: true })).toHaveAttribute(
-        'aria-current',
-        'page',
-      );
+      await expect(
+        tabs.getByRole('button', { name: tabLabelOf(name), exact: true }),
+      ).toHaveAttribute('aria-current', 'page');
   }
   for (const name of ['Messages']) {
     await openPage(page, name);

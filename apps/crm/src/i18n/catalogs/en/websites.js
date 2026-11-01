@@ -105,8 +105,6 @@ export default {
     'The website or draft changed elsewhere. Your entries are preserved. Reload the latest version before saving or publishing again.',
   savingHelp: 'Publishing saves the exact current draft. No separate content approval is required.',
   emptyTheme: 'Theme {number}',
-  'tabs.label': 'Website sections',
-  'tabs.content': 'Content',
   'tabs.team': 'Team',
   'tabs.properties': 'Properties',
   'tabs.enquiries': 'Enquiries',

@@ -79,8 +79,7 @@ test('an Admin publishes a property from its details, sees it Live, then withdra
 
   await details.getByRole('button', { name: 'Close record details', exact: true }).click();
   await expect(details).toHaveCount(0);
-  await page.goto('/#/website');
-  await page.getByRole('tab', { name: 'Properties', exact: true }).click();
+  await page.goto('/#/website-properties');
   const table = page.getByRole('table', { name: 'Website listings', exact: true });
   const row = table.getByRole('row', { name: new RegExp(title) });
   await expect(row).toContainText('Live');

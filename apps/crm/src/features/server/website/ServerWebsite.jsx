@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Tabs, tabPanelProps } from '../../../components/ui/Tabs.jsx';
 import { useSession } from '../../../hooks/useSession.js';
+import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useWebsiteEditor } from './useWebsiteEditor.js';
@@ -12,17 +12,22 @@ import { WebsiteThemes } from './WebsiteThemes.jsx';
 import { WebsiteCopy } from './WebsiteCopy.jsx';
 import { WebsiteActions } from './WebsiteActions.jsx';
 import { WebsiteReview } from './WebsiteReview.jsx';
-import { WebsitePanel, contentTab, websiteTabs } from './WebsitePanels.jsx';
+import { WebsitePanel, contentTab } from './WebsitePanels.jsx';
 import '../profile/profile.css';
 import './website.css';
 import './website-themes.css';
 import './website-actions.css';
 
-function WebsiteEditor({ api, user, workspace, platform, t }) {
+/**
+ * One site's editor and its sections (NAV): the sidebar and header tabs choose `section`. The
+ * content form stays mounted, hidden, while another section is open, so a draft survives.
+ */
+function WebsiteEditor({ api, workspace, platform, section, t }) {
   const editor = useWebsiteEditor(api, workspace, platform, t);
+  const { navigate } = useNavigation();
   const [review, setReview] = useState(false);
   const content = contentTab(platform);
-  const [tab, setTab] = useState(content);
+  const tab = section || content;
   const { state, form, busy, error, change, run } = editor;
   if (!state)
     return error ? (
@@ -39,15 +44,8 @@ function WebsiteEditor({ api, user, workspace, platform, t }) {
     );
   return (
     <div className="website-page page-stack">
-      <WebsiteOverview state={state} dirty={editor.dirty} platform={platform} t={t} />
-      <Tabs
-        label={t('websites.tabs.label')}
-        tabs={websiteTabs(platform, user, t)}
-        value={tab}
-        onChange={setTab}
-        idPrefix="website"
-      />
-      <div {...tabPanelProps('website', content, tab)}>
+      <div className="website-content page-stack" hidden={tab !== content}>
+        <WebsiteOverview state={state} dirty={editor.dirty} platform={platform} t={t} />
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -81,15 +79,17 @@ function WebsiteEditor({ api, user, workspace, platform, t }) {
         )}
       </div>
       {tab !== content && (
-        <div {...tabPanelProps('website', tab, tab)}>
-          <WebsitePanel tab={tab} site={state.site} onGoToContent={() => setTab(content)} />
-        </div>
+        <WebsitePanel
+          tab={tab}
+          site={state.site}
+          onGoToContent={() => navigate(platform ? 'Platform website' : 'Website')}
+        />
       )}
     </div>
   );
 }
 
-export function ServerWebsite({ platform = false }) {
+export function ServerWebsite({ platform = false, section }) {
   const { api, user } = useSession();
   const { owner } = useWorkspaceScope();
   const { t } = useI18n();
@@ -103,9 +103,9 @@ export function ServerWebsite({ platform = false }) {
     <WebsiteEditor
       key={platform ? 'platform' : owner.id}
       api={api}
-      user={user}
       workspace={user.workspaceId || user.id}
       platform={platform}
+      section={section}
       t={t}
     />
   );

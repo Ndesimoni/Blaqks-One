@@ -26,7 +26,11 @@ const placesOf = (name) =>
  * sidebar, then the header tab when the section holds several routes. On narrow screens
  * the rail and sidebar live in the navigation drawer.
  */
-export async function openPage(page, name, { tabLabel = name } = {}) {
+/** A route's header tab label where it differs from the route name (website routes, NAV). */
+export const tabLabelOf = (name) =>
+  ({ 'Platform website': 'General site', 'Platform companies': 'Companies' })[name] || name;
+
+export async function openPage(page, name, { tabLabel = tabLabelOf(name) } = {}) {
   const places = placesOf(name);
   if (!places.length) throw new Error(`No product holds ${name}`);
   if (!(await rail(page).isVisible()))

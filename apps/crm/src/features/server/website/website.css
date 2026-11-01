@@ -138,3 +138,7 @@
     border-left: 0;
   }
 }
+/* The content form stays mounted while another website section is open (NAV). */
+.website-content[hidden] {
+  display: none;
+}

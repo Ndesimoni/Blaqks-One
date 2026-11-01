@@ -18,7 +18,12 @@ export const settingsRoutes = [
 export const connectedRoutes = [
   { name: 'Start', path: '/start' },
   { name: 'Website', path: '/website' },
+  // The Websites product's other sections and Platform website's Companies tab (NAV).
+  { name: 'Website team', path: '/website-team' },
+  { name: 'Website properties', path: '/website-properties' },
+  { name: 'Website enquiries', path: '/website-enquiries' },
   { name: 'Platform website', path: '/platform-website' },
+  { name: 'Platform companies', path: '/platform-companies' },
   { name: 'Inbox', path: '/inbox' },
   { name: 'Team chat', path: '/team-chat' },
   { name: 'Inbox rules', path: '/inbox-rules' },

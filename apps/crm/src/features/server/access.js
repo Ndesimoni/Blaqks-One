@@ -1,5 +1,6 @@
 import { routePermissions } from '../../config/team.js';
 import { findEntry, returnsOnly } from './assignment/assignmentModel.js';
+import { websiteGate } from './website/websiteRoutes.js';
 
 export function canManageTeam(user) {
   return user?.roleId === 'admin' || user?.roleId === 'super-admin';
@@ -15,8 +16,9 @@ export const activityLabel = (user) => (hasTeamFeatures(user) ? 'Team activity' 
 
 export function canOpenSection(user, route) {
   if (!['admin', 'super-admin', 'staff'].includes(user?.roleId)) return false;
-  if (route === 'Website') return user.roleId === 'admin';
-  if (route === 'Platform website') return user.roleId === 'super-admin';
+  // Website routes keep the gates of the tabs they replaced (website/websiteRoutes.js).
+  const website = websiteGate(user, route, () => canOpenSection(user, 'Clients'));
+  if (website !== null) return website;
   if (['Team & access', 'Workspaces'].includes(route)) return canManageTeam(user);
   // Only the owning company Admin connects or disconnects channels (design §8).
   if (route === 'Channels') return user?.roleId === 'admin';

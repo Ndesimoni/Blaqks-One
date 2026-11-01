@@ -19,11 +19,23 @@ const placed = (user) =>
   );
 const grouped = (user) => connectedGroups(user).flatMap((group) => group.items);
 
+// The website sections replaced the Website pages' in-page tabs, so only products list them.
+const formerTabs = [
+  'Website team',
+  'Website properties',
+  'Website enquiries',
+  'Platform companies',
+];
+
 test('every destination of the grouped sidebar has exactly one place among the products', () => {
   for (const user of [admin, staff, superAdmin]) {
     const routes = placed(user);
     assert.equal(new Set(routes).size, routes.length, `${user.roleId} has a duplicate`);
-    assert.deepEqual([...new Set(routes)].sort(), [...new Set(grouped(user))].sort(), user.roleId);
+    assert.deepEqual(
+      routes.filter((route) => !formerTabs.includes(route)).sort(),
+      [...new Set(grouped(user))].sort(),
+      user.roleId,
+    );
   }
 });
 

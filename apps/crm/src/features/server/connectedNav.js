@@ -1,11 +1,11 @@
 import { nav } from '../../config/navigation.js';
 import { canManageTeam, canOpenSection } from './access.js';
+import { WEBSITE_ROUTES } from './website/websiteRoutes.js';
 
 /** Existing route names keep their icons; connected-only destinations reuse a related icon. */
 const sharedIcons = Object.fromEntries(nav.flatMap((group) => group.items));
 const extraIcons = {
-  Website: 'home',
-  'Platform website': 'building',
+  ...Object.fromEntries(Object.entries(WEBSITE_ROUTES).map(([name, route]) => [name, route.icon])),
   'My profile': 'person',
   'Team & access': 'shield',
   Channels: 'chat',

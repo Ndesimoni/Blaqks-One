@@ -11,12 +11,14 @@ const listed = async (team) =>
   );
 
 async function openCompanies(page) {
-  await page.goto('/#/platform-website');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Platform website');
-  const tab = page.getByRole('tab', { name: /^Companies/ });
-  await tab.click();
-  await expect(tab).toHaveAttribute('aria-selected', 'true');
-  return page.getByRole('tabpanel', { name: /^Companies/ });
+  await page.goto('/#/platform-companies');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Companies');
+  const tabs = page.getByRole('navigation', { name: 'Section tabs' });
+  await expect(tabs.getByRole('button', { name: 'Companies', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  return page.getByRole('main');
 }
 
 test('the Super Admin finds a company and turns its licence off after the impact warning', async ({
@@ -84,8 +86,10 @@ test('company Admins and staff cannot see the Companies tab or read the list', a
           reads.push(request.url());
       });
       await signInMember(page, member.user.email);
-      await page.goto('/#/platform-website');
-      await expect(page.getByRole('tab', { name: /^Companies/ })).toHaveCount(0);
+      // The Companies tab is its own address now; members reach neither it nor the list.
+      await page.goto('/#/platform-companies');
+      await expect(page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+      await expect(page.getByRole('navigation', { name: 'Section tabs' })).toHaveCount(0);
       await expect(page.getByLabel('Search companies', { exact: true })).toHaveCount(0);
       expect(reads).toEqual([]);
     } finally {

@@ -23,7 +23,16 @@ export const productList = [
       { key: 'tools', routes: ['Calculators', 'Guide'] },
     ],
   },
-  { key: 'web', icon: 'monitor', sections: [{ key: 'website', routes: ['Website'] }] },
+  {
+    key: 'web',
+    icon: 'monitor',
+    sections: [
+      { key: 'websiteContent', routes: ['Website'] },
+      { key: 'websiteTeam', routes: ['Website team'] },
+      { key: 'websiteListings', routes: ['Website properties'] },
+      { key: 'websiteEnquiries', routes: ['Website enquiries'] },
+    ],
+  },
   {
     key: 'market',
     icon: 'layers',
@@ -46,7 +55,7 @@ export const productList = [
     sections: [
       { key: 'workspaces', routes: ['Workspaces'], group: 'platform' },
       { key: 'applications', routes: ['Marketplace applications'] },
-      { key: 'platformWebsite', routes: ['Platform website'] },
+      { key: 'platformWebsite', routes: ['Platform website', 'Platform companies'] },
     ],
   },
   {

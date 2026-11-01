@@ -9,7 +9,7 @@ const savedProfile = async (session, member) =>
 test('staff agree in My profile; the Admin allows, edits and stops publishing from the Team tab', async ({
   page,
   browser,
-}) => {
+}, testInfo) => {
   const team = await settingsTeam('team');
   const name = team.one.user.name;
   const staff = await memberPage(browser, team.one.user.email);
@@ -37,10 +37,11 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
 
   // The Admin finds them as Public on Website → Team; their own row always publishes.
   await openWebsite(page, team.admin);
-  await page.getByRole('tab', { name: 'Team', exact: true }).click();
+  await page.goto('/#/website-team');
   const table = page.getByRole('table', { name: 'Website team', exact: true });
   const row = table.getByRole('row').filter({ hasText: name });
   await expect(row).toContainText('Public');
+  await page.screenshot({ path: testInfo.outputPath('website-team.png') });
   await expect(row).toContainText('Given');
   await expect(row).toContainText('Not allowed');
   await expect(row).toContainText('0 live listings');

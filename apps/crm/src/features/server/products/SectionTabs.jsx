@@ -2,6 +2,7 @@ import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { activityLabel } from '../access.js';
 import { navLabel } from '../connectedNav.js';
+import { websiteRoute } from '../website/websiteRoutes.js';
 
 /**
  * Header tabs (NAV): the routes of the current section, shown when it has more than one.
@@ -20,7 +21,11 @@ export function SectionTabs({ user, section, route, navigate }) {
           aria-current={name === route ? 'page' : undefined}
           onClick={() => navigate(name)}
         >
-          {name === 'Team activity' ? activityLabel(user) : navLabel(user, name)}
+          {name === 'Team activity'
+            ? activityLabel(user)
+            : websiteRoute(name)?.tab
+              ? t(websiteRoute(name).tab)
+              : navLabel(user, name)}
         </button>
       ))}
     </nav>

@@ -41,7 +41,7 @@ test('a member adds their own Instagram link; the Admin sees it as text and keep
 
   // The Admin's Edit profile shows the link as plain text, never an input or a link.
   await openWebsite(page, team.admin);
-  await page.getByRole('tab', { name: 'Team', exact: true }).click();
+  await page.goto('/#/website-team');
   const table = page.getByRole('table', { name: 'Website team', exact: true });
   const row = table.getByRole('row').filter({ hasText: name });
   await row.getByRole('button', { name: `Edit profile for ${name}`, exact: true }).click();

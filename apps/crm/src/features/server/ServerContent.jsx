@@ -39,6 +39,7 @@ import { IncomingShares } from './shares/IncomingShares.jsx';
 import { ShareLinkPage } from './shares/ShareLinkPage.jsx';
 import { SHARE_ROUTE } from './shares/shareModel.js';
 import { ServerWebsite } from './website/ServerWebsite.jsx';
+import { websiteRoute } from './website/websiteRoutes.js';
 import { StartPage } from './products/StartPage.jsx';
 
 export function ServerContent({ owner }) {
@@ -62,8 +63,18 @@ export function ServerContent({ owner }) {
     );
   if (route === 'Start') return <StartPage />;
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
-  if (['Website', 'Platform website'].includes(route))
-    return <ServerWebsite key={route} platform={route === 'Platform website'} />;
+  // One element per site across its sections, so an unsaved content draft survives switching.
+  const website = websiteRoute(route);
+  if (website) {
+    const platform = website.gate === 'platform';
+    return (
+      <ServerWebsite
+        key={platform ? 'platform' : 'company'}
+        platform={platform}
+        section={website.section}
+      />
+    );
+  }
   // The member's own account: independent of the selected workspace's records.
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Channels') return <ServerChannels />;
