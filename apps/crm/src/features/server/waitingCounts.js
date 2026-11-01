@@ -70,6 +70,14 @@ export const waitingSources = Object.freeze({
     labelKey: 'handoverRequests.nav.agreements',
     event: LISTING_SHARES_CHANGED,
   },
+  // The Super Admin's marketplace applications waiting for a decision (top bar bell only).
+  Applications: {
+    read: (api, workspace, signal) =>
+      api
+        .marketplaceApplications(workspace, 'pending', signal)
+        .then((value) => (Array.isArray(value?.applications) ? value.applications.length : 0)),
+    labelKey: 'frame.notices.applications',
+  },
   // Leads and Clients are one collection, so both show the leads shared with the caller.
   Leads: shareSource('Clients'),
   Clients: shareSource('Clients'),

@@ -21,4 +21,52 @@ export default {
   'groups.Clients': 'Clients',
   'groups.Contacts': 'Contacts',
   'groups.Properties': 'Properties',
+  bell: 'Notifications',
+  bellWaiting: { one: 'Notifications, 1 waiting', other: 'Notifications, {count} waiting' },
+  notifications: 'Notifications',
+  closeNotifications: 'Close notifications',
+  noticeTabs: 'Show',
+  'tabs.all': 'All',
+  'tabs.mentions': 'Mentions',
+  'tabs.approvals': 'Approvals',
+  'notices.mentions': {
+    one: 'You were mentioned in Team chat',
+    other: 'You were mentioned {count} times in Team chat',
+  },
+  'notices.handovers': {
+    one: 'A deal hand-over is waiting for you',
+    other: '{count} deal hand-overs are waiting for you',
+  },
+  'notices.agreements': {
+    one: 'An offer or listing from another company is waiting for you',
+    other: '{count} offers or listings from other companies are waiting for you',
+  },
+  'notices.applications': {
+    one: 'A marketplace application is waiting for a decision',
+    other: '{count} marketplace applications are waiting for a decision',
+  },
+  'notices.clients': {
+    one: 'A colleague shared a client or lead with you',
+    other: 'Colleagues shared {count} clients or leads with you',
+  },
+  'notices.properties': {
+    one: 'A colleague shared a property with you',
+    other: 'Colleagues shared {count} properties with you',
+  },
+  'notices.contacts': {
+    one: 'A colleague shared a contact with you',
+    other: 'Colleagues shared {count} contacts with you',
+  },
+  'where.mentions': 'Open Team chat',
+  'where.handovers': 'Open Deals',
+  'where.agreements': 'Open Agreements',
+  'where.applications': 'Open Marketplace applications',
+  'where.clients': 'Open Clients',
+  'where.properties': 'Open Properties',
+  'where.contacts': 'Open Contacts',
+  caughtUp: 'You are all caught up',
+  'caughtUpDetail.all': 'Mentions, approvals and records shared with you appear here.',
+  'caughtUpDetail.mentions': 'Mentions of you in Team chat appear here.',
+  'caughtUpDetail.approvals':
+    'Hand-overs, offers from other companies and applications waiting for you appear here.',
 };

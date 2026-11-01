@@ -7,13 +7,14 @@ import { CreateMenu } from './products/CreateMenu.jsx';
 import { HeaderTitle } from './products/HeaderTitle.jsx';
 import { HeaderMessages } from './products/messenger/HeaderMessages.jsx';
 import { HeaderSearch } from './products/HeaderSearch.jsx';
+import { NotificationBell } from './products/NotificationBell.jsx';
 import { ServerTheme } from './ServerTheme.jsx';
 import { useNavigation, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 import './products/frame.css';
 
 /**
  * The top bar (NAV5, Bitrix24's header): the product and page name, search, Create for the
- * current product, the messenger, the theme and the account menu. The company is named in the section
+ * current product, the messenger, notifications, the theme and the account menu. The company is named in the section
  * sidebar, so no workspace panel is needed on each page.
  */
 export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenger }) {
@@ -52,6 +53,7 @@ export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenge
         <HeaderSearch />
         <CreateMenu product={product} />
         <HeaderMessages onOpen={onMessenger} />
+        <NotificationBell />
         <ServerTheme />
         <AccountMenu busy={busy} />
       </div>
