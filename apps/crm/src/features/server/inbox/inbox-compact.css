@@ -27,3 +27,69 @@
     justify-content: flex-end;
   }
 }
+/* Mine, Unassigned, Team and Spam run across the top like the header's section tabs. */
+.inbox-tabs.inbox-top-tabs {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  padding: 0 16px;
+  border-block-end: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+}
+.inbox-top-tabs .inbox-tab {
+  flex: 0 0 auto;
+  min-block-size: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+:root[data-theme] .inbox-top-tabs .inbox-tab.is-active {
+  border-block-end-color: var(--gold);
+  background: none;
+  color: var(--ink);
+  box-shadow: none;
+}
+/* Channel chips (approved mockup) instead of a channel menu. */
+.inbox-channel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  inline-size: 100%;
+}
+.inbox-channel-chips > button,
+.inbox-composer-tabs > [role='tab'] {
+  min-block-size: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.inbox-channel-chips > button[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+/* The composer's Reply and Internal note read as underlined tabs. */
+.inbox-composer-tabs > [role='tab'] {
+  border-width: 0 0 2px;
+  border-color: transparent;
+  border-radius: 0;
+  background: none;
+}
+.inbox-composer-tabs > [role='tab'][aria-selected='true'] {
+  border-color: var(--gold);
+  color: var(--ink);
+}
+@media (max-width: 899px) {
+  .inbox-top-tabs:not(.is-list) {
+    display: none;
+  }
+}

@@ -6,6 +6,7 @@ import { sendingMailbox } from './composerModel.js';
 import { useMailbox } from '../mailbox/useMailbox.js';
 import { SidePanel } from './SidePanel.jsx';
 import { ConversationList } from './ConversationList.jsx';
+import { InboxTabs } from './InboxTabs.jsx';
 import { ConversationView } from './ConversationView.jsx';
 import { POLL_MS, canReplyOn, listParams } from './inboxModel.js';
 import { StartEmail } from './StartEmail.jsx';
@@ -97,6 +98,7 @@ export function ServerInbox({ owner, selection }) {
   return (
     <div className="inbox-page">
       <h1 className="sr-only">{t('inbox.title')}</h1>
+      <InboxTabs view={view} summary={summary} pane={pane} />
       <section
         className={`inbox-layout is-${pane}${ready ? ' has-panel' : ''}`}
         aria-label={t('inbox.title')}

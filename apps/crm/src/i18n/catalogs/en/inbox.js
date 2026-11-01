@@ -50,6 +50,7 @@ export default {
   'list.views': 'Conversation views',
   'list.channelFilter': 'Channel',
   'list.allChannels': 'All channels',
+  'list.all': 'All',
   'list.stateFilter': 'State',
   'list.count': { one: '{count} conversation', other: '{count} conversations' },
   'list.more': 'Load more',

@@ -3,7 +3,7 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ConversationRow } from './ConversationRow.jsx';
-import { CHANNELS, TABS, searchRows } from './inboxModel.js';
+import { CHANNELS, searchRows } from './inboxModel.js';
 import { ListEmpty, ListError, ListSkeleton } from './InboxStates.jsx';
 
 const STATES = ['', 'new', 'open', 'waiting', 'resolved'];
@@ -26,13 +26,16 @@ function moveFocus(event) {
   }
 }
 
-/** Search, tabs, filters and the bounded, scrolling list of conversations. */
+/** A channel's chip shows once the company has the channel, or while it is the filter. */
+const shown = (name, filters, summary) =>
+  name === filters.channel || (summary.channels ?? []).some((entry) => entry.channel === name);
+
+/** Search, channel chips, the state filter and the bounded, scrolling list of conversations. */
 export function ConversationList({ view, list, summary, selectedId, onOpen, onStart }) {
   const { t } = useI18n();
   const id = useId();
   const { tab, filters, query } = view;
   const rows = searchRows(list.rows, query);
-  const counts = { mine: summary.mine, unassigned: summary.unassigned };
   return (
     <section className="inbox-list-pane" aria-label={t('inbox.list.label')}>
       <div className="inbox-list-tools">
@@ -53,39 +56,23 @@ export function ConversationList({ view, list, summary, selectedId, onOpen, onSt
             </Button>
           )}
         </div>
-        <div role="tablist" aria-label={t('inbox.list.views')} className="inbox-tabs">
-          {TABS.map((name) => (
-            <button
-              key={name}
-              type="button"
-              role="tab"
-              aria-selected={tab === name}
-              className={'inbox-tab' + (tab === name ? ' is-active' : '')}
-              onClick={() => view.setTab(name)}
-            >
-              {t(`inbox.tab.${name}`)}
-              {counts[name] > 0 && (
-                <span className="inbox-tab-count">{counts[name] > 99 ? '99+' : counts[name]}</span>
-              )}
-            </button>
-          ))}
-        </div>
         <div className="inbox-filters">
-          <label htmlFor={`${id}-channel`} className="sr-only">
-            {t('inbox.list.channelFilter')}
-          </label>
-          <select
-            id={`${id}-channel`}
-            value={filters.channel}
-            onChange={(event) => view.setFilter('channel', event.target.value)}
+          <div
+            className="inbox-channel-chips"
+            role="group"
+            aria-label={t('inbox.list.channelFilter')}
           >
-            <option value="">{t('inbox.list.allChannels')}</option>
-            {CHANNELS.map((name) => (
-              <option key={name} value={name}>
-                {t(`inbox.channel.${name}`)}
-              </option>
+            {['', ...CHANNELS.filter((name) => shown(name, filters, summary))].map((name) => (
+              <button
+                key={name || 'all'}
+                type="button"
+                aria-pressed={filters.channel === name}
+                onClick={() => view.setFilter('channel', name)}
+              >
+                {name ? t(`inbox.channel.${name}`) : t('inbox.list.all')}
+              </button>
             ))}
-          </select>
+          </div>
           {tab !== 'spam' && (
             <>
               <label htmlFor={`${id}-state`} className="sr-only">
