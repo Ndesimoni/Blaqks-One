@@ -5,10 +5,13 @@ import { N } from '../../lib/format.js';
 import { directoryNoun, plural } from './grid/directoryNouns.js';
 import { RecordSort } from './RecordSort.jsx';
 import { useRecordAccess } from './useRecordAccess.js';
+import './grid/directory-toolbar.css';
 
 /**
- * Directory heading slot: one authorized count and the page's single primary action. The shell
- * still owns the `h1`, so this repeats neither the title nor its description (UI3, B-02).
+ * Directory heading slot: one authorized count (for screen readers; the grid's footer shows the
+ * total) and the page's single primary action, which starts the toolbar row as in Bitrix24's
+ * lists (approved mockup). The top bar owns the `h1`, so this repeats neither title nor
+ * description (UI3, B-02).
  * `noun` and `onAdd` let a view of another collection (Leads over Clients) keep its own words.
  * `sortable={false}` drops the phone sort control for a presentation with a fixed order (the
  * Interaction log feed).

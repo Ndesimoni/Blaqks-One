@@ -125,10 +125,10 @@
   color: var(--muted);
   font-size: 13px;
 }
-@media (max-width: 1050px) {
+@media (max-width: 1439px) {
   .header-search {
-    flex-basis: 220px;
-    min-inline-size: 140px;
+    flex-basis: 240px;
+    min-inline-size: 150px;
   }
 }
 @media (max-width: 750px) {
