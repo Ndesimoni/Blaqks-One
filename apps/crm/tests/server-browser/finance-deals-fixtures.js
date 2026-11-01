@@ -45,7 +45,7 @@ export async function dealCall(team, deal, method, suffix, body) {
  */
 export async function openDeals(page) {
   await page.goto('/#/deals');
-  await expect(page.locator('.page-heading h1')).toHaveText('Deals & commissions');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Deals & commissions');
   await expect(page.getByRole('region', { name: 'Deals connection status' })).toHaveCount(0);
   const list = page.getByRole('group', { name: 'View', exact: true }).getByRole('button', {
     name: 'List',

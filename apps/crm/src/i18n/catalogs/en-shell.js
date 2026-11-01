@@ -1,5 +1,6 @@
 /** English catalogues: The app frame: navigation, start page, messenger, shared Kanban, sign-up and account. Registered through catalogs/index.js. */
 import enCommon from './en/common.js';
+import enFrame from './en/frame.js';
 import enKanban from './en/kanban.js';
 import enMessenger from './en/messenger.js';
 import enNavigation from './en/navigation.js';
@@ -15,6 +16,7 @@ export const shellCatalogs = {
   common: enCommon,
   navigation: enNavigation,
   products: enProducts,
+  frame: enFrame,
   start: enStart,
   messenger: enMessenger,
   kanban: enKanban,

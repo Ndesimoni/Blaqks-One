@@ -8,7 +8,7 @@ import { ServerContent } from './ServerContent.jsx';
 import { ServerDialogs } from './ServerDialogs.jsx';
 import { ServerHeader } from './ServerHeader.jsx';
 import { ServerNavigation } from './ServerNavigation.jsx';
-import { ServerPageHeading } from './ServerPageHeading.jsx';
+import { ServerPageActions } from './ServerPageActions.jsx';
 import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
 import { SectionTabs } from './products/SectionTabs.jsx';
 import { useProductNav } from './products/useProductNav.js';
@@ -51,10 +51,10 @@ export function ServerShell({ owner, workspaces }) {
       >
         Skip to main content
       </a>
-      <ServerNavigation nav={nav} />
+      <ServerNavigation nav={nav} company={platform ? t('websites.platformTitle') : owner?.name} />
       <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
         <ServerHeader
-          owner={platform ? { name: t('websites.platformTitle') } : owner}
+          product={nav.here?.product}
           sidebarOpen={nav.sectionsVisible}
           onToggleSidebar={nav.here ? nav.toggleSidebar : null}
           onMessenger={setMessenger}
@@ -89,9 +89,8 @@ export function ServerShell({ owner, workspaces }) {
               )}
             </section>
           )}
-          {/* The full-height tools keep accessible headings of their own. */}
           {!fullHeight && route !== 'Start' && (
-            <ServerPageHeading owner={owner} workspaces={workspaces} />
+            <ServerPageActions owner={owner} workspaces={workspaces} />
           )}
           <ServerContent owner={owner} />
           {!fullHeight && (

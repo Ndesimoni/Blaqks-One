@@ -12,9 +12,10 @@ import './products/products.css';
 
 /**
  * The product rail and the current product's section sidebar (NAV). Wide screens show both,
- * the sidebar hidden when the person chose so; narrow screens show them in a drawer.
+ * the sidebar hidden when the person chose so; narrow screens show them in a drawer. The
+ * sidebar names the company under the product (NAV5).
  */
-export function ServerNavigation({ nav }) {
+export function ServerNavigation({ nav, company }) {
   const { user } = useSession();
   const { route, navigate } = useNavigation();
   const { mobileNav, setMobileNav } = useWorkspaceView();
@@ -26,7 +27,14 @@ export function ServerNavigation({ nav }) {
     setMobileNav(false);
   };
   const sidebar = (
-    <SectionSidebar user={user} product={current} here={nav.here} route={route} navigate={select} />
+    <SectionSidebar
+      user={user}
+      product={current}
+      company={company}
+      here={nav.here}
+      route={route}
+      navigate={select}
+    />
   );
   if (!mobile)
     return (

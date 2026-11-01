@@ -1,14 +1,24 @@
 import React from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { useSession } from '../../hooks/useSession.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { AccountMenu } from './products/AccountMenu.jsx';
+import { CreateMenu } from './products/CreateMenu.jsx';
+import { HeaderTitle } from './products/HeaderTitle.jsx';
 import { HeaderMessages } from './products/messenger/HeaderMessages.jsx';
 import { ServerTheme } from './ServerTheme.jsx';
-import { useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
+import { useNavigation, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
+import './products/frame.css';
 
-/** The top bar names the member's company, so no workspace panel is needed on each page. */
-export function ServerHeader({ owner, sidebarOpen, onToggleSidebar, onMessenger }) {
+/**
+ * The top bar (NAV5, Bitrix24's header): the product and page name, Create for the current
+ * product, the messenger, the theme and the account menu. The company is named in the section
+ * sidebar, so no workspace panel is needed on each page.
+ */
+export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenger }) {
   const { t } = useI18n();
+  const { user } = useSession();
+  const { route } = useNavigation();
   const { mobileNav, setMobileNav } = useWorkspaceView();
   const { busy } = useWorkspaceActions();
   return (
@@ -35,9 +45,10 @@ export function ServerHeader({ owner, sidebarOpen, onToggleSidebar, onMessenger 
             <Icon name="menu" size={20} />
           </button>
         )}
-        <strong className="topbar-workspace">{owner?.name || 'Connected CRM'}</strong>
+        <HeaderTitle user={user} route={route} product={product} />
       </div>
       <div className="top-actions">
+        <CreateMenu product={product} />
         <HeaderMessages onOpen={onMessenger} />
         <ServerTheme />
         <AccountMenu busy={busy} />

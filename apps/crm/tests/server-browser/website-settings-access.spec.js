@@ -56,7 +56,7 @@ test('platform content stays separate from the selected company workspace', asyn
       companyReads.push(request.url());
   });
   await page.goto(`/#/platform-website?workspace=${team.admin.user.workspaceId}`);
-  await expect(page.locator('.page-heading h1')).toHaveText('Platform website');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Platform website');
   const headline = page.getByLabel('Homepage headline', { exact: true });
   await expect(headline).toHaveValue('Published platform introduction');
   await expect(page.getByLabel('Company initials', { exact: true })).toHaveCount(0);

@@ -18,7 +18,7 @@ test.beforeEach(async ({ page }) => {
 
 test('an Admin connects, reconnects and disconnects a channel', async ({ page }) => {
   await page.goto('/#/channels');
-  await expect(page.locator('.page-heading h1')).toHaveText('Channels');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Channels');
   await expect(page.getByRole('article')).toHaveCount(5);
   // The generic form; WhatsApp now connects a Twilio account (whatsapp-numbers.spec.js).
   const facebook = card(page, 'Facebook Page');

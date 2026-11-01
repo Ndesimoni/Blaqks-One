@@ -81,7 +81,7 @@ test('staff with only future finance access get a clear workspace state and no c
     expect(profile.user.permissions.relationships).toBe(false);
     // Payments is connected (finance F3): an own view with nothing recorded yet.
     await staff.page.goto('/#/payments');
-    await expect(staff.page.locator('.page-heading h1')).toHaveText('Commission receipts');
+    await expect(staff.page.getByRole('heading', { level: 1 })).toHaveText('Commission receipts');
     await expect(staff.page.getByText('No payments yet', { exact: true })).toBeVisible();
     await expect(
       staff.page.getByRole('region', { name: 'Payments connection status' }),

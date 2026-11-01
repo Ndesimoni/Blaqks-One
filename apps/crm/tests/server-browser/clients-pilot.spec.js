@@ -3,7 +3,7 @@ import { expect, test } from './fixtures.js';
 import { addClient, signIn } from './helpers.js';
 import { actions, assignTeam, held, setGrants } from './permissions-fixtures.js';
 
-const description = 'Manage relationships, qualification, budgets, and conversion.';
+const heading = 'Clients & requirements';
 const viewports = [
   { width: 1280, height: 800, label: '1280' },
   { width: 390, height: 844, label: '390' },
@@ -15,8 +15,8 @@ async function capture(page, testInfo, role) {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     for (const theme of ['light', 'dark']) {
       await setTheme(page, theme);
-      await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-      await expect(page.getByText(description, { exact: true })).toHaveCount(1);
+      // The page is named once, in the top bar (NAV5); Bitrix24 shows no description line.
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
       await expect(page.getByText(/^Total clients$/)).toHaveCount(0);
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),

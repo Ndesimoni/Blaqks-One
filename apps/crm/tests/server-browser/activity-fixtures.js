@@ -38,7 +38,7 @@ export function busyDay(team, count) {
 /** Opens the activity screen and waits for the first page. */
 export async function openActivity(page, heading, search = '') {
   await page.goto(`/#/team-activity${search}`);
-  await expect(page.locator('.page-heading h1')).toHaveText(heading);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
   await expect(page.getByText('Loading activity…')).toHaveCount(0);
   return page.getByRole('region', { name: 'Activity', exact: true });
 }

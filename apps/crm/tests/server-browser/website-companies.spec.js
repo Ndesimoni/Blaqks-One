@@ -12,7 +12,7 @@ const listed = async (team) =>
 
 async function openCompanies(page) {
   await page.goto('/#/platform-website');
-  await expect(page.locator('.page-heading h1')).toHaveText('Platform website');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Platform website');
   const tab = page.getByRole('tab', { name: /^Companies/ });
   await tab.click();
   await expect(tab).toHaveAttribute('aria-selected', 'true');

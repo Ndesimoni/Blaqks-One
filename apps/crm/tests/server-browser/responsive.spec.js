@@ -17,12 +17,13 @@ test('connected navigation and shared screens reflow in both themes with keyboar
       }
       for (const route of ['/clients', '/contacts', '/properties']) {
         await page.goto(`/#${route}`);
-        await expect(page.locator('.page-heading h1')).toBeVisible();
+        await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
         ).toBe(true);
-        expect(await textContrast(page.locator('.topbar-workspace'))).toBeGreaterThanOrEqual(4.5);
-        expect(await textContrast(page.locator('.page-heading p'))).toBeGreaterThanOrEqual(4.5);
+        expect(await textContrast(page.locator('.header-page'))).toBeGreaterThanOrEqual(4.5);
+        if (width > 750)
+          expect(await textContrast(page.locator('.header-crumb'))).toBeGreaterThanOrEqual(4.5);
       }
       await page.screenshot({ path: testInfo.outputPath(`connected-${width}-${theme}.png`) });
     }

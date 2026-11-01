@@ -18,14 +18,8 @@
     max-width: none;
   }
 }
-/* The member's company name in the top bar, shortened on narrow screens. */
 .connected-shell .top-left {
   min-inline-size: 0;
-}
-.topbar-workspace {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 /* Inbox and Team chat fill the window below the top bar like messenger apps (owner,
    2026-10-22): the page does not scroll and the tool takes all the height left. */

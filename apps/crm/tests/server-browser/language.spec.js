@@ -10,7 +10,7 @@ const english = (page) => page.getByRole('radio', { name: /^English/ });
 
 async function openProfile(page) {
   await page.goto('/#/my-profile');
-  await expect(page.locator('.page-heading h1')).toHaveText('My profile');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My profile');
 }
 
 test('members switch My profile to Arabic (preview) and back, kept across reloads', async ({

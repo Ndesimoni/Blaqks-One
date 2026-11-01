@@ -9,7 +9,7 @@ test('the Admin edits the lead rules, and the change is kept', async ({ page }, 
   const identity = await session(page);
   query(`DELETE FROM inbox.crm_inbox_rules WHERE workspace_id='${identity.user.workspaceId}'`);
   await page.goto('/#/inbox-rules');
-  await expect(page.locator('.page-heading h1')).toHaveText('Inbox rules');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Inbox rules');
   const words = page.getByRole('list', { name: 'Property words' });
   await expect(words).toContainText('villa');
   await words.getByRole('button', { name: 'Remove villa' }).click();

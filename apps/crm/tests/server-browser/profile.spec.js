@@ -8,7 +8,7 @@ const signedOut = (page) =>
 
 async function openProfile(page) {
   await page.goto('/#/my-profile');
-  await expect(page.locator('.page-heading h1')).toHaveText('My profile');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('My profile');
   await expect(page.getByRole('heading', { name: 'Account details' })).toBeVisible();
 }
 

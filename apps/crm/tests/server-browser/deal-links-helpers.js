@@ -17,7 +17,7 @@ export async function openLog(page, logId) {
   const close = page.getByRole('button', { name: 'Close record details', exact: true });
   if (await close.count()) await close.click();
   await page.goto('/#/interaction-log');
-  await expect(page.locator('.page-heading h1')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   return openRecord(page, logId);
 }
 

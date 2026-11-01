@@ -37,7 +37,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
   }
   for (const name of ['Messages']) {
     await openPage(page, name);
-    await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(labels[name]);
     await expect(page.getByRole('region', { name: `${name} connection status` })).toContainText(
       'NOT CONNECTED YET',
     );
@@ -58,7 +58,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
     ['Client care', 'Add touchpoint'],
   ]) {
     await openPage(page, name);
-    await expect(page.locator('.page-heading h1')).toHaveText(labels[name]);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(labels[name]);
     // An empty list repeats its Add action in the empty state.
     await expect(page.getByRole('button', { name: action, exact: true }).first()).toBeVisible();
     await expect(page.getByRole('region', { name: `${name} connection status` })).toHaveCount(0);
@@ -68,7 +68,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
   await expect(page).toHaveURL(/#\/dashboard$/);
   await page.reload();
   // A restored session opens the workspace before the shell renders; allow for that.
-  await expect(page.locator('.page-heading h1')).toHaveText('Overview', { timeout: 20000 });
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Overview', { timeout: 20000 });
   await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
   // Only the Messages preview still says it is not connected.

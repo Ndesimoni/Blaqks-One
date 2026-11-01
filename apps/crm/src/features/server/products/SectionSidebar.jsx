@@ -24,7 +24,7 @@ function SectionEntry({ section, label, active, route, onSelect }) {
  * The contextual sidebar (NAV): only the current product's sections. A section opens on the
  * route already open in it, else on its first route; the routes themselves are header tabs.
  */
-export function SectionSidebar({ user, product, here, route, navigate }) {
+export function SectionSidebar({ user, product, company, here, route, navigate }) {
   const { t } = useI18n();
   const title = t(`products.${product}`);
   const sections = productSections(user, product);
@@ -42,6 +42,7 @@ export function SectionSidebar({ user, product, here, route, navigate }) {
   return (
     <aside id="section-sidebar" className="sidebar section-sidebar">
       <h2 className="section-sidebar-title">{title}</h2>
+      {company && <p className="section-sidebar-company">{company}</p>}
       <nav className="nav-groups" aria-label={t('products.sectionsOf', { product: title })}>
         <div className="nav-group">
           {sections.filter((section) => !section.personal).map(entry)}

@@ -17,7 +17,7 @@ test('an Admin dashboard counts the whole team and narrows to one member’s wor
   const { page, context } = await memberPage(browser, fixture.people.admin.email);
   try {
     await page.goto('/#/dashboard');
-    await expect(page.locator('.page-heading h1')).toHaveText('Overview');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Overview');
     await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
     await expect(page.getByText('Figures from your whole team’s records')).toBeVisible();
     await expectCounts(page, team(2));

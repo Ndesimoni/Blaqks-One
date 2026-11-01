@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../../hooks/useSession.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { canOpenSection } from '../access.js';
 import { productSections } from './productModel.js';
+import { useDisclosure } from './useDisclosure.js';
 import './start.css';
 
 const initials = (name) =>
@@ -26,24 +27,7 @@ export function AccountMenu({ busy }) {
   const { user } = useSession();
   const { navigate } = useNavigation();
   const go = useNavigate();
-  const [open, setOpen] = useState(false);
-  const root = useRef(null);
-  const opener = useRef(null);
-  useEffect(() => {
-    if (!open) return undefined;
-    const outside = (event) => !root.current?.contains(event.target) && setOpen(false);
-    const escape = (event) => {
-      if (event.key !== 'Escape') return;
-      setOpen(false);
-      opener.current?.focus();
-    };
-    document.addEventListener('pointerdown', outside);
-    document.addEventListener('keydown', escape);
-    return () => {
-      document.removeEventListener('pointerdown', outside);
-      document.removeEventListener('keydown', escape);
-    };
-  }, [open]);
+  const { open, setOpen, root, opener } = useDisclosure();
   const personal = productSections(user, 'settings').filter((section) => section.personal);
   const choose = (route) => {
     setOpen(false);

@@ -11,7 +11,7 @@ test('the Client desk shows a connected profile, property matches and timeline',
   const { page, context } = await memberPage(browser, one.email);
   try {
     await page.goto('/#/client-desk');
-    await expect(page.locator('.page-heading h1')).toHaveText('Client search & matching');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Client search & matching');
     await expect(page.getByRole('region', { name: 'Client desk connection status' })).toHaveCount(
       0,
     );
