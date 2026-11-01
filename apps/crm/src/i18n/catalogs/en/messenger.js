@@ -15,4 +15,14 @@ export default {
   switch: 'Messenger',
   fullPage: 'Open full page',
   close: 'Close the messenger',
+  strip: 'Recent conversations',
+  openMessenger: 'Open the messenger',
+  unknownSender: 'Unknown sender',
+  stripInbox: '{name}, Client inbox',
+  stripInboxUnread: '{name}, Client inbox, unread',
+  stripTeam: '{name}, Team chat',
+  stripTeamUnread: {
+    one: '{name}, Team chat, {count} unread',
+    other: '{name}, Team chat, {count} unread',
+  },
 };

@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { useSession } from '../../hooks/useSession.js';
-import { useNavigation, useWorkspaceActions, useWorkspaceView } from '../../hooks/useWorkspace.js';
+import { useNavigation, useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { useI18n } from '../../i18n/useI18n.js';
+import { canOpenSection } from './access.js';
 import { ServerContent } from './ServerContent.jsx';
 import { ServerDialogs } from './ServerDialogs.jsx';
 import { ServerHeader } from './ServerHeader.jsx';
 import { ServerNavigation } from './ServerNavigation.jsx';
 import { ServerPageActions } from './ServerPageActions.jsx';
-import { ServerWorkspacePicker } from './ServerWorkspacePicker.jsx';
+import { ServerWorkspaceBanner } from './ServerWorkspaceBanner.jsx';
 import { SectionTabs } from './products/SectionTabs.jsx';
 import { useProductNav } from './products/useProductNav.js';
+import { ChatStrip } from './products/messenger/ChatStrip.jsx';
 import { MessengerPanel } from './products/messenger/MessengerPanel.jsx';
 import { BottomBar } from './products/BottomBar.jsx';
 import { visibleProducts } from './products/productModel.js';
@@ -22,23 +24,29 @@ export function ServerShell({ owner, workspaces }) {
   const { route, navigate } = useNavigation();
   const nav = useProductNav(user, route, navigate);
   const [messenger, setMessenger] = useState(null);
+  const [start, setStart] = useState('');
   const platform = route === 'Platform website';
   // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
   const fullHeight = ['Inbox', 'Team chat'].includes(route);
+  // Bitrix24's right panel (NAV5) on wide screens; the Super Admin reads no conversations,
+  // and the full Inbox and Team chat pages give the messages that room instead.
+  const wide = useMediaQuery('(min-width: 1181px)');
+  const strip =
+    wide &&
+    !fullHeight &&
+    user.roleId !== 'super-admin' &&
+    (canOpenSection(user, 'Inbox') || canOpenSection(user, 'Team chat'));
   const { toast, setToast, setMobileNav } = useWorkspaceView();
-  const { busy } = useWorkspaceActions();
-  const location = useLocation();
-  const go = useNavigate();
-  const selectWorkspace = (id) => {
-    const params = new URLSearchParams(location.search);
-    params.set('workspace', id);
-    go({ pathname: location.pathname, search: `?${params}` });
+  const openMessenger = (box, id = '') => {
+    setStart(id);
+    setMessenger(box);
   };
   return (
     <div
       className={
         'app-shell connected-shell has-rail has-bottom-bar' +
-        (nav.sectionsVisible ? '' : ' sections-hidden')
+        (nav.sectionsVisible ? '' : ' sections-hidden') +
+        (strip ? ' has-chat-strip' : '')
       }
     >
       <a
@@ -57,38 +65,11 @@ export function ServerShell({ owner, workspaces }) {
           product={nav.here?.product}
           sidebarOpen={nav.sectionsVisible}
           onToggleSidebar={nav.here ? nav.toggleSidebar : null}
-          onMessenger={setMessenger}
+          onMessenger={openMessenger}
         />
         <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
         <main className="main-content" id="main-content" tabIndex={-1}>
-          {/* Members see their company in the top bar; the panel is only for the Super Admin,
-              who switches companies, and for archived (read-only) workspaces. */}
-          {!platform && (user.roleId === 'super-admin' || owner.status === 'archived') && (
-            <section className="workspace-banner" aria-label="Active workspace">
-              <Icon name="shield" size={20} />
-              <div>
-                <span>
-                  {owner.status === 'archived'
-                    ? 'ARCHIVED WORKSPACE · READ-ONLY'
-                    : 'CONNECTED WORKSPACE'}
-                </span>
-                <strong>{owner.name}</strong>
-                <p>
-                  {owner.status === 'archived'
-                    ? 'This Admin account and its team have been removed. Saved records remain available for review; changes are disabled.'
-                    : 'Clients, contacts, properties and client activity are saved to your CRM server.'}
-                </p>
-              </div>
-              {user.roleId === 'super-admin' && (
-                <ServerWorkspacePicker
-                  owner={owner}
-                  workspaces={workspaces}
-                  busy={busy}
-                  onSelect={selectWorkspace}
-                />
-              )}
-            </section>
-          )}
+          <ServerWorkspaceBanner owner={owner} workspaces={workspaces} platform={platform} />
           {!fullHeight && route !== 'Start' && (
             <ServerPageActions owner={owner} workspaces={workspaces} />
           )}
@@ -100,6 +81,7 @@ export function ServerShell({ owner, workspaces }) {
           )}
         </main>
       </div>
+      {strip && <ChatStrip refreshKey={`${route}|${messenger}`} onOpen={openMessenger} />}
       <BottomBar
         products={visibleProducts(user)}
         current={nav.here?.product || null}
@@ -113,6 +95,7 @@ export function ServerShell({ owner, workspaces }) {
         <MessengerPanel
           owner={owner}
           box={messenger}
+          start={start}
           onBox={setMessenger}
           onClose={() => setMessenger(null)}
         />

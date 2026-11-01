@@ -20,11 +20,12 @@ const boxes = [
  * right edge over any page, one pane at a time like the phone layout. The open conversation
  * lives in the panel, not the address bar, so the page behind keeps its own address.
  */
-export function MessengerPanel({ owner, box, onBox, onClose }) {
+export function MessengerPanel({ owner, box, start = '', onBox, onClose }) {
   const { t } = useI18n();
   const { user } = useSession();
   const { navigate } = useNavigation();
-  const [open, setOpen] = useState({ inbox: '', team: '' });
+  // `start` opens one conversation straight away, as a chat strip avatar asks.
+  const [open, setOpen] = useState(() => ({ inbox: '', team: '', ...(start && { [box]: start }) }));
   const allowed = boxes.filter(([, route]) => canOpenSection(user, route));
   const selection = {
     id: open[box],

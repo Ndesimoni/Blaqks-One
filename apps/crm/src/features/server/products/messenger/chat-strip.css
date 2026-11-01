@@ -1,0 +1,59 @@
+/* NAV5: Bitrix24's right panel on wide screens: the messenger and recent conversations. */
+.chat-strip {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  inline-size: 64px;
+  padding-block: 14px;
+  padding-inline: 6px max(6px, env(safe-area-inset-right, 0px));
+  overflow-y: auto;
+  border-inline-start: 1px solid var(--line);
+  background: var(--panel);
+}
+.chat-strip hr {
+  inline-size: 32px;
+  margin: 2px 0;
+  border: 0;
+  border-block-start: 1px solid var(--line);
+}
+.chat-strip-who {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.chat-strip-who.is-team {
+  background: var(--hover);
+  color: var(--ink);
+}
+.chat-strip-who:hover {
+  box-shadow: 0 0 0 2px var(--line);
+}
+/* An unread Client inbox conversation shows a dot; a room shows its count. */
+.chat-strip-who .header-badge:empty {
+  min-inline-size: 10px;
+  block-size: 10px;
+  padding: 0;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+}
+.connected-shell.has-chat-strip .main-area {
+  margin-inline-end: 64px;
+}
+.connected-shell.has-chat-strip .toast {
+  right: calc(27px + 64px);
+}
