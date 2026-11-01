@@ -1,0 +1,37 @@
+/**
+ * Record details as a right-edge panel (NAV redesign): header actions, the read-only lead
+ * stage track and a client's activity timeline. Keys are `recordPanel.<key>`.
+ */
+export default {
+  close: 'Close record details',
+  closeText: 'Close',
+  actions: 'Actions',
+  editRecord: 'Edit record',
+  editLead: 'Edit lead',
+  delete: 'Delete',
+  startMessage: 'Start message',
+  startMessageHint: 'Choose Email or WhatsApp. No message is sent by this preview.',
+  kindClients: 'Client',
+  kindLeads: 'Lead',
+  kindContacts: 'Contact',
+  kindFollowUps: 'Follow-up',
+  kindViewings: 'Viewing',
+  kindShortlist: 'Shortlist match',
+  kindInteractionLog: 'Conversation',
+  kindClientCare: 'Client care',
+  kindDeals: 'Deal',
+  stageTrack: 'Lead stage: {stage}',
+  stageNone: 'No stage set',
+  stagePosition: 'Stage {position} of {total}',
+  stageOffPath: 'Outside the pipeline: {stage}',
+  calculated: 'Calculated fields',
+  activity: 'Activity',
+  activityCount: { one: '{count} entry', other: '{count} entries' },
+  activityHint: 'Follow-ups, viewings, conversations and client care, newest first.',
+  activityEmpty: 'No follow-ups, viewings, conversations or client care for this client yet.',
+  eventFollowUp: 'Follow-up',
+  eventViewing: 'Viewing',
+  eventInteraction: 'Conversation',
+  eventCare: 'Client care',
+  undated: 'No date',
+};

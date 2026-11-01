@@ -1,5 +1,8 @@
 import React, { useEffect, useId, useRef } from 'react';
 
+/** Placement classes; `right` is the full-height record panel at the right edge. */
+const placements = { center: ' modal-centered', right: ' modal-right' };
+
 /** Native modal dialogs provide background inertness, focus containment and Escape. */
 export function Drawer({
   children,
@@ -27,7 +30,7 @@ export function Drawer({
   return (
     <dialog
       ref={dialogRef}
-      className={'modal-root' + (placement === 'center' ? ' modal-centered' : '')}
+      className={'modal-root' + (placements[placement] || '')}
       aria-modal="true"
       aria-labelledby={titleId || generatedId}
       onKeyDown={(event) => {

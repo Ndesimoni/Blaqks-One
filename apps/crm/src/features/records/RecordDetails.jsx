@@ -1,18 +1,20 @@
-import { PropertyRecordDetails } from './PropertyRecordDetails.jsx';
-import { RecordDetailFields } from './RecordDetailFields.jsx';
-import { LinkedProperties } from './LinkedProperties.jsx';
-import { recordDetailFields } from './formSections.js';
-import { schema } from '../../lib/schema.js';
-import { get } from '../../lib/records.js';
-import { Icon } from '../../components/ui/Icon.jsx';
-import { Button } from '../../components/ui/Button.jsx';
 import React, { useId } from 'react';
 import { Drawer } from '../../components/ui/Drawer.jsx';
-import { useNavigation, useWorkspaceActions } from '../../hooks/useWorkspace.js';
-import { useSession } from '../../hooks/useSession.js';
-import { hasMessagingAccess } from '../messaging/model.js';
-import { RecordSchedule } from '../calendar/RecordSchedule.jsx';
+import { useNavigation } from '../../hooks/useWorkspace.js';
+import { get } from '../../lib/records.js';
+import { schema } from '../../lib/schema.js';
+import { recordTitle } from './panel/panelModel.js';
+import { RecordPanelActions } from './panel/RecordPanelActions.jsx';
+import { RecordPanelBody } from './panel/RecordPanelBody.jsx';
+import { RecordPanelHeader } from './panel/RecordPanelHeader.jsx';
+import './panel/record-panel.css';
 
+/**
+ * Record details as a large panel from the right edge (Bitrix24's record slider, approved
+ * mockup, owner 2026-10-31): title, actions and a client's stage track on top, then facts
+ * beside the activity timeline or related records. The demo and connected mode share it;
+ * connected-only sections arrive through `extras`.
+ */
 function RecordDetails({
   detail,
   data,
@@ -26,115 +28,54 @@ function RecordDetails({
   canEdit = true,
   extras = null,
 }) {
-  const { module, record: r } = detail;
+  const { module, record } = detail;
   const { route } = useNavigation();
-  const { startMessage } = useWorkspaceActions();
-  const { user } = useSession();
   const lead = module === 'Clients' && route === 'Leads';
-  const fields = schema(module);
-  const id = get(r, fields[0].name);
+  const id = get(record, schema(module)[0].name);
   const titleId = useId();
-  const changeable = !readOnly && (canDelete || canEdit);
   return (
     // Opening a related record remounts the dialog so focus, scroll and the opener reset cleanly.
     <Drawer
       key={`${module}:${id}`}
-      className="detail-drawer"
-      size={module === 'Properties' ? 'wide' : 'standard'}
+      className="detail-drawer record-panel"
+      placement="right"
       titleId={titleId}
       onClose={close}
     >
-      <div className="drawer-top">
-        <div>
-          <div className="eyebrow">{(lead ? 'Leads' : module).toUpperCase()} · RECORD DETAILS</div>
-          <h2
-            id={titleId}
-            tabIndex={module === 'Properties' ? -1 : undefined}
-            data-initial-focus={module === 'Properties' ? true : undefined}
-          >
-            {get(r, 'Full name') || get(r, 'Listing title') || get(r, 'Next action') || id}
-          </h2>
-          <p>
-            {id} · {fields.length} available fields
-          </p>
-        </div>
-        <button
-          className="icon-btn"
-          aria-label="Close record details"
-          onClick={close}
-          disabled={busy}
-        >
-          <Icon name="close" size={21} />
-        </button>
-      </div>
-      <div className="drawer-body">
-        {extras}
-        {module === 'Clients' && showMessaging && !readOnly && (
-          <div className="record-message-action">
-            <Button
-              variant="light"
-              icon="chat"
-              disabled={!hasMessagingAccess(user)}
-              onClick={() => startMessage(r)}
-            >
-              Start message
-            </Button>
-            <small>Choose Email or WhatsApp. No message is sent by this preview.</small>
-          </div>
-        )}
-        {['Follow-ups', 'Viewings'].includes(module) && (
-          <RecordSchedule module={module} record={r} data={data} />
-        )}
-        {module === 'Properties' && (
-          <PropertyRecordDetails
-            record={r}
-            contacts={data?.Contacts}
+      <RecordPanelHeader
+        module={module}
+        record={record}
+        id={id}
+        title={recordTitle(record, id)}
+        titleId={titleId}
+        lead={lead}
+        busy={busy}
+        onClose={close}
+        actions={
+          <RecordPanelActions
+            module={module}
+            record={record}
+            lead={lead}
+            busy={busy}
+            readOnly={readOnly}
+            canDelete={canDelete}
+            canEdit={canEdit}
+            showMessaging={showMessaging}
             edit={edit}
+            remove={remove}
             close={close}
-            readOnly={readOnly || !canEdit}
           />
-        )}
-        <RecordDetailFields
-          module={module}
-          record={r}
-          fields={recordDetailFields(module)}
-          id={id}
-          data={data}
-        />
-        {module === 'Contacts' && <LinkedProperties contact={r} properties={data?.Properties} />}
-      </div>
-      <div className="drawer-footer">
-        {!changeable ? (
-          <Button variant="light" onClick={close}>
-            Close
-          </Button>
-        ) : (
-          <>
-            {canDelete && (
-              <Button
-                variant="danger-light"
-                icon="trash"
-                onClick={() => remove(module, r)}
-                disabled={busy}
-              >
-                Delete
-              </Button>
-            )}
-            {canEdit && (
-              <Button
-                icon="edit"
-                disabled={busy}
-                onClick={() => {
-                  close();
-                  edit(module, r);
-                }}
-              >
-                {lead ? 'Edit lead' : 'Edit record'}
-              </Button>
-            )}
-          </>
-        )}
-      </div>
+        }
+      />
+      <RecordPanelBody
+        module={module}
+        record={record}
+        data={data}
+        edit={edit}
+        close={close}
+        readOnly={readOnly || !canEdit}
+        extras={extras}
+      />
     </Drawer>
   );
 }

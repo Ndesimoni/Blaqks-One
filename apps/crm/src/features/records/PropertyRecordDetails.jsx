@@ -9,21 +9,28 @@ import { safeExternalUrl } from '../../lib/validation.js';
 import { OverflowList } from '../../components/ui/OverflowList.jsx';
 import { BuildingContacts } from './BuildingContacts.jsx';
 
-export function PropertyRecordDetails({ record: r, contacts, edit, close, readOnly = false }) {
+/** The listing's photos across the top of its details; editors jump to the photo step. */
+export function PropertyRecordGallery({ record, edit, close, readOnly = false }) {
+  return (
+    <PropertyGallery
+      record={record}
+      onEdit={
+        readOnly
+          ? undefined
+          : () => {
+              close();
+              edit('Properties', record, 'presentation');
+            }
+      }
+    />
+  );
+}
+
+/** Floor plans and tours, amenities and highlights, then the building's saved contacts. */
+export function PropertyRecordDetails({ record: r, contacts }) {
   const source = useMediaSource();
   return (
     <div className="property-detail-studio">
-      <PropertyGallery
-        record={r}
-        onEdit={
-          readOnly
-            ? undefined
-            : () => {
-                close();
-                edit('Properties', r, 'presentation');
-              }
-        }
-      />
       <div className="media-detail-block">
         <div className="detail-section-heading">
           <Icon name="layers" size={18} />

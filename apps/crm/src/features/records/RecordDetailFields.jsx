@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { RecordsContext } from '../../app/WorkspaceContext.js';
 import { Icon } from '../../components/ui/Icon.jsx';
-import { Badge } from '../../components/ui/Badge.jsx';
-import { get } from '../../lib/records.js';
+import { useI18n } from '../../i18n/useI18n.js';
 import { propertyPrice } from '../../lib/properties.js';
 import { formatValue } from '../../lib/crm.js';
 import { detailLink } from '../../lib/detailLinks.js';
 import { LinkedContact } from './LinkedContact.jsx';
+import { factSections } from './panel/factSections.js';
 
 /**
  * Safe configured links open externally and a property's contact opens its details; every other
@@ -34,35 +34,29 @@ function DetailValue({ module, record: r, field: f, data }) {
     : formatValue(data, module, r, f);
 }
 
-export function RecordDetailFields({ module, record: r, fields, id, data }) {
+/**
+ * Every workbook field of the record, in the editor's named sections (calculated fields
+ * last). The record's ID and status appear in the panel header above.
+ */
+export function RecordDetailFields({ module, record: r, data }) {
+  const { t } = useI18n();
   return (
-    <>
-      <div className="detail-highlight">
-        <span className="detail-watermark">
-          <Icon name="briefcase" size={30} />
-        </span>
-        <div>
-          <small>RECORD ID</small>
-          <strong>{id}</strong>
-        </div>
-        <Badge>
-          {get(r, 'Lead stage') ||
-            get(r, 'Deal stage') ||
-            get(r, 'Listing status') ||
-            get(r, 'Task status') ||
-            'Active'}
-        </Badge>
-      </div>
-      <div className="details-grid">
-        {fields.map((f) => (
-          <div className={'detail-field ' + (f.type === 'textarea' ? 'wide' : '')} key={f.key}>
-            <span>{f.name}</span>
-            <strong>
-              <DetailValue module={module} record={r} field={f} data={data} />
-            </strong>
+    <div className="record-facts">
+      {factSections(module, t('recordPanel.calculated')).map((section) => (
+        <section className="record-facts-section" key={section.id}>
+          <h3>{section.title}</h3>
+          <div className="details-grid">
+            {section.fields.map((f) => (
+              <div className={'detail-field ' + (f.type === 'textarea' ? 'wide' : '')} key={f.key}>
+                <span>{f.name}</span>
+                <strong>
+                  <DetailValue module={module} record={r} field={f} data={data} />
+                </strong>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </>
+        </section>
+      ))}
+    </div>
   );
 }

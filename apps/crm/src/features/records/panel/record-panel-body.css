@@ -1,0 +1,94 @@
+/* Record panel body (approved mockup `.record` and `.fields`): a listing's gallery, then the
+   facts beside related content on wide screens and above it on narrow ones. */
+:root[data-theme] .record-panel .record-panel-body {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 20px 24px 32px;
+  background: var(--bg);
+}
+.record-panel-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.record-panel-main,
+.record-panel-side {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+.record-panel-side:empty {
+  display: none;
+}
+/* Sections from other features stack by the gap here, not by their own outer margins. */
+.record-panel .record-panel-main > *,
+.record-panel .record-panel-side > * {
+  margin-block: 0;
+}
+.record-facts {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.record-facts-section {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+:root[data-theme] .record-facts-section h3 {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+:root[data-theme] .record-panel .details-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+:root[data-theme] .record-panel .detail-field {
+  gap: 2px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+:root[data-theme] .record-panel .detail-field > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+:root[data-theme] .record-panel .detail-field strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+/* Wide panels: facts on the left, related content on the right; facts alone fill the row. */
+@media (min-width: 1024px) {
+  .record-panel-columns {
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  }
+  .record-panel-columns:has(> .record-panel-side:empty) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-theme] .record-panel-columns:not(:has(> .record-panel-side:empty)) .details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  :root[data-theme] .record-panel .record-panel-body {
+    padding: 14px 16px 24px;
+  }
+  :root[data-theme] .record-panel .details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
