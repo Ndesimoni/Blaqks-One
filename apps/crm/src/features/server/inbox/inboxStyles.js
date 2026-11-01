@@ -16,3 +16,4 @@ import './saved-picker.css';
 import './saved-picker-phone.css';
 import './saved-manager.css';
 import './inbox-responsive.css';
+import './inbox-compact.css';

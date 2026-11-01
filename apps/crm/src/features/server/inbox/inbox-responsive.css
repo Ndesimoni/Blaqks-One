@@ -106,7 +106,7 @@
     padding: 16px;
   }
 }
-@media (min-width: 900px) and (max-width: 1439px) {
+@media (min-width: 900px) and (max-width: 1279px) {
   .inbox-layout.is-details .inbox-panel-head {
     display: flex;
   }

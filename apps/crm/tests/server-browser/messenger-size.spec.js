@@ -118,7 +118,10 @@ test('Team chat gives the messages most of the window', async ({ page }, testInf
   await signIn(page);
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/#/team-chat');
-  await page.getByRole('button', { name: /#general/ }).click();
+  await page
+    .getByRole('region', { name: 'Conversations' })
+    .getByRole('button', { name: /#general/ })
+    .click();
   const composer = page.getByLabel('Message', { exact: true });
   for (const [, body] of TALK.slice(0, 5)) {
     await composer.fill(body);

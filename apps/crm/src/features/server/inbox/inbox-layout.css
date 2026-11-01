@@ -16,10 +16,10 @@
   border-radius: 0;
   background: var(--panel);
 }
-/* The client panel gets its own column only where the conversation keeps enough room. */
-@media (min-width: 1440px) {
+/* The client panel gets its own column from 1280px, as the approved mockup shows. */
+@media (min-width: 1280px) {
   .inbox-layout.has-panel {
-    grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) 300px;
+    grid-template-columns: minmax(240px, 280px) minmax(0, 1fr) 260px;
   }
 }
 .inbox-list-pane,
@@ -72,7 +72,7 @@
   }
 }
 /* Between phone and wide desktop the panel opens over the conversation on request. */
-@media (min-width: 900px) and (max-width: 1439px) {
+@media (min-width: 900px) and (max-width: 1279px) {
   .inbox-layout.has-panel .inbox-panel {
     display: none;
   }

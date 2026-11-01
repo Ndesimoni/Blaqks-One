@@ -28,12 +28,11 @@ export function ServerShell({ owner, workspaces }) {
   const platform = route === 'Platform website';
   // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
   const fullHeight = ['Inbox', 'Team chat'].includes(route);
-  // Bitrix24's right panel (NAV5) on wide screens; the Super Admin reads no conversations,
-  // and the full Inbox and Team chat pages give the messages that room instead.
+  // Bitrix24's right panel (NAV5) on wide screens, the messenger pages included as in the
+  // approved mockup; the Super Admin reads no company conversations.
   const wide = useMediaQuery('(min-width: 1181px)');
   const strip =
     wide &&
-    !fullHeight &&
     user.roleId !== 'super-admin' &&
     (canOpenSection(user, 'Inbox') || canOpenSection(user, 'Team chat'));
   const { toast, setToast, setMobileNav } = useWorkspaceView();

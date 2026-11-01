@@ -86,7 +86,10 @@ test('a group is started, a colleague is mentioned and sees the mention', async 
   await expect(page.getByText('only its 4 members can read it')).toBeVisible();
   const newest = await memberPage(browser, invitedC.email);
   await openPage(newest.page, 'Team chat');
-  await newest.page.getByRole('button', { name: /Marina viewings/ }).click();
+  await newest.page
+    .getByRole('region', { name: 'Conversations' })
+    .getByRole('button', { name: /Marina viewings/ })
+    .click();
   await expect(newest.page.getByText('Please call')).toBeVisible();
   await newest.context.close();
   // The mentioned colleague sees @1 on the sidebar and on the group, then reads it.
@@ -96,7 +99,9 @@ test('a group is started, a colleague is mentioned and sees the mention', async 
   await expect(chatNav).toHaveAccessibleName(/1 mention of you/);
   await expect(chatNav.locator('.connected-nav-badge')).toHaveText('@1');
   await chatNav.click();
-  const row = other.page.getByRole('button', { name: /Marina viewings/ });
+  const row = other.page
+    .getByRole('region', { name: 'Conversations' })
+    .getByRole('button', { name: /Marina viewings/ });
   await expect(row.locator('.chat-mention-badge')).toContainText('@1');
   await row.click();
   const mine = other.page.locator('.chat-message.is-mentioned');
@@ -118,6 +123,10 @@ test('a group is started, a colleague is mentioned and sees the mention', async 
       name: 'Leave group',
     })
     .click();
-  await expect(other.page.getByRole('button', { name: /Marina viewings/ })).toHaveCount(0);
+  await expect(
+    other.page
+      .getByRole('region', { name: 'Conversations' })
+      .getByRole('button', { name: /Marina viewings/ }),
+  ).toHaveCount(0);
   await other.context.close();
 });

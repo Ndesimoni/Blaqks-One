@@ -11,11 +11,12 @@ import { NotificationBell } from './products/NotificationBell.jsx';
 import { ServerTheme } from './ServerTheme.jsx';
 import { useNavigation, useWorkspaceView, useWorkspaceActions } from '../../hooks/useWorkspace.js';
 import './products/frame.css';
+import './products/frame-identity.css';
 
 /**
  * The top bar (NAV5, Bitrix24's header): the product and page name, search, Create for the
- * current product, the messenger, notifications, the theme and the account menu. The company is named in the section
- * sidebar, so no workspace panel is needed on each page.
+ * current product, the messenger, notifications, the theme and the account menu. The company
+ * is named in the section sidebar, so no workspace panel is needed on each page.
  */
 export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenger }) {
   const { t } = useI18n();
@@ -44,7 +45,7 @@ export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenge
             aria-label={t(sidebarOpen ? 'products.hideSections' : 'products.showSections')}
             onClick={onToggleSidebar}
           >
-            <Icon name="menu" size={20} />
+            <Icon name="panel" size={20} />
           </button>
         )}
         <HeaderTitle user={user} route={route} product={product} />

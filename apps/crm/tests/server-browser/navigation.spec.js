@@ -81,7 +81,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
   await expect(sectionNav(page).locator('.connected-nav-status')).toHaveCount(0);
   await openPage(page, 'Messages');
   await expect(
-    sectionButton(page, 'messages', 'Inbox').locator('.connected-nav-status'),
+    sectionButton(page, 'messages', 'Client inbox').locator('.connected-nav-status'),
   ).toHaveText('Not connected');
   await openPage(page, 'Clients');
   await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();

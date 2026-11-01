@@ -26,7 +26,10 @@ test('a team talks in #general and privately', async ({ page, browser }, testInf
   const colleague = await activate(invited);
   await signIn(page);
   await page.goto('/#/team-chat');
-  await page.getByRole('button', { name: /#general/ }).click();
+  await page
+    .getByRole('region', { name: 'Conversations' })
+    .getByRole('button', { name: /#general/ })
+    .click();
   const thread = page.locator('.chat-thread');
   const composer = page.getByLabel('Message', { exact: true });
   await composer.fill('Good morning team, viewing schedule is in the shared calendar.');
@@ -52,7 +55,10 @@ test('a team talks in #general and privately', async ({ page, browser }, testInf
   // The colleague sees the channel message and writes privately to the Admin.
   const other = await memberPage(browser, invited.email);
   await other.page.goto('/#/team-chat');
-  await other.page.getByRole('button', { name: /#general/ }).click();
+  await other.page
+    .getByRole('region', { name: 'Conversations' })
+    .getByRole('button', { name: /#general/ })
+    .click();
   await expect(other.page.locator('.chat-thread')).toContainText('Good morning team');
   await other.page.getByRole('button', { name: 'New message' }).click();
   await other.page.getByLabel('Find a colleague').fill('Fixture Admin');
@@ -69,6 +75,9 @@ test('a team talks in #general and privately', async ({ page, browser }, testInf
   await direct.click();
   await expect(page.locator('.chat-thread')).toContainText('cover my 5pm viewing');
   await shots(page, testInfo, 'chat-direct');
-  await page.getByRole('button', { name: /#general/ }).click();
+  await page
+    .getByRole('region', { name: 'Conversations' })
+    .getByRole('button', { name: /#general/ })
+    .click();
   await shots(page, testInfo, 'chat-general');
 });

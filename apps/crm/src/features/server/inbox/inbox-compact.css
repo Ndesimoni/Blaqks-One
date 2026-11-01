@@ -1,0 +1,29 @@
+/* The approved mockup's three columns from 1280px leave the conversation narrow: the reply is
+   sent with a round arrow ("Send" stays its accessible name) and the status and assignee
+   menus take their own row, so the one-line composer (owner, 2026-10-22) keeps its line. */
+.inbox-reply-form .composer-row > .btn[type='submit'] {
+  flex: none;
+  inline-size: 44px;
+  min-inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+}
+.inbox-reply-form .composer-row > .btn[type='submit'] > span {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (min-width: 1280px) and (max-width: 1599px) {
+  .inbox-layout.has-panel .inbox-head {
+    flex-wrap: wrap;
+  }
+  .inbox-layout.has-panel .inbox-head-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+}

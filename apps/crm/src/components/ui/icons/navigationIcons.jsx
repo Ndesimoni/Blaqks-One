@@ -79,6 +79,12 @@ export const navigationIcons = {
       <path d="M3 6h18M3 12h18M3 18h18" />
     </>
   ),
+  panel: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M9 4v16" />
+    </>
+  ),
   bell: (
     <>
       <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />

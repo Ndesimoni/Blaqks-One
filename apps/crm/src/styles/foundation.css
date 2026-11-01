@@ -3,6 +3,8 @@
   --deep: #132623;
   --deep2: #1b302d;
   --muted: #607267;
+  /* Display face for page and panel titles (approved mockup, Bitrix24 frame). */
+  --display: Georgia, 'Times New Roman', serif;
   --muted-dark: #53665b;
   --gold: #bc9765;
   --gold-light: #e4cda5;
