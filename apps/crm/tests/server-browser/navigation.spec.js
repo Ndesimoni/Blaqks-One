@@ -56,16 +56,16 @@ test('connected Admin navigation restores every group and unfinished routes neve
   for (const [name, action] of [
     ['Dashboard', 'Add new lead'],
     ['Client desk', 'Add client'],
-    ['Leads', 'Add lead'],
-    ['Follow-ups', 'Add follow-up'],
-    ['Viewings', 'Add viewing'],
-    ['Shortlist', 'Add match'],
-    ['Interaction log', 'Add conversation'],
-    ['Client care', 'Add touchpoint'],
+    ['Leads', 'Create'],
+    ['Follow-ups', 'Create'],
+    ['Viewings', 'Create'],
+    ['Shortlist', 'Create'],
+    ['Interaction log', 'Create'],
+    ['Client care', 'Create'],
   ]) {
     await openPage(page, name);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(sectionLabelOf(name));
-    // An empty list repeats its Add action in the empty state.
+    // Lists add records from the top bar's Create (approved mockup); the rest keep their own.
     await expect(page.getByRole('button', { name: action, exact: true }).first()).toBeVisible();
     await expect(page.getByRole('region', { name: `${name} connection status` })).toHaveCount(0);
     await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);
@@ -84,7 +84,9 @@ test('connected Admin navigation restores every group and unfinished routes neve
     sectionButton(page, 'messages', 'Client inbox').locator('.connected-nav-status'),
   ).toHaveText('Not connected');
   await openPage(page, 'Clients');
-  await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toBeVisible();
   await expect(sectionButton(page, 'crm', 'Clients')).toHaveAttribute('aria-current', 'page');
   await expect(
     sectionTabs(page).getByRole('button', { name: 'All clients', exact: true }),

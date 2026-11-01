@@ -1,5 +1,12 @@
 import { test, expect } from './fixtures.js';
-import { addClient, externalUpdate, openClientEditor, saveRecordForm, signIn } from './helpers.js';
+import {
+  addClient,
+  createRecord,
+  externalUpdate,
+  openClientEditor,
+  saveRecordForm,
+  signIn,
+} from './helpers.js';
 
 test('stale edits preserve the draft and reload only after an explicit choice', async ({
   page,
@@ -28,7 +35,7 @@ test('stale edits preserve the draft and reload only after an explicit choice', 
 
 test('failed saves keep entered data and allow retry', async ({ page }) => {
   await signIn(page);
-  await page.getByRole('button', { name: 'Add client', exact: true }).click();
+  await createRecord(page, 'Client');
   await page.getByLabel('Client ID').fill('BROWSER-RETRY');
   await page.getByLabel('Full name').fill('Retained draft');
   await page.route('**/api/crm/workspaces/*/records/Clients', (route) => route.abort());
@@ -51,7 +58,7 @@ test('an authoritative expired session clears cached workspace data', async ({ p
       body: JSON.stringify({ message: 'Sign in to continue.' }),
     }),
   );
-  await page.getByRole('button', { name: 'Add client', exact: true }).click();
+  await createRecord(page, 'Client');
   await page.getByLabel('Client ID').fill('BROWSER-EXPIRED');
   await saveRecordForm(page);
   await expect(page.getByLabel('Email address')).toBeVisible();

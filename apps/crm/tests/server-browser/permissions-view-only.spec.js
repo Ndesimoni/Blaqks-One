@@ -1,3 +1,4 @@
+import { createRecord } from './helpers.js';
 import { test, expect } from './fixtures.js';
 import { memberPage, openRecord, saveRecordForm } from './assign-helpers.js';
 import {
@@ -88,7 +89,7 @@ test('a create-only member adds a client, then cannot edit or delete it', async 
   try {
     await page.goto('/#/clients');
     await expect(page.locator('.view-only-chip')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Add client', exact: true }).click();
+    await createRecord(page, 'Client');
     await page.getByRole('dialog').getByLabel('Full name').fill('Created by create-only');
     await saveRecordForm(page);
     await expect(page.getByRole('dialog')).toHaveCount(0);

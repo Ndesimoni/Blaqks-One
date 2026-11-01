@@ -1,3 +1,4 @@
+import { createRecord } from './helpers.js';
 import { test, expect } from './fixtures.js';
 import { assignTeam } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, setTheme } from './assign-helpers.js';
@@ -52,7 +53,7 @@ test('contact tabs and location fields reflow and stay keyboard reachable at 390
           expect(box).toBeGreaterThanOrEqual(36);
         await noPageOverflow(page);
         await page.screenshot({ path: shot(testInfo, `contacts-tabs-${width}-${theme}.png`) });
-        await page.getByRole('button', { name: 'Add contact', exact: true }).click();
+        await createRecord(page, 'Contact');
         const form = page.getByRole('dialog');
         await settle(page);
         const emirate = form.getByLabel('Emirate', { exact: true });
@@ -73,7 +74,9 @@ test('contact tabs and location fields reflow and stay keyboard reachable at 390
         page.once('dialog', (prompt) => prompt.accept());
         await page.keyboard.press('Escape');
         await expect(form).toHaveCount(0);
-        await expect(page.getByRole('button', { name: 'Add contact', exact: true })).toBeFocused();
+        await expect(
+          page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+        ).toBeFocused();
       }
   } finally {
     await context.close();

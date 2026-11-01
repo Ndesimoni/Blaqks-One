@@ -58,13 +58,7 @@ export function LeadsPage({ toolbarExtras = null }) {
 
   return (
     <div className="page-stack leads-page">
-      <RecordDirectoryHead
-        module="Clients"
-        noun="lead"
-        accessModule="Leads"
-        onAdd={addLead}
-        columnNames={leadColumns}
-      />
+      <RecordDirectoryHead module="Clients" noun="lead" columnNames={leadColumns} />
       <LeadsToolbar
         filters={{
           sources,

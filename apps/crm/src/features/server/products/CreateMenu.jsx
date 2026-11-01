@@ -1,6 +1,6 @@
 import React from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
-import { useWorkspaceActions } from '../../../hooks/useWorkspace.js';
+import { useNavigation, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useRecordAccess } from '../../records/useRecordAccess.js';
 import { createItems } from './createModel.js';
@@ -14,8 +14,9 @@ export function CreateMenu({ product }) {
   const { t } = useI18n();
   const actions = useWorkspaceActions();
   const can = useRecordAccess();
+  const { route } = useNavigation();
   const { open, setOpen, root, opener } = useDisclosure();
-  const items = createItems(product, can);
+  const items = createItems(product, can, route);
   if (!items.length || actions.readOnly) return null;
   const choose = (item) => {
     setOpen(false);

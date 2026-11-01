@@ -54,7 +54,9 @@ test('the Clients directory states its count once and offers one primary action'
   await expect(page.locator('.record-count-word')).toHaveText(
     Number(count) === 1 ? 'client' : 'clients',
   );
-  await expect(page.getByRole('button', { name: 'Add client', exact: true })).toHaveCount(1);
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toHaveCount(1);
   await capture(page, testInfo, 'admin');
 });
 

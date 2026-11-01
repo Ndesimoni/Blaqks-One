@@ -105,7 +105,9 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     await card.getByRole('link', { name: 'View archived records' }).click();
     await expect(page.getByText('ARCHIVED WORKSPACE · READ-ONLY', { exact: true })).toBeVisible();
     await expect(page.getByText('Archived company client', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add client', exact: true })).toHaveCount(0);
+    await expect(
+      page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+    ).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Import saved records' })).toHaveCount(0);
     await page.getByRole('button', { name: 'Open record ARCHIVED-BROWSER-CLIENT' }).click();
     const details = page.getByRole('dialog');

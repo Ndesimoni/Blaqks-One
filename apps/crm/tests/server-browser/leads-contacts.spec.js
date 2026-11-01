@@ -1,6 +1,6 @@
 import { setTheme } from './assign-helpers.js';
 import { expect, test } from './fixtures.js';
-import { addClient, saveRecordForm, signIn } from './helpers.js';
+import { addClient, createRecord, saveRecordForm, signIn } from './helpers.js';
 
 const viewports = [
   { width: 1280, height: 800, label: '1280' },
@@ -43,7 +43,7 @@ async function openSignIn(page) {
 }
 
 async function addContact(page, id, name) {
-  await page.getByRole('button', { name: 'Add contact', exact: true }).click();
+  await createRecord(page, 'Contact');
   const form = page.getByRole('dialog');
   await form.getByLabel('Contact ID', { exact: true }).fill(id);
   await form.getByLabel('Full name', { exact: true }).fill(name);
@@ -67,7 +67,9 @@ test('Leads read as one directory with a compact source filter and one primary a
   const leadCount = Number(await page.locator('.record-count-number').innerText());
   await expect(page.locator('.record-count-word')).toHaveText(leadCount === 1 ? 'lead' : 'leads');
   await expect(page.getByText(/^Total leads$/)).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Add lead', exact: true })).toHaveCount(1);
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toHaveCount(1);
   const views = page.getByRole('group', { name: 'View', exact: true });
   await expect(views.getByRole('button', { name: 'Kanban', exact: true })).toHaveAttribute(
     'aria-pressed',
@@ -125,7 +127,9 @@ test('Contacts lead with role, contact method and location behind one count', as
   await expect(page.locator('.record-count-word')).toHaveText(
     contactCount === 1 ? 'contact' : 'contacts',
   );
-  await expect(page.getByRole('button', { name: 'Add contact', exact: true })).toHaveCount(1);
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toHaveCount(1);
   const group = page.getByRole('group', { name: 'Filter Contacts', exact: true });
   await expect(group.getByRole('button')).toHaveCount(6);
   await expect(page.locator('.data-table thead th')).toHaveCount(8);

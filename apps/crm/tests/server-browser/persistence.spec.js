@@ -57,5 +57,7 @@ test('server unavailability never falls back to browser demo identity or records
   await expect(page.getByRole('heading', { name: 'Unable to open the CRM' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
   await expect(page.getByText('Demo password', { exact: true })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Add client', exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toHaveCount(0);
 });

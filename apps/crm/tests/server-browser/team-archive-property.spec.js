@@ -38,7 +38,9 @@ test('archived property photos and details remain viewable without editing or up
   await expect(dialog).toHaveCount(0);
   await page.goto(`/#/properties?workspace=${member.id}`);
   await expect(page.getByText('ARCHIVED WORKSPACE · READ-ONLY', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Add property', exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toHaveCount(0);
   await page.getByRole('button', { name: 'Card view', exact: true }).click();
   await page.getByRole('button', { name: /Retained archive house/ }).click();
   const details = page.getByRole('dialog');

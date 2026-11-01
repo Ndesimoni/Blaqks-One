@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { saveRecordForm, session, signIn } from './helpers.js';
+import { createRecord, saveRecordForm, session, signIn } from './helpers.js';
 
 test('a linked contact and property photos persist through the real forms and database', async ({
   page,
@@ -9,13 +9,13 @@ test('a linked contact and property photos persist through the real forms and da
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await signIn(page, 'admin-b');
   await page.goto('/#/contacts');
-  await page.getByRole('button', { name: 'Add contact', exact: true }).click();
+  await createRecord(page, 'Contact');
   await page.getByLabel('Contact ID').fill('BROWSER-LANDLORD');
   await page.getByLabel('Full name').fill('Synthetic Landlord');
   await saveRecordForm(page);
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.goto('/#/properties');
-  await page.getByRole('button', { name: 'Add property', exact: true }).click();
+  await createRecord(page, 'Property');
   await page.getByLabel('Property ID').fill('BROWSER-PROPERTY');
   await page.getByLabel('Listing title').fill('Connected property with photos');
   await page.getByLabel('Contact ID').selectOption('BROWSER-LANDLORD');

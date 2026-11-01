@@ -57,3 +57,15 @@ test('pages with a main heading of their own are named in the top bar without on
   assert.deepEqual(OWN_HEADING, ['Start', 'Inbox', 'Team chat']);
   assert.equal(pageTitle('Inbox', admin, t), 'Inbox');
 });
+
+test('Create offers the open page’s own records first where the CRM list lacks them', () => {
+  const keys = (route) => createItems('crm', () => true, route).map((item) => item.key);
+  assert.deepEqual(keys('Shortlist').slice(0, 2), ['shortlist', 'lead']);
+  assert.equal(keys('Interaction log')[0], 'interaction');
+  assert.equal(keys('Client care')[0], 'clientCare');
+  assert.equal(keys('Clients')[0], 'lead');
+  assert.deepEqual(
+    createItems('crm', (module) => module === 'Shortlist', 'Shortlist').map((item) => item.key),
+    ['shortlist'],
+  );
+});

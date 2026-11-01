@@ -1,3 +1,4 @@
+import { createRecord } from './helpers.js';
 import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, openRecord, saveRecordForm, workspaceRecords } from './assign-helpers.js';
@@ -46,7 +47,7 @@ test('assigned-only staff see only their records in lists, totals, pickers and r
     ]);
     await page.keyboard.press('Escape');
     await expect(page.getByRole('dialog')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Add viewing', exact: true }).click();
+    await createRecord(page, 'Viewing');
     await expect(
       page.getByRole('dialog').getByLabel('Client ID', { exact: true }).locator('option'),
     ).toHaveCount(2);
@@ -73,7 +74,7 @@ test('staff get server-issued IDs and no Delete on parents; Admins may type IDs'
   try {
     const { page } = staff;
     await page.goto('/#/clients');
-    await page.getByRole('button', { name: 'Add client', exact: true }).click();
+    await createRecord(page, 'Client');
     const idField = page.getByRole('dialog').getByLabel('Client ID', { exact: true });
     await expect(idField).toHaveAttribute('readonly', '');
     await expect(page.getByRole('dialog').getByLabel('Full name')).toBeFocused();
@@ -102,7 +103,7 @@ test('staff get server-issued IDs and no Delete on parents; Admins may type IDs'
     await expect(page.getByRole('dialog').getByRole('button', { name: 'Delete' })).toHaveCount(0);
     await page.keyboard.press('Escape');
     await page.goto('/#/follow-ups');
-    await page.getByRole('button', { name: 'Add follow-up', exact: true }).click();
+    await createRecord(page, 'Follow-up');
     const taskClient = page.getByRole('dialog').getByLabel('Client ID', { exact: true });
     await expect(taskClient).toBeFocused();
     await taskClient.selectOption(created.record.client_id);
@@ -115,7 +116,7 @@ test('staff get server-issued IDs and no Delete on parents; Admins may type IDs'
     expect(property.record.property_id).toMatch(/^PR-\d{3,}$/);
 
     await owner.page.goto('/#/clients');
-    await owner.page.getByRole('button', { name: 'Add client', exact: true }).click();
+    await createRecord(owner.page, 'Client');
     const ownerId = owner.page.getByRole('dialog').getByLabel('Client ID', { exact: true });
     await expect(ownerId).not.toHaveAttribute('readonly', '');
     await expect(ownerId).toBeFocused();

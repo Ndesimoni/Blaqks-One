@@ -15,7 +15,20 @@ const crm = [
   { key: 'viewing', module: 'Viewings' },
 ];
 
-/** The Create items for a product, limited to the modules `can(module, 'create')` allows. */
-export function createItems(product, can) {
-  return product === 'crm' ? crm.filter((item) => can(item.module, 'create')) : [];
+/** Records only their own page creates, offered first while that page is open. */
+const ownPage = {
+  Shortlist: { key: 'shortlist', module: 'Shortlist' },
+  'Interaction log': { key: 'interaction', module: 'Interaction log' },
+  'Client care': { key: 'clientCare', module: 'Client care' },
+};
+
+/**
+ * The Create items for a product, limited to the modules `can(module, 'create')` allows; on
+ * the Shortlist, Interaction log and Client care pages their own records come first, since
+ * the lists themselves have no Add buttons (approved mockup).
+ */
+export function createItems(product, can, route) {
+  if (product !== 'crm') return [];
+  const items = ownPage[route] ? [ownPage[route], ...crm] : crm;
+  return items.filter((item) => can(item.module, 'create'));
 }

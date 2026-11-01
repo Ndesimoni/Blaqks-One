@@ -75,9 +75,9 @@ test('staff with only future finance access get a clear workspace state and no c
     for (const name of ['Clients', 'Contacts', 'Properties', 'Team']) {
       await expect(staff.page.getByRole('button', { name, exact: true })).toHaveCount(0);
     }
-    await expect(staff.page.getByRole('button', { name: 'Add client', exact: true })).toHaveCount(
-      0,
-    );
+    await expect(
+      staff.page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+    ).toHaveCount(0);
     const profile = await session(staff.page);
     expect(profile.user.permissions.finance).toBe(true);
     expect(profile.user.permissions.relationships).toBe(false);
@@ -89,9 +89,9 @@ test('staff with only future finance access get a clear workspace state and no c
       staff.page.getByRole('region', { name: 'Payments connection status' }),
     ).toHaveCount(0);
     await expect(staff.page.locator('.data-table tbody tr')).toHaveCount(0);
-    await expect(staff.page.getByRole('button', { name: 'Add client', exact: true })).toHaveCount(
-      0,
-    );
+    await expect(
+      staff.page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+    ).toHaveCount(0);
     await staff.page.goto('/#/workspaces');
     await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
     // Staff get their own "My activity" feed (docs/team-activity-design.md), never team events.

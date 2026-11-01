@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures.js';
 import { assignTeam } from './assign-fixtures.js';
-import { session } from './helpers.js';
+import { createRecord, session } from './helpers.js';
 import {
   assignInBrowser,
   memberPage,
@@ -43,7 +43,7 @@ test('an Admin saves a contact address and map link that survive reload, search 
   const contacts = async () => (await workspaceRecords(page)).body.records.Contacts;
   try {
     await page.goto('/#/contacts');
-    await page.getByRole('button', { name: 'Add contact', exact: true }).click();
+    await createRecord(page, 'Contact');
     const form = page.getByRole('dialog');
     await form.getByLabel('Contact ID', { exact: true }).fill('CT-ADDR-1');
     await form.getByLabel('Full name', { exact: true }).fill('Addr manager');

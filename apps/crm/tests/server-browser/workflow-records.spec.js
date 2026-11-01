@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures.js';
 import { openPage } from './product-nav.js';
-import { addClient, saveRecordForm, session, signIn } from './helpers.js';
+import { addClient, createRecord, saveRecordForm, session, signIn } from './helpers.js';
 
 test('a connected viewing links to a client, survives reload and protects that client', async ({
   page,
@@ -10,7 +10,7 @@ test('a connected viewing links to a client, survives reload and protects that c
   await signIn(page);
   await addClient(page, 'BROWSER-WF-CLIENT', 'Workflow Client');
   await openPage(page, 'Viewings');
-  await page.getByRole('button', { name: 'Add viewing', exact: true }).click();
+  await createRecord(page, 'Viewing');
   const dialog = page.getByRole('dialog');
   await dialog.getByLabel('Viewing ID').fill('BROWSER-WF-VIEW');
   await dialog.getByLabel('Client ID', { exact: true }).selectOption('BROWSER-WF-CLIENT');
@@ -45,7 +45,7 @@ test('a lead added from Leads is saved as a connected client with lead defaults'
 }) => {
   await signIn(page);
   await openPage(page, 'Leads');
-  await page.getByRole('button', { name: 'Add lead', exact: true }).click();
+  await createRecord(page, 'Lead');
   await page.getByLabel('Client ID').fill('BROWSER-WF-LEAD');
   await page.getByLabel('Full name').fill('Workflow Lead');
   await saveRecordForm(page);

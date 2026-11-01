@@ -1,6 +1,6 @@
 import { openSection } from './assign-helpers.js';
 import { expect, test } from './fixtures.js';
-import { signIn } from './helpers.js';
+import { createRecord, signIn } from './helpers.js';
 
 const hintText = 'Include the country code, such as +971 50 123 4567.';
 
@@ -11,7 +11,7 @@ function phoneField(page) {
 
 test('field hints follow focus, typing and the member preference', async ({ page }) => {
   await signIn(page);
-  await page.getByRole('button', { name: 'Add client', exact: true }).click();
+  await createRecord(page, 'Client');
   let { phone, field } = phoneField(page);
   const info = () => field.getByRole('button', { name: 'Show field guidance' });
 
@@ -36,7 +36,7 @@ test('field hints follow focus, typing and the member preference', async ({ page
   await toggle.uncheck();
   await expect(page.getByText('Saved. Automatic field hints are off.')).toBeVisible();
   await openSection(page, 'Clients');
-  await page.getByRole('button', { name: 'Add client', exact: true }).click();
+  await createRecord(page, 'Client');
   ({ phone, field } = phoneField(page));
   await phone.focus();
   await expect(field.getByRole('note')).toHaveCount(0);

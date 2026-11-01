@@ -1,3 +1,4 @@
+import { createRecord } from './helpers.js';
 import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import {
@@ -36,7 +37,7 @@ test('an Admin files a security guard by location, finds it, recategorises it an
   const search = page.getByRole('textbox', { name: 'Search Contacts', exact: true });
   try {
     await page.goto('/#/contacts');
-    await page.getByRole('button', { name: 'Add contact', exact: true }).click();
+    await createRecord(page, 'Contact');
     const form = page.getByRole('dialog');
     await form.getByLabel('Contact ID', { exact: true }).fill('CT-LOC-1');
     await form.getByLabel('Full name', { exact: true }).fill('Loc guard');

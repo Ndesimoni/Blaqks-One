@@ -1,3 +1,4 @@
+import { createRecord } from './helpers.js';
 import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, saveRecordForm, workspaceRecords } from './assign-helpers.js';
@@ -29,7 +30,7 @@ test('an Admin saves property Address, Map link and links that open related reco
   page.on('pageerror', (error) => errors.push(error.message));
   try {
     await page.goto('/#/properties');
-    await page.getByRole('button', { name: 'Add property', exact: true }).click();
+    await createRecord(page, 'Property');
     const form = page.getByRole('dialog');
     const next = form.getByRole('button', { name: 'Next', exact: true });
     await form.getByLabel('Property ID', { exact: true }).fill('PR-PL-1');

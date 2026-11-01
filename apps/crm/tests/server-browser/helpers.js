@@ -18,7 +18,9 @@ export async function signIn(page, account = 'admin-a') {
   ).toBeVisible();
   await page.goto('/#/clients');
   await expect(page.getByRole('heading', { level: 1, name: 'Clients', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
+  ).toBeVisible();
 }
 
 /**
@@ -42,8 +44,14 @@ export async function signOut(page) {
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
 }
 
+/** Opens a record's editor from the top bar's + Create; CRM lists have no Add buttons. */
+export async function createRecord(page, item) {
+  await page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }).click();
+  await page.locator('#create-panel').getByRole('button', { name: item, exact: true }).click();
+}
+
 export async function addClient(page, id, name) {
-  await page.getByRole('button', { name: 'Add client', exact: true }).click();
+  await createRecord(page, 'Client');
   await page.getByLabel('Client ID').fill(id);
   await page.getByLabel('Full name').fill(name);
   await saveRecordForm(page);
