@@ -95,7 +95,7 @@ export function KanbanBoard({
           >
             <header className="kanban-column-head">
               <h2 id={headingId}>{column.title}</h2>
-              <span className="kanban-count">{column.items.length}</span>
+              <span className="kanban-count">{column.summary ?? column.items.length}</span>
             </header>
             <div className="kanban-cards">
               {shown.map((item) => {
@@ -107,6 +107,7 @@ export function KanbanBoard({
                     column={column.key}
                     columns={columns}
                     movable={canMove(item)}
+                    disabled={busy}
                     moveLabel={moveLabel(item)}
                     menuOpen={menu === key}
                     onMenu={(open) => setMenu(open ? key : '')}

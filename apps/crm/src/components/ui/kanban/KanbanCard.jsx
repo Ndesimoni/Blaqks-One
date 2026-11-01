@@ -14,6 +14,7 @@ export function KanbanCard({
   column,
   columns,
   movable,
+  disabled = false,
   moveLabel,
   menuOpen,
   onMenu,
@@ -49,7 +50,7 @@ export function KanbanCard({
       ref={root}
       data-kanban-item={itemId}
       className={'kanban-card' + (dragging ? ' is-dragging' : '')}
-      draggable={movable}
+      draggable={movable && !disabled}
       onDragStart={(event) => {
         event.dataTransfer.setData('text/plain', itemId);
         event.dataTransfer.effectAllowed = 'move';
@@ -66,6 +67,7 @@ export function KanbanCard({
           aria-label={moveLabel}
           aria-expanded={menuOpen}
           aria-controls={menuOpen ? menuId : undefined}
+          disabled={disabled}
           onClick={() => onMenu(!menuOpen)}
         >
           <Icon name="more" size={16} />

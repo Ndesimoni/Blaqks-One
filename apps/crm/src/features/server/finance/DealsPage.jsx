@@ -8,7 +8,12 @@ import { DealTable } from './DealTable.jsx';
 import { DealDialogs } from './DealDialogs.jsx';
 import { HandoverRequests } from './HandoverRequests.jsx';
 import { CommissionStatement } from './CommissionStatement.jsx';
+import { DealsBoard } from './DealsBoard.jsx';
+import { ViewSwitch } from '../../../components/ui/ViewSwitch.jsx';
+import { useRememberedChoice } from '../../../hooks/useRememberedChoice.js';
+import { useI18n } from '../../../i18n/useI18n.js';
 
+const dealViews = ['kanban', 'list'];
 const tabs = [
   { id: 'deals', label: 'Deals' },
   { id: 'statement', label: 'Commission statement' },
@@ -20,7 +25,9 @@ const tabs = [
  * and the row's server-computed `allowed`.
  */
 export function DealsPage() {
-  const { overview, team, actions, readOnly } = useFinanceContext();
+  const { overview, team, actions, readOnly, user } = useFinanceContext();
+  const { t } = useI18n();
+  const [view, setView] = useRememberedChoice(`kws-deals-view:${user.id}`, dealViews, 'kanban');
   const [tab, setTab] = useState('deals');
   const [filters, setFilters] = useState(emptyDealFilters);
   const [page, setPage] = useState(0);
@@ -64,31 +71,55 @@ export function DealsPage() {
         onApprove={(handover) => open('approveHandover', null, { handover })}
         onReview={(handover) => open('reviewHandover', null, { handover })}
       />
-      <div className="tabs finance-tabs" role="group" aria-label="Deals views">
-        {tabs.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            aria-pressed={tab === item.id}
-            className={tab === item.id ? 'active' : ''}
-            onClick={() => setTab(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
+      <div className="deal-views">
+        <div className="tabs finance-tabs" role="group" aria-label="Deals sections">
+          {tabs.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={tab === item.id}
+              className={tab === item.id ? 'active' : ''}
+              onClick={() => setTab(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+        {tab === 'deals' && (
+          <ViewSwitch
+            label={t('dealsBoard.view')}
+            options={[
+              ['list', t('dealsBoard.list'), 'menu'],
+              ['kanban', t('dealsBoard.kanban'), 'grid'],
+            ]}
+            value={view}
+            onChange={setView}
+          />
+        )}
       </div>
       {tab === 'deals' ? (
         <>
           <DealFilters filters={filters} onChange={changeFilters} count={visible.length} />
-          <DealTable
-            deals={visible}
-            total={deals.length}
-            page={page}
-            onPage={setPage}
-            onOpen={(deal) => open('details', deal)}
-            onAdd={actions.can('createDeal') ? () => open('create') : null}
-            onReset={() => changeFilters(emptyDealFilters)}
-          />
+          {view === 'kanban' ? (
+            <DealsBoard
+              deals={visible}
+              total={deals.length}
+              stage={filters.stage}
+              onOpen={(deal) => open('details', deal)}
+              onAdd={actions.can('createDeal') ? () => open('create') : null}
+              onReset={() => changeFilters(emptyDealFilters)}
+            />
+          ) : (
+            <DealTable
+              deals={visible}
+              total={deals.length}
+              page={page}
+              onPage={setPage}
+              onOpen={(deal) => open('details', deal)}
+              onAdd={actions.can('createDeal') ? () => open('create') : null}
+              onReset={() => changeFilters(emptyDealFilters)}
+            />
+          )}
         </>
       ) : (
         <CommissionStatement />

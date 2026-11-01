@@ -19,6 +19,7 @@
   display: grid;
   gap: 8px;
   min-inline-size: 0;
+  min-block-size: 280px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -56,7 +57,7 @@
 }
 .kanban-column[data-tone='green'],
 .kanban-tone[data-tone='green'] {
-  --kanban-tone: var(--primary);
+  --kanban-tone: var(--pipeline-active);
 }
 .kanban-column[data-tone='accent'],
 .kanban-tone[data-tone='accent'] {

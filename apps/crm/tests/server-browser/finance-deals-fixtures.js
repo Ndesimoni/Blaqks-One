@@ -39,11 +39,19 @@ export async function dealCall(team, deal, method, suffix, body) {
   return result.value.deal;
 }
 
-/** Opens Deals in a signed-in page and waits for the connected screen. */
+/**
+ * Opens Deals in its List view: these specs check the table and phone cards. The Kanban view,
+ * the default since NAV, has its own spec (deals-board.spec.js); the choice is remembered.
+ */
 export async function openDeals(page) {
   await page.goto('/#/deals');
   await expect(page.locator('.page-heading h1')).toHaveText('Deals & commissions');
   await expect(page.getByRole('region', { name: 'Deals connection status' })).toHaveCount(0);
+  const list = page.getByRole('group', { name: 'View', exact: true }).getByRole('button', {
+    name: 'List',
+    exact: true,
+  });
+  if ((await list.getAttribute('aria-pressed')) !== 'true') await list.click();
 }
 
 export const openDeal = async (page, dealId) => {

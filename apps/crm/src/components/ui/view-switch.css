@@ -36,7 +36,7 @@
   outline: 2px solid var(--focus, var(--gold));
   outline-offset: 1px;
 }
-/* Phones show the option's icon; its label stays in the accessible name. */
+/* Icons reinforce the short labels without replacing them on phones. */
 .view-switch-icon {
   display: none;
 }
@@ -52,14 +52,6 @@
   }
   .view-switch-icon {
     display: block;
-  }
-  .view-switch-label {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
   }
 }
 @media (prefers-reduced-motion: reduce) {

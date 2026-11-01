@@ -12,6 +12,16 @@
     flex-basis: 100%;
     min-width: 0;
   }
+  /* Stage and assignment filters open below the search row from the Filters button. */
+  .lead-more-filters {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .lead-more-filters[hidden] {
+    display: none;
+  }
   /* Keep search and reset together without changing their keyboard order. */
   .lead-filters .search-small {
     flex-basis: 0;

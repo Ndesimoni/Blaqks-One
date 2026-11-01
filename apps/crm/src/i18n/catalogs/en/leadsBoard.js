@@ -2,6 +2,7 @@
 export default {
   label: 'Leads pipeline',
   view: 'View',
+  filters: 'Filters',
   kanban: 'Kanban',
   list: 'List',
   open: 'Open {name}',

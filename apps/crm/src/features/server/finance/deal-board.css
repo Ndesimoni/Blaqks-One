@@ -1,0 +1,64 @@
+/* Deal cards on the Deals pipeline (NAV). The board itself lives in components/ui/kanban. */
+.deal-board-card {
+  display: grid;
+  gap: 4px;
+  inline-size: 100%;
+  padding: 12px 40px 12px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+.deal-board-card:focus-visible {
+  outline: 2px solid var(--focus, var(--gold));
+  outline-offset: -2px;
+}
+.deal-board-code {
+  font-size: 12px;
+  color: var(--muted);
+}
+.deal-board-client {
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.deal-board-value {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.deal-board-meta {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.deal-board-money {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.deal-board-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-block-start: 4px;
+}
+.deal-views {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.deal-views .segmented-view-switch {
+  margin-inline-start: auto;
+}
+@media (max-width: 760px) {
+  .deal-board-card {
+    padding-inline-end: 48px;
+  }
+}
