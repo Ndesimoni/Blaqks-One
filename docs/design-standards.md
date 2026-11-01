@@ -12,6 +12,7 @@ The user-approved [CRM design refresh](design-refresh.md) is the visual baseline
 - Keep scrolling smooth and purposeful. Use natural page scrolling for primary content and bounded scrolling for selectable collections. Keep sidebar settings and modal actions reachable; preserve selection, filters and drafts when content scrolls or collapses.
 - Use the shared brief transitions for colour, border and shadow changes, with clear hover, focus and pressed states. Keep controls stable under the pointer and honour reduced-motion preferences for animations and programmatic scrolling.
 - Carry the same hierarchy and colours across mobile, tablet and desktop, in both themes. Verify readable contrast, keyboard focus, comfortable touch targets and page reflow against the accessibility rules below.
+- Follow Bitrix24's frame (owner, 2026-11-01, NAV5): the product rail and section sidebar on the left; a top bar naming the page as "Product / Page" (the page's one main heading, with no description line below it), search, Create for the current product, the messenger buttons, the notifications bell, the theme switch and the account menu; header tabs for a section's routes; and, from 1181px, the right-hand strip of recent conversations. Pages start with their own tools. Details, search results, notifications and the messenger open as panels from the right edge.
 
 ### Premium polish for new work (owner, 2026-10-16)
 
