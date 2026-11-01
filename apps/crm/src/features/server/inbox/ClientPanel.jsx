@@ -1,6 +1,7 @@
 import React from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
-import { useNavigation, useRecords } from '../../../hooks/useWorkspace.js';
+import { Button } from '../../../components/ui/Button.jsx';
+import { useNavigation, useRecords, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { get } from '../../../lib/records.js';
 import { comingUp, recordFacts } from './clientPanelModel.js';
@@ -11,6 +12,7 @@ export function ClientPanel({ conversation, onClose }) {
   const { t } = useI18n();
   const { entries, data } = useRecords();
   const { navigate } = useNavigation();
+  const actions = useWorkspaceActions();
   const row = conversation.conversation;
   const record = row.record;
   const entry = record?.recordId
@@ -18,6 +20,13 @@ export function ClientPanel({ conversation, onClose }) {
     : null;
   const facts = entry ? recordFacts(entry.record) : [];
   const upcoming = record?.legacyId ? comingUp(data, record.legacyId) : [];
+  const [next, ...later] = upcoming;
+  const client = record?.collection === 'Clients';
+  // Open the record's own panel here when it is loaded, else its list (approved mockup).
+  const open = () =>
+    entry
+      ? actions.dispatchRow(record.collection, entry.record)
+      : navigate(client ? 'Leads' : 'Contacts');
   return (
     <aside
       className="inbox-panel"
@@ -54,7 +63,7 @@ export function ClientPanel({ conversation, onClose }) {
           {entry && get(entry.record, 'Lead stage') && (
             <Badge>{get(entry.record, 'Lead stage')}</Badge>
           )}
-          {facts.length > 0 && (
+          {(facts.length > 0 || next) && (
             <dl className="inbox-facts">
               {facts.map(([label, value]) => (
                 <div key={label}>
@@ -62,13 +71,21 @@ export function ClientPanel({ conversation, onClose }) {
                   <dd>{value}</dd>
                 </div>
               ))}
+              {next && (
+                <div>
+                  <dt>{t('inbox.panel.fact.nextStep')}</dt>
+                  <dd>
+                    {t(`inbox.panel.${next.kind}`, { title: next.title })} · {next.when}
+                  </dd>
+                </div>
+              )}
             </dl>
           )}
-          {upcoming.length > 0 && (
+          {later.length > 0 && (
             <div className="inbox-coming">
               <span className="inbox-eyebrow">{t('inbox.panel.comingUp')}</span>
               <ul>
-                {upcoming.map((item) => (
+                {later.map((item) => (
                   <li key={`${item.kind}-${item.id}`}>
                     <span>{t(`inbox.panel.${item.kind}`, { title: item.title })}</span>
                     <small>{item.when}</small>
@@ -77,13 +94,19 @@ export function ClientPanel({ conversation, onClose }) {
               </ul>
             </div>
           )}
-          <button
-            type="button"
-            className="inbox-link"
-            onClick={() => navigate(record.collection === 'Clients' ? 'Leads' : 'Contacts')}
-          >
-            {t(`inbox.panel.open${record.collection}`)}
-          </button>
+          <div className="inbox-panel-actions">
+            <Button variant="light" onClick={open}>
+              {t(client ? 'inbox.panel.openClient' : 'inbox.panel.openContact')}
+            </Button>
+            {client && actions.can?.('Follow-ups', 'create') && (
+              <Button
+                variant="light"
+                onClick={() => actions.add('Follow-ups', { client_id: record.legacyId })}
+              >
+                {t('inbox.panel.schedule')}
+              </Button>
+            )}
+          </div>
         </section>
       )}
     </aside>
