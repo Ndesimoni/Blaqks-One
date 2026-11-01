@@ -1,0 +1,103 @@
+/* Connected Follow-ups: deadline groups, a quiet task list and the existing grid footer. */
+:root[data-theme] .deadline-group-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 16px 18px 8px;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+.deadline-group-title span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+.deadline-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.deadline-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease);
+}
+.deadline-row:hover {
+  background: var(--hover);
+}
+.deadline-group:last-child .deadline-row:last-child {
+  border-bottom: 0;
+}
+.deadline-content {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+:root[data-theme] .deadline-content p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+:root[data-theme] .deadline-content .deadline-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  color: var(--ink);
+}
+.deadline-title strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.deadline-id {
+  color: var(--muted);
+  font-size: 12px;
+}
+.deadline-links,
+.deadline-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+:root[data-theme] .deadline-content .deadline-links {
+  color: var(--ink);
+}
+.deadline-meta time {
+  font-variant-numeric: tabular-nums;
+}
+.deadline-actions .row-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+.deadline-actions .row-link:hover {
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+}
+.deadline-actions .row-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (max-width: 750px) {
+  :root[data-theme] .deadline-group-title {
+    padding-inline: 14px;
+  }
+  .deadline-row {
+    padding: 12px 14px;
+  }
+}

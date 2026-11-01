@@ -1,0 +1,23 @@
+/** Connected Follow-ups deadline view (NAV). */
+export default {
+  view: 'Follow-ups view',
+  deadline: 'Deadline',
+  list: 'List',
+  records: 'Follow-ups records',
+  pages: 'Follow-ups pages',
+  all: 'All follow-ups',
+  overdue: 'Overdue',
+  today: 'Today',
+  upcoming: 'Upcoming',
+  undated: 'No due date',
+  closed: 'Closed',
+  groupCount: '{count} total',
+  untitled: 'Follow-up',
+  due: 'Due date',
+  missingDate: 'Not set or invalid',
+  noStatus: 'No status',
+  empty: 'No matching follow-ups',
+  filtered: 'Clear the filters to show every follow-up.',
+  first: 'Add a follow-up to plan your next client contact.',
+  add: 'Add follow-up',
+};
