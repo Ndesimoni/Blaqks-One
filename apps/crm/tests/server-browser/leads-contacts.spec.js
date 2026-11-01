@@ -132,9 +132,9 @@ test('Contacts lead with role, contact method and location behind one count', as
   ).toHaveCount(1);
   const group = page.getByRole('group', { name: 'Filter Contacts', exact: true });
   await expect(group.getByRole('button')).toHaveCount(6);
-  await expect(page.locator('.data-table thead th')).toHaveCount(8);
+  await expect(page.locator('.data-table thead th')).toHaveCount(6);
   const head = page.locator('.data-table thead');
-  for (const name of ['Contact type', 'Phone', 'Email', 'Company', 'Building / project'])
+  for (const name of ['Contact', 'Role', 'Phone', 'Linked to'])
     await expect(head).toContainText(name);
   await expect(page.locator('.data-table tbody tr').first()).toContainText('Landlord');
 

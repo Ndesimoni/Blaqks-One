@@ -37,7 +37,26 @@
 :is(.filters-toolbar, .inventory-results-bar, .lead-filters) > .assigned-filter {
   flex-basis: 100%;
 }
+/* In a CRM grid's filter row it stays beside the presets as a chip-shaped select (owner,
+   2026-11-01: features the mockup leaves out keep its style). */
+.grid-filterbar > .assigned-filter {
+  flex: 0 1 auto;
+}
+:root[data-theme] .grid-filterbar .assigned-filter select {
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 32px 6px 14px;
+  border-radius: 999px;
+}
 @media (max-width: 750px) {
+  .grid-filterbar .assigned-filter label {
+    flex: 0 0 auto;
+  }
+  :root[data-theme] .grid-filterbar .assigned-filter select {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+  }
   .assigned-filter {
     flex-basis: 100%;
   }

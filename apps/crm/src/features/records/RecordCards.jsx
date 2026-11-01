@@ -2,7 +2,8 @@ import React from 'react';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { formatValue } from '../../lib/crm.js';
 import { clName, get, prName } from '../../lib/records.js';
-import { GridPerson } from './grid/GridCell.jsx';
+import { columnHeading } from './grid/columnHeadings.js';
+import { GridPerson, personColumn } from './grid/GridCell.jsx';
 import { KeptChip } from './KeptChip.jsx';
 import { RecordRowActions } from './RecordRowActions.jsx';
 import './cards.css';
@@ -33,7 +34,7 @@ export function RecordCards({ module, data, current, pick, readOnly, onOpen }) {
     return name && name !== formatted && name !== '—' ? `${name} · ${formatted}` : formatted;
   };
   const filled = (record, field) => value(record, field) !== '—';
-  const person = titleColumn?.name === 'Full name';
+  const person = personColumn.test(titleColumn?.name || '');
   return (
     <ul className="record-cards" aria-label={`${module} records`}>
       {current.map((record, index) => {
@@ -61,7 +62,7 @@ export function RecordCards({ module, data, current, pick, readOnly, onOpen }) {
               <dl className="record-card-facts">
                 {facts.map((field) => (
                   <div key={field.key}>
-                    <dt>{field.name.replace(/ AED$/, '')}</dt>
+                    <dt>{columnHeading(module, field.name)}</dt>
                     <dd>{value(record, field)}</dd>
                   </div>
                 ))}

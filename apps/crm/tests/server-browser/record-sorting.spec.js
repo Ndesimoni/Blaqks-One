@@ -19,7 +19,7 @@ test('phone sorting changes record order, resets pagination and survives desktop
   page,
 }) => {
   const admin = await login();
-  for (let index = 1; index <= 14; index++) {
+  for (let index = 1; index <= 24; index++) {
     const suffix = String(index).padStart(2, '0');
     await add(admin, 'Clients', {
       client_id: `SORT-${suffix}`,
@@ -37,22 +37,22 @@ test('phone sorting changes record order, resets pagination and survives desktop
   await controls
     .getByRole('combobox', { name: 'Sort direction', exact: true })
     .selectOption('desc');
-  await expect(cards(page).first()).toContainText('Sort fixture 14');
-  await expect(cards(page)).toHaveCount(12);
+  await expect(cards(page).first()).toContainText('Sort fixture 24');
+  await expect(cards(page)).toHaveCount(20);
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Sort records', exact: true })).toBeFocused();
   const pager = page.getByRole('navigation', { name: 'Clients pages', exact: true });
-  await pager.getByRole('button', { name: 'Next', exact: true }).click();
-  await expect(cards(page)).toHaveCount(2);
+  await pager.getByRole('button', { name: 'Page 2', exact: true }).click();
+  await expect(cards(page)).toHaveCount(4);
   controls = await sortControls(page);
   await controls.getByRole('combobox', { name: 'Sort direction', exact: true }).selectOption('asc');
-  await expect(cards(page)).toHaveCount(12);
+  await expect(cards(page)).toHaveCount(20);
   await expect(cards(page).first()).toContainText('Sort fixture 01');
-  await expect(pager).toContainText('Showing 1–12 of 14');
+  await expect(pager).toContainText('Showing 1–20 of 24');
   await page.keyboard.press('Escape');
   await page.setViewportSize({ width: 1280, height: 800 });
   const table = page.getByRole('table', { name: 'Clients records', exact: true });
-  await expect(table.getByRole('columnheader', { name: 'Full name' })).toHaveAttribute(
+  await expect(table.getByRole('columnheader', { name: 'Client', exact: true })).toHaveAttribute(
     'aria-sort',
     'ascending',
   );
@@ -68,7 +68,7 @@ test('phone sorting changes record order, resets pagination and survives desktop
   await controls
     .getByRole('combobox', { name: 'Sort direction', exact: true })
     .selectOption('desc');
-  await expect(cards(page).first()).toContainText('Sort fixture 14');
+  await expect(cards(page).first()).toContainText('Sort fixture 24');
 });
 
 test('Contacts expose the same phone sorting controls', async ({ page }) => {

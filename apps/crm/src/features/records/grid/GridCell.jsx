@@ -5,8 +5,10 @@ import { initials } from '../../../lib/records.js';
 import { KeptChip } from '../KeptChip.jsx';
 import './grid-person.css';
 
-const stageName = /stage|status|tier|priority/i;
-const strongName = /Full name|Listing title|Next action|Community/i;
+const stageName = /stage|status|tier|priority|Client response/i;
+const strongName = /Full name|Listing title|Next action|Community|Client name auto/i;
+/** Columns holding a person's name, shown with initials as the mockup's person cells. */
+export const personColumn = /^(Full name|Client name auto)$/;
 
 /** A person's name with initials, as in the mockup's people columns; the initials are decoration. */
 export function GridPerson({ name, children }) {
@@ -33,7 +35,7 @@ export function GridCell({ data, module, record, field, first }) {
     );
   if (!strongName.test(field.name)) return value;
   const strong = <span className="cell-strong">{value}</span>;
-  return field.name === 'Full name' && value !== '—' ? (
+  return personColumn.test(field.name) && value !== '—' ? (
     <GridPerson name={value}>{strong}</GridPerson>
   ) : (
     strong

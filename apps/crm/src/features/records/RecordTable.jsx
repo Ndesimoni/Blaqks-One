@@ -39,7 +39,7 @@ function RecordTable({
   const pick = (columnNames || preferredCols[module] || [])
     .map((name) => columns.find((f) => f.name === name))
     .filter(Boolean);
-  const perPage = limit ? 12 : 500;
+  const perPage = limit ? 20 : 500;
   const { current, currentPage, setPage } = usePagedRecords(arr, perPage);
   return (
     <>

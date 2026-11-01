@@ -8,9 +8,9 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: 10px;
-  background: var(--panel);
+  background: transparent;
   color: var(--muted);
 }
 .grid-tool:hover {

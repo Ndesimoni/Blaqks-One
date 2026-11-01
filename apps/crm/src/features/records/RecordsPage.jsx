@@ -10,7 +10,7 @@ import { GridFilterBar } from './grid/GridFilterBar.jsx';
 import { useGridColumns } from './grid/useGridColumns.js';
 import { RecordDirectoryHead } from './RecordDirectoryHead.jsx';
 import { RecordTable } from './RecordTable.jsx';
-import { matchesRecordTab, recordTabs } from './selectors.js';
+import { activeTab, matchesRecordTab, recordTabs } from './selectors.js';
 
 /** The Interaction log reads as an activity feed (NAV); the other directories are grids. */
 const feedModules = new Set(['Interaction log']);
@@ -29,7 +29,8 @@ function RecordsPage({
 }) {
   const { t } = useI18n();
   const { user } = useSession();
-  const { tab, setTab, setPage, query, setQuery } = useWorkspaceView();
+  const { tab: viewTab, setTab, setPage, query, setQuery } = useWorkspaceView();
+  const tab = activeTab(tabs, viewTab);
   const arr = useRecordSearch(module, (record) =>
     matchesTab ? matchesTab(record, tab) : matchesRecordTab(module, record, tab),
   );
@@ -46,16 +47,14 @@ function RecordsPage({
       <GridFilterBar
         module={module}
         presetLabel={
-          tab === tabs[0]
-            ? t('recordGrid.allPreset', { things: plural(directoryNoun(module)) })
-            : tab
+          tab === 'All' ? t('recordGrid.allPreset', { things: plural(directoryNoun(module)) }) : tab
         }
         tabs={tabs}
         tab={tab}
         onTab={firstPage(setTab)}
         query={query}
         onQuery={firstPage(setQuery)}
-        tools={feed ? null : <GridColumnChooser grid={grid} />}
+        tools={feed ? null : <GridColumnChooser module={module} grid={grid} />}
         extras={toolbarExtras}
       />
       {feed ? (

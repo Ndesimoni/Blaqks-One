@@ -1,14 +1,15 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { columnHeading } from './columnHeadings.js';
 import './grid-columns.css';
 
 /**
- * The grid's column chooser: an icon button opening every column of the sheet as a checkbox.
+ * The grid's column chooser: the mockup's gear button, opening every column of the sheet as a checkbox.
  * It stays open while columns are ticked; Escape or a click outside closes it. The identity
  * column cannot be removed.
  */
-export function GridColumnChooser({ grid }) {
+export function GridColumnChooser({ module, grid }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const root = useRef(null);
@@ -43,7 +44,7 @@ export function GridColumnChooser({ grid }) {
         aria-controls={id}
         onClick={() => setOpen((value) => !value)}
       >
-        <Icon name="sliders" size={18} />
+        <Icon name="settings" size={20} />
       </button>
       {open && (
         <div
@@ -63,7 +64,7 @@ export function GridColumnChooser({ grid }) {
                   disabled={field.name === grid.identity}
                   onChange={() => grid.toggle(field.name)}
                 />
-                <span>{field.name}</span>
+                <span>{columnHeading(module, field.name)}</span>
                 {field.name === grid.identity && <small>{t('recordGrid.columnsFixed')}</small>}
               </label>
             ))}

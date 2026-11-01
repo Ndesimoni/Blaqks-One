@@ -20,6 +20,13 @@ async function showTab(page, name) {
   );
 }
 
+/** All contacts is the pill's default preset; choosing the pressed chip again returns to it. */
+async function showAll(page) {
+  const group = page.getByRole('group', { name: 'Filter Contacts', exact: true });
+  await group.locator('[aria-pressed="true"]').click();
+  await expect(group.locator('[aria-pressed="true"]')).toHaveCount(0);
+}
+
 test('an Admin files a security guard by location, finds it, recategorises it and staff see it', async ({
   browser,
 }) => {
@@ -59,7 +66,7 @@ test('an Admin files a security guard by location, finds it, recategorises it an
     });
 
     await page.reload();
-    await expect(page.locator('.data-table thead')).toContainText('Building / project');
+    await expect(page.locator('.data-table thead')).toContainText('Linked to');
     await expect(rows.filter({ hasText: 'CT-LOC-1' })).toContainText('Marina Gate 2');
     await showTab(page, 'Security guards');
     await expect(rows).toHaveCount(1);
@@ -67,7 +74,7 @@ test('an Admin files a security guard by location, finds it, recategorises it an
     await showTab(page, 'Other contacts');
     await expect(rows).toHaveCount(1);
     await expect(rows).toContainText('Loc owner');
-    await showTab(page, 'All');
+    await showAll(page);
     for (const query of ['marina gate 2', 'DUBAI MARINA']) {
       await search.fill(query);
       await expect(rows).toHaveCount(1);

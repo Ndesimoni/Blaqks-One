@@ -21,11 +21,15 @@ test('contact categories handle imported casing and keep unknown or unclassified
   const before = structuredClone(records);
   const inTab = (tab) => records.filter((record) => matchesContactTab(record, tab));
   assert.deepEqual(inTab('Landlords'), [records[0]]);
+  assert.deepEqual(inTab('Developers'), [records[5]]);
   assert.deepEqual(inTab('Clients'), [records[1]]);
   assert.deepEqual(inTab('Security guards'), [records[2]]);
   assert.deepEqual(inTab('Building managers'), [records[3]]);
-  assert.deepEqual(inTab('Other contacts'), records.slice(4));
-  assert.deepEqual(inTab('All'), records);
+  assert.deepEqual(
+    inTab('Other contacts'),
+    records.slice(4).filter((record) => record !== records[5]),
+  );
+  assert.deepEqual(inTab('All contacts'), records);
   assert.deepEqual(records, before);
 });
 
@@ -51,8 +55,9 @@ test('contact categories combine with the existing search and sort without chang
 
 test('contact tabs list each category once in order and every type has exactly one category', () => {
   assert.deepEqual(contactTabs, [
-    'All',
+    'All contacts',
     'Landlords',
+    'Developers',
     'Clients',
     'Security guards',
     'Building managers',
@@ -60,7 +65,7 @@ test('contact tabs list each category once in order and every type has exactly o
   ]);
   for (const contact_type of OPTIONS['Contact type']) {
     const tabs = contactTabs.filter(
-      (tab) => tab !== 'All' && matchesContactTab({ contact_type }, tab),
+      (tab) => tab !== contactTabs[0] && matchesContactTab({ contact_type }, tab),
     );
     assert.equal(tabs.length, 1, contact_type);
   }

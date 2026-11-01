@@ -87,39 +87,3 @@
 .grid-card .grid-table .row-link:active:not(:disabled) {
   background: var(--surface-subtle);
 }
-/* Footer: the filtered total on the left; the page range and pager on the right. */
-.grid-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
-  padding: 10px 14px;
-  border-top: 1px solid var(--line);
-}
-:root[data-theme] .grid-total {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-}
-.grid-total strong {
-  color: var(--ink);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-:root[data-theme] .grid-foot .table-footer {
-  flex: 1 1 auto;
-  justify-content: flex-end;
-  gap: 8px 16px;
-  padding: 0;
-  border: 0;
-  font-size: 13px;
-}
-@media (max-width: 750px) {
-  .grid-foot {
-    padding: 10px 12px;
-  }
-  :root[data-theme] .grid-foot .table-footer {
-    justify-content: space-between;
-  }
-}

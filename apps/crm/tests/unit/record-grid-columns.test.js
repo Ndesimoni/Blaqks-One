@@ -18,8 +18,9 @@ test('every directory starts on columns that exist in its sheet, identity first'
     assert.equal(columns[0], names(module)[0], `${module} leads with its ID`);
     for (const name of columns) assert.ok(names(module).includes(name), `${module}: ${name}`);
   }
-  assert.equal(defaultColumns('Clients').length, 7, 'eight table headings with Open record');
-  assert.equal(defaultColumns('Contacts').length, 7);
+  // The approved mockup's columns: Client, Phone, Last contact; Contact, Role, Phone, Linked to.
+  assert.deepEqual(defaultColumns('Clients').slice(1), ['Full name', 'Phone', 'Last contact auto']);
+  assert.equal(defaultColumns('Contacts').length, 5);
 });
 
 test('a remembered choice keeps known columns, leads with the ID and never breaks the page', () => {

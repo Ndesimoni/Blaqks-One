@@ -1,6 +1,6 @@
 /* Grid filter bar (Bitrix24 list pattern, NAV): the search field carries the active preset as a
-   pill; the page's existing filters follow as chips, then the column chooser and any extra
-   filter (connected "Assigned to") on its own row. */
+   pill; the other presets follow as chips, then the column chooser and any extra filter
+   (connected "Assigned to", styled in assigned-filter.css). */
 .grid-filterbar {
   display: flex;
   flex-wrap: wrap;
@@ -15,7 +15,7 @@
   align-items: center;
   gap: 8px;
   min-height: 40px;
-  padding: 4px 6px 4px 12px;
+  padding: 4px 6px 4px 10px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--panel);
@@ -107,9 +107,6 @@
 :root[data-theme] .grid-chip:focus-visible {
   outline-offset: 1px;
 }
-.grid-filterbar > .assigned-filter {
-  flex-basis: 100%;
-}
 /* Phones: the field on its own row; chips scroll sideways beside the column chooser. */
 @media (max-width: 750px) {
   .grid-filterbar {
@@ -138,13 +135,5 @@
   }
   .grid-chip {
     min-height: 40px;
-  }
-  .grid-filterbar .assigned-filter label {
-    flex: 0 0 auto;
-  }
-  .grid-filterbar .assigned-filter select {
-    flex: 1;
-    min-width: 0;
-    min-height: 44px;
   }
 }

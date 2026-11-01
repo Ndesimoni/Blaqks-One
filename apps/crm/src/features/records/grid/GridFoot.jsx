@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pagination } from '../../../components/ui/Pagination.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { N } from '../../../lib/format.js';
+import { GridPager } from './GridPager.jsx';
+import './grid-foot.css';
 
-/** Grid footer (Bitrix24 list pattern): the filtered total, then the page range and pager. */
+/** The mockup's grid footer: "Total: N" on the left, the numbered pages and page size beside it. */
 export function GridFoot({ total, page, perPage, label, onPage }) {
   const { t } = useI18n();
   return (
@@ -11,14 +12,7 @@ export function GridFoot({ total, page, perPage, label, onPage }) {
       <p className="grid-total">
         {t('recordGrid.total')} <strong>{N(total)}</strong>
       </p>
-      <Pagination
-        variant="table"
-        total={total}
-        page={page}
-        pageSize={perPage}
-        label={label}
-        onChange={onPage}
-      />
+      <GridPager total={total} page={page} perPage={perPage} label={label} onPage={onPage} />
     </div>
   );
 }

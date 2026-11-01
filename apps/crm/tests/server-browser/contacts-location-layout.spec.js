@@ -4,7 +4,8 @@ import { assignTeam } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, setTheme } from './assign-helpers.js';
 import { focusVisible, tallTargets } from './permissions-visual-helpers.js';
 
-const allTabs = ['All', 'Landlords', 'Clients', 'Security guards', 'Building managers'];
+// All contacts is the filter field's default pill; the other presets are chips (the mockup).
+const allTabs = ['Landlords', 'Developers', 'Clients', 'Security guards', 'Building managers'];
 allTabs.push('Other contacts');
 const shot = (testInfo, name) =>
   process.env.CONTACTS_QA_SHOTS
@@ -35,7 +36,7 @@ test('contact tabs and location fields reflow and stay keyboard reachable at 390
         await page.goto('/#/contacts');
         await setTheme(page, theme);
         await expect(group.getByRole('button')).toHaveText(allTabs);
-        await group.getByRole('button', { name: 'All', exact: true }).focus();
+        await group.getByRole('button', { name: allTabs[0], exact: true }).focus();
         for (const name of allTabs.slice(1)) {
           await page.keyboard.press('Tab');
           await expect(group.getByRole('button', { name, exact: true })).toBeFocused();
@@ -47,6 +48,9 @@ test('contact tabs and location fields reflow and stay keyboard reachable at 390
           'aria-pressed',
           'true',
         );
+        // Choosing the pressed preset again returns to the default, All contacts.
+        await page.keyboard.press('Enter');
+        await expect(group.locator('[aria-pressed="true"]')).toHaveCount(0);
         for (const box of await group
           .getByRole('button')
           .evaluateAll((items) => items.map((item) => item.getBoundingClientRect().height)))

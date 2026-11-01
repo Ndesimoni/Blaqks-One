@@ -4,9 +4,9 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import './grid-filter.css';
 
 /**
- * The grid's filter bar (Bitrix24 list pattern, NAV): one search field showing the active
- * preset as a pill, the page's existing filters as preset chips, then the page's tools (the
- * column chooser) and any extra filter such as the connected "Assigned to".
+ * The grid's filter bar (the approved mockup's grid view): one field showing the active preset
+ * as a pill, the other presets as chips (choosing the active one again returns to the first),
+ * then the page's tools (the column chooser) and any extra filter such as "Assigned to".
  */
 export function GridFilterBar({
   module,
@@ -36,7 +36,6 @@ export function GridFilterBar({
           input.current?.focus();
         }}
       >
-        <Icon name="search" size={16} />
         <span className="grid-preset-pill" aria-hidden="true">
           {presetLabel}
         </span>
@@ -65,13 +64,13 @@ export function GridFilterBar({
       </div>
       {presets && (
         <div className="grid-presets" role="group" aria-label={`Filter ${module}`}>
-          {tabs.map((name) => (
+          {tabs.slice(1).map((name) => (
             <button
               key={name}
               type="button"
               className="grid-chip"
               aria-pressed={name === tab}
-              onClick={() => onTab(name)}
+              onClick={() => onTab(name === tab ? tabs[0] : name)}
             >
               {name}
             </button>

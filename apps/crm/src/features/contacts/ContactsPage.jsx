@@ -9,7 +9,7 @@ export function ContactsPage({ toolbarExtras = null }) {
         module="Contacts"
         tabs={contactTabs}
         matchesTab={matchesContactTab}
-        emptyDetail="Try another search or choose All to show every contact."
+        emptyDetail="Try another search or choose All contacts to show every contact."
         toolbarExtras={toolbarExtras}
       />
     </div>

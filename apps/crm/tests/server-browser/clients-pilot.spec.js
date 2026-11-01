@@ -32,7 +32,7 @@ async function capture(page, testInfo, role) {
       } else {
         await expect(page.locator('.data-table tbody tr').first()).toBeVisible();
         await expect(page.locator('.record-card')).toHaveCount(0);
-        await expect(page.locator('.data-table thead th')).toHaveCount(8);
+        await expect(page.locator('.data-table thead th')).toHaveCount(5);
       }
       await page.screenshot({
         path: testInfo.outputPath(`clients-${role}-${viewport.label}-${theme}.png`),

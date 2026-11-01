@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { get } from '../../lib/records.js';
+import { columnHeading } from './grid/columnHeadings.js';
 import { GridCell } from './grid/GridCell.jsx';
 import { useWideTable } from './grid/useWideTable.js';
 import { RecordRowActions } from './RecordRowActions.jsx';
@@ -52,7 +53,7 @@ export function RecordTableView({
                     setPage(0);
                   }}
                 >
-                  {f.name.replace(/ AED$/, '')}{' '}
+                  {columnHeading(module, f.name)}{' '}
                   {sort.key === f.key && (
                     <Icon name={sort.direction === 'asc' ? 'up' : 'down'} size={12} />
                   )}

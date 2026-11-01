@@ -79,7 +79,9 @@ test('the filter bar keeps the search name and the pressed preset group browser 
   const html = bar({ tab: 'Landlords', presetLabel: 'Landlords' });
   assert.match(html, /<input aria-label="Search Contacts" placeholder="Filter and search"/);
   assert.match(html, /role="group" aria-label="Filter Contacts"/);
-  assert.equal(html.match(/class="grid-chip"/g).length, 3);
+  // The first preset is the pill's default, so only the others are chips (the mockup).
+  assert.equal(html.match(/class="grid-chip"/g).length, 2);
+  assert.doesNotMatch(html, /class="grid-chip"[^>]*>All</);
   assert.match(html, /aria-pressed="true"[^>]*>Landlords</);
   assert.match(html, /class="grid-preset-pill" aria-hidden="true">Landlords</);
   assert.match(html, /aria-label="Clear search and filter"/);

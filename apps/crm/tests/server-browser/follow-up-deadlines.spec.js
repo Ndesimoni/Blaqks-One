@@ -38,7 +38,8 @@ test('deadline groups retain search, list preference and the record slider', asy
     page.getByRole('button', { name: 'Open record DL-OVERDUE', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('heading', { name: /^Today/ })).toHaveCount(0);
-  await page.getByRole('button', { name: 'All', exact: true }).click();
+  // Choosing the pressed preset again returns to the default, All follow-ups.
+  await page.getByRole('button', { name: 'Overdue', exact: true }).click();
   await page.getByRole('button', { name: 'Open record DL-TODAY', exact: true }).click();
   await expect(page.getByRole('dialog')).toContainText('Synthetic action DL-TODAY');
   await page.keyboard.press('Escape');

@@ -52,7 +52,7 @@ export function ViewingsPage({ toolbarExtras = null }) {
               value={view}
               onChange={firstPage(chooseView)}
             />
-            {view === 'list' && <GridColumnChooser grid={grid} />}
+            {view === 'list' && <GridColumnChooser module={module} grid={grid} />}
           </>
         }
         extras={toolbarExtras}

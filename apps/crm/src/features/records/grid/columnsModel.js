@@ -2,29 +2,15 @@ import { preferredCols } from '../../../config/tableColumns.js';
 import { workflowColumns } from '../workflowPresentation.js';
 
 /**
- * Desktop columns for the reviewed directories: identity, role or requirement, stage and next
- * task fit beside the action cell at 1280, so nothing is clipped (UI3 §5.4, UI4a).
+ * Default columns of the approved mockup's grids (owner, 2026-11-01), after the identity column;
+ * every other column of the sheet stays one tick away in the column chooser.
  */
 const pilotColumns = {
   ...workflowColumns,
-  Clients: [
-    'Client ID',
-    'Full name',
-    'Lead stage',
-    'Buy / rent',
-    'Maximum budget AED',
-    'Lead quality score / 100',
-    'Next follow-up auto',
-  ],
-  Contacts: [
-    'Contact ID',
-    'Full name',
-    'Contact type',
-    'Phone',
-    'Email',
-    'Company',
-    'Building / project',
-  ],
+  Clients: ['Client ID', 'Full name', 'Phone', 'Last contact auto'],
+  Contacts: ['Contact ID', 'Full name', 'Contact type', 'Phone', 'Building / project'],
+  Shortlist: ['Match ID', 'Client name auto', 'Property title auto', 'Client response'],
+  'Client care': ['Care ID', 'Client name auto', 'Touchpoint type', 'Next contact', 'Task status'],
 };
 
 /** The columns a directory shows until its viewer chooses others. */
