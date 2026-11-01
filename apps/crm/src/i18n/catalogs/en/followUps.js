@@ -19,5 +19,4 @@ export default {
   empty: 'No matching follow-ups',
   filtered: 'Clear the filters to show every follow-up.',
   first: 'Add a follow-up to plan your next client contact.',
-  add: 'Add follow-up',
 };

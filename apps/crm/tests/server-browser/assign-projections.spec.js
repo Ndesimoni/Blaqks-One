@@ -84,6 +84,7 @@ test('the holder of a listing sees other agents’ viewings as date/time and age
   const { page, context } = await memberPage(browser, one.email);
   try {
     await page.goto('/#/viewings');
+    await page.getByRole('button', { name: 'List', exact: true }).click();
     await expect(page.getByRole('navigation', { name: 'Viewings pages' })).toContainText('of 0');
     await page.goto('/#/properties');
     await page.getByRole('button', { name: /Held listing/ }).click();

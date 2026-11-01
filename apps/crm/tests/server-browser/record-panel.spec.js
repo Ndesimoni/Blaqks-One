@@ -121,6 +121,7 @@ test('leads keep Edit lead, and a lost lead marks no stage on the track', async 
     await expect(lost).toHaveCount(0);
 
     await openPage(page, 'Leads');
+    await page.getByRole('button', { name: 'List', exact: true }).click();
     const lead = await openRecord(page, 'CL-RP-1');
     await expect(lead.locator('.record-panel-title p')).toHaveText('Lead · Website · CL-RP-1');
     await lead.getByRole('button', { name: 'Edit lead', exact: true }).click();

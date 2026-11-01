@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '../../../components/ui/Button.jsx';
 import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { dubaiToday } from '../../../lib/dubaiDate.js';
@@ -18,7 +17,7 @@ export function DeadlineList({ records, emptyDetail, filtered }) {
   const { t } = useI18n();
   const { data } = useRecords();
   const { query } = useWorkspaceView();
-  const { dispatchRow, readOnly = false, add } = useWorkspaceActions();
+  const { dispatchRow, readOnly = false } = useWorkspaceActions();
   const today = dubaiToday();
   const ordered = orderDeadlines(records, today);
   const counts = new Map(
@@ -57,15 +56,7 @@ export function DeadlineList({ records, emptyDetail, filtered }) {
           detail={emptyDetail}
           query={query}
           readOnly={readOnly}
-          action={
-            filtered ? (
-              false
-            ) : (
-              <Button icon="plus" onClick={() => add('Follow-ups')}>
-                {t('followUps.add')}
-              </Button>
-            )
-          }
+          action={filtered ? false : undefined}
         />
       )}
       <GridFoot

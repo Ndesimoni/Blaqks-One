@@ -105,7 +105,9 @@ A one-time entry before first use:
 - Brokers not chosen get a polite notice ("The broker chose another option") and may
   answer again only with a different property.
 - **Still available:** if no answer suits, or a chosen deal falls through, the requester
-  reopens the request for 3 new answers. This does not reset the 30-day expiry.
+  reopens the request for 3 new answers. This does not reset the 30-day expiry. The
+  button reads **Open a new round** since the NAV restyle (2026-11-01, design review
+  finding 10).
 - A request closes when the requester marks it done, or when it expires.
 
 ## 6. Commission and contact
