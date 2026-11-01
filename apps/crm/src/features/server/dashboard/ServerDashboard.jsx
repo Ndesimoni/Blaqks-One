@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords } from '../../../hooks/useWorkspace.js';
-import { DashboardWelcome } from '../../dashboard/DashboardWelcome.jsx';
 import { PrioritiesPanel } from '../../dashboard/PrioritiesPanel.jsx';
 import { BarListPanel } from '../../dashboard/BarListPanel.jsx';
-import { AssignedToFilter } from '../assignment/AssignedToFilter.jsx';
 import { ConnectedMetrics } from './ConnectedMetrics.jsx';
 import { RecordCountsPanel } from './RecordCountsPanel.jsx';
 import { FinanceWidgets } from './FinanceWidgets.jsx';
@@ -12,7 +10,7 @@ import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
 import { useDashboardWorkload } from './useDashboardWorkload.js';
 import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
 import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
-import { hasTeamFeatures } from '../access.js';
+import { DashboardToolbar } from './DashboardToolbar.jsx';
 import { GetStartedChecklist } from './GetStartedChecklist.jsx';
 import '../assignment/assigned-filter.css';
 
@@ -43,7 +41,8 @@ export function ServerDashboard({ owner }) {
       : 'Figures from the records assigned to you';
   return (
     <div className="page-stack dashboard-page connected-dashboard">
-      <DashboardWelcome />
+      <DashboardToolbar workload={workload} caption={caption} />
+      <ConnectedMetrics figures={figures} widgets={widgets} />
       {user.roleId === 'admin' && (
         <GetStartedChecklist
           workspaceId={owner.id}
@@ -52,23 +51,6 @@ export function ServerDashboard({ owner }) {
           firstName={user.name.trim().split(/\s+/)[0]}
         />
       )}
-      <div className="subhead-row">
-        <div>
-          <h2>Your business, at a glance</h2>
-          <p>{caption}</p>
-        </div>
-        {workload.module && hasTeamFeatures(user) && (
-          <AssignedToFilter
-            module={workload.module}
-            filter={workload.filter}
-            onChange={workload.setFilter}
-            assignees={workload.assignees}
-            me={workload.me}
-            count={workload.count}
-          />
-        )}
-      </div>
-      <ConnectedMetrics figures={figures} widgets={widgets} />
       {widgets.finance && owner && <FinanceWidgets owner={owner} />}
       <div className="split-main">
         <RecordCountsPanel
