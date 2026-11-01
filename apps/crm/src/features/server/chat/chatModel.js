@@ -60,3 +60,12 @@ export const channelSlug = (value = '') =>
 
 /** The day key of an ISO time in Dubai, to separate messages by day. */
 export const dayOf = (at) => new Date(at).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+
+/** Who is in a room besides the caller: everyone in a channel, a group's members, the peer. */
+export function roomMemberNames(room, people = []) {
+  const names = (ids) =>
+    ids.map((id) => people.find((person) => person.id === id)?.name).filter(Boolean);
+  if (room.kind === 'channel') return people.map((person) => person.name).filter(Boolean);
+  if (room.kind === 'group') return names(room.members ?? []);
+  return names(room.peerId ? [room.peerId] : []);
+}

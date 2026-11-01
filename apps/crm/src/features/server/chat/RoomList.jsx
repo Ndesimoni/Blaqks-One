@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { splitRooms } from './chatModel.js';
+import { roomTitle, splitRooms } from './chatModel.js';
 import { NewConversation } from './NewConversation.jsx';
 import { NewGroup } from './NewGroup.jsx';
 import { RoomRow } from './RoomRow.jsx';
 
-/** Channels, groups and direct messages, with New channel (the Admin), New group and New message. */
-export function RoomList({ chat, selectedId, onOpen }) {
+/**
+ * Channels, groups and direct messages, with New channel (the Admin), New group and New
+ * message; `kind` (the top tabs) shows one part, and the search narrows the rooms by name.
+ */
+export function RoomList({ chat, selectedId, onOpen, kind = 'all' }) {
   const { t } = useI18n();
   const [mode, setMode] = useState(null);
+  const [query, setQuery] = useState('');
+  const needle = query.trim().toLowerCase();
+  const matching = (rooms) =>
+    rooms.filter(
+      (room) => !needle || roomTitle(room, chat.people, t).toLowerCase().includes(needle),
+    );
   const { channels, groups, direct } = splitRooms(chat.rooms);
+  const shows = (part) => kind === 'all' || kind === part;
   const opened = (result) => {
     if (result.error) return result.error;
     setMode(null);
@@ -69,13 +79,24 @@ export function RoomList({ chat, selectedId, onOpen }) {
   );
   return (
     <section className="chat-list" aria-label={t('chat.rooms')}>
-      {group(
-        t('chat.channels'),
-        channels,
-        chat.canCreateChannel && add('chat.newChannel', 'channel'),
-      )}
-      {group(t('chat.groups'), groups, add('chat.newGroup', 'group'))}
-      {group(t('chat.direct'), direct, add('chat.newMessage', 'direct'))}
+      <label className="chat-search">
+        <span className="sr-only">{t('chat.search')}</span>
+        <input
+          type="search"
+          value={query}
+          placeholder={t('chat.search')}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+      </label>
+      {shows('channel') &&
+        group(
+          t('chat.channels'),
+          matching(channels),
+          chat.canCreateChannel && add('chat.newChannel', 'channel'),
+        )}
+      {shows('group') && group(t('chat.groups'), matching(groups), add('chat.newGroup', 'group'))}
+      {shows('direct') &&
+        group(t('chat.direct'), matching(direct), add('chat.newMessage', 'direct'))}
     </section>
   );
 }

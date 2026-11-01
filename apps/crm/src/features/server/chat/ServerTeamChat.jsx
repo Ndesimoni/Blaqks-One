@@ -1,10 +1,12 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { ChatTabs } from './ChatTabs.jsx';
 import { RoomList } from './RoomList.jsx';
+import { RoomMembers } from './RoomMembers.jsx';
 import { RoomView } from './RoomView.jsx';
 import { useChat } from './useChat.js';
 import './chat.css';
@@ -14,6 +16,7 @@ import './chat-mentions.css';
 import './chat-groups.css';
 import './chat-members.css';
 import './chat-phone.css';
+import './chat-frame.css';
 
 /**
  * Team chat (packets C2 and C3): channels, groups and private messages on the left, the
@@ -27,6 +30,7 @@ export function ServerTeamChat({ selection }) {
   const location = useLocation();
   const go = useNavigate();
   const chat = useChat(api, owner.id);
+  const [kind, setKind] = useState('all');
   // In the slide-in messenger (NAV3) the panel holds the open room, not the URL.
   const selectedId = selection
     ? selection.id
@@ -52,11 +56,16 @@ export function ServerTeamChat({ selection }) {
   return (
     <div className="chat-page">
       <h1 className="sr-only">{t('chat.title')}</h1>
+      <ChatTabs kind={kind} onKind={setKind} />
       <section
-        className={'chat-layout' + (room ? ' is-room' : ' is-list')}
+        className={
+          'chat-layout' +
+          (room ? ' is-room' : ' is-list') +
+          (room && !selection ? ' has-members' : '')
+        }
         aria-label={t('chat.title')}
       >
-        <RoomList chat={chat} selectedId={selectedId} onOpen={open} />
+        <RoomList chat={chat} selectedId={selectedId} onOpen={open} kind={kind} />
         <section className="chat-room-pane" aria-label={room ? undefined : t('chat.title')}>
           {room ? (
             <RoomView
@@ -79,6 +88,7 @@ export function ServerTeamChat({ selection }) {
             <p className="chat-muted chat-choose">{t('chat.choose')}</p>
           )}
         </section>
+        {room && !selection && <RoomMembers room={room} people={chat.people} />}
       </section>
     </div>
   );
