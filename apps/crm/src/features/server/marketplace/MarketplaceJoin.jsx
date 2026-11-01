@@ -56,8 +56,8 @@ export function MarketplaceJoin({ termsVersion, onChanged }) {
   };
   if (!started)
     return (
-      <section className="market-card">
-        <h3>{t('marketplaceJoin.join.title')}</h3>
+      <section className="market-card market-join-start">
+        <h2>{t('marketplaceJoin.join.title')}</h2>
         <p>{t('marketplaceJoin.join.text')}</p>
         <Button onClick={() => setStarted(true)} disabled={!value}>
           {t('marketplaceJoin.join.start')}
@@ -81,8 +81,8 @@ export function MarketplaceJoin({ termsVersion, onChanged }) {
   const steps = STEPS.map((id) => ({ id, title: t(`marketplaceJoin.join.step.${id}`) }));
   const canNext = step === 0 ? !problem : step === 1 ? agreed(ticks, consent) : true;
   return (
-    <section className="market-card">
-      <h3>{t('marketplaceJoin.join.title')}</h3>
+    <section className="market-card market-join">
+      <h2>{t('marketplaceJoin.join.title')}</h2>
       <FormStepper
         steps={steps}
         activeStep={step}
@@ -131,7 +131,7 @@ export function MarketplaceJoin({ termsVersion, onChanged }) {
         )}
       </div>
       {step < 3 && (
-        <div className="market-actions">
+        <div className="market-actions market-step-actions">
           {step > 0 && (
             <Button variant="light" onClick={() => setStep(step - 1)} disabled={busy}>
               {t('marketplaceJoin.join.back')}

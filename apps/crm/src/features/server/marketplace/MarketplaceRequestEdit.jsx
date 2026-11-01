@@ -30,7 +30,11 @@ export function MarketplaceRequestEdit({ request, onClose, onSaved }) {
     }
   };
   return (
-    <FinanceDialog title={t('marketplaceRequests.post.editTitle')} onClose={onClose}>
+    <FinanceDialog
+      title={t('marketplaceRequests.post.editTitle')}
+      onClose={onClose}
+      className="market-slider market-form-slider"
+    >
       <MarketplaceRequestForm draft={draft} onChange={setDraft} prefix="market-edit" />
       {problem && (
         <p className="field-error" role="alert">

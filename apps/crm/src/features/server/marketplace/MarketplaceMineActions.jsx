@@ -3,14 +3,14 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 
 /**
- * The member's own profile actions (packet MK1b): edit, photo and preview in one row, and
- * leaving the marketplace on its own row below a hairline, apart from the everyday actions.
+ * The member's own everyday profile actions (packet MK1b): edit, photo and preview in one row,
+ * with the photo's or the save's error below. Leaving sits apart, on the card's last row.
  */
-export function MarketplaceMineActions({ mine, hasPhoto, onPreview, onLeave }) {
+export function MarketplaceMineActions({ mine, hasPhoto, onPreview }) {
   const { t } = useI18n();
   const busy = Boolean(mine.busy);
   return (
-    <>
+    <div className="market-profile-actions">
       <div className="market-actions">
         <Button variant="light" onClick={() => mine.setEditing(true)}>
           {t('marketplaceJoin.mine.edit')}
@@ -32,11 +32,6 @@ export function MarketplaceMineActions({ mine, hasPhoto, onPreview, onLeave }) {
           {mine.error}
         </p>
       )}
-      <div className="market-leave">
-        <Button variant="danger-light" onClick={onLeave}>
-          {t('marketplaceJoin.mine.leave')}
-        </Button>
-      </div>
-    </>
+    </div>
   );
 }

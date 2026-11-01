@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useMarketActivity } from './useMarketActivity.js';
 import { MarketplaceRequestActivity } from './MarketplaceRequestActivity.jsx';
+import { readSummary } from './requestSummary.js';
+import { requestTitle } from './requestText.js';
+import './marketplace-updates.css';
 
 const labels = {
   selected_other: 'notificationSelected',
@@ -13,16 +17,23 @@ const labels = {
   new_answer: 'notificationOffer',
 };
 
-/** Persistent request updates keep off-board or paused participation reachable. */
+/**
+ * Persistent request updates keep off-board or paused participation reachable: the requests
+ * the member offered on or asked about, then a feed of recent updates.
+ */
 export function MarketplaceNotifications() {
   const { t, format } = useI18n();
   const k = (key) => t(`marketplaceAnswers.${key}`);
   const list = useMarketActivity('marketplaceNotifications');
   const activity = useMarketActivity('marketplaceActivity');
   const [requestId, setRequestId] = useState('');
+  const requests = activity.value?.requests || [];
+  const notices = list.value?.notifications || [];
+  const opened = requests.find((request) => (request.requestId || request.id) === requestId);
+  const summary = readSummary(opened);
   return (
     <section className="market-updates" aria-label={k('notifications')}>
-      <div className="market-actions">
+      <div className="market-toolbar">
         <Button
           variant="light"
           onClick={() => {
@@ -37,27 +48,42 @@ export function MarketplaceNotifications() {
       {list.loading && <p role="status">{k('loading')}</p>}
       {list.error && <p role="alert">{list.error}</p>}
       {activity.error && <p role="alert">{activity.error}</p>}
-      <ul className="market-request-list">
-        {(activity.value?.requests || []).map((request) => (
-          <li className="market-card" key={request.id}>
-            <strong>{request.propertyType}</strong>
-            <p>
-              {request.state === 'paused'
-                ? k('paused')
-                : t(`marketplaceRequests.mine.state.${request.state}`)}
-            </p>
-            <Button variant="light" onClick={() => setRequestId(request.requestId || request.id)}>
-              {k('open')}
-            </Button>
-          </li>
-        ))}
+      {requests.length > 0 && <h3 className="market-subhead">{k('involved')}</h3>}
+      <ul className="market-feed">
+        {requests.map((request) => {
+          const facts = readSummary(request);
+          return (
+            <li className="market-feed-row" key={request.id}>
+              <span className="market-feed-icon" aria-hidden="true">
+                <Icon name="layers" size={18} />
+              </span>
+              <div>
+                <strong>{facts ? requestTitle(t, facts) : request.propertyType}</strong>
+                <p>
+                  {request.state === 'paused'
+                    ? k('paused')
+                    : t(`marketplaceRequests.mine.state.${request.state}`)}
+                </p>
+              </div>
+              <Button variant="light" onClick={() => setRequestId(request.requestId || request.id)}>
+                {k('open')}
+              </Button>
+            </li>
+          );
+        })}
       </ul>
-      {!list.loading && !list.value?.notifications?.length && <p>{k('noNotifications')}</p>}
-      <ul className="market-request-list">
-        {(list.value?.notifications || []).map((notice) => (
-          <li className="market-card" key={notice.id}>
-            <p>{k(labels[notice.kind] || 'notificationOther')}</p>
-            <time dateTime={notice.createdAt}>{format.date(notice.createdAt)}</time>
+      <h3 className="market-subhead">{k('recent')}</h3>
+      {!list.loading && !notices.length && <p className="market-empty">{k('noNotifications')}</p>}
+      <ul className="market-feed">
+        {notices.map((notice) => (
+          <li className="market-feed-row" key={notice.id}>
+            <span className="market-feed-icon" aria-hidden="true">
+              <Icon name="bell" size={18} />
+            </span>
+            <div>
+              <p>{k(labels[notice.kind] || 'notificationOther')}</p>
+              <time dateTime={notice.createdAt}>{format.date(notice.createdAt)}</time>
+            </div>
             <Button variant="light" onClick={() => setRequestId(notice.requestId)}>
               {k('openUpdate')}
             </Button>
@@ -65,7 +91,11 @@ export function MarketplaceNotifications() {
         ))}
       </ul>
       {requestId && (
-        <MarketplaceRequestActivity requestId={requestId} onClose={() => setRequestId('')} />
+        <MarketplaceRequestActivity
+          requestId={requestId}
+          summary={summary}
+          onClose={() => setRequestId('')}
+        />
       )}
     </section>
   );

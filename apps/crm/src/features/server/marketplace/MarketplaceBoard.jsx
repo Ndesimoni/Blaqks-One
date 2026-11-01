@@ -4,8 +4,8 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceBoardCard } from './MarketplaceBoardCard.jsx';
 import { MarketplaceBoardFilters } from './MarketplaceBoardFilters.jsx';
 import { MarketplaceProfileDialog } from './MarketplaceProfileDialog.jsx';
-import { useBoard } from './useRequests.js';
 import { MarketplaceRequestActivity } from './MarketplaceRequestActivity.jsx';
+import { useBoard } from './useRequests.js';
 
 const noFilters = Object.freeze({
   purpose: '',
@@ -15,16 +15,25 @@ const noFilters = Object.freeze({
   band: '',
 });
 
-/** Other companies' open requests, filtered on the server and paged (packet MK2). */
+/**
+ * Open client requests as a grid of cards, filtered on the server and paged (packet MK2).
+ * An empty board says whether nothing is posted or nothing matches the filters.
+ */
 export function MarketplaceBoard() {
   const { t } = useI18n();
   const [filters, setFilters] = useState(noFilters);
   const board = useBoard(filters);
   const [broker, setBroker] = useState('');
-  const [requestId, setRequestId] = useState('');
+  const [opened, setOpened] = useState(null);
+  const filtered = Object.values(filters).some(Boolean);
   return (
     <div className="market-board">
-      <MarketplaceBoardFilters filters={filters} onChange={setFilters} />
+      <p className="market-note">{t('marketplaceRequests.board.text')}</p>
+      <MarketplaceBoardFilters
+        filters={filters}
+        onChange={setFilters}
+        onClear={() => setFilters(noFilters)}
+      />
       {board.loading && !board.requests.length && (
         <p role="status">{t('marketplaceRequests.board.loading')}</p>
       )}
@@ -34,7 +43,16 @@ export function MarketplaceBoard() {
         </p>
       )}
       {!board.loading && !board.error && !board.requests.length && (
-        <p className="market-empty">{t('marketplaceRequests.board.empty')}</p>
+        <div className="market-empty">
+          {filtered ? (
+            <p>{t('marketplaceRequests.board.empty')}</p>
+          ) : (
+            <>
+              <strong>{t('marketplaceBoard.empty.title')}</strong>
+              <p>{t('marketplaceBoard.empty.text')}</p>
+            </>
+          )}
+        </div>
       )}
       <ul className="market-board-list">
         {board.requests.map((request) => (
@@ -42,7 +60,7 @@ export function MarketplaceBoard() {
             key={request.id}
             request={request}
             onOpenBroker={setBroker}
-            onOpenRequest={() => setRequestId(request.id)}
+            onOpenRequest={() => setOpened(request)}
           />
         ))}
       </ul>
@@ -54,10 +72,11 @@ export function MarketplaceBoard() {
         </Button>
       )}
       {broker && <MarketplaceProfileDialog memberId={broker} onClose={() => setBroker('')} />}
-      {requestId && (
+      {opened && (
         <MarketplaceRequestActivity
-          requestId={requestId}
-          onClose={() => setRequestId('')}
+          requestId={opened.id}
+          summary={opened}
+          onClose={() => setOpened(null)}
           onChanged={board.retry}
         />
       )}

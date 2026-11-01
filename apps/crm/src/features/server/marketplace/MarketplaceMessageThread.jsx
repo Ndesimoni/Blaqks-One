@@ -49,7 +49,7 @@ export function MarketplaceMessageThread({
       {thread.error && <p role="alert">{thread.error}</p>}
       <ol className="market-message-list" aria-label={k('messages')}>
         {(thread.value?.messages || []).map((message) => (
-          <li key={message.id}>
+          <li key={message.id} className={message.authorId === user.id ? 'is-mine' : undefined}>
             <strong>
               {message.authorId === user.id ? k('you') : participantName || k('broker')}
             </strong>
@@ -78,14 +78,16 @@ export function MarketplaceMessageThread({
           {error}
         </p>
       )}
-      {!paused && (
-        <Button onClick={send} disabled={busy || !body.trim()}>
-          {k('send')}
+      <div className="market-actions">
+        {!paused && (
+          <Button onClick={send} disabled={busy || !body.trim()}>
+            {k('send')}
+          </Button>
+        )}
+        <Button variant="light" onClick={thread.reload} disabled={thread.loading}>
+          {k('refresh')}
         </Button>
-      )}
-      <Button variant="light" onClick={thread.reload} disabled={thread.loading}>
-        {k('refresh')}
-      </Button>
+      </div>
     </div>
   );
 }

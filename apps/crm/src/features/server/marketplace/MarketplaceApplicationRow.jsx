@@ -4,6 +4,14 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceDecision } from './MarketplaceDecision.jsx';
 
+const TONES = {
+  pending: 'amber',
+  approved: 'green',
+  declined: 'red',
+  revoked: 'red',
+  not_applied: 'slate',
+};
+
 /**
  * One application in the platform queue: the company, who applied, when, the counts behind
  * the checklist, and the decision buttons the company's state allows.
@@ -23,7 +31,7 @@ export function MarketplaceApplicationRow({ row, onChanged }) {
             {format.date(row.companyCreatedAt) || row.companyCreatedAt}
           </span>
         </div>
-        <Badge>{t(`marketplace.states.${row.state}`)}</Badge>
+        <Badge tone={TONES[row.state]}>{t(`marketplace.states.${row.state}`)}</Badge>
       </div>
       <p className="market-detail">
         {t('marketplace.applications.applied', {
@@ -46,7 +54,7 @@ export function MarketplaceApplicationRow({ row, onChanged }) {
           <span>{t(`marketplace.states.${row.state}`)}</span> {row.reason}
         </p>
       )}
-      <div className="market-actions">
+      <div className="market-actions market-application-actions">
         {pending && (
           <>
             <Button onClick={() => setAction('approved')}>

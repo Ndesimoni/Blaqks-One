@@ -14,6 +14,7 @@ export function MarketplaceDecisionDialog({ decision, busy, error, onClose, onSu
       onClose={onClose}
       onSubmit={onSubmit}
       submitLabel={k('submit')}
+      className="market-dialog-short"
     >
       <p className="market-hint">{k('privacy')}</p>
     </FinanceDialog>

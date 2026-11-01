@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { useSession } from '../../../hooks/useSession.js';
 import { ListingView } from '../finance/ListingView.jsx';
@@ -46,12 +47,14 @@ export function MarketplaceAgreement({ answer, request, busy, onOpen }) {
       )}
       {release?.released === true && release.listing ? (
         <>
-          <p role="status">{k('released')}</p>
+          <p className="market-released" role="status">
+            {k('released')}
+          </p>
           <ListingView
             property={toProperty(release.listing, release.photos || [], release.floorPlans || [])}
             file={(file) => api.listingShareFileUrl(user.workspaceId, answer.shareId, file)}
           />
-          <dl className="record-review-grid">
+          <dl className="market-fields market-contacts">
             {['requester', 'broker'].map((side) => {
               const person = release.contacts?.[side];
               const digits = person?.phone?.replace(/\D/g, '') || '';
@@ -86,7 +89,10 @@ export function MarketplaceAgreement({ answer, request, busy, onOpen }) {
           </dl>
         </>
       ) : (
-        <p className="market-hint">{k('sealed')}</p>
+        <p className="market-private-line">
+          <Icon name="lock" size={15} />
+          <span>{k('sealed')}</span>
+        </p>
       )}
     </section>
   );

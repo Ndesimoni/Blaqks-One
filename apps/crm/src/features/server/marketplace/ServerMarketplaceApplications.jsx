@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
-import './marketplace-applications.css';
 import './marketplace.css';
 import './marketplace-profile.css';
+import './marketplace-applications.css';
 import { MarketplaceApplicationList } from './MarketplaceApplicationList.jsx';
 import { useMarketplaceApplications } from './useMarketplace.js';
 

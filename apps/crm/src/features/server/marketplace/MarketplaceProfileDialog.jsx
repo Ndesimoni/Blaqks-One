@@ -8,8 +8,9 @@ import { readProfile } from './marketplaceProfileModel.js';
 import { MarketplaceStats } from './MarketplaceStats.jsx';
 
 /**
- * "Preview how others see me" (packet MK1b): the profile through the same read another company
- * uses, so a member sees exactly what is published — never an email or a phone.
+ * A broker's marketplace profile in a right-hand slider, and "Preview how others see me"
+ * (packet MK1b): the profile through the same read another company uses, so a member sees
+ * exactly what is published — the facts first, never an email or a phone.
  */
 export function MarketplaceProfileDialog({ memberId, onClose }) {
   const { api, user } = useSession();
@@ -28,7 +29,11 @@ export function MarketplaceProfileDialog({ memberId, onClose }) {
   }, [api, user.workspaceId, memberId]);
   const profile = state.value;
   return (
-    <FinanceDialog title={t('marketplaceJoin.profile.title')} onClose={onClose}>
+    <FinanceDialog
+      title={t('marketplaceJoin.profile.title')}
+      onClose={onClose}
+      className="market-slider market-slider-narrow"
+    >
       {state.loading && <p role="status">{t('marketplace.loading')}</p>}
       {state.error && (
         <p className="field-error" role="alert">
@@ -42,8 +47,8 @@ export function MarketplaceProfileDialog({ memberId, onClose }) {
             company={profile.company}
             src={profile.hasPhoto ? api.marketplacePhotoUrl(user.workspaceId, memberId) : ''}
           />
-          <MarketplaceFacts profile={profile} />
           <MarketplaceStats stats={profile.stats} />
+          <MarketplaceFacts profile={profile} />
         </div>
       )}
     </FinanceDialog>

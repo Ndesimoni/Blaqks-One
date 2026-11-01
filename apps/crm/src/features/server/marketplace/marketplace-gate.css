@@ -1,0 +1,135 @@
+/* Before joining (broker marketplace §15): the intro, the eligibility checklist with its
+   meter and ticks, the waiting states as one calm panel, and the company's access card. */
+.market-intro p + p {
+  color: var(--muted);
+}
+.market-checklist-card {
+  gap: 14px;
+}
+.market-progress {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.market-meter {
+  block-size: 6px;
+  border-radius: 3px;
+  background: var(--hover);
+  overflow: hidden;
+}
+.market-meter span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: inline-size var(--duration) var(--ease);
+}
+.market-checklist {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-checklist li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 12px;
+  min-height: 44px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.market-checklist li:last-child {
+  border-bottom: 0;
+}
+.market-tick {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+}
+.is-met .market-tick {
+  border-color: var(--market-ok);
+  background: var(--market-ok);
+  color: var(--panel);
+}
+.market-detail {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.market-checklist .market-detail {
+  text-align: end;
+}
+.market-apply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding-top: 4px;
+}
+.market-state {
+  justify-items: center;
+  gap: 10px;
+  padding: 40px 24px;
+  text-align: center;
+}
+.market-state-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  border-radius: 16px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.market-card.market-state p {
+  max-width: 52ch;
+  color: var(--muted);
+}
+.market-card.market-state .market-reason {
+  color: var(--ink);
+  text-align: start;
+}
+.market-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.market-switch strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+.market-join-start .btn,
+.market-state .btn {
+  justify-self: start;
+}
+.market-state .btn {
+  justify-self: center;
+}
+@media (max-width: 520px) {
+  .market-card {
+    padding: 16px;
+  }
+  .market-checklist li {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  .market-checklist .market-detail {
+    grid-column: 2;
+    text-align: start;
+  }
+  .market-switch .btn,
+  .market-join-start .btn {
+    inline-size: 100%;
+  }
+}

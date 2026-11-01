@@ -46,7 +46,11 @@ export function MarketplaceRequestPost({ onClose, onPosted }) {
     setError('');
   };
   return (
-    <FinanceDialog title={t('marketplaceRequests.post.title')} onClose={onClose}>
+    <FinanceDialog
+      title={t('marketplaceRequests.post.title')}
+      onClose={onClose}
+      className="market-slider market-form-slider"
+    >
       {!clientId && <MarketplaceRequestClientPicker onPick={setClientId} />}
       {clientId && found.loading && <p role="status">{t('marketplaceRequests.post.picking')}</p>}
       {clientId && found.error && (
@@ -64,7 +68,10 @@ export function MarketplaceRequestPost({ onClose, onPosted }) {
       {clientId && draft && (
         <>
           <MarketplaceRequestForm draft={draft} onChange={setDraft} prefix="market-post" />
-          <MarketplaceRequestReview draft={draft} />
+          <section className="market-section market-preview">
+            <h3>{t('marketplaceJoin.join.review')}</h3>
+            <MarketplaceRequestReview draft={draft} />
+          </section>
           {problem && (
             <p className="field-error" role="alert">
               {t(`marketplaceRequests.post.${problem}`)}

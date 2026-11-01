@@ -1,3 +1,5 @@
+/* The request slider's body (packet MK3, marketplace redesign): the round's status and what
+   stays private, the sender's offer form and the private broker conversations as a thread. */
 .market-request-activity,
 .market-conversations,
 .market-message-thread,
@@ -6,77 +8,129 @@
   gap: 12px;
   min-width: 0;
 }
-.market-offer-list,
+.market-request-activity {
+  gap: 16px;
+}
+.market-request-status {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.market-status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:root[data-theme] .market-status-pills p {
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-theme] .market-status-pills .market-paused {
+  background: var(--market-warn-subtle);
+  color: var(--market-warn);
+}
+:root[data-theme] .marketplace-page .market-private-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--gold);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.market-private-line svg {
+  margin-top: 2px;
+  color: var(--accent);
+}
+.market-offer-pick {
+  max-width: 420px;
+}
+.market-offer-send > .btn,
+.market-request-status > .btn {
+  justify-self: start;
+}
+.market-consent {
+  align-items: flex-start;
+}
+.market-conversation-list,
 .market-message-list {
   display: grid;
-  gap: 12px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
+.market-conversation-list:empty {
+  display: none;
+}
+.market-conversation-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.market-conversation-row:last-child {
+  border-bottom: 0;
+}
+.market-conversation-row .btn[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.market-message-thread {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
 .market-message-list {
   max-height: 360px;
   overflow-y: auto;
+  padding: 4px 2px;
+  overscroll-behavior: contain;
 }
 .market-message-list li {
-  padding: 12px;
+  justify-self: start;
+  max-width: min(85%, 560px);
+  padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--panel);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--surface-subtle);
+}
+.market-message-list li.is-mine {
+  justify-self: end;
+  border-color: transparent;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--accent-subtle);
+}
+.market-message-list strong {
+  color: var(--ink);
+  font-size: 13px;
 }
 .market-message-list time {
   margin-left: 8px;
   color: var(--muted);
   font-size: 12px;
 }
-.market-message-list p {
+:root[data-theme] .market-message-list p {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 14px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.market-conversations textarea {
+.market-conversations textarea,
+.market-message-thread textarea {
   width: 100%;
   resize: vertical;
-}
-.market-conversation-row {
-  display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.market-conversation-row .market-broker {
-  flex: 1;
-  margin-top: 0;
-}
-.market-request-activity button {
-  min-height: 44px;
-}
-.market-updates time {
-  display: block;
-  margin-bottom: 12px;
-  color: var(--muted);
-}
-.market-match-checklist {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 8px 16px;
-}
-.market-match-checklist dt {
-  font-size: 12px;
-  color: var(--muted);
-}
-.market-match-checklist dd {
-  margin: 2px 0 0;
-  font-size: 13px;
-}
-.market-offer-list summary {
-  min-height: 44px;
-  align-content: center;
-  cursor: pointer;
-  color: var(--ink);
-}
-.market-offer-list summary:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
 }

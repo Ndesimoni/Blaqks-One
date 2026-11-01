@@ -1,14 +1,8 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { monthName } from './requestText.js';
 
-/** A `YYYY-MM` move-in month as "November 2026". */
-export const monthName = (month) => {
-  const date = new Date(`${month}-01T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return month;
-  return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-};
-
-/** One request's facts, worded once for a board card and a My requests row (packet MK2). */
+/** One request's facts, worded once for the request slider and the review before posting. */
 export function requestFacts(t, request) {
   const bedrooms = () => {
     if (request.bedrooms === null) return t('marketplaceRequests.board.noBedrooms');
@@ -62,7 +56,7 @@ export function requestFacts(t, request) {
 export function MarketplaceRequestFacts({ request }) {
   const { t } = useI18n();
   return (
-    <dl className="record-review-grid market-review">
+    <dl className="market-fields">
       {requestFacts(t, request).map(([label, value]) => (
         <div key={label}>
           <dt>{label}</dt>

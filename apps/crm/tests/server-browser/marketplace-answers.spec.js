@@ -138,7 +138,7 @@ test('brokers offer a property, message without a match, and reopen after select
       .click();
 
     await poster.page.getByRole('button', { name: 'Offers and messages' }).click();
-    await poster.page.getByRole('button', { name: 'Still available — reopen request' }).click();
+    await poster.page.getByRole('button', { name: 'Open a new round', exact: true }).click();
     await poster.page
       .getByRole('dialog')
       .getByRole('button', { name: 'Confirm', exact: true })

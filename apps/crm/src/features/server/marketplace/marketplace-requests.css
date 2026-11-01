@@ -1,141 +1,97 @@
-/* Client requests and the board (packet MK2), light and dark, 390 px first. */
+/* Board, My requests and Updates (packet MK2): header-style tabs and the poster's requests as
+   list rows with their actions. Light and dark, 390 px first. */
+.market-workspace {
+  display: grid;
+  min-width: 0;
+}
 .market-tabs {
   display: flex;
-  gap: 0.25rem;
+  gap: 4px;
+  margin-bottom: 18px;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 1rem;
   overflow-x: auto;
+  scrollbar-width: thin;
 }
 .market-tab {
+  flex: none;
+  min-height: 44px;
+  padding: 10px 14px;
   border: 0;
+  border-bottom: 2px solid transparent;
   background: none;
-  padding: 0.6rem 0.9rem;
+  color: var(--muted);
   font: inherit;
   font-weight: 600;
-  color: var(--muted);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
   white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.market-tab:hover {
+  color: var(--ink);
 }
 .market-tab.is-active {
+  border-bottom-color: var(--gold);
   color: var(--ink);
-  border-bottom-color: var(--accent);
+}
+.market-tab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
 }
 .market-panel,
-.market-board,
 .market-requests {
   display: grid;
-  gap: 1rem;
+  gap: 14px;
+  min-width: 0;
 }
-.market-board > .btn {
-  justify-self: start;
-}
-.market-filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 0.6rem;
-}
-.market-filter select {
-  width: 100%;
-}
-.market-board-list,
-.market-request-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0.75rem;
-}
-.market-board-card .market-card-head,
-.market-request-row .market-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-.market-card-head h4 {
-  margin: 0;
-  font-size: 1rem;
-}
-.market-chip {
-  display: inline-block;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  background: var(--accent-subtle);
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.market-chips {
+.market-toolbar {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.35rem;
-}
-.market-chip.is-own {
-  background: var(--primary);
-  color: var(--on-primary);
-}
-.market-chip.is-closed {
-  opacity: 0.65;
-}
-.market-chip.is-expired {
-  border: 1px dashed var(--line);
-  background: none;
-}
-.market-facts-line {
-  margin: 0.25rem 0;
-}
-.market-hint {
-  margin: 0.35rem 0 0;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.market-broker {
-  display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-top: 0.75rem;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+.market-toolbar .market-note {
+  flex: 1 1 280px;
+}
+.market-request-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
   padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
+  list-style: none;
 }
-.market-broker span span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.85rem;
+.market-request-row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 18px;
 }
-.market-empty {
-  margin: 0;
-  padding: 1.25rem;
-  border: 1px dashed var(--line);
-  border-radius: 0.75rem;
-  color: var(--muted);
+.market-request-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
-.market-notice {
-  margin: 0;
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.5rem;
-  background: var(--accent-subtle);
+.market-request-row .market-card-head {
+  justify-content: flex-start;
+}
+.market-row-client {
   font-weight: 600;
 }
-.market-band {
-  grid-column: 1 / -1;
+.market-request-row.is-closed,
+.market-request-row.is-expired {
+  box-shadow: none;
 }
-.market-consent {
-  align-items: flex-start;
-  margin: 0.75rem 0;
+.market-request-row.is-closed .market-request-main {
+  opacity: 0.8;
 }
-.field-wide {
-  grid-column: 1 / -1;
-}
-@media (min-width: 720px) {
-  .market-board-list,
-  .market-request-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (min-width: 900px) {
+  .market-request-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+  .market-request-actions {
+    justify-content: flex-end;
+    max-width: 420px;
   }
 }

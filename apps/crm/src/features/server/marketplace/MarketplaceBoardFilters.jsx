@@ -1,17 +1,30 @@
 import React from 'react';
+import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { propertyTypes } from './requestOptions.js';
+import { bands, emirateSlugs } from './requestsModel.js';
 
 const ANY = '';
+const BEDROOMS = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-/** The board's five filters, in a row that wraps on phones (packet MK2). */
-export function MarketplaceBoardFilters({ filters, onChange }) {
+/**
+ * The board's five filters as one filter bar that wraps on phones (packet MK2), with Clear
+ * filters once any is set. The server filters; this only holds the choices.
+ */
+export function MarketplaceBoardFilters({ filters, onChange, onClear }) {
   const { t } = useI18n();
   const set = (key) => (event) => onChange({ ...filters, [key]: event.target.value });
-  const field = (key, label, children) => (
+  const active = Object.values(filters).some((value) => value !== ANY);
+  const field = (key, label, any, options) => (
     <div className="field market-filter">
       <label htmlFor={`market-filter-${key}`}>{label}</label>
       <select id={`market-filter-${key}`} value={filters[key]} onChange={set(key)}>
-        {children}
+        <option value={ANY}>{any}</option>
+        {options.map(([value, text]) => (
+          <option key={value} value={value}>
+            {text}
+          </option>
+        ))}
       </select>
     </div>
   );
@@ -24,103 +37,45 @@ export function MarketplaceBoardFilters({ filters, onChange }) {
       {field(
         'purpose',
         t('marketplaceRequests.post.purpose'),
-        <>
-          <option value={ANY}>{t('marketplaceRequests.board.anyPurpose')}</option>
-          <option value="buy">{t('marketplaceRequests.board.purpose.buy')}</option>
-          <option value="rent">{t('marketplaceRequests.board.purpose.rent')}</option>
-        </>,
+        t('marketplaceRequests.board.anyPurpose'),
+        [
+          ['buy', t('marketplaceRequests.board.purpose.buy')],
+          ['rent', t('marketplaceRequests.board.purpose.rent')],
+        ],
       )}
       {field(
         'emirate',
         t('marketplaceRequests.post.emirate'),
-        <>
-          <option value={ANY}>{t('marketplaceRequests.board.anyEmirate')}</option>
-          {[
-            'dubai',
-            'abu-dhabi',
-            'sharjah',
-            'ajman',
-            'umm-al-quwain',
-            'ras-al-khaimah',
-            'fujairah',
-          ].map((slug) => (
-            <option key={slug} value={slug}>
-              {t(`marketplaceJoin.emirate.${slug}`)}
-            </option>
-          ))}
-        </>,
+        t('marketplaceRequests.board.anyEmirate'),
+        emirateSlugs.map((slug) => [slug, t(`marketplaceJoin.emirate.${slug}`)]),
       )}
       {field(
         'propertyType',
         t('marketplaceRequests.post.propertyType'),
-        <>
-          <option value={ANY}>{t('marketplaceRequests.board.anyType')}</option>
-          {[
-            'Apartment',
-            'Studio',
-            'Villa',
-            'Townhouse',
-            'Penthouse',
-            'Duplex',
-            'Loft',
-            'Serviced apartment',
-            'Hotel apartment',
-            'Office',
-            'Retail',
-            'Shop',
-            'Showroom',
-            'Warehouse',
-            'Industrial',
-            'Commercial building',
-            'Residential building',
-            'Plot',
-            'Land',
-            'Other',
-          ].map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </>,
+        t('marketplaceRequests.board.anyType'),
+        propertyTypes.map((name) => [name, name]),
       )}
       {field(
         'bedrooms',
         t('marketplaceRequests.post.bedrooms'),
-        <>
-          <option value={ANY}>{t('marketplaceRequests.board.anyBedrooms')}</option>
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-            <option key={count} value={String(count)}>
-              {count === 0
-                ? t('marketplaceRequests.board.studio')
-                : t('marketplaceRequests.board.bedrooms', { count })}
-            </option>
-          ))}
-        </>,
+        t('marketplaceRequests.board.anyBedrooms'),
+        BEDROOMS.map((count) => [
+          String(count),
+          count === 0
+            ? t('marketplaceRequests.board.studio')
+            : t('marketplaceRequests.board.bedrooms', { count }),
+        ]),
       )}
       {field(
         'band',
         t('marketplaceRequests.post.budgetLabel'),
-        <>
-          <option value={ANY}>{t('marketplaceRequests.board.anyBand')}</option>
-          {[
-            'buy_1m',
-            'buy_2m',
-            'buy_3m',
-            'buy_5m',
-            'buy_10m',
-            'buy_10m_plus',
-            'rent_50k',
-            'rent_100k',
-            'rent_150k',
-            'rent_250k',
-            'rent_500k',
-            'rent_500k_plus',
-          ].map((band) => (
-            <option key={band} value={band}>
-              {t(`marketplaceRequests.band.${band}`)}
-            </option>
-          ))}
-        </>,
+        t('marketplaceRequests.board.anyBand'),
+        bands.map((band) => [band, t(`marketplaceRequests.band.${band}`)]),
+      )}
+      {active && (
+        <Button variant="light" className="market-filters-clear" onClick={onClear}>
+          {t('marketplaceRequests.board.clear')}
+        </Button>
       )}
     </div>
   );

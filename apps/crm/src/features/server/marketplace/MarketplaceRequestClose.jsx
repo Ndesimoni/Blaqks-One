@@ -23,7 +23,11 @@ export function MarketplaceRequestClose({ request, onClose, onClosed }) {
     }
   };
   return (
-    <FinanceDialog title={t('marketplaceRequests.mine.closeTitle')} onClose={onClose}>
+    <FinanceDialog
+      title={t('marketplaceRequests.mine.closeTitle')}
+      onClose={onClose}
+      className="market-dialog-short"
+    >
       <p>{t('marketplaceRequests.mine.closeText')}</p>
       {error && (
         <p className="field-error" role="alert">

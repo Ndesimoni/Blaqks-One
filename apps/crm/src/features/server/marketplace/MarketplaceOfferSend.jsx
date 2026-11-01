@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useRecords } from '../../../hooks/useWorkspace.js';
 import { useSession } from '../../../hooks/useSession.js';
@@ -7,11 +7,15 @@ import { ListingView } from '../finance/ListingView.jsx';
 import { toProperty } from '../listingShares/listingShareLinks.js';
 import { MarketplaceMatchChecklist } from './MarketplaceMatchChecklist.jsx';
 
-/** The sender reviews a frozen snapshot before repeating its digest at submission. */
+/**
+ * Offering one of the sender's matching properties: pick, review the frozen snapshot with its
+ * ticks and what stays private, confirm, send. The digest is repeated at submission.
+ */
 export function MarketplaceOfferSend({ requestId, matches, onSent, onBusy }) {
   const { api, user } = useSession();
   const { entries } = useRecords();
   const { t } = useI18n();
+  const id = useId();
   const k = (key) => t(`marketplaceAnswers.${key}`);
   const [recordId, setRecordId] = useState('');
   const [review, setReview] = useState(null);
@@ -49,13 +53,13 @@ export function MarketplaceOfferSend({ requestId, matches, onSent, onBusy }) {
     }
   };
   return (
-    <section className="market-offer-send">
-      <h3>{k('matches')}</h3>
+    <section className="market-section market-offer-send" aria-labelledby={id}>
+      <h3 id={id}>{k('matches')}</h3>
       {!matches.length ? (
         <p>{k('noMatches')}</p>
       ) : (
         <>
-          <label className="field">
+          <label className="field market-offer-pick">
             <span>{k('chooseProperty')}</span>
             <select
               value={recordId}
@@ -88,8 +92,8 @@ export function MarketplaceOfferSend({ requestId, matches, onSent, onBusy }) {
               <MarketplaceMatchChecklist
                 checklist={matches.find((match) => match.recordId === recordId)?.checklist}
               />
-              <p className="market-hint">{k('privacy')}</p>
-              <label className="outside-share-check">
+              <p className="market-private-line">{k('privacy')}</p>
+              <label className="market-check market-consent">
                 <input
                   type="checkbox"
                   checked={checked}

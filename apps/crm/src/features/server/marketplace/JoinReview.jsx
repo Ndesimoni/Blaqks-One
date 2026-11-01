@@ -31,7 +31,7 @@ export function JoinReview({ draft, terms, busy, error, onJoin }) {
   return (
     <section className="market-step">
       <h3>{t('marketplaceJoin.join.review')}</h3>
-      <dl className="record-review-grid market-review">
+      <dl className="market-fields">
         {rows.map(([label, value]) => (
           <div key={label}>
             <dt>{label}</dt>
@@ -45,9 +45,11 @@ export function JoinReview({ draft, terms, busy, error, onJoin }) {
           {error}
         </p>
       )}
-      <Button onClick={onJoin} disabled={busy}>
-        {busy ? t('marketplaceJoin.join.joining') : t('marketplaceJoin.join.submit')}
-      </Button>
+      <div className="market-actions market-step-actions">
+        <Button onClick={onJoin} disabled={busy}>
+          {busy ? t('marketplaceJoin.join.joining') : t('marketplaceJoin.join.submit')}
+        </Button>
+      </div>
     </section>
   );
 }

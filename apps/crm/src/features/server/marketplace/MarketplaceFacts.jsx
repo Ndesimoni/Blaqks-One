@@ -37,7 +37,7 @@ export function MarketplaceFacts({ profile, head = [] }) {
   ];
   return (
     <>
-      <dl className="record-review-grid market-review">
+      <dl className="market-fields">
         {rows.map(([label, value]) => (
           <div key={label}>
             <dt>{label}</dt>

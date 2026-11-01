@@ -2,13 +2,16 @@ import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import './marketplace-stats.css';
 
-/** Small, factual marketplace history. Unknown metrics remain unknown rather than zero. */
+/**
+ * Small, factual marketplace history as figure tiles, never stars (broker marketplace §7).
+ * Unknown metrics remain unknown rather than zero, and disputes stay unavailable until MK5.
+ * `compact` folds the tiles behind the completed-deals count on a board card.
+ */
 export function MarketplaceStats({ stats, compact = false }) {
   const { t, format } = useI18n();
   const k = (key, values) => t(`marketplaceAgreement.${key}`, values);
   if (!stats) return null;
   const rows = [
-    [k('accepted'), format.number(stats.acceptedAgreements)],
     [k('completed'), format.number(stats.completedDeals)],
     [
       k('completionRate'),
@@ -24,11 +27,11 @@ export function MarketplaceStats({ stats, compact = false }) {
             hours: format.number(stats.averageResponseHours, { maximumFractionDigits: 1 }),
           }),
     ],
+    [k('accepted'), format.number(stats.acceptedAgreements)],
   ];
   const facts = (
     <>
-      <p className="market-hint">{k('statsScope')}</p>
-      <dl className="record-review-grid market-review">
+      <dl className="market-figures">
         {rows.map(([label, value]) => (
           <div key={label}>
             <dt>{label}</dt>
@@ -36,6 +39,7 @@ export function MarketplaceStats({ stats, compact = false }) {
           </div>
         ))}
       </dl>
+      <p className="market-hint">{k('statsScope')}</p>
       <p className="market-hint">{k('responseScope')}</p>
       {stats.responseSamples !== null && (
         <p className="market-hint">{k('samples', { count: stats.responseSamples })}</p>
@@ -49,7 +53,7 @@ export function MarketplaceStats({ stats, compact = false }) {
       {facts}
     </details>
   ) : (
-    <section className="market-stats" aria-label={k('stats')}>
+    <section className="market-stats market-section" aria-label={k('stats')}>
       <h3>{k('stats')}</h3>
       {facts}
     </section>

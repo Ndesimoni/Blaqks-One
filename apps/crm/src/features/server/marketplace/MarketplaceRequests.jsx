@@ -41,9 +41,9 @@ export function MarketplaceRequests() {
 
   return (
     <div className="market-requests">
-      <p className="market-hint">{t('marketplaceRequests.mine.text')}</p>
-      <div className="market-actions">
-        <Button onClick={() => setDialog({ name: 'post' })}>
+      <div className="market-toolbar">
+        <p className="market-note">{t('marketplaceRequests.mine.text')}</p>
+        <Button icon="plus" onClick={() => setDialog({ name: 'post' })}>
           {t('marketplaceRequests.mine.post')}
         </Button>
       </div>
@@ -64,10 +64,10 @@ export function MarketplaceRequests() {
         </p>
       )}
       {!list.loading && !list.error && !list.requests.length && (
-        <section className="market-empty">
-          <h4>{t('marketplaceRequests.mine.emptyTitle')}</h4>
+        <div className="market-empty">
+          <strong>{t('marketplaceRequests.mine.emptyTitle')}</strong>
           <p>{t('marketplaceRequests.mine.emptyText')}</p>
-        </section>
+        </div>
       )}
       <ul className="market-request-list">
         {list.requests.map((request) => (
@@ -85,6 +85,7 @@ export function MarketplaceRequests() {
       {dialog.name === 'activity' && editing && (
         <MarketplaceRequestActivity
           requestId={editing.id}
+          summary={editing}
           onClose={() => setDialog({ name: '' })}
           onChanged={list.retry}
         />

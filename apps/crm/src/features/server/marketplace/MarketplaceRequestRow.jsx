@@ -1,6 +1,11 @@
 import React from 'react';
+import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { MarketplaceRequestTags } from './MarketplaceRequestTags.jsx';
+import { requestLine, requestTitle } from './requestText.js';
+
+const TONES = { open: 'green', full: 'amber', paused: 'amber', expired: 'red', closed: 'slate' };
 
 /** The renew button is offered in the last seven days, or once the request has expired. */
 const renewSoon = (request) => {
@@ -10,71 +15,57 @@ const renewSoon = (request) => {
   return request.canRenew && left <= 7 * 86_400_000;
 };
 
-/** One of the poster's own requests, with what they may do next (packet MK2). */
+/** One of the poster's own requests as a list row, with what they may do next (packet MK2). */
 export function MarketplaceRequestRow({ request, busy, onEdit, onRenew, onClose, onActivity }) {
   const { t, format } = useI18n();
   const ends = format.date(request.expiresAt) || request.expiresAt;
   const renewable = renewSoon(request);
+  const waiting = Boolean(busy);
   return (
     <li className={`market-card market-request-row is-${request.state}`}>
-      <div className="market-card-head">
-        <h4>{request.propertyType}</h4>
-        <span className={`market-chip is-${request.state}`}>
-          {t(`marketplaceRequests.mine.state.${request.state}`)}
-        </span>
+      <div className="market-request-main">
+        <div className="market-card-head">
+          <h3>{requestTitle(t, request)}</h3>
+          <Badge tone={TONES[request.state]}>
+            {t(`marketplaceRequests.mine.state.${request.state}`)}
+          </Badge>
+        </div>
+        <p className="market-card-line">{requestLine(t, request)}</p>
+        <p className="market-row-client">
+          {request.clientName
+            ? t('marketplaceRequests.mine.client', { name: request.clientName })
+            : t('marketplaceRequests.mine.clientGone')}
+        </p>
+        <MarketplaceRequestTags request={request} />
+        <p className="market-hint">{t('marketplaceRequests.mine.ends', { date: ends })}</p>
       </div>
-      <p className="market-facts-line">
-        {request.clientName
-          ? t('marketplaceRequests.mine.client', { name: request.clientName })
-          : t('marketplaceRequests.mine.clientGone')}
-      </p>
-      <p className="market-facts-line">
-        {t(`marketplaceRequests.board.purpose.${request.purpose}`)} ·{' '}
-        {t(`marketplaceJoin.emirate.${request.emirate}`)} ·{' '}
-        {t(`marketplaceRequests.band.${request.budgetBand}`)}
-      </p>
-      <p className="market-hint">{t('marketplaceRequests.mine.ends', { date: ends })}</p>
-      <div className="market-actions">
-        <Button variant="light" onClick={onActivity}>
+      <div className="market-actions market-request-actions">
+        <Button variant={request.state === 'expired' ? 'light' : 'primary'} onClick={onActivity}>
           {t('marketplaceAnswers.open')}
         </Button>
-      </div>
-      {request.state === 'paused' && (
-        <div className="market-actions">
-          <Button variant="light" onClick={onClose} disabled={Boolean(busy)}>
-            {t('marketplaceRequests.mine.close')}
-          </Button>
-        </div>
-      )}
-      {request.state === 'open' && (
-        <div className="market-actions">
-          <Button variant="light" onClick={onEdit} disabled={Boolean(busy)}>
+        {request.state === 'open' && (
+          <Button variant="light" onClick={onEdit} disabled={waiting}>
             {t('marketplaceRequests.mine.edit')}
           </Button>
-          <Button variant="light" onClick={onClose} disabled={Boolean(busy)}>
+        )}
+        {request.state === 'expired' && request.canRenew && (
+          <Button onClick={onRenew} disabled={waiting}>
+            {t('marketplaceRequests.mine.renew')}
+          </Button>
+        )}
+        {['open', 'paused', 'expired'].includes(request.state) && (
+          <Button variant="light" onClick={onClose} disabled={waiting}>
             {t('marketplaceRequests.mine.close')}
           </Button>
-          {renewable && (
-            <Button variant="light" onClick={onRenew} disabled={Boolean(busy)}>
-              {busy === 'renew'
-                ? t('marketplaceRequests.post.saving')
-                : t('marketplaceRequests.mine.renew')}
-            </Button>
-          )}
-        </div>
-      )}
-      {request.state === 'expired' && (
-        <div className="market-actions">
-          {request.canRenew && (
-            <Button onClick={onRenew} disabled={Boolean(busy)}>
-              {t('marketplaceRequests.mine.renew')}
-            </Button>
-          )}
-          <Button variant="light" onClick={onClose} disabled={Boolean(busy)}>
-            {t('marketplaceRequests.mine.close')}
+        )}
+        {request.state === 'open' && renewable && (
+          <Button variant="light" onClick={onRenew} disabled={waiting}>
+            {busy === 'renew'
+              ? t('marketplaceRequests.post.saving')
+              : t('marketplaceRequests.mine.renew')}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </li>
   );
 }

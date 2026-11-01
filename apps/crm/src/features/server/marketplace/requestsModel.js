@@ -71,7 +71,7 @@ export function readRequirements(value) {
 }
 
 /** One card's shared facts, on the board and in My requests. */
-function readFacts(value) {
+export function readFacts(value) {
   if (!isObject(value)) throw invalid();
   return {
     id: id(value.id),

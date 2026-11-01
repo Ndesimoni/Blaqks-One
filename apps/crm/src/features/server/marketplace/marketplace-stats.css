@@ -1,20 +1,77 @@
-.market-stats summary {
-  min-height: 44px;
-  align-content: center;
-  cursor: pointer;
-  color: var(--ink);
-  font-size: 13px;
+/* Marketplace facts as figure tiles (broker marketplace §7: facts, never stars), the board
+   card's folded facts, and the released agreement's contacts and links (MK4). */
+.market-stats {
+  display: grid;
+  gap: 10px;
 }
-.market-stats summary:focus-visible {
+.market-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+  gap: 8px;
+  margin: 0;
+}
+.market-figures > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.market-figures dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.market-figures dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+details.market-stats > summary {
+  padding-block: 12px;
+  color: var(--muted);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+details.market-stats > summary:hover {
+  color: var(--ink);
+}
+details.market-stats > summary:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+  border-radius: 6px;
+}
+details.market-stats .market-figures {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+details.market-stats .market-figures dd {
+  font-size: 16px;
+}
+:root[data-theme] .marketplace-page .market-released {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--market-ok-subtle);
+  color: var(--market-ok);
+  font-size: 13px;
+  font-weight: 600;
 }
 .market-agreement a {
   color: var(--accent);
+  font-weight: 600;
   text-underline-offset: 3px;
 }
 .market-agreement dd a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+.market-contacts {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
 }

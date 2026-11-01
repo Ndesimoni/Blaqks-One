@@ -57,15 +57,17 @@ export function MarketplaceConversations({
   };
   const conversations = list.value?.conversations || [];
   return (
-    <section className="market-conversations" aria-label={k('messages')}>
+    <section className="market-section market-conversations" aria-label={k('messages')}>
       <h3>{k('messages')}</h3>
       {list.loading && <p role="status">{k('loading')}</p>}
       {list.error && <p role="alert">{list.error}</p>}
-      {!list.loading && !conversations.length && <p>{k('noConversations')}</p>}
+      {!list.loading && !conversations.length && (
+        <p className="market-hint">{k('noConversations')}</p>
+      )}
       {canMessage && !paused && <p className="market-hint">{k('noMatches')}</p>}
-      <div className="market-actions">
+      <ul className="market-conversation-list">
         {conversations.map((conversation) => (
-          <div className="market-conversation-row" key={conversation.id}>
+          <li className="market-conversation-row" key={conversation.id}>
             <button
               type="button"
               className="market-broker"
@@ -92,14 +94,16 @@ export function MarketplaceConversations({
             >
               {k('openConversation')}
             </Button>
-          </div>
+          </li>
         ))}
-        {canMessage && !paused && !conversations.length && (
+      </ul>
+      {canMessage && !paused && !conversations.length && (
+        <div className="market-actions">
           <Button variant="light" onClick={() => setComposing(true)}>
             {k('messagePoster')}
           </Button>
-        )}
-      </div>
+        </div>
+      )}
       {composing && canMessage && !paused && (
         <>
           <p className="market-hint">{k('messageHint')}</p>
@@ -114,9 +118,11 @@ export function MarketplaceConversations({
               onChange={(event) => setBody(event.target.value)}
             />
           </label>
-          <Button onClick={start} disabled={busy || !body.trim()}>
-            {k('send')}
-          </Button>
+          <div className="market-actions">
+            <Button onClick={start} disabled={busy || !body.trim()}>
+              {k('send')}
+            </Button>
+          </div>
         </>
       )}
       {error && (

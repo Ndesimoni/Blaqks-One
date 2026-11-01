@@ -28,9 +28,9 @@ export function JoinTerms({ terms, ticks, consent, onTick, onConsent, part }) {
     <>
       <section className="market-step">
         <h3>{t('marketplaceJoin.join.commitments')}</h3>
-        <ul className="market-checklist">
+        <ul className="market-choices">
           {terms.commitments.map((line, index) => (
-            <li key={line} className="is-met">
+            <li key={line}>
               <label className="market-check">
                 <input
                   type="checkbox"

@@ -6,12 +6,12 @@ import { MarketplaceNotifications } from './MarketplaceNotifications.jsx';
 
 const TABS = ['board', 'mine', 'updates'];
 
-/** Board and My requests, below the member's own profile (packet MK2). */
+/** Board, My requests and Updates as header-style tabs above the member's profile (MK2). */
 export function MarketplaceRequestTabs() {
   const { t } = useI18n();
   const [tab, setTab] = useState('board');
   return (
-    <section className="market-card">
+    <section className="market-workspace">
       <div className="market-tabs" role="tablist" aria-label={t('marketplaceRequests.board.title')}>
         {TABS.map((key) => (
           <button

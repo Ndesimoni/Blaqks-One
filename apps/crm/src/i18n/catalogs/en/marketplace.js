@@ -2,6 +2,8 @@
 export default {
   intro:
     'Post what your clients are looking for; brokers with a matching property answer privately.',
+  introTitle: 'The broker marketplace',
+  privacy: 'Client names and contact details stay hidden until both brokers accept a split.',
   loading: 'Loading the marketplace…',
   retry: 'Try again',
   'checklist.title': 'What Blaqks One looks for',
@@ -16,11 +18,12 @@ export default {
   'checklist.recentMet': 'Something changed in the last 30 days',
   'checklist.recentMissing': 'Nothing changed in the last 30 days',
   'checklist.count': '{count} of {need}',
+  'checklist.progress': '{met} of {total} met',
   'checklist.met': 'Done',
   'checklist.notMet': 'Not yet',
   'notApplied.title': 'Not on the marketplace yet',
   'notApplied.text': 'When the checklist is complete, your company can ask Blaqks One for access.',
-  'notApplied.incomplete': 'Complete every line below to apply.',
+  'notApplied.incomplete': 'Complete every line to apply.',
   'notApplied.apply': 'Apply to the marketplace',
   'notApplied.applying': 'Sending your application…',
   'notApplied.staff': 'Ask your Admin to apply.',

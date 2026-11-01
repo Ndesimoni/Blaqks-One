@@ -3,19 +3,22 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import './marketplace.css';
+import './marketplace-gate.css';
 import './marketplace-join.css';
 import './marketplace-profile.css';
 import './marketplace-requests.css';
+import './marketplace-board.css';
 import './marketplace-picker.css';
+import './marketplace-slider.css';
 import { MarketplaceApproved } from './MarketplaceApproved.jsx';
 import { MarketplaceNotApplied } from './MarketplaceNotApplied.jsx';
 import { MarketplaceWaiting } from './MarketplaceWaiting.jsx';
 import { useMarketplaceStatus } from './useMarketplace.js';
 
 /**
- * The Marketplace screen for company members (broker marketplace MK1): where the company
- * stands, the checklist it must meet, the Admin's application and, once approved, the company
- * switch, joining and the member's own profile. Client requests arrive with MK2.
+ * The Marketplace screen for company members (broker marketplace MK1–MK4, restyled to the
+ * approved mockup): where the company stands, the checklist it must meet, the Admin's
+ * application and, once approved, joining, the board, the member's requests and profile.
  */
 export function ServerMarketplace() {
   const { user } = useSession();

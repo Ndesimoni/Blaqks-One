@@ -1,5 +1,53 @@
-/* Ticks in the join and terms steps (broker marketplace MK1): emirates, property types,
-   commitments and the consent, each a row with its label, never a bare field-sized box. */
+/* Joining (broker marketplace MK1): the stepper as step chips, the profile ticks, the
+   commitments as choice rows, the terms box and the review. Every tick keeps its label. */
+.market-join {
+  gap: 16px;
+}
+:root[data-theme] .market-join .form-stepper {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.market-join .form-progress {
+  margin-bottom: 8px;
+}
+.market-join .form-stepper .form-step-list > li {
+  flex: none;
+}
+:root[data-theme] .market-join .form-step-list button {
+  inline-size: auto;
+  min-height: 36px;
+  padding: 6px 14px 6px 8px;
+  border-radius: 999px;
+  font-size: 12.5px;
+}
+:root[data-theme] .market-join .form-step-list button[aria-current='step'] {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+:root[data-theme] .market-join .form-step-list button:not(:disabled, [aria-current]) {
+  border-color: transparent;
+  background: var(--market-ok-subtle);
+  color: var(--market-ok);
+}
+.market-join .form-step-number {
+  inline-size: 22px;
+  block-size: 22px;
+  font-size: 11px;
+}
+.market-join-body,
+.market-step {
+  display: grid;
+  gap: 14px;
+}
+.market-step {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.market-form {
+  row-gap: 20px;
+}
 .market-fieldset {
   min-width: 0;
   margin: 0;
@@ -14,8 +62,15 @@
 }
 .market-checks {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 140px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
   gap: 8px;
+}
+.market-choices {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .market-check {
   display: flex;
@@ -24,15 +79,22 @@
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--panel);
   color: var(--ink);
   font-size: 14px;
   line-height: 1.45;
   cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease);
+}
+.market-check:hover {
+  border-color: var(--muted);
 }
 .market-check:has(input:checked) {
-  border-color: var(--primary);
+  border-color: var(--gold);
+  background: var(--accent-subtle);
 }
 .market-check:focus-within {
   outline: 2px solid var(--focus);
@@ -51,4 +113,28 @@
   border-radius: 4px;
   background: none;
   accent-color: var(--primary);
+}
+.market-terms {
+  max-height: 320px;
+  overflow: auto;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.market-terms:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.market-card .market-reason {
+  border: 1px dashed var(--gold);
+}
+@media (max-width: 750px) {
+  .market-join .form-step-label {
+    display: inline;
+  }
 }
