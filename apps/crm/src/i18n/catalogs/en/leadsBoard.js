@@ -14,4 +14,7 @@ export default {
   next: 'Next follow-up {date}',
   hot: 'Hot',
   priority: 'High priority',
+  source: 'Source',
+  anySource: 'Any source',
+  mine: 'Showing the leads assigned to you.',
 };

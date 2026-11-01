@@ -49,6 +49,14 @@ export function leadNeed(record) {
     .join(' · ');
 }
 
+/** The mockup's "Looking for" column on the Leads list: display only, from leadNeed. */
+export const lookingForColumn = Object.freeze({
+  key: 'looking_for',
+  name: 'Looking for',
+  virtual: true,
+  value: leadNeed,
+});
+
 /** The highest budget as a number, or null when none is recorded. */
 export function leadBudget(record) {
   const value = Number(get(record, 'Maximum budget AED'));

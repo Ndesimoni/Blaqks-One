@@ -31,6 +31,7 @@ export function RecordTableView({
   tableLabel,
   gridRows = false,
   selection = null,
+  view = module,
 }) {
   const scroll = useRef(null);
   const wide = useWideTable(scroll);
@@ -54,7 +55,7 @@ export function RecordTableView({
             {pick.map((f) =>
               f.virtual ? (
                 <th key={f.key} scope="col">
-                  {columnHeading(module, f.name)}
+                  {columnHeading(view, f.name)}
                 </th>
               ) : (
                 <th key={f.key} scope="col" aria-sort={ariaSort(sort, f)}>
@@ -69,7 +70,7 @@ export function RecordTableView({
                       setPage(0);
                     }}
                   >
-                    {columnHeading(module, f.name)}{' '}
+                    {columnHeading(view, f.name)}{' '}
                     {sort.key === f.key && (
                       <Icon name={sort.direction === 'asc' ? 'up' : 'down'} size={12} />
                     )}

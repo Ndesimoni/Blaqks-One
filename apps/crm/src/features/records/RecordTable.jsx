@@ -37,6 +37,8 @@ function RecordTable({
   emptyAction,
   gridRows = false,
   selectionActions = null,
+  view = module,
+  added = [],
 }) {
   const records = useRecords();
   const { data } = records;
@@ -45,7 +47,7 @@ function RecordTable({
   const cards = useMediaQuery(cardQuery);
 
   const columns = schema(module);
-  const fields = gridFields(module, records.gridColumns?.[module]);
+  const fields = gridFields(module, [...(records.gridColumns?.[module] || []), ...added]);
   const pick = (columnNames || preferredCols[module] || [])
     .map((name) => fields.find((f) => f.name === name))
     .filter(Boolean);
@@ -71,6 +73,7 @@ function RecordTable({
             current={current}
             pick={pick}
             identity={columns[0]}
+            view={view}
             readOnly={readOnly}
             onOpen={(record) => dispatchRow(module, record)}
           />
@@ -89,6 +92,7 @@ function RecordTable({
             tableLabel={tableLabel}
             gridRows={gridRows}
             selection={selecting ? selection : null}
+            view={view}
           />
         )}
         {!arr.length && (

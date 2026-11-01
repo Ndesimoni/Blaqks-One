@@ -88,19 +88,23 @@ test('Leads read as one directory with a compact source filter and one primary a
       .getByText('Pilot lead Alpha'),
   ).toBeVisible();
 
-  const sources = page.getByRole('group', { name: 'Filter leads by source', exact: true });
-  const notRecorded = sources.getByRole('button', { name: /^Not recorded \d+$/ });
-  await expect(notRecorded).toBeVisible();
-  await notRecorded.click();
-  await expect(notRecorded).toHaveAttribute('aria-pressed', 'true');
+  // The mockup's presets lead the filter row; Source (with counts) and Lead stage stay as pills.
+  const presets = page.getByRole('group', { name: 'Filter leads', exact: true });
+  for (const name of ['New this week', 'Hot', 'From the website'])
+    await expect(presets.getByRole('button', { name, exact: true })).toBeVisible();
   const clear = page.getByRole('button', { name: 'Clear filters', exact: true });
-  await expect(clear).toBeEnabled();
+  await expect(clear).toHaveCount(0);
+  const source = page.getByRole('combobox', { name: 'Source', exact: true });
+  await expect(source.locator('option', { hasText: /^Not recorded \(\d+\)$/ })).toHaveCount(1);
+  await source.selectOption('Not recorded');
+  await expect(source).toHaveValue('Not recorded');
   const stage = page.getByRole('combobox', { name: 'Lead stage', exact: true });
   await stage.selectOption('New');
   await expect(stage).toHaveValue('New');
   await clear.click();
-  await expect(clear).toBeDisabled();
+  await expect(clear).toHaveCount(0);
   await expect(stage).toHaveValue('');
+  await expect(source).toHaveValue('');
 
   await views.getByRole('button', { name: 'List', exact: true }).click();
   const pager = page.getByRole('navigation', { name: 'Leads pages' });

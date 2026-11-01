@@ -111,7 +111,8 @@ export function ServerContent({ owner }) {
   const page = (toolbarExtras, selectionActions) => {
     if (route === 'Viewings') return <ViewingsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Follow-ups') return <FollowUpsPage toolbarExtras={toolbarExtras} />;
-    if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
+    if (route === 'Leads')
+      return <LeadsPage toolbarExtras={toolbarExtras} selectionActions={selectionActions} />;
     if (route === 'Contacts')
       return <ContactsPage toolbarExtras={toolbarExtras} selectionActions={selectionActions} />;
     if (route === 'Properties') return <PropertyDirectory toolbarExtras={toolbarExtras} />;

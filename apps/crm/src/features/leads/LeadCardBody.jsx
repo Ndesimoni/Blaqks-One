@@ -11,10 +11,11 @@ import './leads-board.css';
 const nextField = schema('Clients').find((field) => field.name === 'Next follow-up auto');
 
 /**
- * A lead's Kanban card: name, what they want, budget, next follow-up, source and tier.
- * The whole body opens the lead's details; the board adds the move control beside it.
+ * A lead's Kanban card as the mockup's: name, what they want, then budget and agent on one
+ * line; our next follow-up, source and tier tags stay below. The whole body opens the lead's
+ * details; the board adds the move control beside it.
  */
-export function LeadCardBody({ record, data, name, onOpen }) {
+export function LeadCardBody({ record, data, name, agent = '', onOpen }) {
   const { t } = useI18n();
   const need = leadNeed(record);
   const budget = leadBudget(record);
@@ -30,8 +31,13 @@ export function LeadCardBody({ record, data, name, onOpen }) {
     >
       <strong className="lead-card-name">{name}</strong>
       {need && <span className="lead-card-need">{need}</span>}
-      {budget !== null && (
-        <span className="lead-card-budget">{t('leadsBoard.budget', { amount: AED(budget) })}</span>
+      {(budget !== null || agent) && (
+        <span className="lead-card-meta">
+          <span className="lead-card-budget">
+            {budget !== null && t('leadsBoard.budget', { amount: AED(budget) })}
+          </span>
+          {agent && <span className="lead-card-agent">{agent}</span>}
+        </span>
       )}
       {next !== '—' && (
         <span className="lead-card-next">{t('leadsBoard.next', { date: next })}</span>

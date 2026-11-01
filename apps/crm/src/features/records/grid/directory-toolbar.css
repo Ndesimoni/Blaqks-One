@@ -17,7 +17,7 @@
   grid-column: 1;
 }
 .record-directory > .grid-filterbar,
-.leads-page > .lead-source-bar {
+.leads-page > .grid-filterbar {
   grid-column: 2;
 }
 :root[data-theme] .record-directory-head {
@@ -38,7 +38,7 @@
   .record-directory > .record-directory-head,
   .record-directory > .grid-filterbar,
   .leads-page > .record-directory-head,
-  .leads-page > .lead-source-bar {
+  .leads-page > .grid-filterbar {
     grid-column: 1 / -1;
   }
 }

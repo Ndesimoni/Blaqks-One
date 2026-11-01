@@ -24,7 +24,10 @@ export function LeadsBoard({
   emptyAction,
 }) {
   const { t } = useI18n();
-  const { data } = useRecords();
+  const leadRecords = useRecords();
+  const { data } = leadRecords;
+  // The mockup's card shows each lead's agent (connected Clients' Agent column).
+  const agent = leadRecords.gridColumns?.Clients?.find((field) => field.name === 'Agent');
   const actions = useWorkspaceActions();
   const { setToast } = useWorkspaceView();
   const [saving, setSaving] = useState('');
@@ -75,6 +78,7 @@ export function LeadsBoard({
           record={record}
           data={data}
           name={nameOf(record)}
+          agent={agent?.value(record) || ''}
           onOpen={() => actions.dispatchRow('Clients', record)}
         />
       )}

@@ -10,6 +10,12 @@ const headings = {
     'Property title auto': 'Property',
     'Client response': 'Status',
   },
+  Leads: {
+    'Full name': 'Lead',
+    'Maximum budget AED': 'Budget',
+    'Lead stage': 'Stage',
+    'Lead source': 'Source',
+  },
   Viewings: {
     'Appointment date & time': 'When',
     'Property title auto': 'Viewing',

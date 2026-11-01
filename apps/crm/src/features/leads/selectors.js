@@ -1,15 +1,17 @@
 import { OPTIONS } from '../../config/fields.js';
+import { leadTier } from '../../lib/crm.js';
+import { shiftDay } from '../../lib/dubaiDate.js';
 import { get } from '../../lib/records.js';
 
-/** One directory row reads source, stage, contact method, campaign and the next task (UI4a). */
-export const leadColumns = [
-  'Client ID',
-  'Full name',
-  'Lead stage',
-  'Lead source',
-  'Phone',
-  'Campaign reference',
-  'Next follow-up auto',
+/**
+ * The approved mockup's Leads presets. The first reads "My leads" for someone who sees only
+ * their own and "All leads" for the team; it never narrows what the server returned.
+ */
+export const leadPresets = (mine) => [
+  mine ? 'My leads' : 'All leads',
+  'New this week',
+  'Hot',
+  'From the website',
 ];
 
 const key = (value) => value.toLowerCase();
@@ -22,8 +24,22 @@ export function leadFieldValue(record, field) {
   );
 }
 
-export function matchesLeadFilters(record, { source = '', stage = '' } = {}) {
+/** Leads added since Monday of the current Dubai week (`today` is `YYYY-MM-DD`). */
+function addedThisWeek(record, today) {
+  const added = String(get(record, 'Date added') ?? '').slice(0, 10);
+  const weekday = new Date(`${today}T00:00:00Z`).getUTCDay();
+  return Boolean(added) && added >= shiftDay(today, -((weekday + 6) % 7)) && added <= today;
+}
+
+const presetMatchers = {
+  'New this week': addedThisWeek,
+  Hot: (record) => leadTier(record) === 'Hot',
+  'From the website': (record) => key(leadFieldValue(record, 'Lead source')) === 'website',
+};
+
+export function matchesLeadFilters(record, { preset = '', source = '', stage = '', today } = {}) {
   return (
+    (!presetMatchers[preset] || presetMatchers[preset](record, today)) &&
     (!source || key(leadFieldValue(record, 'Lead source')) === key(source)) &&
     (!stage || key(leadFieldValue(record, 'Lead stage')) === key(stage))
   );
