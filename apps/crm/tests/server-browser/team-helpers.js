@@ -30,7 +30,11 @@ export async function activateInNewContext(browser, link, email, password = 'Tea
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto(link);
-  await expect(page.getByRole('heading', { name: 'Join your team' })).toBeVisible();
+  // A brand-new browser loads the whole development bundle first; under parallel workers
+  // that cold start can pass five seconds before the page renders (the API answers in ms).
+  await expect(page.getByRole('heading', { name: 'Join your team' })).toBeVisible({
+    timeout: 15_000,
+  });
   await page.getByLabel('Choose password').fill(password);
   await page.getByLabel('Confirm password').fill(password);
   await page.getByRole('button', { name: 'Activate account', exact: true }).click();

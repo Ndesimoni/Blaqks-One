@@ -8,6 +8,7 @@ import { TeamPersonFields } from './TeamPersonFields.jsx';
 import { TeamAccessFields } from './TeamAccessFields.jsx';
 import { TeamMemberReview } from './TeamMemberReview.jsx';
 import { blankMember, memberError, memberPayload, teamSteps } from './model.js';
+import './team-panel.css';
 
 export function TeamMemberDialog({ member, roles, workspaceId, canInviteAdmin, onClose, onSaved }) {
   const { api } = useSession();
@@ -75,7 +76,12 @@ export function TeamMemberDialog({ member, roles, workspaceId, canInviteAdmin, o
     }
   };
   return (
-    <Drawer className="connected-team-dialog" titleId="team-member-title" onClose={close}>
+    <Drawer
+      className="connected-team-dialog"
+      placement="right"
+      titleId="team-member-title"
+      onClose={close}
+    >
       <div className="drawer-top">
         <div>
           <h2 id="team-member-title">{member ? 'Edit teammate' : 'Invite teammate'}</h2>
