@@ -12,6 +12,7 @@ export default {
   showBar: 'Show the bottom bar',
   sectionsOf: '{product} sections',
   tabs: 'Section tabs',
+  'tabs.allClients': 'All clients',
   personal: 'Personal',
   hideSections: 'Hide the section sidebar',
   showSections: 'Show the section sidebar',

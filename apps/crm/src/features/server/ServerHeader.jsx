@@ -18,7 +18,7 @@ import './products/frame-identity.css';
  * current product, the messenger, notifications, the theme and the account menu. The company
  * is named in the section sidebar, so no workspace panel is needed on each page.
  */
-export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenger }) {
+export function ServerHeader({ product, section, sidebarOpen, onToggleSidebar, onMessenger }) {
   const { t } = useI18n();
   const { user } = useSession();
   const { route } = useNavigation();
@@ -48,7 +48,7 @@ export function ServerHeader({ product, sidebarOpen, onToggleSidebar, onMessenge
             <Icon name="panel" size={20} />
           </button>
         )}
-        <HeaderTitle user={user} route={route} product={product} />
+        <HeaderTitle user={user} route={route} product={product} section={section} />
       </div>
       <div className="top-actions">
         <HeaderSearch />

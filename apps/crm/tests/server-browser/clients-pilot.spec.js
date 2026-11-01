@@ -3,7 +3,7 @@ import { expect, test } from './fixtures.js';
 import { addClient, signIn } from './helpers.js';
 import { actions, assignTeam, held, setGrants } from './permissions-fixtures.js';
 
-const heading = 'Clients & requirements';
+const heading = 'Clients';
 const viewports = [
   { width: 1280, height: 800, label: '1280' },
   { width: 390, height: 844, label: '390' },

@@ -62,6 +62,7 @@ export function ServerShell({ owner, workspaces }) {
       <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
         <ServerHeader
           product={nav.here?.product}
+          section={nav.here?.section?.key}
           sidebarOpen={nav.sectionsVisible}
           onToggleSidebar={nav.here ? nav.toggleSidebar : null}
           onMessenger={openMessenger}

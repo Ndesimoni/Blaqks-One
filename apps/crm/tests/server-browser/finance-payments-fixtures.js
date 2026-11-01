@@ -23,12 +23,10 @@ export async function approvalTeam(prefix) {
   return { ...team, people };
 }
 
-const headings = { payments: 'Commission receipts', expenses: 'Business expenses' };
-
 /** Opens Payments or Expenses (optionally on the approval queue) and waits for the list. */
 export async function openEntries(page, kind, { queue = false } = {}) {
   await page.goto(`/#/${kind}${queue ? '?q=awaiting-approval' : ''}`);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(headings[kind]);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Deals & money');
   await expect(page.getByRole('region', { name: /connection status/ })).toHaveCount(0);
   await expect(page.getByRole('status').filter({ hasText: /^Loading/ })).toHaveCount(0);
 }

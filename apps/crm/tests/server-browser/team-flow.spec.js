@@ -32,12 +32,16 @@ test('Admin invites a colleague with multiple positions who signs in to the shar
   );
   const staff = await activateInNewContext(browser, link, 'shared-staff@browser-team.test');
   try {
-    await expect(staff.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { level: 1, name: 'Clients', exact: true }),
+    ).toBeVisible();
     // Staff see assigned records only, so the Admin hands this client to the new colleague.
     const staffId = (await session(staff.page)).user.id;
     await assignInBrowser(page, 'Clients', 'client_id', 'BROWSER-TEAM-CLIENT', staffId);
     await staff.page.reload();
-    await expect(staff.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { level: 1, name: 'Clients', exact: true }),
+    ).toBeVisible();
     await staff.page.getByLabel('Search Clients', { exact: true }).fill('BROWSER-TEAM-CLIENT');
     await expect(staff.page.getByText('Shared team client', { exact: true })).toBeVisible();
     await expect(staff.page.getByRole('button', { name: 'Team', exact: true })).toHaveCount(0);
@@ -77,7 +81,9 @@ test('Super Admin invites an Admin with a separate workspace and Admin creation 
   const link = await finishInvitation(page, dialog);
   const admin = await activateInNewContext(browser, link, 'separate-admin@browser-team.test');
   try {
-    await expect(admin.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+    await expect(
+      admin.page.getByRole('heading', { level: 1, name: 'Clients', exact: true }),
+    ).toBeVisible();
     const identity = await session(admin.page);
     expect(identity.user.roleId).toBe('admin');
     expect(identity.user.workspaceId).toBe(identity.user.id);

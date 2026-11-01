@@ -21,6 +21,10 @@ const placesOf = (name) =>
       .map((section) => ({ product: product.key, section })),
   );
 
+/** The top bar's title for a route: its section's name, as the approved mockup shows. */
+export const sectionLabelOf = (name) =>
+  labels[`sections.${placesOf(name)[0]?.section.key}`] || name;
+
 /**
  * Opens a route the way a person would: the product on the rail, the section in the
  * sidebar, then the header tab when the section holds several routes. On narrow screens
@@ -28,7 +32,11 @@ const placesOf = (name) =>
  */
 /** A route's header tab label where it differs from the route name (website routes, NAV). */
 export const tabLabelOf = (name) =>
-  ({ 'Platform website': 'General site', 'Platform companies': 'Companies' })[name] || name;
+  ({
+    Clients: 'All clients',
+    'Platform website': 'General site',
+    'Platform companies': 'Companies',
+  })[name] || name;
 
 export async function openPage(page, name, { tabLabel = tabLabelOf(name) } = {}) {
   const places = placesOf(name);

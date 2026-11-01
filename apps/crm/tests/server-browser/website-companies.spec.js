@@ -12,7 +12,7 @@ const listed = async (team) =>
 
 async function openCompanies(page) {
   await page.goto('/#/platform-companies');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Companies');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Platform website');
   const tabs = page.getByRole('navigation', { name: 'Section tabs' });
   await expect(tabs.getByRole('button', { name: 'Companies', exact: true })).toHaveAttribute(
     'aria-current',

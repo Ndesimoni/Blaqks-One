@@ -3,7 +3,9 @@ import { landWhereTestsBegin } from './helpers.js';
 
 export async function openTeam(page) {
   await page.goto('/#/team-access');
-  await expect(page.getByRole('heading', { name: 'Team', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Team & access', exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Invite teammate', exact: true })).toBeEnabled();
 }
 

@@ -89,7 +89,7 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   await expect(details).toContainText(`${second.name} (you)`);
 
   await holder.page.reload();
-  await expect(holder.page.getByRole('heading', { level: 1 })).toHaveText('Deals & commissions');
+  await expect(holder.page.getByRole('heading', { level: 1 })).toHaveText('Deals & money');
   await expect(holder.page.getByRole('heading', { name: 'No deals yet' })).toBeVisible();
   await expect(holder.page.getByRole('region', { name: 'Hand-over requests' })).toHaveCount(0);
   // The client went with the deal; the holder keeps it view only (agreements design §18).

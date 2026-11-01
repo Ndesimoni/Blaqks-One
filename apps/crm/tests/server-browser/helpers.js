@@ -17,7 +17,7 @@ export async function signIn(page, account = 'admin-a') {
     page.getByRole('heading', { level: 1, name: /^Good (morning|afternoon|evening)/ }),
   ).toBeVisible();
   await page.goto('/#/clients');
-  await expect(page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Clients', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Add client', exact: true })).toBeVisible();
 }
 

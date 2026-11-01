@@ -33,7 +33,7 @@ export async function signInActivatedMember(page, email) {
   await page.getByLabel('Password', { exact: true }).fill('Team123!');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await landWhereTestsBegin(page);
-  await expect(page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Clients', exact: true })).toBeVisible();
 }
 
 export async function expectSuspended(page, email) {

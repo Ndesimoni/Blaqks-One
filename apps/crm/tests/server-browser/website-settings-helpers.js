@@ -48,7 +48,7 @@ export async function allowCompany(owner, company) {
 export async function openWebsite(page, admin) {
   await signInMember(page, admin.user.email);
   await page.goto('/#/website');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Website');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Content');
 }
 
 export async function currentSite(admin) {

@@ -28,7 +28,7 @@ test('members land on the start page, open products from it and use the account 
   await expect(messages.locator('.connected-nav-badge, .count')).toHaveCount(0);
 
   await crm.getByRole('button', { name: 'Open CRM', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Overview');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard');
   await expect(rail(page).getByRole('button', { name: 'CRM', exact: true })).toHaveAttribute(
     'aria-current',
     'page',

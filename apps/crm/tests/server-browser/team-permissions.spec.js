@@ -43,7 +43,9 @@ test('owner edits staff access, invalidates the session and retains the new gran
     await staff.page.getByLabel('Email address').fill('changed-access@browser-team.test');
     await staff.page.getByLabel('Password', { exact: true }).fill('Team123!');
     await staff.page.getByRole('button', { name: 'Sign in', exact: true }).click();
-    await expect(staff.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { level: 1, name: 'Clients', exact: true }),
+    ).toBeVisible();
     await expect(staff.page.getByRole('button', { name: 'Properties', exact: true })).toHaveCount(
       0,
     );
@@ -81,7 +83,7 @@ test('staff with only future finance access get a clear workspace state and no c
     expect(profile.user.permissions.relationships).toBe(false);
     // Payments is connected (finance F3): an own view with nothing recorded yet.
     await staff.page.goto('/#/payments');
-    await expect(staff.page.getByRole('heading', { level: 1 })).toHaveText('Commission receipts');
+    await expect(staff.page.getByRole('heading', { level: 1 })).toHaveText('Deals & money');
     await expect(staff.page.getByText('No payments yet', { exact: true })).toBeVisible();
     await expect(
       staff.page.getByRole('region', { name: 'Payments connection status' }),

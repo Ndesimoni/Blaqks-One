@@ -10,7 +10,7 @@ test('the top bar names the page and Create opens the chosen editor, then return
   page.on('pageerror', (error) => errors.push(error.message));
   await signIn(page, 'owner');
   const header = page.getByRole('banner');
-  await expect(header.getByRole('heading', { level: 1 })).toHaveText('Clients & requirements');
+  await expect(header.getByRole('heading', { level: 1 })).toHaveText('Clients');
   await expect(header.locator('.header-crumb')).toHaveText('CRM /');
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
   await expect(page.locator('.section-sidebar-company')).not.toBeEmpty();
@@ -33,7 +33,7 @@ test('the top bar names the page and Create opens the chosen editor, then return
   await expect(create).toBeFocused();
 
   await openPage(page, 'Dashboard');
-  await expect(header.getByRole('heading', { level: 1 })).toHaveText('Overview');
+  await expect(header.getByRole('heading', { level: 1 })).toHaveText('Dashboard');
   await create.click();
   await panel.getByRole('button', { name: 'Contact', exact: true }).click();
   const editor = page.getByRole('dialog');

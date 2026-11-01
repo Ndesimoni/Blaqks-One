@@ -39,7 +39,9 @@ test('renewing a pending invitation replaces its old link and activates the same
   }
   const staff = await activateInNewContext(browser, link, 'renewed-link@browser-team.test');
   try {
-    await expect(staff.page.getByRole('heading', { name: 'Clients & requirements' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { level: 1, name: 'Clients', exact: true }),
+    ).toBeVisible();
   } finally {
     await staff.context.close();
   }

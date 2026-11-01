@@ -25,7 +25,9 @@ export function SectionTabs({ user, section, route, navigate }) {
             ? activityLabel(user)
             : websiteRoute(name)?.tab
               ? t(websiteRoute(name).tab)
-              : navLabel(user, name)}
+              : name === 'Clients'
+                ? t('products.tabs.allClients')
+                : navLabel(user, name)}
         </button>
       ))}
     </nav>
