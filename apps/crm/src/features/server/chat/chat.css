@@ -12,10 +12,9 @@
   grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
   min-block-size: 520px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border: 0;
+  border-radius: 0;
   background: var(--panel);
-  box-shadow: var(--shadow);
 }
 .chat-list {
   overflow-y: auto;

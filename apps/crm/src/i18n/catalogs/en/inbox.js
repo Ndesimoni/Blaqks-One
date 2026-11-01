@@ -1,6 +1,6 @@
 /** Inbox text in English (docs/i18n.md). Keys are `inbox.<key>`. */
 export default {
-  title: 'Inbox',
+  title: 'Client inbox',
   description: 'Client conversations from WhatsApp, email and social, in one place.',
   'nav.unread': { one: '{count} unread', other: '{count} unread' },
   'tab.mine': 'Mine',

@@ -1,13 +1,16 @@
 import React from 'react';
-import { Icon } from '../../../components/ui/Icon.jsx';
+import { initials } from '../profile/profileModel.js';
 import { badge, roomTitle } from './chatModel.js';
+import './chat-avatars.css';
 
-const ICONS = { channel: 'chat', group: 'users', direct: 'person' };
-
-/** One room in the list: its name, unread count and, when you are mentioned, `@count`. */
+/**
+ * One room in the list, as the approved mockup shows it: an initials avatar, its name, its
+ * unread count and, when you are mentioned, `@count`.
+ */
 export function RoomRow({ room, people, selected, onOpen, t }) {
   const count = badge(room.unread);
   const mentions = badge(room.mentions);
+  const title = roomTitle(room, people, t);
   return (
     <li>
       <button
@@ -16,9 +19,11 @@ export function RoomRow({ room, people, selected, onOpen, t }) {
         aria-current={selected ? 'true' : undefined}
         onClick={() => onOpen(room.id)}
       >
-        <Icon name={ICONS[room.kind] || 'chat'} size={16} />
+        <span className={`chat-room-avatar is-${room.kind}`} aria-hidden="true">
+          {initials(title.replace(/^#/, ''))}
+        </span>
         <span className="chat-room-name">
-          <bdi>{roomTitle(room, people, t)}</bdi>
+          <bdi>{title}</bdi>
         </span>
         {mentions && (
           <span className="chat-mention-badge">

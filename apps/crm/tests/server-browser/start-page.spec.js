@@ -24,7 +24,7 @@ test('members land on the start page, open products from it and use the account 
   await expect(crm).toContainText('follow-ups due');
   await expect(page.getByRole('article', { name: 'Websites', exact: true })).toBeVisible();
   const messages = page.getByRole('navigation', { name: 'Messages', exact: true });
-  await expect(messages.getByRole('button', { name: 'Inbox', exact: true })).toBeVisible();
+  await expect(messages.getByRole('button', { name: 'Client inbox', exact: true })).toBeVisible();
   await expect(messages.locator('.connected-nav-badge, .count')).toHaveCount(0);
 
   await crm.getByRole('button', { name: 'Open CRM', exact: true }).click();

@@ -82,7 +82,7 @@ export function StartPage() {
           <strong>{t('products.messages')}</strong>
           {links.map((route) => (
             <button type="button" key={route} onClick={() => navigate(route)}>
-              {route}
+              {t(`products.sections.${route === 'Inbox' ? 'inbox' : 'teamChat'}`)}
             </button>
           ))}
         </nav>

@@ -30,7 +30,7 @@ export default {
   'sections.websiteEnquiries': 'Enquiries',
   'sections.board': 'Marketplace',
   'sections.agreements': 'Agreements',
-  'sections.inbox': 'Inbox',
+  'sections.inbox': 'Client inbox',
   'sections.teamChat': 'Team chat',
   'sections.workspaces': 'Workspaces',
   'sections.applications': 'Marketplace applications',

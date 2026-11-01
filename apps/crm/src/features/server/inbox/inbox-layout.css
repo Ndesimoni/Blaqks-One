@@ -12,10 +12,9 @@
   grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
   min-block-size: 520px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border: 0;
+  border-radius: 0;
   background: var(--panel);
-  box-shadow: var(--shadow);
 }
 /* The client panel gets its own column only where the conversation keeps enough room. */
 @media (min-width: 1440px) {

@@ -1,10 +1,32 @@
-/* Team chat messages, the composer and the new conversation form (C2). */
-.chat-message {
-  padding: 8px 10px;
-  border-radius: 10px;
+/* Team chat messages as Bitrix24's bubbles (approved mockup): others' on the left with their
+   name, yours on the right in the primary colour; the composer and the new conversation form. */
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.chat-message:hover {
-  background: var(--surface-subtle);
+.chat-messages > .chat-day {
+  align-self: center;
+}
+.chat-message {
+  align-self: flex-start;
+  max-inline-size: min(75%, 620px);
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px 16px 16px 4px;
+  background: var(--panel);
+}
+.chat-message.is-mine {
+  align-self: flex-end;
+  border-color: transparent;
+  border-radius: 16px 16px 4px 16px;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.chat-message.is-mine .chat-message-head,
+.chat-message.is-mine .chat-actions > button {
+  color: inherit;
+  opacity: 0.85;
 }
 .chat-message-head {
   display: flex;
@@ -19,13 +41,16 @@
   font-size: 14px;
 }
 .chat-message.is-mine .chat-message-head strong {
-  color: var(--primary);
+  color: inherit;
 }
 .chat-body,
 .chat-deleted {
   margin: 2px 0 0;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+.chat-messages .chat-message .chat-body {
+  color: inherit;
 }
 .chat-deleted {
   color: var(--muted);
@@ -103,4 +128,22 @@
 }
 .chat-people button:hover {
   background: var(--hover);
+}
+/* Team chat sends with a round arrow (approved mockup); "Send" stays its accessible name. */
+.chat-composer .composer-row > .btn[type='submit'] {
+  flex: none;
+  inline-size: 44px;
+  min-inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+}
+.chat-composer .composer-row > .btn[type='submit'] > span {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
