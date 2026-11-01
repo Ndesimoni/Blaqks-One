@@ -1,50 +1,17 @@
 /* Payments, expenses, approvals and history (finance-design §7). Loaded after finance-forms.css. */
-.finance-filter-label {
-  color: var(--muted-dark);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-.finance-queue-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 8px 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--panel);
-  color: var(--ink);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    border-color var(--duration) var(--ease),
-    background var(--duration) var(--ease);
-}
-.finance-queue-chip:hover {
-  border-color: var(--focus);
-  background: var(--hover);
-}
-.finance-queue-chip:active {
-  background: var(--surface-subtle);
-}
-.finance-queue-chip[aria-pressed='true'] {
-  border-color: var(--accent);
-  background: var(--accent-subtle);
-}
-.finance-queue-chip:focus-visible,
 .finance-receipt:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-.finance-queue-count {
-  min-width: 24px;
-  padding: 1px 8px;
+/* The approvers' count on the Waiting for approval preset chip (design step 2d). */
+.finance-page .grid-chip-count {
+  display: inline-block;
+  min-width: 22px;
+  margin-inline-start: 8px;
+  padding: 0 7px;
   border-radius: 999px;
   background: var(--surface-subtle);
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
@@ -138,8 +105,19 @@
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
-@media (prefers-reduced-motion: reduce) {
-  .finance-queue-chip {
-    transition: none;
-  }
+/* Payments and expenses as the mockup's grid (design step 2d): a toolbar row with the scope
+   line and the add button on the right (the mockup's page action), then the filter row. */
+.entries-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.entries-head > .btn {
+  margin-inline-start: auto;
+}
+:root[data-theme] .entries-scope {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
 }

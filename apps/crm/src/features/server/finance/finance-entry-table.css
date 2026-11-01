@@ -125,20 +125,8 @@
 .entry-card .finance-duty {
   max-width: none;
 }
-.finance-queue-count.has-items {
-  background: var(--gold);
-  color: var(--on-primary);
-}
-:root[data-theme='light'] .finance-queue-count.has-items {
-  background: #f8efd9;
-  color: #805b24;
-}
 @media (max-width: 750px) {
   .finance-page .finance-filters {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .finance-queue-chip {
-    width: 100%;
-    justify-content: center;
   }
 }

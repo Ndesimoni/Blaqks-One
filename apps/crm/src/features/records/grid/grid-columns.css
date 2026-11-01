@@ -40,6 +40,10 @@
   color: var(--ink);
   box-shadow: 0 8px 24px #00000026;
 }
+.grid-columns-panel.from-start {
+  right: auto;
+  left: 0;
+}
 :root[data-theme] .grid-columns-title {
   margin: 0;
   color: var(--ink);

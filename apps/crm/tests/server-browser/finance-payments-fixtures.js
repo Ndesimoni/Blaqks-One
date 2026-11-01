@@ -29,6 +29,16 @@ export async function openEntries(page, kind, { queue = false } = {}) {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Deals & money');
   await expect(page.getByRole('region', { name: /connection status/ })).toHaveCount(0);
   await expect(page.getByRole('status').filter({ hasText: /^Loading/ })).toHaveCount(0);
+  // The list opens on This month (the mockup's first preset); fixtures may date rows in the
+  // previous month, so plain visits show every row, as the old Any status default did.
+  if (!queue) await page.getByRole('button', { name: `All ${kind}`, exact: true }).click();
+}
+
+/** Turns on a column the mockup grid leaves out (the gear's column chooser). */
+export async function showColumn(page, name) {
+  await page.getByRole('button', { name: 'Choose columns', exact: true }).click();
+  await page.getByRole('group', { name: 'Columns' }).getByLabel(name, { exact: true }).check();
+  await page.keyboard.press('Escape');
 }
 
 /** The desktop table row for one record ID. */

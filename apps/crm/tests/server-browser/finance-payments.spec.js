@@ -19,7 +19,8 @@ test('an agent records a payment, another approver approves it, and the statemen
 
   const own = await memberPage(browser, agent.email);
   await openEntries(own.page, 'payments');
-  await expect(own.page.getByRole('button', { name: /Awaiting approval/ })).toHaveCount(0);
+  // Everyone has the preset; only approvers see its count of rows to decide.
+  await expect(own.page.locator('.grid-chip-count')).toHaveCount(0);
   // The empty list repeats its Add action.
   await own.page.getByRole('button', { name: 'Record payment', exact: true }).first().click();
   const form = own.page.getByRole('dialog', { name: 'Record payment' });
@@ -50,7 +51,7 @@ test('an agent records a payment, another approver approves it, and the statemen
 
   const review = await memberPage(browser, approver.email);
   await openEntries(review.page, 'payments', { queue: true });
-  const chip = review.page.getByRole('button', { name: /Awaiting approval/ });
+  const chip = review.page.getByRole('button', { name: /Waiting for approval/ });
   await expect(chip).toHaveAttribute('aria-pressed', 'true');
   await expect(chip).toContainText('1');
   for (const layout of layouts) await checkLayout(review.page, layout, 'payments-queue');

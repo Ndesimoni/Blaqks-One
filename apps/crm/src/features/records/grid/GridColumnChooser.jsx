@@ -12,6 +12,8 @@ import './grid-columns.css';
 export function GridColumnChooser({ module, grid }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
+  // A gear that wrapped to the start of a row opens its panel rightwards, not off-screen.
+  const [fromStart, setFromStart] = useState(false);
   const root = useRef(null);
   const button = useRef(null);
   const id = useId();
@@ -42,13 +44,16 @@ export function GridColumnChooser({ module, grid }) {
         title={t('recordGrid.columns')}
         aria-expanded={open}
         aria-controls={id}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          setFromStart((button.current?.getBoundingClientRect().left ?? 0) < 320);
+          setOpen((value) => !value);
+        }}
       >
         <Icon name="settings" size={20} />
       </button>
       {open && (
         <div
-          className="grid-columns-panel"
+          className={'grid-columns-panel' + (fromStart ? ' from-start' : '')}
           id={id}
           role="group"
           aria-label={t('recordGrid.columnsTitle')}

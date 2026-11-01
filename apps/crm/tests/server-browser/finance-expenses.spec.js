@@ -9,6 +9,7 @@ import {
   openEntries,
   openEntry,
   overview,
+  showColumn,
 } from './finance-payments-fixtures.js';
 
 const LINK = 'https://files.example.test/receipts/synthetic-1.pdf';
@@ -46,6 +47,7 @@ test('staff record expenses for themselves with a safe https receipt link', asyn
   const row = entryRow(page, 'expenses', expense.expenseId);
   await expect(row).toContainText('Pending approval');
   await expect(row).toContainText(aed(150_000));
+  await showColumn(page, 'Receipt');
   const link = row.getByRole('link', { name: /Open receipt/ });
   await expect(link).toHaveAttribute('href', LINK);
   await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
@@ -78,8 +80,9 @@ test('the Admin records an expense on behalf of a team member, who then sees it 
   const owners = rows.map((row) => row.incurredBy.id).sort();
   expect(owners).toEqual([agent.id, team.admin.user.id].sort());
   const forAgent = rows.find((row) => row.incurredBy.id === agent.id);
+  await showColumn(admin.page, 'Incurred by');
   await expect(entryRow(admin.page, 'expenses', forAgent.expenseId)).toContainText(agent.name);
-  await expect(admin.page.getByRole('button', { name: /Awaiting approval/ })).toContainText('2');
+  await expect(admin.page.getByRole('button', { name: /Waiting for approval/ })).toContainText('2');
   for (const layout of layouts) await checkLayout(admin.page, layout, 'expenses-team');
   await admin.context.close();
 

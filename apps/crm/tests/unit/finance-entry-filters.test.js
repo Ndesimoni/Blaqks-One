@@ -3,13 +3,13 @@ import assert from 'node:assert/strict';
 import {
   decidableCount,
   earnedDealOptions,
-  emptyEntryFilters,
   filterEntries,
   initialEntryFilters,
   paymentPreview,
   QUEUE_QUERY,
   receiptHost,
 } from '../../src/features/server/finance/entryFilters.js';
+import { entryPresets } from '../../src/features/server/finance/entryPresets.js';
 
 const allowed = (approve = false) => ({ edit: false, approve, reject: approve, void: false });
 const row = (id, status, extra = {}) => ({
@@ -22,22 +22,45 @@ const row = (id, status, extra = {}) => ({
   ...extra,
 });
 
-test('the queue shows pending rows; status and search narrow further', () => {
+test("the mockup's presets lead; the earlier status filters follow; search narrows further", () => {
+  const today = '2026-11-01';
   const rows = [
-    row('PM-001', 'pending', { allowed: allowed(true) }),
-    row('PM-002', 'approved', { reference: 'INV-77' }),
-    row('PM-003', 'pending'),
+    row('PM-001', 'pending', { allowed: allowed(true), receiptDate: '2026-11-01' }),
+    row('PM-002', 'approved', { reference: 'INV-77', receiptDate: '2026-10-30' }),
+    row('PM-003', 'pending', { receiptDate: '2026-11-20' }),
     row('PM-004', 'rejected'),
+    row('EX-001', 'void', { category: 'Digital marketing', datePaid: '2026-11-03' }),
   ];
-  const ids = (filters) =>
-    filterEntries(rows, { ...emptyEntryFilters, ...filters }).map((r) => r.id);
-  assert.deepEqual(ids({ queue: true }), ['PM-001', 'PM-003']);
-  assert.deepEqual(ids({ status: 'rejected' }), ['PM-004']);
-  assert.deepEqual(ids({ query: 'inv-77' }), ['PM-002']);
-  assert.deepEqual(ids({ queue: true, status: 'approved' }), []);
+  const ids = (preset, query = '') =>
+    filterEntries(rows, { preset, query }, undefined, today).map((r) => r.id);
+  assert.deepEqual(entryPresets.payments.slice(0, 3), [
+    'This month',
+    'Waiting for approval',
+    'Approved',
+  ]);
+  assert.deepEqual(entryPresets.expenses.slice(0, 3), [
+    'This month',
+    'Waiting for approval',
+    'Marketing',
+  ]);
+  assert.deepEqual(ids('This month'), ['PM-001', 'PM-003', 'EX-001']);
+  assert.deepEqual(ids('Waiting for approval'), ['PM-001', 'PM-003']);
+  assert.deepEqual(ids('Rejected'), ['PM-004']);
+  assert.deepEqual(ids('Voided'), ['EX-001']);
+  assert.deepEqual(ids('Marketing'), ['EX-001']);
+  assert.deepEqual(ids('All payments', 'inv-77'), ['PM-002']);
+  assert.deepEqual(ids('Approved', 'pm-003'), []);
   assert.equal(decidableCount(rows.filter((r) => r.status === 'pending')), 1);
-  assert.deepEqual(initialEntryFilters(QUEUE_QUERY), { ...emptyEntryFilters, queue: true });
-  assert.deepEqual(initialEntryFilters('PM-2'), { ...emptyEntryFilters, query: 'PM-2' });
+  // The Dashboard's queue link opens Waiting for approval; a search looks across every row.
+  assert.deepEqual(initialEntryFilters('payments', QUEUE_QUERY), {
+    query: '',
+    preset: 'Waiting for approval',
+  });
+  assert.deepEqual(initialEntryFilters('payments', 'PM-2'), {
+    query: 'PM-2',
+    preset: 'All payments',
+  });
+  assert.deepEqual(initialEntryFilters('expenses', ''), { query: '', preset: 'This month' });
 });
 
 test('receipt hosts are shown for https links only', () => {

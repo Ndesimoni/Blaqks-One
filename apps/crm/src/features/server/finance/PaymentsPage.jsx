@@ -23,9 +23,7 @@ export function PaymentsPage() {
     };
     return {
       icon: 'wallet',
-      teamHeading: 'Team commission receipts',
       teamIntro: 'Every payment received on this workspace’s earned deals.',
-      ownHeading: 'Your commission receipts',
       ownIntro: 'Payments received on deals you hold.',
       empty: 'Record a payment once a deal is earned and its fee is received.',
       date: (entry) => `Received ${readableDate(entry.receiptDate)}`,
@@ -40,9 +38,16 @@ export function PaymentsPage() {
             </>
           ),
         },
-        { label: 'Submitted by', cell: (entry) => entry.submittedBy.name },
         { label: 'Amount', num: true, cell: (entry) => formatAed(entry.amountFils) },
-        { label: 'Total with VAT', num: true, cell: (entry) => formatAed(entry.totalFils) },
+        { label: 'Received', cell: (entry) => readableDate(entry.receiptDate) },
+        // Beyond the approved mockup's columns, one tick away in the column chooser.
+        { label: 'Submitted by', extra: true, cell: (entry) => entry.submittedBy.name },
+        {
+          label: 'Total with VAT',
+          extra: true,
+          num: true,
+          cell: (entry) => formatAed(entry.totalFils),
+        },
       ],
     };
   }, [overview.deals, overview.references]);

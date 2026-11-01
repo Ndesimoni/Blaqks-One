@@ -37,7 +37,7 @@ test('approvers never review their own submissions; a rejected payment is correc
   const reject = review.page.getByRole('dialog', { name: 'Reject payment' });
   await expect(reject.getByRole('button', { name: 'Reject', exact: true })).toBeDisabled();
   await giveReason(review.page, 'Reject payment', 'Bank slip missing', 'Reject');
-  await review.page.getByRole('button', { name: /Awaiting approval/ }).click();
+  await review.page.getByRole('button', { name: 'All payments', exact: true }).click();
   const rejected = entryRow(review.page, 'payments', theirs.paymentId);
   await expect(rejected).toContainText('Rejected');
   await expect(rejected).toContainText('Bank slip missing');

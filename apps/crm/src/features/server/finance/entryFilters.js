@@ -5,27 +5,22 @@
  */
 import { paymentVat } from '../../../lib/finance/commission.js';
 import { referenceName } from './dealFilters.js';
+import { entryPresets, inPreset, WAITING } from './entryPresets.js';
 
-export const ENTRIES_PER_PAGE = 12;
+export const ENTRIES_PER_PAGE = 20;
 /** The Dashboard's deep link (`?q=`) that opens a list on its approval queue. */
 export const QUEUE_QUERY = 'awaiting-approval';
-export const entryStatusOptions = Object.freeze([
-  { id: '', label: 'Any status' },
-  { id: 'pending', label: 'Pending approval' },
-  { id: 'approved', label: 'Approved' },
-  { id: 'rejected', label: 'Rejected' },
-  { id: 'void', label: 'Voided' },
-]);
-export const emptyEntryFilters = Object.freeze({ query: '', status: '', queue: false });
 
-/** Filters from the route query: the queue link, or a plain search. */
-export function initialEntryFilters(initialQuery) {
-  if (initialQuery === QUEUE_QUERY) return { ...emptyEntryFilters, queue: true };
-  return { ...emptyEntryFilters, query: initialQuery || '' };
+/**
+ * `{ query, preset }` from the route query: the queue link opens Waiting for approval, a
+ * search looks across every row, and otherwise the kind's first preset (This month).
+ */
+export function initialEntryFilters(kind, initialQuery) {
+  const presets = entryPresets[kind];
+  if (initialQuery === QUEUE_QUERY) return { query: '', preset: WAITING };
+  if (initialQuery) return { query: initialQuery, preset: presets.at(-1) };
+  return { query: '', preset: presets[0] };
 }
-
-export const entryFiltersActive = (filters) =>
-  Boolean(filters.query || filters.status || filters.queue);
 
 const lower = (value) => String(value ?? '').toLowerCase();
 
@@ -47,14 +42,14 @@ function searchText(entry, references) {
   ].map(lower);
 }
 
-/** `{ query, status, queue }`; the queue shows pending rows only. */
-export function filterEntries(entries, filters, references) {
+/** `{ query, preset }`: the preset, then the search; `today` is the Dubai calendar day. */
+export function filterEntries(entries, filters, references, today) {
   const query = lower(filters.query).trim();
-  return entries.filter((entry) => {
-    if (filters.queue && entry.status !== 'pending') return false;
-    if (filters.status && entry.status !== filters.status) return false;
-    return !query || searchText(entry, references).some((value) => value.includes(query));
-  });
+  return entries.filter(
+    (entry) =>
+      inPreset(entry, filters.preset, today) &&
+      (!query || searchText(entry, references).some((value) => value.includes(query))),
+  );
 }
 
 /** Pending rows this caller may approve or reject (the queue badge count). */

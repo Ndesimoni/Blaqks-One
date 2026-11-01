@@ -7,6 +7,7 @@ import './grid-filter.css';
  * The grid's filter bar (the approved mockup's grid view): one field showing the active preset
  * as a pill, the other presets as chips (choosing the active one again returns to the first),
  * then the page's tools (the column chooser) and any extra filter such as "Assigned to".
+ * `counts` puts a number on a chip (the approvers' Waiting for approval queue).
  */
 export function GridFilterBar({
   module,
@@ -18,6 +19,7 @@ export function GridFilterBar({
   onQuery,
   tools = null,
   extras = null,
+  counts = null,
 }) {
   const { t } = useI18n();
   const input = useRef(null);
@@ -73,6 +75,7 @@ export function GridFilterBar({
               onClick={() => onTab(name === tab ? tabs[0] : name)}
             >
               {name}
+              {counts?.[name] != null && <span className="grid-chip-count">{counts[name]}</span>}
             </button>
           ))}
         </div>

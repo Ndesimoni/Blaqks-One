@@ -90,7 +90,7 @@ test('Dashboard finance equals the API totals; the own view never shows company 
   await adminPage.page.setViewportSize({ width: 1280, height: 900 });
   await panelOf(adminPage.page).getByRole('button', { name: 'Review expenses' }).click();
   await expect(adminPage.page.getByRole('heading', { level: 1 })).toHaveText('Deals & money');
-  const chip = adminPage.page.getByRole('button', { name: /Awaiting approval/ });
+  const chip = adminPage.page.getByRole('button', { name: /Waiting for approval/ });
   await expect(chip).toHaveAttribute('aria-pressed', 'true');
   await expect(adminPage.page.getByRole('table', { name: 'Expenses' })).toContainText(
     'Pending approval',

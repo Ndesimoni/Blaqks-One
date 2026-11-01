@@ -16,18 +16,23 @@ export function ExpensesPage() {
   const view = useMemo(
     () => ({
       icon: 'money',
-      teamHeading: 'Team expenses',
       teamIntro: 'Every expense recorded in this workspace.',
-      ownHeading: 'Your expenses',
       ownIntro: 'Expenses you incurred.',
       empty: 'Record what you spend so an approver can review it.',
       date: (entry) => `Paid ${readableDate(entry.datePaid)}`,
       title: describe,
       columns: [
-        { label: 'Incurred by', cell: (entry) => entry.incurredBy.name },
-        { label: 'Details', cell: describe },
-        { label: 'Receipt', cell: (entry) => <ReceiptLink url={entry.receiptUrl} /> },
+        { label: 'Category', cell: (entry) => entry.category || '—' },
         { label: 'Amount', num: true, cell: (entry) => formatAed(entry.amountFils) },
+        { label: 'Date', cell: (entry) => readableDate(entry.datePaid) },
+        // Beyond the approved mockup's columns, one tick away in the column chooser.
+        { label: 'Incurred by', extra: true, cell: (entry) => entry.incurredBy.name },
+        { label: 'Details', extra: true, cell: describe },
+        {
+          label: 'Receipt',
+          extra: true,
+          cell: (entry) => <ReceiptLink url={entry.receiptUrl} />,
+        },
       ],
     }),
     [],
