@@ -8,10 +8,8 @@ import { Icon } from '../../components/ui/Icon.jsx';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { KeptChip } from '../records/KeptChip.jsx';
 import { PropertyCardImage } from './PropertyCardImage.jsx';
-import { useI18n } from '../../i18n/useI18n.js';
 
 export function PropertyCard({ property: p, index: i, onSelect }) {
-  const { t } = useI18n();
   const photos = mediaPhotos(p);
   const cover = photos[0] || demoListingPhoto(p);
   return (
@@ -35,11 +33,11 @@ export function PropertyCard({ property: p, index: i, onSelect }) {
         </span>
       </div>
       <div className="property-content">
+        {/* The mockup's card: the title, then the price, then the facts. */}
+        <h3>{get(p, 'Listing title') || 'Untitled listing'}</h3>
         <div className="property-price">
-          <small>ASKING PRICE</small>
           <strong>{propertyPrice(p)}</strong>
         </div>
-        <h3>{get(p, 'Listing title') || 'Untitled listing'}</h3>
         <p>
           <Icon name="pin" size={14} />
           {get(p, 'Community') || 'Community not set'} · {get(p, 'Emirate') || 'UAE'}
@@ -80,10 +78,6 @@ export function PropertyCard({ property: p, index: i, onSelect }) {
               <Icon name="image" size={12} /> {photos.length}
             </span>
           )}
-        </div>
-        <div className="property-bottom">
-          <span>{t('properties.open')}</span>
-          <Icon name="arrow" size={18} />
         </div>
       </div>
     </button>

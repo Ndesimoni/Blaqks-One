@@ -1,5 +1,4 @@
 import React from 'react';
-import { propertyListingTags } from '../../config/properties.js';
 import { useI18n } from '../../i18n/useI18n.js';
 
 const labels = {
@@ -14,12 +13,9 @@ const labels = {
 export function PropertyActiveFilters({ f, query, updateFilter, clearQuery, resetFilters }) {
   const { t } = useI18n();
   const filters = Object.entries(f).flatMap(([key, value]) => {
-    if (!value || value === 'All') return [];
-    const label =
-      key === 'purpose'
-        ? propertyListingTags.find((item) => item.key === value)?.label || value
-        : `${labels[key]}: ${value}`;
-    return [{ key, label }];
+    // The preset (Available or a purpose) shows as the filter field's pill, not a chip.
+    if (!value || value === 'All' || key === 'purpose') return [];
+    return [{ key, label: `${labels[key]}: ${value}` }];
   });
   if (query.trim()) filters.unshift({ key: 'query', label: `Search: ${query.trim()}` });
   if (!filters.length) return null;

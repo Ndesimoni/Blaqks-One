@@ -1,32 +1,3 @@
-.property-toolbar,
-.property-toolbar .inventory-tools {
-  width: 100%;
-}
-.property-toolbar .inventory-tools {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.property-toolbar .inventory-search {
-  flex: 1 1 250px;
-  min-width: 190px;
-}
-.property-toolbar .overflow-list {
-  flex: 2 1 420px;
-  min-width: 280px;
-}
-.property-toolbar .property-purpose-bar {
-  display: flex;
-  gap: 4px;
-}
-.property-toolbar .purpose-pill {
-  min-height: 44px;
-  padding: 8px 10px;
-}
-.property-toolbar .purpose-pill svg,
-.property-toolbar .purpose-pill b {
-  display: none;
-}
 .property-filter-trigger {
   display: inline-flex;
   align-items: center;
@@ -96,48 +67,14 @@
 }
 .modern-property-card .property-price {
   display: grid;
-  gap: 3px;
-  margin: 12px 0 0;
-}
-.modern-property-card .property-price small {
-  color: var(--muted-dark);
-  font-size: 10px;
+  margin: 4px 0 0;
 }
 .modern-property-card .property-price strong {
   color: var(--ink);
-  font-size: 18px;
-}
-.modern-property-card .property-bottom > span {
-  color: var(--muted-dark);
-  font-size: 11px;
-  font-weight: 700;
-}
-@media (max-width: 1100px) {
-  .property-toolbar .inventory-tools {
-    flex-wrap: wrap;
-  }
-  .property-toolbar .overflow-list {
-    order: 5;
-    flex-basis: 100%;
-  }
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
 }
 @media (max-width: 750px) {
-  .property-toolbar .inventory-search {
-    flex-basis: 100%;
-  }
-  .property-toolbar .overflow-list {
-    min-width: 0;
-  }
-  .property-toolbar .property-purpose-bar {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-  .property-toolbar .purpose-pill {
-    flex: 0 0 auto;
-    min-height: 44px;
-    font-size: 11px;
-  }
   .property-grid.property-grid-refined {
     grid-template-columns: 1fr;
   }

@@ -3,7 +3,7 @@ import { login } from '../api/helpers.mjs';
 import { expect, test } from './fixtures.js';
 import { signIn } from './helpers.js';
 
-test('property cards and table share twelve-per-page filters and media fallback', async ({
+test('property cards (twelve per page) and the list grid share filters and media fallback', async ({
   page,
 }) => {
   const admin = await login();
@@ -39,17 +39,16 @@ test('property cards and table share twelve-per-page filters and media fallback'
   await expect(page.locator('.modern-property-card')).toHaveCount(1);
   await chips.getByRole('button', { name: 'Clear filters' }).click();
   await page.getByLabel('Search properties').fill('UI4b listing');
-  await page.getByRole('button', { name: 'Table view' }).click();
+  // The mockup's List / Cards; the list is the grid with 20 rows per page.
+  await page.getByRole('button', { name: 'List', exact: true }).click();
   const table = page.getByRole('table', { name: 'Properties records' });
-  await expect(table.locator('tbody tr')).toHaveCount(12);
-  await page
-    .getByRole('navigation', { name: 'Properties pages' })
-    .getByRole('button', {
-      name: 'Next',
-    })
-    .click();
-  await expect(table.locator('tbody tr')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Card view' }).click();
+  await expect(table.locator('tbody tr')).toHaveCount(13);
+  for (const name of ['Property', 'Price', 'Details', 'Status'])
+    await expect(table.getByRole('columnheader', { name, exact: true })).toBeVisible();
+  await expect(table.locator('tbody tr').first()).toContainText('Synthetic community');
+  await page.getByRole('button', { name: 'Cards', exact: true }).click();
+  await expect(page.locator('.modern-property-card')).toHaveCount(12);
+  await page.getByLabel('Search properties').fill('UI4b listing 13');
   await expect(page.locator('.modern-property-card')).toHaveCount(1);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('.property-grid-refined')).toHaveCSS('grid-template-columns', '358px');

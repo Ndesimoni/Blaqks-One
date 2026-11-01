@@ -1,6 +1,43 @@
+import { propertyListingTags } from '../../config/properties.js';
+import { N } from '../../lib/format.js';
 import { propertyMatchesPurpose } from '../../lib/properties.js';
 import { get } from '../../lib/records.js';
 import { selectRecords } from '../../lib/workspace.js';
+
+/**
+ * The approved mockup's Available preset (a listing status) beside our listing purposes with
+ * their counts. All listings stays the default: Listing status is optional, so opening on
+ * Available would hide listings without one after every reload.
+ */
+export const AVAILABLE = 'Available';
+export const propertyPresets = [
+  { key: 'All', label: 'All listings' },
+  { key: AVAILABLE, label: 'Available' },
+  ...propertyListingTags.filter((tag) => tag.key !== 'All'),
+];
+
+export const matchesPropertyPreset = (property, preset) =>
+  preset === AVAILABLE
+    ? get(property, 'Listing status') === AVAILABLE
+    : propertyMatchesPurpose(property, preset);
+
+/** The mockup's Details column: "2 bed · 1,240 sq ft · Dubai Marina", display only. */
+export const detailsColumn = Object.freeze({
+  key: 'details',
+  name: 'Details',
+  virtual: true,
+  value: (property) => {
+    const bedrooms = get(property, 'Bedrooms');
+    const area = get(property, 'Area sq ft');
+    return [
+      bedrooms !== undefined && bedrooms !== '' && `${bedrooms} bed`,
+      area && `${N(area)} sq ft`,
+      get(property, 'Community'),
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  },
+});
 
 export const defaultPropertyFilters = () => ({
   purpose: 'All',
@@ -20,7 +57,7 @@ export function selectProperties(
     query,
     sort,
     filter: (property) => {
-      if (!propertyMatchesPurpose(property, filters.purpose)) return false;
+      if (!matchesPropertyPreset(property, filters.purpose)) return false;
       for (const [key, field] of [
         ['type', 'Property type'],
         ['emirate', 'Emirate'],

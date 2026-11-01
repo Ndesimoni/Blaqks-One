@@ -13,6 +13,7 @@ export const mockupGrids = new Set([
   'Client care',
   'Viewings',
   'Leads',
+  'Properties',
 ]);
 
 /** Default columns; every other column of the sheet stays one tick away in the chooser. */
@@ -24,6 +25,7 @@ const pilotColumns = {
   'Client care': ['Client name auto', 'Touchpoint type', 'Next contact', 'Task status'],
   Viewings: ['Appointment date & time', 'Property title auto', 'Client name auto'],
   Leads: ['Full name', 'Looking for', 'Maximum budget AED', 'Lead stage', 'Agent', 'Lead source'],
+  Properties: ['Listing title', 'Price / annual rent AED', 'Details', 'Listing status'],
 };
 
 /** The columns a directory shows until its viewer chooses others. */

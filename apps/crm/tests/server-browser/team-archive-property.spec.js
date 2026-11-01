@@ -42,7 +42,7 @@ test('archived property photos and details remain viewable without editing or up
   await expect(
     page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
   ).toHaveCount(0);
-  await page.getByRole('button', { name: 'Card view', exact: true }).click();
+  await page.getByRole('button', { name: 'Cards', exact: true }).click();
   await page.getByRole('button', { name: /Retained archive house/ }).click();
   const details = page.getByRole('dialog');
   await expect(
@@ -53,6 +53,6 @@ test('archived property photos and details remain viewable without editing or up
     details.getByRole('button', { name: /Edit|Delete|Upload|Add property photos/ }),
   ).toHaveCount(0);
   await details.getByRole('button', { name: 'Close', exact: true }).click();
-  await page.getByRole('button', { name: 'Table view', exact: true }).click();
+  await page.getByRole('button', { name: 'List', exact: true }).click();
   await expect(page.getByRole('button', { name: openName('BROWSER-ARCHIVE-HOUSE') })).toBeVisible();
 });

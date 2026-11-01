@@ -1,6 +1,9 @@
 export default {
   photoLimit: 'JPG, PNG, WebP · up to {limit}',
   filters: 'Filters',
+  view: 'Property view',
+  list: 'List',
+  cards: 'Cards',
   refine: 'Refine properties',
   clearAll: 'Clear all filters',
   clear: 'Clear filters',

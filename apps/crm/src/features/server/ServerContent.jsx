@@ -115,7 +115,10 @@ export function ServerContent({ owner }) {
       return <LeadsPage toolbarExtras={toolbarExtras} selectionActions={selectionActions} />;
     if (route === 'Contacts')
       return <ContactsPage toolbarExtras={toolbarExtras} selectionActions={selectionActions} />;
-    if (route === 'Properties') return <PropertyDirectory toolbarExtras={toolbarExtras} />;
+    if (route === 'Properties')
+      return (
+        <PropertyDirectory toolbarExtras={toolbarExtras} selectionActions={selectionActions} />
+      );
     return (
       <RecordsPage
         module={route}

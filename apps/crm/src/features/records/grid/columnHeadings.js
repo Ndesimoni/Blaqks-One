@@ -16,6 +16,11 @@ const headings = {
     'Lead stage': 'Stage',
     'Lead source': 'Source',
   },
+  Properties: {
+    'Listing title': 'Property',
+    'Price / annual rent AED': 'Price',
+    'Listing status': 'Status',
+  },
   Viewings: {
     'Appointment date & time': 'When',
     'Property title auto': 'Viewing',

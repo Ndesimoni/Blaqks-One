@@ -49,7 +49,7 @@ test('view-only staff see their assigned records with a View only chip and no ch
       await expect(chip).toContainText(/view only/i);
       await expect(page.getByRole('button', { name: /^Add\b/ }), route).toHaveCount(0);
       if (route === 'properties')
-        await page.getByRole('button', { name: 'Table view', exact: true }).click();
+        await page.getByRole('button', { name: 'List', exact: true }).click();
       if (route === 'leads') await page.getByRole('button', { name: 'List', exact: true }).click();
       const details = await openRecord(page, ids[collection]);
       await expect(footer(details), route).toHaveText(['Close']);

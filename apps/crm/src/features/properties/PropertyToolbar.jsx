@@ -1,9 +1,19 @@
 import React from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { ViewSwitch } from '../../components/ui/ViewSwitch.jsx';
 import { useWorkspaceView } from '../../hooks/useWorkspace.js';
-import { PropertyPurposes } from './PropertyPurposes.jsx';
 import { useI18n } from '../../i18n/useI18n.js';
+import { GridFilterBar } from '../records/grid/GridFilterBar.jsx';
+import { matchesPropertyPreset, propertyPresets } from './selectors.js';
 
+const keyOf = new Map(propertyPresets.map(({ key, label }) => [label, key]));
+
+/**
+ * The mockup's Properties filter row: the field with the active preset (All listings by
+ * default), the mockup's Available and our listing purposes as chips with their counts, then
+ * Filters (the refine panel), List / Cards and, for the list, the column chooser. `extras`
+ * holds the connected Assigned to.
+ */
 export function PropertyToolbar({
   all,
   f,
@@ -13,58 +23,58 @@ export function PropertyToolbar({
   filtersOpen,
   setFiltersOpen,
   updateFilter,
+  chooser,
 }) {
   const { query, setQuery, setPage, viewMode, setViewMode } = useWorkspaceView();
   const { t } = useI18n();
+  const active = propertyPresets.find(({ key }) => key === f.purpose) || propertyPresets[0];
+  const counts = Object.fromEntries(
+    propertyPresets
+      .slice(1)
+      .map(({ key, label }) => [
+        label,
+        all.filter((property) => matchesPropertyPreset(property, key)).length,
+      ]),
+  );
   return (
-    <div className="property-toolbar" aria-label="Property directory controls">
-      <div className="inventory-tools">
-        <div className="search-small inventory-search">
-          <Icon name="search" size={16} />
-          <input
-            aria-label="Search properties"
-            placeholder="Search address, project, ID..."
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(0);
-            }}
+    <GridFilterBar
+      module="properties"
+      presetLabel={active.label}
+      tabs={propertyPresets.map(({ label }) => label)}
+      tab={active.label}
+      onTab={(label) => updateFilter('purpose', keyOf.get(label))}
+      query={query}
+      onQuery={(value) => {
+        setQuery(value);
+        setPage(0);
+      }}
+      counts={counts}
+      tools={
+        <>
+          <button
+            type="button"
+            className="property-filter-trigger"
+            aria-expanded={filtersOpen}
+            aria-controls={filtersId}
+            onClick={() => setFiltersOpen((open) => !open)}
+          >
+            <Icon name="filter" size={17} />
+            {t('properties.filters')}
+            {activeCount ? ` (${activeCount})` : ''}
+          </button>
+          <ViewSwitch
+            label={t('properties.view')}
+            options={[
+              ['table', t('properties.list'), 'menu'],
+              ['cards', t('properties.cards'), 'grid'],
+            ]}
+            value={viewMode}
+            onChange={setViewMode}
           />
-        </div>
-        <PropertyPurposes all={all} purpose={f.purpose} updateFilter={updateFilter} />
-        {extras}
-        <button
-          type="button"
-          className="property-filter-trigger"
-          aria-expanded={filtersOpen}
-          aria-controls={filtersId}
-          onClick={() => setFiltersOpen((open) => !open)}
-        >
-          <Icon name="filter" size={17} />
-          {t('properties.filters')}
-          {activeCount ? ` (${activeCount})` : ''}
-        </button>
-        <div className="view-switch" role="group" aria-label="Property view mode">
-          <button
-            aria-label="Table view"
-            aria-pressed={viewMode === 'table'}
-            className={viewMode === 'table' ? 'on' : ''}
-            onClick={() => setViewMode('table')}
-            title="Table view"
-          >
-            <Icon name="menu" size={17} />
-          </button>
-          <button
-            aria-label="Card view"
-            aria-pressed={viewMode === 'cards'}
-            className={viewMode === 'cards' ? 'on' : ''}
-            onClick={() => setViewMode('cards')}
-            title="Card view"
-          >
-            <Icon name="grid" size={17} />
-          </button>
-        </div>
-      </div>
-    </div>
+          {viewMode === 'table' && chooser}
+        </>
+      }
+      extras={extras}
+    />
   );
 }
