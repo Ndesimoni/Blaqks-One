@@ -31,7 +31,9 @@ test('deadline groups retain search, list preference and the record slider', asy
     'aria-pressed',
     'true',
   );
-  for (const title of ['Overdue', 'Today', 'Upcoming', 'No due date', 'Closed'])
+  // The mockup's Overdue, Today and This week lead; two days ahead is This week or Later
+  // depending on the weekday, and No due date and Closed keep every task in view.
+  for (const title of ['Overdue', 'Today', '(This week|Later)', 'No due date', 'Closed'])
     await expect(page.getByRole('heading', { name: new RegExp(`^${title}`) })).toBeVisible();
   await page.getByRole('button', { name: 'Overdue', exact: true }).click();
   await expect(page.locator('.deadline-row')).toHaveCount(1);
@@ -42,6 +44,14 @@ test('deadline groups retain search, list preference and the record slider', asy
   await page.getByRole('button', { name: openName('DL-TODAY') }).click();
   await expect(page.getByRole('dialog')).toContainText('Synthetic action DL-TODAY');
   await page.keyboard.press('Escape');
+  // The mockup's Done checkbox saves the task as Completed; unticking reopens it.
+  const done = page.getByRole('checkbox', { name: 'Done: Synthetic action DL-TODAY' });
+  await done.check();
+  await expect(page.locator('.toast')).toContainText('Record saved');
+  await expect(page.locator('.deadline-group.is-closed')).toContainText('DL-TODAY');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await done.uncheck();
+  await expect(page.locator('.deadline-group.is-today')).toContainText('DL-TODAY');
   await page.getByLabel('Search Follow-ups', { exact: true }).fill('DL-CLOSED');
   await expect(page.getByRole('heading', { name: /^Closed/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: /^Overdue/ })).toHaveCount(0);

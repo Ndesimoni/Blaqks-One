@@ -1,20 +1,32 @@
-/* Connected Follow-ups: deadline groups, a quiet task list and the existing grid footer. */
+/* Connected Follow-ups as the mockup's deadline list: each group's pill and count above its own
+   card of one-line task rows (Done checkbox, title · client, time on the right), then the grid
+   footer. */
+.deadline-group + .deadline-group {
+  margin-top: 18px;
+}
 :root[data-theme] .deadline-group-title {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 12px;
-  margin: 0;
-  padding: 16px 18px 8px;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0;
-  color: var(--ink);
 }
-.deadline-group-title span {
-  color: var(--muted);
+:root[data-theme] .deadline-pill {
+  padding: 2px 9px;
+  border-radius: 999px;
   font-size: 12px;
+}
+:root[data-theme] .is-today .deadline-pill {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.deadline-count {
+  color: var(--muted);
+  font-size: 13px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 .deadline-rows {
   margin: 0;
@@ -23,81 +35,71 @@
 }
 .deadline-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 44px;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 12px 18px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--line);
   cursor: pointer;
   transition: background-color var(--duration) var(--ease);
 }
+.deadline-row:last-child {
+  border-bottom: 0;
+}
 .deadline-row:hover {
   background: var(--hover);
 }
-.deadline-group:last-child .deadline-row:last-child {
-  border-bottom: 0;
-}
-.deadline-content {
-  display: grid;
-  min-width: 0;
-  gap: 4px;
-  overflow-wrap: anywhere;
-}
-:root[data-theme] .deadline-content p {
+.deadline-done {
+  width: 18px;
+  height: 18px;
   margin: 0;
-  font-size: 13px;
-  color: var(--muted);
+  accent-color: var(--primary);
+  cursor: pointer;
 }
-:root[data-theme] .deadline-content .deadline-title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 12px;
-  color: var(--ink);
+.deadline-done:disabled {
+  cursor: not-allowed;
 }
-.deadline-title strong {
-  font-size: 14px;
-  font-weight: 600;
-}
-.deadline-id {
-  color: var(--muted);
-  font-size: 12px;
-}
-.deadline-links,
-.deadline-meta {
+:root[data-theme] .deadline-line {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 12px;
-}
-:root[data-theme] .deadline-content .deadline-links {
+  gap: 2px 0;
+  min-width: 0;
+  margin: 0;
   color: var(--ink);
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
-.deadline-meta time {
-  font-variant-numeric: tabular-nums;
+.deadline-line strong {
+  font-weight: 600;
 }
-.deadline-actions .row-link {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
+.deadline-detail {
   color: var(--muted);
+  white-space: pre-wrap;
 }
-.deadline-actions .row-link:hover {
-  background: var(--panel);
-  box-shadow: inset 0 0 0 1px var(--line);
-  color: var(--ink);
+.deadline-line .badge {
+  margin-inline-start: 10px;
 }
-.deadline-actions .row-link:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
+.is-done .deadline-line strong {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.deadline-when {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.deadline-list > .grid-foot {
+  margin-top: 8px;
+  padding-inline: 4px;
+  border-top: 0;
 }
 @media (max-width: 750px) {
-  :root[data-theme] .deadline-group-title {
-    padding-inline: 14px;
-  }
   .deadline-row {
-    padding: 12px 14px;
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+  .deadline-when {
+    grid-column: 2;
   }
 }

@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   deadlineGroup,
   deadlineMoment,
+  deadlineWhen,
   groupDeadlines,
   isOverdueDeadline,
   orderDeadlines,
@@ -43,7 +44,19 @@ test('deadline groups use the Dubai business day and keep terminal tasks out of 
   assert.equal(isOverdueDeadline(task('A', now), day), false);
   assert.equal(isOverdueDeadline(task('A', '2026-10-31'), day), true);
   assert.equal(isOverdueDeadline(task('A', '2026-10-31', 'Completed'), day), false);
-  assert.equal(deadlineGroup(task('A', '2026-11-02'), day), 'upcoming');
+  // The mockup's This week runs to Sunday; 1 November 2026 is a Sunday, so Monday is Later.
+  assert.equal(deadlineGroup(task('A', '2026-11-02'), day), 'later');
+  const monday = '2026-11-02';
+  assert.equal(deadlineGroup(task('A', '2026-11-08'), monday), 'week');
+  assert.equal(deadlineGroup(task('A', '2026-11-09'), monday), 'later');
+  assert.deepEqual(deadlineWhen(task('A', '2026-11-02 10:30'), monday), {
+    kind: 'time',
+    time: '10:30',
+  });
+  assert.equal(deadlineWhen(task('A', '2026-11-01'), monday).kind, 'yesterday');
+  assert.equal(deadlineWhen(task('A', '2026-11-05'), monday).kind, 'weekday');
+  assert.equal(deadlineWhen(task('A', '2026-10-20'), monday).kind, 'date');
+  assert.equal(deadlineWhen(task('A', ''), monday).kind, 'none');
   assert.equal(deadlineGroup(task('A', '2026-02-30'), day), 'undated');
   for (const status of ['Completed', 'Cancelled', 'Closed', 'Done']) {
     assert.equal(deadlineGroup(task('A', '2020-01-01', status), day), 'closed');

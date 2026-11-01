@@ -1,6 +1,21 @@
 import { get, isDone } from '../../../lib/records.js';
 
-export const deadlineGroups = ['overdue', 'today', 'upcoming', 'undated', 'closed'];
+/**
+ * The approved mockup's groups (Overdue, Today, This week) lead; Later, No due date and Closed
+ * follow so no follow-up drops out of view (owner, 2026-11-01).
+ */
+export const deadlineGroups = ['overdue', 'today', 'week', 'later', 'undated', 'closed'];
+
+/** A calendar day `days` after `day` (`YYYY-MM-DD`, no time zone involved). */
+export function addDays(day, days) {
+  const stamp = new Date(`${day}T00:00:00Z`);
+  stamp.setUTCDate(stamp.getUTCDate() + days);
+  return stamp.toISOString().slice(0, 10);
+}
+
+/** The Sunday ending the Monday–Sunday week `today` falls in, as on the Viewings week. */
+export const weekEnd = (today) =>
+  addDays(today, (7 - new Date(`${today}T00:00:00Z`).getUTCDay()) % 7);
 
 /** Stored dates are UAE calendar values, not browser-zone instants. Invalid dates stay visible. */
 export function deadlineMoment(value) {
@@ -22,7 +37,19 @@ export function deadlineGroup(record, today) {
   if (isDone(get(record, 'Task status'))) return 'closed';
   const { day } = deadlineMoment(get(record, 'Due date'));
   if (!day) return 'undated';
-  return day < today ? 'overdue' : day === today ? 'today' : 'upcoming';
+  if (day < today) return 'overdue';
+  if (day === today) return 'today';
+  return day <= weekEnd(today) ? 'week' : 'later';
+}
+
+/** What a row shows on the right (the mockup's time): a time today, Yesterday, a weekday or a date. */
+export function deadlineWhen(record, today) {
+  const { day, time } = deadlineMoment(get(record, 'Due date'));
+  if (!day) return { kind: 'none' };
+  if (day === today) return time ? { kind: 'time', time } : { kind: 'today' };
+  if (day === addDays(today, -1)) return { kind: 'yesterday', time };
+  if (day > today && day <= weekEnd(today)) return { kind: 'weekday', day, time };
+  return { kind: 'date', day, time };
 }
 
 /** The connected Overdue preset means before today, matching the deadline heading. */

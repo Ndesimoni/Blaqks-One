@@ -3,7 +3,7 @@ import { ViewSwitch } from '../../../components/ui/ViewSwitch.jsx';
 import { useRecordSearch } from '../../../hooks/useRecordSearch.js';
 import { useRememberedChoice } from '../../../hooks/useRememberedChoice.js';
 import { useSession } from '../../../hooks/useSession.js';
-import { useWorkspaceView } from '../../../hooks/useWorkspace.js';
+import { useRecords, useWorkspaceView } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { dubaiToday } from '../../../lib/dubaiDate.js';
 import { GridColumnChooser } from '../../records/grid/GridColumnChooser.jsx';
@@ -24,6 +24,8 @@ export function FollowUpsPage({ toolbarExtras = null }) {
   const { t } = useI18n();
   const { user } = useSession();
   const { tab, setTab, query, setQuery, setPage } = useWorkspaceView();
+  // The mockup's "My follow-ups" for someone who sees only their own; Admins see the team's.
+  const mine = useRecords().scope !== 'team';
   const [view, chooseView] = useRememberedChoice(
     `kws-follow-ups-view:${user.id}`,
     views,
@@ -45,7 +47,7 @@ export function FollowUpsPage({ toolbarExtras = null }) {
       <RecordDirectoryHead module={module} columnNames={grid.columns} sortable={view === 'list'} />
       <GridFilterBar
         module={module}
-        presetLabel={tab === tabs[0] ? t('followUps.all') : tab}
+        presetLabel={tab === tabs[0] ? t(mine ? 'followUps.mine' : 'followUps.all') : tab}
         tabs={tabs}
         tab={tab}
         onTab={firstPage(setTab)}

@@ -8,16 +8,24 @@ import { usePagedRecords } from '../../records/grid/usePagedRecords.js';
 import { RecordTableEmpty } from '../../records/RecordTableEmpty.jsx';
 import { DeadlineRow } from './DeadlineRow.jsx';
 import { groupDeadlines, orderDeadlines } from './deadlineModel.js';
+import { useDeadlineDone } from './useDeadlineDone.js';
 import '../../records/grid/grid-card.css';
 import './deadlines.css';
 
-const PER_PAGE = 12;
+const PER_PAGE = 20;
+/** The mockup's pill tones: Overdue warns, Today is gold (deadlines.css), Closed is done. */
+const pillTone = { overdue: 'amber', today: 'gold', closed: 'green' };
 
+/**
+ * The mockup's deadline list: each group's pill and count above its own card of task rows, then
+ * the grid footer. Counts cover every page; the rows are paged in deadline order.
+ */
 export function DeadlineList({ records, emptyDetail, filtered }) {
   const { t } = useI18n();
   const { data } = useRecords();
   const { query } = useWorkspaceView();
   const { dispatchRow, readOnly = false } = useWorkspaceActions();
+  const done = useDeadlineDone();
   const today = dubaiToday();
   const ordered = orderDeadlines(records, today);
   const counts = new Map(
@@ -25,22 +33,25 @@ export function DeadlineList({ records, emptyDetail, filtered }) {
   );
   const { current, currentPage, setPage } = usePagedRecords(ordered, PER_PAGE);
   return (
-    <div className="grid-card deadline-list">
+    <div className="deadline-list">
       {current.length > 0 && (
         <section aria-label={t('followUps.records')}>
           {groupDeadlines(current, today).map(({ key, records }) => (
             <div key={key} className={`deadline-group is-${key}`}>
               <h2 className="deadline-group-title">
-                {t(`followUps.${key}`)}
-                <span>{t('followUps.groupCount', { count: counts.get(key) })}</span>
+                <span className={`deadline-pill badge badge-${pillTone[key] || 'slate'}`}>
+                  {t(`followUps.${key}`)}
+                </span>
+                <span className="deadline-count">{counts.get(key)}</span>
               </h2>
-              <ol className="deadline-rows">
+              <ol className="deadline-rows grid-card">
                 {records.map((record) => (
                   <DeadlineRow
                     key={get(record, 'Activity ID')}
                     record={record}
                     data={data}
-                    readOnly={readOnly}
+                    today={today}
+                    done={done}
                     onOpen={() => dispatchRow('Follow-ups', record)}
                   />
                 ))}
@@ -50,14 +61,16 @@ export function DeadlineList({ records, emptyDetail, filtered }) {
         </section>
       )}
       {!records.length && (
-        <RecordTableEmpty
-          module="Follow-ups"
-          title={t('followUps.empty')}
-          detail={emptyDetail}
-          query={query}
-          readOnly={readOnly}
-          action={filtered ? false : undefined}
-        />
+        <div className="grid-card">
+          <RecordTableEmpty
+            module="Follow-ups"
+            title={t('followUps.empty')}
+            detail={emptyDetail}
+            query={query}
+            readOnly={readOnly}
+            action={filtered ? false : undefined}
+          />
+        </div>
       )}
       <GridFoot
         total={records.length}
