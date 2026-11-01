@@ -1,4 +1,4 @@
-/** The app frame (NAV5): the top bar's page name and Create. */
+/** The app frame (NAV5): the top bar's page name, Create and search. */
 export default {
   create: 'Create',
   createIn: 'Create in {product}',
@@ -8,4 +8,17 @@ export default {
   'items.property': 'Property',
   'items.followUp': 'Follow-up',
   'items.viewing': 'Viewing',
+  search: 'Search clients, contacts and properties',
+  searchAll: { one: 'See the match', other: 'See all {count} matches' },
+  matches: { one: '1 match', other: '{count} matches' },
+  searchNone: 'No client, contact or property matches “{query}”.',
+  searchHint: 'Type at least two letters.',
+  searchLoading: 'Loading your records…',
+  searchMore: 'Showing {shown} of {count}. Add more letters to narrow the search.',
+  results: 'Search',
+  resultsFor: { one: '1 match for “{query}”', other: '{count} matches for “{query}”' },
+  closeResults: 'Close search',
+  'groups.Clients': 'Clients',
+  'groups.Contacts': 'Contacts',
+  'groups.Properties': 'Properties',
 };
