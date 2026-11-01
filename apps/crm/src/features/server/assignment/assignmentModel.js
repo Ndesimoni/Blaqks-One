@@ -95,6 +95,20 @@ export function bulkTargets(entries, collection, filter) {
   };
 }
 
+/**
+ * A grid selection's bulk targets (design step 2b): the ticked rows' entries and their common
+ * holder as an "Assigned to" value ('queue' for none), or null when the holders differ.
+ */
+export function selectedTargets(entries, collection, records) {
+  const rows = records.map((record) => findEntry(entries, collection, record)).filter(Boolean);
+  const holders = new Set(rows.map((row) => effectiveHolder(entries, collection, row) || 'queue'));
+  return {
+    records: rows.map(({ id, version }) => ({ collection, id, version })),
+    tooMany: rows.length > bulkLimit,
+    holder: holders.size === 1 ? [...holders][0] : null,
+  };
+}
+
 export function assignedToLabel(filter, people, me) {
   if (!filter) return 'Everyone';
   if (filter === 'queue') return queueLabel;

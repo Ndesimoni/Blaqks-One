@@ -12,6 +12,7 @@ import {
   refused,
   setGrants,
 } from './permissions-fixtures.js';
+import { anyOpenName } from './record-open.js';
 
 test('view-only staff see their assigned records with a View only chip and no change controls', async ({
   browser,
@@ -95,8 +96,8 @@ test('a create-only member adds a client, then cannot edit or delete it', async 
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(page.getByText('Created by create-only', { exact: true })).toBeVisible();
     const row = page.getByRole('row').filter({ hasText: 'Created by create-only' });
-    const button = row.getByRole('button', { name: /^Open record / });
-    const id = (await button.getAttribute('aria-label')).replace('Open record ', '');
+    const button = row.getByRole('button', { name: anyOpenName });
+    const id = (await button.getAttribute('aria-label')).replace(/^(.*, )?open record /i, '');
     await page.reload();
     const details = await openRecord(page, id);
     await expect(footer(details)).toHaveText(['Close']);

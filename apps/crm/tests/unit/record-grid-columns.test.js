@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   cleanColumns,
   defaultColumns,
+  mockupGrids,
   sameColumns,
   toggleColumn,
 } from '../../src/features/records/grid/columnsModel.js';
@@ -11,39 +12,43 @@ import { schema } from '../../src/lib/schema.js';
 
 const names = (module) => schema(module).map((field) => field.name);
 
-test('every directory starts on columns that exist in its sheet, identity first', () => {
+test("every directory starts on its sheet's columns; mockup grids leave the ID out", () => {
   for (const module of ['Clients', 'Contacts', 'Shortlist', 'Client care', 'Follow-ups']) {
     const columns = defaultColumns(module);
     assert.ok(columns.length > 2, module);
-    assert.equal(columns[0], names(module)[0], `${module} leads with its ID`);
     for (const name of columns) assert.ok(names(module).includes(name), `${module}: ${name}`);
+    const grid = mockupGrids.has(module);
+    assert.equal(columns.includes(names(module)[0]), !grid, `${module} ID column`);
   }
   // The approved mockup's columns: Client, Phone, Last contact; Contact, Role, Phone, Linked to.
-  assert.deepEqual(defaultColumns('Clients').slice(1), ['Full name', 'Phone', 'Last contact auto']);
-  assert.equal(defaultColumns('Contacts').length, 5);
+  assert.deepEqual(defaultColumns('Clients'), ['Full name', 'Phone', 'Last contact auto']);
+  assert.equal(defaultColumns('Contacts').length, 4);
 });
 
-test('a remembered choice keeps known columns, leads with the ID and never breaks the page', () => {
+test('a remembered choice keeps known columns, a fixed ID leads and nothing breaks the page', () => {
   const sheet = names('Contacts');
   const fallback = defaultColumns('Contacts');
-  assert.deepEqual(cleanColumns(['Email', 'Contact ID', 'Phone'], sheet, fallback), [
+  const saved = ['Email', 'Contact ID', 'Phone'];
+  assert.deepEqual(cleanColumns(saved, sheet, fallback, 'Contact ID'), [
     'Contact ID',
     'Email',
     'Phone',
   ]);
+  assert.deepEqual(cleanColumns(saved, sheet, fallback, null), saved, 'a mockup grid keeps order');
   assert.deepEqual(cleanColumns(['Phone', 'Retired column', 'Phone', 7], sheet, fallback), [
-    'Contact ID',
     'Phone',
   ]);
   for (const saved of [null, 'Phone', {}, [], ['Retired column']])
     assert.equal(cleanColumns(saved, sheet, fallback), fallback);
 });
 
-test('ticking appends a column, unticking removes it and the ID column stays', () => {
+test('ticking appends a column; unticking removes it but never a fixed ID or the last column', () => {
   const start = ['Client ID', 'Full name'];
   assert.deepEqual(toggleColumn(start, 'Phone', 'Client ID'), ['Client ID', 'Full name', 'Phone']);
   assert.deepEqual(toggleColumn(start, 'Full name', 'Client ID'), ['Client ID']);
   assert.equal(toggleColumn(start, 'Client ID', 'Client ID'), start);
+  assert.deepEqual(toggleColumn(start, 'Client ID', null), ['Full name']);
+  assert.deepEqual(toggleColumn(['Full name'], 'Full name', null), ['Full name']);
   assert.equal(sameColumns(start, ['Client ID', 'Full name']), true);
   assert.equal(sameColumns(start, ['Full name', 'Client ID']), false);
   assert.equal(sameColumns(start, ['Client ID']), false);

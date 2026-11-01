@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, openRecord } from './assign-helpers.js';
+import { openName } from './record-open.js';
 
 async function startReassign(page, id) {
   const details = await openRecord(page, id);
@@ -21,7 +22,7 @@ test('an Admin hands a client to staff with a note the new assignee reads in his
   const staff = await memberPage(browser, one.email);
   try {
     await staff.page.goto('/#/clients');
-    await expect(staff.page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(staff.page.getByRole('button', { name: openName(id) })).toHaveCount(0);
 
     await owner.page.goto('/#/clients');
     const { details, dialog } = await startReassign(owner.page, id);
@@ -87,12 +88,12 @@ test('staff are warned before a hand-off, lose the record and the teammate recei
     await expect(sender.page.locator('.toast')).toContainText(
       'Record handed off. You no longer see it.',
     );
-    await expect(sender.page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(sender.page.getByRole('button', { name: openName(id) })).toHaveCount(0);
     await expect(sender.page.getByRole('navigation', { name: 'Clients pages' })).toContainText(
       'Showing 0–0 of 0',
     );
     await sender.page.reload();
-    await expect(sender.page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(sender.page.getByRole('button', { name: openName(id) })).toHaveCount(0);
 
     await receiver.page.goto('/#/clients');
     await receiver.page.reload();

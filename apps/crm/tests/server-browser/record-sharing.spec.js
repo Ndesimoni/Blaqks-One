@@ -2,6 +2,7 @@ import { test, expect } from './fixtures.js';
 import { sectionNav } from './product-nav.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, openRecord } from './assign-helpers.js';
+import { openName } from './record-open.js';
 
 // Record sharing R1 (docs/record-sharing.md): one client, holder to one colleague, view only.
 const record = {
@@ -73,7 +74,7 @@ test('a holder shares a client, the colleague accepts a view-only copy, and stop
     await expect(
       sidebar.getByRole('button', { name: 'Clients, 1 lead shared with you', exact: true }),
     ).toBeVisible();
-    await expect(page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(id) })).toHaveCount(0);
 
     // The link shows only the offer: type, label, sender, dates and status.
     await page.goto(path);
@@ -122,7 +123,7 @@ test('a holder shares a client, the colleague accepts a view-only copy, and stop
 
     await page.reload();
     await expect(page.getByRole('table', { name: 'Clients records' })).toBeVisible();
-    await expect(page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(id) })).toHaveCount(0);
   } finally {
     await holder.context.close();
     await colleague.context.close();

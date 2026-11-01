@@ -11,6 +11,7 @@ import {
   setGrants,
 } from './permissions-fixtures.js';
 import { FINANCE, withFinance } from '../api/permission-helpers.mjs';
+import { openName } from './record-open.js';
 
 /** Record actions plus "See team finance", which Client deletes also need (owner Q9, L-F2). */
 const teamFinance = (base) => withFinance(base, { ...FINANCE.preset, teamView: true });
@@ -43,10 +44,10 @@ test('whole-team Delete clients & contacts follows the tick and the linked-modul
     page.once('dialog', (confirmation) => confirmation.accept());
     await details.getByRole('button', { name: 'Delete', exact: true }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: `Open record ${gone}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(gone) })).toHaveCount(0);
     await page.reload();
-    await expect(page.getByRole('button', { name: `Open record ${kept}` })).toBeVisible();
-    await expect(page.getByRole('button', { name: `Open record ${gone}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(kept) })).toBeVisible();
+    await expect(page.getByRole('button', { name: openName(gone) })).toHaveCount(0);
   } finally {
     await staff.context.close();
   }

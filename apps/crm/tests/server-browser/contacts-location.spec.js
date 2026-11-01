@@ -8,6 +8,7 @@ import {
   saveRecordForm,
   workspaceRecords,
 } from './assign-helpers.js';
+import { openName } from './record-open.js';
 
 const location = { 'Building / project': 'Marina Gate 2', Community: 'Dubai Marina' };
 
@@ -67,7 +68,8 @@ test('an Admin files a security guard by location, finds it, recategorises it an
 
     await page.reload();
     await expect(page.locator('.data-table thead')).toContainText('Linked to');
-    await expect(rows.filter({ hasText: 'CT-LOC-1' })).toContainText('Marina Gate 2');
+    const located = page.getByRole('button', { name: openName('CT-LOC-1') });
+    await expect(rows.filter({ has: located })).toContainText('Marina Gate 2');
     await showTab(page, 'Security guards');
     await expect(rows).toHaveCount(1);
     await expect(rows).toContainText('Loc guard');
@@ -78,7 +80,7 @@ test('an Admin files a security guard by location, finds it, recategorises it an
     for (const query of ['marina gate 2', 'DUBAI MARINA']) {
       await search.fill(query);
       await expect(rows).toHaveCount(1);
-      await expect(rows).toContainText('CT-LOC-1');
+      await expect(located).toBeVisible();
     }
     await search.fill('');
 

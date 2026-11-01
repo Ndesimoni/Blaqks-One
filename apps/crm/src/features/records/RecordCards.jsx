@@ -14,13 +14,13 @@ import { recordCardFields, workflowColumns } from './workflowPresentation.js';
  * Phone presentation of a record page: one card per record, identity and stage first, then the
  * two most scannable facts (all linked/date task context for workflows), then row actions.
  */
-export function RecordCards({ module, data, current, pick, readOnly, onOpen }) {
+export function RecordCards({ module, data, current, pick, identity, readOnly, onOpen }) {
   const {
     id: idColumn,
     title: titleColumn,
     state: stageColumn,
     limit,
-  } = recordCardFields(module, pick);
+  } = recordCardFields(module, pick, identity);
   const factColumns = pick.filter((f) => f !== idColumn && f !== titleColumn && f !== stageColumn);
   const value = (record, field) => {
     const formatted = formatValue(data, module, record, field);

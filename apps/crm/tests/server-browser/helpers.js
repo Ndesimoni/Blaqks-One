@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
 import { saveRecordForm } from '../browser/helpers/record-form.js';
+import { openName } from './record-open.js';
 
 export { saveRecordForm };
 
@@ -59,7 +60,7 @@ export async function addClient(page, id, name) {
 }
 
 export async function openClientEditor(page, id) {
-  await page.getByRole('button', { name: `Open record ${id}`, exact: true }).click();
+  await page.getByRole('button', { name: openName(id) }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Edit record' }).click();
   await expect(page.getByLabel('Full name')).toBeVisible();
 }

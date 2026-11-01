@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { schema } from '../../../lib/schema.js';
-import { cleanColumns, defaultColumns, sameColumns, toggleColumn } from './columnsModel.js';
+import {
+  cleanColumns,
+  defaultColumns,
+  mockupGrids,
+  sameColumns,
+  toggleColumn,
+} from './columnsModel.js';
 
 const storageKey = (viewer, module) => `kws-grid-columns:${viewer || 'viewer'}:${module}`;
 
 // Columns are a per-viewer convenience; storage may be unavailable or hold an old entry.
-function read(key, names, fallback) {
+function read(key, names, fallback, fixed) {
   try {
-    return cleanColumns(JSON.parse(localStorage.getItem(key) || 'null'), names, fallback);
+    return cleanColumns(JSON.parse(localStorage.getItem(key) || 'null'), names, fallback, fixed);
   } catch {
     return fallback;
   }
@@ -30,9 +36,11 @@ export function useGridColumns(module, viewer) {
   const fields = useMemo(() => schema(module), [module]);
   const names = useMemo(() => fields.map((field) => field.name), [fields]);
   const fallback = useMemo(() => defaultColumns(module), [module]);
+  // A mockup grid's ID is an ordinary column; other tables keep theirs first.
+  const fixed = mockupGrids.has(module) ? null : names[0];
   const key = storageKey(viewer, module);
-  const [columns, setColumns] = useState(() => read(key, names, fallback));
-  useEffect(() => setColumns(read(key, names, fallback)), [key, names, fallback]);
+  const [columns, setColumns] = useState(() => read(key, names, fallback, fixed));
+  useEffect(() => setColumns(read(key, names, fallback, fixed)), [key, names, fallback, fixed]);
   const choose = useCallback(
     (next) => {
       setColumns(next);
@@ -43,9 +51,9 @@ export function useGridColumns(module, viewer) {
   return {
     fields,
     columns,
-    identity: names[0],
+    identity: fixed,
     isDefault: sameColumns(columns, fallback),
-    toggle: (name) => choose(toggleColumn(columns, name, names[0])),
+    toggle: (name) => choose(toggleColumn(columns, name, fixed)),
     reset: () => choose(fallback),
   };
 }

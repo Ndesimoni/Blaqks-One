@@ -7,6 +7,7 @@ import {
   saveRecordForm,
   signIn,
 } from './helpers.js';
+import { openName } from './record-open.js';
 
 test('stale edits preserve the draft and reload only after an explicit choice', async ({
   page,
@@ -28,9 +29,9 @@ test('stale edits preserve the draft and reload only after an explicit choice', 
   await saveRecordForm(page);
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole('row').filter({ hasText: 'BROWSER-CONFLICT' })).toContainText(
-    'Resolved client',
-  );
+  // The grid names a row by its open control ("Resolved client, open record BROWSER-CONFLICT").
+  const open = page.getByRole('button', { name: openName('BROWSER-CONFLICT') });
+  await expect(page.getByRole('row').filter({ has: open })).toContainText('Resolved client');
 });
 
 test('failed saves keep entered data and allow retry', async ({ page }) => {
@@ -46,7 +47,7 @@ test('failed saves keep entered data and allow retry', async ({ page }) => {
   await page.unroute('**/api/crm/workspaces/*/records/Clients');
   await saveRecordForm(page);
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Open record BROWSER-RETRY' })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('BROWSER-RETRY') })).toBeVisible();
 });
 
 test('an authoritative expired session clears cached workspace data', async ({ page }) => {

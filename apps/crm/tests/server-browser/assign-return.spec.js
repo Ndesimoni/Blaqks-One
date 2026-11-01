@@ -7,6 +7,7 @@ import {
   setTheme,
   workspaceRecords,
 } from './assign-helpers.js';
+import { openName } from './record-open.js';
 
 const chain =
   "Only the client's holder, the Admin or a full-team member can pass this follow-up on. " +
@@ -83,9 +84,9 @@ test("a direct assignee who does not hold the client returns the follow-up to th
     await expect(page.locator('.toast')).toContainText(
       "Follow-up returned to the client's holder.",
     );
-    await expect(page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(id) })).toHaveCount(0);
     await page.reload();
-    await expect(page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(id) })).toHaveCount(0);
 
     await holder.page.goto('/#/follow-ups');
     await holder.page.reload();

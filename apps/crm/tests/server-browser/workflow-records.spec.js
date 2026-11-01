@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { openPage } from './product-nav.js';
 import { addClient, createRecord, saveRecordForm, session, signIn } from './helpers.js';
+import { openName } from './record-open.js';
 
 test('a connected viewing links to a client, survives reload and protects that client', async ({
   page,
@@ -17,7 +18,7 @@ test('a connected viewing links to a client, survives reload and protects that c
   await saveRecordForm(page);
   await expect(dialog).toHaveCount(0);
   await page.reload();
-  await expect(page.getByRole('button', { name: 'Open record BROWSER-WF-VIEW' })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('BROWSER-WF-VIEW') })).toBeVisible();
   const identity = await session(page);
   const response = await page.request.get(`/api/crm/workspaces/${identity.user.id}/records`);
   const viewing = (await response.json()).records.Viewings.find(
@@ -27,7 +28,7 @@ test('a connected viewing links to a client, survives reload and protects that c
 
   await openPage(page, 'Clients');
   await page.getByLabel('Search Clients', { exact: true }).fill('BROWSER-WF-CLIENT');
-  await page.getByRole('button', { name: 'Open record BROWSER-WF-CLIENT', exact: true }).click();
+  await page.getByRole('button', { name: openName('BROWSER-WF-CLIENT') }).click();
   page.once('dialog', (prompt) => prompt.accept());
   await page
     .getByRole('dialog')
@@ -36,7 +37,7 @@ test('a connected viewing links to a client, survives reload and protects that c
   await expect(page.locator('.toast')).toContainText('A linked record prevents this change.');
   await page.reload();
   await page.getByLabel('Search Clients', { exact: true }).fill('BROWSER-WF-CLIENT');
-  await expect(page.getByRole('button', { name: 'Open record BROWSER-WF-CLIENT' })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('BROWSER-WF-CLIENT') })).toBeVisible();
   expect(errors).toEqual([]);
 });
 

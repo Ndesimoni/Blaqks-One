@@ -2,15 +2,19 @@ import { preferredCols } from '../../../config/tableColumns.js';
 import { workflowColumns } from '../workflowPresentation.js';
 
 /**
- * Default columns of the approved mockup's grids (owner, 2026-11-01), after the identity column;
- * every other column of the sheet stays one tick away in the column chooser.
+ * The directories drawn as the approved mockup's grid (owner, 2026-11-01): no ID column by
+ * default, a select column and the first cell opening the record. Other tables keep their ID
+ * first and their row buttons until their own design step.
  */
+export const mockupGrids = new Set(['Clients', 'Contacts', 'Shortlist', 'Client care']);
+
+/** Default columns; every other column of the sheet stays one tick away in the chooser. */
 const pilotColumns = {
   ...workflowColumns,
-  Clients: ['Client ID', 'Full name', 'Phone', 'Last contact auto'],
-  Contacts: ['Contact ID', 'Full name', 'Contact type', 'Phone', 'Building / project'],
-  Shortlist: ['Match ID', 'Client name auto', 'Property title auto', 'Client response'],
-  'Client care': ['Care ID', 'Client name auto', 'Touchpoint type', 'Next contact', 'Task status'],
+  Clients: ['Full name', 'Phone', 'Last contact auto'],
+  Contacts: ['Full name', 'Contact type', 'Phone', 'Building / project'],
+  Shortlist: ['Client name auto', 'Property title auto', 'Client response'],
+  'Client care': ['Client name auto', 'Touchpoint type', 'Next contact', 'Task status'],
 };
 
 /** The columns a directory shows until its viewer chooses others. */
@@ -19,23 +23,23 @@ export function defaultColumns(module) {
 }
 
 /**
- * A remembered choice, kept only for names that are still columns of the sheet. The identity
- * column (the sheet's first) always leads, so every row keeps its ID and Open record action.
- * Anything unreadable falls back to the defaults.
+ * A remembered choice, kept only for names that are still columns of the sheet. A `fixed`
+ * column (the ID of a table that is not a mockup grid) always leads, so its rows keep their ID
+ * and Open record action. Anything unreadable falls back to the defaults.
  */
-export function cleanColumns(saved, names, fallback) {
+export function cleanColumns(saved, names, fallback, fixed) {
   if (!Array.isArray(saved)) return fallback;
   const known = new Set(names);
   const kept = [...new Set(saved.filter((name) => typeof name === 'string' && known.has(name)))];
   if (!kept.length) return fallback;
-  const [identity] = names;
-  return [identity, ...kept.filter((name) => name !== identity)];
+  return fixed ? [fixed, ...kept.filter((name) => name !== fixed)] : kept;
 }
 
-/** Ticking adds a column at the end; unticking removes it. The identity column stays. */
-export function toggleColumn(columns, name, identity) {
-  if (name === identity) return columns;
-  return columns.includes(name) ? columns.filter((column) => column !== name) : [...columns, name];
+/** Ticking adds a column at the end; unticking removes it, except a fixed or the last column. */
+export function toggleColumn(columns, name, fixed) {
+  if (name === fixed) return columns;
+  if (!columns.includes(name)) return [...columns, name];
+  return columns.length > 1 ? columns.filter((column) => column !== name) : columns;
 }
 
 export const sameColumns = (a, b) =>

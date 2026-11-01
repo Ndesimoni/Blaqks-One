@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { addClient, session, signIn, signOut } from './helpers.js';
 import { selectWorkspace } from './workspace-helpers.js';
+import { openName } from './record-open.js';
 
 test('a client survives reload and another browser but remains private to its admin', async ({
   page,
@@ -10,18 +11,18 @@ test('a client survives reload and another browser but remains private to its ad
   await addClient(page, 'BROWSER-PERSIST', 'Persisted Client');
   await page.reload();
   await page.getByLabel('Search Clients', { exact: true }).fill('BROWSER-PERSIST');
-  await expect(page.getByRole('button', { name: 'Open record BROWSER-PERSIST' })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('BROWSER-PERSIST') })).toBeVisible();
   const identity = await session(page);
   const context = await browser.newContext();
   const other = await context.newPage();
   await signIn(other);
   await other.getByLabel('Search Clients', { exact: true }).fill('BROWSER-PERSIST');
-  await expect(other.getByRole('button', { name: 'Open record BROWSER-PERSIST' })).toBeVisible();
+  await expect(other.getByRole('button', { name: openName('BROWSER-PERSIST') })).toBeVisible();
   await signOut(other);
   await expect(other.getByLabel('Email address')).toBeVisible();
   await signIn(other, 'admin-b');
   await other.getByLabel('Search Clients', { exact: true }).fill('BROWSER-PERSIST');
-  await expect(other.getByRole('button', { name: 'Open record BROWSER-PERSIST' })).toHaveCount(0);
+  await expect(other.getByRole('button', { name: openName('BROWSER-PERSIST') })).toHaveCount(0);
   await other.goto(`/#/clients?workspace=${identity.user.id}`);
   await expect(
     other.getByRole('heading', { name: 'Workspace access is restricted' }),
@@ -46,7 +47,7 @@ test('Super Admin switches to a member workspace and saves there', async ({ page
     ),
   ).toBe(true);
   await selectWorkspace(page, 'Super Admin workspace');
-  await expect(page.getByRole('button', { name: 'Open record BROWSER-SUPER' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: openName('BROWSER-SUPER') })).toHaveCount(0);
 });
 
 test('server unavailability never falls back to browser demo identity or records', async ({

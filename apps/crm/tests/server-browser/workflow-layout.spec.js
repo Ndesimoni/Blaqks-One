@@ -2,6 +2,7 @@ import { expect, test } from './fixtures.js';
 import { add } from '../api/assignment-helpers.mjs';
 import { login } from '../api/helpers.mjs';
 import { signIn } from './helpers.js';
+import { anyOpenName } from './record-open.js';
 
 test('workflow cards retain task dates, state and linked records in both themes', async ({
   page,
@@ -38,7 +39,8 @@ test('workflow cards retain task dates, state and linked records in both themes'
       'Shortlist',
       'shortlist',
       { match_id: 'UI5-MATCH', date_sent: '2020-01-01', client_response: 'Pending' },
-      'Date sent',
+      // The mockup's Shortlist shows Client, Property and Status; Date sent is in the chooser.
+      'Client',
     ],
     [
       'Interaction log',
@@ -61,7 +63,8 @@ test('workflow cards retain task dates, state and linked records in both themes'
         next_contact: '2020-01-02',
         task_status: 'Open',
       },
-      'Next contact',
+      // The mockup's heading for Next contact.
+      'Due',
     ],
   ];
   for (const [module, , record] of scenarios) {
@@ -89,7 +92,7 @@ test('workflow cards retain task dates, state and linked records in both themes'
       const card = page.locator(feed ? '.feed-event' : '.record-card').first();
       await expect(card).toContainText(dateLabel);
       await expect(card).toContainText('Synthetic workflow');
-      await expect(card.getByRole('button', { name: /^Open record/ })).toBeVisible();
+      await expect(card.getByRole('button', { name: anyOpenName })).toBeVisible();
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
       ).toBe(true);

@@ -10,6 +10,7 @@ import {
   refused,
   setGrants,
 } from './permissions-fixtures.js';
+import { openName } from './record-open.js';
 
 test('a direct assignee without Hand on cannot delete a follow-up but can still return it', async ({
   browser,
@@ -61,7 +62,7 @@ test('a direct assignee without Hand on cannot delete a follow-up but can still 
       "Follow-up returned to the client's holder.",
     );
     await page.reload();
-    await expect(page.getByRole('button', { name: `Open record ${id}` })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: openName(id) })).toHaveCount(0);
   } finally {
     await staff.context.close();
   }

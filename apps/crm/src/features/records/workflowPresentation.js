@@ -56,9 +56,12 @@ export const workflowTitles = {
   'Client care': 'Touchpoint type',
 };
 
-/** Mobile workflows keep all task context rather than truncating to two facts. */
-export function recordCardFields(module, pick) {
-  const id = pick[0];
+/**
+ * Mobile workflows keep all task context rather than truncating to two facts. `identity` is the
+ * sheet's ID column, which a mockup grid may not list among its columns.
+ */
+export function recordCardFields(module, pick, identity = pick[0]) {
+  const id = identity;
   const title =
     pick.find((field) => field.name === workflowTitles[module]) ||
     pick.find(

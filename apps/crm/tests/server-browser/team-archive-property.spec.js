@@ -2,6 +2,7 @@ import { test, expect } from './fixtures.js';
 import { signIn, session } from './helpers.js';
 import { closeInvitation, finishInvitation, openTeam, startInvitation } from './team-helpers.js';
 import { clickMemberAction, teamCard } from './team-status-helpers.js';
+import { openName } from './record-open.js';
 
 test('archived property photos and details remain viewable without editing or uploading', async ({
   page,
@@ -53,7 +54,5 @@ test('archived property photos and details remain viewable without editing or up
   ).toHaveCount(0);
   await details.getByRole('button', { name: 'Close', exact: true }).click();
   await page.getByRole('button', { name: 'Table view', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Open record BROWSER-ARCHIVE-HOUSE' }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('BROWSER-ARCHIVE-HOUSE') })).toBeVisible();
 });

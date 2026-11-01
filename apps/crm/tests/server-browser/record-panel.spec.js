@@ -2,6 +2,7 @@ import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, openRecord, setTheme } from './assign-helpers.js';
 import { openPage } from './product-nav.js';
+import { openName } from './record-open.js';
 
 const NAME = 'Panel client Layla';
 const SIZES = [
@@ -70,7 +71,7 @@ test('client details open as a right-edge panel with the stage track and activit
       await setTheme(page, theme);
       for (const [width, height] of SIZES) {
         await page.setViewportSize({ width, height });
-        const open = page.getByRole('button', { name: 'Open record CL-RP-1', exact: true });
+        const open = page.getByRole('button', { name: openName('CL-RP-1') });
         const panel = await openRecord(page, 'CL-RP-1');
         await expect(panel).toHaveAccessibleName(NAME);
         await expect(panel.getByRole('heading', { level: 2, name: NAME })).toBeFocused();

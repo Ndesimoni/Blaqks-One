@@ -2,6 +2,7 @@ import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, setTheme } from './assign-helpers.js';
 import { textContrast } from '../browser/helpers/contrast.js';
+import { openName } from './record-open.js';
 
 test('the hand-off dialog and Assigned to filter work by keyboard in both themes at 390px', async ({
   browser,
@@ -33,7 +34,7 @@ test('the hand-off dialog and Assigned to filter work by keyboard in both themes
         expect(await textContrast(filter.locator('label'))).toBeGreaterThanOrEqual(4.5);
         await page.screenshot({ path: testInfo.outputPath(`filter-${width}-${theme}.png`) });
 
-        const open = page.getByRole('button', { name: `Open record ${id}`, exact: true });
+        const open = page.getByRole('button', { name: openName(id) });
         await open.focus();
         await expect(open).toBeFocused();
         await page.keyboard.press('Enter');
@@ -88,7 +89,7 @@ test('Escape closes only the hand-off dialog and returns focus to Reassign', asy
   const { page, context } = await memberPage(browser, team.people.admin.email);
   try {
     await page.goto('/#/clients');
-    await page.getByRole('button', { name: `Open record ${id}`, exact: true }).click();
+    await page.getByRole('button', { name: openName(id) }).click();
     const details = page.getByRole('dialog', { name: 'Escape client' });
     const reassign = details.getByRole('button', { name: 'Reassign', exact: true });
     await reassign.click();

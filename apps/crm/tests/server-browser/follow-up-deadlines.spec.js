@@ -3,6 +3,7 @@ import { add } from '../api/assignment-helpers.mjs';
 import { login } from '../api/helpers.mjs';
 import { dubaiToday, shiftDay } from '../../src/lib/dubaiDate.js';
 import { signIn } from './helpers.js';
+import { openName } from './record-open.js';
 
 test('deadline groups retain search, list preference and the record slider', async ({ page }) => {
   const admin = await login();
@@ -34,13 +35,11 @@ test('deadline groups retain search, list preference and the record slider', asy
     await expect(page.getByRole('heading', { name: new RegExp(`^${title}`) })).toBeVisible();
   await page.getByRole('button', { name: 'Overdue', exact: true }).click();
   await expect(page.locator('.deadline-row')).toHaveCount(1);
-  await expect(
-    page.getByRole('button', { name: 'Open record DL-OVERDUE', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('DL-OVERDUE') })).toBeVisible();
   await expect(page.getByRole('heading', { name: /^Today/ })).toHaveCount(0);
   // Choosing the pressed preset again returns to the default, All follow-ups.
   await page.getByRole('button', { name: 'Overdue', exact: true }).click();
-  await page.getByRole('button', { name: 'Open record DL-TODAY', exact: true }).click();
+  await page.getByRole('button', { name: openName('DL-TODAY') }).click();
   await expect(page.getByRole('dialog')).toContainText('Synthetic action DL-TODAY');
   await page.keyboard.press('Escape');
   await page.getByLabel('Search Follow-ups', { exact: true }).fill('DL-CLOSED');
@@ -48,9 +47,7 @@ test('deadline groups retain search, list preference and the record slider', asy
   await expect(page.getByRole('heading', { name: /^Overdue/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'List', exact: true }).click();
   await expect(page.getByRole('table', { name: 'Follow-ups records', exact: true })).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Open record DL-CLOSED', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('DL-CLOSED') })).toBeVisible();
   await page.reload();
   await expect(page.getByRole('button', { name: 'List', exact: true })).toHaveAttribute(
     'aria-pressed',

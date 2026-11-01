@@ -6,8 +6,8 @@ import './grid-columns.css';
 
 /**
  * The grid's column chooser: the mockup's gear button, opening every column of the sheet as a checkbox.
- * It stays open while columns are ticked; Escape or a click outside closes it. The identity
- * column cannot be removed.
+ * It stays open while columns are ticked; Escape or a click outside closes it. A fixed ID
+ * column and the last ticked column cannot be removed.
  */
 export function GridColumnChooser({ module, grid }) {
   const { t } = useI18n();
@@ -61,7 +61,10 @@ export function GridColumnChooser({ module, grid }) {
                 <input
                   type="checkbox"
                   checked={grid.columns.includes(field.name)}
-                  disabled={field.name === grid.identity}
+                  disabled={
+                    field.name === grid.identity ||
+                    (grid.columns.length === 1 && grid.columns[0] === field.name)
+                  }
                   onChange={() => grid.toggle(field.name)}
                 />
                 <span>{columnHeading(module, field.name)}</span>

@@ -9,6 +9,7 @@ import {
 } from './team-helpers.js';
 import { expectSuspended, openMemberActions, teamCard } from './team-status-helpers.js';
 import { textContrast } from '../browser/helpers/contrast.js';
+import { openName } from './record-open.js';
 
 test('Super Admin deletes an Admin into a read-only archive with their team and all records', async ({
   page,
@@ -109,7 +110,7 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
       page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
     ).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Import saved records' })).toHaveCount(0);
-    await page.getByRole('button', { name: 'Open record ARCHIVED-BROWSER-CLIENT' }).click();
+    await page.getByRole('button', { name: openName('ARCHIVED-BROWSER-CLIENT') }).click();
     const details = page.getByRole('dialog');
     await expect(details.getByRole('button', { name: /Edit record|Delete/ })).toHaveCount(0);
     await details.getByRole('button', { name: 'Close', exact: true }).click();

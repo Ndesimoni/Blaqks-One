@@ -2,6 +2,7 @@ import { expect } from '@playwright/test';
 import { landWhereTestsBegin, session } from './helpers.js';
 import { saveRecordForm } from '../browser/helpers/record-form.js';
 import { openPage } from './product-nav.js';
+import { openName } from './record-open.js';
 
 export const password = 'Team123!';
 
@@ -48,7 +49,7 @@ export async function openSection(page, name) {
 
 /** Opens record details from the current list by its visible ID. */
 export async function openRecord(page, id) {
-  await page.getByRole('button', { name: `Open record ${id}`, exact: true }).click();
+  await page.getByRole('button', { name: openName(id) }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   return dialog;

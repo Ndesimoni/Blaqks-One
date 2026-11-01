@@ -1,6 +1,6 @@
 /**
  * The record directory grid and the Interaction log feed (NAV, Bitrix24 list and activity feed
- * patterns): filter bar, column chooser, footer and day groups.
+ * patterns): filter bar, column chooser, selection bar, footer and day groups.
  */
 export default {
   placeholder: 'Filter and search',
@@ -15,6 +15,15 @@ export default {
   showing: 'Showing {first}–{last} of {total} records',
   page: 'Page {page}',
   rowsPerPage: 'Rows per page: {count}',
+  openNamed: '{name}, open record {id}',
+  openId: 'Open record {id}',
+  selectPage: 'Select every row on this page',
+  selectRow: 'Select {name}',
+  selection: 'Selected rows',
+  selected: '{count} selected',
+  message: 'Message',
+  assign: 'Assign to…',
+  clearSelection: 'Clear selection',
   emptyFiltered: 'Try another filter or search, or clear them to show every record.',
   today: 'Today',
   yesterday: 'Yesterday',

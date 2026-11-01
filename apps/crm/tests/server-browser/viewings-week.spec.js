@@ -3,6 +3,7 @@ import { add } from '../api/assignment-helpers.mjs';
 import { login } from '../api/helpers.mjs';
 import { dubaiToday, shiftDay } from '../../src/lib/dubaiDate.js';
 import { signIn } from './helpers.js';
+import { openName } from './record-open.js';
 
 test('week view preserves dated and unscheduled viewings, navigation and List preference', async ({
   page,
@@ -31,40 +32,24 @@ test('week view preserves dated and unscheduled viewings, navigation and List pr
     'true',
   );
   await expect(page.getByText(/^Dubai time/)).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Open record WK-EARLY', exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Open record WK-LATE', exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Open record WK-NEXT', exact: true })).toHaveCount(
-    0,
-  );
+  await expect(page.getByRole('button', { name: openName('WK-EARLY') })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('WK-LATE') })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('WK-NEXT') })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /^Unscheduled/ })).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Open record WK-UNDATED', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('WK-UNDATED') })).toBeVisible();
   await page.getByRole('button', { name: 'Next week', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Open record WK-NEXT', exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Open record WK-EARLY', exact: true })).toHaveCount(
-    0,
-  );
+  await expect(page.getByRole('button', { name: openName('WK-NEXT') })).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('WK-EARLY') })).toHaveCount(0);
   await page.getByRole('button', { name: 'Previous week', exact: true }).click();
-  await page.getByRole('button', { name: 'Open record WK-EARLY', exact: true }).press('Enter');
+  await page.getByRole('button', { name: openName('WK-EARLY') }).press('Enter');
   await expect(page.getByRole('dialog')).toContainText('WK-EARLY');
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Next week', exact: true }).click();
   await page.getByRole('button', { name: 'Today', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: 'Open record WK-EARLY', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('WK-EARLY') })).toBeVisible();
   await page.getByRole('button', { name: 'List', exact: true }).click();
   await expect(page.getByRole('table', { name: 'Viewings records', exact: true })).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Open record WK-NEXT', exact: true }),
-  ).toBeVisible();
+  await expect(page.getByRole('button', { name: openName('WK-NEXT') })).toBeVisible();
   await page.reload();
   await expect(page.getByRole('button', { name: 'List', exact: true })).toHaveAttribute(
     'aria-pressed',

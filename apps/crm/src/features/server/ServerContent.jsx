@@ -108,23 +108,30 @@ export function ServerContent({ owner }) {
   if (route === 'Inbox') return <ServerInbox owner={owner} />;
   if (['Deals', 'Payments', 'Expenses'].includes(route))
     return <FinanceContent key={route} route={route} owner={owner} />;
-  const page = (toolbarExtras) => {
+  const page = (toolbarExtras, selectionActions) => {
     if (route === 'Viewings') return <ViewingsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Follow-ups') return <FollowUpsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
-    if (route === 'Contacts') return <ContactsPage toolbarExtras={toolbarExtras} />;
+    if (route === 'Contacts')
+      return <ContactsPage toolbarExtras={toolbarExtras} selectionActions={selectionActions} />;
     if (route === 'Properties') return <PropertyDirectory toolbarExtras={toolbarExtras} />;
-    return <RecordsPage module={route} toolbarExtras={toolbarExtras} />;
+    return (
+      <RecordsPage
+        module={route}
+        toolbarExtras={toolbarExtras}
+        selectionActions={selectionActions}
+      />
+    );
   };
   const collection = route === 'Leads' ? 'Clients' : route;
   // Records a colleague shared with the caller wait above Leads, Clients, Properties and
   // Contacts; other pages show nothing there.
   return (
     <AssignmentPageScope key={route} module={collection}>
-      {(toolbarExtras) => (
+      {(toolbarExtras, selectionActions) => (
         <>
           <IncomingShares collection={collection} />
-          {page(toolbarExtras)}
+          {page(toolbarExtras, selectionActions)}
         </>
       )}
     </AssignmentPageScope>

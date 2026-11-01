@@ -6,23 +6,39 @@ import { useRecords } from '../../../hooks/useWorkspace.js';
 import { AssigneeSelect } from './AssigneeSelect.jsx';
 import { AssignmentNoteField } from './AssignmentNoteField.jsx';
 import { useBulkReassign } from './useBulkReassign.js';
-import { assignedToLabel, bulkLimit, bulkTargets, noteError } from './assignmentModel.js';
+import {
+  assignedToLabel,
+  bulkLimit,
+  bulkTargets,
+  noteError,
+  selectedTargets,
+} from './assignmentModel.js';
 
-/** Team scope: move every record in the current "Assigned to" filter together, or none. */
-export function BulkReassignDialog({ module, filter, assignees, me, onClose }) {
+/**
+ * Team scope: move every record in the current "Assigned to" filter, or the grid's ticked rows
+ * (`selected`), together or none. `onDone` runs after a move succeeds.
+ */
+export function BulkReassignDialog({ module, filter, selected, assignees, me, onClose, onDone }) {
   const titleId = useId();
   const fieldId = useId();
   const { entries } = useRecords();
-  const { records: targets, tooMany } = useMemo(
-    () => bulkTargets(entries, module, filter),
-    [entries, module, filter],
+  const {
+    records: targets,
+    tooMany,
+    holder,
+  } = useMemo(
+    () =>
+      selected
+        ? selectedTargets(entries, module, selected)
+        : { ...bulkTargets(entries, module, filter), holder: filter },
+    [entries, module, filter, selected],
   );
   const bulk = useBulkReassign(module, targets);
   const [choice, setChoice] = useState('');
   const [note, setNote] = useState('');
   const [message, setMessage] = useState('');
   const issue = noteError(note);
-  const same = choice !== '' && choice === filter;
+  const same = choice !== '' && choice === holder;
   const blocked = bulk.busy || !choice || same || !targets.length || tooMany || Boolean(issue);
   const close = () => {
     if (!bulk.busy) onClose();
@@ -33,9 +49,12 @@ export function BulkReassignDialog({ module, filter, assignees, me, onClose }) {
     setMessage('');
     const result = await bulk.submit(choice === 'queue' ? null : choice, note);
     if (result?.message) setMessage(result.message);
-    else if (result?.done) onClose();
+    else if (result?.done) {
+      onDone?.();
+      onClose();
+    }
   };
-  const source = assignedToLabel(filter, assignees.people, me);
+  const source = holder ? assignedToLabel(holder, assignees.people, me) : 'different people';
   return (
     <Drawer className="assignment-dialog" titleId={titleId} onClose={close}>
       <div className="drawer-top">
@@ -63,7 +82,8 @@ export function BulkReassignDialog({ module, filter, assignees, me, onClose }) {
           </p>
           {tooMany && (
             <p className="field-error" role="alert">
-              This filter has more than {bulkLimit} records. Reassign at most {bulkLimit} at a time.
+              This {selected ? 'selection' : 'filter'} has more than {bulkLimit} records. Reassign
+              at most {bulkLimit} at a time.
             </p>
           )}
           <AssigneeSelect

@@ -5,6 +5,7 @@ import { useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { RecordFeed } from './feed/RecordFeed.jsx';
 import { directoryNoun, plural } from './grid/directoryNouns.js';
+import { mockupGrids } from './grid/columnsModel.js';
 import { GridColumnChooser } from './grid/GridColumnChooser.jsx';
 import { GridFilterBar } from './grid/GridFilterBar.jsx';
 import { useGridColumns } from './grid/useGridColumns.js';
@@ -17,8 +18,8 @@ const feedModules = new Set(['Interaction log']);
 
 /**
  * A record directory in the Bitrix24 list pattern (NAV): count and primary action, the filter
- * bar, then the grid or feed. `toolbarExtras` is an optional slot (connected mode supplies
- * the "Assigned to" filter).
+ * bar, then the grid or feed. `toolbarExtras` and `selectionActions` are optional slots
+ * (connected mode supplies the "Assigned to" filter and Assign to… for ticked rows).
  */
 function RecordsPage({
   module,
@@ -26,6 +27,7 @@ function RecordsPage({
   matchesTab,
   emptyDetail,
   toolbarExtras = null,
+  selectionActions = null,
 }) {
   const { t } = useI18n();
   const { user } = useSession();
@@ -66,6 +68,8 @@ function RecordsPage({
           emptyDetail={detail}
           columnNames={grid.columns}
           sortInHeading
+          gridRows={mockupGrids.has(module)}
+          selectionActions={selectionActions}
         />
       )}
     </div>
