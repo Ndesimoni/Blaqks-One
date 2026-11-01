@@ -7,6 +7,7 @@ import enDealParties from './en/dealParties.js';
 import enDealsBoard from './en/dealsBoard.js';
 import enFieldHints from './en/fieldHints.js';
 import enFollowUps from './en/followUps.js';
+import enViewings from './en/viewings.js';
 import enHandoverOffer from './en/handoverOffer.js';
 import enHandoverRequests from './en/handoverRequests.js';
 import enHandoverReview from './en/handoverReview.js';
@@ -29,6 +30,7 @@ export const crmCatalogs = {
   dealsBoard: enDealsBoard,
   fieldHints: enFieldHints,
   followUps: enFollowUps,
+  viewings: enViewings,
   handoverOffer: enHandoverOffer,
   handoverRequests: enHandoverRequests,
   handoverReview: enHandoverReview,

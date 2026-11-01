@@ -19,6 +19,7 @@ import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
 import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
 import { FinanceContent } from './finance/FinanceContent.jsx';
 import { FollowUpsPage } from './followUps/FollowUpsPage.jsx';
+import { ViewingsPage } from './viewings/ViewingsPage.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
 import { ServerInbox } from './inbox/ServerInbox.jsx';
 import { ServerInboxRules } from './inboxRules/ServerInboxRules.jsx';
@@ -97,6 +98,7 @@ export function ServerContent({ owner }) {
   if (['Deals', 'Payments', 'Expenses'].includes(route))
     return <FinanceContent key={route} route={route} owner={owner} />;
   const page = (toolbarExtras) => {
+    if (route === 'Viewings') return <ViewingsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Follow-ups') return <FollowUpsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Leads') return <LeadsPage toolbarExtras={toolbarExtras} />;
     if (route === 'Contacts') return <ContactsPage toolbarExtras={toolbarExtras} />;

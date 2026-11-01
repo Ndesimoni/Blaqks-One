@@ -77,7 +77,7 @@ test('workflow cards retain task dates, state and linked records in both themes'
     // The Interaction log reads as an activity feed at every width (NAV); the rest are grids.
     const feed = module === 'Interaction log';
     await page.goto(`/#/${route}`);
-    if (module === 'Follow-ups')
+    if (['Follow-ups', 'Viewings'].includes(module))
       await page.getByRole('button', { name: 'List', exact: true }).click();
     await page.getByLabel(`Search ${module}`, { exact: true }).fill('UI5-');
     for (const theme of ['dark', 'light']) {

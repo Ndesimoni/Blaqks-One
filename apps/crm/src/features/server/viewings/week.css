@@ -1,0 +1,146 @@
+/* Viewings are appointments, not duration blocks; no placement implies how long a visit lasts. */
+.viewing-week {
+  container-type: inline-size;
+  display: grid;
+  gap: 16px;
+}
+.viewing-week-toolbar,
+.viewing-week-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.viewing-week-toolbar {
+  justify-content: space-between;
+}
+:root[data-theme] .viewing-week-range h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+:root[data-theme] .viewing-week-range p,
+:root[data-theme] .viewing-week-empty {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.viewing-week-navigation button,
+.viewings-page .segmented-view-switch button {
+  min-height: 44px;
+}
+.viewing-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+.viewing-week-day {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  padding: 12px;
+}
+.viewing-week-day.is-today {
+  border-color: var(--primary);
+}
+:root[data-theme] .viewing-week-day h3 {
+  display: grid;
+  gap: 4px;
+  min-height: 44px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.viewing-today-label {
+  color: var(--primary);
+  font-size: 12px;
+}
+:root[data-theme] :is(.viewing-day-count, .viewing-no-events) {
+  color: var(--muted);
+  font-size: 12px;
+}
+.viewing-week-day ol,
+.viewing-unscheduled-cards {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.viewing-week-card {
+  position: relative;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  transition: background-color var(--duration) var(--ease);
+}
+.viewing-week-card:hover {
+  background: var(--hover);
+}
+.viewing-week-content {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+:root[data-theme] .viewing-week-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+:root[data-theme] .viewing-week-content .viewing-week-time {
+  min-height: 36px;
+  padding-right: 42px;
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.viewing-week-content strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.viewing-week-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+.viewing-week-actions .row-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+.viewing-week-actions .row-link:hover {
+  color: var(--ink);
+  background: var(--panel);
+}
+.viewing-week-actions .row-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+@container (max-width: 1200px) {
+  .viewing-week-days {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@container (max-width: 750px) {
+  .viewing-week-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 540px) {
+  .viewing-week-days {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
