@@ -1,5 +1,6 @@
 /* Record panel header (approved mockup `.slider-head`): avatar, title and subtitle, the
-   record's actions, its status chips and, for clients, the stage track below. */
+   record's actions (Share and Publish from its sections), its status chips and, for clients,
+   the stage track below. */
 :root[data-theme] .record-panel .record-panel-head {
   position: relative;
   display: flex;
@@ -54,16 +55,19 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
-:root[data-theme] .record-panel .record-panel-actions {
+/* Share, the record's own action group, then Publish, in one row that wraps. */
+:root[data-theme] .record-panel :is(.record-panel-actions, .record-panel-actions > .drawer-footer) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  margin-inline-start: auto;
   padding: 0;
   border: 0;
   background: transparent;
+}
+.record-panel-actions {
+  margin-inline-start: auto;
 }
 .record-panel-status {
   display: flex;
@@ -78,6 +82,41 @@
 .record-panel-status .record-kept-chip {
   margin-inline-start: 0;
 }
+/* Share asks "A colleague" or "Another company" in a small popover, like the top bar's Create. */
+.record-share-choice {
+  position: relative;
+}
+.record-share-panel {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: calc(100% + 6px);
+  z-index: 5;
+  display: grid;
+  inline-size: 220px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 18px 40px rgba(13, 31, 23, 0.18);
+}
+.record-share-hint {
+  padding: 8px 10px 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.record-share-panel button {
+  min-height: 44px;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+.record-share-panel button:hover:not(:disabled) {
+  background: var(--hover);
+}
 @media (max-width: 760px) {
   :root[data-theme] .record-panel .record-panel-head {
     padding: 12px 16px;
@@ -88,9 +127,17 @@
   :root[data-theme] .record-panel .record-panel-title h2 {
     font-size: 19px;
   }
-  :root[data-theme] .record-panel .record-panel-actions {
+  :root[data-theme]
+    .record-panel
+    :is(.record-panel-actions, .record-panel-actions > .drawer-footer) {
     justify-content: flex-start;
+  }
+  .record-panel-actions {
     width: 100%;
     margin-inline-start: 0;
+  }
+  /* Phones start the actions at the left edge, so the choice opens rightwards. */
+  .record-share-panel {
+    inset-inline: 0 auto;
   }
 }

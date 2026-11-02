@@ -5,6 +5,7 @@ import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { usePanelCommand } from '../../records/panel/panelCommands.js';
 import { actionCollection } from '../access.js';
 import { findEntry } from '../assignment/assignmentModel.js';
 import { canShareRecord } from '../shares/shareModel.js';
@@ -34,6 +35,10 @@ export function OutsideSharing({ module, record }) {
   const entry = collection === 'Properties' ? findEntry(records.entries, collection, record) : null;
   const enabled = !readOnly && owner.id === user.workspaceId && canShareRecord(user, entry);
   const shares = useRecordListingShares(enabled ? entry.id : null);
+  usePanelCommand(
+    'shareCompany',
+    enabled ? { label: t('recordPanel.shareCompany'), run: () => setSharing(true) } : null,
+  );
   if (!enabled) return null;
   const count = shares.shares.filter(open).length;
   return (

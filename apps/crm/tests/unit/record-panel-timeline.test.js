@@ -96,7 +96,34 @@ test('other clients, blank client IDs and hidden collections stay out', () => {
     schedule.map((entry) => entry.module),
     ['Viewings'],
   );
-  assert.deepEqual(activityModules, ['Follow-ups', 'Viewings', 'Interaction log', 'Client care']);
+  assert.deepEqual(activityModules, [
+    'Follow-ups',
+    'Viewings',
+    'Shortlist',
+    'Interaction log',
+    'Client care',
+  ]);
+});
+
+test("a listing's timeline gathers its own activity and names the client", () => {
+  const listing = { property_id: 'PR-7' };
+  const rows = {
+    Clients: [{ client_id: 'CL-1', full_name: 'Synthetic buyer' }],
+    Viewings: [
+      { viewing_id: 'VW-1', client_id: 'CL-1', property_id: 'PR-7' },
+      { viewing_id: 'VW-2', client_id: 'CL-1', property_id: 'PR-8' },
+    ],
+    Shortlist: [{ match_id: 'SH-1', client_id: 'CL-1', property_id: 'PR-7' }],
+    'Interaction log': [{ log_id: 'LG-1', property_id_optional: 'PR-7' }],
+  };
+  const entries = selectRecordTimeline(rows, listing, undefined, 'property');
+  assert.deepEqual(entries.map((entry) => entry.module).sort(), [
+    'Interaction log',
+    'Shortlist',
+    'Viewings',
+  ]);
+  assert.equal(entries.find((entry) => entry.module === 'Viewings').title, 'Synthetic buyer');
+  assert.deepEqual(selectRecordTimeline(rows, { property_id: '' }, undefined, 'property'), []);
 });
 
 test('missing collections and unknown properties still give readable entries', () => {

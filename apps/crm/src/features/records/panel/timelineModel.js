@@ -1,10 +1,17 @@
 import { dateNum } from '../../../lib/dates.js';
-import { get, prName } from '../../../lib/records.js';
+import { clName, get, prName } from '../../../lib/records.js';
 
 const text = (value) => String(value ?? '').trim();
 const joined = (...values) => values.map(text).filter(Boolean).join(' · ');
 const property = (data, id) =>
   text(id) && Array.isArray(data?.Properties) ? prName(data, text(id)) : text(id);
+const client = (data, id) =>
+  text(id) && Array.isArray(data?.Clients) ? clName(data, text(id)) : text(id);
+/** On a listing's timeline the other party is the client; on a client's, the listing. */
+const other = (row, data, link) =>
+  link === 'property'
+    ? client(data, get(row, 'Client ID'))
+    : property(data, get(row, 'Property ID'));
 
 /**
  * The client activity collections as timeline entries. Follow-ups and viewings read as in
@@ -30,11 +37,23 @@ const sources = [
     kind: 'viewing',
     icon: 'eye',
     id: 'Viewing ID',
-    read: (row, data) => ({
+    read: (row, data, link) => ({
       date: get(row, 'Appointment date & time'),
-      title: property(data, get(row, 'Property ID')),
+      title: other(row, data, link),
       detail: get(row, 'Client feedback'),
       status: get(row, 'Viewing status'),
+    }),
+  },
+  {
+    module: 'Shortlist',
+    kind: 'shortlist',
+    icon: 'heart',
+    id: 'Match ID',
+    read: (row, data, link) => ({
+      date: get(row, 'Date sent'),
+      title: other(row, data, link),
+      detail: get(row, 'Notes'),
+      status: get(row, 'Client response'),
     }),
   },
   {
@@ -68,21 +87,30 @@ const sources = [
 /** Collections the timeline reads; each still needs the viewer's module access. */
 export const activityModules = sources.map((source) => source.module);
 
+/** The field each collection links a client or (`property`) a listing with. */
+const linkField = (link, module) =>
+  link === 'client'
+    ? 'Client ID'
+    : ['Interaction log', 'Client care'].includes(module)
+      ? 'Property ID optional'
+      : 'Property ID';
+
 /**
- * One client's follow-ups, viewings, conversations and care entries from loaded records,
- * newest first, undated last. `canSee(module)` leaves out collections the viewer cannot
- * open. A client without an ID matches nothing, so blank links never gather strangers.
+ * One client's (or, with `link` 'property', one listing's) follow-ups, viewings, shortlists,
+ * conversations and care entries from loaded records, newest first, undated last.
+ * `canSee(module)` leaves out collections the viewer cannot open. A record without an ID
+ * matches nothing, so blank links never gather strangers.
  */
-export function selectRecordTimeline(data, client, canSee = () => true) {
-  const clientId = text(get(client, 'Client ID'));
-  if (!clientId) return [];
+export function selectRecordTimeline(data, record, canSee = () => true, link = 'client') {
+  const ownId = text(get(record, link === 'client' ? 'Client ID' : 'Property ID'));
+  if (!ownId) return [];
   return sources
     .filter((source) => canSee(source.module))
     .flatMap((source) =>
       (data?.[source.module] || [])
-        .filter((row) => text(get(row, 'Client ID')) === clientId)
+        .filter((row) => text(get(row, linkField(link, source.module))) === ownId)
         .map((row, index) => {
-          const entry = source.read(row, data);
+          const entry = source.read(row, data, link);
           return {
             key: `${source.module}:${index}:${text(get(row, source.id))}`,
             module: source.module,

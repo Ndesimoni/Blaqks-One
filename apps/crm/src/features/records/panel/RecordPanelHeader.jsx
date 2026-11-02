@@ -10,8 +10,9 @@ import './record-panel-head.css';
 
 /**
  * The panel header (approved mockup): close, an initials avatar for people, the title and a
- * one-line subtitle, the record's actions, its status and view-only chip, and a client's
- * Lead stage track. The title takes focus on opening so the panel starts from the top.
+ * one-line subtitle, the record's actions, its status, sections' pills (a listing's Website)
+ * and view-only chip, and a client's Lead stage track. The title takes focus on opening so
+ * the panel starts from the top.
  */
 export function RecordPanelHeader({
   module,
@@ -23,6 +24,7 @@ export function RecordPanelHeader({
   busy,
   onClose,
   actions,
+  commands = {},
 }) {
   const { t } = useI18n();
   const kind = kindKey(module, lead);
@@ -58,6 +60,13 @@ export function RecordPanelHeader({
       {actions}
       <div className="record-panel-status">
         {status ? <Badge>{status}</Badge> : null}
+        {Object.entries(commands)
+          .filter(([, command]) => command.pill)
+          .map(([key, command]) => (
+            <Badge key={key} tone={command.tone}>
+              {command.pill}
+            </Badge>
+          ))}
         <KeptChip module={module} record={record} />
       </div>
       {module === 'Clients' && <StageTrack value={get(record, 'Lead stage')} />}

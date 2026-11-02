@@ -3,6 +3,7 @@ import { Drawer } from '../../components/ui/Drawer.jsx';
 import { useNavigation } from '../../hooks/useWorkspace.js';
 import { get } from '../../lib/records.js';
 import { schema } from '../../lib/schema.js';
+import { PanelCommandsProvider, usePanelCommandList } from './panel/panelCommands.js';
 import { recordTitle } from './panel/panelModel.js';
 import { RecordPanelActions } from './panel/RecordPanelActions.jsx';
 import { RecordPanelBody } from './panel/RecordPanelBody.jsx';
@@ -13,7 +14,7 @@ import './panel/record-panel.css';
  * Record details as a large panel from the right edge (Bitrix24's record slider, approved
  * mockup, owner 2026-10-31): title, actions and a client's stage track on top, then facts
  * beside the activity timeline or related records. The demo and connected mode share it;
- * connected-only sections arrive through `extras`.
+ * connected-only sections arrive through `extras` and offer header commands (Share, Publish).
  */
 function RecordDetails({
   detail,
@@ -33,6 +34,7 @@ function RecordDetails({
   const lead = module === 'Clients' && route === 'Leads';
   const id = get(record, schema(module)[0].name);
   const titleId = useId();
+  const { commands, register } = usePanelCommandList();
   return (
     // Opening a related record remounts the dialog so focus, scroll and the opener reset cleanly.
     <Drawer
@@ -42,40 +44,44 @@ function RecordDetails({
       titleId={titleId}
       onClose={close}
     >
-      <RecordPanelHeader
-        module={module}
-        record={record}
-        id={id}
-        title={recordTitle(record, id)}
-        titleId={titleId}
-        lead={lead}
-        busy={busy}
-        onClose={close}
-        actions={
-          <RecordPanelActions
-            module={module}
-            record={record}
-            lead={lead}
-            busy={busy}
-            readOnly={readOnly}
-            canDelete={canDelete}
-            canEdit={canEdit}
-            showMessaging={showMessaging}
-            edit={edit}
-            remove={remove}
-            close={close}
-          />
-        }
-      />
-      <RecordPanelBody
-        module={module}
-        record={record}
-        data={data}
-        edit={edit}
-        close={close}
-        readOnly={readOnly || !canEdit}
-        extras={extras}
-      />
+      <PanelCommandsProvider value={register}>
+        <RecordPanelHeader
+          module={module}
+          record={record}
+          id={id}
+          title={recordTitle(record, id)}
+          titleId={titleId}
+          lead={lead}
+          busy={busy}
+          onClose={close}
+          commands={commands}
+          actions={
+            <RecordPanelActions
+              module={module}
+              record={record}
+              lead={lead}
+              busy={busy}
+              readOnly={readOnly}
+              canDelete={canDelete}
+              canEdit={canEdit}
+              showMessaging={showMessaging}
+              edit={edit}
+              remove={remove}
+              close={close}
+              commands={commands}
+            />
+          }
+        />
+        <RecordPanelBody
+          module={module}
+          record={record}
+          data={data}
+          edit={edit}
+          close={close}
+          readOnly={readOnly || !canEdit}
+          extras={extras}
+        />
+      </PanelCommandsProvider>
     </Drawer>
   );
 }

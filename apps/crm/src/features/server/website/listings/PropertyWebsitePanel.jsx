@@ -9,6 +9,7 @@ import {
   useWorkspaceView,
 } from '../../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../../i18n/useI18n.js';
+import { usePanelCommand } from '../../../records/panel/panelCommands.js';
 import { actionCollection } from '../../access.js';
 import { findEntry } from '../../assignment/assignmentModel.js';
 import { PublishDialog } from '../publish/PublishDialog.jsx';
@@ -17,6 +18,13 @@ import { publishedAt, recordWebsite } from './listingsModel.js';
 import { useWebsiteListings } from './useWebsiteListings.js';
 import { WithdrawListing } from './WithdrawListing.jsx';
 import './website-listings.css';
+
+/** The slider header's Website pill for each status: catalogue key and badge tone. */
+const pills = {
+  none: ['pillNone', 'slate'],
+  live: ['pillLive', 'green'],
+  changed: ['pillChanged', 'amber'],
+};
 
 /**
  * "Website" in a property's details (the only publishing entry for staff): whether it is
@@ -44,13 +52,28 @@ export function PropertyWebsitePanel({ module, record }) {
   const staff = user.roleId !== 'admin';
   const listings = useWebsiteListings(enabled);
   const own = usePublishers(undefined, enabled && staff);
-  if (!enabled) return null;
-  const website = recordWebsite(listings.publications, entry);
+  const website = enabled ? recordWebsite(listings.publications, entry) : { status: 'none' };
   const blocked = staff && !own.loading && !own.error && !own.eligible.length;
   const checking = listings.loading || (staff && own.loading);
   const error = listings.error || (staff && own.error);
-  const ready = !checking && !error;
+  const ready = enabled && !checking && !error;
   const listed = website.status !== 'none';
+  // The slider header's Website pill and Publish on website (approved mockup).
+  usePanelCommand(
+    'website',
+    ready ? { pill: k(pills[website.status][0]), tone: pills[website.status][1] } : null,
+  );
+  usePanelCommand(
+    'publish',
+    ready && !blocked
+      ? {
+          label: k(listed ? 'republish' : 'publishOnWebsite'),
+          disabled: listings.busy,
+          run: () => setPublishing(true),
+        }
+      : null,
+  );
+  if (!enabled) return null;
   const status = {
     none: k('panelNone'),
     live: publishedAt(website.publication)

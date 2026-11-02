@@ -84,6 +84,30 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+/* Connected sections (assignment, sharing, website) stack as full-width rows below the
+   columns, a row's button dropping under its text when narrow; a listing's plans, amenities
+   and building contacts follow as cards that wrap, so none overflows another. */
+.record-panel-sections {
+  display: grid;
+  gap: 12px;
+}
+.record-panel .record-panel-sections > * {
+  min-width: 0;
+  margin: 0;
+}
+.record-panel-sections .assignment-row {
+  flex-wrap: wrap;
+}
+.record-panel-sections .assignment-current {
+  flex: 1 1 240px;
+}
+.record-panel .property-detail-studio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  align-items: start;
+  gap: 16px;
+  margin: 0;
+}
 @media (max-width: 760px) {
   :root[data-theme] .record-panel .record-panel-body {
     padding: 14px 16px 24px;

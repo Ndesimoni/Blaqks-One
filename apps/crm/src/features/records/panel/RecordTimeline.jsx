@@ -2,6 +2,7 @@ import React, { useId } from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { OverflowList } from '../../../components/ui/OverflowList.jsx';
+import { useWorkspaceActions } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { dateNum, readableDate } from '../../../lib/dates.js';
 import { useRelatedRecords } from '../useRelatedRecords.js';
@@ -13,19 +14,63 @@ const eventKeys = {
   viewing: 'recordPanel.eventViewing',
   interaction: 'recordPanel.eventInteraction',
   care: 'recordPanel.eventCare',
+  shortlist: 'recordPanel.eventShortlist',
 };
 
 /**
- * A client's activity, newest first: the follow-ups, viewings, conversations and client care
- * already loaded for this workspace, limited to the collections the viewer may open. It only
- * reads; new activity is still added from those pages. Hidden without any of that access.
+ * The mockup's add-activity buttons: a follow-up, viewing or conversation (the mockup's Note)
+ * already linked to this client or listing, for people who may create them. Each opens the
+ * usual editor; `link(module)` gives the linking field.
  */
-export function RecordTimeline({ data, client }) {
+function TimelineAdd({ link }) {
+  const { t } = useI18n();
+  const { add, can, readOnly = false } = useWorkspaceActions();
+  if (readOnly || !add) return null;
+  const choices = [
+    ['Follow-ups', 'recordPanel.addFollowUp'],
+    ['Viewings', 'recordPanel.addViewing'],
+    ['Interaction log', 'recordPanel.addConversation'],
+  ].filter(([module]) => (can ? can(module, 'create') : true));
+  if (!choices.length) return null;
+  return (
+    <div className="record-timeline-add">
+      {choices.map(([module, label]) => (
+        <button
+          key={module}
+          type="button"
+          className="btn btn-light"
+          onClick={() => add(module, link(module))}
+        >
+          <Icon name="plus" size={15} />
+          <span>{t(label)}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * A client's or (`property`) a listing's activity, newest first: the follow-ups, viewings,
+ * shortlists, conversations and client care already loaded for this workspace, limited to the
+ * collections the viewer may open, with the mockup's buttons to add linked activity.
+ * Hidden without any of that access.
+ */
+export function RecordTimeline({ data, client, property }) {
   const { t } = useI18n();
   const { canSee } = useRelatedRecords();
   const headingId = useId();
   if (!activityModules.some(canSee)) return null;
-  const entries = selectRecordTimeline(data, client, canSee);
+  const record = property || client;
+  const kind = property ? 'property' : 'client';
+  const entries = selectRecordTimeline(data, record, canSee, kind);
+  // A conversation names its listing in the optional property field.
+  const link = (module) =>
+    property
+      ? {
+          [module === 'Interaction log' ? 'property_id_optional' : 'property_id']:
+            property.property_id,
+        }
+      : { client_id: client.client_id };
   const label = t('recordPanel.activity');
   return (
     <section className="record-timeline" aria-labelledby={headingId}>
@@ -35,7 +80,10 @@ export function RecordTimeline({ data, client }) {
           {t('recordPanel.activityCount', { count: entries.length })}
         </span>
       </div>
-      <p className="record-timeline-hint">{t('recordPanel.activityHint')}</p>
+      <p className="record-timeline-hint">
+        {t(property ? 'recordPanel.listingActivityHint' : 'recordPanel.activityHint')}
+      </p>
+      <TimelineAdd link={link} />
       {entries.length ? (
         <OverflowList
           items={entries}

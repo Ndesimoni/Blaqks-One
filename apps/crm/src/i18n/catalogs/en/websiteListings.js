@@ -67,4 +67,7 @@ export default {
   panelBlocked:
     'Set up your website profile in My profile and ask your Admin for publishing access.',
   publishOnWebsite: 'Publish on website',
+  pillNone: 'Website: Not published',
+  pillLive: 'Website: Live',
+  pillChanged: 'Website: Live · changes not public',
 };
