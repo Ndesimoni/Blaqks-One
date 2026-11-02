@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
-import { useRecords, useWorkspaceActions } from '../../../hooks/useWorkspace.js';
+import { useRecords, useWorkspaceActions, useWorkspaceView } from '../../../hooks/useWorkspace.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { canOpenSection } from '../access.js';
 import { useOpenMessenger } from '../products/messenger/messengerContext.js';
+import { plainEmail } from './composerModel.js';
 import { contactOptions, linkedConversation } from './contactModel.js';
 import { PersonEmail } from './PersonEmail.jsx';
 
 /**
- * Call, Email and WhatsApp for a client or contact, or the client a record is about (owner,
- * 2026-11-02), as `{ options, commands: { call, email, whatsapp }, dialog }` for the record
- * slider's header and the Client desk. Call dials the number. Email opens the person's latest
- * email conversation in the messenger when one is among the member's recent ones, else the
- * Messages "New email" with the person chosen (`dialog`), whose conversation then opens.
- * WhatsApp opens a chat with the number, since WhatsApp sending in the CRM is still to come
- * (W1b). Email and WhatsApp follow the member's channel grants; the server decides every send.
+ * Call and Message for a client or contact, or the client a record is about (owner,
+ * 2026-11-02: the mockup's Call and Message, one way into the chat), as `{ options, commands:
+ * { call, message }, dialog }` for the record slider's header and the Client desk. Call dials
+ * the number. Message opens the person's latest conversation (email or WhatsApp) in the
+ * messenger when one is among the member's recent ones; else it starts the Messages "New email"
+ * with the person chosen (`dialog`), whose conversation then opens; with neither, it says so.
+ * The member's grants and the server decide what may be read or sent.
  */
 export function useContactCommands({ module, record }) {
   const { t } = useI18n();
@@ -23,6 +24,7 @@ export function useContactCommands({ module, record }) {
   const { owner } = useWorkspaceScope();
   const { entries, keptFor } = useRecords();
   const { readOnly = false } = useWorkspaceActions();
+  const { setToast } = useWorkspaceView();
   const openMessenger = useOpenMessenger();
   const messages = openMessenger && canOpenSection(user, 'Inbox') ? openMessenger : null;
   const [writing, setWriting] = useState(false);
@@ -31,36 +33,42 @@ export function useContactCommands({ module, record }) {
     ? { person: null, call: '', email: false, whatsapp: '' }
     : contactOptions({ module, record, entries, keptFor, user });
   const { person } = options;
-  const command = (key, icon, rest) =>
-    options[key]
+  const name = person?.name || person?.legacy;
+  const command = (key, icon, offered, rest) =>
+    offered
       ? {
           label: t(`recordPanel.${key}Person`),
           name: t('recordPanel.contactNamed', {
             action: t(`recordPanel.${key}Person`),
-            name: person.name || person.legacy,
+            name,
           }),
           icon,
           ...rest,
         }
       : null;
   // A failed lookup still lets the member write a new email.
-  const email = async () => {
-    if (!messages) return setWriting(true);
-    setLooking(true);
-    const page = await api
-      .conversations(owner.id, { channel: 'email', limit: 100 })
-      .catch(() => null);
-    setLooking(false);
-    const existing = linkedConversation(page?.conversations, person);
-    if (existing) messages('inbox', existing);
-    else setWriting(true);
+  const message = async () => {
+    if (messages) {
+      setLooking(true);
+      const page = await api.conversations(owner.id, { limit: 100 }).catch(() => null);
+      setLooking(false);
+      const existing = linkedConversation(page?.conversations, person);
+      if (existing) return messages('inbox', existing);
+    }
+    if (options.email) setWriting(true);
+    else {
+      const key = plainEmail(person.email) ? 'noConversationGrant' : 'noConversation';
+      setToast(t(`recordPanel.${key}`, { name }));
+    }
   };
   return {
     options,
     commands: {
-      call: command('call', 'phone', { href: `tel:+${options.call}` }),
-      email: command('email', 'mail', { run: email, disabled: looking }),
-      whatsapp: command('whatsapp', 'chat', { href: `https://wa.me/${options.whatsapp}` }),
+      call: command('call', 'phone', options.call, { href: `tel:+${options.call}` }),
+      message: command('message', 'chat', person && (messages || options.email), {
+        run: message,
+        disabled: looking,
+      }),
     },
     dialog:
       writing && person ? (

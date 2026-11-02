@@ -18,13 +18,13 @@ test('the Client desk shows the chosen client, their contact actions, matches an
     await expect(page.locator('.client-desk-row').first()).toHaveAttribute('aria-current', 'true');
     const hero = page.locator('.client-desk-hero');
     await expect(hero.getByRole('heading', { name: 'Dash client one' })).toBeVisible();
-    // The mockup's Call and WhatsApp follow the number and the WhatsApp grant; no email grant.
+    // The mockup's Call and Message, as on the client's slider.
     await expect(hero.getByRole('link', { name: 'Call Dash client one' })).toHaveAttribute(
       'href',
       'tel:+971500000101',
     );
-    await expect(hero.getByRole('link', { name: 'WhatsApp Dash client one' })).toBeVisible();
-    await expect(hero.getByRole('button', { name: 'Email Dash client one' })).toHaveCount(0);
+    await expect(hero.getByRole('button', { name: 'Message Dash client one' })).toBeVisible();
+    await expect(hero.getByRole('link', { name: 'WhatsApp Dash client one' })).toHaveCount(0);
     const matches = page.getByRole('region', { name: /^1 matching property/ });
     await expect(matches).toContainText('Dash Marina listing');
     await expect(matches.getByRole('button', { name: 'Add to shortlist' })).toBeVisible();

@@ -21,23 +21,19 @@ async function contactTeam(prefix) {
   return team;
 }
 
-/** The slider's Call and WhatsApp links and Email button for the named person. */
+/** The slider's Call link and Message button for the named person, and nothing else. */
 async function expectContact(panel, name) {
   const head = panel.locator('.record-panel-head');
   await expect(head.getByRole('link', { name: `Call ${name}` })).toHaveAttribute(
     'href',
     'tel:+971500000111',
   );
-  await expect(head.getByRole('link', { name: `WhatsApp ${name}` })).toHaveAttribute(
-    'href',
-    'https://wa.me/971500000111',
-  );
-  return head.getByRole('button', { name: `Email ${name}` });
+  for (const gone of [`WhatsApp ${name}`, `Email ${name}`])
+    await expect(head.getByRole('link', { name: gone })).toHaveCount(0);
+  return head.getByRole('button', { name: `Message ${name}` });
 }
 
-test('a client and a conversation with them offer Call, Email and WhatsApp', async ({
-  browser,
-}) => {
+test('a client and a conversation with them offer Call and Message', async ({ browser }) => {
   test.setTimeout(120000);
   const team = await contactTeam('rcontact');
   const { page, context } = await memberPage(browser, team.people.admin.email);
@@ -46,9 +42,9 @@ test('a client and a conversation with them offer Call, Email and WhatsApp', asy
   try {
     await page.setViewportSize({ width: 1280, height: 860 });
     const panel = await openRecord(page, 'CL-RC-1');
-    const email = await expectContact(panel, NAME);
-    // Email opens the CRM's own new email over the slider; without a mailbox it says so.
-    await email.click();
+    const message = await expectContact(panel, NAME);
+    // No chat yet: Message starts the CRM's own new email; without a mailbox it says so.
+    await message.click();
     const writing = page.getByRole('dialog', { name: 'New email', exact: true });
     await expect(writing).toContainText('Connect your Google mailbox before sending email.');
     await page.keyboard.press('Escape');
@@ -68,15 +64,18 @@ test('a client and a conversation with them offer Call, Email and WhatsApp', asy
     await context.close();
   }
 
-  // Staff without the email or WhatsApp grant may still call their own client.
+  // Staff without the email grant may call; with no chat yet, Message says why it cannot start.
   const staff = await memberPage(browser, team.people.one.email);
   try {
     await staff.page.setViewportSize({ width: 1280, height: 860 });
     const panel = await openRecord(staff.page, 'CL-RC-2');
     const head = panel.locator('.record-panel-head');
     await expect(head.getByRole('link', { name: `Call ${NAME}` })).toBeVisible();
-    await expect(head.getByRole('button', { name: `Email ${NAME}` })).toHaveCount(0);
-    await expect(head.getByRole('link', { name: `WhatsApp ${NAME}` })).toHaveCount(0);
+    await head.getByRole('button', { name: `Message ${NAME}` }).click();
+    await expect(staff.page.locator('.toast')).toContainText(
+      `No conversation with ${NAME} yet, and your account can't send email.`,
+    );
+    await expect(staff.page.getByRole('dialog', { name: 'New email' })).toHaveCount(0);
   } finally {
     await staff.context.close();
   }

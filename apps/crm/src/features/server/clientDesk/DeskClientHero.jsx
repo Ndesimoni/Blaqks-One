@@ -15,8 +15,8 @@ import { clientNeed } from './clientDeskModel.js';
 
 /**
  * The chosen client (approved mockup): initials, name, what they look for and their budget;
- * stage, agent, source and lead quality as pills; then Call, WhatsApp and Email as on the
- * client's slider, and Open client for the full record.
+ * stage, agent, source and lead quality as pills; then Call and Message as on the client's
+ * slider, and Open client for the full record.
  */
 export function DeskClientHero({ client }) {
   const { t } = useI18n();
@@ -58,7 +58,7 @@ export function DeskClientHero({ client }) {
         ))}
       </div>
       <div className="client-desk-actions">
-        {[commands.call, commands.whatsapp, commands.email].filter(Boolean).map((command) => (
+        {[commands.call, commands.message].filter(Boolean).map((command) => (
           <ContactCommand key={command.label} command={command} />
         ))}
         <Button variant="light" icon="external" onClick={() => dispatchRow('Clients', client)}>

@@ -3,7 +3,7 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 
 /**
- * A contact command (Call, Email, WhatsApp) in a record slider or the Client desk: a button, or
+ * A contact command (Call, Message) in a record slider or the Client desk: a button, or
  * a link when it has `href`. A web link opens in a new tab, a `tel:` link in the phone app.
  */
 export function ContactCommand({ command }) {

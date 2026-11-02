@@ -6,7 +6,7 @@ import { clearInbox } from './inbox-fixtures.js';
 
 const NAME = 'Synthetic Slider Email Client';
 
-test("a client's Email writes in Messages, then reopens that conversation", async ({ page }) => {
+test("a client's Message writes in Messages, then reopens that conversation", async ({ page }) => {
   test.setTimeout(120000);
   await signIn(page);
   const identity = await session(page);
@@ -32,9 +32,9 @@ test("a client's Email writes in Messages, then reopens that conversation", asyn
   await page.goto('/#/clients');
   await page.reload();
   const panel = await openRecord(page, clientId);
-  const email = panel.getByRole('button', { name: `Email ${NAME}` });
-  // No conversation yet: the Messages "New email" opens with the client chosen.
-  await email.click();
+  const message = panel.getByRole('button', { name: `Message ${NAME}` });
+  // No conversation yet: Message starts the Messages "New email" with the client chosen.
+  await message.click();
   const writing = page.getByRole('dialog', { name: 'New email', exact: true });
   await expect(writing).toContainText('slider.client@example.test');
   await expect(writing.getByLabel('Subject')).toBeFocused();
@@ -49,8 +49,8 @@ test("a client's Email writes in Messages, then reopens that conversation", asyn
   await expect(messenger).toHaveCount(0);
   await expect(panel).toBeVisible();
 
-  // The next Email opens that conversation instead of a new email.
-  await email.click();
+  // The next Message opens that conversation instead of a new email.
+  await message.click();
   await expect(messenger.locator('.inbox-thread')).toContainText('Saturday at 5 is confirmed');
   await expect(page.getByRole('dialog', { name: 'New email', exact: true })).toHaveCount(0);
 });

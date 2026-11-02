@@ -61,8 +61,8 @@ export function contactOptions({ module, record, entries, keptFor, user }) {
 }
 
 /**
- * The person's most recent conversation among `rows` (an inbox list page, newest activity
- * first) linked to their record, or ''. Spam is left out.
+ * The person's most recent conversation, on any channel, among `rows` (an inbox list page,
+ * newest activity first) linked to their record, or ''. Spam is left out.
  */
 export function linkedConversation(rows, person) {
   const row = (rows || []).find(

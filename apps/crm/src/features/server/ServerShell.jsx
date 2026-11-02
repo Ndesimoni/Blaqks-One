@@ -41,78 +41,81 @@ export function ServerShell({ owner, workspaces }) {
     setStart(id);
     setMessenger(box);
   };
+  // Pages and record sliders open a client's conversation in the messenger (Message).
   return (
-    <div
-      className={
-        'app-shell connected-shell has-rail has-bottom-bar' +
-        (nav.sectionsVisible ? '' : ' sections-hidden') +
-        (strip ? ' has-chat-strip' : '')
-      }
-    >
-      <a
-        className="skip-link"
-        href="#main-content"
-        onClick={(event) => {
-          event.preventDefault();
-          document.getElementById('main-content')?.focus();
-        }}
+    <MessengerContext.Provider value={openMessenger}>
+      <div
+        className={
+          'app-shell connected-shell has-rail has-bottom-bar' +
+          (nav.sectionsVisible ? '' : ' sections-hidden') +
+          (strip ? ' has-chat-strip' : '')
+        }
       >
-        Skip to main content
-      </a>
-      <ServerNavigation nav={nav} company={platform ? t('websites.platformTitle') : owner?.name} />
-      <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
-        <ServerHeader
-          product={nav.here?.product}
-          section={nav.here?.section?.key}
-          sidebarOpen={nav.sectionsVisible}
-          onToggleSidebar={nav.here ? nav.toggleSidebar : null}
-          onMessenger={openMessenger}
+        <a
+          className="skip-link"
+          href="#main-content"
+          onClick={(event) => {
+            event.preventDefault();
+            document.getElementById('main-content')?.focus();
+          }}
+        >
+          Skip to main content
+        </a>
+        <ServerNavigation
+          nav={nav}
+          company={platform ? t('websites.platformTitle') : owner?.name}
         />
-        <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
-        <main className="main-content" id="main-content" tabIndex={-1}>
-          <ServerWorkspaceBanner owner={owner} workspaces={workspaces} platform={platform} />
-          {!fullHeight && route !== 'Start' && (
-            <ServerPageActions owner={owner} workspaces={workspaces} />
-          )}
-          <ServerContent owner={owner} />
-          {!fullHeight && (
-            <footer className="main-footer">
-              <span>© {new Date().getFullYear()} Keys with Simoni</span>
-            </footer>
-          )}
-        </main>
-      </div>
-      {strip && <ChatStrip refreshKey={`${route}|${messenger}`} onOpen={openMessenger} />}
-      <BottomBar
-        products={visibleProducts(user)}
-        current={nav.here?.product || null}
-        route={route}
-        onOpen={nav.openProduct}
-        onHome={() => navigate('Start')}
-        onSections={() => setMobileNav(true)}
-      />
-      {/* Record sliders open a client's conversation in the messenger (Email). */}
-      <MessengerContext.Provider value={openMessenger}>
-        <ServerDialogs />
-      </MessengerContext.Provider>
-      {messenger && (
-        <MessengerPanel
-          owner={owner}
-          box={messenger}
-          start={start}
-          onBox={setMessenger}
-          onClose={() => setMessenger(null)}
-        />
-      )}
-      {toast && (
-        <div className="toast" role="status">
-          <Icon name="info" size={17} />
-          {toast}
-          <button aria-label="Dismiss notification" onClick={() => setToast('')}>
-            <Icon name="close" size={14} />
-          </button>
+        <div className={'main-area' + (fullHeight ? ' is-full-height' : '')}>
+          <ServerHeader
+            product={nav.here?.product}
+            section={nav.here?.section?.key}
+            sidebarOpen={nav.sectionsVisible}
+            onToggleSidebar={nav.here ? nav.toggleSidebar : null}
+            onMessenger={openMessenger}
+          />
+          <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
+          <main className="main-content" id="main-content" tabIndex={-1}>
+            <ServerWorkspaceBanner owner={owner} workspaces={workspaces} platform={platform} />
+            {!fullHeight && route !== 'Start' && (
+              <ServerPageActions owner={owner} workspaces={workspaces} />
+            )}
+            <ServerContent owner={owner} />
+            {!fullHeight && (
+              <footer className="main-footer">
+                <span>© {new Date().getFullYear()} Keys with Simoni</span>
+              </footer>
+            )}
+          </main>
         </div>
-      )}
-    </div>
+        {strip && <ChatStrip refreshKey={`${route}|${messenger}`} onOpen={openMessenger} />}
+        <BottomBar
+          products={visibleProducts(user)}
+          current={nav.here?.product || null}
+          route={route}
+          onOpen={nav.openProduct}
+          onHome={() => navigate('Start')}
+          onSections={() => setMobileNav(true)}
+        />
+        <ServerDialogs />
+        {messenger && (
+          <MessengerPanel
+            owner={owner}
+            box={messenger}
+            start={start}
+            onBox={setMessenger}
+            onClose={() => setMessenger(null)}
+          />
+        )}
+        {toast && (
+          <div className="toast" role="status">
+            <Icon name="info" size={17} />
+            {toast}
+            <button aria-label="Dismiss notification" onClick={() => setToast('')}>
+              <Icon name="close" size={14} />
+            </button>
+          </div>
+        )}
+      </div>
+    </MessengerContext.Provider>
   );
 }
