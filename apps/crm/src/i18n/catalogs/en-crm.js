@@ -17,6 +17,7 @@ import enHandoverReview from './en/handoverReview.js';
 import enLeadsBoard from './en/leadsBoard.js';
 import enListingShareViews from './en/listingShareViews.js';
 import enListingShares from './en/listingShares.js';
+import enPerformance from './en/performance.js';
 import enProperties from './en/properties.js';
 import enRecordGrid from './en/recordGrid.js';
 import enRecordKeeps from './en/recordKeeps.js';
@@ -43,6 +44,7 @@ export const crmCatalogs = {
   leadsBoard: enLeadsBoard,
   listingShares: enListingShares,
   listingShareViews: enListingShareViews,
+  performance: enPerformance,
   properties: enProperties,
   recordGrid: enRecordGrid,
   recordKeeps: enRecordKeeps,

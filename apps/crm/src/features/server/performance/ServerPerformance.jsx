@@ -9,6 +9,9 @@ import { PerformanceHeader } from './PerformanceHeader.jsx';
 import { PerformanceGoals } from './PerformanceGoals.jsx';
 import { PerformanceChart } from './PerformanceChart.jsx';
 import { PerformanceHistory } from './PerformanceHistory.jsx';
+import { PerformanceKpis } from './PerformanceKpis.jsx';
+import { AgentWins } from './AgentWins.jsx';
+import { closedDeals } from './performanceKpis.js';
 import { usePerformanceTargets } from './usePerformanceTargets.js';
 import { targetsFor } from './targetsModel.js';
 import {
@@ -21,7 +24,9 @@ import {
 import './performance.css';
 
 /**
- * Connected Performance: targets from the server, actuals derived only from the records and
+ * Connected Performance as the approved mockup's report (design queue item 9): the month's
+ * figure tiles and, for the whole team, deals won by agent; then the goals with targets from
+ * the server, the twelve-month chart and history. Actuals come only from the records and
  * finance this session can already see. Team-scope members may narrow the page to one person
  * with the Assigned-to filter; assigned-only members see their own work and targets.
  */
@@ -48,6 +53,10 @@ export function ServerPerformance({ owner }) {
   };
   const forSelection = targetsFor(targets.targets, selection);
   const financeReady = financeShown && Boolean(finance.overview);
+  const closed = useMemo(
+    () => (financeReady ? closedDeals(finance.overview, selection, month) : []),
+    [financeReady, finance.overview, selection, month],
+  );
   // Staff never receive another member's targets, so say so instead of "No target set".
   const hidden = kind === 'member' && memberId !== user.id && !canManageTeam(user);
   return (
@@ -59,6 +68,16 @@ export function ServerPerformance({ owner }) {
         scope={scope}
         workload={workload}
       />
+      <PerformanceKpis
+        rows={rows}
+        closed={closed}
+        financeReady={financeReady}
+        selection={selection}
+        me={user.id}
+        data={workload.data}
+        month={month}
+      />
+      {financeReady && selection.kind === 'team' && <AgentWins closed={closed} month={month} />}
       <PerformanceGoals
         metrics={metrics}
         current={rows.at(-1)}

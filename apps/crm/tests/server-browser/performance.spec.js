@@ -20,7 +20,17 @@ test('the Admin sets a member’s targets and the member reads them with their o
   const adminPage = await memberPage(browser, team.people.admin.email);
   const goals = await openPerformance(adminPage.page, month);
   await expect(goals.getByText('Team targets · automatic actuals')).toBeVisible();
+  // The mockup's tiles and deals won by agent, for the whole team.
+  const figures = adminPage.page.getByRole('region', { name: 'Performance figures' });
+  const tile = (label) => figures.locator('.kpi-tile').filter({ hasText: label });
+  await expect(tile('Deals won').locator('.kpi-value')).toHaveText('1');
+  await expect(tile('Commission earned').locator('.kpi-value')).toContainText('AED');
+  await expect(tile('Lead response time')).toBeVisible();
+  const wins = adminPage.page.getByRole('region', { name: /^Deals won by agent · / });
+  await expect(wins).toContainText(team.people.agent.name);
+  await expect(wins).toContainText('1 · AED');
   await adminPage.page.getByLabel('Assigned to').selectOption({ label: team.people.agent.name });
+  await expect(wins).toHaveCount(0);
   await expect(goals.getByText('Member targets · automatic actuals')).toBeVisible();
   const save = async (metric, label, value) => {
     const row = goal(goals, metric);
@@ -70,6 +80,11 @@ test('a member without finance access never sees deal or fee figures', async ({ 
   await expect(page.getByRole('region', { name: 'New enquiries by month' })).toBeVisible();
   await expect(page.locator('main')).not.toContainText('AED');
   await expect(page.locator('main')).not.toContainText('Earned fees');
+  const figures = page.getByRole('region', { name: 'Performance figures' });
+  await expect(figures).toContainText('Lead response time');
+  for (const hidden of ['Deals won', 'Commission earned', 'Average days to close'])
+    await expect(figures).not.toContainText(hidden);
+  await expect(page.getByRole('region', { name: /^Deals won by agent/ })).toHaveCount(0);
   for (const layout of layouts.slice(2)) await checkLayout(page, layout, 'performance-no-finance');
   await page.goto('/#/crm-insights');
   await expect(page.getByRole('region', { name: 'Lead quality distribution' })).toBeVisible();

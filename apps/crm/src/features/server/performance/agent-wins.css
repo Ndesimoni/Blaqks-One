@@ -1,0 +1,55 @@
+/* "Deals won by agent" (approved mockup `.bars`): name, one-scale bar, then count and fees. */
+:root[data-theme] .agent-wins-title {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+}
+.agent-wins-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.agent-win {
+  display: grid;
+  grid-template-columns: minmax(80px, 160px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.agent-win-name {
+  overflow: hidden;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agent-win-track {
+  height: 12px;
+}
+.agent-win-track span {
+  display: block;
+  min-width: 4px;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--chart-bar);
+}
+.agent-win-value {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+:root[data-theme] .agent-wins-empty {
+  margin: 0;
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .agent-win {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .agent-win-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

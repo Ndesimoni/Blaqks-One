@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { N } from '../../../lib/format.js';
 import { addDays } from '../followUps/deadlineModel.js';
@@ -12,24 +11,10 @@ import {
   weekStart,
 } from './kpiModel.js';
 import { Sparkbars } from './Sparkbars.jsx';
+import { StatTile as Tile } from './StatTile.jsx';
 
 const WEEKS = 8;
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-/** One stat tile (label, value, note, optional trend); it opens the page behind the figure. */
-function Tile({ label, value, note, tone = '', route, children }) {
-  const { navigate } = useNavigation();
-  return (
-    <button type="button" className="kpi-tile" onClick={() => navigate(route)}>
-      <span className="kpi-label">{label}</span>
-      <span className="kpi-row">
-        <strong className="kpi-value">{value}</strong>
-        {children}
-      </span>
-      {note && <span className={'kpi-note' + (tone ? ` is-${tone}` : '')}>{note}</span>}
-    </button>
-  );
-}
 
 /**
  * The approved mockup's four figure tiles over the workload's records: follow-ups due today

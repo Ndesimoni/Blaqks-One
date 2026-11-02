@@ -1,18 +1,5 @@
-/* The connected Dashboard's figure tiles and Today table (approved mockup `.tiles`, dataviz
-   stat tiles). Chart colours are the theme's green and gold stepped up to chart strength and
-   checked against each mode's panel; the quiet gray carries context periods. */
-.connected-dashboard {
-  --chart-bar: #2b7a50;
-  --chart-current: #a06c22;
-  --chart-quiet: #c3cec7;
-  --chart-track: #dcebe2;
-}
-:root[data-theme='dark'] .connected-dashboard {
-  --chart-bar: #56a379;
-  --chart-current: #b8873c;
-  --chart-quiet: #4b6355;
-  --chart-track: #2a4235;
-}
+/* Figure tiles (approved mockup `.tiles`, dataviz stat tiles) for the Dashboard and Performance,
+   and the Dashboard's Today table. Chart colours come from chart-tokens.css. */
 .kpi-tiles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
@@ -36,6 +23,13 @@
 .kpi-tile:hover {
   border-color: var(--gold);
 }
+/* A figure that opens nothing reads as a tile, not a control. */
+.kpi-tile.is-static {
+  cursor: default;
+}
+.kpi-tile.is-static:hover {
+  border-color: var(--line);
+}
 .kpi-tile:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
@@ -52,6 +46,7 @@
   gap: 12px;
 }
 .kpi-value {
+  white-space: nowrap;
   font-size: 28px;
   font-weight: 650;
   letter-spacing: -0.01em;
@@ -70,12 +65,13 @@
   color: var(--danger);
   font-weight: 600;
 }
+/* The trend gives way before the figure does: it shrinks, the value never wraps. */
 .sparkbars {
   display: flex;
-  flex: none;
+  flex: 0 1 96px;
   align-items: flex-end;
   gap: 2px;
-  width: 96px;
+  min-width: 40px;
   height: 34px;
   border-bottom: 1px solid var(--line);
 }

@@ -16,7 +16,7 @@ import { workloadDeals } from './kpiModel.js';
 import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
 import { useDashboardWorkload } from './useDashboardWorkload.js';
 import '../assignment/assigned-filter.css';
-import './dashboard-kpis.css';
+import './chart-tokens.css';
 import './dashboard-charts.css';
 
 /**

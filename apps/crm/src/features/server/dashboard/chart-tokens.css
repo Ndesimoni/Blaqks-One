@@ -1,0 +1,15 @@
+/* Chart colours for the connected reports: the theme's green and gold stepped up to chart
+   strength and checked against each mode's panel (dataviz validator: contrast, lightness band,
+   chroma). Green draws bars; gold marks the current period against the quiet gray. */
+:root {
+  --chart-bar: #2b7a50;
+  --chart-current: #a06c22;
+  --chart-quiet: #c3cec7;
+  --chart-track: #dcebe2;
+}
+:root[data-theme='dark'] {
+  --chart-bar: #56a379;
+  --chart-current: #b8873c;
+  --chart-quiet: #4b6355;
+  --chart-track: #2a4235;
+}
