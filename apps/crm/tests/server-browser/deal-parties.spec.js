@@ -42,7 +42,8 @@ test('the receiver of a hand-over sees the client and the listing on the deal', 
     await expect.poll(() => image.evaluate((node) => node.naturalWidth)).toBeGreaterThan(0);
     await expect(parties).not.toContainText('Zqx client private note');
     await parties.getByRole('button', { name: /^Open client / }).click();
-    const client = page.getByRole('dialog', { name: /Synthetic Zqxbuyer/ });
+    // The deal slider's name also carries the client, so match the client's own exactly.
+    const client = page.getByRole('dialog', { name: 'Synthetic Zqxbuyer', exact: true });
     await expect(client).toContainText('zqx.buyer@example.test');
     await page.keyboard.press('Escape');
     await details.getByRole('button', { name: 'Close deal details' }).click();

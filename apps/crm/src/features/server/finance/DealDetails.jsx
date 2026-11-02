@@ -1,96 +1,81 @@
 import React, { useId, useState } from 'react';
 import { Drawer } from '../../../components/ui/Drawer.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
-import { readableDate } from '../../../lib/dates.js';
-import { formatAed, formatPercent } from '../../../lib/finance/money.js';
+import { useI18n } from '../../../i18n/useI18n.js';
+import '../../records/panel/record-panel.css';
+import '../../records/panel/record-panel-body.css';
 import { useFinanceContext } from './useFinanceRequests.js';
-import { feeBasisLabels } from './financeLabels.js';
-import { holderName, referenceName } from './dealFilters.js';
 import { detailFields } from './dealDraft.js';
 import { Fact } from './EntryFacts.jsx';
-import { StageChip } from './DealChips.jsx';
-import { DealSummary } from './DealSummary.jsx';
+import { DealPanelHeader } from './DealPanelHeader.jsx';
+import { DealFactsCard } from './DealFactsCard.jsx';
+import { DealPaymentsCard } from './DealPaymentsCard.jsx';
 import { DealCalculationPanel } from './DealCalculationPanel.jsx';
 import { DealParties } from './DealParties.jsx';
 import { DealActions } from './DealActions.jsx';
 import { DealActionDialog } from './DealActionDialog.jsx';
 import { FinanceHistory } from './FinanceHistory.jsx';
-
-const fee = (deal) =>
-  deal.feeBasis === 'fixed'
-    ? `${feeBasisLabels.fixed} · ${formatAed(deal.fixedFeeFils)}`
-    : `${feeBasisLabels.percentage} · ${formatPercent(deal.feeRateBp)}`;
-
-const withId = (name, id) => (name ? `${name} (${id})` : id);
+import { PaymentForm } from './PaymentForm.jsx';
+import './deal-panel.css';
 
 /**
- * A deal's shaped details (finance-design §7), in reading order: the headline figures, the
- * commission split, the deal's facts, notes and history, then the actions its `allowed`
- * flags permit.
+ * A deal's shaped details (finance-design §7) as the approved mockup's record slider: the
+ * header with Record payment, Move to the next stage and the stage bar; the facts and the
+ * commission split on the left, payments and history on the right; then the client and
+ * listing and the notes. The footer keeps every action the row's `allowed` flags permit.
  */
 export function DealDetails({ deal, onClose }) {
-  const { overview, team, user } = useFinanceContext();
+  const { team } = useFinanceContext();
+  const { t } = useI18n();
   const [action, setAction] = useState(null);
+  const [paying, setPaying] = useState(false);
   const titleId = useId();
-  const refs = overview.references;
-  const client = referenceName(refs, 'Clients', deal.clientId);
-  const property = referenceName(refs, 'Properties', deal.propertyId);
-  const notes = detailFields.filter((field) => deal.details[field.key]);
+  const subtitleId = useId();
+  const notesId = useId();
+  // The target close date already reads in the facts card.
+  const notes = detailFields.filter(
+    (field) => field.key !== 'target_close_date' && deal.details[field.key],
+  );
   return (
+    // The slider's name is the deal's name with its kind, client and ID.
     <Drawer
-      className="detail-drawer finance-details deal-details"
-      titleId={titleId}
+      className="detail-drawer record-panel deal-panel"
+      placement="right"
+      titleId={`${titleId} ${subtitleId}`}
       onClose={onClose}
     >
-      <div className="drawer-top">
-        <div>
-          <div className="eyebrow">DEALS · DEAL DETAILS</div>
-          <h2 id={titleId} tabIndex={-1} data-initial-focus>
-            {deal.dealId}
-          </h2>
-          <p className="deal-details-context">
-            <StageChip stage={deal.stage} />
-            <span>
-              {client ? `${client} · ` : ''}
-              {deal.dealType}
-            </span>
-          </p>
-        </div>
-        <button className="icon-btn" aria-label="Close deal details" onClick={onClose}>
-          <Icon name="close" size={21} />
-        </button>
-      </div>
-      <div className="drawer-body finance-details-body deal-details-body">
+      <DealPanelHeader
+        deal={deal}
+        titleId={titleId}
+        subtitleId={subtitleId}
+        onClose={onClose}
+        onRecordPayment={() => setPaying(true)}
+      />
+      <div className="drawer-body record-panel-body finance-details-body deal-panel-body">
         {deal.pendingHandover && (
           <p className="finance-note warning" role="note">
-            <Icon name="users" size={16} /> A hand-over of this deal is waiting for a response.
+            <Icon name="users" size={16} /> {t('dealPanel.handoverWaiting')}
           </p>
         )}
-        <DealSummary deal={deal} team={team} />
+        <div className="record-panel-columns">
+          <div className="record-panel-main">
+            <DealFactsCard deal={deal} />
+            <DealCalculationPanel
+              calculation={deal.calculation}
+              team={team}
+              override={deal.override}
+              secondAgent={deal.secondAgent}
+            />
+          </div>
+          <div className="record-panel-side">
+            <DealPaymentsCard deal={deal} />
+            <FinanceHistory kind="deals" row={deal} />
+          </div>
+        </div>
         <DealParties deal={deal} />
-        <DealCalculationPanel
-          calculation={deal.calculation}
-          team={team}
-          override={deal.override}
-          secondAgent={deal.secondAgent}
-        />
-        <section className="finance-detail-section" aria-labelledby={`${titleId}-facts`}>
-          <h3 id={`${titleId}-facts`}>Deal</h3>
-          <dl className="finance-facts">
-            <Fact label="Client">{withId(client, deal.clientId)}</Fact>
-            <Fact label="Property">{deal.propertyId && withId(property, deal.propertyId)}</Fact>
-            <Fact label="Holder">{holderName(deal.assignee, user.id)}</Fact>
-            <Fact label="Second agent">{deal.secondAgent?.name}</Fact>
-            <Fact label="Fee">{fee(deal)}</Fact>
-            <Fact label="Partner share">
-              {`${formatPercent(deal.partnerShareBp)}${deal.partnerName ? ` · ${deal.partnerName}` : ''}`}
-            </Fact>
-            <Fact label="Earned">{deal.earnedOn ? readableDate(deal.earnedOn) : 'Not earned'}</Fact>
-          </dl>
-        </section>
         {notes.length > 0 && (
-          <section className="finance-detail-section" aria-labelledby={`${titleId}-notes`}>
-            <h3 id={`${titleId}-notes`}>Notes</h3>
+          <section className="finance-detail-section deal-notes" aria-labelledby={notesId}>
+            <h3 id={notesId}>{t('dealPanel.notes')}</h3>
             <dl className="finance-facts">
               {notes.map((field) => (
                 <Fact key={field.key} label={field.label} wide={field.type === 'textarea'}>
@@ -100,7 +85,6 @@ export function DealDetails({ deal, onClose }) {
             </dl>
           </section>
         )}
-        <FinanceHistory kind="deals" row={deal} />
       </div>
       <DealActions deal={deal} onAction={setAction} onClose={onClose} />
       {action && (
@@ -109,6 +93,13 @@ export function DealDetails({ deal, onClose }) {
           deal={deal}
           onClose={() => setAction(null)}
           onDone={action === 'delete' ? onClose : () => setAction(null)}
+        />
+      )}
+      {paying && (
+        <PaymentForm
+          dealId={deal.dealId}
+          onClose={() => setPaying(false)}
+          onDone={() => setPaying(false)}
         />
       )}
     </Drawer>

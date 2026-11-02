@@ -40,3 +40,18 @@ export function stageMoveBody(deal, stage) {
   if (!dealStages.includes(stage) || deal?.stage === stage) return null;
   return dealBodyFromDraft({ ...draftFromDeal(deal), stage }).body;
 }
+
+/** Stages that take a deal out of the pipeline rather than move it forward. */
+const offPipeline = ['Lost', 'Cancelled', 'On hold'];
+
+/** The deal pipeline the slider's stage bar shows, in order: New through Completed. */
+export const dealPipeline = dealStages.filter((stage) => !offPipeline.includes(stage));
+
+/**
+ * The stage after `stage` on the pipeline (the slider's "Move to …"), or '' at Completed and
+ * for a deal outside the pipeline, which moves only through Edit deal or the board.
+ */
+export function nextDealStage(stage) {
+  const at = dealPipeline.indexOf(stage);
+  return at >= 0 && at < dealPipeline.length - 1 ? dealPipeline[at + 1] : '';
+}

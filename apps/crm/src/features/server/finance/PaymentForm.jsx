@@ -11,10 +11,11 @@ import { useFinanceContext } from './useFinanceRequests.js';
 
 /**
  * Record or correct a commission receipt (finance-design §4, §7, §16). The deal picker lists
- * only earned deals in the caller's view; the deal is fixed after the payment is created.
- * VAT and total are an estimate; the server computes them and only approval counts them.
+ * only earned deals in the caller's view (`dealId` preselects one, as the deal slider's Record
+ * payment does); the deal is fixed after the payment is created. VAT and total are an
+ * estimate; the server computes them and only approval counts them.
  */
-export function PaymentForm({ payment, onClose, onDone }) {
+export function PaymentForm({ payment, dealId = '', onClose, onDone }) {
   const { overview } = useFinanceContext();
   const id = useId();
   const today = dubaiToday();
@@ -26,7 +27,7 @@ export function PaymentForm({ payment, onClose, onDone }) {
   const form = useEntryForm({
     kind: 'payments',
     latest,
-    initial: payment ? paymentDraft(payment) : emptyPaymentDraft(today),
+    initial: payment ? paymentDraft(payment) : { ...emptyPaymentDraft(today), dealId },
     validate: (draft) => validatePayment(draft, { today, creating: !payment }),
     onDone,
     onClose,

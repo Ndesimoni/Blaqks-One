@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { KanbanBoard } from '../../../components/ui/kanban/KanbanBoard.jsx';
-import { useWorkspaceView } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { dealColumns, stageMoveBody } from './dealBoardModel.js';
+import { dealColumns } from './dealBoardModel.js';
 import { DealCardBody } from './DealCardBody.jsx';
+import { useDealStageMove } from './useDealStageMove.js';
 import { useFinanceContext } from './useFinanceRequests.js';
 import './deal-board.css';
 
@@ -17,29 +17,12 @@ import './deal-board.css';
 export function DealsBoard({ deals, total, stage, onOpen, onAdd, onReset }) {
   const { t } = useI18n();
   const { actions, readOnly } = useFinanceContext();
-  const { setToast } = useWorkspaceView();
-  const [saving, setSaving] = useState('');
   const [focusRequest, setFocusRequest] = useState(null);
   const sequence = useRef(0);
+  const { move, saving } = useDealStageMove({
+    onSettled: (deal) => setFocusRequest({ key: deal.id, sequence: ++sequence.current }),
+  });
   const canMove = (deal) => !readOnly && actions.can('editDeal', deal);
-  const move = async (deal, stage) => {
-    const body = stageMoveBody(deal, stage);
-    if (!body || saving || actions.busy) return;
-    setSaving(deal.id);
-    try {
-      const result = await actions.saveDeal(body, deal);
-      setToast(
-        result.ok
-          ? t('dealsBoard.moved', { id: deal.dealId, stage })
-          : result.message || t('dealsBoard.failed', { id: deal.dealId }),
-      );
-    } catch (error) {
-      setToast(error?.message || t('dealsBoard.failed', { id: deal.dealId }));
-    } finally {
-      setSaving('');
-      setFocusRequest({ key: deal.id, sequence: ++sequence.current });
-    }
-  };
   const filtered = total > 0;
   return (
     <KanbanBoard

@@ -1,31 +1,9 @@
-/* The mockup's listing summary in the record slider: a facts card (`.fields`) with small
-   uppercase labels, then the dashed gold "Private to your CRM" box. */
+/* The mockup's listing summary in the record slider: the shared facts card
+   (record-panel-cards.css), then the dashed gold "Private to your CRM" box. */
 .property-summary {
   display: grid;
   gap: 14px;
   align-content: start;
-}
-.property-summary-facts {
-  display: grid;
-  gap: 12px;
-  margin: 0;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--panel);
-}
-:root[data-theme] .property-summary-facts dt {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-:root[data-theme] .property-summary-facts dd {
-  margin: 2px 0 0;
-  color: var(--ink);
-  font-size: 14px;
-  overflow-wrap: anywhere;
 }
 .property-private-box {
   display: grid;

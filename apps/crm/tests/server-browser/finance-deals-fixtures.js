@@ -54,9 +54,10 @@ export async function openDeals(page) {
   if ((await list.getAttribute('aria-pressed')) !== 'true') await list.click();
 }
 
+/** Opens a deal's slider, named "<deal name> Deal · <client> · <ID>". */
 export const openDeal = async (page, dealId) => {
   await page.getByRole('button', { name: `Open deal ${dealId}`, exact: true }).click();
-  const details = page.getByRole('dialog', { name: dealId, exact: true });
+  const details = page.getByRole('dialog', { name: new RegExp(` · ${dealId}$`) });
   await expect(details).toBeVisible();
   return details;
 };

@@ -4,6 +4,7 @@ import { useI18n } from '../../i18n/useI18n.js';
 import { readableDate } from '../../lib/dates.js';
 import { maskPhone, N } from '../../lib/format.js';
 import { get } from '../../lib/records.js';
+import './panel/record-panel-cards.css';
 import './property-summary.css';
 
 const joined = (...values) =>
@@ -55,7 +56,7 @@ export function PropertySummary({ record: r, data }) {
   return (
     <div className="property-summary">
       {facts.length > 0 && (
-        <dl className="property-summary-facts">
+        <dl className="record-fact-card property-summary-facts">
           {facts.map(([key, value]) => (
             <div key={key}>
               <dt>{t(`recordPanel.fact${key[0].toUpperCase()}${key.slice(1)}`)}</dt>

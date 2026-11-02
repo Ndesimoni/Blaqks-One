@@ -9,21 +9,20 @@ export const leadStages = stageAndListingOptions['Lead stage'].filter(
 );
 
 /**
- * The read-only Lead stage track. Earlier stages are done, the saved one is current and later
- * ones wait. Lost, On hold or a value imported from elsewhere sits outside the pipeline: no
- * step is marked and the value is returned as `offPath`. Matching ignores case and spaces.
+ * A read-only stage track over `stages` (the Lead stage pipeline unless given, e.g. a deal's).
+ * Earlier stages are done, the saved one is current and later ones wait. A stage outside the
+ * pipeline (Lost, On hold, a value imported from elsewhere) marks no step and is returned as
+ * `offPath`. Matching ignores case and spaces.
  */
-export function stageTrack(value) {
+export function stageTrack(value, stages = leadStages) {
   const saved = String(value ?? '').trim();
-  const at = saved
-    ? leadStages.findIndex((stage) => stage.toLowerCase() === saved.toLowerCase())
-    : -1;
+  const at = saved ? stages.findIndex((stage) => stage.toLowerCase() === saved.toLowerCase()) : -1;
   return {
-    stage: at >= 0 ? leadStages[at] : saved,
+    stage: at >= 0 ? stages[at] : saved,
     position: at + 1,
-    total: leadStages.length,
+    total: stages.length,
     offPath: at < 0 ? saved : '',
-    steps: leadStages.map((label, index) => ({
+    steps: stages.map((label, index) => ({
       label,
       state: at < 0 || index > at ? 'todo' : index < at ? 'done' : 'current',
     })),

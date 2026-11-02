@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { dealColumns, stageMoveBody } from '../../src/features/server/finance/dealBoardModel.js';
+import {
+  dealColumns,
+  dealPipeline,
+  nextDealStage,
+  stageMoveBody,
+} from '../../src/features/server/finance/dealBoardModel.js';
 import { dealBodyFromDraft, draftFromDeal } from '../../src/features/server/finance/dealDraft.js';
 import { dealStages } from '../../src/features/server/finance/dealModel.js';
 
@@ -55,4 +60,21 @@ test('no move body for the same stage, an unknown stage or a deal that no longer
   assert.equal(stageMoveBody(deal, 'Viewing'), null);
   assert.equal(stageMoveBody(deal, 'Imaginary'), null);
   assert.equal(stageMoveBody({ ...deal, clientId: '' }, 'Offer'), null);
+});
+
+test('the slider moves a deal one pipeline stage on, never off the pipeline', () => {
+  assert.deepEqual(dealPipeline, [
+    'New',
+    'Qualified',
+    'Viewing',
+    'Offer',
+    'Negotiation',
+    'Documentation',
+    'Completed',
+  ]);
+  assert.equal(nextDealStage('Negotiation'), 'Documentation');
+  assert.equal(nextDealStage('Documentation'), 'Completed');
+  for (const stage of ['Completed', 'Lost', 'Cancelled', 'On hold', '']) {
+    assert.equal(nextDealStage(stage), '');
+  }
 });

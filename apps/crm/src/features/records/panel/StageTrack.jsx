@@ -4,17 +4,15 @@ import { stageTrack } from './stageModel.js';
 import './record-panel-stage.css';
 
 /**
- * A client's Lead stage as a read-only pipeline track (Bitrix24's stage bar): finished
- * stages tinted, the current one filled. Narrow panels shorten it to bars with a caption.
- * Stages change only through Edit record, so nothing here is a control.
+ * A client's Lead stage, or (`stages`, `labelKey`) a deal's, as a read-only pipeline track
+ * (Bitrix24's stage bar): finished stages tinted, the current one filled. Narrow panels
+ * shorten it to bars with a caption. Nothing here is a control.
  */
-export function StageTrack({ value }) {
+export function StageTrack({ value, stages, labelKey = 'recordPanel.stageTrack' }) {
   const { t } = useI18n();
-  const track = stageTrack(value);
+  const track = stageTrack(value, stages);
   const { position, total } = track;
-  const label = track.stage
-    ? t('recordPanel.stageTrack', { stage: track.stage })
-    : t('recordPanel.stageNone');
+  const label = track.stage ? t(labelKey, { stage: track.stage }) : t('recordPanel.stageNone');
   const caption = track.offPath
     ? t('recordPanel.stageOffPath', { stage: track.offPath })
     : position

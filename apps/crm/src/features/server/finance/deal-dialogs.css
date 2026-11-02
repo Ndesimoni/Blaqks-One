@@ -108,13 +108,6 @@
   .deal-actions-main .deal-action-primary {
     grid-column: 1 / -1;
   }
-  .deal-summary-figures {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .deal-summary-figures .deal-summary-key {
-    grid-column: 1 / -1;
-    order: -1;
-  }
 }
 @media (max-width: 480px) {
   .deal-record .finance-dialog-record-side {
