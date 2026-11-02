@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { contactOptions, phoneDigits } from '../../src/features/server/inbox/contactModel.js';
+import {
+  contactOptions,
+  linkedConversation,
+  phoneDigits,
+} from '../../src/features/server/inbox/contactModel.js';
 
 // Clearly fictional people, as the connected record entries hold them.
 const entries = {
@@ -88,4 +92,18 @@ test('kept copies, unknown clients and other records offer nothing', () => {
     none,
   );
   assert.deepEqual(contactOptions({ module: 'Viewings', record: {}, entries, user: admin }), none);
+});
+
+test("Email opens the person's newest linked conversation, never spam", () => {
+  const person = { collection: 'Clients', id: 'c-1' };
+  const rows = [
+    { id: 'spam', state: 'spam', linked: { collection: 'Clients', recordId: 'c-1' } },
+    { id: 'other', state: 'open', linked: { collection: 'Clients', recordId: 'c-2' } },
+    { id: 'hidden', state: 'open', linked: { collection: 'Clients', recordId: null } },
+    { id: 'newest', state: 'resolved', linked: { collection: 'Clients', recordId: 'c-1' } },
+    { id: 'older', state: 'open', linked: { collection: 'Clients', recordId: 'c-1' } },
+  ];
+  assert.equal(linkedConversation(rows, person), 'newest');
+  assert.equal(linkedConversation(rows, { collection: 'Contacts', id: 'c-1' }), '');
+  assert.equal(linkedConversation(undefined, person), '');
 });

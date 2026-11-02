@@ -14,6 +14,7 @@ import { ServerWorkspaceBanner } from './ServerWorkspaceBanner.jsx';
 import { SectionTabs } from './products/SectionTabs.jsx';
 import { useProductNav } from './products/useProductNav.js';
 import { ChatStrip } from './products/messenger/ChatStrip.jsx';
+import { MessengerContext } from './products/messenger/messengerContext.js';
 import { MessengerPanel } from './products/messenger/MessengerPanel.jsx';
 import { BottomBar } from './products/BottomBar.jsx';
 import { visibleProducts } from './products/productModel.js';
@@ -90,7 +91,10 @@ export function ServerShell({ owner, workspaces }) {
         onHome={() => navigate('Start')}
         onSections={() => setMobileNav(true)}
       />
-      <ServerDialogs />
+      {/* Record sliders open a client's conversation in the messenger (Email). */}
+      <MessengerContext.Provider value={openMessenger}>
+        <ServerDialogs />
+      </MessengerContext.Provider>
       {messenger && (
         <MessengerPanel
           owner={owner}

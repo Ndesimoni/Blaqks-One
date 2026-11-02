@@ -59,3 +59,17 @@ export function contactOptions({ module, record, entries, keptFor, user }) {
     whatsapp: canReplyOn(user, 'whatsapp') ? digits : '',
   };
 }
+
+/**
+ * The person's most recent conversation among `rows` (an inbox list page, newest activity
+ * first) linked to their record, or ''. Spam is left out.
+ */
+export function linkedConversation(rows, person) {
+  const row = (rows || []).find(
+    (conversation) =>
+      conversation.state !== 'spam' &&
+      conversation.linked?.collection === person.collection &&
+      conversation.linked?.recordId === person.id,
+  );
+  return row?.id || '';
+}

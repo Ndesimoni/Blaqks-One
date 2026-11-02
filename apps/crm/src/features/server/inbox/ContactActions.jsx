@@ -6,11 +6,16 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { usePanelCommand } from '../../records/panel/panelCommands.js';
 import { useMailbox } from '../mailbox/useMailbox.js';
 import { sendingMailbox } from './composerModel.js';
-import { contactOptions } from './contactModel.js';
+import { canOpenSection } from '../access.js';
+import { useOpenMessenger } from '../products/messenger/messengerContext.js';
+import { contactOptions, linkedConversation } from './contactModel.js';
 import { StartEmail } from './StartEmail.jsx';
 
-/** The new email to the person, once the member's mailbox has loaded. */
-function PersonEmail({ person, onClose }) {
+/**
+ * The new email to the person, once the member's mailbox has loaded. When sent, its
+ * conversation opens in the messenger (`onSent`), else a toast confirms it.
+ */
+function PersonEmail({ person, onSent, onClose }) {
   const { t } = useI18n();
   const { api, user } = useSession();
   const { owner } = useWorkspaceScope();
@@ -19,9 +24,10 @@ function PersonEmail({ person, onClose }) {
   if (box.status === 'loading') return null;
   const start = async (body) => {
     try {
-      await api.startConversation(owner.id, body);
+      const { conversationId } = await api.startConversation(owner.id, body);
       onClose();
-      setToast(t('recordPanel.emailSent', { name: person.name || person.legacy }));
+      if (onSent && conversationId) onSent(conversationId);
+      else setToast(t('recordPanel.emailSent', { name: person.name || person.legacy }));
       return '';
     } catch (failure) {
       return failure.message || 'error';
@@ -40,17 +46,22 @@ function PersonEmail({ person, onClose }) {
 /**
  * Call, Email and WhatsApp in the record slider's header for a client or contact, or the client
  * a record is about (owner, 2026-11-02; the mockup's Call and Message). Call dials the number.
- * Email opens the CRM's own new email with the person chosen, so it is sent from the member's
- * mailbox and kept in the Client inbox. WhatsApp opens a chat with the number, since WhatsApp
- * sending in the CRM is still to come (W1b). Email and WhatsApp follow the member's channel
- * grants, and the server decides every send.
+ * Email opens the person's latest email conversation in the messenger when one is among the
+ * member's recent ones, else the Messages "New email" with the person chosen, whose
+ * conversation then opens. WhatsApp opens a chat with the number, since WhatsApp sending in
+ * the CRM is still to come (W1b). Email and WhatsApp follow the member's channel grants, and
+ * the server decides every send.
  */
 export function ContactActions({ module, record }) {
   const { t } = useI18n();
-  const { user } = useSession();
+  const { api, user } = useSession();
+  const { owner } = useWorkspaceScope();
   const { entries, keptFor } = useRecords();
   const { readOnly = false } = useWorkspaceActions();
+  const openMessenger = useOpenMessenger();
+  const messages = openMessenger && canOpenSection(user, 'Inbox') ? openMessenger : null;
   const [writing, setWriting] = useState(false);
+  const [looking, setLooking] = useState(false);
   const options = readOnly
     ? { person: null }
     : contactOptions({ module, record, entries, keptFor, user });
@@ -68,12 +79,28 @@ export function ContactActions({ module, record }) {
         }
       : null;
   usePanelCommand('call', command('call', 'phone', { href: `tel:+${options.call}` }));
-  usePanelCommand('email', command('email', 'mail', { run: () => setWriting(true) }));
+  // A failed lookup still lets the member write a new email.
+  const email = async () => {
+    if (!messages) return setWriting(true);
+    setLooking(true);
+    const page = await api
+      .conversations(owner.id, { channel: 'email', limit: 100 })
+      .catch(() => null);
+    setLooking(false);
+    const existing = linkedConversation(page?.conversations, person);
+    if (existing) messages('inbox', existing);
+    else setWriting(true);
+  };
+  usePanelCommand('email', command('email', 'mail', { run: email, disabled: looking }));
   usePanelCommand(
     'whatsapp',
     command('whatsapp', 'chat', { href: `https://wa.me/${options.whatsapp}` }),
   );
   return writing && person ? (
-    <PersonEmail person={person} onClose={() => setWriting(false)} />
+    <PersonEmail
+      person={person}
+      onSent={messages && ((id) => messages('inbox', id))}
+      onClose={() => setWriting(false)}
+    />
   ) : null;
 }
