@@ -17,6 +17,8 @@
 }
 .kanban-column {
   display: grid;
+  /* The heading stays on top of an empty or short column instead of spreading down it. */
+  align-content: start;
   gap: 8px;
   min-inline-size: 0;
   min-block-size: 280px;

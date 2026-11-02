@@ -1,28 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '../../components/ui/Button.jsx';
 import { ViewSwitch } from '../../components/ui/ViewSwitch.jsx';
-import { useMediaQuery } from '../../hooks/useMediaQuery.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { GridFilterBar } from '../records/grid/GridFilterBar.jsx';
-
-const phoneQuery = '(max-width: 750px)';
-
-/** A filter kept beside the mockup's presets, drawn as a pill select. */
-function PillSelect({ label, value, onChange, anyLabel, options }) {
-  return (
-    <label className="lead-pill-filter">
-      <span>{label}</span>
-      <select value={value} onChange={(event) => onChange(event.target.value)}>
-        <option value="">{anyLabel}</option>
-        {options.map(([option, text]) => (
-          <option key={option} value={option}>
-            {text}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
-}
+import { GridKeptFilters } from '../records/grid/GridKeptFilters.jsx';
+import { GridPillSelect } from '../records/grid/GridPillSelect.jsx';
 
 /**
  * The mockup's Leads filter row: the search field with the active preset, the other presets as
@@ -32,19 +14,17 @@ function PillSelect({ label, value, onChange, anyLabel, options }) {
  */
 export function LeadsToolbar({ filters, view, onView, chooser, toolbarExtras }) {
   const { t } = useI18n();
-  const phone = useMediaQuery(phoneQuery);
-  const [open, setOpen] = useState(false);
   const { presets, preset, onPreset, sources, source, stage, stages } = filters;
   const kept = (
     <>
-      <PillSelect
+      <GridPillSelect
         label={t('leadsBoard.source')}
         value={source}
         onChange={filters.onSource}
         anyLabel={t('leadsBoard.anySource')}
         options={sources.map(({ label, count }) => [label, `${label} (${count})`])}
       />
-      <PillSelect
+      <GridPillSelect
         label="Lead stage"
         value={stage}
         onChange={filters.onStage}
@@ -83,26 +63,9 @@ export function LeadsToolbar({ filters, view, onView, chooser, toolbarExtras }) 
         </>
       }
       extras={
-        <div className="lead-filters" role="group" aria-label="Lead filters">
-          {phone ? (
-            <>
-              <Button
-                variant="light"
-                icon="filter"
-                aria-expanded={open}
-                aria-controls="lead-more-filters"
-                onClick={() => setOpen((value) => !value)}
-              >
-                {t('leadsBoard.filters')}
-              </Button>
-              <div id="lead-more-filters" className="lead-more-filters" hidden={!open}>
-                {kept}
-              </div>
-            </>
-          ) : (
-            kept
-          )}
-        </div>
+        <GridKeptFilters label="Lead filters" className="lead-filters">
+          {kept}
+        </GridKeptFilters>
       }
     />
   );

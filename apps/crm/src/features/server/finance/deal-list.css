@@ -1,5 +1,12 @@
-/* Deals list: filters, table, money, chips, hand-over requests and phone cards.
-   Loaded after finance-skeleton.css; deal-only classes, so Payments/Expenses keep theirs. */
+/* Deals list: page head, table, money, chips and phone cards. Loaded after
+   finance-skeleton.css; deal-only classes, so Payments/Expenses keep theirs. */
+/* The page head (design queue item 5): Deals / Commission statement, the scope, Add deal. */
+.deals-head > .finance-tabs {
+  margin: 0;
+}
+.deals-head > .entries-scope {
+  flex: 1 1 240px;
+}
 .finance-status-chip.deal-chip {
   white-space: nowrap;
 }
@@ -12,8 +19,12 @@
 .deal-table td {
   overflow-wrap: break-word;
 }
-.deal-table td:first-child {
-  white-space: nowrap;
+/* The deal's name wraps; its ID sits below it. */
+.deal-table .deal-name-cell {
+  min-width: 180px;
+}
+.deal-name-cell .finance-sub {
+  display: block;
 }
 .deal-table tbody tr {
   cursor: pointer;
@@ -46,12 +57,6 @@
   line-height: 1.6;
   text-transform: uppercase;
 }
-.finance-page .finance-filters.deal-filters {
-  grid-template-columns: minmax(240px, 2fr) repeat(auto-fit, minmax(150px, 1fr));
-}
-.deal-filters .search-small {
-  grid-column: auto;
-}
 .deal-card-list {
   gap: 10px;
 }
@@ -59,11 +64,23 @@
   gap: 8px;
   padding: 14px 16px;
 }
-.deal-card-code {
-  font-size: 14px;
-}
-.deal-card-client {
+.deal-card-title {
   font-size: 15px;
+  overflow-wrap: anywhere;
+}
+/* The mockup card's meta line: client on the left, value on the right. */
+.deal-card-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+:root[data-theme] .deal-card-line .deal-card-client {
+  font-size: 13px;
+  font-weight: 500;
+}
+.deal-card-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .deal-card-money {
   align-items: baseline;
@@ -86,63 +103,4 @@
   justify-content: space-between;
   align-items: center;
   gap: 6px 10px;
-}
-.deal-handovers .finance-calc-head h2 {
-  font-size: 16px;
-}
-.deal-handover {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px 14px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: var(--surface-subtle);
-}
-.deal-handover-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--accent-subtle);
-  color: var(--accent);
-}
-.deal-handover .finance-handover-text {
-  gap: 4px;
-}
-.deal-handover .finance-handover-text strong {
-  display: block;
-}
-.deal-handover-terms {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 8px;
-  margin-top: 2px;
-}
-.deal-handover-terms small {
-  color: var(--muted-dark);
-  font-size: 12px;
-}
-.deal-handover-actions {
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-}
-@media (max-width: 750px) {
-  .finance-page .finance-filters.deal-filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .deal-filters :is(.search-small, .finance-filter-summary, .deal-filter-wide) {
-    grid-column: 1 / -1;
-  }
-  .deal-handover {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-  }
-  .deal-handover-actions {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
 }

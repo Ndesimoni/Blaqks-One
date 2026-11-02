@@ -1,21 +1,5 @@
 @media (max-width: 750px) {
-  .lead-filters {
-    align-items: stretch;
-  }
-  /* Source, stage and assignment open below the search row from the Filters button. */
-  .lead-more-filters {
-    display: flex;
-    flex-basis: 100%;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .lead-more-filters[hidden] {
-    display: none;
-  }
-  .lead-pill-filter {
-    justify-content: space-between;
-  }
-  :root[data-theme] .lead-pill-filter select,
+  /* Assigned to fills its row inside the Filters panel, like the shared pill selects. */
   :root[data-theme] .leads-page .lead-filters .assigned-filter select {
     flex: 1;
     min-width: 0;

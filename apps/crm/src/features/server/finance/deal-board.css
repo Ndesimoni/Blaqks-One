@@ -15,18 +15,24 @@
   outline: 2px solid var(--focus, var(--gold));
   outline-offset: -2px;
 }
-.deal-board-code {
-  font-size: 12px;
-  color: var(--muted);
-}
-.deal-board-client {
+.deal-board-title {
   font-size: 14px;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
+/* The mockup card's meta line: client on the left, value on the right. */
+.deal-board-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
 .deal-board-value {
-  font-size: 13px;
+  color: var(--ink);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .deal-board-meta {
   color: var(--muted);
@@ -47,15 +53,6 @@
   align-items: center;
   gap: 6px;
   margin-block-start: 4px;
-}
-.deal-views {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-}
-.deal-views .segmented-view-switch {
-  margin-inline-start: auto;
 }
 @media (max-width: 760px) {
   .deal-board-card {

@@ -6,6 +6,7 @@ export default {
   placeholder: 'Filter and search',
   allPreset: 'All {things}',
   clear: 'Clear search and filter',
+  filters: 'Filters',
   columns: 'Choose columns',
   columnsTitle: 'Columns',
   columnsHint: 'Ticked columns show in the table and on phone cards.',

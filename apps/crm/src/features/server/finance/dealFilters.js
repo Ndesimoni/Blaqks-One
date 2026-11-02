@@ -1,15 +1,39 @@
+import { dubaiToday } from '../../../lib/dubaiDate.js';
+
 /**
  * Deals list filters and display helpers (finance-design §7). Filters narrow deals already in
  * the caller's shaped overview; they never widen what the server returned.
  */
 export const DEALS_PER_PAGE = 12;
+/** The approved mockup's presets; the first is the default. */
+export const dealPresets = Object.freeze(['All deals', 'Closing this month']);
 export const earnedFilters = Object.freeze([
   { id: '', label: 'Any earned state' },
   { id: 'earned', label: 'Earned' },
   { id: 'unearned', label: 'Not earned' },
 ]);
 export const QUEUE = 'queue';
-export const emptyDealFilters = Object.freeze({ query: '', stage: '', earned: '', holder: '' });
+export const emptyDealFilters = Object.freeze({
+  preset: dealPresets[0],
+  query: '',
+  stage: '',
+  earned: '',
+  holder: '',
+});
+const closedStages = ['Completed', 'Lost', 'Cancelled'];
+
+/**
+ * "Closing this month": an open deal whose target close date (`YYYY-MM-DD`) falls in the
+ * Dubai month of `today`. Completed, lost and cancelled deals have already closed.
+ */
+export function closingThisMonth(deal, today = dubaiToday()) {
+  const target = String(deal.details?.target_close_date ?? '').trim();
+  return (
+    /^\d{4}-\d{2}/.test(target) &&
+    target.slice(0, 7) === today.slice(0, 7) &&
+    !closedStages.includes(deal.stage)
+  );
+}
 
 const lower = (value) => String(value ?? '').toLowerCase();
 
@@ -19,10 +43,23 @@ export function referenceName(references, collection, id) {
   return references?.[collection]?.find((row) => row.id === id)?.name ?? null;
 }
 
-/** `{ stage, earned, holder, query }`; `holder` is a member ID or `queue` (team view). */
-export function filterDeals(deals, filters, references) {
+/**
+ * A deal's name as the mockup lists deals: its listing and type ("Marina Gate 2-bed · Rental")
+ * when the caller can see the listing, else its type ("Sale deal").
+ */
+export function dealTitle(deal, references) {
+  const property = referenceName(references, 'Properties', deal.propertyId);
+  return property ? `${property} · ${deal.dealType}` : `${deal.dealType} deal`;
+}
+
+/**
+ * `{ preset, stage, earned, holder, query }`; `holder` is a member ID or `queue` (team view).
+ * `today` is the Dubai calendar day the Closing this month preset reads.
+ */
+export function filterDeals(deals, filters, references, today = dubaiToday()) {
   const query = lower(filters.query).trim();
   return deals.filter((deal) => {
+    if (filters.preset === dealPresets[1] && !closingThisMonth(deal, today)) return false;
     if (filters.stage && deal.stage !== filters.stage) return false;
     if (filters.earned === 'earned' && !deal.earnedOn) return false;
     if (filters.earned === 'unearned' && deal.earnedOn) return false;
@@ -38,8 +75,9 @@ export function filterDeals(deals, filters, references) {
   });
 }
 
-/** True when any filter narrows the list (to offer a reset and distinguish "no results"). */
-export const filtersActive = (filters) => Object.values(filters).some((value) => value !== '');
+/** True when a kept filter (stage, earned, holder) narrows the list, to offer Clear filters. */
+export const filtersActive = (filters) =>
+  ['stage', 'earned', 'holder'].some((key) => Boolean(filters[key]));
 
 /** Clamps a page index to the available pages after filtering. */
 export function clampPage(page, total, size = DEALS_PER_PAGE) {

@@ -10,39 +10,6 @@
 .leads-page .grid-filter-field {
   flex-basis: 240px;
 }
-.lead-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-.grid-filterbar > .lead-filters,
-.grid-filterbar .lead-filters > .assigned-filter {
-  flex: 0 1 auto;
-}
-.lead-pill-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
-}
-:root[data-theme] .lead-pill-filter select {
-  min-height: 36px;
-  padding: 6px 32px 6px 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--panel);
-  color: var(--ink);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-}
-.lead-pill-filter select:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
 .lead-card-meta {
   display: flex;
   justify-content: space-between;

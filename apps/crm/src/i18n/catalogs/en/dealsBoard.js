@@ -1,4 +1,4 @@
-/** The Deals pipeline and its view switch (NAV). Keys are `dealsBoard.<key>`. */
+/** The Deals page: pipeline, list columns, filters and view switch. Keys are `dealsBoard.<key>`. */
 export default {
   label: 'Deals pipeline',
   view: 'View',
@@ -16,4 +16,16 @@ export default {
   noMatch: 'No matching deals',
   noMatchDetail: 'Try another search or clear the filters.',
   clear: 'Clear filters',
+  filters: 'Deal filters',
+  sections: 'Deals sections',
+  teamScope: 'Every deal in this workspace, with the full commission split.',
+  ownScope: 'Deals you hold and your own commission.',
+  colDeal: 'Deal',
+  colClient: 'Client',
+  colValue: 'Value',
+  colStage: 'Stage',
+  colAgent: 'Agent',
+  colNetFee: 'Net fee',
+  colPayment: 'Payment',
+  colTarget: 'Target close',
 };

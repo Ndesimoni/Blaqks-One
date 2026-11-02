@@ -53,7 +53,8 @@ test('an Admin adds a deal with a live estimate, splits it, earns it and reads t
   await expect(editor).toHaveCount(0);
 
   const open = page.getByRole('button', { name: /^Open deal DL-/ }).first();
-  const dealId = (await open.textContent()).trim();
+  // The open button names the deal (listing and type); its accessible name carries the ID.
+  const dealId = (await open.getAttribute('aria-label')).replace('Open deal ', '');
   await expect(page.getByRole('table', { name: 'Deals' })).toContainText(agent.name);
   for (const layout of layouts) await checkLayout(page, layout, 'deals-list');
   await page.setViewportSize({ width: 1280, height: 900 });

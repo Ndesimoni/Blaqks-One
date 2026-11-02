@@ -12,6 +12,7 @@ import {
   shoot,
 } from './finance-deals-fixtures.js';
 import { openRecord } from './assign-helpers.js';
+import { openName } from './record-open.js';
 
 test('a holder offers a deal keeping a referral share and the teammate accepts it', async ({
   browser,
@@ -94,7 +95,11 @@ test('a holder offers a deal keeping a referral share and the teammate accepts i
   await expect(holder.page.getByRole('region', { name: 'Hand-over requests' })).toHaveCount(0);
   // The client went with the deal; the holder keeps it view only (agreements design §18).
   await holder.page.goto('/#/clients');
-  await expect(holder.page.locator('tr', { hasText: clientId })).toContainText('View only');
+  // The grid names the client; its ID is in the open button's accessible name.
+  const row = holder.page
+    .getByRole('row')
+    .filter({ has: holder.page.getByRole('button', { name: openName(clientId) }) });
+  await expect(row).toContainText('View only');
   const client = await openRecord(holder.page, clientId);
   await expect(client).toContainText(`View only. Handed over to ${second.name}`);
   await expect(client).toContainText('referral 10%');

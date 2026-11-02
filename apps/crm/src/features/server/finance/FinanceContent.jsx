@@ -19,6 +19,7 @@ import './finance-details.css';
 import './finance-decisions.css';
 import './finance-skeleton.css';
 import './deal-list.css';
+import './deal-handovers.css';
 import './deal-details.css';
 import './deal-dialogs.css';
 

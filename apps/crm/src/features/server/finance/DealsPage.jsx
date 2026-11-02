@@ -1,17 +1,20 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { N } from '../../../lib/format.js';
+import { Empty } from '../../../components/ui/Empty.jsx';
+import { useRememberedChoice } from '../../../hooks/useRememberedChoice.js';
+import { useI18n } from '../../../i18n/useI18n.js';
+import { dubaiToday } from '../../../lib/dubaiDate.js';
+import { GridColumnChooser } from '../../records/grid/GridColumnChooser.jsx';
 import { useFinanceContext } from './useFinanceRequests.js';
 import { emptyDealFilters, filterDeals } from './dealFilters.js';
-import { DealFilters } from './DealFilters.jsx';
+import { dealListColumns } from './DealListColumns.jsx';
+import { DealsToolbar } from './DealsToolbar.jsx';
 import { DealTable } from './DealTable.jsx';
 import { DealDialogs } from './DealDialogs.jsx';
 import { HandoverRequests } from './HandoverRequests.jsx';
 import { CommissionStatement } from './CommissionStatement.jsx';
 import { DealsBoard } from './DealsBoard.jsx';
-import { ViewSwitch } from '../../../components/ui/ViewSwitch.jsx';
-import { useRememberedChoice } from '../../../hooks/useRememberedChoice.js';
-import { useI18n } from '../../../i18n/useI18n.js';
+import { useEntryColumns } from './useEntryColumns.js';
 
 const dealViews = ['kanban', 'list'];
 const tabs = [
@@ -20,9 +23,10 @@ const tabs = [
 ];
 
 /**
- * "Deals & commissions" (finance-design §7): the caller's shaped deals with filters, pending
- * hand-over requests and the commission statement. Every action follows `financeAccess`
- * and the row's server-computed `allowed`.
+ * "Deals & commissions" (finance-design §7) as the approved mockup's screen (design queue item
+ * 5): Deals / Commission statement, the scope and Add deal, pending hand-over requests, then
+ * the filter row (All deals, Closing this month, our kept filters) above the Kanban or List.
+ * Every action follows `financeAccess` and the row's server-computed `allowed`.
  */
 export function DealsPage() {
   const { overview, team, actions, readOnly, user } = useFinanceContext();
@@ -33,31 +37,57 @@ export function DealsPage() {
   const [page, setPage] = useState(0);
   const [dialog, setDialog] = useState(null);
   const deals = overview.deals;
+  const today = dubaiToday();
   const visible = useMemo(
-    () => filterDeals(deals, filters, overview.references),
-    [deals, filters, overview.references],
+    () => filterDeals(deals, filters, overview.references, today),
+    [deals, filters, overview.references, today],
   );
+  const listColumns = useMemo(
+    () => dealListColumns({ team, me: user.id, references: overview.references, t }),
+    [team, user.id, overview.references, t],
+  );
+  const columns = useEntryColumns('deals', user.id, listColumns);
   const changeFilters = (next) => {
     setFilters(next);
     setPage(0);
   };
   const open = (kind, deal = null, extra = {}) => setDialog({ kind, dealId: deal?.id, ...extra });
+  const add = actions.can('createDeal') ? () => open('create') : null;
+  const reset = () => changeFilters(emptyDealFilters);
+  const empty = deals.length ? (
+    <Empty
+      icon="search"
+      title={t('dealsBoard.noMatch')}
+      detail={t('dealsBoard.noMatchDetail')}
+      action={<Button onClick={reset}>{t('dealsBoard.clear')}</Button>}
+    />
+  ) : (
+    <Empty
+      icon="briefcase"
+      title={t('dealsBoard.none')}
+      detail={team ? t('dealsBoard.noneDetail') : 'Deals you hold appear here.'}
+      action={add && <Button onClick={add}>Add deal</Button>}
+    />
+  );
   return (
-    <div className="page-stack finance-page">
-      <div className="directory-top">
-        <div className="directory-count">
-          <div className="large-count">{N(deals.length)}</div>
-          <div>
-            <strong>{team ? 'Team deals' : 'Your deals'}</strong>
-            <p>
-              {team
-                ? 'Every deal in this workspace, with the full commission split.'
-                : 'Deals you hold and your own commission.'}
-            </p>
-          </div>
+    <div className="page-stack finance-page deals-page">
+      <div className="entries-head deals-head">
+        <div className="tabs finance-tabs" role="group" aria-label={t('dealsBoard.sections')}>
+          {tabs.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={tab === item.id}
+              className={tab === item.id ? 'active' : ''}
+              onClick={() => setTab(item.id)}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
-        {actions.can('createDeal') && (
-          <Button icon="plus" onClick={() => open('create')}>
+        <p className="entries-scope">{t(team ? 'dealsBoard.teamScope' : 'dealsBoard.ownScope')}</p>
+        {add && (
+          <Button icon="plus" onClick={add}>
             Add deal
           </Button>
         )}
@@ -71,53 +101,32 @@ export function DealsPage() {
         onApprove={(handover) => open('approveHandover', null, { handover })}
         onReview={(handover) => open('reviewHandover', null, { handover })}
       />
-      <div className="deal-views">
-        <div className="tabs finance-tabs" role="group" aria-label="Deals sections">
-          {tabs.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={tab === item.id}
-              className={tab === item.id ? 'active' : ''}
-              onClick={() => setTab(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-        {tab === 'deals' && (
-          <ViewSwitch
-            label={t('dealsBoard.view')}
-            options={[
-              ['list', t('dealsBoard.list'), 'menu'],
-              ['kanban', t('dealsBoard.kanban'), 'grid'],
-            ]}
-            value={view}
-            onChange={setView}
-          />
-        )}
-      </div>
       {tab === 'deals' ? (
         <>
-          <DealFilters filters={filters} onChange={changeFilters} count={visible.length} />
+          <DealsToolbar
+            filters={filters}
+            onChange={changeFilters}
+            view={view}
+            onView={setView}
+            chooser={<GridColumnChooser module="deals" grid={columns.grid} />}
+          />
           {view === 'kanban' ? (
             <DealsBoard
               deals={visible}
               total={deals.length}
               stage={filters.stage}
               onOpen={(deal) => open('details', deal)}
-              onAdd={actions.can('createDeal') ? () => open('create') : null}
-              onReset={() => changeFilters(emptyDealFilters)}
+              onAdd={add}
+              onReset={reset}
             />
           ) : (
             <DealTable
               deals={visible}
-              total={deals.length}
               page={page}
               onPage={setPage}
               onOpen={(deal) => open('details', deal)}
-              onAdd={actions.can('createDeal') ? () => open('create') : null}
-              onReset={() => changeFilters(emptyDealFilters)}
+              shown={columns.shown}
+              empty={empty}
             />
           )}
         </>

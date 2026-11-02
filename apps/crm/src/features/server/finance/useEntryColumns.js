@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { useStoredColumns } from '../../records/grid/useStoredColumns.js';
 
 /**
- * The columns one viewer sees in Payments or Expenses (the mockup grid's gear): the view's
- * columns without `extra` by default, the extra ones a tick away. Presentation only.
+ * The columns one viewer sees in Deals, Payments or Expenses (the mockup grid's gear): the
+ * view's columns without `extra` by default, the extra ones a tick away. Presentation only.
  */
 export function useEntryColumns(kind, viewer, columns) {
   const names = useMemo(() => columns.map((column) => column.label), [columns]);
