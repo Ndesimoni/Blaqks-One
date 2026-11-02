@@ -5,8 +5,8 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { TitleSection } from '../../../components/ui/TitleSection.jsx';
 import { N } from '../../../lib/format.js';
-import { useFinance } from '../finance/useFinance.js';
 import { QUEUE_QUERY } from '../finance/entryFilters.js';
+import { CollectionMeter } from './CollectionMeter.jsx';
 import { financeFigures } from './financeDashboard.js';
 import './finance-widgets.css';
 
@@ -36,13 +36,13 @@ function PendingRow({ pending, approver, navigate }) {
 
 /**
  * Dashboard finance (finance-design §7), fed only from `GET /finance` for the selected
- * workspace. The own view shows the member's commission and submissions — never company
- * figures; the team view shows the team totals. A failure stays inside this panel.
+ * workspace (`finance`, loaded once by the Dashboard). The own view shows the member's
+ * commission and submissions — never company figures; the team view shows the team totals,
+ * then how much of the fees due has been collected. A failure stays inside this panel.
  */
-export function FinanceWidgets({ owner }) {
-  const { api, user } = useSession();
+export function FinanceWidgets({ finance }) {
+  const { user } = useSession();
   const { navigate } = useNavigation();
-  const finance = useFinance(api, owner.id, user);
   const figures = useMemo(
     () => (finance.overview ? financeFigures(finance.overview, user.id) : null),
     [finance.overview, user.id],
@@ -92,6 +92,7 @@ export function FinanceWidgets({ owner }) {
               </div>
             ))}
           </dl>
+          <CollectionMeter overview={finance.overview} />
           <PendingRow
             pending={figures.pending}
             approver={finance.access.approve}

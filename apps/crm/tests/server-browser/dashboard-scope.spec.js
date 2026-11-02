@@ -1,6 +1,6 @@
 import { test, expect } from './fixtures.js';
 import { memberPage, workspaceRecords } from './assign-helpers.js';
-import { dashboardTeam, held, metric } from './dashboard-fixtures.js';
+import { dashboardTeam, dubaiDay, held, metric, metricNote } from './dashboard-fixtures.js';
 
 /**
  * Cross-linked records around the dashboard team: one's client viewing two's listing, two's client
@@ -30,7 +30,8 @@ async function crossLinkedTeam(prefix) {
   await held(
     team,
     'Follow-ups',
-    { client_id: clientOf(hidden), next_action: 'Scope direct task', due_date: '2020-02-02' },
+    // Due today, so it reaches the Dashboard's Today table.
+    { client_id: clientOf(hidden), next_action: 'Scope direct task', due_date: dubaiDay() },
     one.id,
   );
   for (const client of [mine, hidden]) {
@@ -83,10 +84,10 @@ test('assigned-only dashboard figures equal the scoped /records payload and requ
     );
     expect(upcoming).toHaveLength(2);
     expect(records['Follow-ups']).toHaveLength(2);
-    await expect(metric(page, 'ACTIVE LEADS')).toHaveText(String(records.Clients.length));
-    await expect(metric(page, 'PROPERTIES')).toHaveText(String(records.Properties.length));
-    await expect(metric(page, 'FOLLOW-UPS DUE')).toHaveText(String(records['Follow-ups'].length));
-    await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText(String(upcoming.length));
+    // One's own follow-up is long overdue; the direct task on two's client is due today.
+    await expect(metric(page, 'Follow-ups due today')).toHaveText('1');
+    await expect(metricNote(page, 'Follow-ups due today')).toHaveText('1 overdue');
+    await expect(metric(page, 'Viewings this week')).toHaveText('0');
     const sum = async (heading) =>
       (
         await page
@@ -100,8 +101,9 @@ test('assigned-only dashboard figures equal the scoped /records payload and requ
     expect(await sum('Lead pipeline')).toBe(records.Clients.length);
     expect(await sum('Where leads come from')).toBe(records.Clients.length);
     // Hidden records appear only as the server's permitted labels, never with other details.
-    const priorities = page.locator('.activity-panel').filter({ hasText: 'Your priorities' });
-    await expect(priorities).toContainText(
+    const agenda = page.getByRole('region', { name: 'Today', exact: true });
+    await expect(agenda).toContainText('Scope direct task');
+    await expect(agenda).toContainText(
       `${hidden.record.client_id} · Dash hidden client (not assigned to you)`,
     );
     const viewings = page.locator('.next-viewings');
@@ -133,7 +135,7 @@ test('an Admin narrowed to one workload still names linked records held by other
     const viewings = page.locator('.next-viewings');
     await page.getByLabel('Assigned to', { exact: true }).selectOption({ label: one.name });
     await expect(page.getByText('Figures for the selected workload')).toBeVisible();
-    await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText('2');
+    await expect(viewings.locator('button.viewing-mini')).toHaveCount(2);
     // The Admin can open this listing, so it must not be reported as unavailable.
     await expect(viewings).toContainText('Scope other listing');
     await expect(viewings).not.toContainText(

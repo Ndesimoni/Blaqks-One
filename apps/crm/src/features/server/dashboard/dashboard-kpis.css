@@ -1,0 +1,109 @@
+/* The connected Dashboard's figure tiles and Today table (approved mockup `.tiles`, dataviz
+   stat tiles). Chart colours are the theme's green and gold stepped up to chart strength and
+   checked against each mode's panel; the quiet gray carries context periods. */
+.connected-dashboard {
+  --chart-bar: #2b7a50;
+  --chart-current: #a06c22;
+  --chart-quiet: #c3cec7;
+  --chart-track: #dcebe2;
+}
+:root[data-theme='dark'] .connected-dashboard {
+  --chart-bar: #56a379;
+  --chart-current: #b8873c;
+  --chart-quiet: #4b6355;
+  --chart-track: #2a4235;
+}
+.kpi-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+}
+.kpi-tile {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 116px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease);
+}
+.kpi-tile:hover {
+  border-color: var(--gold);
+}
+.kpi-tile:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.kpi-label {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.kpi-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.kpi-value {
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.kpi-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+.kpi-note.is-up {
+  color: var(--pipeline-active);
+  font-weight: 600;
+}
+.kpi-note.is-down,
+.kpi-note.is-alert {
+  color: var(--danger);
+  font-weight: 600;
+}
+.sparkbars {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 2px;
+  width: 96px;
+  height: 34px;
+  border-bottom: 1px solid var(--line);
+}
+.sparkbar {
+  flex: 1;
+  min-width: 4px;
+  border-radius: 2px 2px 0 0;
+  background: var(--chart-quiet);
+}
+.sparkbar.is-current {
+  background: var(--chart-current);
+}
+:root[data-theme] .dashboard-section-title {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.today-table tbody tr {
+  cursor: pointer;
+}
+.today-when {
+  width: 90px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+:root[data-theme] .dashboard-today-empty {
+  margin: 0;
+  padding: 16px;
+  color: var(--muted);
+}

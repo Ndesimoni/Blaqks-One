@@ -66,9 +66,15 @@ export async function dashboardTeam(prefix) {
   return { team, one, two, mine, hidden, listing };
 }
 
-/** A metric tile's value by its label. */
+/** A figure tile's value, and its note, by the tile's label. */
 export const metric = (page, name) =>
-  page.locator('.metric').filter({ hasText: name }).locator('.metric-value');
+  page.locator('.kpi-tile').filter({ hasText: name }).locator('.kpi-value');
+export const metricNote = (page, name) =>
+  page.locator('.kpi-tile').filter({ hasText: name }).locator('.kpi-note');
+
+/** Today's Dubai calendar day, as the Dashboard's Today reads it. */
+export const dubaiDay = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Dubai' }).format(new Date());
 
 /** Expected totals in the Records in view panel. */
 export async function expectCounts(page, counts) {

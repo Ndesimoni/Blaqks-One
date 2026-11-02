@@ -46,3 +46,18 @@ export function financeFigures(overview, me) {
     },
   };
 }
+
+/**
+ * How much of the fees due has come in, for the collected meter: the team's received against
+ * received plus outstanding, or (own view) the caller's received share against their own.
+ * `{ receivedFils, dueFils, percent }` with BigInt fils (as `formatAed` takes them); 0n when
+ * nothing is due yet.
+ */
+export function collectedShare(overview) {
+  const team = overview.scope === 'team' && overview.teamTotals;
+  const totals = team ? overview.teamTotals : overview.statement.totals;
+  const received = BigInt(team ? totals.receivedFils : totals.receivedShareFils);
+  const due = received + BigInt(totals.outstandingFils);
+  const percent = due > 0n ? Number((received * 100n) / due) : 0;
+  return { receivedFils: received, dueFils: due, percent };
+}

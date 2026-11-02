@@ -54,8 +54,8 @@ test('connected Admin navigation restores every group and unfinished routes neve
     ).toHaveCount(0);
   }
   for (const [name, action] of [
-    ['Dashboard', 'Add new lead'],
-    ['Client desk', 'Add client'],
+    ['Dashboard', 'Create'],
+    ['Client desk', 'Create'],
     ['Leads', 'Create'],
     ['Follow-ups', 'Create'],
     ['Viewings', 'Create'],
@@ -65,7 +65,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
   ]) {
     await openPage(page, name);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(sectionLabelOf(name));
-    // Lists add records from the top bar's Create (approved mockup); the rest keep their own.
+    // Every page adds records from the top bar's Create (approved mockup).
     await expect(page.getByRole('button', { name: action, exact: true }).first()).toBeVisible();
     await expect(page.getByRole('region', { name: `${name} connection status` })).toHaveCount(0);
     await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);

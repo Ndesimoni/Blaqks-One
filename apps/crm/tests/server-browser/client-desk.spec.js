@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { memberPage } from './assign-helpers.js';
 import { actions, setGrants } from './permissions-fixtures.js';
-import { assignTeam, dashboardTeam, held } from './dashboard-fixtures.js';
+import { assignTeam, dashboardTeam, dubaiDay, held } from './dashboard-fixtures.js';
 
 test('the Client desk shows the chosen client, their contact actions, matches and activity', async ({
   browser,
@@ -56,7 +56,9 @@ test('view-only members get no add, edit or shortlist actions on the Dashboard o
   try {
     await page.goto('/#/dashboard');
     await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'View follow-ups' })).toBeVisible();
+    await expect(
+      page.locator('.kpi-tile').filter({ hasText: 'Follow-ups due today' }),
+    ).toBeVisible();
     for (const name of ['Add new lead', 'Create follow-up'])
       await expect(page.getByRole('button', { name })).toHaveCount(0);
     await page.goto('/#/client-desk');
@@ -85,7 +87,7 @@ test('a client reached only through an assigned follow-up shows name, phone and 
   await held(
     team,
     'Follow-ups',
-    { client_id: client.record.client_id, next_action: 'Desk call' },
+    { client_id: client.record.client_id, next_action: 'Desk call', due_date: dubaiDay() },
     one.id,
   );
   const { page, context } = await memberPage(browser, one.email);
@@ -105,8 +107,9 @@ test('a client reached only through an assigned follow-up shows name, phone and 
       await expect(page.locator('.client-desk')).not.toContainText(secret);
     await expect(page.getByRole('region', { name: /matching propert/ })).toHaveCount(0);
     await page.goto('/#/dashboard');
-    const priorities = page.locator('.activity-panel').filter({ hasText: 'Your priorities' });
-    await expect(priorities).toContainText(
+    const today = page.getByRole('region', { name: 'Today', exact: true });
+    await expect(today).toContainText('Desk call');
+    await expect(today).toContainText(
       `${client.record.client_id} · Desk task client (not assigned to you)`,
     );
   } finally {

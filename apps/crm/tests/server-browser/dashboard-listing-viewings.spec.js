@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { assignTeam, held } from './assign-fixtures.js';
 import { memberPage, noPageOverflow, setTheme, workspaceRecords } from './assign-helpers.js';
-import { metric } from './dashboard-fixtures.js';
+import { expectCounts } from './dashboard-fixtures.js';
 
 /**
  * Agent one holds a listing and one client. Agent two's client and a queued client have viewings
@@ -57,8 +57,8 @@ test('a listing holder sees other agents’ viewings on it as time, property and
       await expect(panel).not.toContainText(secret);
     await heldRows.first().click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
-    // The upcoming figure still counts only the caller's own visible viewings.
-    await expect(metric(page, 'UPCOMING VIEWINGS')).toHaveText('1');
+    // The figures still count only the caller's own visible viewings.
+    await expectCounts(page, { Viewings: 1 });
     const { body } = await workspaceRecords(page);
     expect(body.scope).toBe('assigned');
     expect(body.listingViewings).toHaveLength(2);

@@ -1,38 +1,49 @@
 import React, { useMemo } from 'react';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords } from '../../../hooks/useWorkspace.js';
-import { PrioritiesPanel } from '../../dashboard/PrioritiesPanel.jsx';
-import { BarListPanel } from '../../dashboard/BarListPanel.jsx';
-import { ConnectedMetrics } from './ConnectedMetrics.jsx';
-import { RecordCountsPanel } from './RecordCountsPanel.jsx';
-import { FinanceWidgets } from './FinanceWidgets.jsx';
+import { dubaiToday } from '../../../lib/dubaiDate.js';
+import { useFinance } from '../finance/useFinance.js';
 import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
-import { useDashboardWorkload } from './useDashboardWorkload.js';
-import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
-import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
 import { DashboardToolbar } from './DashboardToolbar.jsx';
+import { FinanceWidgets } from './FinanceWidgets.jsx';
 import { GetStartedChecklist } from './GetStartedChecklist.jsx';
+import { KpiTiles } from './KpiTiles.jsx';
+import { LeadBars } from './LeadBars.jsx';
+import { RecordCountsPanel } from './RecordCountsPanel.jsx';
+import { TodayAgenda } from './TodayAgenda.jsx';
+import { dashboardWidgets, linkedName, selectConnectedDashboard } from './dashboardModel.js';
+import { workloadDeals } from './kpiModel.js';
+import { showsListingViewings, upcomingEntries } from './upcomingModel.js';
+import { useDashboardWorkload } from './useDashboardWorkload.js';
 import '../assignment/assigned-filter.css';
+import './dashboard-kpis.css';
+import './dashboard-charts.css';
 
 /**
- * Connected Dashboard: figures from this session's scoped records only, never demo data.
- * Finance figures come from the workspace's scoped finance overview.
+ * Connected Dashboard as the approved mockup's screen (design queue item 8): the four figure
+ * tiles and Today first, then the panels the owner kept (Get started for the Admin, finance,
+ * the lead charts, upcoming viewings and records in view). Figures come from this session's
+ * scoped records and the workspace's scoped finance overview only, never demo data.
  */
 export function ServerDashboard({ owner }) {
-  const { user, company } = useSession();
+  const { api, user, company } = useSession();
   // Names use every record the viewer can see; only the figures follow the workload filter.
   const { data: visible, scope, referenceFor, listingViewings } = useRecords();
   const workload = useDashboardWorkload();
   const { data } = workload;
   const widgets = dashboardWidgets(user);
+  // One finance request feeds the pipeline tile and the finance panel, only where they show.
+  const finance = useFinance(api, owner?.id, widgets.finance && owner ? user : null);
   const figures = useMemo(() => selectConnectedDashboard(data), [data]);
   const ownView = showsListingViewings(workload.filter, workload.me);
   const upcoming = useMemo(
     () => upcomingEntries(figures.upcoming, listingViewings, ownView),
     [figures.upcoming, listingViewings, ownView],
   );
+  const deals = finance.overview ? workloadDeals(finance.overview.deals, workload.filter) : null;
   const clientName = (id) => linkedName(visible, referenceFor, 'Clients', id);
   const propertyName = (id) => linkedName(visible, referenceFor, 'Properties', id);
+  const today = dubaiToday();
   const caption =
     scope === 'team'
       ? workload.filter
@@ -42,7 +53,15 @@ export function ServerDashboard({ owner }) {
   return (
     <div className="page-stack dashboard-page connected-dashboard">
       <DashboardToolbar workload={workload} caption={caption} />
-      <ConnectedMetrics figures={figures} widgets={widgets} />
+      <KpiTiles data={data} figures={figures} deals={deals} widgets={widgets} today={today} />
+      {widgets.schedule && (
+        <TodayAgenda
+          data={data}
+          today={today}
+          clientName={clientName}
+          propertyName={propertyName}
+        />
+      )}
       {user.roleId === 'admin' && (
         <GetStartedChecklist
           workspaceId={owner.id}
@@ -51,38 +70,21 @@ export function ServerDashboard({ owner }) {
           firstName={user.name.trim().split(/\s+/)[0]}
         />
       )}
-      {widgets.finance && owner && <FinanceWidgets owner={owner} />}
-      <div className="split-main">
-        <RecordCountsPanel
-          collections={widgets.collections}
-          counts={figures.counts}
-          caption="Open a list to review or update these records"
-        />
-        {widgets.schedule && (
-          <PrioritiesPanel
-            data={data}
-            summary={{ tasks: figures.tasks, dueTasks: figures.dueTasks }}
-            clientName={clientName}
-          />
-        )}
-      </div>
-      <div className="triple-grid">
+      {widgets.finance && owner && <FinanceWidgets finance={finance} />}
+      <div className="dashboard-charts">
         {widgets.leads && (
           <>
-            <BarListPanel
+            <LeadBars
               heading="Lead pipeline"
               caption="Where your clients stand today"
               rows={figures.stages}
-              max={figures.maxStage}
               empty="No lead stages recorded."
               link={{ label: 'Manage leads', route: 'Leads' }}
             />
-            <BarListPanel
+            <LeadBars
               heading="Where leads come from"
               caption="Top channels bringing clients in"
               rows={figures.sources.slice(0, 5)}
-              max={figures.maxSource}
-              colorOffset={1}
               empty="No lead sources recorded."
               link={{ label: 'Review sources', route: 'Leads' }}
             />
@@ -96,6 +98,11 @@ export function ServerDashboard({ owner }) {
           />
         )}
       </div>
+      <RecordCountsPanel
+        collections={widgets.collections}
+        counts={figures.counts}
+        caption="Open a list to review or update these records"
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-/* The Dashboard's toolbar row (approved mockup): quick actions, scope, then the workload. */
+/* The Dashboard's toolbar row (approved mockup): the scope, then the workload filter. */
 .dashboard-toolbar {
   display: flex;
   flex-wrap: wrap;
