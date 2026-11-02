@@ -1,73 +1,63 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Empty } from '../../../components/ui/Empty.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useRecords, useWorkspaceView } from '../../../hooks/useWorkspace.js';
-import { MessagePreviewDialog } from '../../messaging/MessagePreviewDialog.jsx';
-import { ClientPicker } from '../../clients/ClientPicker.jsx';
-import { ClientMessageTools, ClientProfileHero } from '../../clients/ClientProfile.jsx';
-import { ClientMatches, ClientTimeline } from '../../clients/ClientActivity.jsx';
-import { selectClientDesk, selectClientTimeline } from '../../clients/selectors.js';
+import { useI18n } from '../../../i18n/useI18n.js';
+import { get } from '../../../lib/records.js';
+import { selectClientDesk } from '../../clients/selectors.js';
+import { RecordTimeline } from '../../records/panel/RecordTimeline.jsx';
+import '../../records/panel/record-panel-timeline.css';
 import { canOpenSection } from '../access.js';
-import { linkedName } from '../dashboard/dashboardModel.js';
+import { DeskClientHero } from './DeskClientHero.jsx';
+import { DeskClientList } from './DeskClientList.jsx';
+import { DeskMatches } from './DeskMatches.jsx';
 import { TaskClientsPanel } from './TaskClientsPanel.jsx';
 import { selectTaskClients } from './clientDeskModel.js';
-import './client-desk-layout.css';
+import './desk.css';
+import './desk-cards.css';
 
 /**
- * Connected Client desk over the session's scoped Clients and Properties. Clients reached only
- * through an assigned follow-up appear as contact cards, never as profiles or matches.
+ * The connected Client desk as the approved mockup's screen (design queue item 7): the client
+ * picker, the chosen client with Call, WhatsApp and Email, their property matches, and their
+ * activity beside them, all over the session's scoped records. Clients reached only through
+ * an assigned follow-up appear as contact cards, never as profiles or matches.
  */
 export function ServerClientDesk() {
+  const { t } = useI18n();
   const { user } = useSession();
-  const { data, taskClients, referenceFor } = useRecords();
+  const { data, taskClients } = useRecords();
   const { query, selectedClient } = useWorkspaceView();
-  const [channel, setChannel] = useState(null);
   const { clients, client, matches } = selectClientDesk(data, query, selectedClient);
-  const timeline = selectClientTimeline(data, client, (id) =>
-    linkedName(data, referenceFor, 'Properties', id),
-  );
   const contacts = selectTaskClients(taskClients, data.Clients, query);
   return (
-    <div className="desk-layout connected-desk">
-      <ClientPicker clients={clients} client={client} />
-      <div className="desk-body">
-        {client ? (
-          <>
-            <ClientProfileHero client={client} />
-            <ClientMessageTools
-              client={client}
-              onPreview={setChannel}
-              caption="Channel access comes from your account permissions. Sender accounts are not connected."
+    <div className="client-desk-wrap">
+      <div className="client-desk">
+        <DeskClientList clients={clients} client={client} />
+        <div className="client-desk-main">
+          {client ? (
+            <>
+              <DeskClientHero key={get(client, 'Client ID')} client={client} />
+              {canOpenSection(user, 'Properties') && (
+                <DeskMatches client={client} matches={matches} />
+              )}
+            </>
+          ) : (
+            <Empty
+              icon="users"
+              title={t(
+                data.Clients.length ? 'clientDesk.noMatchingClients' : 'clientDesk.selectTitle',
+              )}
+              detail={t(data.Clients.length ? 'clientDesk.tryAnother' : 'clientDesk.selectDetail')}
             />
-            {canOpenSection(user, 'Properties') && (
-              <ClientMatches client={client} matches={matches} />
-            )}
-            {canOpenSection(user, 'Follow-ups') && <ClientTimeline timeline={timeline} />}
-          </>
-        ) : (
-          <Empty
-            title={data.Clients.length ? 'No matching clients' : 'Select a client'}
-            detail={
-              data.Clients.length
-                ? 'Try another name, phone number or ID.'
-                : 'Clients you can work with appear here with their property matches.'
-            }
-            icon="users"
-          />
+          )}
+          <TaskClientsPanel clients={contacts} />
+        </div>
+        {client && (
+          <div className="client-desk-side">
+            <RecordTimeline data={data} client={client} />
+          </div>
         )}
-        <TaskClientsPanel clients={contacts} />
       </div>
-      {channel && client && (
-        <MessagePreviewDialog
-          channel={channel}
-          recipient={{
-            name: client.full_name || 'Client',
-            phone: client.phone,
-            email: client.email,
-          }}
-          onClose={() => setChannel(null)}
-        />
-      )}
     </div>
   );
 }

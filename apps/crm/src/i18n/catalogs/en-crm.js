@@ -3,6 +3,7 @@ import enAgreementForm from './en/agreementForm.js';
 import enAgreementLifecycle from './en/agreementLifecycle.js';
 import enAgreements from './en/agreements.js';
 import enCalculators from './en/calculators.js';
+import enClientDesk from './en/clientDesk.js';
 import enDealPanel from './en/dealPanel.js';
 import enDealParties from './en/dealParties.js';
 import enDealsBoard from './en/dealsBoard.js';
@@ -27,6 +28,7 @@ export const crmCatalogs = {
   agreements: enAgreements,
   agreementLifecycle: enAgreementLifecycle,
   calculators: enCalculators,
+  clientDesk: enClientDesk,
   dealPanel: enDealPanel,
   dealParties: enDealParties,
   dealsBoard: enDealsBoard,

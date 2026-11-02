@@ -1,43 +1,11 @@
 import React, { useId } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceActions } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { hasMessagingAccess } from '../../messaging/model.js';
+import { ContactCommand } from './ContactCommand.jsx';
 import { ShareChoice } from './ShareChoice.jsx';
-
-/**
- * A section's contact command (Call, Email, WhatsApp): a button, or a link when it has `href`;
- * a web link opens in a new tab, a `tel:` link in the phone app.
- */
-function ContactCommand({ command }) {
-  if (!command.href)
-    return (
-      <Button
-        variant="light"
-        icon={command.icon}
-        aria-label={command.name}
-        title={command.name}
-        onClick={command.run}
-      >
-        {command.label}
-      </Button>
-    );
-  return (
-    <a
-      className="btn btn-light"
-      href={command.href}
-      target={command.href.startsWith('https:') ? '_blank' : undefined}
-      rel="noopener noreferrer"
-      aria-label={command.name}
-      title={command.name}
-    >
-      <Icon name={command.icon} size={16} aria-hidden="true" />
-      <span>{command.label}</span>
-    </a>
-  );
-}
 
 /**
  * The record's actions in the panel header. The rules are unchanged from the former footer:
