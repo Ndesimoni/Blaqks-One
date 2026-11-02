@@ -34,7 +34,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 7. [x] **Client desk** (`d8b7d44`; Call and Message (as on the client slider) replace the preview box; Open client replaces Edit profile; lead quality kept as a pill; match photos dropped for the mockup's compact cards; activity is the slider's timeline) (`crm.clients.desk`): a client picker ("Find a client"), the chosen client and their property matches.
 8. [x] **Dashboard** (`1f98bf9`; owner kept Team finance, lead charts, Upcoming viewings, Records in view and, for now, Get started; tiles carry trends, finance a collected meter; Your priorities gives way to Today) (`crm.dashboard.overview`): figure tiles first, then the mockup's panels. Report our extra panels before changing them.
 9. [x] **Reports: Performance** (`ad99920`; lead response in days, not hours, as leads keep only the day they arrived; goals, chart and history kept below) (`crm.reports.performance`): tiles (deals won, commission earned, average days to close, lead response time) and one bar per agent on one scale.
-10. [ ] **Reports: CRM insights** (`crm.reports.insights`): tiles such as Leads from the website.
+10. [x] **Reports: CRM insights** (`ef41a4c`; old figure tiles kept as feed lines; four panels kept below; no filter field above the feed, as there is nothing to filter) (`crm.reports.insights`): tiles such as Leads from the website.
 11. [ ] **Reports: Date search** (`crm.reports.dates`): a From / To form and its results.
 12. [ ] **Tools: Calculators** (`crm.tools.calculators`): calculator choice, fields and the result.
 13. [ ] **Tools: Guide** (`crm.tools.guide`): "Search the guide", articles grouped by topic, an article page with steps and related guides.
