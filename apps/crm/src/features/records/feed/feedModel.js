@@ -78,3 +78,14 @@ export function channelKind(channel) {
   const text = String(channel ?? '');
   return channelKinds.find(([pattern]) => pattern.test(text))?.[1] || 'note';
 }
+
+/**
+ * How a conversation's title joins the channel to the client, as the approved mockup's feed
+ * reads ("Call with Layla Haddad", "Email to Omar Farouk", "WhatsApp from Priya Nair"): calls
+ * and meetings are "with"; other channels are "to" when outbound, "from" when inbound.
+ */
+export function feedWay(kind, direction) {
+  if (kind === 'phone' || kind === 'meeting') return 'with';
+  const value = String(direction ?? '').trim();
+  return /^out/i.test(value) ? 'to' : /^in/i.test(value) ? 'from' : 'with';
+}

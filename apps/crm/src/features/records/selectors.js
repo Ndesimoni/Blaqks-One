@@ -13,6 +13,7 @@ export const recordTabs = (module) =>
     Clients: ['All clients', 'Buyers', 'Tenants', 'Hot leads', 'Closed', 'Lost'],
     Shortlist: ['Active shortlists', 'All shortlists'],
     'Client care': ['Due this month', 'Birthdays', 'Renewals', 'All client care'],
+    'Interaction log': ['Everything'],
     Deals: ['All', 'Open', 'Completed', 'Lost'],
     'Follow-ups': ['All', 'Overdue', 'Open', 'Completed'],
     Viewings: ['All', 'Upcoming', 'Completed'],

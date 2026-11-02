@@ -5,6 +5,7 @@ import {
   dayCounts,
   dayLabelKey,
   feedMoment,
+  feedWay,
   groupFeed,
   orderFeed,
 } from '../../src/features/records/feed/feedModel.js';
@@ -72,4 +73,13 @@ test('each workbook channel has its icon and custom channels fall back to a note
   assert.equal(channelKind('E-mail'), 'mail');
   assert.equal(channelKind(undefined), 'note');
   assert.equal(channelKind('Instagram'), 'note');
+});
+
+test("a title joins channel and client as the mockup's feed does", () => {
+  assert.equal(feedWay('phone', 'Outbound'), 'with');
+  assert.equal(feedWay('meeting', 'Inbound'), 'with');
+  assert.equal(feedWay('mail', 'Outbound'), 'to');
+  assert.equal(feedWay('whatsapp', 'Inbound'), 'from');
+  assert.equal(feedWay('sms', ''), 'with');
+  assert.equal(feedWay('note', undefined), 'with');
 });

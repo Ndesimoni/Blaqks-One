@@ -5,23 +5,37 @@ import { readableDate } from '../../../lib/dates.js';
 import { clName, get, prName } from '../../../lib/records.js';
 import { RecordRowActions } from '../RecordRowActions.jsx';
 import { ChannelIcon } from './ChannelIcon.jsx';
-import { channelKind, feedFields as F, feedMoment } from './feedModel.js';
+import { channelKind, feedFields as F, feedMoment, feedWay } from './feedModel.js';
 
 const text = (record, field) => String(get(record, field) ?? '').trim();
+const title = (word) => word[0].toUpperCase() + word.slice(1);
 
 /**
- * One conversation: channel icon, topic, time, channel and direction; the linked client and
- * listing; the summary; then the follow-up action, its due date and status. A click anywhere
- * opens the record, as a table row does; the Open record button serves the keyboard.
+ * One conversation, as the approved mockup's feed: channel icon, then who and how ("Email to
+ * Omar Farouk") and the time; the topic and listing; the summary; then the follow-up action,
+ * its due date and status. Without a linked client the topic leads, with channel and
+ * direction beside the time. A click anywhere opens the record, as a table row does; the
+ * Open record button serves the keyboard.
  */
 export function FeedEvent({ module, data, record, readOnly, onOpen }) {
   const { t } = useI18n();
   const { day, time } = feedMoment(get(record, F.when));
   const channel = text(record, F.channel);
   const kind = channelKind(channel);
-  const meta = [channel, text(record, F.direction)].filter(Boolean);
+  const direction = text(record, F.direction);
+  const way = feedWay(kind, direction);
+  const client = text(record, F.client) && clName(data, text(record, F.client));
+  const topic = text(record, F.topic);
+  // A custom channel keeps its own name; "Other" or none reads as a conversation.
+  const custom = kind === 'note' && channel && !/^other$/i.test(channel);
+  const what = custom ? channel : t(`recordGrid.feed${title(kind)}`);
+  const headline = client
+    ? t('recordGrid.feedTitle', { what, way: t(`recordGrid.feed${title(way)}`), name: client })
+    : topic || t('recordGrid.untitled');
+  // A call's or meeting's title has no direction, and a title without a client no channel.
+  const meta = client ? [way === 'with' ? direction : ''] : [channel, direction];
   const links = [
-    text(record, F.client) && clName(data, text(record, F.client)),
+    client && topic,
     text(record, F.property) && prName(data, text(record, F.property)),
   ].filter(Boolean);
   const summary = text(record, F.summary);
@@ -33,13 +47,11 @@ export function FeedEvent({ module, data, record, readOnly, onOpen }) {
       </span>
       <div className="feed-body">
         <p className="feed-line">
-          <strong className="feed-title">
-            {text(record, F.topic) || t('recordGrid.untitled')}
-          </strong>
-          {(time || meta.length > 0) && (
+          <strong className="feed-title">{headline}</strong>
+          {(time || meta.some(Boolean)) && (
             <span className="feed-when">
               {time && <time dateTime={`${day}T${time}`}>{time}</time>}
-              {meta.map((item, index) => (
+              {meta.filter(Boolean).map((item, index) => (
                 <span key={index}>{item}</span>
               ))}
             </span>
