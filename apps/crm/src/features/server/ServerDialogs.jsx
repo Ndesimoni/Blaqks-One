@@ -3,6 +3,7 @@ import { useRecords, useWorkspaceView, useWorkspaceActions } from '../../hooks/u
 import { RecordEditor } from '../records/RecordEditor.jsx';
 import { RecordDetails } from '../records/RecordDetails.jsx';
 import { AssignmentDetails } from './assignment/AssignmentDetails.jsx';
+import { ContactActions } from './inbox/ContactActions.jsx';
 import { KeptNotice } from './KeptNotice.jsx';
 import { RecordSharing } from './shares/RecordSharing.jsx';
 import { OutsideSharing } from './listingShares/OutsideSharing.jsx';
@@ -30,6 +31,7 @@ export function ServerDialogs() {
               <KeptNotice badge={kept} />
             ) : (
               <>
+                <ContactActions module={detail.module} record={detail.record} />
                 <AssignmentDetails module={detail.module} record={detail.record} />
                 <RecordSharing module={detail.module} record={detail.record} />
                 <OutsideSharing module={detail.module} record={detail.record} />

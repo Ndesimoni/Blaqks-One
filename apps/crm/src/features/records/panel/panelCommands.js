@@ -33,8 +33,9 @@ export function usePanelCommandList() {
 }
 
 /**
- * Offers `command` ({ label, disabled, pill, tone, run }) in the slider header while
- * it is not null; outside a slider it does nothing. `run` may change on every render.
+ * Offers `command` ({ label, name, icon, disabled, pill, tone, run or href }) in the slider
+ * header while it is not null; outside a slider it does nothing. `name` is a fuller accessible
+ * name; `href` makes it a link. `run` may change on every render.
  */
 export function usePanelCommand(key, command) {
   const register = useContext(PanelCommandsContext);
@@ -42,18 +43,21 @@ export function usePanelCommand(key, command) {
   useLayoutEffect(() => {
     run.current = command?.run || null;
   });
-  const { label, disabled = false, pill, tone } = command || {};
+  const { label, name, icon, href, disabled = false, pill, tone } = command || {};
   const offered = Boolean(command);
   const runs = Boolean(command?.run);
   useEffect(() => {
     if (!register || !offered) return undefined;
     register(key, {
       label,
+      name,
+      icon,
+      href,
       disabled,
       pill,
       tone,
       run: runs ? () => run.current?.() : null,
     });
     return () => register(key, null);
-  }, [register, key, offered, runs, label, disabled, pill, tone]);
+  }, [register, key, offered, runs, label, name, icon, href, disabled, pill, tone]);
 }

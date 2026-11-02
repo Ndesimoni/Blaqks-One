@@ -69,6 +69,10 @@
 .record-panel-actions {
   margin-inline-start: auto;
 }
+/* Call and WhatsApp are links styled as the buttons beside them. */
+:root[data-theme] .record-panel .record-panel-actions a.btn {
+  text-decoration: none;
+}
 .record-panel-status {
   display: flex;
   flex-wrap: wrap;

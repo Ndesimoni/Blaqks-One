@@ -1,5 +1,6 @@
 import React, { useId } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceActions } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
@@ -7,11 +8,44 @@ import { hasMessagingAccess } from '../../messaging/model.js';
 import { ShareChoice } from './ShareChoice.jsx';
 
 /**
+ * A section's contact command (Call, Email, WhatsApp): a button, or a link when it has `href`;
+ * a web link opens in a new tab, a `tel:` link in the phone app.
+ */
+function ContactCommand({ command }) {
+  if (!command.href)
+    return (
+      <Button
+        variant="light"
+        icon={command.icon}
+        aria-label={command.name}
+        title={command.name}
+        onClick={command.run}
+      >
+        {command.label}
+      </Button>
+    );
+  return (
+    <a
+      className="btn btn-light"
+      href={command.href}
+      target={command.href.startsWith('https:') ? '_blank' : undefined}
+      rel="noopener noreferrer"
+      aria-label={command.name}
+      title={command.name}
+    >
+      <Icon name={command.icon} size={16} aria-hidden="true" />
+      <span>{command.label}</span>
+    </a>
+  );
+}
+
+/**
  * The record's actions in the panel header. The rules are unchanged from the former footer:
  * Delete and Edit follow the caller's permissions, and a record nobody may change offers only
  * Close. The group keeps the `drawer-footer` class, the shared hook for a dialog's record
- * actions that browser checks read. Sections' `commands` add the mockup's Share before it and,
- * for a listing, Publish on website after it, which then takes the one primary place from Edit.
+ * actions that browser checks read. Sections' `commands` add Call, Email and WhatsApp
+ * and the mockup's Share before it and, for a listing, Publish on website after it, which then
+ * takes the one primary place from Edit.
  */
 export function RecordPanelActions({
   module,
@@ -34,8 +68,14 @@ export function RecordPanelActions({
   const changeable = !readOnly && (canDelete || canEdit);
   const publish = commands.publish?.run ? commands.publish : null;
   const shares = [commands.shareColleague, commands.shareCompany].filter((c) => c?.run);
+  const contact = [commands.call, commands.email, commands.whatsapp].filter(
+    (c) => c?.run || c?.href,
+  );
   return (
     <div className="record-panel-actions">
+      {contact.map((command) => (
+        <ContactCommand key={command.label} command={command} />
+      ))}
       <ShareChoice choices={shares} />
       <div className="drawer-footer" role="group" aria-label={t('recordPanel.actions')}>
         {module === 'Clients' && showMessaging && !readOnly && (

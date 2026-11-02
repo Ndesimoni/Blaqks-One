@@ -49,7 +49,8 @@ export function canSendAgain(message, messages, userId) {
   );
 }
 
-const plainEmail = (value) => /^[^\s@"<>,;:\\()[\]]+@[^\s@"<>,;:\\()[\]]+\.[^\s@]+$/.test(value);
+export const plainEmail = (value) =>
+  /^[^\s@"<>,;:\\()[\]]+@[^\s@"<>,;:\\()[\]]+\.[^\s@]+$/.test(value);
 
 /** Clients and Contacts with a usable email address that match the search. */
 export function emailRecipients(entries, query) {
