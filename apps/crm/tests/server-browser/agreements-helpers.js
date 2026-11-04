@@ -7,7 +7,8 @@ export async function openAgreements(page) {
 }
 
 /** The agreement row with this synthetic listing label. */
-export const agreementRow = (page, listing) => page.locator('.agreement-row', { hasText: listing });
+export const agreementRow = (page, listing) =>
+  page.locator('.agreement-row, .agreement-card', { hasText: listing });
 
 /**
  * Drafts a co-broking agreement through every form step for the member with `email`,

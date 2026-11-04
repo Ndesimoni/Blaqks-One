@@ -21,6 +21,12 @@ async function companyBMember(suffix) {
   return { ...session, email: invited.email, name: `Synthetic ${suffix}` };
 }
 
+const listView = (page) =>
+  page
+    .getByRole('group', { name: 'Show agreements as', exact: true })
+    .getByRole('button', { name: 'List', exact: true })
+    .click();
+
 test('company A sends a co-broking offer that a member of company B accepts', async ({
   page,
   browser,
@@ -46,6 +52,8 @@ test('company A sends a co-broking offer that a member of company B accepts', as
   );
   await page.getByRole('button', { name: 'Close agreement' }).click();
   await page.getByRole('tab', { name: /Sent/ }).click();
+  // The list view keeps each agreement's direction and whose turn it is (the board is default).
+  await listView(page);
   await expect(agreementRow(page, listing)).toContainText(`To ${member.name}`);
   await expect(agreementRow(page, listing)).toContainText('40%');
   await shots(page, testInfo, 'agreements-list');
@@ -53,6 +61,7 @@ test('company A sends a co-broking offer that a member of company B accepts', as
   const other = await memberPage(browser, member.email);
   await openAgreements(other.page);
   await other.page.getByRole('tab', { name: /Incoming/ }).click();
+  await listView(other.page);
   const incoming = agreementRow(other.page, listing);
   await expect(incoming).toContainText('From Fixture Admin A');
   await expect(incoming).toContainText('Your answer is needed');

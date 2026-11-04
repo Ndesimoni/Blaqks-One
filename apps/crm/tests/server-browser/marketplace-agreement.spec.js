@@ -25,7 +25,7 @@ test('a selected offer releases private details only after negotiated agreement 
     await expect(poster.page.getByRole('link', { name: 'Chat on WhatsApp' })).toHaveCount(0);
 
     await openAgreements(broker.page);
-    await broker.page.locator('.agreement-row').first().click();
+    await broker.page.locator('.agreement-card').first().click();
     await expect(broker.page.getByRole('dialog')).not.toContainText('MK4-PRIVATE-UNIT');
     await expect(broker.page.getByRole('dialog')).not.toContainText(customer.record.full_name);
     await confirmAction(broker.page, 'Accept', 'Accept agreement', 'Accepted');

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
+import { ViewSwitch } from '../../../components/ui/ViewSwitch.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { AgreementDetail } from './AgreementDetail.jsx';
 import { AgreementForm } from './AgreementForm.jsx';
+import { AgreementBoard } from './AgreementBoard.jsx';
 import { AgreementList } from './AgreementList.jsx';
 import { ListingSharesPanel } from '../listingShares/ListingSharesPanel.jsx';
 import { filterByTab, TABS } from './agreementModel.js';
@@ -17,7 +19,8 @@ import './agreement-lifecycle.css';
 
 /**
  * Agreements (docs/agreements-design.md §13): offers between this company and another,
- * filtered Incoming / Sent / All, and Listings shared between companies (record sharing R2).
+ * filtered Incoming / Sent / All as the approved mockup's board (design queue item 28) or a
+ * list, and Listings shared between companies (record sharing R2).
  * The detail opens over the list; drafts, revisions and counter-offers use one form that
  * freezes the reviewed terms into a new revision.
  */
@@ -26,6 +29,7 @@ export function ServerAgreements() {
   const { t } = useI18n();
   const list = useAgreements(api, user.workspaceId);
   const [tab, setTab] = useState('all');
+  const [view, setView] = useState('board');
   const [openId, setOpenId] = useState(null);
   const [form, setForm] = useState(null);
   const counts = Object.fromEntries(
@@ -69,13 +73,31 @@ export function ServerAgreements() {
           </button>
         </div>
         {tab !== 'listings' && (
-          <Button icon="plus" onClick={() => setForm({ mode: 'create' })}>
-            {t('agreements.new')}
-          </Button>
+          <div className="agreements-toolbar-end">
+            <ViewSwitch
+              label={t('agreements.view.label')}
+              options={[
+                ['board', t('agreements.view.board'), 'grid'],
+                ['list', t('agreements.view.list'), 'menu'],
+              ]}
+              value={view}
+              onChange={setView}
+            />
+            <Button icon="plus" onClick={() => setForm({ mode: 'create' })}>
+              {t('agreements.new')}
+            </Button>
+          </div>
         )}
       </div>
       {tab === 'listings' ? (
         <ListingSharesPanel />
+      ) : view === 'board' ? (
+        <AgreementBoard
+          list={list}
+          tab={tab}
+          onOpen={setOpenId}
+          onCreate={() => setForm({ mode: 'create' })}
+        />
       ) : (
         <AgreementList
           key={tab}
