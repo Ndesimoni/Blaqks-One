@@ -9,9 +9,10 @@ import {
 } from '../../src/features/server/dashboard/getStartedModel.js';
 import {
   companyDraft,
-  companyDraftError,
-  companyDraftPayload,
-} from '../../src/features/server/profile/companyProfileModel.js';
+  companyErrors,
+  companyPayload,
+  draftChanged,
+} from '../../src/features/server/company/companyModel.js';
 
 // Companies are universal (B0, docs/deepseek-delivery-plan.md §3): the retired individual
 // Company access follows the signed-in role throughout the connected CRM.
@@ -62,15 +63,43 @@ test('checklist preference is scoped and storage failures stay harmless', () => 
   assert.doesNotThrow(() => hideChecklist('workspace-a', blocked));
 });
 
-test('company profile drafts validate and preserve the company version', () => {
-  const company = { displayName: 'Old name', emirate: 'dubai', version: 4 };
-  assert.deepEqual(companyDraft(company), { displayName: 'Old name', emirate: 'dubai' });
-  assert.deepEqual(companyDraftError({ displayName: 'Firm', emirate: '' }), [
-    'emirate',
-    'signupErrors.invalidCompany',
-  ]);
+test('company drafts check every field and send office details tidied', () => {
+  const company = { displayName: 'Old name', emirate: 'dubai', officePhone: '+97145552210' };
+  const draft = companyDraft(company);
+  assert.deepEqual(draft, {
+    displayName: 'Old name',
+    tradeLicence: '',
+    emirate: 'dubai',
+    officePhone: '+97145552210',
+    officeAddress: '',
+  });
+  assert.equal(draftChanged(draft, company), false);
+  assert.equal(draftChanged({ ...draft, tradeLicence: ' DED 1 ' }, company), true);
+  assert.deepEqual(companyErrors(draft), {});
   assert.deepEqual(
-    companyDraftPayload(company, { displayName: ' New firm ', emirate: 'sharjah' }),
-    { version: 4, displayName: 'New firm', emirate: 'sharjah' },
+    companyErrors({ ...draft, displayName: ' ', emirate: '', officePhone: '045552210' }),
+    {
+      displayName: 'company.invalidName',
+      emirate: 'company.invalidEmirate',
+      officePhone: 'company.invalidPhone',
+    },
+  );
+  assert.deepEqual(
+    companyErrors({ ...draft, officeAddress: 'a\nb', tradeLicence: 'L'.repeat(41) }),
+    {
+      tradeLicence: 'company.invalidLicence',
+      officeAddress: 'company.invalidAddress',
+    },
+  );
+  assert.deepEqual(
+    companyPayload(4, { ...draft, displayName: ' New firm ', officePhone: '+971 4 (555) 2210' }),
+    {
+      version: 4,
+      displayName: 'New firm',
+      emirate: 'dubai',
+      tradeLicence: null,
+      officePhone: '+97145552210',
+      officeAddress: null,
+    },
   );
 });

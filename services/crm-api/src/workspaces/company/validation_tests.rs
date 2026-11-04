@@ -7,6 +7,9 @@ fn request(name: &str, emirate: Option<&str>) -> UpdateRequest {
         version: 1,
         display_name: name.into(),
         emirate: emirate.map(str::to_owned),
+        trade_licence: None,
+        office_phone: None,
+        office_address: None,
     }
 }
 
@@ -59,6 +62,39 @@ fn request_denies_unowned_fields_and_wrong_shapes() {
             "{key}"
         );
     }
+}
+
+#[test]
+fn office_details_are_kept_when_left_out_cleared_when_empty_and_checked_when_sent() {
+    let base = serde_json::json!({"version":1,"displayName":"Synthetic","emirate":"dubai"});
+    let left_out: UpdateRequest = serde_json::from_value(base.clone()).unwrap();
+    assert!(left_out.trade_licence.is_none() && left_out.office_phone.is_none());
+    let mut body = base.clone();
+    body["tradeLicence"] = serde_json::json!("  DED 1043378 ");
+    body["officePhone"] = serde_json::json!("+971 4 (555) 2210");
+    body["officeAddress"] = serde_json::Value::Null;
+    let mut sent: UpdateRequest = serde_json::from_value(body).unwrap();
+    prepare(&mut sent).unwrap();
+    assert_eq!(sent.trade_licence, Some(Some("DED 1043378".into())));
+    assert_eq!(sent.office_phone, Some(Some("+97145552210".into())));
+    assert_eq!(sent.office_address, Some(None));
+    for (key, value) in [
+        ("tradeLicence", "L".repeat(41)),
+        ("officeAddress", "A".repeat(201)),
+        ("officeAddress", "Line one\nline two".into()),
+        ("officePhone", "045552210".into()),
+        ("officePhone", "+971 4 555 22 10 ext 3".into()),
+    ] {
+        let mut body = base.clone();
+        body[key] = serde_json::json!(value);
+        let mut request: UpdateRequest = serde_json::from_value(body).unwrap();
+        assert!(prepare(&mut request).is_err(), "{key}: {value}");
+    }
+    let mut cleared = base.clone();
+    cleared["tradeLicence"] = serde_json::json!("   ");
+    let mut request: UpdateRequest = serde_json::from_value(cleared).unwrap();
+    prepare(&mut request).unwrap();
+    assert_eq!(request.trade_licence, Some(None));
 }
 
 #[test]

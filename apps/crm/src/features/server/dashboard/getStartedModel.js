@@ -6,7 +6,7 @@ export function deriveGettingStarted(data, company) {
     { id: 'client', route: 'Clients', complete: Boolean(data.Clients?.length) },
     { id: 'followUp', route: 'Follow-ups', complete: Boolean(data['Follow-ups']?.length) },
   ];
-  if (!company?.setupComplete) tasks.push({ id: 'company', route: 'My profile', complete: false });
+  if (!company?.setupComplete) tasks.push({ id: 'company', route: 'Company', complete: false });
   tasks.push({ id: 'team', route: 'Team & access', complete: false });
   return tasks;
 }

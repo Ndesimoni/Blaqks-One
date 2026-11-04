@@ -4,7 +4,6 @@ import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { AccountGate } from './AccountGate.jsx';
 import { AccountSummary } from './AccountSummary.jsx';
-import { CompanyProfileForm } from './CompanyProfileForm.jsx';
 import { GuidanceSetting } from './GuidanceSetting.jsx';
 import { LanguageSetting } from './LanguageSetting.jsx';
 import { ProfileCard } from './ProfileCard.jsx';
@@ -22,7 +21,7 @@ import './profile.css';
  * header tabs. It never reads CRM records and grants no extra powers (docs/i18n.md).
  */
 export function ServerProfile() {
-  const { api, user, company, replaceUser, replaceCompany } = useSession();
+  const { api, replaceUser } = useSession();
   const { refreshDirectory } = useWorkspaceScope();
   const { t, languages } = useI18n();
   return (
@@ -76,20 +75,6 @@ export function ServerProfile() {
             >
               <GuidanceSetting api={api} account={account} onSaved={onPreferenceSaved} />
             </ProfileCard>
-            {user.roleId === 'admin' && (
-              <ProfileCard
-                id="company-profile"
-                title={t('signupSetup.companyProfileTitle')}
-                description={t('signupSetup.companyProfileDescription')}
-              >
-                <CompanyProfileForm
-                  api={api}
-                  workspaceId={user.workspaceId}
-                  company={company}
-                  onSaved={replaceCompany}
-                />
-              </ProfileCard>
-            )}
           </div>
         );
       }}

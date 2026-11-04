@@ -61,6 +61,8 @@ test('a route is found in its product and section, and sections keep their heade
   // My profile's tabs: a website profile only for agents (the Admin, staff with Properties).
   const profileTabs = ['My profile', 'Website profile', 'Sign-in and security'];
   assert.deepEqual(locate(admin, 'Website profile').section.routes, profileTabs);
+  assert.equal(locate(admin, 'Company').section.key, 'company');
+  assert.equal(locate(staff, 'Company'), null);
   assert.equal(locate(staff, 'Website profile'), null);
   assert.deepEqual(locate(staff, 'My profile').section.routes, [
     'My profile',

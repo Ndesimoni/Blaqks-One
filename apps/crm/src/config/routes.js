@@ -29,6 +29,8 @@ export const connectedRoutes = [
   { name: 'Inbox rules', path: '/inbox-rules' },
   { name: 'My mailbox', path: '/my-mailbox' },
   { name: 'My WhatsApp', path: '/my-whatsapp' },
+  // The Admin's company details (design queue item 15).
+  { name: 'Company', path: '/company' },
   // My profile's other header tabs (design queue item 14).
   { name: 'Website profile', path: '/website-profile' },
   { name: 'Sign-in and security', path: '/sign-in-security' },

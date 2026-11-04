@@ -62,6 +62,7 @@ export const productList = [
     key: 'settings',
     icon: 'sliders',
     sections: [
+      { key: 'company', routes: ['Company'] },
       { key: 'team', routes: ['Team & access'] },
       { key: 'activity', routes: ['Team activity'], group: 'company' },
       { key: 'channels', routes: ['Channels'] },

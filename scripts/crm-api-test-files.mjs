@@ -1,4 +1,5 @@
 import { agreementTestFiles } from './crm-api-test-files-agreements.mjs';
+import { companyTestFiles, signupTestFiles } from './crm-api-test-files-company.mjs';
 import { marketplaceTestFiles } from './crm-api-test-files-marketplace.mjs';
 import { messagingTestFiles } from './crm-api-test-files-messaging.mjs';
 import { websiteTestFiles, websiteNextTestFile } from './crm-api-test-files-websites.mjs';
@@ -8,11 +9,7 @@ export const apiTestFiles = [
   'apps/crm/tests/api/auth.test.mjs',
   ...websiteTestFiles,
   'apps/crm/tests/api/auth-foundation.test.mjs',
-  'apps/crm/tests/api/company-profile.test.mjs',
-  'apps/crm/tests/api/company-access.test.mjs',
-  'apps/crm/tests/api/company-migration.test.mjs',
-  'apps/crm/tests/api/company-free-seats-migration.test.mjs',
-  'apps/crm/tests/api/company-races.test.mjs',
+  ...companyTestFiles,
   'apps/crm/tests/api/records.test.mjs',
   'apps/crm/tests/api/workflow-records.test.mjs',
   'apps/crm/tests/api/referral-links.test.mjs',
@@ -105,13 +102,7 @@ export const apiTestFiles = [
   'apps/crm/tests/api/activity-feed.test.mjs',
   'apps/crm/tests/api/activity-scope.test.mjs',
   'apps/crm/tests/api/activity-h1.test.mjs',
-  'apps/crm/tests/api/signup-start.test.mjs',
-  'apps/crm/tests/api/signup-verify.test.mjs',
-  'apps/crm/tests/api/signup-enumeration.test.mjs',
-  'apps/crm/tests/api/signup-limits.test.mjs',
-  'apps/crm/tests/api/signup-races.test.mjs',
-  'apps/crm/tests/api/signup-release-races.test.mjs',
-  'apps/crm/tests/api/signup-invitations.test.mjs',
+  ...signupTestFiles,
   ...agreementTestFiles,
   ...marketplaceTestFiles,
   'apps/crm/tests/api/record-sharing-contract.test.mjs',

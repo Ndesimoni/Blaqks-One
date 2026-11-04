@@ -7,6 +7,7 @@ use uuid::Uuid;
 pub async fn get<'e>(executor: impl sqlx::PgExecutor<'e>, workspace: &str) -> ApiResult<Company> {
     sqlx::query_as::<_, Company>(
         "SELECT account_type,member_limit,display_name,emirate, \
+         trade_licence,office_phone,office_address, \
          setup_completed_at IS NOT NULL AS setup_complete,version \
          FROM crm_company_profiles WHERE workspace_id=$1",
     )
@@ -84,14 +85,20 @@ pub(super) async fn update_details(
         ));
     }
     validation::for_company(request)?;
+    // Office details left out of a request (sign-up's setup) keep their saved values.
+    let kept = |sent: &Option<Option<String>>, saved: Option<String>| sent.clone().unwrap_or(saved);
     sqlx::query(
-        "UPDATE crm_company_profiles SET display_name=$2,emirate=$3, \
+        "UPDATE crm_company_profiles SET display_name=$2,emirate=$3,trade_licence=$4, \
+         office_phone=$5,office_address=$6, \
          setup_completed_at=COALESCE(setup_completed_at,now()),updated_at=now(), \
          version=version+1 WHERE workspace_id=$1",
     )
     .bind(workspace)
     .bind(&request.display_name)
     .bind(&request.emirate)
+    .bind(kept(&request.trade_licence, current.trade_licence))
+    .bind(kept(&request.office_phone, current.office_phone))
+    .bind(kept(&request.office_address, current.office_address))
     .execute(&mut **transaction)
     .await?;
     events::append(transaction, workspace, actor, "details_updated", None, None).await?;

@@ -13,6 +13,7 @@ import { ServerAgreements } from './agreements/ServerAgreements.jsx';
 import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 import { ServerCalculators } from './calculators/ServerCalculators.jsx';
 import { ServerChannels } from './channels/ServerChannels.jsx';
+import { ServerCompany } from './company/ServerCompany.jsx';
 import { ServerTeamChat } from './chat/ServerTeamChat.jsx';
 import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
 import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
@@ -82,6 +83,7 @@ export function ServerContent({ owner }) {
   if (route === 'Website profile') return <ServerWebsiteProfile />;
   if (route === 'Sign-in and security') return <ServerSecurity />;
   if (route === 'Channels') return <ServerChannels />;
+  if (route === 'Company') return <ServerCompany />;
   if (route === 'Inbox rules') return <ServerInboxRules />;
   if (route === 'Team chat') return <ServerTeamChat />;
   if (route === 'Agreements') return <ServerAgreements />;

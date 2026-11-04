@@ -10,6 +10,7 @@ const extraIcons = {
   'Website profile': 'monitor',
   'Sign-in and security': 'lock',
   'Team & access': 'shield',
+  Company: 'building',
   Channels: 'chat',
   'Inbox rules': 'sliders',
   'My mailbox': 'note',
@@ -57,7 +58,15 @@ export const displayGroups = [
   {
     key: 'company',
     pinned: true,
-    items: ['Team & access', 'Team activity', 'Channels', 'Inbox rules', 'Website', 'Workspaces'],
+    items: [
+      'Company',
+      'Team & access',
+      'Team activity',
+      'Channels',
+      'Inbox rules',
+      'Website',
+      'Workspaces',
+    ],
   },
   {
     key: 'platform',

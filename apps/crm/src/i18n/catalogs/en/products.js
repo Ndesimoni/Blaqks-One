@@ -37,6 +37,7 @@ export default {
   'sections.workspaces': 'Workspaces',
   'sections.applications': 'Marketplace applications',
   'sections.platformWebsite': 'Platform website',
+  'sections.company': 'Company',
   'sections.team': 'Team & access',
   'sections.activity': 'Team activity',
   'sections.channels': 'Channels',

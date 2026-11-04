@@ -8,6 +8,9 @@ export const emptyCompany = {
   memberLimit: 3,
   displayName: null,
   emirate: null,
+  tradeLicence: null,
+  officePhone: null,
+  officeAddress: null,
   setupComplete: false,
   version: 1,
 };

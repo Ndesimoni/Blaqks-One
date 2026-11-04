@@ -55,6 +55,9 @@ pub struct Company {
     pub member_limit: Option<i32>,
     pub display_name: Option<String>,
     pub emirate: Option<String>,
+    pub trade_licence: Option<String>,
+    pub office_phone: Option<String>,
+    pub office_address: Option<String>,
     pub setup_complete: bool,
     pub version: i64,
 }
