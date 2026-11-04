@@ -29,6 +29,9 @@ export const connectedRoutes = [
   { name: 'Inbox rules', path: '/inbox-rules' },
   { name: 'My mailbox', path: '/my-mailbox' },
   { name: 'My WhatsApp', path: '/my-whatsapp' },
+  // My profile's other header tabs (design queue item 14).
+  { name: 'Website profile', path: '/website-profile' },
+  { name: 'Sign-in and security', path: '/sign-in-security' },
   { name: 'Agreements', path: '/agreements' },
   { name: 'Marketplace', path: '/marketplace' },
   // Google's sign-in returns here (E1a); the page finishes it and clears the address bar.

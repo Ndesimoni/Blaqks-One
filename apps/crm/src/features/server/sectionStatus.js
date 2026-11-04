@@ -22,6 +22,8 @@ const connectedSections = new Set([
   'Guide',
   // The member's own account under `/auth/account` and `/auth/sessions`.
   'My profile',
+  'Website profile',
+  'Sign-in and security',
   // `GET /activity`: the whole workspace for managers, the member's own actions for staff.
   'Team activity',
   // `/channels`: the Admin's connections registry (packet X1).
@@ -54,6 +56,8 @@ const purposes = {
   Performance: 'Review targets and business performance.',
   Guide: 'Learn how to use your CRM workspace.',
   'My profile': 'Review your account, update your details and manage sign-in security.',
+  'Website profile': 'Choose how you appear on your company website and the Blaqks One website.',
+  'Sign-in and security': 'Change your password and sign out devices you do not recognise.',
   Workspaces: 'Review the workspaces this account is permitted to open.',
   'Team activity': 'Review who changed what in this workspace, and when.',
   'My activity': 'Review the changes you have made in this workspace.',

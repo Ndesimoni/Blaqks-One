@@ -67,7 +67,11 @@ export const productList = [
       { key: 'channels', routes: ['Channels'] },
       { key: 'inboxRules', routes: ['Inbox rules'] },
       { key: 'workspaces', routes: ['Workspaces'], group: 'company' },
-      { key: 'profile', routes: ['My profile'], personal: true },
+      {
+        key: 'profile',
+        routes: ['My profile', 'Website profile', 'Sign-in and security'],
+        personal: true,
+      },
       { key: 'myActivity', routes: ['Team activity'], group: 'personal', personal: true },
       { key: 'mailbox', routes: ['My mailbox'], personal: true },
       { key: 'whatsapp', routes: ['My WhatsApp'], personal: true },

@@ -21,6 +21,7 @@ export function GuidanceSetting({ api, account, onSaved }) {
           <input
             type="checkbox"
             role="switch"
+            className="profile-switch"
             checked={enabled}
             disabled={save.status === 'saving'}
             onChange={(event) => save.choose(event.target.checked)}

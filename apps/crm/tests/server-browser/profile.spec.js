@@ -12,6 +12,15 @@ async function openProfile(page) {
   await expect(page.getByRole('heading', { name: 'Account details' })).toBeVisible();
 }
 
+/** My profile's Sign-in and security header tab: the password and signed-in devices. */
+async function openSecurity(page) {
+  await page
+    .getByRole('navigation', { name: 'Section tabs' })
+    .getByRole('button', { name: 'Sign-in and security', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Active sessions' })).toBeVisible();
+}
+
 const sessionRows = (page) =>
   page.getByRole('list', { name: 'Signed-in devices' }).getByRole('listitem');
 
@@ -50,9 +59,10 @@ test('members edit their details, change their password and manage their session
     page.getByRole('button', { name: 'Account menu, Browser Profile Edited', exact: true }),
   ).toBeVisible();
 
-  // Sessions list and signing out other devices.
+  // Sessions list and signing out other devices, on the Sign-in and security tab.
   const other = await memberPage(browser, invited.email);
-  await page.reload();
+  await openSecurity(page);
+  await expect(page).toHaveURL(/#\/sign-in-security$/);
   await expect(sessionRows(page)).toHaveCount(3);
   await expect(page.getByText('This device', { exact: true })).toHaveCount(1);
   await expect(sessionRows(page).filter({ hasText: 'This device' })).toContainText('Chrome');
@@ -89,7 +99,7 @@ test('members edit their details, change their password and manage their session
     'Current password is incorrect.',
   );
   await expect(current).toHaveValue('');
-  await expect(page.getByRole('heading', { name: 'Account details' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Change password' })).toBeVisible();
 
   // A successful change keeps this device signed in and signs out the second context.
   await current.fill('Team123!');
@@ -103,13 +113,14 @@ test('members edit their details, change their password and manage their session
   await second.page.reload();
   await signedOut(second.page);
   await second.context.close();
+  await expect(page.getByText(/^Last changed /)).toBeVisible();
   // The rotated CSRF token is in use: another save succeeds without signing in again.
+  await openProfile(page);
   await page.getByLabel('Full name *').fill('Browser Profile Final');
   await page.getByRole('button', { name: 'Save changes' }).click();
   await expect(page.getByText('Your details were saved.')).toBeVisible();
   await page.reload();
   await expect(page.getByLabel('Full name *')).toHaveValue('Browser Profile Final');
-  await expect(page.getByText(/^Last changed /)).toBeVisible();
   await page.screenshot({ path: test.info().outputPath('profile-desktop.png'), fullPage: true });
 });
 
@@ -126,9 +137,12 @@ test('My profile reflows on mobile and desktop in both themes', async ({ page },
       await page.setViewportSize({ width, height });
       await setTheme(page, theme);
       await openProfile(page);
-      await expect(sessionRows(page).first()).toBeVisible();
       await noPageOverflow(page);
       const path = testInfo.outputPath(`profile-${width}-${theme}.png`);
       await page.screenshot({ path, fullPage: true });
+      await page.goto('/#/sign-in-security');
+      await expect(sessionRows(page).first()).toBeVisible();
+      await noPageOverflow(page);
+      await page.screenshot({ path: path.replace('.png', '-security.png'), fullPage: true });
     }
 });

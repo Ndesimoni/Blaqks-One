@@ -33,6 +33,8 @@ import { ServerMarketplaceApplications } from './marketplace/ServerMarketplaceAp
 import { ServerMyWhatsapp } from './myWhatsapp/ServerMyWhatsapp.jsx';
 import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { ServerProfile } from './profile/ServerProfile.jsx';
+import { ServerSecurity } from './profile/ServerSecurity.jsx';
+import { ServerWebsiteProfile } from './profile/ServerWebsiteProfile.jsx';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
 import { IncomingShares } from './shares/IncomingShares.jsx';
@@ -77,6 +79,8 @@ export function ServerContent({ owner }) {
   }
   // The member's own account: independent of the selected workspace's records.
   if (route === 'My profile') return <ServerProfile />;
+  if (route === 'Website profile') return <ServerWebsiteProfile />;
+  if (route === 'Sign-in and security') return <ServerSecurity />;
   if (route === 'Channels') return <ServerChannels />;
   if (route === 'Inbox rules') return <ServerInboxRules />;
   if (route === 'Team chat') return <ServerTeamChat />;

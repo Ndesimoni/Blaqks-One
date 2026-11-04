@@ -4,13 +4,16 @@ import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
 import { SocialLinkFields } from '../website/social/SocialLinkFields.jsx';
 import { WebsiteProfileFields } from '../website/team/WebsiteProfileFields.jsx';
 import * as model from '../website/team/websiteTeamModel.js';
+import { ConsentSwitch } from './ConsentSwitch.jsx';
+import { ProfileCard } from './ProfileCard.jsx';
 import { WebsiteProfileSectionFoot } from './WebsiteProfileSectionFoot.jsx';
 import { WebsiteProfileSectionStatus } from './WebsiteProfileSectionStatus.jsx';
 
 /**
- * The member's own public details, social links and consent. Consent is given or withdrawn
- * only here; turning it off asks first, because the server takes the profile and listings
- * down at once. Links save with the profile as the member's own (website-social-links.md).
+ * The member's own public details, social links and consent, as the approved mockup's two
+ * cards and save bar (design queue item 14). Consent is given or withdrawn only here; turning
+ * it off asks first, because the server takes the profile and listings down at once. Links
+ * save with the profile as the member's own (website-social-links.md).
  */
 export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
   const { profile, live } = own;
@@ -75,61 +78,67 @@ export function WebsiteProfileSectionForm({ own, admin, fallbackName, t }) {
     }
   };
   return (
-    <form className="acct-form wp-form" onSubmit={submit} noValidate>
-      <div className="acct-card-body">
-        <WebsiteProfileSectionStatus profile={profile} live={live} admin={admin} t={t} />
-        <WebsiteProfileFields
-          idPrefix="wp"
-          form={form}
-          errors={errors}
+    <form className="acct-form wp-form page-stack acct-page" onSubmit={submit} noValidate>
+      <div className="profile-grid">
+        <ProfileCard id="website-show" title={k('showTitle')} description={k('showDescription')}>
+          <div className="acct-card-body">
+            <WebsiteProfileSectionStatus profile={profile} live={live} admin={admin} t={t} />
+            <ConsentSwitch
+              checked={form.consent}
+              disabled={busy}
+              onChange={(next) => change('consent', next)}
+              t={t}
+            />
+            <WebsiteProfileFields
+              idPrefix="wp"
+              form={form}
+              errors={errors}
+              busy={busy}
+              inputs={inputs}
+              onChange={change}
+              t={t}
+            />
+          </div>
+        </ProfileCard>
+        <ProfileCard id="website-links" title={k('linksTitle')} description={k('linksDescription')}>
+          <div className="acct-card-body">
+            <SocialLinkFields
+              idPrefix="wp-social"
+              legend={t('websiteSocial.ownLegend')}
+              quietLegend
+              hint={`${t('websiteSocial.ownHint')} ${t('websiteSocial.hint')}`}
+              values={form.social}
+              errors={errors}
+              disabled={busy}
+              inputs={inputs}
+              onChange={changeLink}
+            />
+          </div>
+        </ProfileCard>
+      </div>
+      {failure && (
+        <div className="acct-alert" role="alert">
+          <p className="field-error">{failure.text}</p>
+          {failure.stale && (
+            <Button variant="light" onClick={own.reload}>
+              {k('reload')}
+            </Button>
+          )}
+        </div>
+      )}
+      <div className="panel profile-save-bar">
+        <WebsiteProfileSectionFoot
+          status={status}
+          changed={changed}
+          confirming={confirming}
           busy={busy}
-          inputs={inputs}
-          onChange={change}
+          live={live}
+          onConfirm={submit}
+          onCancel={() => setConfirming(false)}
+          onReset={reset}
           t={t}
         />
-        <div className="wp-social">
-          <SocialLinkFields
-            idPrefix="wp-social"
-            legend={t('websiteSocial.ownLegend')}
-            hint={`${t('websiteSocial.ownHint')} ${t('websiteSocial.hint')}`}
-            values={form.social}
-            errors={errors}
-            disabled={busy}
-            inputs={inputs}
-            onChange={changeLink}
-          />
-        </div>
-        <label className="wp-consent">
-          <input
-            type="checkbox"
-            checked={form.consent}
-            disabled={busy}
-            onChange={(event) => change('consent', event.target.checked)}
-          />
-          <span>{k('consent')}</span>
-        </label>
-        {failure && (
-          <div className="acct-alert" role="alert">
-            <p className="field-error">{failure.text}</p>
-            {failure.stale && (
-              <Button variant="light" onClick={own.reload}>
-                {k('reload')}
-              </Button>
-            )}
-          </div>
-        )}
       </div>
-      <WebsiteProfileSectionFoot
-        status={status}
-        changed={changed}
-        confirming={confirming}
-        busy={busy}
-        live={live}
-        onConfirm={submit}
-        onCancel={() => setConfirming(false)}
-        onReset={reset}
-        t={t}
-      />
     </form>
   );
 }

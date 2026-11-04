@@ -23,14 +23,19 @@ test('a member adds their own Instagram link; the Admin sees it as text and keep
   const staff = await memberPage(browser, team.one.user.email);
   try {
     // The member types the address without https://; it is saved in its canonical form.
-    await staff.page.goto('/#/my-profile');
-    const own = staff.page.getByRole('region', { name: 'Website profile', exact: true });
+    await staff.page.goto('/#/website-profile');
+    const own = staff.page.getByRole('region', {
+      name: 'Show me on the company website',
+      exact: true,
+    });
     await own.getByRole('textbox', { name: 'Specialty', exact: true }).fill('Synthetic marinas');
-    const links = own.getByRole('group', { name: 'Your social links (optional)', exact: true });
+    const links = staff.page
+      .getByRole('region', { name: 'My social links', exact: true })
+      .getByRole('group', { name: 'Your social links (optional)', exact: true });
     const instagram = links.getByRole('textbox', { name: 'Instagram', exact: true });
     await instagram.fill('instagram.com/synthetic.agent');
-    await own.getByRole('button', { name: 'Save website profile', exact: true }).click();
-    await expect(own.getByText('Your website profile was saved.')).toBeVisible();
+    await staff.page.getByRole('button', { name: 'Save website profile', exact: true }).click();
+    await expect(staff.page.getByText('Your website profile was saved.')).toBeVisible();
     await expect(instagram).toHaveValue(agentLink);
     expect((await savedProfile(team.admin, team.one)).body.social).toEqual({
       instagram: agentLink,

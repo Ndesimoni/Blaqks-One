@@ -7,6 +7,8 @@ const sharedIcons = Object.fromEntries(nav.flatMap((group) => group.items));
 const extraIcons = {
   ...Object.fromEntries(Object.entries(WEBSITE_ROUTES).map(([name, route]) => [name, route.icon])),
   'My profile': 'person',
+  'Website profile': 'monitor',
+  'Sign-in and security': 'lock',
   'Team & access': 'shield',
   Channels: 'chat',
   'Inbox rules': 'sliders',

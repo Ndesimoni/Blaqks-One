@@ -34,6 +34,7 @@ export const sectionLabelOf = (name) =>
 export const tabLabelOf = (name) =>
   ({
     Clients: 'All clients',
+    'My profile': 'Profile',
     'Platform website': 'General site',
     'Platform companies': 'Companies',
   })[name] || name;

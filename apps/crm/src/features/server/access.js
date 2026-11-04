@@ -43,8 +43,13 @@ export function canOpenSection(user, route) {
       user?.roleId === 'admin' ||
       (user?.roleId === 'staff' && user.channelAccess?.whatsapp === true)
     );
-  if (['Start', 'Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'].includes(route))
-    return true;
+  // A website profile: the company Admin, and staff who can open Properties (an agent's rule).
+  if (route === 'Website profile')
+    return (
+      user.roleId === 'admin' || (user.roleId === 'staff' && user.permissions?.properties === true)
+    );
+  const open = ['Start', 'Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'];
+  if ([...open, 'Sign-in and security'].includes(route)) return true;
   if (route === 'Messages')
     return (
       canManageTeam(user) ||

@@ -15,8 +15,11 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
   const staff = await memberPage(browser, team.one.user.email);
   try {
     // The staff member sets up their own website profile and gives consent in My profile.
-    await staff.page.goto('/#/my-profile');
-    const own = staff.page.getByRole('region', { name: 'Website profile', exact: true });
+    await staff.page.goto('/#/website-profile');
+    const own = staff.page.getByRole('region', {
+      name: 'Show me on the company website',
+      exact: true,
+    });
     await expect(own).toContainText('Not on the website yet');
     await expect(own).toContainText('Ask your Admin for publishing access');
     await expect(own.getByRole('textbox', { name: 'Public name', exact: true })).toHaveValue(name);
@@ -24,9 +27,9 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
       .getByRole('textbox', { name: 'Specialty', exact: true })
       .fill('Synthetic marina apartments');
     await own.getByRole('textbox', { name: 'Public WhatsApp', exact: true }).fill('+971501234567');
-    await own.getByRole('checkbox', { name: /^I agree that my name, specialty/ }).check();
-    await own.getByRole('button', { name: 'Save website profile', exact: true }).click();
-    await expect(own.getByText('Your website profile was saved.')).toBeVisible();
+    await own.getByRole('switch', { name: 'I agree to appear on the website' }).check();
+    await staff.page.getByRole('button', { name: 'Save website profile', exact: true }).click();
+    await expect(staff.page.getByText('Your website profile was saved.')).toBeVisible();
     await expect(own).toContainText('Public · 0 live listings');
     const agreed = await savedProfile(team.admin, team.one);
     expect(agreed).toMatchObject({ consent: true, active: true, canPublish: false });

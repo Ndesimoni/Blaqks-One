@@ -13,6 +13,7 @@ export default {
   sectionsOf: '{product} sections',
   tabs: 'Section tabs',
   'tabs.allClients': 'All clients',
+  'tabs.profile': 'Profile',
   personal: 'Personal',
   hideSections: 'Hide the section sidebar',
   showSections: 'Show the section sidebar',

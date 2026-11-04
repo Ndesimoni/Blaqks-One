@@ -70,7 +70,7 @@ export function AccountSummary({ account }) {
         <p className="acct-card-foot acct-note">
           <Icon name="info" size={15} />
           Your Admin manages your email, role, positions and access. You can edit your name and
-          phone below.
+          phone in Your details.
         </p>
       )}
     </div>

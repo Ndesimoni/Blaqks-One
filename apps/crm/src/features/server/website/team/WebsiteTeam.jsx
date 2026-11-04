@@ -50,7 +50,7 @@ function TeamPanel({ api, user, t }) {
     hide: (target) => open('hide', target),
     allow: (target) => act(target, team.grant(target, true), 'allowed'),
     show: (target) => act(target, visible(target, true), 'shown'),
-    myProfile: () => navigate('My profile'),
+    myProfile: () => navigate('Website profile'),
   };
   if (team.error)
     return (

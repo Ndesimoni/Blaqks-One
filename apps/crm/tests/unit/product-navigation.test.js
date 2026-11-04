@@ -19,12 +19,15 @@ const placed = (user) =>
   );
 const grouped = (user) => connectedGroups(user).flatMap((group) => group.items);
 
-// The website sections replaced the Website pages' in-page tabs, so only products list them.
+// The website sections replaced the Website pages' in-page tabs, and My profile's other tabs
+// are header tabs only, so only products list them.
 const formerTabs = [
   'Website team',
   'Website properties',
   'Website enquiries',
   'Platform companies',
+  'Website profile',
+  'Sign-in and security',
 ];
 
 test('every destination of the grouped sidebar has exactly one place among the products', () => {
@@ -55,6 +58,14 @@ test('a route is found in its product and section, and sections keep their heade
   assert.equal(locate(admin, 'Workspaces').product, 'settings');
   assert.equal(locate(superAdmin, 'Workspaces').product, 'platform');
   assert.equal(locate(admin, 'Page not found'), null);
+  // My profile's tabs: a website profile only for agents (the Admin, staff with Properties).
+  const profileTabs = ['My profile', 'Website profile', 'Sign-in and security'];
+  assert.deepEqual(locate(admin, 'Website profile').section.routes, profileTabs);
+  assert.equal(locate(staff, 'Website profile'), null);
+  assert.deepEqual(locate(staff, 'My profile').section.routes, [
+    'My profile',
+    'Sign-in and security',
+  ]);
 });
 
 test('a product reopens on its remembered route only while that route is still allowed', () => {

@@ -28,6 +28,6 @@ export default {
   hint: 'Paste each profile address from the network’s own site. Short links and redirects aren’t accepted.',
   ownLegend: 'Your social links (optional)',
   ownHint:
-    'Shown on your public profile while you agree below. Your Other website appears on your company website only.',
+    'Shown on your public profile while you agree to appear on the website. Your Other website appears on your company website only.',
   notAdded: 'Not added',
 };

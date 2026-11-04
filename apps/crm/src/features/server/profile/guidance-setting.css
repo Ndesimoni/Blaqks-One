@@ -9,16 +9,9 @@
   cursor: pointer;
 }
 
+/* The switch itself is the shared `.profile-switch` (profile-cards.css). */
 :root[data-theme] .guidance-switch input {
-  inline-size: 44px;
-  block-size: 24px;
-  accent-color: var(--focus);
-  cursor: pointer;
-}
-
-:root[data-theme] .guidance-switch input:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
+  flex: none;
 }
 
 :root[data-theme] .guidance-note {
