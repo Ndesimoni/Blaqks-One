@@ -78,3 +78,12 @@
     height: auto;
   }
 }
+/* The mockup's note line above the grid. */
+.website-enquiries-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}

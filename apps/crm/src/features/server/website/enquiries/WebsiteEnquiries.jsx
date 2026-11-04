@@ -14,8 +14,9 @@ import '../website-lists.css';
 import './website-enquiries.css';
 
 /**
- * Admin "Enquiries" tab of Website: enquiries from the company website and the general
- * site, newest first, each with the lead it created. `siteId` is the company site's id,
+ * Admin "Enquiries" tab of Website as the approved mockup's grid page (design queue item 24):
+ * the privacy note above enquiries from the company website and the general site, newest
+ * first, each with the lead it created. `siteId` is the company site's id,
  * which tells Company site from General site.
  */
 export function WebsiteEnquiries({ siteId = null }) {
@@ -37,16 +38,13 @@ export function WebsiteEnquiries({ siteId = null }) {
   const open = reading && list.rows.find((enquiry) => enquiry.id === reading);
   return (
     <section className="website-list" aria-labelledby="website-enquiries-title">
-      <div className="website-list-head">
-        <h2 id="website-enquiries-title">{k('title')}</h2>
-        <div className="website-list-notes">
-          <p className="website-list-note">
-            <Icon name="lock" size={14} />
-            {k('privateNote')}
-          </p>
-          <p className="website-list-note">{k('marketingNote')}</p>
-        </div>
-      </div>
+      <h2 id="website-enquiries-title" className="sr-only">
+        {k('title')}
+      </h2>
+      <p className="note-line website-enquiries-note">
+        <Icon name="lock" size={14} />
+        {k('privateNote')} {k('marketingNote')}
+      </p>
       <p className="website-list-status" role="status">
         {notice}
       </p>
