@@ -79,6 +79,17 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 37. [ ] **Create form slider**: compare with the mockup's create form (sections, step chips, footer).
 38. [ ] **Empty, loading, error and no-access states**: compare with the mockup's state pages and skeletons.
 
+## Audit of items 12–38 (2026-11-04)
+
+Screenshots of every remaining screen against the mockup: none matches yet, so none is ticked.
+
+- Closest: the Start page (cards and Messages strip are there; the Websites and Marketplace cards lack their figures and second button, and the strip lacks Marketplace chats).
+- Older layouts to redo: Calculators (all four stacked, not one picked by chips with a Result card), Guide (a workflow page, not searchable articles), My profile (one long page; the mockup splits Profile, Website profile and a separate Company section), Channels, My mailbox and My WhatsApp (not the mockup's connection cards), Inbox rules (no save bar or version line), Team activity (filter form, not the feed).
+- Grids not yet on the shared grid: Website Team, Properties and Enquiries; Marketplace applications; Platform website Companies.
+- Marketplace has two sidebar sections (Marketplace, Agreements) where the mockup has Board, My requests, Updates, Agreements and My broker profile.
+- Platform Workspaces is still "Not connected yet" for the Super Admin; the workspace directory and seat-limit APIs exist, so item 33 is frontend work.
+- Sign-in has no brand panel yet.
+
 ## Left out so far (reported to the owner)
 
 - Shortlist "Added by": the server does not record who added a match.
