@@ -1,5 +1,6 @@
 import { test, expect } from './fixtures.js';
-import { signIn } from './helpers.js';
+import { session, signIn } from './helpers.js';
+import { clearInbox, seedConversation } from './inbox-fixtures.js';
 import { noPageOverflow } from './assign-helpers.js';
 
 test('the slide-in messenger opens Team chat and the Inbox over any page', async ({ page }) => {
@@ -36,6 +37,34 @@ test('the slide-in messenger opens Team chat and the Inbox over any page', async
   await expect(page.getByRole('dialog', { name: 'Team chat' })).toBeVisible();
   await noPageOverflow(page);
   expect(errors).toEqual([]);
+});
+
+test('Open full page stays on the conversation that was open in the panel', async ({ page }) => {
+  await signIn(page);
+  await page.getByRole('button', { name: /^Open Team chat/ }).click();
+  const team = page.getByRole('dialog', { name: 'Team chat' });
+  await team.getByRole('button', { name: /#general/ }).click();
+  await expect(team.locator('.chat-room-pane')).toBeVisible();
+  await team.getByRole('button', { name: 'Open full page', exact: true }).click();
+  await expect(page).toHaveURL(/#\/team-chat\?room=/);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.locator('.chat-room-pane')).toBeVisible();
+
+  const workspace = (await session(page)).user.workspaceId;
+  clearInbox(workspace);
+  seedConversation(workspace, {
+    name: 'Synthetic Full Page Client',
+    messages: [{ body: 'Is the Marina flat still available?' }],
+  });
+  await page.getByRole('button', { name: /^Open the Client inbox/ }).click();
+  const inbox = page.getByRole('dialog', { name: 'Client inbox' });
+  await inbox.getByRole('tab', { name: /^Unassigned/ }).click();
+  await inbox.getByRole('button', { name: /Synthetic Full Page Client/ }).click();
+  await expect(inbox.locator('.inbox-thread')).toContainText('Marina flat');
+  await inbox.getByRole('button', { name: 'Open full page', exact: true }).click();
+  await expect(page).toHaveURL(/#\/inbox\?conversation=/);
+  await expect(page.locator('.inbox-thread')).toContainText('Marina flat');
+  clearInbox(workspace);
 });
 
 test('the Super Admin, who reads no company conversations, has no messenger', async ({ page }) => {

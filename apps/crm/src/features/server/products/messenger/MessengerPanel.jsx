@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Drawer } from '../../../../components/ui/Drawer.jsx';
 import { Icon } from '../../../../components/ui/Icon.jsx';
 import { useSession } from '../../../../hooks/useSession.js';
-import { useNavigation } from '../../../../hooks/useWorkspace.js';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { routePath } from '../../../../config/routes.js';
 import { useI18n } from '../../../../i18n/useI18n.js';
 import { canOpenSection } from '../../access.js';
 import { ServerTeamChat } from '../../chat/ServerTeamChat.jsx';
@@ -23,7 +24,8 @@ const boxes = [
 export function MessengerPanel({ owner, box, start = '', onBox, onClose }) {
   const { t } = useI18n();
   const { user } = useSession();
-  const { navigate } = useNavigation();
+  const go = useNavigate();
+  const { search } = useLocation();
   // `start` opens one conversation straight away, as a chat strip avatar asks.
   const [open, setOpen] = useState(() => ({ inbox: '', team: '', ...(start && { [box]: start }) }));
   const allowed = boxes.filter(([, route]) => canOpenSection(user, route));
@@ -31,9 +33,15 @@ export function MessengerPanel({ owner, box, start = '', onBox, onClose }) {
     id: open[box],
     open: (id) => setOpen((current) => ({ ...current, [box]: id })),
   };
+  // The full page opens on the conversation that was open here (the address names it).
   const fullPage = () => {
     onClose();
-    navigate(box === 'team' ? 'Team chat' : 'Inbox');
+    const params = new URLSearchParams();
+    const workspace = new URLSearchParams(search).get('workspace');
+    if (workspace) params.set('workspace', workspace);
+    if (open[box]) params.set(box === 'team' ? 'room' : 'conversation', open[box]);
+    const path = routePath(box === 'team' ? 'Team chat' : 'Inbox');
+    go(path + (params.size ? `?${params}` : ''));
   };
   return (
     <Drawer
