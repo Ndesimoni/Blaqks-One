@@ -29,6 +29,20 @@ test('milestones must total exactly 100% and amount to the price', () => {
   assert.equal(schedule.totalFils, aed(1_000_000));
 });
 
+test('dates are optional, and the dates given stay in order', () => {
+  const undated = (dates) =>
+    base().milestones.map((row, index) => ({ ...row, date: dates[index] }));
+  const loose = offPlanSchedule(base({ milestones: undated(['', '2027-06-01', undefined]) }));
+  assert.deepEqual(
+    loose.milestones.map((row) => row.date),
+    ['', '2027-06-01', ''],
+  );
+  assert.throws(
+    () => offPlanSchedule(base({ milestones: undated(['2027-06-01', '', '2026-11-01']) })),
+    RangeError,
+  );
+});
+
 test('cumulative allocation keeps every fils exactly once', () => {
   const schedule = offPlanSchedule({
     priceFils: 100,

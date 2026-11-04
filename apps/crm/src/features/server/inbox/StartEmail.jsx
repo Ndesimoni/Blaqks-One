@@ -14,7 +14,8 @@ import { SavedRepliesButton } from './saved/SavedRepliesButton.jsx';
 /**
  * New email (Start message, E1b/E1d): to a Client or Contact the member may see, from the
  * member's own connected mailbox. On success the new conversation opens. `initialTo` starts
- * with a recipient chosen (a record slider's Email), and the subject takes focus.
+ * with a recipient chosen (a record slider's Email), and the subject takes focus;
+ * `initialSubject` and `initialBody` start the text (a calculator's summary).
  */
 // A SendGrid company member without a usable address asks their Admin (E3d).
 const notReady = {
@@ -23,13 +24,20 @@ const notReady = {
   companyReconnect: 'inboxSend.start.companyReconnect',
 };
 
-export function StartEmail({ mailbox, initialTo = null, onStart, onClose }) {
+export function StartEmail({
+  mailbox,
+  initialTo = null,
+  initialSubject = '',
+  initialBody = '',
+  onStart,
+  onClose,
+}) {
   const { t } = useI18n();
   const { navigate } = useNavigation();
   const id = useId();
   const [to, setTo] = useState(initialTo);
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
+  const [subject, setSubject] = useState(initialSubject);
+  const [body, setBody] = useState(initialBody);
   const [busy, setBusy] = useState(false);
   const bodyRef = useRef(null);
   const { api, user } = useSession();

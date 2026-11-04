@@ -2,7 +2,7 @@ import React, { useId, useMemo, useState } from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { COST_DEFAULTS, purchaseCosts } from '../../../lib/finance/calculators.js';
 import { parseAed, parsePercent } from '../../../lib/finance/money.js';
-import { CalcRow } from './CalcRow.jsx';
+import { CalcPanel } from './CalcPanel.jsx';
 import { CalculatorField } from './CalculatorField.jsx';
 
 const initial = { price: '', dld: '4', agency: '2', vat: '5' };
@@ -17,76 +17,83 @@ export function PurchaseCalculator() {
   const [draft, setDraft] = useState(initial);
   const update = (key) => (value) => setDraft((current) => ({ ...current, [key]: value }));
   const price = parseAed(draft.price);
-  const dld = parsePercent(draft.dld);
-  const agency = parsePercent(draft.agency);
-  const vat = parsePercent(draft.vat);
-  const ratesInvalid = [dld, agency, vat].some((rate) => rate.error);
+  const rates = {
+    dld: parsePercent(draft.dld),
+    agency: parsePercent(draft.agency),
+    vat: parsePercent(draft.vat),
+  };
+  const ratesInvalid = Object.values(rates).some((rate) => rate.error);
   const costs = useMemo(() => {
     if (price.error || price.value === null || ratesInvalid) return null;
     try {
       return purchaseCosts({
         priceFils: price.value,
-        dldBp: dld.value ?? COST_DEFAULTS.dldBp,
-        agencyBp: agency.value ?? COST_DEFAULTS.agencyBp,
-        vatBp: vat.value ?? COST_DEFAULTS.vatBp,
+        dldBp: rates.dld.value ?? COST_DEFAULTS.dldBp,
+        agencyBp: rates.agency.value ?? COST_DEFAULTS.agencyBp,
+        vatBp: rates.vat.value ?? COST_DEFAULTS.vatBp,
       });
     } catch {
       return null;
     }
-  }, [price.value, price.error, dld.value, agency.value, vat.value, ratesInvalid]);
+  }, [
+    price.value,
+    price.error,
+    rates.dld.value,
+    rates.agency.value,
+    rates.vat.value,
+    ratesInvalid,
+  ]);
+  const rate = (key) => (
+    <CalculatorField
+      id={`${uid}-${key}`}
+      label={t(`calculators.${key}`)}
+      unit={t('calculators.percentUnit')}
+      value={draft[key]}
+      onChange={update(key)}
+      error={rates[key].error ? 'calculators.invalidRate' : ''}
+    />
+  );
+  const money = format.money;
+  const rows = costs
+    ? [
+        { label: t('calculators.dld'), value: money(costs.dldFils) },
+        { label: t('calculators.agency'), value: money(costs.agencyFils) },
+        { label: t('calculators.vat'), value: money(costs.vatFils) },
+        { label: t('calculators.total'), value: money(costs.totalFils), strong: true },
+        { label: t('calculators.cashNeeded'), value: money(price.value + costs.totalFils) },
+      ]
+    : [];
+  const percent = (key) => `${draft[key].trim() || initial[key]}%`;
   return (
-    <section className="panel calc-card" aria-labelledby={`${uid}-title`}>
-      <h3 id={`${uid}-title`}>{t('calculators.purchaseTitle')}</h3>
-      <p className="calc-body">{t('calculators.purchaseBody')}</p>
-      <div className="calc-grid">
+    <CalcPanel
+      title={t('calculators.purchaseTitle')}
+      note={<p className="calc-note">{t('calculators.purchaseNote')}</p>}
+      result={{
+        rows,
+        ready: Boolean(costs),
+        prompt: t('calculators.prompt'),
+        inputs: costs
+          ? [
+              [t('calculators.price'), money(price.value)],
+              ...['dld', 'agency', 'vat'].map((key) => [t(`calculators.${key}`), percent(key)]),
+            ]
+          : [],
+      }}
+    >
+      <div className="calc-fields">
         <CalculatorField
           id={`${uid}-price`}
           label={t('calculators.price')}
-          prefix="AED"
+          unit={t('calculators.aed')}
           value={draft.price}
+          placeholder={t('calculators.pricePlaceholder')}
           onChange={update('price')}
           error={price.error ? 'calculators.invalidPrice' : ''}
-          hint={t('calculators.priceHint')}
         />
-        <CalculatorField
-          id={`${uid}-dld`}
-          label={t('calculators.dld')}
-          suffix="%"
-          value={draft.dld}
-          onChange={update('dld')}
-          error={dld.error ? 'calculators.invalidRate' : ''}
-        />
-        <CalculatorField
-          id={`${uid}-agency`}
-          label={t('calculators.agency')}
-          suffix="%"
-          value={draft.agency}
-          onChange={update('agency')}
-          error={agency.error ? 'calculators.invalidRate' : ''}
-        />
-        <CalculatorField
-          id={`${uid}-vat`}
-          label={t('calculators.vat')}
-          suffix="%"
-          value={draft.vat}
-          onChange={update('vat')}
-          error={vat.error ? 'calculators.invalidRate' : ''}
-        />
+        {rate('dld')}
+        {rate('agency')}
+        {rate('vat')}
       </div>
-      <p className="calc-note">{t('calculators.defaultsNote')}</p>
-      <section className="calc-results" aria-live="polite" aria-label={t('calculators.costs')}>
-        <h4>{t('calculators.costs')}</h4>
-        {costs ? (
-          <dl>
-            <CalcRow label={t('calculators.dldCost')} value={format.money(costs.dldFils)} />
-            <CalcRow label={t('calculators.agencyCost')} value={format.money(costs.agencyFils)} />
-            <CalcRow label={t('calculators.vatCost')} value={format.money(costs.vatFils)} />
-            <CalcRow label={t('calculators.total')} value={format.money(costs.totalFils)} strong />
-          </dl>
-        ) : (
-          <p className="calc-note">{t('calculators.prompt')}</p>
-        )}
-      </section>
-    </section>
+    </CalcPanel>
   );
 }

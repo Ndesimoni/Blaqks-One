@@ -9,9 +9,10 @@ import {
   scheduleCsv,
 } from '../../../lib/finance/offPlan.js';
 import { downloadBlob } from '../../../services/files/download.js';
+import { CalcPanel } from './CalcPanel.jsx';
 import { CalculatorField } from './CalculatorField.jsx';
 import { MilestoneRow } from './MilestoneRow.jsx';
-import { OffPlanResults } from './OffPlanResults.jsx';
+import { offPlanRows } from './OffPlanRows.jsx';
 import './off-plan.css';
 
 const initialRows = (t) => [
@@ -21,8 +22,8 @@ const initialRows = (t) => [
 ];
 
 /**
- * Q6 off-plan schedule. Shares must total 100% and dates must be ordered; the schedule is
- * exported as CSV and never written to a property or any other record.
+ * Q6 off-plan schedule. Shares must total 100%; dates are optional but must be in order. The
+ * schedule can be downloaded as CSV and is never written to a property or any other record.
  */
 export function OffPlanCalculator() {
   const { t, format } = useI18n();
@@ -32,20 +33,19 @@ export function OffPlanCalculator() {
   const [rows, setRows] = useState(() => initialRows(t));
   const parsed = rows.map((row) => ({
     percent: parsePercent(row.percent),
-    date: isIsoDate(row.date),
+    date: !row.date || isIsoDate(row.date),
   }));
   const percentInvalid = parsed.some(
     (entry) => entry.percent.error || entry.percent.value === null,
   );
   const totalBp = parsed.reduce((sum, entry) => sum + (entry.percent.value ?? 0), 0);
-  const totalInvalid = !percentInvalid && totalBp !== 10_000;
+  const dated = rows.map((row) => row.date).filter(Boolean);
   const datesInvalid =
-    parsed.some((entry) => !entry.date) ||
-    rows.some((row, index) => index > 0 && row.date < rows[index - 1].date);
+    parsed.some((entry) => !entry.date) || dated.some((day, index) => day < dated[index - 1]);
   const value = parseAed(price);
   const schedule = useMemo(() => {
-    if (value.error || value.value === null || percentInvalid || totalInvalid || datesInvalid)
-      return null;
+    if (value.error || value.value === null || percentInvalid || datesInvalid) return null;
+    if (totalBp !== 10_000) return null;
     try {
       return offPlanSchedule({
         priceFils: value.value,
@@ -58,7 +58,7 @@ export function OffPlanCalculator() {
     } catch {
       return null;
     }
-  }, [value.value, value.error, percentInvalid, totalInvalid, datesInvalid, rows, parsed]);
+  }, [value.value, value.error, percentInvalid, totalBp, datesInvalid, rows, parsed]);
   const change = (id, key, next) =>
     setRows((current) => current.map((row) => (row.id === id ? { ...row, [key]: next } : row)));
   const add = () => {
@@ -69,7 +69,6 @@ export function OffPlanCalculator() {
     if (rows.length > 1) setRows((current) => current.filter((row) => row.id !== id));
   };
   const exportSchedule = () => {
-    if (!schedule) return;
     const headers = ['milestone', 'date', 'percent', 'amount'].map((key) =>
       t(`calculators.${key}`),
     );
@@ -79,16 +78,30 @@ export function OffPlanCalculator() {
       'off-plan-schedule.csv',
     );
   };
+  const sharesValid = !percentInvalid;
   return (
-    <section className="panel calc-card" aria-labelledby={`${uid}-title`}>
-      <h3 id={`${uid}-title`}>{t('calculators.offPlanTitle')}</h3>
-      <p className="calc-body">{t('calculators.offPlanBody')}</p>
-      <div className="calc-grid">
+    <CalcPanel
+      title={t('calculators.offPlanTitle')}
+      note={<p className="calc-note">{t('calculators.offPlanNote')}</p>}
+      result={{
+        rows: offPlanRows({ t, format, rows, schedule, totalBp, sharesValid }),
+        ready: Boolean(schedule),
+        prompt: t('calculators.offPlanPrompt'),
+        inputs: schedule ? [[t('calculators.price'), format.money(value.value)]] : [],
+        actions: (
+          <Button variant="light" icon="download" disabled={!schedule} onClick={exportSchedule}>
+            {t('calculators.exportSchedule')}
+          </Button>
+        ),
+      }}
+    >
+      <div className="calc-fields">
         <CalculatorField
           id={`${uid}-price`}
           label={t('calculators.price')}
-          prefix="AED"
+          unit={t('calculators.aed')}
           value={price}
+          placeholder={t('calculators.pricePlaceholder')}
           onChange={setPrice}
           error={value.error ? 'calculators.invalidPrice' : ''}
         />
@@ -108,21 +121,11 @@ export function OffPlanCalculator() {
           />
         ))}
       </div>
-      <div className="milestone-actions">
-        <Button variant="light" onClick={add} disabled={rows.length >= MAX_MILESTONES}>
-          {t('calculators.addMilestone')}
-        </Button>
-        <span className="calc-note">
-          {t('calculators.totalShare')}: {format.percent(totalBp)}
-        </span>
-      </div>
+      <Button variant="light" icon="plus" onClick={add} disabled={rows.length >= MAX_MILESTONES}>
+        {t('calculators.addMilestone')}
+      </Button>
       {percentInvalid && <p className="field-error">{t('calculators.offPlanPercent')}</p>}
-      {totalInvalid && <p className="field-error">{t('calculators.offPlanTotal')}</p>}
       {datesInvalid && <p className="field-error">{t('calculators.offPlanOrder')}</p>}
-      <section className="calc-results" aria-live="polite" aria-label={t('calculators.schedule')}>
-        <h4>{t('calculators.schedule')}</h4>
-        <OffPlanResults schedule={schedule} totalShareBp={totalBp} onExport={exportSchedule} />
-      </section>
-    </section>
+    </CalcPanel>
   );
 }

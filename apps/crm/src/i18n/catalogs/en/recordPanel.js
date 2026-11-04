@@ -37,6 +37,7 @@ export default {
   noConversationGrant: "No conversation with {name} yet, and your account can't send email.",
   contactNamed: '{action} {name}',
   emailSent: "Email sent to {name}. It's in your Client inbox.",
+  emailSentPlain: "Email sent. It's in your Client inbox.",
   share: 'Share',
   shareWith: 'Share with',
   shareColleague: 'A colleague',

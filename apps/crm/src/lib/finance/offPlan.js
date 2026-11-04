@@ -20,7 +20,8 @@ export function isIsoDate(value) {
 
 /**
  * `{ milestones: [{ label, percentBp, date, amountFils }], totalFils }`. Labels are 1–80
- * characters, shares total 10000 basis points, and dates must be in non-decreasing order.
+ * characters and shares total 10000 basis points. A date is optional (`''`); the dates given
+ * must be in non-decreasing order.
  */
 export function offPlanSchedule({ priceFils, milestones }) {
   if (!isFils(priceFils) || !Array.isArray(milestones)) throw invalid();
@@ -31,14 +32,15 @@ export function offPlanSchedule({ priceFils, milestones }) {
   const rows = milestones.map((milestone) => {
     const label = typeof milestone.label === 'string' ? milestone.label.trim() : '';
     if (!label || label.length > 80 || !isBp(milestone.percentBp)) throw invalid();
-    if (!isIsoDate(milestone.date) || milestone.date < previousDate) throw invalid();
+    const date = milestone.date ?? '';
+    if (date && (!isIsoDate(date) || date < previousDate)) throw invalid();
     cumulativeBp += milestone.percentBp;
     if (cumulativeBp > 10_000) throw invalid();
     const cumulativeFils = Number(hu(BigInt(priceFils), BigInt(cumulativeBp)));
     const amountFils = cumulativeFils - allocatedFils;
     allocatedFils = cumulativeFils;
-    previousDate = milestone.date;
-    return { label, percentBp: milestone.percentBp, date: milestone.date, amountFils };
+    if (date) previousDate = date;
+    return { label, percentBp: milestone.percentBp, date, amountFils };
   });
   if (cumulativeBp !== 10_000) throw invalid();
   return { milestones: rows, totalFils: allocatedFils };
