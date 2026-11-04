@@ -1,43 +1,29 @@
 import React from 'react';
-import { Button } from '../../../../components/ui/Button.jsx';
 import { useI18n } from '../../../../i18n/useI18n.js';
+import { GridFilterBar } from '../../../records/grid/GridFilterBar.jsx';
+import '../../../records/grid/grid-filter.css';
 import { FILTERS } from './companiesModel.js';
 
-/** Search by company, website name or address, and narrow by the flag still to check. */
-export function CompanyFilters({ query, filter, counts, onQuery, onFilter, onClear, searchRef }) {
+/**
+ * The approved mockup's filter row for company websites (design queue item 32): All companies,
+ * then Licence not verified and Not entitled with their counts, and search by company, website
+ * name or address.
+ */
+export function CompanyFilters({ query, filter, counts, onQuery, onFilter }) {
   const { t } = useI18n();
-  const k = (key, vars) => t(`websiteCompanies.${key}`, vars);
+  const label = (name) => t(`websiteCompanies.preset.${name}`);
+  const tabs = FILTERS.map(label);
   return (
-    <section className="panel website-list-filters" aria-label={k('table')}>
-      <div className="field">
-        <label htmlFor="website-companies-search">{k('search')}</label>
-        <input
-          ref={searchRef}
-          id="website-companies-search"
-          type="search"
-          value={query}
-          placeholder={k('searchPlaceholder')}
-          autoComplete="off"
-          onChange={(event) => onQuery(event.target.value)}
-        />
-      </div>
-      <div className="field">
-        <label htmlFor="website-companies-filter">{k('filter')}</label>
-        <select
-          id="website-companies-filter"
-          value={filter}
-          onChange={(event) => onFilter(event.target.value)}
-        >
-          {FILTERS.map((name) => (
-            <option key={name} value={name}>
-              {k(`filter.${name}`, { count: counts[name] })}
-            </option>
-          ))}
-        </select>
-      </div>
-      <Button variant="light" onClick={onClear} disabled={!query && filter === 'all'}>
-        {k('clear')}
-      </Button>
-    </section>
+    <GridFilterBar
+      module={t('websiteCompanies.module')}
+      presetLabel={label(filter)}
+      tabs={tabs}
+      tab={label(filter)}
+      onTab={(name) => onFilter(FILTERS[tabs.indexOf(name)])}
+      query={query}
+      onQuery={onQuery}
+      placeholder={t('websiteCompanies.searchPlaceholder')}
+      counts={Object.fromEntries(FILTERS.map((name) => [label(name), counts[name]]))}
+    />
   );
 }

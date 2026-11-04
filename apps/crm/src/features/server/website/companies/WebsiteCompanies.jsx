@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '../../../../components/ui/Button.jsx';
 import { Pagination } from '../../../../components/ui/Pagination.jsx';
 import { useMediaQuery } from '../../../../hooks/useMediaQuery.js';
@@ -23,7 +23,6 @@ function CompaniesList({ api }) {
   const [page, setPage] = useState(0);
   const [editing, setEditing] = useState(null);
   const [notice, setNotice] = useState('');
-  const searchRef = useRef(null);
   const change = (setter) => (value) => {
     setter(value);
     setPage(0);
@@ -32,7 +31,6 @@ function CompaniesList({ api }) {
     setQuery('');
     setFilter('all');
     setPage(0);
-    searchRef.current?.focus();
   };
   if (list.loading) return <ListSkeleton label={k('loading')} />;
   if (!list.rows)
@@ -48,8 +46,6 @@ function CompaniesList({ api }) {
         counts={filterCounts(list.rows, query)}
         onQuery={change(setQuery)}
         onFilter={change(setFilter)}
-        onClear={clear}
-        searchRef={searchRef}
       />
       <p className="website-list-status" role="status">
         {notice}
