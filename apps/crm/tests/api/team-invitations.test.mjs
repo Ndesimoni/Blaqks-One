@@ -16,6 +16,12 @@ test('invitation activation requires a valid one-use token, trusted origin and e
   assert.equal(inspect.status, 200);
   assert.equal(inspect.value.invitation.email, invited.email);
   assert.equal(inspect.value.invitation.roleId, 'staff');
+  // The heading names the company the invitation joins (design queue item 34).
+  const company = query(
+    `SELECT coalesce(display_name,'') FROM crm_company_profiles ` +
+      `WHERE workspace_id='${owner.user.workspaceId}'`,
+  );
+  assert.equal(inspect.value.invitation.company ?? '', company);
   assert.equal(
     (
       await request('/auth/invitations/accept', {

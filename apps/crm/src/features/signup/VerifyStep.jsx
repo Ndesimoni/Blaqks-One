@@ -4,6 +4,9 @@ import { useI18n } from '../../i18n/useI18n.js';
 import { BotCheck } from './BotCheck.jsx';
 import { bidiIsolate } from './signupModel.js';
 
+/** 42 → "0:42", as the mockup counts down to the next code. */
+const clock = (seconds) => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+
 export function VerifyStep({
   request,
   code,
@@ -57,7 +60,12 @@ export function VerifyStep({
           disabled={Boolean(busy)}
           aria-invalid={error?.field === 'code'}
           aria-describedby={error?.field === 'code' ? 'signup-code-error' : undefined}
-          onChange={(event) => onCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+          onChange={(event) => {
+            const next = event.target.value.replace(/\D/g, '').slice(0, 6);
+            onCode(next);
+            // Six digits typed or pasted verify at once, as most sign-ups do.
+            if (next.length === 6 && next !== code && !busy) onVerify(next);
+          }}
         />
       </div>
       {error && (
@@ -69,27 +77,33 @@ export function VerifyStep({
         {t(busy === 'verify' ? 'signup.verifying' : 'signup.verifyCreate')}
       </Button>
       <BotCheck {...bot} />
-      <div className="signup-verify-actions">
+      <p className="auth-alt">
+        {t('signup.noCode')}{' '}
         {request.sends >= 5 ? (
-          <button type="button" className="signup-text-action" onClick={onDifferent}>
+          <button type="button" className="auth-link" onClick={onDifferent}>
             {t('signup.startAgain')}
           </button>
-        ) : seconds > 0 ? (
-          <span>{t('signup.resendIn', { seconds })}</span>
         ) : (
-          <button
-            type="button"
-            className="signup-text-action"
-            disabled={Boolean(busy) || !bot.ready}
-            onClick={resend}
-          >
-            {t(busy === 'resend' ? 'signup.resending' : 'signup.resend')}
-          </button>
+          <>
+            {seconds > 0 ? (
+              t('signup.resendIn', { time: clock(seconds) })
+            ) : (
+              <button
+                type="button"
+                className="auth-link"
+                disabled={Boolean(busy) || !bot.ready}
+                onClick={resend}
+              >
+                {t(busy === 'resend' ? 'signup.resending' : 'signup.resend')}
+              </button>
+            )}
+            {' · '}
+            <button type="button" className="auth-link" onClick={onDifferent}>
+              {t('signup.differentEmail')}
+            </button>
+          </>
         )}
-        <button type="button" className="signup-text-action" onClick={onDifferent}>
-          {t('signup.differentEmail')}
-        </button>
-      </div>
+      </p>
       {announced && (
         <span className="sr-only" role="status">
           {t('signup.resendReady')}

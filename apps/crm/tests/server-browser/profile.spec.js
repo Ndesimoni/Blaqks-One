@@ -3,8 +3,11 @@ import { login } from '../api/helpers.mjs';
 import { activate, invite } from '../api/team-helpers.mjs';
 import { memberPage, noPageOverflow, setTheme, signInMember } from './assign-helpers.js';
 
+// After a reload the development bundle can take longer than the default wait to load.
 const signedOut = (page) =>
-  expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
+  expect(page.getByRole('heading', { name: 'Sign in', exact: true })).toBeVisible({
+    timeout: 30_000,
+  });
 
 async function openProfile(page) {
   await page.goto('/#/my-profile');

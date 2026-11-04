@@ -35,6 +35,10 @@ pub struct Invitation {
     pub role_id: String,
     pub owner_name: String,
     pub expires_at: String,
+    /// The company a staff invitation joins, by its display name (the mockup's "Join Keys
+    /// with Simoni"); an Admin invited by Blaqks One starts their own, so none is named.
+    #[sqlx(skip)]
+    pub company: Option<String>,
 }
 
 pub fn unavailable() -> ApiError {
@@ -75,7 +79,13 @@ pub async fn inspect(
     protection::origin(&state, &headers)?;
     let Json(request) = body.map_err(|_| unavailable())?;
     throttle::invitation(&state.pool, &request.token).await?;
-    let invitation = find(&state.pool, &request.token).await?;
+    let mut invitation = find(&state.pool, &request.token).await?;
+    if invitation.role_id == "staff" {
+        invitation.company = crate::workspaces::company::get(&state.pool, &invitation.workspace_id)
+            .await
+            .ok()
+            .and_then(|company| company.display_name);
+    }
     Ok(Json(json!({"invitation":invitation})))
 }
 

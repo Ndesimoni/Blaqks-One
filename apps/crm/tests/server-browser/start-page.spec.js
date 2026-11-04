@@ -9,7 +9,7 @@ test('members land on the start page, open products from it and use the account 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
-  await page.getByLabel('Email address').fill('admin-a@crm-fixture.test');
+  await page.getByLabel('Email', { exact: true }).fill('admin-a@crm-fixture.test');
   await page.getByLabel('Password', { exact: true }).fill(process.env.CRM_FIXTURE_PASSWORD);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(/#\/start$/);
@@ -46,6 +46,6 @@ test('members land on the start page, open products from it and use the account 
   await expect(account).toBeFocused();
   await account.click();
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByLabel('Email address')).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);
 });

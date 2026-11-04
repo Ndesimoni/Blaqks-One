@@ -63,7 +63,7 @@ test('Admin invites a colleague with multiple positions who signs in to the shar
   await page.getByLabel('Search team').fill('Browser shared-staff');
   await expect(teamCard(page, 'Browser shared-staff')).toContainText('Active');
   await signOut(page);
-  await expect(page.getByLabel('Email address')).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
   await signIn(page, 'admin-b');
   await openTeam(page);
   await expect(page.getByText('Browser shared-staff', { exact: true })).toHaveCount(0);

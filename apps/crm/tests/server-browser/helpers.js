@@ -6,7 +6,7 @@ export { saveRecordForm };
 
 export async function signIn(page, account = 'admin-a') {
   await page.goto('/');
-  await page.getByLabel('Email address').fill(`${account}@crm-fixture.test`);
+  await page.getByLabel('Email', { exact: true }).fill(`${account}@crm-fixture.test`);
   await page.getByLabel('Password', { exact: true }).fill(process.env.CRM_FIXTURE_PASSWORD);
   const [response] = await Promise.all([
     page.waitForResponse((reply) => reply.url().endsWith('/api/crm/auth/login')),

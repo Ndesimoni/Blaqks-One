@@ -62,7 +62,7 @@ test('an authoritative expired session clears cached workspace data', async ({ p
   await createRecord(page, 'Client');
   await page.getByLabel('Client ID').fill('BROWSER-EXPIRED');
   await saveRecordForm(page);
-  await expect(page.getByLabel('Email address')).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(page.getByRole('table')).toHaveCount(0);
 });

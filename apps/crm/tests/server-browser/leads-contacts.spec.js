@@ -39,7 +39,7 @@ async function capture(page, testInfo, name) {
 /** A cold Vite start can leave the lazy shell on its splash past the helper's default wait. */
 async function openSignIn(page) {
   await page.goto('/');
-  await expect(page.getByLabel('Email address')).toBeVisible({ timeout: 60000 });
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible({ timeout: 60000 });
 }
 
 async function addContact(page, id, name) {

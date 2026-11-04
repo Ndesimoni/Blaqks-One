@@ -3,8 +3,9 @@ import { SessionContext } from '../../app/SessionContext.js';
 import { GuidanceProvider } from '../../app/GuidanceContext.jsx';
 import { createCrmClient } from '../../services/crm/client.js';
 import { ServerStatus } from './ServerStatus.jsx';
-import { ServerSignIn } from './ServerSignIn.jsx';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { SIGN_IN, afterSignIn, isSignUpPath } from '../auth/authPaths.js';
+import { SignInGate } from '../auth/SignInGate.jsx';
 import { InvitationActivation } from '../server-team/InvitationActivation.jsx';
 import { useAccountLanguage } from './useAccountLanguage.js';
 import { SignupPage } from '../signup/SignupPage.jsx';
@@ -71,12 +72,18 @@ export function ServerSession({ children }) {
   // My profile installs the saved profile after a name, phone or language change.
   const replaceUser = useCallback((profile) => setUser(profile), []);
   const replaceCompany = useCallback((profile) => setCompany(profile), []);
+  // Joining from an invitation signs the person in with their company already set up.
+  const installSession = useCallback((session) => {
+    setUser(session.user);
+    setCompany(session.company);
+    setNotice('');
+  }, []);
   const installSignupUser = useCallback((profile) => {
     setUser(profile);
     setCompany(null);
   }, []);
   useEffect(() => {
-    if (!user || company || location.pathname === '/sign-up') return;
+    if (!user || company || isSignUpPath(location.pathname)) return;
     const controller = new AbortController();
     setLoading(true);
     setError('');
@@ -106,10 +113,10 @@ export function ServerSession({ children }) {
       />
     );
   if (location.pathname === '/activate-invitation')
-    return <InvitationActivation api={api} signedIn={!!user} />;
-  if (location.pathname === '/sign-up')
+    return <InvitationActivation api={api} signedIn={!!user} onJoined={installSession} />;
+  if (isSignUpPath(location.pathname))
     return <SignupPage api={api} user={user} onVerified={installSignupUser} onSignOut={signOut} />;
-  if (!user) return <ServerSignIn api={api} signIn={signIn} notice={notice} />;
+  if (!user) return <SignInGate api={api} signIn={signIn} notice={notice} />;
   if (!company)
     return (
       <ServerStatus
@@ -119,6 +126,8 @@ export function ServerSession({ children }) {
         signIn={signOut}
       />
     );
+  // Signed in at the sign-in address: on to the page that was asked for.
+  if (location.pathname === SIGN_IN) return <Navigate replace to={afterSignIn(location.search)} />;
   return (
     <SessionContext.Provider value={value}>
       <GuidanceProvider enabled={user.guidanceEnabled}>{children}</GuidanceProvider>

@@ -30,7 +30,7 @@ export async function assignInBrowser(page, collection, idKey, legacyId, assigne
 /** Signs a team-fixture member in through the real form in a fresh page. */
 export async function signInMember(page, email) {
   await page.goto('/');
-  await page.getByLabel('Email address').fill(email);
+  await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await landWhereTestsBegin(page);

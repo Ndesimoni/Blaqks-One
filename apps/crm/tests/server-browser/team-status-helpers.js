@@ -29,7 +29,7 @@ export async function changeAccountStatus(page, name, action) {
 
 export async function signInActivatedMember(page, email) {
   await page.goto('/');
-  await page.getByLabel('Email address').fill(email);
+  await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Team123!');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await landWhereTestsBegin(page);
@@ -38,13 +38,13 @@ export async function signInActivatedMember(page, email) {
 
 export async function expectSuspended(page, email) {
   await page.reload();
-  await expect(page.getByLabel('Email address')).toBeVisible();
-  await page.getByLabel('Email address').fill(email);
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+  await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill('Team123!');
   const [response] = await Promise.all([
     page.waitForResponse((reply) => reply.url().endsWith('/api/crm/auth/login')),
     page.getByRole('button', { name: 'Sign in', exact: true }).click(),
   ]);
   expect(response.status()).toBe(401);
-  await expect(page.getByLabel('Email address')).toBeVisible();
+  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
 }

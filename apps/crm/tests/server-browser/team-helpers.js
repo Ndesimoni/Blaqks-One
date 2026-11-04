@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { landWhereTestsBegin } from './helpers.js';
+import { landWhereTestsBegin, session } from './helpers.js';
 
 export async function openTeam(page) {
   await page.goto('/#/team-access');
@@ -34,18 +34,15 @@ export async function activateInNewContext(browser, link, email, password = 'Tea
   await page.goto(link);
   // A brand-new browser loads the whole development bundle first; under parallel workers
   // that cold start can pass five seconds before the page renders (the API answers in ms).
-  await expect(page.getByRole('heading', { name: 'Join your team' })).toBeVisible({
+  await expect(page.getByRole('heading', { name: /^Join / })).toBeVisible({
     timeout: 15_000,
   });
-  await page.getByLabel('Choose password').fill(password);
+  await page.getByLabel('Choose a password').fill(password);
   await page.getByLabel('Confirm password').fill(password);
-  await page.getByRole('button', { name: 'Activate account', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Account activated' })).toBeVisible();
-  await page.getByRole('button', { name: 'Go to sign in', exact: true }).click();
-  await page.getByLabel('Email address').fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(password);
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.getByRole('button', { name: 'Join the team', exact: true }).click();
+  // Joining signs the person in and opens their workspace (design queue item 34).
   await landWhereTestsBegin(page);
+  expect((await session(page)).user.email).toBe(email);
   return { context, page };
 }
 

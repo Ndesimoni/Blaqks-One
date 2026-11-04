@@ -1,7 +1,7 @@
 export default {
   brokerageTitle: 'Set up your company',
-  brokerageBody: 'Add the name and emirate your team will see across the CRM.',
-  freeSeats: 'Your Free plan includes 3 seats, including yours.',
+  brokerageBody:
+    'Your company gets its own private workspace. You can invite two colleagues on the Free plan.',
   companyName: 'Company name',
   emirate: 'Emirate',
   emiratePlaceholder: 'Choose an emirate',
@@ -13,8 +13,8 @@ export default {
   emirateRasAlKhaimah: 'Ras Al Khaimah',
   emirateFujairah: 'Fujairah',
   licenceHint: 'Licence details can be added later. You will need them before publishing listings.',
-  finish: 'Finish setup',
-  finishing: 'Saving setup…',
+  finish: 'Create my workspace',
+  finishing: 'Creating your workspace…',
   checklistEyebrow: 'GET STARTED',
   checklistTitle: 'Welcome, {firstName}',
   checklistBody: 'A few useful steps will make your CRM ready for everyday work.',

@@ -30,7 +30,6 @@ export function SetupStep({ values, error, busy, onChange, onSave }) {
       }}
     >
       <p>{t('signupSetup.brokerageBody')}</p>
-      <p className="signup-hint">{t('signupSetup.freeSeats')}</p>
       <SignupField
         id="signup-display-name"
         label={t('signupSetup.companyName')}

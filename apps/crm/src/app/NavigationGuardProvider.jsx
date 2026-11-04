@@ -3,20 +3,26 @@ import { Outlet, useBlocker } from 'react-router-dom';
 
 export const NavigationGuardContext = createContext(null);
 
-/** One router blocker coordinates record forms, message drafts and failed workspace saves. */
+/** Whether a guard holds this move: it has unsaved or busy work, and the move leaves its flow. */
+const holds = (guard, next) => (guard.dirty || guard.busy) && !guard.within?.(next?.pathname ?? '');
+
+/**
+ * One router blocker coordinates record forms, message drafts and failed workspace saves. A
+ * guard's `within(pathname)` lets its own flow move between addresses (sign-up's steps).
+ */
 export function NavigationGuardProvider() {
   const guards = useRef(new Map());
   const register = useCallback((id, guard) => {
     guards.current.set(id, guard);
     return () => guards.current.delete(id);
   }, []);
-  const blocker = useBlocker(() =>
-    [...guards.current.values()].some(({ dirty, busy }) => dirty || busy),
+  const blocker = useBlocker(({ nextLocation }) =>
+    [...guards.current.values()].some((guard) => holds(guard, nextLocation)),
   );
   useEffect(() => {
     if (blocker.state !== 'blocked') return;
-    const active = [...guards.current.values()];
-    if (!active.some(({ dirty, busy }) => dirty || busy)) blocker.proceed();
+    const active = [...guards.current.values()].filter((guard) => holds(guard, blocker.location));
+    if (!active.length) blocker.proceed();
     else if (active.some(({ busy }) => busy)) blocker.reset();
     else {
       const message =

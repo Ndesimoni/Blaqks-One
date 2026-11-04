@@ -47,7 +47,15 @@ test('team mutations use scoped paths and session CSRF while invitation secrets 
       status: 200,
       ok: true,
       json: async () =>
-        url.endsWith('/auth/session') ? { user: { id: 'owner' }, csrfToken: 'csrf' } : {},
+        url.endsWith('/auth/session')
+          ? { user: { id: 'owner' }, csrfToken: 'csrf' }
+          : url.endsWith('/invitations/accept')
+            ? {
+                user: { id: 'joined' },
+                csrfToken: 'joined-csrf',
+                company: { accountType: 'brokerage', version: 1, setupComplete: true },
+              }
+            : {},
     };
   });
   await api.session();
@@ -56,7 +64,8 @@ test('team mutations use scoped paths and session CSRF while invitation secrets 
   await api.updateMember('owner/a', 'staff/b', { version: 1 });
   await api.renewInvitation('owner/a', 'staff/b', 2);
   await api.inspectInvitation('private-token');
-  await api.acceptInvitation('private-token', 'Team123!');
+  // Accepting signs the person in: the reply's session becomes the client's (item 34).
+  assert.equal((await api.acceptInvitation('private-token', 'Team123!')).user.id, 'joined');
   assert.equal(calls[1].url, '/api/crm/workspaces/owner%2Fa/team');
   assert.equal(calls[3].url, '/api/crm/workspaces/owner%2Fa/team/staff%2Fb');
   assert.equal(calls[3].options.method, 'PATCH');

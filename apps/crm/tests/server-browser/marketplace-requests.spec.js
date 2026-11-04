@@ -20,8 +20,8 @@ async function openMember(browser, email) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     await page.goto('/');
     try {
-      await page.getByLabel('Email address').waitFor({ timeout: 30000 });
-      await page.getByLabel('Email address').fill(email);
+      await page.getByLabel('Email', { exact: true }).waitFor({ timeout: 30000 });
+      await page.getByLabel('Email', { exact: true }).fill(email);
       await page.getByLabel('Password', { exact: true }).fill(password);
       await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     } catch {

@@ -27,7 +27,6 @@ export function DetailsStep({ values, status, bot, error, busy, onChange, onSubm
         onSubmit();
       }}
     >
-      <p>{t('signup.detailsBody')}</p>
       <SignupField id="signup-name" label={t('signup.fullName')} error={message('name')}>
         <input
           ref={refs.name}
@@ -131,9 +130,12 @@ export function DetailsStep({ values, status, bot, error, busy, onChange, onSubm
       <Button className="signup-primary" type="submit" disabled={busy || !bot.ready}>
         {t(busy ? 'signup.sendingCode' : 'signup.sendCode')}
       </Button>
-      <button className="signup-text-action" type="button" onClick={onSignIn}>
-        {t('signup.haveAccount')}
-      </button>
+      <p className="auth-alt">
+        {t('signup.haveAccount')}{' '}
+        <button className="auth-link" type="button" onClick={onSignIn}>
+          {t('signup.signIn')}
+        </button>
+      </p>
     </form>
   );
 }

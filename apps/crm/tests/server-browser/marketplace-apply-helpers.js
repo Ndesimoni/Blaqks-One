@@ -7,7 +7,7 @@ export async function openMember(browser, email) {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto('/');
-  await page.getByLabel('Email address').waitFor({ timeout: 30000 });
+  await page.getByLabel('Email', { exact: true }).waitFor({ timeout: 30000 });
   await signInMember(page, email);
   return { context, page };
 }

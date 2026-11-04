@@ -9,15 +9,15 @@ const address = (kind) => `${kind}-${randomUUID()}@example.test`;
 
 async function openSignup(page) {
   await page.goto('/');
-  await page.getByRole('link', { name: 'Create an account' }).click();
+  await page.getByRole('link', { name: 'Create a company account' }).click();
   await expect(page).toHaveURL(/#\/sign-up$/);
   await expect(page.getByRole('heading', { name: 'Create your account' })).toBeVisible();
 }
 
 async function enterDetails(page, email, name) {
   await page.getByLabel('Full name').fill(name);
-  await page.getByLabel('Email address').fill(email);
-  await page.getByLabel('Mobile number').fill('+971 50 123 4567');
+  await page.getByLabel('Email', { exact: true }).fill(email);
+  await page.getByLabel('Mobile', { exact: true }).fill('+971 50 123 4567');
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('checkbox').check();
 }
@@ -26,12 +26,13 @@ async function verify(page) {
   const started = page.waitForResponse(
     (response) => response.url().endsWith('/api/crm/signup/start') && response.status() === 202,
   );
-  await page.getByRole('button', { name: 'Send code' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
   const body = await (await started).json();
-  await expect(page.getByRole('heading', { name: 'Enter your verification code' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Check your email' })).toBeVisible();
+  await expect(page).toHaveURL(/#\/sign-up\/verify$/);
   await expect(page.getByRole('note')).toContainText('no email was sent');
-  await page.getByLabel('Verification code').fill(codeFor(body.requestId));
-  await page.getByRole('button', { name: 'Verify and create account' }).click();
+  // Six digits verify at once, without pressing Verify and continue.
+  await page.getByLabel('Code', { exact: true }).fill(codeFor(body.requestId));
 }
 
 async function expectSession(page, email) {
@@ -49,9 +50,10 @@ test('an account creates its company and opens the three-seat Team page', async 
   await enterDetails(page, email, 'Synthetic Company Owner');
   await verify(page);
   await expect(page.getByRole('heading', { name: 'Set up your company' })).toBeVisible();
+  await expect(page).toHaveURL(/#\/sign-up\/company$/);
   await page.getByLabel('Company name').fill('Synthetic Horizon Realty');
   await page.getByLabel('Emirate').selectOption('dubai');
-  await page.getByRole('button', { name: 'Finish setup' }).click();
+  await page.getByRole('button', { name: 'Create my workspace' }).click();
   await expectSession(page, email);
   expect(
     query(

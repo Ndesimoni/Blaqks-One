@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button.jsx';
-import { ServerTheme } from '../server/ServerTheme.jsx';
+import { useI18n } from '../../i18n/useI18n.js';
+import { SIGN_IN } from '../auth/authPaths.js';
+import { AuthShell } from '../auth/AuthShell.jsx';
+import { invitationIntro, invitationTitle } from './invitationModel.js';
 import { InvitationPasswordForm } from './InvitationPasswordForm.jsx';
 
-export function InvitationActivation({ api, signedIn }) {
+/**
+ * Joining a team from an invitation link, as the approved mockup's full-screen split screen
+ * (design queue item 34): the company to join, who invited you and as what, then a password.
+ * Joining signs the person in and opens their workspace (`onJoined` installs the session).
+ */
+export function InvitationActivation({ api, signedIn, onJoined }) {
+  const { t } = useI18n();
   const location = useLocation();
   const go = useNavigate();
   const token = new URLSearchParams(location.search).get('token') || '';
@@ -18,78 +27,73 @@ export function InvitationActivation({ api, signedIn }) {
     setInvitation(null);
     setError('');
     if (!token) {
-      setError('This invitation link is incomplete. Ask your Admin for a new link.');
+      setError(t('auth.invite.incomplete'));
       return;
     }
     api
       .inspectInvitation(token, controller.signal)
       .then((result) => {
-        if (!result.invitation?.email)
-          throw Error('The invitation could not be opened. Ask your Admin for a new link.');
+        if (!result.invitation?.email) throw Error(t('auth.invite.unopened'));
         if (!controller.signal.aborted) setInvitation(result.invitation);
       })
       .catch((failure) => {
         if (failure.name !== 'AbortError') setError(failure.message);
       });
     return () => controller.abort();
-  }, [api, token, attempt, signedIn]);
+  }, [api, token, attempt, signedIn, t]);
+  const toSignIn = () => go(SIGN_IN, { replace: true });
+  // Once joined and signed in, open the workspace (after the form, and its guard, are gone).
+  useEffect(() => {
+    if (complete && signedIn) go('/', { replace: true });
+  }, [complete, signedIn, go]);
+  // Checked first: joining signs the person in, which the page sees before it moves on.
+  if (complete)
+    return (
+      <AuthShell busy>
+        <h1>{t('auth.invite.doneTitle')}</h1>
+        <p role="status">{t('auth.invite.opening')}</p>
+      </AuthShell>
+    );
+  if (signedIn)
+    return (
+      <AuthShell>
+        <h1>{t('auth.invite.signedInTitle')}</h1>
+        <p>{t('auth.invite.signedIn')}</p>
+        <Button className="auth-submit" onClick={() => go('/sign-out')}>
+          {t('auth.invite.signOut')}
+        </Button>
+      </AuthShell>
+    );
   return (
-    <main className="sign-in-page">
-      <section className="panel team-standalone-wizard" aria-labelledby="activation-title">
-        <div className="drawer-top">
-          <div>
-            <h1 id="activation-title">{complete ? 'Account activated' : 'Join your team'}</h1>
-            <p>Keys with Simoni</p>
-          </div>
-          <ServerTheme />
-        </div>
-        <div className="drawer-body team-fields">
-          {signedIn ? (
-            <>
-              <p>Sign out of your current account before activating this invitation.</p>
-              <Button onClick={() => go('/sign-out')}>Sign out</Button>
-            </>
-          ) : complete ? (
-            <>
-              <p>
-                Your account is ready. Sign in with {invitation.email} and the password you chose.
-              </p>
-              <Button onClick={() => go('/', { replace: true })}>Go to sign in</Button>
-            </>
-          ) : error ? (
-            <>
-              <p className="field-error" role="alert">
-                {error}
-              </p>
-              <Button variant="light" onClick={() => setAttempt((value) => value + 1)}>
-                Retry
-              </Button>
-              <Button onClick={() => go('/', { replace: true })}>Go to sign in</Button>
-            </>
-          ) : !invitation ? (
-            <p role="status">Checking invitation…</p>
-          ) : (
-            <>
-              <h2>Welcome, {invitation.name}</h2>
-              <p>Invited by {invitation.ownerName}.</p>
-              <dl className="connected-team-review">
-                <dt>Email</dt>
-                <dd>{invitation.email}</dd>
-                <dt>Phone</dt>
-                <dd>{invitation.phone}</dd>
-                <dt>Account</dt>
-                <dd>{invitation.roleId === 'admin' ? 'Admin · Own workspace' : 'Teammate'}</dd>
-              </dl>
-              <p>Expires {new Date(invitation.expiresAt).toLocaleString()}.</p>
-              <InvitationPasswordForm
-                email={invitation.email}
-                onAccept={(password) => api.acceptInvitation(token, password)}
-                onComplete={() => setComplete(true)}
-              />
-            </>
-          )}
-        </div>
-      </section>
-    </main>
+    <AuthShell busy={!invitation && !error}>
+      <h1>{invitationTitle(invitation, t)}</h1>
+      {error ? (
+        <>
+          <p className="field-error" role="alert">
+            {error}
+          </p>
+          <Button variant="light" onClick={() => setAttempt((value) => value + 1)}>
+            {t('auth.invite.retry')}
+          </Button>
+          <Button className="auth-submit" onClick={toSignIn}>
+            {t('auth.invite.goSignIn')}
+          </Button>
+        </>
+      ) : !invitation ? (
+        <p role="status">{t('auth.invite.checking')}</p>
+      ) : (
+        <>
+          <p>{invitationIntro(invitation, t)}</p>
+          <InvitationPasswordForm
+            invitation={invitation}
+            onAccept={(password) => api.acceptInvitation(token, password)}
+            onComplete={(session) => {
+              setComplete(true);
+              onJoined(session);
+            }}
+          />
+        </>
+      )}
+    </AuthShell>
   );
 }

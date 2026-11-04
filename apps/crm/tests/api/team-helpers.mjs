@@ -84,7 +84,19 @@ export async function activate(invited, password = 'Team123!') {
     body: { token: invited.invitation.token, password },
   });
   assert.equal(accepted.status, 200, JSON.stringify(accepted.value));
-  return staffLogin(invited.email, password);
+  // Accepting signs the person in, as sign-up does (design queue item 34): the returned
+  // session is theirs, so no second sign-in is needed.
+  const { user, csrfToken: csrf, company } = accepted.value;
+  assert.equal(user?.email, invited.email);
+  assert.ok(csrf && company);
+  const cookie = accepted.headers.get('set-cookie').split(';')[0];
+  assert.equal((await request('/auth/session', { cookie })).status, 200);
+  return {
+    user,
+    cookie,
+    csrf,
+    request: (path, options) => request(path, { cookie, csrf, ...options }),
+  };
 }
 
 export async function findMember(owner, id) {

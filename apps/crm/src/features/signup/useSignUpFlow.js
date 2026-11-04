@@ -62,12 +62,12 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
     },
     [onVerified],
   );
-  const verify = async () => {
-    if (!validCode(code)) return setError({ field: 'code', key: 'signupErrors.codeRequired' });
+  const verify = async (value = code) => {
+    if (!validCode(value)) return setError({ field: 'code', key: 'signupErrors.codeRequired' });
     setBusy('verify');
     setError(null);
     try {
-      install(await api.signupVerify(request.requestId, code));
+      install(await api.signupVerify(request.requestId, value));
     } catch (failure) {
       if (failure.status === 0) {
         try {

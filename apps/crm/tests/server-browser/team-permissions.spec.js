@@ -39,8 +39,8 @@ test('owner edits staff access, invalidates the session and retains the new gran
     await dialog.getByRole('button', { name: 'Save changes', exact: true }).click();
     await expect(dialog).toHaveCount(0);
     await staff.page.reload();
-    await expect(staff.page.getByLabel('Email address')).toBeVisible();
-    await staff.page.getByLabel('Email address').fill('changed-access@browser-team.test');
+    await expect(staff.page.getByLabel('Email', { exact: true })).toBeVisible();
+    await staff.page.getByLabel('Email', { exact: true }).fill('changed-access@browser-team.test');
     await staff.page.getByLabel('Password', { exact: true }).fill('Team123!');
     await staff.page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await expect(

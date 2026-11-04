@@ -119,7 +119,7 @@ test('whole-team visibility shows the team records but never ungranted sections'
     await expect(dialog).toHaveCount(0);
 
     await staff.page.reload();
-    await expect(staff.page.getByLabel('Email address')).toBeVisible();
+    await expect(staff.page.getByLabel('Email', { exact: true })).toBeVisible();
     await signInMember(staff.page, one.email);
     await staff.page.goto('/#/clients');
     await expect(staff.page.getByRole('navigation', { name: 'Clients pages' })).toContainText(

@@ -111,8 +111,12 @@ export function createCrmClient(fetchRequest = globalThis.fetch, onUnauthorized 
       }),
     inspectInvitation: (token, signal) =>
       request('/auth/invitations/inspect', { method: 'POST', body: { token }, signal }),
+    /** Activates the invitation and returns the new session (the person is signed in). */
     acceptInvitation: (token, password) =>
-      request('/auth/invitations/accept', { method: 'POST', body: { token, password } }),
+      identityWithCompany('/auth/invitations/accept', {
+        method: 'POST',
+        body: { token, password },
+      }),
     records: (workspace, signal) => request(`${scope(workspace)}/records`, { signal }),
     save: (workspace, collection, record, metadata) =>
       request(recordPath(workspace, collection, metadata?.id), {

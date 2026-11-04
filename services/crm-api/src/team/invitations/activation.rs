@@ -1,14 +1,17 @@
 use super::inspect;
 use crate::team::{access, account_type::seats, audit};
 use crate::{
-    auth::{identity_rules, password, password_policy, protection, session, throttle},
+    auth::{
+        accounts, device, identity_rules, password, password_policy, profile::Profile, protection,
+        session, sessions, throttle,
+    },
     error::{ApiError, ApiResult},
     state::AppState,
     workspaces,
 };
 use axum::{
     extract::{rejection::JsonRejection, State},
-    http::HeaderMap,
+    http::{header, HeaderMap},
     Json,
 };
 use serde::Deserialize;
@@ -22,11 +25,14 @@ pub struct AcceptRequest {
     phone: Option<String>,
 }
 
+/// Activates the invited account and signs the person in, as sign-up does once the account
+/// exists (design queue item 34: joining goes straight into the workspace). The session is
+/// issued in the activation's transaction, for the account's own workspace.
 pub async fn accept(
     State(state): State<AppState>,
     headers: HeaderMap,
     body: Result<Json<AcceptRequest>, JsonRejection>,
-) -> ApiResult<Json<Value>> {
+) -> ApiResult<(HeaderMap, Json<Value>)> {
     protection::origin(&state, &headers)?;
     let Json(request) =
         body.map_err(|_| ApiError::invalid("Provide an invitation and password."))?;
@@ -106,6 +112,28 @@ pub async fn accept(
         "activated",
     )
     .await?;
+    let agent = headers
+        .get(header::USER_AGENT)
+        .and_then(|value| value.to_str().ok());
+    let label = device::label(agent);
+    let issued = sessions::issue(&mut transaction, invitation.user_id, label.as_deref()).await?;
+    let profile = accounts::live_profile(&mut transaction, invitation.user_id).await?;
+    let company = workspaces::company::get(&mut *transaction, &profile.workspace_id).await?;
     transaction.commit().await?;
-    Ok(Json(json!({"ok":true})))
+    let mut response_headers = HeaderMap::new();
+    response_headers.insert(
+        header::SET_COOKIE,
+        session::cookie(&issued.token, state.config.secure_cookie, false)
+            .parse()
+            .unwrap(),
+    );
+    Ok((
+        response_headers,
+        Json(json!({
+            "ok": true,
+            "user": Profile::from(profile),
+            "csrfToken": issued.csrf_token,
+            "company": company,
+        })),
+    ))
 }

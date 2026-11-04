@@ -1,0 +1,75 @@
+/* The approved website design's account pages (owner, 2026-11-05): one centred card under a
+   gold-rimmed arc, filling the window; the CRM's golds and Georgia, in light and dark. */
+:root {
+  --auth-disc: #ffffff;
+  --auth-rim: rgba(188, 151, 101, 0.95);
+  --auth-glow: rgba(188, 151, 101, 0.35);
+  --auth-glow-2: rgba(47, 107, 74, 0.14);
+}
+:root[data-theme='dark'] {
+  --auth-disc: #08140d;
+  --auth-rim: rgba(228, 205, 165, 0.9);
+  --auth-glow: rgba(228, 205, 165, 0.32);
+  --auth-glow-2: rgba(47, 107, 74, 0.3);
+}
+.auth-page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 22px;
+  min-block-size: 100svh;
+  padding-block: 56px;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px))
+    max(16px, env(safe-area-inset-right, 0px));
+  overflow: hidden;
+  background: var(--bg);
+}
+.auth-page::before {
+  content: '';
+  position: absolute;
+  inset-block-start: -380px;
+  inset-inline-start: 50%;
+  inline-size: 900px;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--auth-disc);
+  box-shadow:
+    0 1.5px 0 var(--auth-rim),
+    0 20px 80px var(--auth-glow),
+    0 60px 160px var(--auth-glow-2);
+  pointer-events: none;
+}
+.auth-page > * {
+  position: relative;
+}
+.auth-page > .signup-utilities {
+  position: absolute;
+  inset-block-start: 20px;
+  inset-inline-end: max(24px, env(safe-area-inset-right, 0px));
+}
+.auth-wordmark {
+  display: inline-flex;
+  margin: 0;
+  color: var(--ink);
+  font: 600 26px var(--display);
+}
+.auth-wordmark span {
+  inline-size: 7px;
+  block-size: 7px;
+  margin: 6px 0 0 3px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold);
+}
+@media (max-width: 600px) {
+  .auth-page {
+    align-content: start;
+    padding-block: 72px 32px;
+  }
+  .auth-page > .signup-utilities {
+    inset-inline-end: 16px;
+    inset-block-start: 14px;
+  }
+}
