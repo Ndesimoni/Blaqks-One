@@ -27,6 +27,7 @@ import enRecordKeeps from './en/recordKeeps.js';
 import enRecordPanel from './en/recordPanel.js';
 import enRecordShares from './en/recordShares.js';
 import enRecordSorting from './en/recordSorting.js';
+import enTeamFinance from './en/teamFinance.js';
 
 export const crmCatalogs = {
   agreementForm: enAgreementForm,
@@ -57,4 +58,5 @@ export const crmCatalogs = {
   recordPanel: enRecordPanel,
   recordShares: enRecordShares,
   recordSorting: enRecordSorting,
+  teamFinance: enTeamFinance,
 };

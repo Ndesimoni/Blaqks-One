@@ -65,16 +65,26 @@ test('an Admin adds agreements that auto-close the open one and removes a future
     await expect(editor.getByRole('alert')).toHaveText(OVERLAP);
     await expect(editor.getByLabel('Agent share (%)')).toHaveValue('70');
 
-    page.once('dialog', (confirmation) => {
-      expect(confirmation.message()).toContain('The agreement it replaced continues');
-      confirmation.accept();
+    const removeButton = items.nth(0).getByRole('button', {
+      name: `Remove the 65.5% agreement for ${name} starting ${future}`,
     });
-    await items
-      .nth(0)
-      .getByRole('button', {
-        name: `Remove the 65.5% agreement for ${name} starting ${future}`,
-      })
-      .click();
+    await removeButton.click();
+    const confirmation = items.nth(0).getByRole('group', { name: 'Remove agent agreement' });
+    await expect(confirmation).toContainText(
+      `Remove the 65.5% agreement for ${name} starting ${future}?`,
+    );
+    await expect(confirmation.getByRole('button', { name: 'Cancel' })).toBeFocused();
+    await confirmation.getByRole('button', { name: 'Cancel' }).click();
+    await expect(confirmation).toHaveCount(0);
+    await expect(removeButton).toBeFocused();
+
+    await removeButton.click();
+    await page.keyboard.press('Escape');
+    await expect(confirmation).toHaveCount(0);
+    await expect(removeButton).toBeFocused();
+
+    await removeButton.click();
+    await confirmation.getByRole('button', { name: 'Remove agreement' }).click();
     await expect(status).toHaveText(
       'Agreement removed. The agreement it replaced has no end date again.',
     );

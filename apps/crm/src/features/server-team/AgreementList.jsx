@@ -2,6 +2,8 @@ import React, { useId } from 'react';
 import { Badge } from '../../components/ui/Badge.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { formatPercent } from '../../lib/finance/money.js';
+import { useI18n } from '../../i18n/useI18n.js';
+import { InlineConfirm } from '../server/profile/InlineConfirm.jsx';
 import {
   agreementStatus,
   agreementTimelines,
@@ -14,14 +16,25 @@ import {
  * Per-agent agreement timelines (finance-design §7, §13 L-F8). Admins may remove agreements
  * that have not started; `readOnly` (team finance staff) shows the timeline only.
  */
-export function AgreementList({ list, today, readOnly, busy, onRemove }) {
+export function AgreementList({
+  list,
+  today,
+  readOnly,
+  busy,
+  removing,
+  removeError,
+  onAskRemove,
+  onCancelRemove,
+  onConfirmRemove,
+}) {
+  const { t } = useI18n();
   const titleId = useId();
   const groups = agreementTimelines(list.agreements);
   return (
     <section
       className="panel team-finance-panel"
       aria-labelledby={titleId}
-      aria-busy={list.loading}
+      aria-busy={list.loading || busy}
     >
       <div className="team-finance-heading">
         <h3 id={titleId}>Agent agreements</h3>
@@ -61,12 +74,33 @@ export function AgreementList({ list, today, readOnly, busy, onRemove }) {
                       {status === 'future' && !readOnly && (
                         <Button
                           variant="light"
-                          disabled={busy}
+                          disabled={busy || !!removing}
                           aria-label={`Remove the ${share} agreement for ${group.agent.name} starting ${agreement.effectiveFrom}`}
-                          onClick={() => onRemove(agreement, group.agent)}
+                          onClick={(event) => onAskRemove(agreement, event.currentTarget)}
                         >
                           Remove
                         </Button>
+                      )}
+                      {removing?.agreement.id === agreement.id && (
+                        <div className="team-agreement-confirm">
+                          <InlineConfirm
+                            label={t('teamFinance.removeLabel')}
+                            prompt={t('teamFinance.removePrompt', {
+                              share,
+                              agent: group.agent.name,
+                              date: agreement.effectiveFrom,
+                            })}
+                            confirmLabel={t('teamFinance.removeConfirm')}
+                            busy={busy}
+                            onConfirm={onConfirmRemove}
+                            onCancel={onCancelRemove}
+                          />
+                          {removeError && (
+                            <p className="field-error" role="alert">
+                              {removeError}
+                            </p>
+                          )}
+                        </div>
                       )}
                     </li>
                   );

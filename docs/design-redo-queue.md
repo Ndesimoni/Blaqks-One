@@ -43,7 +43,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 
 14. [x] **My profile** and **Website profile** (`e61b1b0`; Profile, Website profile and Sign-in and security as header tabs; account details, language, field guidance, password and devices kept; company profile stays on Profile until item 15) (`settings.profile.profile`, `settings.profile.website`)
 15. [x] **Company details** (`dd16f17`; owner chose the new fields: trade licence number, office phone and office address saved on the server; marketplace switch asks before turning off; plan and seats; company form moved off My profile) (`settings.company.details`)
-16. [ ] **Team finance** (`settings.team.finance`)
+16. [x] **Team finance** (2026-11-04; mockup cards and Company-style save bar; exact Pending approval/self-review note; all split, referral, VAT, TRN and dated agent agreements kept; future-agreement removal now confirms in-page) (`settings.team.finance`)
 17. [ ] **Channels** (`settings.channels.channels`)
 18. [ ] **Inbox rules** (`settings.rules.rules`)
 19. [ ] **My mailbox** (`settings.mailbox.mailbox`)

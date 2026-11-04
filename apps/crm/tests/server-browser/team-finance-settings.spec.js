@@ -14,13 +14,16 @@ test('an Admin sets up finance settings, then keeps the draft through a version 
   const { page } = admin;
   try {
     const panel = await openFinanceSettings(page);
+    await expect(page.getByRole('note').first()).toHaveText(
+      'Every payment and expense is submitted as Pending approval. An Admin or a team member with Approve can decide it. Staff approvers cannot approve or reject their own work; an Admin may.',
+    );
     await expect(panel.getByRole('note')).toHaveText(
       "Set up your team's commission split before marking deals earned.",
     );
     const share = panel.getByLabel('Agent share (%)');
     const referral = panel.getByLabel('Largest referral share (%)');
     await share.fill('12.345');
-    await panel.getByRole('button', { name: 'Save settings', exact: true }).click();
+    await panel.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(panel.getByText(PERCENT)).toBeVisible();
     await expect(share).toBeFocused();
     await expect(share).toHaveAttribute('aria-invalid', 'true');
@@ -33,10 +36,10 @@ test('an Admin sets up finance settings, then keeps the draft through a version 
     await panel.getByRole('checkbox', { name: 'VAT registered' }).check();
     await expect(panel.getByText('VAT rate 5% (fixed)')).toBeVisible();
     await panel.getByLabel('TRN').fill('12345');
-    await panel.getByRole('button', { name: 'Save settings', exact: true }).click();
+    await panel.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(panel.getByText('Enter a 15-digit TRN.')).toBeVisible();
     await panel.getByLabel('TRN').fill('100123456700003');
-    await panel.getByRole('button', { name: 'Save settings', exact: true }).click();
+    await panel.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(panel.getByRole('status')).toHaveText('Finance settings saved.');
     await expect(panel.getByRole('note')).toHaveCount(0);
     expect(await storedSettings(team)).toEqual({
@@ -52,7 +55,7 @@ test('an Admin sets up finance settings, then keeps the draft through a version 
     // Someone else saves first: the stale save is refused and the draft stays.
     await saveSettings(team, { agentShareBp: 5500, secondAgentSource: 'company' });
     await share.fill('70');
-    await panel.getByRole('button', { name: 'Save settings', exact: true }).click();
+    await panel.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(panel.getByRole('alert')).toHaveText(
       'Finance settings changed. Reload before saving. Your changes are still here.',
     );
@@ -62,9 +65,16 @@ test('an Admin sets up finance settings, then keeps the draft through a version 
     await expect(share).toHaveValue('55');
     await expect(panel.getByRole('alert')).toHaveCount(0);
     await share.fill('57.25');
-    await panel.getByRole('button', { name: 'Save settings', exact: true }).click();
+    await panel.getByRole('button', { name: 'Save', exact: true }).click();
     await expect(panel.getByRole('status')).toHaveText('Finance settings saved.');
     expect((await storedSettings(team)).agentShareBp).toBe(5725);
+
+    // Cancel follows the Company save bar and restores the last saved settings.
+    await share.fill('58');
+    await expect(panel.getByRole('status')).toHaveText('You have unsaved finance settings.');
+    await panel.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(share).toHaveValue('57.25');
+    await expect(panel.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
 
     // The draft survives switching to People and back.
     await share.fill('58');

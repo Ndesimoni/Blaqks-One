@@ -46,6 +46,13 @@ export function useFinanceSettingsForm(settings, actions) {
     setDraft(settingsDraft(settings));
     setErrors({});
     setFailure(idle);
+    setSaved('');
+  };
+  const discard = () => {
+    setDraft(settingsDraft(base));
+    setErrors({});
+    setFailure(idle);
+    setSaved('');
   };
   const submit = async (event) => {
     event.preventDefault();
@@ -80,5 +87,17 @@ export function useFinanceSettingsForm(settings, actions) {
     setFailure(idle);
     setSaved('Finance settings saved.');
   };
-  return { base, draft, errors, failure, saved, dirty, formRef, change, loadLatest, submit };
+  return {
+    base,
+    draft,
+    errors,
+    failure,
+    saved,
+    dirty,
+    formRef,
+    change,
+    discard,
+    loadLatest,
+    submit,
+  };
 }

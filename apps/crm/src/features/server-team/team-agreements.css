@@ -27,6 +27,36 @@
   min-height: 44px;
   padding: 6px 0 6px 18px;
 }
+.team-agreement-confirm {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+.team-agreement-confirm .acct-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.team-agreement-confirm .acct-confirm > span {
+  flex: 1 1 320px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.team-agreement-confirm .acct-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.team-agreement-confirm .field-error {
+  margin: 8px 0 0;
+}
 /* A marker on the rail per agreement; the status badge carries the meaning in text. */
 .team-agreement-timeline li::before {
   content: '';
@@ -81,10 +111,10 @@
   }
 }
 @media (max-width: 650px) {
-  .team-finance-panel {
-    padding: 16px;
+  .team-agreement-confirm .acct-actions {
+    width: 100%;
   }
-  .team-finance-actions .btn {
+  .team-agreement-confirm .btn {
     flex: 1 1 auto;
   }
 }
