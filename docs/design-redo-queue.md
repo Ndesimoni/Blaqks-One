@@ -67,7 +67,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 
 ### Platform (Super Admin)
 
-31. [ ] **Marketplace applications: Waiting and Decided** (`platform.papps.pending`, `platform.papps.decided`)
+31. [x] **Marketplace applications: Waiting and Decided** (`86e427b`; Waiting and Decided as the filter row's presets with search; applications stay rows with their counts and decision buttons) (`platform.papps.pending`, `platform.papps.decided`)
 32. [ ] **Websites: General site and Companies** (`platform.pweb.general`, `platform.pweb.companies`)
 33. [ ] **Workspaces: Companies** (`platform.pworkspaces.companies`): grid Company, Admin, Seats, Marketplace; presets Active companies / Archived.
 
