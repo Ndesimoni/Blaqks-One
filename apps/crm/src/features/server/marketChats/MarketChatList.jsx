@@ -1,9 +1,8 @@
 import React from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
-import { GridFilterBar } from '../../records/grid/GridFilterBar.jsx';
-import '../../records/grid/grid-filter.css';
 import { requestTitle } from '../marketplace/requestText.js';
+import { initials } from '../profile/profileModel.js';
 
 /** The rows a view and search leave: Active or Closed, by broker or request. */
 export function chatView(rows, view, t) {
@@ -16,61 +15,58 @@ export function chatView(rows, view, t) {
   );
 }
 
-/** The chats list: the mockup's Active and Closed with search, newest first. */
-export function MarketChatList({
-  rows,
-  view,
-  onView,
-  selectedId,
-  onOpen,
-  nextOffset,
-  loadingMore,
-  onMore,
-}) {
+/**
+ * The approved mockup's broker chat list (the Client inbox's rows): "Search broker chats", then
+ * each chat's broker, when it last moved, the request and the latest message. Older chats load
+ * in pages; search covers the chats loaded so far.
+ */
+export function MarketChatList({ rows, view, onQuery, selectedId, onOpen, more }) {
   const { t, format } = useI18n();
-  const k = (key, vars) => t(`marketChats.${key}`, vars);
-  const tabs = [k('active'), k('closed')];
+  const k = (key) => t(`marketChats.${key}`);
   const shown = chatView(rows, view, t);
   return (
-    <section className="market-chat-list" aria-label={k('listLabel')}>
-      <GridFilterBar
-        module={k('module')}
-        presetLabel={tabs[Number(view.closed)]}
-        tabs={tabs}
-        tab={tabs[Number(view.closed)]}
-        onTab={(name) => onView({ ...view, closed: name === tabs[1] })}
-        query={view.query}
-        onQuery={(query) => onView({ ...view, query })}
-      />
-      {!shown.length && <p className="market-chat-empty">{k('noneHere')}</p>}
+    <section className="chat-list market-chat-list" aria-label={k('listLabel')}>
+      <label className="chat-search">
+        <span className="sr-only">{k('search')}</span>
+        <input
+          type="search"
+          value={view.query}
+          placeholder={k('search')}
+          onChange={(event) => onQuery(event.target.value)}
+        />
+      </label>
+      {!shown.length && <p className="chat-muted market-chat-none">{k('noneHere')}</p>}
       <ul>
         {shown.map((row) => (
           <li key={row.id}>
             <button
               type="button"
-              className={'market-chat-row' + (row.id === selectedId ? ' is-open' : '')}
+              className={'inbox-row' + (row.id === selectedId ? ' is-selected' : '')}
               aria-current={row.id === selectedId ? 'true' : undefined}
               onClick={() => onOpen(row.id)}
             >
-              <span className="market-chat-top">
-                <strong>{row.participantName}</strong>
-                <time dateTime={row.updatedAt}>{format.date(row.updatedAt)}</time>
+              <span className="inbox-avatar" aria-hidden="true">
+                {initials(row.participantName)}
               </span>
-              <span className="market-chat-about">
-                {k(row.mine ? 'yourRequest' : 'theirRequest', {
-                  request: requestTitle(t, row.request),
-                })}
+              <span className="inbox-row-body">
+                <span className="market-chat-request">{requestTitle(t, row.request)}</span>
+                <span className="inbox-row-top">
+                  <bdi className="inbox-row-name">{row.participantName}</bdi>
+                  <time className="inbox-row-age" dateTime={row.updatedAt}>
+                    {format.date(row.updatedAt, { dateStyle: 'medium' })}
+                  </time>
+                </span>
+                <span className="inbox-row-preview">{row.lastMessage?.body || k('noText')}</span>
               </span>
-              {row.lastMessage && <span className="market-chat-last">{row.lastMessage.body}</span>}
             </button>
           </li>
         ))}
       </ul>
-      {nextOffset != null && (
+      {more.nextOffset != null && (
         <div className="market-chat-more">
-          {view.query && <p>{k('searchLoaded')}</p>}
-          <Button variant="light" disabled={loadingMore} onClick={onMore}>
-            {loadingMore ? k('loadingMore') : k('loadMore')}
+          {view.query && <p className="chat-muted">{k('searchLoaded')}</p>}
+          <Button variant="light" disabled={more.loading} onClick={more.load}>
+            {more.loading ? k('loadingMore') : k('loadMore')}
           </Button>
         </div>
       )}

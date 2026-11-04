@@ -3,6 +3,7 @@ import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { START_ROUTE } from './startModel.js';
 import './bottom-bar.css';
+import { isFullHeight } from '../fullHeight.js';
 
 const KEY = 'kws-bottom-bar';
 const BAR_PRODUCTS = ['crm', 'web', 'platform', 'market', 'messages'];
@@ -60,7 +61,10 @@ export function BottomBar({ products, current, route, onOpen, onHome, onSections
     </button>
   );
   return (
-    <nav className="bottom-bar" aria-label={t('products.bar')}>
+    <nav
+      className={'bottom-bar' + (isFullHeight(route) ? ' has-inline-hide' : '')}
+      aria-label={t('products.bar')}
+    >
       {item('home', 'home', t('start.home'), route === START_ROUTE, onHome)}
       {keys.slice(0, 4).map((key) => {
         const product = products.find((entry) => entry.key === key);

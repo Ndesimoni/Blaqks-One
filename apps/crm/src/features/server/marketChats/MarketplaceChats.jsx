@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button.jsx';
-import { Empty } from '../../../components/ui/Empty.jsx';
 import { useUnsavedChanges } from '../../../hooks/useUnsavedChanges.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import '../chat/chat.css';
+import '../chat/chat-frame.css';
+import '../chat/chat-message.css';
+import '../chat/chat-mentions.css';
+import '../chat/chat-phone.css';
+import '../inbox/inbox-rows.css';
 import { InlineConfirm } from '../profile/InlineConfirm.jsx';
-import { MarketplaceMessageThread } from '../marketplace/MarketplaceMessageThread.jsx';
-import '../marketplace/marketplace-answers.css';
+import { MarketChatGate } from './MarketChatGate.jsx';
 import { MarketChatList } from './MarketChatList.jsx';
+import { MarketChatSide } from './MarketChatSide.jsx';
+import { MarketChatThread } from './MarketChatThread.jsx';
 import { useMarketChats } from './useMarketChats.js';
 import './market-chats.css';
 
 const JOIN_FIRST = 'Join the marketplace first.';
 
-/** Messages → Marketplace chats: private broker conversations, Active and Closed. */
+/**
+ * Messages → Marketplace chats as the approved mockup (Team chat's frame): Active and Closed
+ * across the top, the broker chats beside the open one and, on wide screens, its request.
+ * The address names the open chat (the slide-in messenger's `selection` holds it instead).
+ * An unsent message asks before another chat opens. Company Admins never read others' chats.
+ */
 export function MarketplaceChats({ selection = null, onDirty, onBusy }) {
   const { t } = useI18n();
   const k = (key) => t(`marketChats.${key}`);
@@ -26,13 +36,12 @@ export function MarketplaceChats({ selection = null, onDirty, onBusy }) {
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [pending, setPending] = useState(null);
-  const params = new URLSearchParams(location.search);
-  const selectedId = selection ? selection.id : params.get('chat') || '';
+  const selectedId = selection
+    ? selection.id
+    : new URLSearchParams(location.search).get('chat') || '';
   useUnsavedChanges(!selection && dirty, busy, k('discard'));
   useEffect(() => onDirty?.(dirty), [dirty, onDirty]);
   useEffect(() => onBusy?.(busy), [busy, onBusy]);
-  useEffect(() => () => onDirty?.(false), [onDirty]);
-  useEffect(() => () => onBusy?.(false), [onBusy]);
   const changeChat = (id) => {
     if (selection) return selection.open(id);
     const next = new URLSearchParams(location.search);
@@ -45,95 +54,80 @@ export function MarketplaceChats({ selection = null, onDirty, onBusy }) {
     if (dirty) setPending({ run: action });
     else action();
   };
-  const confirmDiscard = () => {
-    const action = pending?.run;
-    setPending(null);
-    action?.();
-  };
   const chat = list.rows?.find((row) => row.id === selectedId);
   useEffect(() => {
     if (selectedId && list.rows && !chat && list.nextOffset != null && !list.loadingMore)
       list.loadMore();
-  }, [selectedId, chat, list.rows, list.nextOffset, list.loadingMore, list.loadMore]);
+  }, [selectedId, chat, list]);
   if (list.status === 409 && list.error === JOIN_FIRST)
     return <MarketChatGate title={k('joinTitle')} detail={k('join')} onOpen={navigate} />;
   if (list.error && !list.rows)
     return <MarketChatGate title={k('unavailable')} detail={list.error} onOpen={navigate} />;
   if (!list.rows) return <p role="status">{k('loading')}</p>;
-  if (!list.rows.length)
-    return (
-      <section className="panel">
-        <Empty icon="chat" title={k('none')} detail={k('noneHint')} />
-      </section>
-    );
+  if (!list.rows.length) return <MarketChatGate title={k('none')} detail={k('noneHint')} />;
+  const tab = (closed) => (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={view.closed === closed}
+      className={view.closed === closed ? 'is-active' : undefined}
+      onClick={() => setView({ ...view, closed })}
+    >
+      {k(closed ? 'closed' : 'active')}
+    </button>
+  );
   return (
-    <div className={'market-chats' + (chat ? ' has-open' : '')}>
-      {list.error && (
-        <p className="field-error market-chat-error" role="alert">
-          {list.error}
-        </p>
-      )}
-      <MarketChatList
-        rows={list.rows}
-        view={view}
-        onView={setView}
-        selectedId={selectedId}
-        onOpen={(id) => guarded(() => changeChat(id))}
-        nextOffset={list.nextOffset}
-        loadingMore={list.loadingMore}
-        onMore={list.loadMore}
-      />
-      <section className="panel market-chat-thread" aria-label={chat?.participantName || k('pick')}>
-        {pending && (
-          <InlineConfirm
-            label={k('discardLabel')}
-            prompt={k('discard')}
-            confirmLabel={k('discardConfirm')}
-            busy={busy}
-            onConfirm={confirmDiscard}
-            onCancel={() => setPending(null)}
-          />
-        )}
-        {chat ? (
-          <>
-            <button
-              type="button"
-              className="market-chat-back"
-              disabled={busy}
-              onClick={() => guarded(() => changeChat(''))}
-            >
-              {k('back')}
-            </button>
-            <MarketplaceMessageThread
+    <div className="chat-page market-chat-page">
+      <div role="tablist" aria-label={k('tabs')} className="chat-top-tabs">
+        {tab(false)}
+        {tab(true)}
+      </div>
+      <section
+        className={
+          'chat-layout' +
+          (chat ? ' is-room' : ' is-list') +
+          (chat && !selection ? ' has-members' : '')
+        }
+        aria-label={k('listLabel')}
+      >
+        <MarketChatList
+          rows={list.rows}
+          view={view}
+          onQuery={(query) => setView({ ...view, query })}
+          selectedId={selectedId}
+          onOpen={(id) => guarded(() => changeChat(id))}
+          more={{ nextOffset: list.nextOffset, loading: list.loadingMore, load: list.loadMore }}
+        />
+        <section className="chat-room-pane">
+          {pending && (
+            <InlineConfirm
+              label={k('discardLabel')}
+              prompt={k('discard')}
+              confirmLabel={k('discardConfirm')}
+              busy={busy}
+              onConfirm={() => {
+                const action = pending.run;
+                setPending(null);
+                action();
+              }}
+              onCancel={() => setPending(null)}
+            />
+          )}
+          {chat ? (
+            <MarketChatThread
               key={chat.id}
-              conversationId={chat.id}
-              participantName={chat.participantName}
-              paused={!chat.canReply}
+              chat={chat}
+              onBack={() => guarded(() => changeChat(''))}
               onSent={list.reload}
               onDirty={setDirty}
               onBusy={setBusy}
             />
-          </>
-        ) : (
-          <p className="market-chat-empty">{k('pick')}</p>
-        )}
+          ) : (
+            <p className="chat-muted chat-choose">{k('pick')}</p>
+          )}
+        </section>
+        {chat && !selection && <MarketChatSide chat={chat} />}
       </section>
     </div>
-  );
-}
-
-function MarketChatGate({ title, detail, onOpen }) {
-  const { t } = useI18n();
-  return (
-    <section className="panel">
-      <Empty
-        icon="layers"
-        title={title}
-        detail={detail}
-        action={
-          <Button onClick={() => onOpen('Marketplace')}>{t('marketChats.openMarketplace')}</Button>
-        }
-      />
-    </section>
   );
 }

@@ -21,7 +21,7 @@
 .connected-shell .top-left {
   min-inline-size: 0;
 }
-/* Inbox and Team chat fill the window below the top bar like messenger apps (owner,
+/* Inbox, Team chat and Marketplace chats fill the window below the top bar like messenger apps (owner,
    2026-10-22): the page does not scroll and the tool takes all the height left. */
 .connected-shell .main-area.is-full-height {
   display: flex;

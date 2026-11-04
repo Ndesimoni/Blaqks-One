@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
 import { useMediaQuery } from '../../hooks/useMediaQuery.js';
+import { isFullHeight } from './fullHeight.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useNavigation, useWorkspaceView } from '../../hooks/useWorkspace.js';
 import { useI18n } from '../../i18n/useI18n.js';
@@ -28,7 +29,7 @@ export function ServerShell({ owner, workspaces }) {
   const [start, setStart] = useState('');
   const platform = route === 'Platform website';
   // Inbox and Team chat fill the window like messenger apps: no page heading or footer.
-  const fullHeight = ['Inbox', 'Team chat'].includes(route);
+  const fullHeight = isFullHeight(route);
   // Bitrix24's right panel (NAV5) on wide screens, the messenger pages included as in the
   // approved mockup; the Super Admin reads no company conversations.
   const wide = useMediaQuery('(min-width: 1181px)');

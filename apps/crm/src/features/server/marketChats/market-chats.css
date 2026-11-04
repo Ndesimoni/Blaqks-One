@@ -1,86 +1,65 @@
-/* Messages → Marketplace chats: the list beside the open chat; one at a time on phones. */
-.market-chats {
-  display: grid;
-  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-}
-.market-chat-list {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-}
+/* Messages → Marketplace chats on Team chat's frame (chat.css, chat-frame.css): the request
+   above each row, the privacy note, the read-only line and the request pane. */
 .market-chat-list ul {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  margin-inline: -12px;
 }
-.market-chat-row {
-  display: grid;
-  gap: 3px;
-  inline-size: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--panel);
-  color: var(--ink);
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-.market-chat-row:hover,
-.market-chat-row.is-open {
-  border-color: var(--gold);
-  background: var(--accent-subtle);
-}
-.market-chat-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-.market-chat-top time,
-.market-chat-about,
-.market-chat-last,
-.market-chat-empty {
-  color: var(--muted-dark);
-  font-size: 13px;
-}
-.market-chat-last {
+.market-chat-request {
   overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.market-chat-empty {
-  margin: 0;
-  padding: 12px 2px;
+.market-chat-list .inbox-row-preview {
+  overflow: hidden;
+  color: var(--muted-dark);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-:root[data-theme] .panel.market-chat-thread {
+.market-chat-none {
+  padding: 12px 4px;
+}
+.market-chat-more {
   display: grid;
-  gap: 12px;
-  min-height: 320px;
-  padding: 16px;
+  gap: 8px;
+  justify-items: center;
+  padding-block: 12px;
 }
-.market-chat-back {
-  display: none;
-  justify-self: start;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--primary);
-  font: inherit;
+.market-chat-window,
+.market-chat-readonly {
+  margin: 0;
+  padding: 8px 16px;
+  border-block-end: 1px solid var(--line);
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.market-chat-readonly {
+  border-block: 1px solid var(--line) 0;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+}
+/* The request pane shows from 1280px, as Team chat's Members pane does (chat-frame.css). */
+@media (min-width: 1280px) {
+  .market-chat-side {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+}
+.market-chat-side dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+.market-chat-side dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.market-chat-side dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
   font-weight: 600;
-}
-@media (max-width: 900px) {
-  .market-chats {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .market-chats.has-open .market-chat-list,
-  .market-chats:not(.has-open) .market-chat-thread {
-    display: none;
-  }
-  .market-chat-back {
-    display: inline-flex;
-  }
 }

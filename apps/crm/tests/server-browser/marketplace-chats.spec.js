@@ -18,20 +18,29 @@ test('a broker reads and answers a marketplace chat from Messages', async ({ bro
     await page.goto('/#/marketplace-chats');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Marketplace chats');
     const row = page.getByRole('button', { name: new RegExp(teams.agent.user.name) });
-    await expect(row).toContainText('Your request');
     await expect(row).toContainText('Synthetic question about the move-in month.');
     await row.click();
     await expect(page).toHaveURL(/chat=/);
-    const thread = page.getByRole('region', { name: teams.agent.user.name, exact: true });
-    await expect(thread).toContainText('Synthetic question about the move-in month.');
-    await thread.getByRole('textbox').fill('Synthetic answer: early next month.');
-    await thread.getByRole('button', { name: 'Send message', exact: true }).click();
-    await expect(thread).toContainText('Synthetic answer: early next month.');
-    // Closed holds chats whose request no longer takes messages.
-    await page
-      .getByRole('group', { name: 'Filter marketplace chats', exact: true })
-      .getByRole('button', { name: 'Closed', exact: true })
-      .click();
+    // The mockup's chat: the broker and the request, the privacy note, bubbles, a one-line box.
+    const pane = page.locator('.chat-room-pane');
+    await expect(pane.getByRole('heading', { level: 2 })).toHaveText(teams.agent.user.name);
+    await expect(pane).toContainText('Your request');
+    await expect(pane).toContainText('Client names and contacts stay hidden');
+    await expect(pane.locator('.chat-message')).toContainText(
+      'Synthetic question about the move-in month.',
+    );
+    await expect(page.getByRole('complementary', { name: 'The request' })).toContainText(
+      'Looking for',
+    );
+    await pane
+      .getByRole('textbox', { name: 'Message' })
+      .fill('Synthetic answer: early next month.');
+    await pane.getByRole('button', { name: 'Send', exact: true }).click();
+    await expect(pane.locator('.chat-message.is-mine')).toContainText(
+      'Synthetic answer: early next month.',
+    );
+    // Closed holds chats whose request has ended.
+    await page.getByRole('tab', { name: 'Closed', exact: true }).click();
     await expect(page.getByText('No chats here.', { exact: false })).toBeVisible();
   } finally {
     await poster.context.close();
