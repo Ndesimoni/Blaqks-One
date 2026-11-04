@@ -108,7 +108,13 @@ test('a request is posted, seen by another company, renewed and closed', async (
     await expect(confirm).toContainText('It leaves the board and frees the client.');
     await confirm.getByRole('button', { name: 'Close request', exact: true }).click();
     await expect(poster.page.getByText('Request closed.')).toBeVisible({ timeout: 30000 });
-    await expect(poster.page.getByText('Closed', { exact: true }).first()).toBeVisible();
+    // A closed request leaves Open and is found under Closed (the mockup's two views).
+    await expect(poster.page.locator('.market-request-row.is-closed')).toHaveCount(0);
+    await poster.page
+      .getByRole('group', { name: 'Filter my requests', exact: true })
+      .getByRole('button', { name: 'Closed', exact: true })
+      .click();
+    await expect(poster.page.locator('.market-request-row.is-closed')).toBeVisible();
     await shots(poster.page, testInfo, 'marketplace-request-closed');
   } finally {
     await poster.context.close();

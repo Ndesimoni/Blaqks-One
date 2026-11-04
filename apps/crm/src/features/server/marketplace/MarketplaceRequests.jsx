@@ -2,14 +2,23 @@ import React, { useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { GridFilterBar } from '../../records/grid/GridFilterBar.jsx';
+import '../../records/grid/grid-filter.css';
 import { MarketplaceRequestClose } from './MarketplaceRequestClose.jsx';
 import { MarketplaceRequestEdit } from './MarketplaceRequestEdit.jsx';
 import { MarketplaceRequestPost } from './MarketplaceRequestPost.jsx';
 import { MarketplaceRequestRow } from './MarketplaceRequestRow.jsx';
+import { requestTitle } from './requestText.js';
 import { useMyRequests } from './useRequests.js';
 import { MarketplaceRequestActivity } from './MarketplaceRequestActivity.jsx';
 
-/** The poster's own requests: post, edit, renew and close (packet MK2). */
+const ENDED = ['expired', 'closed'];
+
+/**
+ * The poster's own requests (packet MK2) as the approved mockup's My requests (design queue item
+ * 27): Open (open, full or paused) and Closed (expired or closed), searchable; post, edit,
+ * renew and close.
+ */
 export function MarketplaceRequests() {
   const { api, user } = useSession();
   const { t } = useI18n();
@@ -18,6 +27,7 @@ export function MarketplaceRequests() {
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [view, setView] = useState({ ended: false, query: '' });
 
   const done = (message) => {
     setDialog({ name: '' });
@@ -38,6 +48,14 @@ export function MarketplaceRequests() {
     }
   };
   const editing = list.requests.find((request) => request.id === dialog.id);
+  const needle = view.query.trim().toLowerCase();
+  const shown = list.requests.filter(
+    (request) =>
+      ENDED.includes(request.state) === view.ended &&
+      (!needle ||
+        `${requestTitle(t, request)} ${request.clientName || ''}`.toLowerCase().includes(needle)),
+  );
+  const tabs = [t('marketplaceRequests.mine.openView'), t('marketplaceRequests.mine.closedView')];
 
   return (
     <div className="market-requests">
@@ -69,8 +87,22 @@ export function MarketplaceRequests() {
           <p>{t('marketplaceRequests.mine.emptyText')}</p>
         </div>
       )}
+      {list.requests.length > 0 && (
+        <GridFilterBar
+          module={t('marketplaceRequests.mine.module')}
+          presetLabel={tabs[Number(view.ended)]}
+          tabs={tabs}
+          tab={tabs[Number(view.ended)]}
+          onTab={(name) => setView({ ...view, ended: name === tabs[1] })}
+          query={view.query}
+          onQuery={(query) => setView({ ...view, query })}
+        />
+      )}
+      {list.requests.length > 0 && !shown.length && (
+        <p className="market-hint">{t('marketplaceRequests.mine.noneHere')}</p>
+      )}
       <ul className="market-request-list">
-        {list.requests.map((request) => (
+        {shown.map((request) => (
           <MarketplaceRequestRow
             key={request.id}
             request={request}

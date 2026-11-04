@@ -54,6 +54,10 @@ export default {
   'mine.text':
     'Up to five open requests, one per client. Each stays on the board for 30 days and can be renewed.',
   'mine.post': 'Post a request',
+  'mine.module': 'my requests',
+  'mine.openView': 'Open',
+  'mine.closedView': 'Closed',
+  'mine.noneHere': 'No requests here. Choose the other view, or clear the search.',
   'mine.emptyTitle': 'No requests yet',
   'mine.emptyText':
     'Post what a client is looking for. Their name and contact details stay in your CRM.',
