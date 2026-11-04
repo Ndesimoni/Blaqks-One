@@ -1,16 +1,19 @@
 import React from 'react';
+import { useSession } from '../../../hooks/useSession.js';
 import { initials } from '../profile/profileModel.js';
-import { badge, roomTitle } from './chatModel.js';
+import { badge, previewLine, roomTitle } from './chatModel.js';
 import './chat-avatars.css';
 
 /**
- * One room in the list, as the approved mockup shows it: an initials avatar, its name, its
- * unread count and, when you are mentioned, `@count`.
+ * One room in the list, as the approved mockup shows it: an initials avatar, its name over
+ * its latest message, its unread count and, when you are mentioned, `@count`.
  */
 export function RoomRow({ room, people, selected, onOpen, t }) {
+  const { user } = useSession();
   const count = badge(room.unread);
   const mentions = badge(room.mentions);
   const title = roomTitle(room, people, t);
+  const preview = previewLine(room, people, user.id, t);
   return (
     <li>
       <button
@@ -22,8 +25,15 @@ export function RoomRow({ room, people, selected, onOpen, t }) {
         <span className={`chat-room-avatar is-${room.kind}`} aria-hidden="true">
           {initials(title.replace(/^#/, ''))}
         </span>
-        <span className="chat-room-name">
-          <bdi>{title}</bdi>
+        <span className="chat-room-text">
+          <span className="chat-room-name">
+            <bdi>{title}</bdi>
+          </span>
+          {preview && (
+            <span className="chat-room-preview">
+              <bdi>{preview}</bdi>
+            </span>
+          )}
         </span>
         {mentions && (
           <span className="chat-mention-badge">

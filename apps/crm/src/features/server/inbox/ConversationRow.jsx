@@ -1,8 +1,12 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { badge } from '../chat/chatModel.js';
 import { ageLabel, contactTitle, initials, statusKey } from './inboxModel.js';
 
-/** One conversation in the list: avatar, sender, age, channel, latest message and status. */
+/**
+ * One conversation in the list: avatar, sender, age, channel, latest message, how many
+ * messages are unread (the server counts to 100, shown as 99+) and status.
+ */
 export function ConversationRow({ row, selected, onOpen }) {
   const { t, format } = useI18n();
   const age = ageLabel(row.lastActivityAt);
@@ -12,6 +16,7 @@ export function ConversationRow({ row, selected, onOpen }) {
       : t(age.key, age.vars);
   const unknown = row.match !== 'linked';
   const status = statusKey(row);
+  const unread = Number(row.unreadCount) || (row.unread ? 1 : 0);
   return (
     <li>
       <button
@@ -38,9 +43,14 @@ export function ConversationRow({ row, selected, onOpen }) {
               {t(`inbox.channel.${row.channel}`)}
             </span>
             <span className="inbox-row-preview">{row.preview || t('inbox.row.noText')}</span>
-            {row.unread && (
-              <span className="inbox-unread-dot">
-                <span className="sr-only">{t('inbox.row.unread')}</span>
+            {unread > 0 && (
+              <span className="inbox-unread-count">
+                <span aria-hidden="true">{badge(unread)}</span>
+                <span className="sr-only">
+                  {unread > 99
+                    ? t('inbox.row.unreadMany')
+                    : t('inbox.nav.unread', { count: unread })}
+                </span>
               </span>
             )}
           </span>

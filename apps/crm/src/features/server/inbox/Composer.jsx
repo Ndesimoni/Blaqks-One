@@ -7,7 +7,8 @@ import { channelHealth } from './inboxModel.js';
 import { ReplyPanel } from './ReplyPanel.jsx';
 
 /**
- * Reply or Internal note. Notes save now. Email replies send from the member's own
+ * Reply, Internal note and, as the mockup's third tab, Saved replies (the reply form puts its
+ * picker button in the tab row; choosing a reply opens Reply). Notes save now. Email replies send from the member's own
  * mailbox (E1d); otherwise the Reply tab says why not: the channel is off, the member lacks
  * the permission or a mailbox, or sending for this channel arrives with its packet (W1).
  */
@@ -18,6 +19,7 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
   const state = replyState({ conversation, user, mailbox, health });
   const [mode, setMode] = useState(state === 'send' ? 'reply' : 'note');
   const [chosen, setChosen] = useState(false);
+  const [slot, setSlot] = useState(null);
   // The mailbox loads after the first render: open on Reply once sending is possible, unless
   // the member already picked a tab, so a reload shows their draft (N2).
   useEffect(() => {
@@ -64,6 +66,7 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
             </button>
           ))}
         </div>
+        <span ref={setSlot} className="inbox-composer-slot" />
         {/* The note's action sits on the tab row so the thread keeps its height. */}
         {mode === 'note' && (
           <div className="inbox-note-actions">
@@ -75,15 +78,22 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
         )}
       </div>
       <div id={`${id}-panel`} role="tabpanel" aria-labelledby={`${id}-${mode}`}>
-        {mode === 'reply' ? (
+        {/* Kept while a note is open, so its draft stays and Saved replies stays in the row. */}
+        <div hidden={mode !== 'reply'}>
           <ReplyPanel
             id={id}
             state={state}
             conversation={conversation}
             mailbox={mailbox}
+            toolSlot={slot}
+            onPicked={() => {
+              setChosen(true);
+              setMode('reply');
+            }}
             onReply={onReply}
           />
-        ) : (
+        </div>
+        {mode === 'note' && (
           <form id={`${id}-form`} className="inbox-note-form" onSubmit={save}>
             <label htmlFor={`${id}-text`} className="sr-only">
               {t('inbox.note.field')}

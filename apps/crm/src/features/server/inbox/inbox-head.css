@@ -47,15 +47,38 @@
 .inbox-head-actions .btn {
   flex: 0 1 auto;
   min-inline-size: 0;
-  max-inline-size: 150px;
+  max-inline-size: 190px;
   block-size: 36px;
   min-block-size: 36px;
-  padding-inline: 10px 32px;
+  padding-inline: 12px 32px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   background: var(--panel);
   color: var(--ink);
   font-size: 13px;
+}
+/* The mockup's "Assigned to" pill: a quiet label, then the holder, which opens the team list. */
+.inbox-assign-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-inline-size: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.inbox-assign-pill label {
+  white-space: nowrap;
+}
+@media (max-width: 899px) {
+  .inbox-assign-pill label {
+    position: absolute;
+    overflow: hidden;
+    inline-size: 1px;
+    block-size: 1px;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 .inbox-icon-button {
   align-items: center;

@@ -1,4 +1,5 @@
-/* The room list's initials avatars (approved mockup); channels and groups read as places. */
+/* The room list's initials avatars (approved mockup); channels and groups read as places.
+   Beside them, the room's name over its latest message. */
 .chat-room-avatar {
   display: grid;
   flex: none;
@@ -15,4 +16,20 @@
 .chat-room-avatar.is-group {
   background: var(--hover);
   color: var(--ink);
+}
+
+.chat-room-text {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+.chat-room-name,
+.chat-room-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-room-preview {
+  color: var(--muted);
+  font-size: 12px;
 }

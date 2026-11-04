@@ -68,3 +68,9 @@ export async function noPageOverflow(page) {
 }
 
 export { saveRecordForm };
+
+/** New email lives in the Messages top bar's Create (approved mockup). */
+export async function startNewEmail(page) {
+  await page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }).click();
+  await page.locator('#create-panel').getByRole('button', { name: 'Email', exact: true }).click();
+}

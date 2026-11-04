@@ -70,13 +70,6 @@
 .chat-room.is-unread .chat-room-name {
   font-weight: 700;
 }
-.chat-room-name {
-  flex: 1;
-  min-inline-size: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .chat-badge {
   min-inline-size: 20px;
   padding: 1px 6px;

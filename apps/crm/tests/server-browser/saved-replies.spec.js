@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { noPageOverflow, signInMember } from './assign-helpers.js';
+import { noPageOverflow, signInMember, startNewEmail } from './assign-helpers.js';
 import { clientWith } from '../api/mailbox-send-helpers.mjs';
 import { addAddress, connectSendgrid } from '../api/sendgrid-helpers.mjs';
 import { sendgridCompany } from './sendgrid-helpers.js';
@@ -16,7 +16,7 @@ test('a company saved reply fills in, the draft comes back, and sending clears i
   await clientWith(session, 'n2.ui.client@example.test');
   await signInMember(page, company.admin.email);
   await page.goto('/#/inbox');
-  await page.getByRole('button', { name: 'New email' }).click();
+  await startNewEmail(page);
   const start = page.getByRole('dialog', { name: 'New email' });
   await start.getByLabel('To').fill('Synthetic Mail Client');
   await start

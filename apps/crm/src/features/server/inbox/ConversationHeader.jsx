@@ -7,8 +7,8 @@ import { contactTitle, initials } from './inboxModel.js';
 const STATES = ['open', 'waiting', 'resolved'];
 
 /**
- * Sender, channel and holder, with the state and assignment controls. Managers and
- * whole-team staff pick any member; assigned-only staff may only claim or release.
+ * Sender, channel and holder, with the state and the mockup's "Assigned to" pill. Managers and
+ * whole-team staff pick any member from the pill; assigned-only staff may only claim or release.
  */
 export function ConversationHeader({
   row,
@@ -87,10 +87,8 @@ export function ConversationHeader({
           </>
         )}
         {members.length > 0 ? (
-          <>
-            <label htmlFor={`${id}-assign`} className="sr-only">
-              {t('inbox.header.assign')}
-            </label>
+          <span className="inbox-assign-pill">
+            <label htmlFor={`${id}-assign`}>{t('inbox.header.assign')}</label>
             <select
               id={`${id}-assign`}
               value={row.assigneeId || ''}
@@ -106,7 +104,7 @@ export function ConversationHeader({
                 </option>
               ))}
             </select>
-          </>
+          </span>
         ) : (
           (!row.assigneeId || mine) && (
             <Button

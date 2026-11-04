@@ -68,6 +68,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 ### Messages
 
 39. [x] **Marketplace chats** (`270c4f8`, with Codex; missed when the Messages entry was ticked; the third Messages section with Active / Closed and search, in the slide-in messenger and on the start page's strip; a read-only server list of the member's own chats) (`messages.market.active`, `messages.market.closed`)
+40. [ ] **Messages audit fixes** (owner, 2026-11-04: "ok do it" on the chat-screen review): the client inbox's "Assigned to" pill; Saved replies as the composer's third tab; New email and New group in the Messages top bar's Create; the state filter as a chip, the count read out only; the slide-in switch says Marketplace; Team chat rows show the latest message; inbox rows and the strip show unread numbers (server counts to 100, shown as 99+). Kept on purpose: Spam tab, lead card, disconnected warning, Team chat's All tab, the panel's inner tabs.
 
 ### Platform (Super Admin)
 

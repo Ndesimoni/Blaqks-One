@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { memberPage, signInMember } from './assign-helpers.js';
+import { memberPage, signInMember, startNewEmail } from './assign-helpers.js';
 import { clientWith } from '../api/mailbox-send-helpers.mjs';
 import { addAddress, connectSendgrid } from '../api/sendgrid-helpers.mjs';
 import { sendgridCompany } from './sendgrid-helpers.js';
@@ -16,7 +16,7 @@ test('the Inbox sends from the company address and never asks for Google', async
   await clientWith(session, 'sendgrid.inbox.client@example.test');
   await signInMember(page, company.admin.email);
   await page.goto('/#/inbox');
-  await page.getByRole('button', { name: 'New email' }).click();
+  await startNewEmail(page);
   const dialog = page.getByRole('dialog', { name: 'New email' });
   // The compose form shows (the company address is ready) and never mentions Google.
   await expect(dialog.getByLabel('Subject')).toBeVisible();
@@ -40,7 +40,7 @@ test('the Inbox sends from the company address and never asks for Google', async
   // A member without an address is told to ask the Admin, with no Google step.
   const { page: agentPage } = await memberPage(browser, company.agent.email);
   await agentPage.goto('/#/inbox');
-  await agentPage.getByRole('button', { name: 'New email' }).click();
+  await startNewEmail(agentPage);
   const empty = agentPage.getByRole('dialog', { name: 'New email' });
   await expect(empty).toContainText('Ask your Admin for a sending address');
   await expect(empty.getByRole('button', { name: 'Open My mailbox' })).toHaveCount(0);

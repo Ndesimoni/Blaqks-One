@@ -10,6 +10,7 @@ import { InboxTabs } from './InboxTabs.jsx';
 import { ConversationView } from './ConversationView.jsx';
 import { POLL_MS, canReplyOn, listParams } from './inboxModel.js';
 import { StartEmail } from './StartEmail.jsx';
+import { useStartRequest } from '../products/useStartRequest.js';
 import { useConversation } from './useConversation.js';
 import { useInboxList } from './useInboxList.js';
 import { useInboxSummary } from './useInboxSummary.js';
@@ -61,6 +62,11 @@ export function ServerInbox({ owner, selection }) {
   // A SendGrid company sends from each member's own address (E3d), else Google.
   const mailbox = sendingMailbox(useMailbox(api, owner.id).data, user.roleId === 'admin');
   const [starting, setStarting] = useState(false);
+  // New email lives in the top bar's Create (approved mockup), which asks with `?start=email`.
+  const startAsked = useStartRequest('email', !selection);
+  useEffect(() => {
+    if (startAsked && canReplyOn(user, 'email')) setStarting(true);
+  }, [startAsked, user]);
   /** New email: returns '' and opens the new conversation, or the server's message. */
   const start = async (body) => {
     try {
@@ -109,7 +115,6 @@ export function ServerInbox({ owner, selection }) {
           summary={summary}
           selectedId={selectedId}
           onOpen={select}
-          onStart={canReplyOn(user, 'email') ? () => setStarting(true) : null}
         />
         <section className="inbox-conversation" aria-label={t('inbox.thread.region')}>
           <ConversationView

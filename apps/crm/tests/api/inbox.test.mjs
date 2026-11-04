@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
-import { login, request } from './helpers.mjs';
+import { login, query, request } from './helpers.mjs';
 import { inboxPath, inboxTeams, seed } from './inbox-helpers.mjs';
 
 let teams;
@@ -69,6 +69,7 @@ test('reading shows messages, notes and the unread mark, never hidden threads', 
   const first = await agent.request(inboxPath(agent, `/${ids.held}`));
   assert.equal(first.status, 200, JSON.stringify(first.value));
   assert.equal(first.value.conversation.unread, true);
+  assert.equal(first.value.conversation.unreadCount, 1);
   assert.equal(first.value.messages.length, 1);
   assert.equal(first.value.messages[0].body, 'Synthetic enquiry for tiktok');
   assert.deepEqual(first.value.notes, []);
@@ -76,6 +77,19 @@ test('reading shows messages, notes and the unread mark, never hidden threads', 
   assert.equal(read.status, 204);
   const after = await agent.request(inboxPath(agent, `/${ids.held}`));
   assert.equal(after.value.conversation.unread, false);
+  assert.equal(after.value.conversation.unreadCount, 0);
+  // Each new inbound message counts, up to 100 (the list shows 99+).
+  query(
+    `INSERT INTO inbox.crm_inbox_messages (id,conversation_id,workspace_id,direction,
+       provider_message_id,status,body,created_at)
+     SELECT gen_random_uuid(),'${ids.held}',workspace_id,'inbound','u-'||n||'-${ids.held}',
+       'received','Synthetic follow-up '||n, now()+n*interval '1 second'
+     FROM inbox.crm_inbox_conversations, generate_series(1,102) n WHERE id='${ids.held}'`,
+  );
+  const row = (await agent.request(inboxPath(agent))).value.conversations.find(
+    (item) => item.id === ids.held,
+  );
+  assert.equal(row.unreadCount, 100);
 });
 
 test('internal notes stay apart from messages', async () => {

@@ -69,3 +69,16 @@ export function roomMemberNames(room, people = []) {
   if (room.kind === 'group') return names(room.members ?? []);
   return names(room.peerId ? [room.peerId] : []);
 }
+
+/**
+ * A room row's second line (approved mockup): its latest message, after who wrote it; in a
+ * direct conversation only your own messages are marked. Empty before the first message.
+ */
+export function previewLine(room, people, me, t) {
+  const last = room.lastMessage;
+  if (!last?.body) return '';
+  if (last.authorId === me) return t('chat.preview.you', { body: last.body });
+  if (room.kind === 'direct') return last.body;
+  const name = nameIn(people, last.authorId) || t('chat.formerMember');
+  return t('chat.preview.by', { name, body: last.body });
+}

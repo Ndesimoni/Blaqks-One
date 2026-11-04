@@ -42,7 +42,7 @@ function ReplyNotice({ state, channel }) {
  * mailbox (O9), otherwise an honest notice. The form is keyed by conversation, so moving to
  * another conversation saves this draft and opens that one's (N2).
  */
-export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
+export function ReplyPanel({ id, state, conversation, mailbox, toolSlot, onPicked, onReply }) {
   if (state !== 'send') return <ReplyNotice state={state} channel={conversation.channel} />;
   return (
     <ReplyForm
@@ -50,6 +50,8 @@ export function ReplyPanel({ id, state, conversation, mailbox, onReply }) {
       id={id}
       conversation={conversation}
       mailbox={mailbox}
+      toolSlot={toolSlot}
+      onPicked={onPicked}
       onReply={onReply}
     />
   );

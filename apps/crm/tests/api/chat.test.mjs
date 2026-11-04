@@ -55,8 +55,20 @@ test('direct messages are private to their two members, even from the Admin', as
     body: { memberId: first.user.id },
   });
   assert.equal(again.value.room.id, room, 'one conversation per pair');
+  const listed = async () => (await rooms(second)).rooms.find((item) => item.id === room);
+  assert.equal((await listed()).lastMessage, null);
   assert.equal((await send(first, room, 'Can you cover my viewing?')).status, 201);
-  assert.ok((await rooms(second)).rooms.some((item) => item.id === room));
+  // The room list carries the latest message and who wrote it, cut to 140 characters.
+  assert.deepEqual((await listed()).lastMessage, {
+    body: 'Can you cover my viewing?',
+    authorId: first.user.id,
+  });
+  const long = `Viewing notes ${'x'.repeat(200)}`;
+  assert.equal((await send(second, room, long)).status, 201);
+  assert.deepEqual((await listed()).lastMessage, {
+    body: long.slice(0, 140),
+    authorId: second.user.id,
+  });
   assert.ok(!(await rooms(admin)).rooms.some((item) => item.id === room));
   assert.equal((await admin.request(chat(admin, `/rooms/${room}/messages`))).status, 404);
   assert.equal((await send(admin, room, 'Reading this')).status, 404);

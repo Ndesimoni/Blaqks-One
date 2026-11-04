@@ -26,7 +26,7 @@ test('wide screens list recent conversations on the right and open one in the me
 
     await unread.click();
     const panel = page.getByRole('dialog', { name: 'Team chat' });
-    await expect(panel.getByText('Strip hello from one')).toBeVisible();
+    await expect(panel.getByText('Strip hello from one', { exact: true })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(panel).toHaveCount(0);
     // Reading the room clears its badge once the panel closes.

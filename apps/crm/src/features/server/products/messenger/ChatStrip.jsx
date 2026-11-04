@@ -44,7 +44,7 @@ export function ChatStrip({ refreshKey, onOpen }) {
           <span aria-hidden="true">{item.initials}</span>
           {item.unread > 0 && (
             <span className="header-badge" aria-hidden="true">
-              {item.box === 'team' ? badge(item.unread) : ''}
+              {badge(item.unread)}
             </span>
           )}
         </button>

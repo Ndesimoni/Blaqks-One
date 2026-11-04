@@ -84,7 +84,8 @@ Defaults assumed from the owner's chat decisions above, for the owner to confirm
 ## API
 
 All under `/api/crm/workspaces/{workspace}/chat`, with the session, and Origin and CSRF on
-writes: `GET /` (rooms with `unread`, `mentions`, and for groups `title` and `members`;
+writes: `GET /` (rooms with `unread`, `mentions`, `lastMessage` — the latest undeleted
+message's `body`, cut to 140 characters, and `authorId` — and for groups `title` and `members`;
 colleagues; `canCreateChannel`), `GET /summary` (`unread`, `mentions`), `POST /channels`,
 `POST /direct`, `POST /groups` (`memberIds`, optional `name`), `GET|POST
 /rooms/{id}/messages` (`?before=` for earlier pages; a sent message may carry

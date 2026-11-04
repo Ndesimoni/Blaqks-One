@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { roomTitle, splitRooms } from './chatModel.js';
@@ -9,11 +9,15 @@ import { RoomRow } from './RoomRow.jsx';
 /**
  * Channels, groups and direct messages, with New channel (the Admin), New group and New
  * message; `kind` (the top tabs) shows one part, and the search narrows the rooms by name.
+ * Each rise of `startGroup` (the top bar's Create) opens New group.
  */
-export function RoomList({ chat, selectedId, onOpen, kind = 'all' }) {
+export function RoomList({ chat, selectedId, onOpen, kind = 'all', startGroup = 0 }) {
   const { t } = useI18n();
   const [mode, setMode] = useState(null);
   const [query, setQuery] = useState('');
+  useEffect(() => {
+    if (startGroup) setMode('group');
+  }, [startGroup]);
   const needle = query.trim().toLowerCase();
   const matching = (rooms) =>
     rooms.filter(

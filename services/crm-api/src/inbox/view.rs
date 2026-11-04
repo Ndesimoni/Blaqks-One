@@ -1,11 +1,12 @@
 //! The conversation row the staff API returns. `preview` is the latest message's first
-//! 140 characters; `unread` compares inbound messages with the viewer's read mark.
+//! 140 characters; `unreadCount` counts inbound messages after the viewer's read mark, up to
+//! 100 (shown as 99+), and `unread` says whether there are any.
 use crate::{auth::profile::UserRow, error::ApiResult, records::lookup};
 use serde_json::{json, Value};
 use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
-/// Columns for alias `c`; `$5` is the viewer's ID for the unread flag.
+/// Columns for alias `c`; `$5` is the viewer's ID for the unread count.
 pub const COLUMNS: &str = "c.id,c.channel,c.connection_id,c.subject,c.state,c.contact_display, \
     c.contact_name, \
     c.match_state,c.linked_collection,c.linked_record_id,c.assignee_id,c.suggested_lead, \
@@ -13,10 +14,10 @@ pub const COLUMNS: &str = "c.id,c.channel,c.connection_id,c.subject,c.state,c.co
     to_char(c.last_activity_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') \
       AS last_activity_at, \
     (extract(epoch FROM c.last_activity_at)*1000000)::bigint AS micros, \
-    EXISTS (SELECT 1 FROM inbox.crm_inbox_messages m WHERE m.conversation_id=c.id \
-      AND m.direction='inbound' AND m.created_at>coalesce((SELECT r.read_at \
-      FROM inbox.crm_inbox_reads r WHERE r.conversation_id=c.id AND r.member_id=$5), \
-      '-infinity'::timestamptz)) AS unread, \
+    (SELECT count(*) FROM (SELECT 1 FROM inbox.crm_inbox_messages m \
+      WHERE m.conversation_id=c.id AND m.direction='inbound' AND m.created_at>coalesce( \
+      (SELECT r.read_at FROM inbox.crm_inbox_reads r WHERE r.conversation_id=c.id \
+      AND r.member_id=$5),'-infinity'::timestamptz) LIMIT 100) u) AS unread, \
     (SELECT left(m.body,140) FROM inbox.crm_inbox_messages m WHERE m.conversation_id=c.id \
       ORDER BY m.created_at DESC,m.id DESC LIMIT 1) AS preview";
 
@@ -39,7 +40,7 @@ pub struct Row {
     pub version: i64,
     pub last_activity_at: String,
     pub micros: i64,
-    pub unread: bool,
+    pub unread: i64,
     pub preview: Option<String>,
 }
 
@@ -65,7 +66,8 @@ impl Row {
             "suggestedLead": self.suggested_lead,
             "firstSource": self.first_source,
             "lastActivityAt": self.last_activity_at,
-            "unread": self.unread,
+            "unread": self.unread > 0,
+            "unreadCount": self.unread,
             "preview": self.preview,
             "version": self.version,
         })

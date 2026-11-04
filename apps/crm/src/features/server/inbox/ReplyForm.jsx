@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
@@ -12,10 +13,10 @@ import { useDraft } from './useDraft.js';
 
 /**
  * The email reply form (E1d, N2): the member's private draft comes back here, saved replies
- * go in from the box's button, and sending first waits for any draft save, so a sent reply
+ * go in from the Saved replies tab (`toolSlot`, the composer's tab row), and sending first waits for any draft save, so a sent reply
  * never returns as a draft (docs/saved-replies-drafts.md, review H1).
  */
-export function ReplyForm({ id, conversation, mailbox, onReply }) {
+export function ReplyForm({ id, conversation, mailbox, toolSlot, onPicked, onReply }) {
   const { t } = useI18n();
   const textRef = useRef(null);
   const [text, setText] = useState('');
@@ -43,6 +44,17 @@ export function ReplyForm({ id, conversation, mailbox, onReply }) {
       await draft.sent();
     }
   };
+  const saved = (
+    <SavedRepliesButton
+      textareaRef={textRef}
+      text={text}
+      setText={setText}
+      values={values}
+      disabled={busy}
+      asTab={Boolean(toolSlot)}
+      onPicked={onPicked}
+    />
+  );
   return (
     <form id={`${id}-reply`} className="inbox-reply-form" onSubmit={send}>
       <label htmlFor={`${id}-reply-text`} className="sr-only">
@@ -53,15 +65,7 @@ export function ReplyForm({ id, conversation, mailbox, onReply }) {
         files={mailbox.company ? files : null}
         attachDisabled={busy}
         meta={<DraftStatus draft={draft} fillIns={leftFillIns(text)} />}
-        tools={
-          <SavedRepliesButton
-            textareaRef={textRef}
-            text={text}
-            setText={setText}
-            values={values}
-            disabled={busy}
-          />
-        }
+        tools={toolSlot ? null : saved}
         action={
           <Button type="submit" icon="arrow" disabled={busy || files.busy || !text.trim()}>
             {busy ? t('inboxSend.reply.sending') : t('inboxSend.reply.send')}
@@ -87,6 +91,7 @@ export function ReplyForm({ id, conversation, mailbox, onReply }) {
           {error}
         </p>
       )}
+      {toolSlot && createPortal(saved, toolSlot)}
     </form>
   );
 }

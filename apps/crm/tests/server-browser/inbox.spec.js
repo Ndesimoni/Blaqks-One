@@ -66,7 +66,7 @@ test('the Inbox lists, opens and annotates conversations without claiming to sen
   await expect(page.locator('.inbox-reply-notice')).toContainText(
     'Replying on WhatsApp from the CRM arrives',
   );
-  await page.getByLabel('Assign to').selectOption(me);
+  await page.getByLabel('Assigned to', { exact: true }).selectOption(me);
   await expect(page.locator('.inbox-head')).toContainText('· You');
   await page.getByRole('tab', { name: /Mine/ }).click();
   await expect(row(page, '+971500000417')).toBeVisible();

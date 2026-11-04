@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { query } from '../api/helpers.mjs';
 import { signIn, session } from './helpers.js';
-import { setTheme } from './assign-helpers.js';
+import { setTheme, startNewEmail } from './assign-helpers.js';
 import { clearInbox } from './inbox-fixtures.js';
 
 /** Both widths in the current theme, for a modal that covers the theme switch. */
@@ -59,7 +59,7 @@ test('connect a Google mailbox, start an email and see it sent', async ({ page }
   await page.goto('/#/inbox');
   await page.reload();
   await shots(page, testInfo, 'inbox-list');
-  await page.getByRole('button', { name: 'New email' }).click();
+  await startNewEmail(page);
   const dialog = page.getByRole('dialog', { name: 'New email' });
   await dialog.getByLabel('To').fill('Synthetic Email');
   await dialog.getByRole('button', { name: /Synthetic Email Client/ }).click();

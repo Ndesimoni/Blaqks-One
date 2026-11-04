@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js';
-import { signInMember } from './assign-helpers.js';
+import { signInMember, startNewEmail } from './assign-helpers.js';
 import { clientWith } from '../api/mailbox-send-helpers.mjs';
 import { jpegWithGps, pdf } from '../api/media-helpers.mjs';
 import { addAddress, connectSendgrid } from '../api/sendgrid-helpers.mjs';
@@ -16,7 +16,7 @@ test('a New email carries a photo and a PDF, and the thread shows both', async (
   await clientWith(session, 'f3a.ui.client@example.test');
   await signInMember(page, company.admin.email);
   await page.goto('/#/inbox');
-  await page.getByRole('button', { name: 'New email' }).click();
+  await startNewEmail(page);
   const dialog = page.getByRole('dialog', { name: 'New email' });
   await dialog.getByLabel('To').fill('Synthetic Mail Client');
   await dialog

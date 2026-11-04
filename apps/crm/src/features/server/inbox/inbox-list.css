@@ -102,20 +102,16 @@
   align-items: center;
   gap: 8px;
 }
-.inbox-filters select {
-  block-size: 34px;
-  padding-inline: 8px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-  color: var(--ink);
+/* The state reads as one more chip after the channels; it opens the state list. */
+.inbox-filters .inbox-state-chip {
+  block-size: 32px;
+  padding: 4px 30px 4px 12px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background-color: var(--accent-subtle);
+  color: var(--accent);
   font-size: 13px;
-}
-.inbox-count {
-  margin-inline-start: auto;
-  white-space: nowrap;
-  color: var(--muted);
-  font-size: 12px;
+  font-weight: 600;
 }
 .inbox-rows {
   flex: 1;

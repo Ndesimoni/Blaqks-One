@@ -9,7 +9,7 @@ const t = (key, vars) => (vars ? `${key} ${JSON.stringify(vars)}` : key);
 const rows = [
   { id: 'c1', match: 'linked', contact: { name: 'Layla Haddad' }, unread: true },
   { id: 'c2', match: 'unknown', contact: { display: '+971 55 000 0000' }, unread: false },
-  { id: 'c3', match: 'linked', contact: { name: 'Omar Farouk' } },
+  { id: 'c3', match: 'linked', contact: { name: 'Omar Farouk' }, unread: true, unreadCount: 4 },
   { id: 'c4', match: 'linked', contact: { name: 'Not shown' } },
 ];
 const rooms = [
@@ -25,7 +25,7 @@ test('the strip lists three inbox conversations, then the newest rooms', () => {
     [
       ['inbox', 'c1', 'Layla Haddad', 'LH', 1],
       ['inbox', 'c2', '+971 55 000 0000', '?', 0],
-      ['inbox', 'c3', 'Omar Farouk', 'OF', 0],
+      ['inbox', 'c3', 'Omar Farouk', 'OF', 4],
       ['team', 'r2', 'Simoni Agent', 'SA', 0],
       ['team', 'r1', '#general', 'G', 3],
     ],

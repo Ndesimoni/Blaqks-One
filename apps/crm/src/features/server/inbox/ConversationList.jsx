@@ -1,5 +1,4 @@
 import React, { useId } from 'react';
-import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ConversationRow } from './ConversationRow.jsx';
@@ -30,8 +29,11 @@ function moveFocus(event) {
 const shown = (name, filters, summary) =>
   name === filters.channel || (summary.channels ?? []).some((entry) => entry.channel === name);
 
-/** Search, channel chips, the state filter and the bounded, scrolling list of conversations. */
-export function ConversationList({ view, list, summary, selectedId, onOpen, onStart }) {
+/**
+ * Search, then the channel chips and the state as one more chip (approved mockup), then the
+ * bounded, scrolling list. New email is in the top bar's Create; the count is read out only.
+ */
+export function ConversationList({ view, list, summary, selectedId, onOpen }) {
   const { t } = useI18n();
   const id = useId();
   const { tab, filters, query } = view;
@@ -50,11 +52,6 @@ export function ConversationList({ view, list, summary, selectedId, onOpen, onSt
               onChange={(event) => view.setQuery(event.target.value)}
             />
           </label>
-          {onStart && (
-            <Button icon="plus" className="inbox-start-button" onClick={onStart}>
-              {t('inboxSend.start.button')}
-            </Button>
-          )}
         </div>
         <div className="inbox-filters">
           <div
@@ -80,6 +77,7 @@ export function ConversationList({ view, list, summary, selectedId, onOpen, onSt
               </label>
               <select
                 id={`${id}-state`}
+                className="inbox-state-chip"
                 value={filters.state}
                 onChange={(event) => view.setFilter('state', event.target.value)}
               >
@@ -91,7 +89,7 @@ export function ConversationList({ view, list, summary, selectedId, onOpen, onSt
               </select>
             </>
           )}
-          <span className="inbox-count" aria-live="polite">
+          <span className="inbox-count sr-only" aria-live="polite">
             {list.status === 'ready' ? t('inbox.list.count', { count: rows.length }) : ''}
           </span>
         </div>

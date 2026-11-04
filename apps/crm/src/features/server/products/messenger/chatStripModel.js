@@ -9,8 +9,8 @@ const newest = (a, b) => (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?
 
 /**
  * The strip's conversations (NAV5, Bitrix24's right panel): the person's newest Client inbox
- * conversations in the list's own order, then their most recent Team chat rooms. An inbox
- * conversation is unread or not; a room carries its unread count.
+ * conversations in the list's own order, then their most recent Team chat rooms, each with
+ * its unread count.
  */
 export function stripItems(rows = [], rooms = [], people = [], t) {
   const inbox = rows.slice(0, STRIP_SHOWN).map((row) => ({
@@ -18,7 +18,7 @@ export function stripItems(rows = [], rooms = [], people = [], t) {
     id: row.id,
     name: contactTitle(row) || t('messenger.unknownSender'),
     initials: senderInitials(row),
-    unread: row.unread ? 1 : 0,
+    unread: Number(row.unreadCount) || (row.unread ? 1 : 0),
   }));
   const team = [...rooms]
     .sort(newest)

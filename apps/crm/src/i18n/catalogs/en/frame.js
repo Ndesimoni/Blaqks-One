@@ -11,6 +11,8 @@ export default {
   'items.shortlist': 'Shortlist entry',
   'items.interaction': 'Interaction',
   'items.clientCare': 'Client care entry',
+  'items.email': 'Email',
+  'items.group': 'Group chat',
   search: 'Search clients, contacts and properties',
   searchAll: { one: 'See the match', other: 'See all {count} matches' },
   matches: { one: '1 match', other: '{count} matches' },

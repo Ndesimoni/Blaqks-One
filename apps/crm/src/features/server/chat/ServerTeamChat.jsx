@@ -4,6 +4,7 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { useStartRequest } from '../products/useStartRequest.js';
 import { ChatTabs } from './ChatTabs.jsx';
 import { RoomList } from './RoomList.jsx';
 import { RoomMembers } from './RoomMembers.jsx';
@@ -31,6 +32,8 @@ export function ServerTeamChat({ selection }) {
   const go = useNavigate();
   const chat = useChat(api, owner.id);
   const [kind, setKind] = useState('all');
+  // The top bar's Create asks for New group with `?start=group` (approved mockup).
+  const startGroup = useStartRequest('group', !selection);
   // In the slide-in messenger (NAV3) the panel holds the open room, not the URL.
   const selectedId = selection
     ? selection.id
@@ -65,7 +68,13 @@ export function ServerTeamChat({ selection }) {
         }
         aria-label={t('chat.title')}
       >
-        <RoomList chat={chat} selectedId={selectedId} onOpen={open} kind={kind} />
+        <RoomList
+          chat={chat}
+          selectedId={selectedId}
+          onOpen={open}
+          kind={kind}
+          startGroup={startGroup}
+        />
         <section className="chat-room-pane" aria-label={room ? undefined : t('chat.title')}>
           {room ? (
             <RoomView

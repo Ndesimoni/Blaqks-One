@@ -1,6 +1,7 @@
 //! `GET /chat`: the member's channels, groups and direct conversations with unread and
-//! mention counts, and the colleagues they can message (totals in `counts.rs`). Every
-//! company's #general channel is created the first time anyone opens chat.
+//! mention counts, each room's latest message (its author and up to 140 characters, never a
+//! deleted one) and the colleagues they can message (totals in `counts.rs`). Every company's
+//! #general channel is created the first time anyone opens chat.
 use super::{
     access::{self, Tx, VISIBLE},
     counts::{MENTIONS, UNREAD},
@@ -25,6 +26,8 @@ struct Row {
     /// A group's participants, the caller included; colleagues who left the company stay.
     members: Option<Vec<Uuid>>,
     last_message_at: Option<String>,
+    last_body: Option<String>,
+    last_author: Option<Uuid>,
     unread: i64,
     mentions: i64,
 }
@@ -66,8 +69,11 @@ pub async fn list(
              FROM chat.crm_chat_participants p WHERE p.room_id=r.id ORDER BY p.member_id) \
            END AS members, \
            to_char(r.last_message_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') \
-             AS last_message_at, {UNREAD} AS unread, {MENTIONS} AS mentions \
-         FROM chat.crm_chat_rooms r WHERE {VISIBLE} \
+             AS last_message_at, left(lm.body,140) AS last_body, lm.author_id AS last_author, \
+           {UNREAD} AS unread, {MENTIONS} AS mentions \
+         FROM chat.crm_chat_rooms r LEFT JOIN LATERAL (SELECT m.body,m.author_id \
+           FROM chat.crm_chat_messages m WHERE m.room_id=r.id AND m.deleted_at IS NULL \
+           ORDER BY m.created_at DESC,m.id DESC LIMIT 1) lm ON true WHERE {VISIBLE} \
          ORDER BY r.kind,r.name NULLS LAST,r.last_message_at DESC NULLS LAST"
     ))
     .bind(&workspace)
@@ -89,7 +95,10 @@ pub async fn list(
             json!({"id": row.id, "kind": row.kind, "name": row.name, "title": row.title,
                 "createdBy": row.created_by,
                 "peerId": row.peer, "members": row.members,
-                "lastMessageAt": row.last_message_at, "unread": row.unread,
+                "lastMessageAt": row.last_message_at,
+                "lastMessage": row.last_body.as_ref().map(|body| json!({
+                    "body": body, "authorId": row.last_author })),
+                "unread": row.unread,
                 "mentions": row.mentions})
         })
         .collect();

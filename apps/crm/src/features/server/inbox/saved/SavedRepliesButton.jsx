@@ -21,9 +21,11 @@ function place(button, popover) {
 /**
  * The saved-replies button inside the message box (docs/saved-replies-drafts.md §5). The
  * picker is a native popover kept inside the form, so it also works in New email's dialog;
- * choosing a reply fills it in and puts it in the box at the cursor.
+ * choosing a reply fills it in and puts it in the box at the cursor. `asTab` draws it as the
+ * inbox composer's third tab, with its name shown.
  */
-export function SavedRepliesButton({ textareaRef, text, setText, values, disabled }) {
+export function SavedRepliesButton(props) {
+  const { textareaRef, text, setText, values, disabled, asTab = false, onPicked } = props;
   const { t } = useI18n();
   const saved = useSavedReplies();
   const id = useId();
@@ -75,6 +77,7 @@ export function SavedRepliesButton({ textareaRef, text, setText, values, disable
     if (!next) return setMessage(t('inboxSaved.picker.tooLong'));
     setText(next.text);
     hide();
+    onPicked?.();
     requestAnimationFrame(() => {
       const area = textareaRef.current;
       area?.focus();
@@ -86,16 +89,17 @@ export function SavedRepliesButton({ textareaRef, text, setText, values, disable
       <button
         ref={buttonRef}
         type="button"
-        className={'composer-tool' + (open ? ' is-open' : '')}
-        aria-label={t('inboxSaved.button')}
-        title={t('inboxSaved.button')}
+        className={(asTab ? 'inbox-composer-saved' : 'composer-tool') + (open ? ' is-open' : '')}
+        aria-label={asTab ? undefined : t('inboxSaved.button')}
+        title={asTab ? undefined : t('inboxSaved.button')}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={id}
         popovertarget={id}
         disabled={disabled}
       >
-        <Icon name="bolt" size={18} />
+        <Icon name="bolt" size={asTab ? 16 : 18} />
+        {asTab && t('inboxSaved.button')}
       </button>
       <div
         ref={popoverRef}

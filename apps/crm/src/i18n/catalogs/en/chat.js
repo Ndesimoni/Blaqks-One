@@ -95,4 +95,6 @@ export default {
   'mention.you': 'Mentions you',
   'mention.count': { one: '{count} mention of you', other: '{count} mentions of you' },
   'nav.mentions': { one: '{count} mention of you', other: '{count} mentions of you' },
+  'preview.you': 'You: {body}',
+  'preview.by': '{name}: {body}',
 };

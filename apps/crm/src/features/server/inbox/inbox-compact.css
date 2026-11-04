@@ -59,7 +59,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  inline-size: 100%;
 }
 .inbox-channel-chips > button,
 .inbox-composer-tabs > [role='tab'] {
@@ -86,6 +85,27 @@
 }
 .inbox-composer-tabs > [role='tab'][aria-selected='true'] {
   border-color: var(--gold);
+  color: var(--ink);
+}
+/* Saved replies sits after them as the mockup's third tab; it opens the picker. */
+.inbox-composer-slot {
+  display: contents;
+}
+.inbox-composer-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 32px;
+  padding: 4px 12px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.inbox-composer-saved:hover,
+.inbox-composer-saved.is-open {
   color: var(--ink);
 }
 @media (max-width: 899px) {
