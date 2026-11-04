@@ -55,7 +55,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 22. [x] **Team** (`0f5e1af`; filter row with the three presets plus Hidden and Not set up, and search; Consent and Actions columns kept beside Person, Profile, Publishing and Live listings) (`web.team.team`): grid Person, Profile, Publishing, Live listings; presets Everyone / Shown / Waiting for consent.
 23. [x] **Listings: Live and Withdrawn** (`8d0f73b`; one page, not two header tabs: Live and Changes not public as presets, Withdrawn and All as chips; Published and Actions columns kept; no withdrawal Reason column, as a withdrawal records no reason) (`web.wprops.live`, `web.wprops.withdrawn`): live count with Publish a property; grids Listing, Public price, Agent, Status (presets Live / Changes not public) and Listing, Agent, Withdrawn, Reason.
 24. [x] **Enquiries** (`c933589`; the note line above the table; Site and Assigned to kept; the This week and Not answered presets left out: the enquiries API pages only and nothing records an answer yet, so they need a server filter first) (`web.enquiries.enquiries`): grid Received, From, About, Lead; presets This week / Not answered.
-25. [ ] **Old content page** (`web.content.old`): compare and close the gaps.
+25. [x] **Old content page** (no change, 2026-11-04: the mockup's superseded draft of Content, not linked from its navigation; its published version, draft saved, Review and Publish are already on our Content page, `18e4409`) (`web.content.old`): compare and close the gaps.
 
 ### Marketplace
 
