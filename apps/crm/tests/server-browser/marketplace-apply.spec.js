@@ -44,6 +44,12 @@ test('an Admin applies, the Super Admin approves, and the switch appears', async
     await expect(dialog).toContainText(company);
     await shots(page, testInfo, 'marketplace-decision');
     await dialog.getByRole('button', { name: 'Approve', exact: true }).click();
+    // A decided application leaves Waiting for Decided (the mockup's two views).
+    await expect(page.locator('.market-application', { hasText: company })).toHaveCount(0);
+    await page
+      .getByRole('group', { name: 'Filter applications', exact: true })
+      .getByRole('button', { name: 'Decided', exact: true })
+      .click();
     await expect(page.locator('.market-application', { hasText: company })).toContainText(
       'Approved',
     );

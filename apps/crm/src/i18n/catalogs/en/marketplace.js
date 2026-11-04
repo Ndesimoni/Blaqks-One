@@ -56,6 +56,10 @@ export default {
   'applications.intro':
     'Companies that asked for marketplace access. You see their names, ages, who applied and the counts, never their records.',
   'applications.listLabel': 'Marketplace applications',
+  'applications.module': 'applications',
+  'applications.waiting': 'Waiting',
+  'applications.decided': 'Decided',
+  'applications.noneHere': 'No applications here. Choose the other view, or clear the search.',
   'applications.accountType.brokerage': 'Brokerage',
   'applications.accountType.individual': 'Independent agent',
   'applications.unnamed': 'Unnamed company',
