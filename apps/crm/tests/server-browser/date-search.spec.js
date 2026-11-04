@@ -24,7 +24,9 @@ test('date search finds a follow-up and a payment, rejects a reversed range and 
   const page = adminPage.page;
   await page.goto('/#/date-search');
   await expect(page.getByRole('region', { name: /connection status/ })).toHaveCount(0);
-  const type = page.getByLabel('RECORD TYPE');
+  // The mockup's form: changes apply with Search.
+  const type = page.getByLabel('Records', { exact: true });
+  const search = page.getByRole('button', { name: 'Search', exact: true });
   await expect(type.locator('option')).toHaveText([
     'New enquiries',
     'Follow-ups',
@@ -35,22 +37,31 @@ test('date search finds a follow-up and a payment, rejects a reversed range and 
     'Expenses paid',
   ]);
   await type.selectOption('Follow-ups');
+  await search.click();
   await expect(page.getByRole('button', { name: /DS-FU-1/ })).toBeVisible();
   await type.selectOption('Fee receipts');
+  await search.click();
   const payment = page.getByRole('button', { name: /PM-/ });
   await expect(payment).toHaveCount(1);
-  await page.getByLabel('FROM DATE').fill(day);
-  await page.getByLabel('TO DATE').fill('2000-01-01');
+  await page.getByLabel('From', { exact: true }).fill(day);
+  await page.getByLabel('To', { exact: true }).fill('2000-01-01');
+  await search.click();
   await expect(page.getByRole('alert')).toContainText('on or after the start date');
   await expect(payment).toHaveCount(0);
-  await page.getByLabel('TO DATE').fill(day);
+  // Clear returns to the last 30 days of the first record type.
+  await page.getByRole('button', { name: 'Clear', exact: true }).click();
+  await expect(type).toHaveValue('New enquiries');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  await type.selectOption('Fee receipts');
+  await page.getByLabel('From', { exact: true }).fill(day);
+  await page.getByLabel('To', { exact: true }).press('Enter');
   await payment.click();
   await expect(page).toHaveURL(/#\/payments/);
   await adminPage.context.close();
 
   const leadPage = await memberPage(browser, team.people.lead.email);
   await leadPage.page.goto('/#/date-search');
-  const options = leadPage.page.getByLabel('RECORD TYPE').locator('option');
+  const options = leadPage.page.getByLabel('Records', { exact: true }).locator('option');
   await expect(options).not.toHaveCount(0);
   await expect(options.filter({ hasText: /Deals earned|Fee receipts|Expenses paid/ })).toHaveCount(
     0,

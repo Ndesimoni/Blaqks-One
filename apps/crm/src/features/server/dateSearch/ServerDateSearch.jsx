@@ -13,7 +13,11 @@ import { DateSearchResults } from './DateSearchResults.jsx';
 import './date-search.css';
 import './date-results.css';
 
-/** Connected Date search: scoped records plus finance rows for members with finance access. */
+/**
+ * Connected Date search as the approved mockup's form (design queue item 11): From, To and the
+ * records to search, applied with Search, then the matching records. Scoped records plus finance
+ * rows for members with finance access.
+ */
 export function ServerDateSearch({ owner }) {
   const { api, user } = useSession();
   const { data } = useRecords();
@@ -26,6 +30,7 @@ export function ServerDateSearch({ owner }) {
     [user, financeAllowed],
   );
   const [filter, setFilter] = useState(defaultDateFilter);
+  const [draft, setDraft] = useState(filter);
   const { type, rows, invalidRange } = selectConnectedDateRows(
     data,
     finance.overview,
@@ -38,9 +43,14 @@ export function ServerDateSearch({ owner }) {
     <div className="page-stack connected-date-search">
       <DateSearchControls
         types={types}
-        type={type}
-        filter={filter}
-        setFilter={setFilter}
+        draft={draft}
+        setDraft={setDraft}
+        onSearch={() => setFilter(draft)}
+        onClear={() => {
+          const fresh = defaultDateFilter();
+          setDraft(fresh);
+          setFilter(fresh);
+        }}
         invalidRange={invalidRange}
       />
       <DateSearchResults
