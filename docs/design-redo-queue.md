@@ -37,7 +37,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 10. [x] **Reports: CRM insights** (`ef41a4c`; old figure tiles kept as feed lines; four panels kept below; no filter field above the feed, as there is nothing to filter) (`crm.reports.insights`): tiles such as Leads from the website.
 11. [x] **Reports: Date search** (`f7c5c4a`; changes apply with Search, Clear returns to the last 30 days; results grouped by date kept below; browser spec passed on 2026-11-04) (`crm.reports.dates`): a From / To form and its results.
 12. [x] **Tools: Calculators** (`ee8fa7c`; Send to a client starts a new email with the summary; editable rates, off-plan milestones with optional dates and the schedule download kept; mortgage down payment now a percentage) (`crm.tools.calculators`): calculator choice, fields and the result.
-13. [ ] **Tools: Guide** (`crm.tools.guide`): "Search the guide", articles grouped by topic, an article page with steps and related guides.
+13. [x] **Tools: Guide** (`a4fc902`; 18 articles written from our real screens, the old workflow steps and access notes among them; topic chips and Open for the section kept; no "Was this helpful?") (`crm.tools.guide`): "Search the guide", articles grouped by topic, an article page with steps and related guides.
 
 ### Settings
 
@@ -97,4 +97,5 @@ Screenshots of every remaining screen against the mockup: none matches yet, so n
 - Payments and Expenses keep their own add buttons: + Create does not offer them yet.
 - Phones keep cards, without selection.
 - Deals (5): our ten stages stay (Offer and Documentation keep their names rather than the mockup's "Offer made" and "Contract"); Add deal stays on the page, since + Create does not offer deals yet; the deal slider keeps a footer with every deal action (the mockup shows only its two header buttons) and a history card in place of the mockup's add-activity timeline.
+- Guide (13): no "Was this helpful?" buttons, since nothing would save the answer; articles show only for sections the person can open.
 - Record slider (4b): the timeline has no "+ Activity" menu (its three add buttons cover it) and no "Published on the website" or "Price set" events (the timeline reads CRM activity only; price history is not recorded). Contact and client sliders (Call, Message, linked records) remain under item 36.
