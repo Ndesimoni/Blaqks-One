@@ -69,7 +69,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 
 31. [x] **Marketplace applications: Waiting and Decided** (`86e427b`; Waiting and Decided as the filter row's presets with search; applications stay rows with their counts and decision buttons) (`platform.papps.pending`, `platform.papps.decided`)
 32. [x] **Websites: General site and Companies** (`9c5585d`; Companies' filter row with counts and search; Not entitled kept beside the mockup's two presets; the General site keeps the Content editor with its publish bar and preview) (`platform.pweb.general`, `platform.pweb.companies`)
-33. [ ] **Workspaces: Companies** (`platform.pworkspaces.companies`): grid Company, Admin, Seats, Marketplace; presets Active companies / Archived.
+33. [x] **Workspaces: Companies** (`5c59f15`; new read-only server list; Active companies / Archived with search; columns Company, Admin, Seats, Marketplace, Created, Open; the company slider's seat limit and archive stay on the company's Team & access, which Open opens) (`platform.pworkspaces.companies`)
 
 ### Sign-in and shared patterns
 
