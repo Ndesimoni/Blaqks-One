@@ -45,7 +45,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 15. [x] **Company details** (`dd16f17`; owner chose the new fields: trade licence number, office phone and office address saved on the server; marketplace switch asks before turning off; plan and seats; company form moved off My profile) (`settings.company.details`)
 16. [x] **Team finance** (`a3f7dcc`, built by Codex; mockup cards and Company-style save bar; exact Pending approval/self-review note; all split, referral, VAT, TRN and dated agent agreements kept; future-agreement removal now confirms in-page) (`settings.team.finance`)
 17. [x] **Channels** (`a476797`; cards with a status pill and Connect / Manage, each opening a right-hand panel; Facebook Page and Instagram stay two cards, as they connect separately; members' numbers and sending addresses moved into the panels) (`settings.channels.channels`)
-18. [ ] **Inbox rules** (`settings.rules.rules`)
+18. [x] **Inbox rules** (`f608a99`; mockup cards and save bar; Blocked senders now lists blocked conversations with Unblock; existing-clients and routing cards kept; the members' private WhatsApp counts card left out, no server count yet) (`settings.rules.rules`)
 19. [ ] **My mailbox** (`settings.mailbox.mailbox`)
 20. [ ] **My WhatsApp** (`settings.whatsapp.whatsapp`)
 21. [ ] **Team activity** (`settings.activity.activity`)
