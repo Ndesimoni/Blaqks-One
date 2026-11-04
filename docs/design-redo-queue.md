@@ -48,7 +48,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 18. [x] **Inbox rules** (`f608a99`; mockup cards and save bar; Blocked senders now lists blocked conversations with Unblock; existing-clients and routing cards kept; the members' private WhatsApp counts card left out, no server count yet) (`settings.rules.rules`)
 19. [x] **My mailbox** (`12f54e0`; connection cards: title, status pill, address and one action; Google connect, sign in again and disconnect kept; the sidebar keeps the name My mailbox, not My email; no Details slider, as the card already shows the address) (`settings.mailbox.mailbox`)
 20. [x] **My WhatsApp** (`12f54e0`; the same card; the member's own Disconnect kept, where the mockup says to ask the Admin) (`settings.whatsapp.whatsapp`)
-21. [ ] **Team activity** (`settings.activity.activity`)
+21. [x] **Team activity** (`c6dee0d`; the feed's filter row: scope and dates in the field, every filter kept as a pill; no free-text search, as the server feed has none) (`settings.activity.activity`)
 
 ### Websites
 
