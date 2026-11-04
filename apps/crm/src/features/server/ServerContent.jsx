@@ -8,13 +8,10 @@ import { PropertyDirectory } from '../properties/PropertyDirectory.jsx';
 import { RecordsPage } from '../records/RecordsPage.jsx';
 import { ServerTeamPage } from '../server-team/ServerTeamPage.jsx';
 import { canOpenSection } from './access.js';
+import { independentScreen } from './independentScreens.jsx';
 import { ServerActivity } from './activity/ServerActivity.jsx';
-import { ServerAgreements } from './agreements/ServerAgreements.jsx';
 import { AssignmentPageScope } from './assignment/AssignmentPageScope.jsx';
 import { ServerCalculators } from './calculators/ServerCalculators.jsx';
-import { ServerChannels } from './channels/ServerChannels.jsx';
-import { ServerCompany } from './company/ServerCompany.jsx';
-import { ServerTeamChat } from './chat/ServerTeamChat.jsx';
 import { ServerClientDesk } from './clientDesk/ServerClientDesk.jsx';
 import { ServerDashboard } from './dashboard/ServerDashboard.jsx';
 import { ServerDateSearch } from './dateSearch/ServerDateSearch.jsx';
@@ -23,19 +20,10 @@ import { FollowUpsPage } from './followUps/FollowUpsPage.jsx';
 import { ViewingsPage } from './viewings/ViewingsPage.jsx';
 import { ServerGuide } from './guide/ServerGuide.jsx';
 import { ServerInbox } from './inbox/ServerInbox.jsx';
-import { ServerInboxRules } from './inboxRules/ServerInboxRules.jsx';
 import { ServerInsights } from './insights/ServerInsights.jsx';
 import { ListingShareLinkPage } from './listingShares/ListingShareLinkPage.jsx';
 import { LISTING_SHARE_ROUTE } from './listingShares/listingShareLinks.js';
-import { GoogleReturn } from './mailbox/GoogleReturn.jsx';
-import { ServerMailbox } from './mailbox/ServerMailbox.jsx';
-import { ServerMarketplace } from './marketplace/ServerMarketplace.jsx';
-import { ServerMarketplaceApplications } from './marketplace/ServerMarketplaceApplications.jsx';
-import { ServerMyWhatsapp } from './myWhatsapp/ServerMyWhatsapp.jsx';
 import { ServerPerformance } from './performance/ServerPerformance.jsx';
-import { ServerProfile } from './profile/ServerProfile.jsx';
-import { ServerSecurity } from './profile/ServerSecurity.jsx';
-import { ServerWebsiteProfile } from './profile/ServerWebsiteProfile.jsx';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
 import { IncomingShares } from './shares/IncomingShares.jsx';
@@ -78,20 +66,9 @@ export function ServerContent({ owner }) {
       />
     );
   }
-  // The member's own account: independent of the selected workspace's records.
-  if (route === 'My profile') return <ServerProfile />;
-  if (route === 'Website profile') return <ServerWebsiteProfile />;
-  if (route === 'Sign-in and security') return <ServerSecurity />;
-  if (route === 'Channels') return <ServerChannels />;
-  if (route === 'Company') return <ServerCompany />;
-  if (route === 'Inbox rules') return <ServerInboxRules />;
-  if (route === 'Team chat') return <ServerTeamChat />;
-  if (route === 'Agreements') return <ServerAgreements />;
-  if (route === 'Marketplace') return <ServerMarketplace />;
-  if (route === 'Marketplace applications') return <ServerMarketplaceApplications />;
-  if (route === 'My mailbox') return <ServerMailbox />;
-  if (route === 'Google sign-in') return <GoogleReturn />;
-  if (route === 'My WhatsApp') return <ServerMyWhatsapp />;
+  // Pages independent of the selected workspace's records (account, settings, messaging).
+  const own = independentScreen(route);
+  if (own) return own;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
   if (loading) return <p role="status">Loading workspace records…</p>;
   if (error)

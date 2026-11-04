@@ -28,6 +28,9 @@ const formerTabs = [
   'Platform companies',
   'Website profile',
   'Sign-in and security',
+  'My requests',
+  'Marketplace updates',
+  'Broker profile',
 ];
 
 test('every destination of the grouped sidebar has exactly one place among the products', () => {

@@ -20,6 +20,9 @@ const extraIcons = {
   'Team chat': 'users',
   Agreements: 'note',
   Marketplace: 'layers',
+  'My requests': 'note',
+  'Marketplace updates': 'bell',
+  'Broker profile': 'person',
   Workspaces: 'building',
   'Marketplace applications': 'layers',
 };

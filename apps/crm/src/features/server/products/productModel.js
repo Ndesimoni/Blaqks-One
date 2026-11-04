@@ -38,7 +38,10 @@ export const productList = [
     icon: 'layers',
     sections: [
       { key: 'board', routes: ['Marketplace'] },
+      { key: 'requests', routes: ['My requests'] },
+      { key: 'updates', routes: ['Marketplace updates'] },
       { key: 'agreements', routes: ['Agreements'] },
+      { key: 'brokerProfile', routes: ['Broker profile'] },
     ],
   },
   {

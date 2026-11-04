@@ -44,6 +44,9 @@ const connectedSections = new Set([
   'Agreements',
   // `/marketplace`: company eligibility, the switch and the platform's decisions (MK1).
   'Marketplace',
+  'My requests',
+  'Marketplace updates',
+  'Broker profile',
   'Marketplace applications',
 ]);
 export const isConnectedSection = (name) => connectedSections.has(name);

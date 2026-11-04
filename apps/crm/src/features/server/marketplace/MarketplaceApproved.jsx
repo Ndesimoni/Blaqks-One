@@ -29,17 +29,17 @@ function MarketplaceCompany({ company, admin, onChanged }) {
 }
 
 /**
- * Approved (broker marketplace §13, packet MK1b). A joined member opens on the board and their
- * profile, with the company's access below; everyone else sees the company card and, while
+ * Approved (broker marketplace §13, packet MK1b). A joined member sees the section `view`
+ * (the company's access below their broker profile); everyone else sees the company card and, while
  * the switch is on, the join card. Staff read why the marketplace is closed when it is off.
  */
-export function MarketplaceApproved({ company, member, admin, onChanged }) {
+export function MarketplaceApproved({ company, member, admin, view, onChanged }) {
   const card = <MarketplaceCompany company={company} admin={admin} onChanged={onChanged} />;
   if (company.enabled && member && member.joined)
     return (
       <>
-        <MarketplaceMine member={member} onChanged={onChanged} />
-        {card}
+        <MarketplaceMine member={member} view={view} onChanged={onChanged} />
+        {view === 'profile' && card}
       </>
     );
   return (

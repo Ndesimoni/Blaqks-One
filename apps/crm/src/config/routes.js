@@ -36,6 +36,10 @@ export const connectedRoutes = [
   { name: 'Sign-in and security', path: '/sign-in-security' },
   { name: 'Agreements', path: '/agreements' },
   { name: 'Marketplace', path: '/marketplace' },
+  // The Marketplace's other sections (design queue items 26–30).
+  { name: 'My requests', path: '/my-requests' },
+  { name: 'Marketplace updates', path: '/marketplace-updates' },
+  { name: 'Broker profile', path: '/broker-profile' },
   // Google's sign-in returns here (E1a); the page finishes it and clears the address bar.
   { name: 'Google sign-in', path: '/oauth/google' },
 ];

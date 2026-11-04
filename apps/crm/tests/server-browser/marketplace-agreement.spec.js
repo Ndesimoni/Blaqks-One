@@ -14,8 +14,7 @@ test('a selected offer releases private details only after negotiated agreement 
   const poster = await memberPage(browser, teams.one.user.email);
   const broker = await memberPage(browser, teams.agent.user.email);
   try {
-    await openSection(poster.page, 'Marketplace');
-    await poster.page.getByRole('tab', { name: 'My requests', exact: true }).click();
+    await openSection(poster.page, 'My requests');
     await poster.page.getByRole('button', { name: 'Offers and messages', exact: true }).click();
     await expect(poster.page.getByRole('dialog')).not.toContainText('MK4-PRIVATE-UNIT');
     await draftMarketplaceAgreement(poster.page);
@@ -44,6 +43,8 @@ test('a selected offer releases private details only after negotiated agreement 
       .getByRole('dialog')
       .getByRole('button', { name: 'Close', exact: true })
       .click();
+    // The completed deal shows on the broker's own profile, under My broker profile.
+    await openSection(poster.page, 'Broker profile');
     await poster.page
       .getByRole('button', { name: 'Preview how others see me', exact: true })
       .click();

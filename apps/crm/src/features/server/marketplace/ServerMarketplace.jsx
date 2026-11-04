@@ -20,7 +20,7 @@ import { useMarketplaceStatus } from './useMarketplace.js';
  * approved mockup): where the company stands, the checklist it must meet, the Admin's
  * application and, once approved, joining, the board, the member's requests and profile.
  */
-export function ServerMarketplace() {
+export function ServerMarketplace({ view = 'board' }) {
   const { user } = useSession();
   const { t } = useI18n();
   const status = useMarketplaceStatus();
@@ -52,6 +52,7 @@ export function ServerMarketplace() {
           company={company}
           member={status.value?.member}
           admin={admin}
+          view={view}
           onChanged={status.reload}
         />
       )}

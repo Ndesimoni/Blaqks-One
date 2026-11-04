@@ -48,10 +48,10 @@ test('a request is posted, seen by another company, renewed and closed', async (
   const viewer = await openMember(browser, teams.agent.user.email);
   try {
     await openSection(poster.page, 'Marketplace');
-    await expect(poster.page.getByRole('tab', { name: 'My requests' })).toBeVisible({
+    await openSection(poster.page, 'My requests');
+    await expect(poster.page.getByRole('button', { name: 'Post a request' })).toBeVisible({
       timeout: 30000,
     });
-    await poster.page.getByRole('tab', { name: 'My requests' }).click();
     await poster.page.getByRole('button', { name: 'Post a request' }).click();
     await poster.page.locator('.market-client', { hasText: record.record.full_name }).click();
     await expect(poster.page.getByLabel('Budget up to (AED)')).toHaveValue('120000');
@@ -64,7 +64,7 @@ test('a request is posted, seen by another company, renewed and closed', async (
     await expect(poster.page.getByText('Synthetic Request Client').first()).toBeVisible();
     await shots(poster.page, testInfo, 'marketplace-my-requests');
     // The poster's own company sees the request on the Board, marked as theirs.
-    await poster.page.getByRole('tab', { name: 'Board' }).click();
+    await openSection(poster.page, 'Marketplace');
     const ownCard = poster.page.locator('.market-board-card', { hasText: 'Your company' });
     await expect(ownCard.first()).toContainText('Dubai Marina', { timeout: 30000 });
     await expect(poster.page.getByText(record.record.full_name)).toHaveCount(0);
@@ -96,7 +96,8 @@ test('a request is posted, seen by another company, renewed and closed', async (
         `WHERE member_id='${teams.one.user.id}'`,
     );
     await poster.page.reload();
-    await poster.page.getByRole('tab', { name: 'My requests' }).click();
+    await expect(poster.page.getByRole('heading', { level: 1 })).toBeVisible();
+    await openSection(poster.page, 'My requests');
     await poster.page.getByRole('button', { name: 'Renew', exact: true }).click();
     await expect(poster.page.getByText(/^Renewed: the request stays on the board/)).toBeVisible({
       timeout: 30000,

@@ -71,7 +71,7 @@ test('brokers offer a property, message without a match, and reopen after select
     await expect(dialog.getByText('1 of 3 active offers')).toBeVisible();
     await dialog.getByRole('button', { name: 'Close', exact: true }).click();
 
-    await poster.page.getByRole('tab', { name: 'My requests' }).click();
+    await openSection(poster.page, 'My requests');
     await poster.page.getByRole('button', { name: 'Offers and messages' }).click();
     dialog = poster.page.getByRole('dialog');
     await expect(dialog.getByText('PRIVATE-UNIT-MK3')).toHaveCount(0);
@@ -86,7 +86,7 @@ test('brokers offer a property, message without a match, and reopen after select
       .getByRole('dialog')
       .getByRole('button', { name: 'Close', exact: true })
       .click();
-    await broker.page.getByRole('tab', { name: 'Updates' }).click();
+    await openSection(broker.page, 'Marketplace updates');
     await broker.page
       .getByRole('button', { name: 'Offers and messages', exact: true })
       .first()
@@ -124,7 +124,7 @@ test('brokers offer a property, message without a match, and reopen after select
     ).toBeVisible();
     await dialog.getByRole('button', { name: 'Close', exact: true }).click();
 
-    await asking.page.getByRole('tab', { name: 'Updates' }).click();
+    await openSection(asking.page, 'Marketplace updates');
     await expect(
       asking.page.getByText('The requesting broker is proceeding with another property.'),
     ).toBeVisible();

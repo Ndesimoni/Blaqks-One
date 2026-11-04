@@ -1,45 +1,5 @@
-/* Board, My requests and Updates (packet MK2): header-style tabs and the poster's requests as
-   list rows with their actions. Light and dark, 390 px first. */
-.market-workspace {
-  display: grid;
-  min-width: 0;
-}
-.market-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-.market-tab {
-  flex: none;
-  min-height: 44px;
-  padding: 10px 14px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    color var(--duration) var(--ease),
-    border-color var(--duration) var(--ease);
-}
-.market-tab:hover {
-  color: var(--ink);
-}
-.market-tab.is-active {
-  border-bottom-color: var(--gold);
-  color: var(--ink);
-}
-.market-tab:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -2px;
-}
-.market-panel,
+/* My requests (packet MK2): the poster's requests as list rows with their actions. Light and
+   dark, 390 px first. */
 .market-requests {
   display: grid;
   gap: 14px;
