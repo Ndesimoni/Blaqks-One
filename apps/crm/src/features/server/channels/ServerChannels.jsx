@@ -5,20 +5,25 @@ import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ChannelCard } from './ChannelCard.jsx';
 import { CHANNELS } from './channelModel.js';
-import { SendingAddresses } from './SendingAddresses.jsx';
+import { ChannelPanel } from './ChannelPanel.jsx';
 import { useChannels } from './useChannels.js';
-import { WhatsappNumbers } from './WhatsappNumbers.jsx';
+import './channel-panel.css';
 import './channels.css';
 import './sendgrid.css';
 import './whatsapp.css';
 
-/** Connected Channels settings: Admin-only connect, reconnect and disconnect. */
+/**
+ * Connected Channels settings as the approved mockup (design queue item 17): Admin-only
+ * connection cards, each opening its panel to connect, reconnect or disconnect and, for
+ * WhatsApp and company email, to give members numbers and addresses.
+ */
 export function ServerChannels() {
   const { api, user } = useSession();
   const { owner } = useWorkspaceScope();
   const { t } = useI18n();
   const { channels, error, reload, notice, setNotice } = useChannels(api, owner.id);
   const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(null);
   if (user.roleId !== 'admin')
     return (
       <section className="panel recovery-panel">
@@ -76,10 +81,11 @@ export function ServerChannels() {
         {t('channels.loading')}
       </p>
     );
-  const live = (provider) =>
-    channels.find((row) => row.provider === provider && row.state !== 'disconnected');
-  const sendgrid = live('sendgrid');
-  const twilio = live('twilio');
+  const page = { api, workspaceId: owner.id, user, t, busy, notice, onConnect: connect };
+  Object.assign(page, { onReconnect: reconnect, onDisconnect: disconnect });
+  const liveOf = (channel) =>
+    channels.filter((row) => row.channel === channel && row.state !== 'disconnected');
+  const opened = CHANNELS.find((entry) => entry.channel === open);
   return (
     <div className="page-stack channels-page">
       <p className="channels-intro">{t('channels.intro')}</p>
@@ -89,7 +95,7 @@ export function ServerChannels() {
         </div>
       )}
       <div aria-live="polite">
-        {notice && (
+        {notice && !opened && (
           <p className="channels-notice" role="status">
             {notice}
           </p>
@@ -100,27 +106,21 @@ export function ServerChannels() {
           <ChannelCard
             key={entry.channel}
             entry={entry}
-            connections={channels.filter(
-              (row) => row.channel === entry.channel && row.state !== 'disconnected',
-            )}
+            connections={liveOf(entry.channel)}
             t={t}
-            busy={busy}
-            onConnect={connect}
-            onReconnect={reconnect}
-            onDisconnect={disconnect}
+            onOpen={() => {
+              setNotice('');
+              setOpen(entry.channel);
+            }}
           />
         ))}
       </div>
-      {twilio && (
-        <WhatsappNumbers api={api} workspaceId={owner.id} connection={twilio} admin={user} t={t} />
-      )}
-      {sendgrid && (
-        <SendingAddresses
-          api={api}
-          workspaceId={owner.id}
-          connection={sendgrid}
-          admin={user}
-          t={t}
+      {opened && (
+        <ChannelPanel
+          entry={opened}
+          connections={liveOf(opened.channel)}
+          page={page}
+          onClose={() => setOpen(null)}
         />
       )}
     </div>

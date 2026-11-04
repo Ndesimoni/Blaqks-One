@@ -1,4 +1,4 @@
-/* Channels settings: cards per channel, connection rows, forms and confirmations. */
+/* Channels settings: connection cards, connection rows, forms and confirmations. */
 .channels-page {
   gap: 18px;
 }
@@ -17,43 +17,22 @@
 }
 .channels-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 18px;
-}
-.channel-card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--panel);
-  box-shadow: var(--shadow);
-}
-.channel-head {
-  display: flex;
-  align-items: flex-start;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
 }
-.channel-head h2 {
+/* The approved mockup's connection card: name, status pill, one line, one button. */
+:root[data-theme] .panel.channel-card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  justify-items: start;
+  padding: 16px;
+}
+:root[data-theme] .channel-card h2 {
   margin: 0;
   color: var(--ink);
-  font-size: 16px;
-}
-.channel-head p {
-  margin: 2px 0 0;
-  color: var(--muted-dark);
-  font-size: 13px;
-}
-.channel-icon {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--surface-subtle);
-  color: var(--primary);
+  font-size: 15px;
+  font-weight: 650;
 }
 .channel-connections {
   display: grid;
@@ -139,9 +118,4 @@
   margin: 0;
   color: var(--primary);
   font-weight: 600;
-}
-@media (max-width: 640px) {
-  .channel-card {
-    padding: 16px;
-  }
 }

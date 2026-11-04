@@ -45,6 +45,7 @@ async function dialogShots(page, testInfo, name) {
 }
 
 const whatsappCard = (page) => page.getByRole('article', { name: 'WhatsApp', exact: true });
+const whatsappPanel = (page) => page.getByRole('dialog', { name: 'WhatsApp', exact: true });
 const numbersRegion = (page) => page.getByRole('region', { name: "Members' numbers" });
 
 test('an Admin connects Twilio, gives a member a number and disconnects it', async ({
@@ -56,7 +57,8 @@ test('an Admin connects Twilio, gives a member a number and disconnects it', asy
   await page.goto('/#/channels');
   const card = whatsappCard(page);
   await card.getByRole('button', { name: 'Connect', exact: true }).click();
-  const form = card.getByRole('form', { name: 'Connect WhatsApp' });
+  const panel = whatsappPanel(page);
+  const form = panel.getByRole('form', { name: 'Connect WhatsApp' });
   await expect(form).toContainText('Find these in your Twilio Console under Account info.');
   await expect(form.getByLabel('Display label')).toHaveValue('Company WhatsApp');
   const sid = form.getByLabel('Account SID');
@@ -81,6 +83,7 @@ test('an Admin connects Twilio, gives a member a number and disconnects it', asy
   await form.getByRole('button', { name: 'Connect Twilio' }).click();
   await expect(page.getByText('Company WhatsApp is connected.')).toBeVisible();
   await expect(card.getByText('Connected', { exact: true })).toBeVisible();
+  await expect(card.getByRole('button', { name: 'Manage', exact: true })).toBeVisible();
   await expect(card).toContainText(`Account SID ending ${company.sid.slice(-4)}`);
   await expect(card).not.toContainText(company.token);
 
@@ -136,11 +139,12 @@ test('an Admin connects Twilio, gives a member a number and disconnects it', asy
   await agent.context.close();
 
   // Disconnecting the account says that every member's number goes with it.
-  await card.getByRole('button', { name: 'Disconnect', exact: true }).click();
-  const off = card.getByRole('group', { name: 'Disconnect channel' });
+  await panel.getByRole('button', { name: 'Disconnect', exact: true }).click();
+  const off = panel.getByRole('group', { name: 'Disconnect channel' });
   await expect(off).toContainText("Every member's WhatsApp number disconnects too");
   await off.getByRole('button', { name: 'Disconnect channel' }).click();
   await expect(page.getByText('Company WhatsApp is disconnected.')).toBeVisible();
   await expect(numbersRegion(page)).toHaveCount(0);
-  await expect(card).toContainText('Not connected yet.');
+  await expect(panel.getByRole('form', { name: 'Connect WhatsApp' })).toBeVisible();
+  await expect(card).toContainText('Not connected');
 });

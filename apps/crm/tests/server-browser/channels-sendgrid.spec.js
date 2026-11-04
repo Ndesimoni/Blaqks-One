@@ -3,6 +3,7 @@ import { memberPage, signInMember } from './assign-helpers.js';
 import {
   addressesCard,
   emailCard,
+  emailPanel,
   openConnectForm,
   sendgridCompany,
   shots,
@@ -28,10 +29,11 @@ test('an Admin connects SendGrid and manages a sending address', async ({
   await expect(page.getByText('Company email is connected.')).toBeVisible();
 
   const card = emailCard(page);
+  const panel = emailPanel(page);
   await expect(card.getByText('Connected', { exact: true })).toBeVisible();
   await expect(card).toContainText(`Twilio SendGrid · Domain ${company.domain}`);
   await expect(card).not.toContainText(company.key);
-  const status = card.getByRole('list', { name: 'SendGrid status' });
+  const status = panel.getByRole('list', { name: 'SendGrid status' });
   await expect(status.getByRole('listitem').filter({ hasText: 'Delivery updates' })).toContainText(
     'On',
   );
@@ -102,13 +104,13 @@ test('an Admin connects SendGrid and manages a sending address', async ({
   await member.context.close();
 
   // The disconnect step names what the Admin must still do in SendGrid and at the registrar.
-  await card.getByRole('button', { name: 'Disconnect', exact: true }).click();
-  const off = card.getByRole('group', { name: 'Disconnect channel' });
+  await panel.getByRole('button', { name: 'Disconnect', exact: true }).click();
+  const off = panel.getByRole('group', { name: 'Disconnect channel' });
   await expect(off).toContainText('delete the API key');
   await expect(off).toContainText("change the domain's MX record");
   await shots(page, testInfo, 'sendgrid-disconnect');
   await off.getByRole('button', { name: 'Disconnect channel' }).click();
   await expect(page.getByText('Company email is disconnected.')).toBeVisible();
   await expect(addressesCard(page)).toHaveCount(0);
-  await expect(card).toContainText('Not connected yet.');
+  await expect(card).toContainText('Not connected');
 });

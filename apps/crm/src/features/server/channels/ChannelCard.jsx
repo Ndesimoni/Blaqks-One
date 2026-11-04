@@ -1,78 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
-import { ChannelForm } from './ChannelForm.jsx';
-import { ConnectionRow } from './ConnectionRow.jsx';
-import { TwilioForm } from './TwilioForm.jsx';
+import { connectionSummary, healthTone } from './channelModel.js';
 
 /**
- * One channel with its live connections, form and disconnect confirmation. A channel
- * holds one live connection per company (email: per member), so Connect appears only
- * when none is live; disconnected rows stay as server history and are not listed. Each
- * handler resolves to '' on success or the reason it failed.
+ * One channel as the approved mockup's connection card (design queue item 17): its name, a
+ * status pill, one line (what it does, or which account is connected) and Connect or Manage,
+ * which opens the channel's panel.
  */
-export function ChannelCard({ entry, connections, t, busy, onConnect, onReconnect, onDisconnect }) {
-  const [form, setForm] = useState(null);
-  const [confirm, setConfirm] = useState(null);
-  const channelName = t(`channels.channel.${entry.channel}`);
-  const close = () => {
-    setForm(null);
-    setConfirm(null);
-  };
-  const submit = async (body) => {
-    const failure =
-      form === 'connect' ? await onConnect(entry.channel, body) : await onReconnect(form, body);
-    if (!failure) close();
-    return failure;
-  };
-  const ConnectForm = entry.provider === 'twilio' ? TwilioForm : ChannelForm;
-  const handlers = { setForm, setConfirm, submit, close, onDisconnect };
+export function ChannelCard({ entry, connections, t, onOpen }) {
+  const live = connections[0];
+  const titleId = `channel-${entry.channel}`;
   return (
-    <article className="channel-card" aria-labelledby={`channel-${entry.channel}`}>
-      <header className="channel-head">
-        <span className="channel-icon" aria-hidden="true">
-          <Icon name={entry.icon} size={20} />
-        </span>
-        <div>
-          <h2 id={`channel-${entry.channel}`}>{channelName}</h2>
-          <p>{t(`channels.channel.${entry.channel}Note`)}</p>
-        </div>
-      </header>
-      {connections.length === 0 ? (
-        <p className="channels-muted">{t('channels.notConnected')}</p>
+    <article className="panel channel-card" aria-labelledby={titleId}>
+      <h2 id={titleId}>{t(`channels.channel.${entry.channel}`)}</h2>
+      {live ? (
+        <Badge tone={healthTone(live.health)}>{t(`channels.status.${live.state}`)}</Badge>
       ) : (
-        <ul className="channel-connections">
-          {connections.map((connection) => (
-            <ConnectionRow
-              key={connection.id}
-              connection={connection}
-              channel={entry.channel}
-              t={t}
-              busy={busy}
-              form={form && form !== 'connect' && form.id === connection.id}
-              confirm={confirm === connection.id}
-              handlers={handlers}
-            />
-          ))}
-        </ul>
+        <Badge tone="slate">{t('channels.status.none')}</Badge>
       )}
-      {form === 'connect' ? (
-        <ConnectForm
-          mode="connect"
-          channel={entry.channel}
-          provider={entry.provider}
-          t={t}
-          busy={busy}
-          onSubmit={submit}
-          onClose={close}
-        />
-      ) : (
-        connections.length === 0 && (
-          <Button variant="light" icon="plus" disabled={busy} onClick={() => setForm('connect')}>
-            {t('channels.connect')}
-          </Button>
-        )
-      )}
+      <p className="channels-muted">
+        {live
+          ? connections.map((connection) => connectionSummary(connection, t)).join(' · ')
+          : t(`channels.channel.${entry.channel}Note`)}
+      </p>
+      <span>
+        <Button variant="light" onClick={onOpen}>
+          {live ? t('channels.manage') : t('channels.connect')}
+        </Button>
+      </span>
     </article>
   );
 }

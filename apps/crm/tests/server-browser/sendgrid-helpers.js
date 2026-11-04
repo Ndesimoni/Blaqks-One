@@ -23,24 +23,32 @@ export async function sendgridCompany(label) {
 }
 
 export const emailCard = (page) => page.getByRole('article', { name: 'Email', exact: true });
+export const emailPanel = (page) => page.getByRole('dialog', { name: 'Email', exact: true });
 export const addressesCard = (page) => page.getByRole('region', { name: 'Sending addresses' });
 
 /** Opens the Email card's connect form, which offers company email first. */
 export async function openConnectForm(page) {
   await page.goto('/#/channels');
   await emailCard(page).getByRole('button', { name: 'Connect', exact: true }).click();
-  const form = page.getByRole('form', { name: 'Connect Email' });
+  const form = emailPanel(page).getByRole('form', { name: 'Connect Email' });
   await expect(form.getByLabel('Provider')).toHaveValue('sendgrid');
   await expect(form).toContainText('Before you connect, in SendGrid:');
   return form;
 }
 
-/** 1280px and 390px screenshots in both themes, each checked for sideways page scroll. */
+/**
+ * 1280px and 390px screenshots in both themes, each checked for sideways page scroll. An open
+ * panel (a modal dialog) makes the theme switch inert, so the theme attribute is set instead.
+ */
 export async function shots(page, testInfo, name) {
+  const modal = (await page.locator('dialog[open]').count()) > 0;
+  const saved = await page.locator('html').getAttribute('data-theme');
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     for (const theme of ['light', 'dark']) {
-      await setTheme(page, theme);
+      if (modal)
+        await page.evaluate((value) => (document.documentElement.dataset.theme = value), theme);
+      else await setTheme(page, theme);
       await page.waitForTimeout(250);
       await noPageOverflow(page);
       await page.screenshot({
@@ -49,5 +57,7 @@ export async function shots(page, testInfo, name) {
       });
     }
   }
+  if (modal)
+    await page.evaluate((value) => (document.documentElement.dataset.theme = value), saved);
   await page.setViewportSize({ width: 1280, height: 900 });
 }

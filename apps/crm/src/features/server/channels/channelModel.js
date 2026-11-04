@@ -27,3 +27,23 @@ export function fieldKeys(provider) {
     credentialHint: sendgrid ? 'channels.sendgrid.keyHint' : 'channels.credentialHint',
   };
 }
+
+const ending = (hint) => String(hint ?? '').replace(/^[^0-9a-zA-Z]*/, '');
+
+/** The card's one line for a live connection: its label and which account it is. */
+export function connectionSummary(connection, t) {
+  const hint = ending(connection.accountHint);
+  const account =
+    connection.provider === 'twilio'
+      ? t('whatsappAccount.account', { hint })
+      : connection.provider === 'sendgrid'
+        ? `${t('channels.providerName.sendgrid')} · ${t('channels.sendgrid.domainShown', {
+            domain: connection.domain ?? connection.accountHint,
+          })}`
+        : `${t(`channels.providerName.${connection.provider}`)} · ${t('channels.accountEnding', { hint })}`;
+  return `${connection.label} · ${account}`;
+}
+
+/** The pill tone for a connection's health, as the cards and rows show it. */
+export const healthTone = (health) =>
+  health === 'attention' ? 'amber' : health === 'off' ? 'slate' : 'green';
