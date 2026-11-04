@@ -59,11 +59,11 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 
 ### Marketplace
 
-26. [ ] **Board** (`market.board.board`)
-27. [ ] **My requests: Open and Closed** (`market.requests.open`, `market.requests.closed`): grids Request, Client budget, Offers (three offer slots), Expires; Request, Outcome, Closed.
-28. [ ] **Agreements: Incoming, Sent and All** (`market.agreements.*`)
-29. [ ] **Broker profile** (`market.profile.profile`)
-30. [ ] **Updates** (`market.updates.updates`)
+26. [x] **Board** (`c648364`; its own sidebar section with the note line and request cards; the board's filters kept) (`market.board.board`)
+27. [ ] **My requests: Open and Closed** (section split done in `c648364`; still to do: Open / Closed as header tabs and the grid columns) (`market.requests.open`, `market.requests.closed`): grids Request, Client budget, Offers (three offer slots), Expires; Request, Outcome, Closed.
+28. [ ] **Agreements: Incoming, Sent and All** (its sidebar section is in the mockup's order since `c648364`; still to do: compare the list with the mockup's board) (`market.agreements.*`)
+29. [x] **Broker profile** (`c648364`; My broker profile is its own section, the company's marketplace card beneath it) (`market.profile.profile`)
+30. [x] **Updates** (`c648364`; its own section) (`market.updates.updates`)
 
 ### Platform (Super Admin)
 
