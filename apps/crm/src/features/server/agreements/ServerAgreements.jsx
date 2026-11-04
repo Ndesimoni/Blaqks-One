@@ -75,10 +75,10 @@ export function ServerAgreements() {
         {tab !== 'listings' && (
           <div className="agreements-toolbar-end">
             <ViewSwitch
-              label={t('agreements.view.label')}
+              label={t('agreementsBoard.view.label')}
               options={[
-                ['board', t('agreements.view.board'), 'grid'],
-                ['list', t('agreements.view.list'), 'menu'],
+                ['board', t('agreementsBoard.view.board'), 'grid'],
+                ['list', t('agreementsBoard.view.list'), 'menu'],
               ]}
               value={view}
               onChange={setView}

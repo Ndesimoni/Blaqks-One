@@ -36,13 +36,13 @@ export function AgreementBoard({ list, tab, onOpen, onCreate }) {
   const state = (agreement) => displayState(agreement, agreement.summary?.authorParty);
   const columns = COLUMNS.map(([key, states]) => ({
     key,
-    title: t(`agreements.column.${key}`),
+    title: t(`agreementsBoard.column.${key}`),
     tone: stateTone(states[0]),
     items: items.filter((agreement) => states.includes(state(agreement))),
   }));
   return (
     <KanbanBoard
-      label={t('agreements.boardLabel')}
+      label={t('agreementsBoard.boardLabel')}
       columns={columns}
       itemKey={(agreement) => agreement.id}
       canMove={() => false}
@@ -74,7 +74,7 @@ export function AgreementBoard({ list, tab, onOpen, onCreate }) {
             </span>
             <span className="agreement-card-meta">
               <span>{t(`agreements.state.${state(agreement)}`)}</span>
-              <span>{t('agreements.card.share', { share: format.percent(share) })}</span>
+              <span>{t('agreementsBoard.card.share', { share: format.percent(share) })}</span>
             </span>
           </button>
         );

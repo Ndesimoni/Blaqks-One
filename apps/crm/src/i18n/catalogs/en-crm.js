@@ -2,6 +2,7 @@
 import enAgreementForm from './en/agreementForm.js';
 import enAgreementLifecycle from './en/agreementLifecycle.js';
 import enAgreements from './en/agreements.js';
+import enAgreementsBoard from './en/agreementsBoard.js';
 import enCalculators from './en/calculators.js';
 import enClientDesk from './en/clientDesk.js';
 import enCompany from './en/company.js';
@@ -32,6 +33,7 @@ import enTeamFinance from './en/teamFinance.js';
 export const crmCatalogs = {
   agreementForm: enAgreementForm,
   agreements: enAgreements,
+  agreementsBoard: enAgreementsBoard,
   agreementLifecycle: enAgreementLifecycle,
   calculators: enCalculators,
   company: enCompany,
