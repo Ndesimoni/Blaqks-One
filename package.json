@@ -15,6 +15,7 @@
     "db:stop": "docker compose stop postgres",
     "db:mark-dev": "node scripts/mark-dev-database.mjs",
     "dev:api": "cargo run --locked --manifest-path services/crm-api/Cargo.toml",
+    "dev:marketing": "npm run dev --prefix apps/marketing",
     "dev:google": "node scripts/dev-fake-google.mjs",
     "dev:sendgrid": "node scripts/dev-fake-sendgrid.mjs",
     "dev:twilio": "node scripts/dev-fake-twilio.mjs",

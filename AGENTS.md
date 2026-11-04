@@ -71,6 +71,7 @@ The CRM frontend lives in `apps/crm/` (an npm workspace); run every `npm run` co
 - apps/crm/src/main.jsx — React entry point
 - apps/crm/tests/ — Active unit, storage contract, API, browser, and offline smoke checks
 - apps/website/ — Next.js general website and company websites
+- apps/marketing/ — Next.js brokerage website (brokerages and agents only; Framer Motion); see apps/marketing/README.md
 - docs/architecture-audit.md — Architecture findings and staged refactoring plan
 - services/calendar-companion/ — Retained local Rust/Axum Google Calendar companion: `api/` handlers, `google/` transport, `store/` encrypted storage, `sync.rs` worker
 - services/crm-api/ — Private Rust/Axum CRM service, PostgreSQL migrations and trusted account CLI; see [module map](docs/backend-foundation.md#module-map). Add new backend domains as sibling modules under `src/`; group a module into subfolders once it holds several workflows

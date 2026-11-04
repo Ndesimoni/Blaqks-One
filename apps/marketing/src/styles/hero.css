@@ -1,0 +1,119 @@
+/* The hero: the line mesh, the gold-rimmed arc and the dashboard rising on scroll. */
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding-top: 88px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 700px;
+  background: radial-gradient(50% 50% at 50% 30%, var(--hero-wash), transparent 70%);
+  pointer-events: none;
+}
+.mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 78% 62% at 50% 26%, #000 34%, transparent 80%);
+  mask-image: radial-gradient(ellipse 78% 62% at 50% 26%, #000 34%, transparent 80%);
+}
+.hero-copy {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 22px;
+}
+.hero h1 {
+  font-size: clamp(42px, 6.4vw, 80px);
+  line-height: 1.02;
+  max-width: 13em;
+}
+.hero h1 span {
+  background: var(--heading-grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-sub {
+  color: var(--text-2);
+  font-size: 18px;
+  max-width: 34em;
+}
+.hero-btns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.stage {
+  position: relative;
+  margin-top: 70px;
+  perspective: 1400px;
+  height: 640px;
+}
+.planet {
+  position: absolute;
+  left: 50%;
+  top: 40px;
+  width: min(1500px, 170%);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(60% 18% at 50% 0%, var(--glow-2), transparent 70%),
+    radial-gradient(circle at 50% 50%, var(--planet-core) 55%, var(--planet-edge) 70%);
+  box-shadow:
+    0 -1.5px 0 var(--rim),
+    0 -18px 60px var(--glow-1),
+    0 -60px 160px var(--glow-2),
+    0 -120px 220px var(--glow-3);
+}
+.dash-holder {
+  position: absolute;
+  left: 50%;
+  top: 150px;
+  width: min(1080px, 94%);
+  transform-origin: 50% 0%;
+  translate: -50% 0;
+}
+.logos {
+  padding-block: 26px 70px;
+  display: grid;
+  gap: 22px;
+  justify-items: center;
+}
+.logos p {
+  color: var(--text-2);
+  font-size: 14px;
+}
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.marquee-track {
+  display: flex;
+  gap: 64px;
+  width: max-content;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-2);
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.logo svg {
+  width: 24px;
+  height: 24px;
+  color: var(--gold);
+}

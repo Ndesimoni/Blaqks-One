@@ -1,0 +1,73 @@
+/* The CRM's own colours (forest green, its two golds, Georgia headings), light and dark,
+   following the visitor's system setting. */
+:root {
+  color-scheme: light;
+  --night: #f3f6f4;
+  --card: #ffffff;
+  --card-2: #fbfcfb;
+  --edge: rgba(30, 46, 45, 0.1);
+  --edge-2: rgba(30, 46, 45, 0.18);
+  --text: #1e2e2d;
+  --text-2: #55675c;
+  --text-3: #66786d;
+  --gold: #bc9765;
+  --gold-2: #e4cda5;
+  --gold-ink: #80603a;
+  --leaf: #2f6b4a;
+  --leaf-2: #2f6b4a;
+  --on-gold: #17251c;
+  --tint: rgba(30, 46, 45, 0.035);
+  --tint-2: rgba(30, 46, 45, 0.05);
+  --nav-bg: rgba(243, 246, 244, 0.82);
+  --glass: rgba(255, 255, 255, 0.86);
+  --planet-core: #ffffff;
+  --planet-edge: #eef3ef;
+  --rim: rgba(188, 151, 101, 0.95);
+  --glow-1: rgba(188, 151, 101, 0.35);
+  --glow-2: rgba(228, 205, 165, 0.5);
+  --glow-3: rgba(47, 107, 74, 0.14);
+  --dash-bg: linear-gradient(180deg, #ffffff, #f7faf8);
+  --big-shadow: 0 40px 120px rgba(13, 28, 20, 0.16);
+  --hero-wash: rgba(47, 107, 74, 0.1);
+  --heading-grad: linear-gradient(180deg, #bc9765, #80603a);
+  --shield-a: #28523d;
+  --shield-b: #1e4331;
+  --shield-tick: #e4cda5;
+  --mesh-line: rgba(30, 46, 45, 0.09);
+  --mesh-glow: rgba(188, 151, 101, 0.95);
+  --display: Georgia, 'Times New Roman', serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --night: #050c08;
+    --card: #0d1a13;
+    --card-2: #112219;
+    --edge: rgba(228, 205, 165, 0.12);
+    --edge-2: rgba(228, 205, 165, 0.22);
+    --text: #eef3ee;
+    --text-2: #a7b8ac;
+    --text-3: #7d9284;
+    --gold-ink: #e4cda5;
+    --leaf-2: #8fd1aa;
+    --tint: rgba(255, 255, 255, 0.03);
+    --tint-2: rgba(255, 255, 255, 0.045);
+    --nav-bg: rgba(5, 12, 8, 0.72);
+    --glass: rgba(13, 26, 19, 0.86);
+    --planet-core: #08140d;
+    --planet-edge: #050c08;
+    --rim: rgba(228, 205, 165, 0.95);
+    --glow-1: rgba(228, 205, 165, 0.42);
+    --glow-2: rgba(188, 151, 101, 0.38);
+    --glow-3: rgba(47, 107, 74, 0.35);
+    --dash-bg: linear-gradient(180deg, #0f1e16, #0a150f);
+    --big-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+    --hero-wash: rgba(47, 107, 74, 0.28);
+    --heading-grad: linear-gradient(180deg, #e4cda5, #bc9765);
+    --shield-a: #ffffff;
+    --shield-b: #c9d4cc;
+    --shield-tick: #2f6b4a;
+    --mesh-line: rgba(228, 205, 165, 0.085);
+    --mesh-glow: rgba(228, 205, 165, 0.95);
+  }
+}
