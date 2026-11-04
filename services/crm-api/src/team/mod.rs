@@ -5,5 +5,6 @@ pub mod audit;
 pub mod catalogue;
 pub mod invitations;
 pub mod members;
+pub mod platform;
 pub mod positions;
 pub mod routes;

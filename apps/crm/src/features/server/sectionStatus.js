@@ -49,7 +49,9 @@ const connectedSections = new Set([
   'Broker profile',
   'Marketplace applications',
 ]);
-export const isConnectedSection = (name) => connectedSections.has(name);
+/** Workspaces is connected for the Super Admin only, as the platform's company list. */
+export const isConnectedSection = (name, user) =>
+  connectedSections.has(name) || (name === 'Workspaces' && user?.roleId === 'super-admin');
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
 
 const purposes = {

@@ -13,12 +13,14 @@ import { ServerSecurity } from './profile/ServerSecurity.jsx';
 import { ServerTeamChat } from './chat/ServerTeamChat.jsx';
 import { ServerWebsiteProfile } from './profile/ServerWebsiteProfile.jsx';
 import { marketView } from './marketplace/marketViews.js';
+import { ServerWorkspaces } from './platformCompanies/ServerWorkspaces.jsx';
 
 /**
  * Pages independent of the selected workspace's records: the member's own account, company
  * settings, messaging, agreements and the Marketplace. Each route's element, or null.
  */
-export function independentScreen(route) {
+export function independentScreen(route, user) {
+  if (route === 'Workspaces' && user?.roleId === 'super-admin') return <ServerWorkspaces />;
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Website profile') return <ServerWebsiteProfile />;
   if (route === 'Sign-in and security') return <ServerSecurity />;

@@ -22,6 +22,7 @@ import enLeadsBoard from './en/leadsBoard.js';
 import enListingShareViews from './en/listingShareViews.js';
 import enListingShares from './en/listingShares.js';
 import enPerformance from './en/performance.js';
+import enPlatformCompanies from './en/platformCompanies.js';
 import enProperties from './en/properties.js';
 import enRecordGrid from './en/recordGrid.js';
 import enRecordKeeps from './en/recordKeeps.js';
@@ -54,6 +55,7 @@ export const crmCatalogs = {
   listingShares: enListingShares,
   listingShareViews: enListingShareViews,
   performance: enPerformance,
+  platformCompanies: enPlatformCompanies,
   properties: enProperties,
   recordGrid: enRecordGrid,
   recordKeeps: enRecordKeeps,

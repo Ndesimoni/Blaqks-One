@@ -67,7 +67,7 @@ export function ServerContent({ owner }) {
     );
   }
   // Pages independent of the selected workspace's records (account, settings, messaging).
-  const own = independentScreen(route);
+  const own = independentScreen(route, user);
   if (own) return own;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
   if (loading) return <p role="status">Loading workspace records…</p>;

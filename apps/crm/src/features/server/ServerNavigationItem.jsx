@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon } from '../../components/ui/Icon.jsx';
+import { useSession } from '../../hooks/useSession.js';
 import { isConnectedSection } from './sectionStatus.js';
 
 /** One connected sidebar entry; sections not yet connected say so, and a badge may count. */
@@ -14,7 +15,8 @@ export function ServerNavigationItem({
   active: activeOverride,
 }) {
   const label = shown || (name === 'Team & access' ? 'Team' : name);
-  const connected = isConnectedSection(name);
+  const { user } = useSession();
+  const connected = isConnectedSection(name, user);
   const active = activeOverride ?? route === name;
   return (
     <button

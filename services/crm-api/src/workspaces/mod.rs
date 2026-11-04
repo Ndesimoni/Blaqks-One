@@ -1,5 +1,6 @@
 pub mod company;
 pub mod handlers;
+pub mod platform;
 pub mod routes;
 
 use crate::{

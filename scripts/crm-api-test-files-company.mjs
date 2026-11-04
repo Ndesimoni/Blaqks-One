@@ -6,6 +6,7 @@ export const companyTestFiles = [
   'apps/crm/tests/api/company-migration.test.mjs',
   'apps/crm/tests/api/company-free-seats-migration.test.mjs',
   'apps/crm/tests/api/company-races.test.mjs',
+  'apps/crm/tests/api/platform-companies.test.mjs',
 ];
 
 export const signupTestFiles = [

@@ -15,6 +15,8 @@ export function companyRoutes({ request, scope }) {
       readCompany(await request(`${scope(workspace)}/company`, { signal })),
     updateCompany: async (workspace, body) =>
       readCompany(await request(`${scope(workspace)}/company`, { method: 'PUT', body })),
+    /** The Super Admin's company list (design queue item 33): Admin, seats, marketplace. */
+    platformCompanies: (signal) => request('/platform/companies', { signal }),
     updateSeatLimit: (workspace, body) =>
       request(`${scope(workspace)}/company/seat-limit`, { method: 'PUT', body }),
   };

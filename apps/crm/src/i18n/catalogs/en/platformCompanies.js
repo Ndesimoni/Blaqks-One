@@ -1,0 +1,21 @@
+/** Platform → Workspaces, the Super Admin's company list (design queue item 33), in English. */
+export default {
+  module: 'companies',
+  active: 'Active companies',
+  archived: 'Archived',
+  table: 'Companies',
+  loading: 'Loading companies…',
+  retry: 'Try again',
+  none: 'No companies here',
+  noneHint: 'Choose the other view, or clear the search.',
+  'col.company': 'Company',
+  'col.admin': 'Admin',
+  'col.seats': 'Seats',
+  'col.marketplace': 'Marketplace',
+  'col.created': 'Created',
+  'col.open': 'Open',
+  seats: '{used} of {limit}',
+  seatsOpen: '{used} · no limit',
+  open: 'Open',
+  openNamed: 'Open {name}',
+};
