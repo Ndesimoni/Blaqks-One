@@ -51,6 +51,13 @@ test('staff agree in My profile; the Admin allows, edits and stops publishing fr
   const adminRow = table.getByRole('row').filter({ hasText: team.admin.user.name });
   await expect(adminRow).toContainText('Admin · always');
   await expect(adminRow.getByRole('button', { name: 'Set up in My profile' })).toBeVisible();
+  // The mockup's presets: Shown keeps the public member and leaves the Admin out.
+  const presets = page.getByRole('group', { name: 'Filter website team', exact: true });
+  await presets.getByRole('button', { name: 'Shown', exact: true }).click();
+  await expect(row).toBeVisible();
+  await expect(adminRow).toHaveCount(0);
+  await presets.getByRole('button', { name: 'Shown', exact: true }).click();
+  await expect(adminRow).toBeVisible();
 
   // Allow publishing takes effect at once.
   await row.getByRole('button', { name: `Allow publishing for ${name}`, exact: true }).click();
