@@ -46,8 +46,8 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 16. [x] **Team finance** (`a3f7dcc`, built by Codex; mockup cards and Company-style save bar; exact Pending approval/self-review note; all split, referral, VAT, TRN and dated agent agreements kept; future-agreement removal now confirms in-page) (`settings.team.finance`)
 17. [x] **Channels** (`a476797`; cards with a status pill and Connect / Manage, each opening a right-hand panel; Facebook Page and Instagram stay two cards, as they connect separately; members' numbers and sending addresses moved into the panels) (`settings.channels.channels`)
 18. [x] **Inbox rules** (`f608a99`; mockup cards and save bar; Blocked senders now lists blocked conversations with Unblock; existing-clients and routing cards kept; the members' private WhatsApp counts card left out, no server count yet) (`settings.rules.rules`)
-19. [ ] **My mailbox** (`settings.mailbox.mailbox`)
-20. [ ] **My WhatsApp** (`settings.whatsapp.whatsapp`)
+19. [x] **My mailbox** (`12f54e0`; connection cards: title, status pill, address and one action; Google connect, sign in again and disconnect kept; the sidebar keeps the name My mailbox, not My email; no Details slider, as the card already shows the address) (`settings.mailbox.mailbox`)
+20. [x] **My WhatsApp** (`12f54e0`; the same card; the member's own Disconnect kept, where the mockup says to ask the Admin) (`settings.whatsapp.whatsapp`)
 21. [ ] **Team activity** (`settings.activity.activity`)
 
 ### Websites
