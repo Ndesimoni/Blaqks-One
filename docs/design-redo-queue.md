@@ -65,6 +65,10 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 29. [x] **Broker profile** (`c648364`; My broker profile is its own section, the company's marketplace card beneath it) (`market.profile.profile`)
 30. [x] **Updates** (`c648364`; its own section) (`market.updates.updates`)
 
+### Messages
+
+39. [x] **Marketplace chats** (`270c4f8`, with Codex; missed when the Messages entry was ticked; the third Messages section with Active / Closed and search, in the slide-in messenger and on the start page's strip; a read-only server list of the member's own chats) (`messages.market.active`, `messages.market.closed`)
+
 ### Platform (Super Admin)
 
 31. [x] **Marketplace applications: Waiting and Decided** (`86e427b`; Waiting and Decided as the filter row's presets with search; applications stay rows with their counts and decision buttons) (`platform.papps.pending`, `platform.papps.decided`)
