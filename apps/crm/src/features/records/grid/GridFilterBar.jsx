@@ -7,7 +7,8 @@ import './grid-filter.css';
  * The grid's filter bar (the approved mockup's grid view): one field showing the active preset
  * as a pill, the other presets as chips (choosing the active one again returns to the first),
  * then the page's tools (the column chooser) and any extra filter such as "Assigned to".
- * `counts` puts a number on a chip (the approvers' Waiting for approval queue).
+ * `counts` puts a number on a chip (the approvers' Waiting for approval queue); `placeholder`
+ * replaces the search field's usual prompt.
  */
 export function GridFilterBar({
   module,
@@ -20,6 +21,7 @@ export function GridFilterBar({
   tools = null,
   extras = null,
   counts = null,
+  placeholder = null,
 }) {
   const { t } = useI18n();
   const input = useRef(null);
@@ -44,7 +46,7 @@ export function GridFilterBar({
         <input
           ref={input}
           aria-label={'Search ' + module}
-          placeholder={t('recordGrid.placeholder')}
+          placeholder={placeholder ?? t('recordGrid.placeholder')}
           value={query}
           onChange={(event) => onQuery(event.target.value)}
         />
