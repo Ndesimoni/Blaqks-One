@@ -1,45 +1,33 @@
-/* Connected Team activity / My activity: page rhythm and the filter panel header. */
+/* Connected Team activity / My activity: page rhythm, the filter row and the feed panel. */
 .connected-activity {
   gap: 16px;
 }
-:root[data-theme] .panel.activity-toolbar {
-  display: grid;
-  gap: 16px;
-  padding: 20px;
+/* The mockup's feed filter row: the scope in the field, the kept filters as pills. */
+.activity-scope {
+  flex: 1 1 320px;
+  cursor: default;
 }
-.activity-toolbar-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 16px;
-}
-.activity-context {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-.activity-context-icon {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: var(--accent-subtle);
-  color: var(--accent);
-}
-:root[data-theme] .activity-context h2 {
-  margin: 0;
+.activity-scope-text strong {
   color: var(--ink);
-  font-size: 16px;
-  letter-spacing: -0.01em;
+  font-weight: 600;
 }
-:root[data-theme] .activity-context p {
-  margin: 2px 0 0;
+.activity-scope-text {
+  overflow: hidden;
   color: var(--muted-dark);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:root[data-theme] .activity-pill input[type='date'] {
+  min-height: 36px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
 }
 :root[data-theme] .activity-range-error {
   margin: 0;
@@ -86,9 +74,6 @@
   min-width: 200px;
 }
 @media (max-width: 720px) {
-  :root[data-theme] .panel.activity-toolbar {
-    padding: 16px;
-  }
   :root[data-theme] .activity-day-head {
     padding: 12px 16px 4px;
   }
