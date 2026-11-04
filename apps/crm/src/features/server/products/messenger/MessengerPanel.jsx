@@ -8,13 +8,21 @@ import { useI18n } from '../../../../i18n/useI18n.js';
 import { canOpenSection } from '../../access.js';
 import { ServerTeamChat } from '../../chat/ServerTeamChat.jsx';
 import { ServerInbox } from '../../inbox/ServerInbox.jsx';
+import { MarketplaceChats } from '../../marketChats/MarketplaceChats.jsx';
 import './messenger.css';
 
 // The approved mockup names the boxes Client inbox and Team chat.
 const boxes = [
   ['inbox', 'Inbox', 'messenger.inboxBox'],
   ['team', 'Team chat', 'messenger.teamBox'],
+  ['market', 'Marketplace chats', 'messenger.marketBox'],
 ];
+// Each box's full page and the address parameter naming its open conversation.
+const pages = {
+  inbox: ['Inbox', 'conversation'],
+  team: ['Team chat', 'room'],
+  market: ['Marketplace chats', 'chat'],
+};
 
 /**
  * The slide-in messenger (NAV3, Bitrix24's pattern): Client inbox and Team chat from the
@@ -27,7 +35,12 @@ export function MessengerPanel({ owner, box, start = '', onBox, onClose }) {
   const go = useNavigate();
   const { search } = useLocation();
   // `start` opens one conversation straight away, as a chat strip avatar asks.
-  const [open, setOpen] = useState(() => ({ inbox: '', team: '', ...(start && { [box]: start }) }));
+  const [open, setOpen] = useState(() => ({
+    inbox: '',
+    team: '',
+    market: '',
+    ...(start && { [box]: start }),
+  }));
   const allowed = boxes.filter(([, route]) => canOpenSection(user, route));
   const selection = {
     id: open[box],
@@ -39,8 +52,9 @@ export function MessengerPanel({ owner, box, start = '', onBox, onClose }) {
     const params = new URLSearchParams();
     const workspace = new URLSearchParams(search).get('workspace');
     if (workspace) params.set('workspace', workspace);
-    if (open[box]) params.set(box === 'team' ? 'room' : 'conversation', open[box]);
-    const path = routePath(box === 'team' ? 'Team chat' : 'Inbox');
+    const [route, key] = pages[box];
+    if (open[box]) params.set(key, open[box]);
+    const path = routePath(route);
     go(path + (params.size ? `?${params}` : ''));
   };
   return (
@@ -84,6 +98,8 @@ export function MessengerPanel({ owner, box, start = '', onBox, onClose }) {
         <div className="messenger-body">
           {box === 'team' ? (
             <ServerTeamChat selection={selection} />
+          ) : box === 'market' ? (
+            <MarketplaceChats selection={selection} />
           ) : (
             <ServerInbox owner={owner} selection={selection} />
           )}

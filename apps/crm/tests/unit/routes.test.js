@@ -14,9 +14,10 @@ test('20 CRM sections, six account/workspace screens and the connected-only page
   assert.equal(settingsRoutes.length, 6);
   // The start page (NAV1b) is one more connected-only page; the website sections (NAV) are four;
   // My profile's Website profile and Sign-in and security tabs and Settings → Company are three
-  // more, and the Marketplace's My requests, Updates and Broker profile three more.
-  assert.equal(routes.length, 47);
-  assert.equal(new Set(routes.map((route) => route.path)).size, 47);
+  // more, the Marketplace's My requests, Updates and Broker profile three more, and Messages'
+  // Marketplace chats one more.
+  assert.equal(routes.length, 48);
+  assert.equal(new Set(routes.map((route) => route.path)).size, 48);
   assert.equal(routePath('Start'), '/start');
   assert.equal(routePath('Messages'), '/messages');
   assert.equal(

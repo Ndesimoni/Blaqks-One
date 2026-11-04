@@ -31,6 +31,7 @@ const formerTabs = [
   'My requests',
   'Marketplace updates',
   'Broker profile',
+  'Marketplace chats',
 ];
 
 test('every destination of the grouped sidebar has exactly one place among the products', () => {

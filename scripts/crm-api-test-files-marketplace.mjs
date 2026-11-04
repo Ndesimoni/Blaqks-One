@@ -8,6 +8,7 @@ export const marketplaceTestFiles = [
   'apps/crm/tests/api/market-offer-access.test.mjs',
   'apps/crm/tests/api/marketplace-lifecycle.test.mjs',
   'apps/crm/tests/api/marketplace-conversations.test.mjs',
+  'apps/crm/tests/api/marketplace-chats.test.mjs',
   'apps/crm/tests/api/marketplace-eligibility.test.mjs',
   'apps/crm/tests/api/marketplace-guards.test.mjs',
   'apps/crm/tests/api/marketplace-join.test.mjs',

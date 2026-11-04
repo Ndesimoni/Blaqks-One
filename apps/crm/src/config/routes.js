@@ -26,6 +26,7 @@ export const connectedRoutes = [
   { name: 'Platform companies', path: '/platform-companies' },
   { name: 'Inbox', path: '/inbox' },
   { name: 'Team chat', path: '/team-chat' },
+  { name: 'Marketplace chats', path: '/marketplace-chats' },
   { name: 'Inbox rules', path: '/inbox-rules' },
   { name: 'My mailbox', path: '/my-mailbox' },
   { name: 'My WhatsApp', path: '/my-whatsapp' },

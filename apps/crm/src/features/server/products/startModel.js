@@ -13,7 +13,7 @@ export const startCards = [
   { key: 'platform', actions: ['Workspaces', 'Marketplace applications'] },
 ];
 
-export const messageLinks = ['Inbox', 'Team chat'];
+export const messageLinks = ['Inbox', 'Team chat', 'Marketplace chats'];
 
 /** Morning before noon, afternoon before six, evening after. */
 export function greetingKey(hour) {

@@ -37,6 +37,7 @@ export default {
   'sections.agreements': 'Agreements',
   'sections.inbox': 'Client inbox',
   'sections.teamChat': 'Team chat',
+  'sections.marketChats': 'Marketplace chats',
   'sections.workspaces': 'Workspaces',
   'sections.applications': 'Marketplace applications',
   'sections.platformWebsite': 'Platform website',

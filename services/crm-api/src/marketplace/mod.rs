@@ -23,6 +23,7 @@ pub mod board_filters;
 pub mod board_limits;
 pub mod company;
 pub mod conversation_access;
+pub mod conversation_mine;
 pub mod conversation_routes;
 pub mod conversation_start;
 pub mod conversation_store;

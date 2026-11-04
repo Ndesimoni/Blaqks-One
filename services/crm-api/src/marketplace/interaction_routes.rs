@@ -1,5 +1,7 @@
 //! Request lifecycle and private broker conversation API.
-use super::{conversation_routes as chat, conversation_start, lifecycle_routes, notices};
+use super::{
+    conversation_mine, conversation_routes as chat, conversation_start, lifecycle_routes, notices,
+};
 use crate::state::AppState;
 use axum::{
     extract::DefaultBodyLimit,
@@ -16,6 +18,10 @@ pub fn router() -> Router<AppState> {
         .route(
             &format!("{BASE}/requests/{{id}}/conversations"),
             get(chat::list).post(conversation_start::start),
+        )
+        .route(
+            &format!("{BASE}/conversations"),
+            get(conversation_mine::mine),
         )
         .route(
             &format!("{BASE}/conversations/{{id}}/messages"),

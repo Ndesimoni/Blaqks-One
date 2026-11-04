@@ -1,0 +1,86 @@
+/* Messages → Marketplace chats: the list beside the open chat; one at a time on phones. */
+.market-chats {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.market-chat-list {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.market-chat-list ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-chat-row {
+  display: grid;
+  gap: 3px;
+  inline-size: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.market-chat-row:hover,
+.market-chat-row.is-open {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.market-chat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.market-chat-top time,
+.market-chat-about,
+.market-chat-last,
+.market-chat-empty {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.market-chat-last {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.market-chat-empty {
+  margin: 0;
+  padding: 12px 2px;
+}
+:root[data-theme] .panel.market-chat-thread {
+  display: grid;
+  gap: 12px;
+  min-height: 320px;
+  padding: 16px;
+}
+.market-chat-back {
+  display: none;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-weight: 600;
+}
+@media (max-width: 900px) {
+  .market-chats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .market-chats.has-open .market-chat-list,
+  .market-chats:not(.has-open) .market-chat-thread {
+    display: none;
+  }
+  .market-chat-back {
+    display: inline-flex;
+  }
+}

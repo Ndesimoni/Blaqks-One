@@ -23,6 +23,7 @@ const extraIcons = {
   'My requests': 'note',
   'Marketplace updates': 'bell',
   'Broker profile': 'person',
+  'Marketplace chats': 'chat',
   Workspaces: 'building',
   'Marketplace applications': 'layers',
 };

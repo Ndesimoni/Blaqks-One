@@ -19,6 +19,9 @@ export function marketplaceActivityRoutes({ request, scope }) {
       request(`${item(workspace, id)}/conversations`, { signal }),
     startMarketplaceConversation: (workspace, id, body) =>
       request(`${item(workspace, id)}/conversations`, { method: 'POST', body: { body } }),
+    /** The member's broker conversations across requests (Messages → Marketplace chats). */
+    myMarketplaceConversations: (workspace, offset = 0, signal) =>
+      request(`${base(workspace)}/conversations?offset=${encodeURIComponent(offset)}`, { signal }),
     marketplaceMessages: (workspace, id, signal) =>
       request(`${base(workspace)}/conversations/${part(id)}/messages`, { signal }),
     sendMarketplaceMessage: (workspace, id, body) =>

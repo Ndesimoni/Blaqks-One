@@ -50,6 +50,7 @@ export const productList = [
     sections: [
       { key: 'inbox', routes: ['Inbox', 'Messages'] },
       { key: 'teamChat', routes: ['Team chat'] },
+      { key: 'marketChats', routes: ['Marketplace chats'] },
     ],
   },
   {

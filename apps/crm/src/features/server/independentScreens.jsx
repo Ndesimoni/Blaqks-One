@@ -12,6 +12,7 @@ import { ServerProfile } from './profile/ServerProfile.jsx';
 import { ServerSecurity } from './profile/ServerSecurity.jsx';
 import { ServerTeamChat } from './chat/ServerTeamChat.jsx';
 import { ServerWebsiteProfile } from './profile/ServerWebsiteProfile.jsx';
+import { MarketplaceChats } from './marketChats/MarketplaceChats.jsx';
 import { marketView } from './marketplace/marketViews.js';
 import { ServerWorkspaces } from './platformCompanies/ServerWorkspaces.jsx';
 
@@ -28,6 +29,7 @@ export function independentScreen(route, user) {
   if (route === 'Company') return <ServerCompany />;
   if (route === 'Inbox rules') return <ServerInboxRules />;
   if (route === 'Team chat') return <ServerTeamChat />;
+  if (route === 'Marketplace chats') return <MarketplaceChats />;
   if (route === 'Agreements') return <ServerAgreements />;
   const market = marketView(route);
   if (market) return <ServerMarketplace view={market} />;

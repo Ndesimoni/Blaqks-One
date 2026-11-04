@@ -39,6 +39,29 @@ pub async fn request(tx: &mut Transaction<'_, Postgres>, id: Uuid) -> ApiResult<
     Ok(row)
 }
 
+/// The same live request projection for aggregate reads, without taking a row lock.
+pub async fn request_read(
+    tx: &mut Transaction<'_, Postgres>,
+    id: Uuid,
+) -> ApiResult<requests::Row> {
+    let row = requests::load(tx, id)
+        .await?
+        .ok_or_else(ApiError::missing)?;
+    visibility::visible(tx, row.member_id)
+        .await?
+        .ok_or_else(ApiError::missing)?;
+    let client = sources::client_of(tx, id)
+        .await?
+        .ok_or_else(ApiError::missing)?;
+    let held =
+        market_requirements::still_held(tx, &[(row.workspace_id.clone(), client, row.member_id)])
+            .await?;
+    if !held.contains(&client) {
+        return Err(ApiError::missing());
+    }
+    Ok(row)
+}
+
 pub fn open(row: &requests::Row) -> ApiResult<()> {
     if row.closed_at.is_some() || row.expired || row.paused_at.is_some() {
         return Err(ApiError::conflict(
@@ -56,6 +79,25 @@ pub async fn load(
     let room: Conversation = sqlx::query_as("SELECT id,request_id,broker_id,broker_workspace FROM marketplace.crm_market_conversations WHERE id=$1")
         .bind(id).fetch_optional(&mut **tx).await?.ok_or_else(ApiError::missing)?;
     let row = request(tx, room.request_id).await?;
+    if actor != room.broker_id && actor != row.member_id {
+        return Err(ApiError::missing());
+    }
+    gate::company_open_or_missing(tx, &room.broker_workspace).await?;
+    visibility::visible(tx, room.broker_id)
+        .await?
+        .ok_or_else(ApiError::missing)?;
+    Ok((room, row))
+}
+
+/// Participant visibility for list reads. Unlike `load`, this never locks the request row.
+pub async fn load_read(
+    tx: &mut Transaction<'_, Postgres>,
+    id: Uuid,
+    actor: Uuid,
+) -> ApiResult<(Conversation, requests::Row)> {
+    let room: Conversation = sqlx::query_as("SELECT id,request_id,broker_id,broker_workspace FROM marketplace.crm_market_conversations WHERE id=$1")
+        .bind(id).fetch_optional(&mut **tx).await?.ok_or_else(ApiError::missing)?;
+    let row = request_read(tx, room.request_id).await?;
     if actor != room.broker_id && actor != row.member_id {
         return Err(ApiError::missing());
     }

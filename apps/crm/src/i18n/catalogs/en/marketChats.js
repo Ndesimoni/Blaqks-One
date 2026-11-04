@@ -1,0 +1,26 @@
+/** Messages → Marketplace chats, the member's private broker conversations, in English. */
+export default {
+  module: 'marketplace chats',
+  listLabel: 'Marketplace chats',
+  active: 'Active',
+  closed: 'Closed',
+  loading: 'Loading marketplace chats…',
+  none: 'No marketplace chats yet',
+  noneHint:
+    'A chat starts when you message a broker about a client request, or a broker messages you about yours.',
+  noneHere: 'No chats here. Choose the other view, or clear the search.',
+  joinTitle: 'Marketplace chats',
+  join: 'Join the marketplace to chat privately with other brokers about client requests.',
+  openMarketplace: 'Open Marketplace',
+  pick: 'Choose a chat to read it.',
+  back: 'All chats',
+  discard: 'Discard your unsent message?',
+  discardLabel: 'Confirm discarding the unsent message',
+  discardConfirm: 'Discard message',
+  loadMore: 'Load older chats',
+  loadingMore: 'Loading…',
+  searchLoaded: 'Search covers the chats loaded so far.',
+  unavailable: 'Marketplace chats are not available',
+  yourRequest: 'Your request · {request}',
+  theirRequest: 'Their request · {request}',
+};

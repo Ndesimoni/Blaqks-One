@@ -21,6 +21,7 @@ import enInsights from './en/insights.js';
 import enLeadsBoard from './en/leadsBoard.js';
 import enListingShareViews from './en/listingShareViews.js';
 import enListingShares from './en/listingShares.js';
+import enMarketChats from './en/marketChats.js';
 import enPerformance from './en/performance.js';
 import enPlatformCompanies from './en/platformCompanies.js';
 import enProperties from './en/properties.js';
@@ -53,6 +54,7 @@ export const crmCatalogs = {
   insights: enInsights,
   leadsBoard: enLeadsBoard,
   listingShares: enListingShares,
+  marketChats: enMarketChats,
   listingShareViews: enListingShareViews,
   performance: enPerformance,
   platformCompanies: enPlatformCompanies,

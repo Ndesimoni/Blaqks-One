@@ -47,6 +47,7 @@ const connectedSections = new Set([
   'My requests',
   'Marketplace updates',
   'Broker profile',
+  'Marketplace chats',
   'Marketplace applications',
 ]);
 /** Workspaces is connected for the Super Admin only, as the platform's company list. */

@@ -10,6 +10,12 @@ import { locate, productList, visibleProducts } from './productModel.js';
 import { firstName, greetingKey, lastRoute, messageLinks, startCards } from './startModel.js';
 import './start.css';
 
+const MESSAGE_SECTIONS = {
+  Inbox: 'inbox',
+  'Team chat': 'teamChat',
+  'Marketplace chats': 'marketChats',
+};
+
 /** The CRM card's figures, from this session's scoped records only. */
 function CrmFigures() {
   const { t } = useI18n();
@@ -82,7 +88,7 @@ export function StartPage() {
           <strong>{t('products.messages')}</strong>
           {links.map((route) => (
             <button type="button" key={route} onClick={() => navigate(route)}>
-              {t(`products.sections.${route === 'Inbox' ? 'inbox' : 'teamChat'}`)}
+              {t(`products.sections.${MESSAGE_SECTIONS[route]}`)}
             </button>
           ))}
         </nav>

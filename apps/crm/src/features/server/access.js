@@ -34,7 +34,13 @@ export function canOpenSection(user, route) {
   if (route === 'Agreements') return user?.roleId !== 'super-admin';
   // The marketplace belongs to Blaqks One companies; the Super Admin reviews its applications
   // on the platform screen instead (broker-marketplace §13–§15, packet MK1).
-  const market = ['Marketplace', 'My requests', 'Marketplace updates', 'Broker profile'];
+  const market = [
+    'Marketplace',
+    'My requests',
+    'Marketplace updates',
+    'Broker profile',
+    'Marketplace chats',
+  ];
   if (market.includes(route)) return user?.roleId !== 'super-admin';
   if (route === 'Marketplace applications') return user?.roleId === 'super-admin';
   // Each member's own mailbox: the Admin, and staff the Admin gave email (decision O8).

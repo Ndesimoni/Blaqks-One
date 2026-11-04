@@ -14,6 +14,7 @@ export default {
   teamBox: 'Team chat',
   switch: 'Messenger',
   fullPage: 'Open full page',
+  marketBox: 'Marketplace chats',
   close: 'Close the messenger',
   strip: 'Recent conversations',
   openMessenger: 'Open the messenger',
