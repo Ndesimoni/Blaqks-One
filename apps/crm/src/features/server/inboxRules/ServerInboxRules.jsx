@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useSession } from '../../../hooks/useSession.js';
-import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { ProfileCard } from '../profile/ProfileCard.jsx';
+import '../profile/profile-cards.css';
+import '../profile/profile.css';
+import { BlockedSenders } from './BlockedSenders.jsx';
+import { RuleCards } from './RuleCards.jsx';
 import { toDraft, useInboxRules } from './useInboxRules.js';
-import { WordList } from './WordList.jsx';
 import './inbox-rules.css';
-import './inbox-rules-states.css';
 
 /**
- * Inbox rules (plan U2, design LeadRules), Admin only: which unknown senders become leads on
- * their own, the property words and whether they suggest or create. Saves with a version.
+ * Inbox rules (plan U2, design LeadRules) as the approved mockup's cards and save bar (design
+ * queue item 18), Admin only: which unknown senders become leads on their own, the property
+ * words and whether they suggest or create, who receives new conversations and the blocked
+ * senders. The rules save together with their version.
  */
 export function ServerInboxRules() {
   const { api, user } = useSession();
   const { t } = useI18n();
-  const { navigate } = useNavigation();
   const rules = useInboxRules(api, user.workspaceId);
   const [draft, setDraft] = useState(null);
   const [notice, setNotice] = useState('');
@@ -31,6 +34,11 @@ export function ServerInboxRules() {
       </section>
     );
   if (!draft) return <p role="status">{t('inboxRules.loading')}</p>;
+  const changed = JSON.stringify(draft) !== JSON.stringify(toDraft(rules.rules));
+  const change = (next) => {
+    setDraft(next);
+    setNotice('');
+  };
   const save = async () => {
     setSaving(true);
     const result = await rules.save(draft);
@@ -38,78 +46,51 @@ export function ServerInboxRules() {
     setNotice(t(`inboxRules.notice.${result || 'saved'}`));
   };
   return (
-    <div className="rules-page">
-      <section className="rules-card rules-row" aria-labelledby="rules-known">
-        <span className="rules-tag">{t('inboxRules.always')}</span>
-        <div>
-          <h2 id="rules-known">{t('inboxRules.known.title')}</h2>
-          <p>{t('inboxRules.known.body')}</p>
+    <div className="page-stack rules-page">
+      <div className="profile-grid rules-grid">
+        <RuleCards draft={draft} onChange={change} t={t} />
+        <ProfileCard id="rules-known" title={t('inboxRules.known.title')}>
+          <div className="acct-card-body">
+            <span className="rules-tag">{t('inboxRules.always')}</span>
+            <p className="acct-muted">{t('inboxRules.known.body')}</p>
+          </div>
+        </ProfileCard>
+        <ProfileCard id="rules-route" title={t('inboxRules.route.title')}>
+          <div className="acct-card-body">
+            <ol className="rules-route">
+              <li>{t('inboxRules.route.listing')}</li>
+              <li>{t('inboxRules.route.client')}</li>
+              <li>{t('inboxRules.route.queue')}</li>
+            </ol>
+          </div>
+        </ProfileCard>
+        <BlockedSenders api={api} workspaceId={user.workspaceId} />
+      </div>
+      <div className="panel profile-save-bar">
+        <div className="acct-card-foot">
+          <div className="acct-foot-status">
+            <p className="acct-muted" role="status" aria-live="polite">
+              {notice ||
+                (changed
+                  ? t('inboxRules.unsaved')
+                  : rules.rules.version > 0
+                    ? t('inboxRules.version', { version: rules.rules.version })
+                    : t('inboxRules.defaults'))}
+            </p>
+          </div>
+          <div className="acct-actions">
+            <Button
+              variant="light"
+              disabled={saving || !changed}
+              onClick={() => change(toDraft(rules.rules))}
+            >
+              {t('inboxRules.cancel')}
+            </Button>
+            <Button disabled={saving || !changed} onClick={save}>
+              {saving ? t('inboxRules.saving') : t('inboxRules.save')}
+            </Button>
+          </div>
         </div>
-      </section>
-      <section className="rules-card" aria-labelledby="rules-auto">
-        <h2 id="rules-auto">{t('inboxRules.auto.title')}</h2>
-        <label className="rules-check">
-          <input
-            type="checkbox"
-            checked={draft.automatic}
-            onChange={(event) => setDraft({ ...draft, automatic: event.target.checked })}
-          />
-          <span>
-            <strong>{t('inboxRules.auto.sources')}</strong>
-            <small>{t('inboxRules.auto.sourcesHint')}</small>
-          </span>
-        </label>
-        <div className="rules-check rules-words-rule">
-          <span className="rules-always">{t('inboxRules.words.alwaysOn')}</span>
-          <span>
-            <strong>{t('inboxRules.words.title')}</strong>
-            <small>{t('inboxRules.words.hint')}</small>
-            <WordList draft={draft} onChange={setDraft} />
-          </span>
-        </div>
-        <fieldset className="rules-modes">
-          <legend className="sr-only">{t('inboxRules.mode.label')}</legend>
-          {['suggest', 'create'].map((mode) => (
-            <label key={mode} className={draft.leadMode === mode ? 'is-selected' : ''}>
-              <input
-                type="radio"
-                name="lead-mode"
-                value={mode}
-                checked={draft.leadMode === mode}
-                onChange={() => setDraft({ ...draft, leadMode: mode })}
-              />
-              {t(`inboxRules.mode.${mode}`)}
-            </label>
-          ))}
-        </fieldset>
-      </section>
-      <section className="rules-card" aria-labelledby="rules-route">
-        <h2 id="rules-route">{t('inboxRules.route.title')}</h2>
-        <ol>
-          <li>{t('inboxRules.route.listing')}</li>
-          <li>{t('inboxRules.route.client')}</li>
-          <li>{t('inboxRules.route.queue')}</li>
-        </ol>
-      </section>
-      <section className="rules-card rules-row" aria-labelledby="rules-block">
-        <div>
-          <h2 id="rules-block">{t('inboxRules.blocked.title')}</h2>
-          <p>{t('inboxRules.blocked.body')}</p>
-        </div>
-        <Button variant="light" onClick={() => navigate('Inbox')}>
-          {t('inboxRules.blocked.open')}
-        </Button>
-      </section>
-      <div className="rules-actions">
-        <p role="status" aria-live="polite">
-          {notice}
-        </p>
-        <Button variant="light" disabled={saving} onClick={() => setDraft(toDraft(rules.rules))}>
-          {t('inboxRules.cancel')}
-        </Button>
-        <Button disabled={saving} onClick={save}>
-          {saving ? t('inboxRules.saving') : t('inboxRules.save')}
-        </Button>
       </div>
     </div>
   );
