@@ -36,7 +36,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 9. [x] **Reports: Performance** (`ad99920`; lead response in days, not hours, as leads keep only the day they arrived; goals, chart and history kept below) (`crm.reports.performance`): tiles (deals won, commission earned, average days to close, lead response time) and one bar per agent on one scale.
 10. [x] **Reports: CRM insights** (`ef41a4c`; old figure tiles kept as feed lines; four panels kept below; no filter field above the feed, as there is nothing to filter) (`crm.reports.insights`): tiles such as Leads from the website.
 11. [x] **Reports: Date search** (`f7c5c4a`; changes apply with Search, Clear returns to the last 30 days; results grouped by date kept below; browser spec passed on 2026-11-04) (`crm.reports.dates`): a From / To form and its results.
-12. [ ] **Tools: Calculators** (`crm.tools.calculators`): calculator choice, fields and the result.
+12. [x] **Tools: Calculators** (`ee8fa7c`; Send to a client starts a new email with the summary; editable rates, off-plan milestones with optional dates and the schedule download kept; mortgage down payment now a percentage) (`crm.tools.calculators`): calculator choice, fields and the result.
 13. [ ] **Tools: Guide** (`crm.tools.guide`): "Search the guide", articles grouped by topic, an article page with steps and related guides.
 
 ### Settings
