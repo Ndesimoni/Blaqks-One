@@ -9,7 +9,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 1. Read the mockup's screen for the route key and compare it with ours.
 2. List every feature ours has that the mockup leaves out. The standing rule ([CRM grid one to one, nothing lost](product-decisions.md)) is to keep them in the mockup's style. Ask the owner only if keeping one is not possible.
 3. Build it, run its unit and connected browser specs (`PLAYWRIGHT_CHANNEL=chrome` on macOS 12), commit, and tick the item here with the commit.
-4. Tell the owner what changed and what is left out, then wait before the next item.
+4. Tell the owner what changed and what is left out, then go straight on to the next item (owner, 2026-11-04: no go-ahead needed between items).
 
 ## Done
 
@@ -44,7 +44,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 14. [x] **My profile** and **Website profile** (`e61b1b0`; Profile, Website profile and Sign-in and security as header tabs; account details, language, field guidance, password and devices kept; company profile stays on Profile until item 15) (`settings.profile.profile`, `settings.profile.website`)
 15. [x] **Company details** (`dd16f17`; owner chose the new fields: trade licence number, office phone and office address saved on the server; marketplace switch asks before turning off; plan and seats; company form moved off My profile) (`settings.company.details`)
 16. [x] **Team finance** (`a3f7dcc`, built by Codex; mockup cards and Company-style save bar; exact Pending approval/self-review note; all split, referral, VAT, TRN and dated agent agreements kept; future-agreement removal now confirms in-page) (`settings.team.finance`)
-17. [ ] **Channels** (`settings.channels.channels`)
+17. [x] **Channels** (`a476797`; cards with a status pill and Connect / Manage, each opening a right-hand panel; Facebook Page and Instagram stay two cards, as they connect separately; members' numbers and sending addresses moved into the panels) (`settings.channels.channels`)
 18. [ ] **Inbox rules** (`settings.rules.rules`)
 19. [ ] **My mailbox** (`settings.mailbox.mailbox`)
 20. [ ] **My WhatsApp** (`settings.whatsapp.whatsapp`)
