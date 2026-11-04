@@ -1,6 +1,5 @@
 import React from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 
 /**
@@ -20,9 +19,6 @@ export function CompanyEmail({ company, mayConnect }) {
   return (
     <article className="mailbox-card" aria-labelledby="company-email-title">
       <header className="mailbox-head">
-        <span className="mailbox-icon" aria-hidden="true">
-          <Icon name="note" size={20} />
-        </span>
         <div>
           <h2 id="company-email-title">{t('mailbox.company.title')}</h2>
           <p>{t('mailbox.company.provider')}</p>

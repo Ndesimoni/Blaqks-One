@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
 import { useI18n } from '../../../i18n/useI18n.js';
@@ -61,9 +60,6 @@ export function ServerMailbox() {
       {(!company || mailbox) && (
         <article className="mailbox-card" aria-labelledby="mailbox-title">
           <header className="mailbox-head">
-            <span className="mailbox-icon" aria-hidden="true">
-              <Icon name="note" size={20} />
-            </span>
             <div>
               <h2 id="mailbox-title">{t('mailbox.card.title')}</h2>
               {mailbox && (

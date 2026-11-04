@@ -1,49 +1,44 @@
-/* My mailbox (E1d): one calm card with the mailbox, its state and one primary action. */
+/* My mailbox (E1d) and My WhatsApp as the approved mockup's connection cards (design queue
+   items 19 and 20): the title, its status pill, the details and one action. */
 .mailbox-page {
   display: grid;
-  gap: 16px;
-  max-inline-size: 720px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: 12px;
+  align-items: start;
+}
+.mailbox-page > [role='status'],
+.mailbox-page > .mailbox-notice {
+  grid-column: 1 / -1;
 }
 .mailbox-card {
   display: grid;
-  gap: 12px;
-  padding: 20px;
+  gap: 10px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--panel);
   box-shadow: var(--shadow);
 }
 .mailbox-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 12px;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
 }
 .mailbox-head > div {
-  flex: 1 1 200px;
   min-inline-size: 0;
 }
 .mailbox-head h2,
 .mailbox-return h2 {
   margin: 0;
   color: var(--ink);
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 650;
 }
 .mailbox-head p {
   margin: 2px 0 0;
   overflow-wrap: anywhere;
   color: var(--muted-dark);
   font-size: 13px;
-}
-.mailbox-icon {
-  display: grid;
-  flex: 0 0 auto;
-  place-items: center;
-  inline-size: 40px;
-  block-size: 40px;
-  border-radius: 12px;
-  background: var(--surface-subtle);
-  color: var(--primary);
 }
 .mailbox-muted,
 .mailbox-what,

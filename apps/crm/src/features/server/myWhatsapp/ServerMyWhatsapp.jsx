@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
-import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useWorkspaceScope } from '../../../hooks/useWorkspaceScope.js';
@@ -64,9 +63,6 @@ export function ServerMyWhatsapp() {
       </div>
       <article className="mailbox-card" aria-labelledby="my-whatsapp-title">
         <header className="mailbox-head">
-          <span className="mailbox-icon" aria-hidden="true">
-            <Icon name="smartphone" size={20} />
-          </span>
           <div>
             <h2 id="my-whatsapp-title" ref={heading} tabIndex={-1}>
               {k('cardTitle')}
