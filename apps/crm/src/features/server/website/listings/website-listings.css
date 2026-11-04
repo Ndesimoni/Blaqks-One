@@ -7,7 +7,7 @@
 .website-listings-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 12px 24px;
 }
@@ -33,12 +33,6 @@
   background: var(--accent-subtle);
   color: var(--ink);
   font-size: 13px;
-}
-.website-listings-filters .tabs button {
-  min-height: 40px;
-}
-.website-listings-search {
-  min-width: min(100%, 260px);
 }
 .website-listing-title {
   display: grid;

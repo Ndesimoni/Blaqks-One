@@ -4,7 +4,7 @@
  * `sourceVersion`, so it shows "Changes not public" until someone republishes.
  */
 export const PAGE_SIZE = 12;
-export const LISTING_FILTERS = ['live', 'withdrawn', 'all'];
+export const LISTING_FILTERS = ['live', 'changed', 'withdrawn', 'all'];
 const EMIRATE_NAMES = {
   dubai: 'Dubai',
   'abu-dhabi': 'Abu Dhabi',

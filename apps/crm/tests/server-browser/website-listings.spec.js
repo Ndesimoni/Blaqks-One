@@ -93,7 +93,7 @@ test('an Admin publishes a property from its details, sees it Live, then withdra
   await expect(confirm).toHaveCount(0);
   await expect(page.locator('.toast')).toContainText('Listing withdrawn');
   await expect(page.getByText('No matching listings')).toBeVisible();
-  const filters = page.getByRole('group', { name: 'Show listings', exact: true });
+  const filters = page.getByRole('group', { name: 'Filter website listings', exact: true });
   await filters.getByRole('button', { name: 'Withdrawn', exact: true }).click();
   await expect(table.getByRole('row', { name: new RegExp(title) })).toContainText('Withdrawn');
 

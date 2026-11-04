@@ -8,7 +8,7 @@ import { useI18n } from '../../../../i18n/useI18n.js';
 import { PublishDialog } from '../publish/PublishDialog.jsx';
 import { profileName } from '../publish/publishModel.js';
 import { usePublishers } from '../publish/usePublishers.js';
-import { filterListings, listingRows, PAGE_SIZE } from './listingsModel.js';
+import { filterListings, isLive, listingRows, PAGE_SIZE } from './listingsModel.js';
 import { ListingsResults } from './ListingsResults.jsx';
 import { ListingsToolbar } from './ListingsToolbar.jsx';
 import { useWebsiteListings } from './useWebsiteListings.js';
@@ -68,6 +68,7 @@ export function WebsiteListings({ site }) {
         site={site}
         filters={filters}
         count={filtered.length}
+        live={rows.filter((row) => isLive(row.status)).length}
         busy={readOnly}
         onFilters={changeFilters}
         onPublish={publishInHead ? () => setPublishing({}) : null}
