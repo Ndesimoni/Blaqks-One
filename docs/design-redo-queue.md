@@ -42,7 +42,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 ### Settings
 
 14. [x] **My profile** and **Website profile** (`e61b1b0`; Profile, Website profile and Sign-in and security as header tabs; account details, language, field guidance, password and devices kept; company profile stays on Profile until item 15) (`settings.profile.profile`, `settings.profile.website`)
-15. [ ] **Company details** (`settings.company.details`)
+15. [x] **Company details** (`dd16f17`; owner chose the new fields: trade licence number, office phone and office address saved on the server; marketplace switch asks before turning off; plan and seats; company form moved off My profile) (`settings.company.details`)
 16. [ ] **Team finance** (`settings.team.finance`)
 17. [ ] **Channels** (`settings.channels.channels`)
 18. [ ] **Inbox rules** (`settings.rules.rules`)
@@ -97,6 +97,7 @@ Screenshots of every remaining screen against the mockup: none matches yet, so n
 - Payments and Expenses keep their own add buttons: + Create does not offer them yet.
 - Phones keep cards, without selection.
 - Deals (5): our ten stages stay (Offer and Documentation keep their names rather than the mockup's "Offer made" and "Contract"); Add deal stays on the page, since + Create does not offer deals yet; the deal slider keeps a footer with every deal action (the mockup shows only its two header buttons) and a history card in place of the mockup's add-activity timeline.
+- Company (15): the save bar shows the version, not who saved it or when (the company's history keeps the actor, but not for display yet); seats show the total in use without the number of invitations.
 - My profile (14): no "Let your Admin manage" card (that delegation, WD1, is not built yet); Language stays its own card (the frozen Arabic preview), not a select inside the form; Public WhatsApp and email stay typed fields, not choices of the member's company number and address.
 - Guide (13): no "Was this helpful?" buttons, since nothing would save the answer; articles show only for sections the person can open.
 - Record slider (4b): the timeline has no "+ Activity" menu (its three add buttons cover it) and no "Published on the website" or "Price set" events (the timeline reads CRM activity only; price history is not recorded). Contact and client sliders (Call, Message, linked records) remain under item 36.
