@@ -13,7 +13,7 @@ import { ImportReview } from './ImportReview.jsx';
 import './import.css';
 
 const steps = [
-  { id: 'source', title: 'Choose records & workspace' },
+  { id: 'source', title: 'Choose records' },
   { id: 'review', title: 'Review & import' },
 ];
 
@@ -44,11 +44,13 @@ export function ImportDialog({ onClose, onImported }) {
     <Drawer titleId={titleId} className="editor-drawer wizard-editor" onClose={close}>
       <div className="drawer-top">
         <div>
-          <div className="eyebrow">SUPER ADMIN · DATA MIGRATION</div>
+          <div className="eyebrow">DATA MIGRATION</div>
           <h2 id={titleId} data-initial-focus tabIndex={-1}>
             Import saved CRM records
           </h2>
-          <p>Move clients, contacts and properties to their server workspace.</p>
+          <p>
+            Bring clients, contacts and properties from an old browser or backup into your company.
+          </p>
         </div>
         <button className="icon-btn" aria-label="Close import" disabled={busy} onClick={close}>
           <Icon name="close" size={21} />
