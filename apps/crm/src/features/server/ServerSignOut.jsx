@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../hooks/useSession.js';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
+import { SIGN_IN } from '../auth/authPaths.js';
 import { ServerStatus } from './ServerStatus.jsx';
 
 export function ServerSignOut() {
@@ -14,8 +15,9 @@ export function ServerSignOut() {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    signOut()
-      .then(() => go('/start', { replace: true }))
+    // The account menu's sign-out leaves for the website home; without one, the sign-in page.
+    signOut({ leave: true })
+      .then((left) => left || go(SIGN_IN, { replace: true }))
       .catch((failure) => setError(failure.message));
   }, [signOut, go, attempt]);
   return (

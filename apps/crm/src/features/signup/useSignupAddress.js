@@ -2,25 +2,35 @@ import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SIGN_UP_STEPS } from '../auth/authPaths.js';
 
+const [DETAILS, , COMPANY, TEAM] = SIGN_UP_STEPS;
+
 /**
- * Keeps sign-up's address on its step: a step forward adds a page to the history, so the
- * browser's Back on the code page returns to the details; going back or opening a step that
- * is not ready (the code page without a code request) replaces the address instead.
+ * Keeps sign-up's address and step together, so the browser's Back works on every step.
+ * Before the account exists the step leads: each step forward is a new page, and Back from the
+ * code returns to the details. Once it exists the address leads: the code page is replaced by
+ * the company, saving the company opens the team as a new page, Back from the team returns to
+ * the company, and Back from the company leaves sign-up for the new workspace's start page.
  */
 export function useSignupAddress(flow, signedIn) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const shown = useRef(null);
-  // The team step follows a finished setup, and stays open on reload while signed in.
-  const step = flow.finished || (signedIn && pathname === SIGN_UP_STEPS[3]) ? 4 : flow.step;
+  const last = useRef(null);
+  const created = flow.step >= 3 || (signedIn && pathname === TEAM);
+  const step = !created ? flow.step : pathname === TEAM && (flow.finished || signedIn) ? 4 : 3;
   useEffect(() => {
-    const wanted = SIGN_UP_STEPS[step - 1];
-    const before = shown.current ?? step;
-    shown.current = step;
-    if (pathname === wanted) return;
-    if (before === step && step === 2 && pathname === SIGN_UP_STEPS[0]) flow.back();
-    else navigate(wanted, { replace: step <= before });
-    // `flow` is a new object each render; the step and the address are what matter.
-  }, [step, pathname, navigate]);
+    const before = last.current;
+    last.current = { step, finished: flow.finished };
+    if (!created) {
+      const wanted = SIGN_UP_STEPS[step - 1];
+      if (pathname === wanted) return;
+      if (before?.step === step && step === 2 && pathname === DETAILS) flow.back();
+      else navigate(wanted, { replace: !before || step <= before.step });
+      return;
+    }
+    if (before && flow.finished > before.finished) navigate(TEAM);
+    else if (before && before.step < 3) navigate(COMPANY, { replace: true });
+    else if (pathname !== COMPANY && pathname !== TEAM) navigate('/start', { replace: true });
+    // `flow` is a new object each render; the step, the save count and the address matter.
+  }, [step, flow.finished, pathname, navigate]);
   return step;
 }

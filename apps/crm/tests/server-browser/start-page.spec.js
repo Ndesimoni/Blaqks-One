@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures.js';
+import { WEBSITE, test, expect } from './fixtures.js';
 import { rail } from './product-nav.js';
 
 const greeting = /^Good (morning|afternoon|evening)/;
@@ -46,6 +46,7 @@ test('members land on the start page, open products from it and use the account 
   await expect(account).toBeFocused();
   await account.click();
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByLabel('Email', { exact: true })).toBeVisible();
+  // Signing out leaves for the website home.
+  await expect(page).toHaveURL(WEBSITE);
   expect(errors).toEqual([]);
 });

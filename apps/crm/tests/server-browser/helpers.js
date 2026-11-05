@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
 import { saveRecordForm } from '../browser/helpers/record-form.js';
+import { WEBSITE, answerWebsite } from './fixtures.js';
 import { openName } from './record-open.js';
 
 export { saveRecordForm };
@@ -39,10 +40,16 @@ export async function landWhereTestsBegin(page) {
   await page.goto(`/#${first}`);
 }
 
-/** Signs out through the account menu on the person's initials (NAV1b). */
+/**
+ * Signs out through the account menu on the person's initials (NAV1b). Signing out leaves for
+ * the website home; the scenario then continues on the CRM's sign-in page.
+ */
 export async function signOut(page) {
+  await answerWebsite(page.context());
   await page.getByRole('button', { name: /^Account menu/ }).click();
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+  await expect(page).toHaveURL(WEBSITE);
+  await page.goto('/#/sign-in');
 }
 
 /** Opens a record's editor from the top bar's + Create; CRM lists have no Add buttons. */

@@ -8,6 +8,7 @@ import { SIGN_IN, afterSignIn, isSignUpPath } from '../auth/authPaths.js';
 import { SignInGate } from '../auth/SignInGate.jsx';
 import { InvitationActivation } from '../server-team/InvitationActivation.jsx';
 import { useAccountLanguage } from './useAccountLanguage.js';
+import { useSignOut } from './useSignOut.js';
 import { SignupPage } from '../signup/SignupPage.jsx';
 import { useI18n } from '../../i18n/useI18n.js';
 
@@ -64,11 +65,11 @@ export function ServerSession({ children }) {
     },
     [api],
   );
-  const signOut = useCallback(async () => {
-    await api.logout();
+  const clearSession = useCallback(() => {
     setUser(null);
     setCompany(null);
-  }, [api]);
+  }, []);
+  const { leaving, signOut } = useSignOut(api, clearSession);
   // My profile installs the saved profile after a name, phone or language change.
   const replaceUser = useCallback((profile) => setUser(profile), []);
   const replaceCompany = useCallback((profile) => setCompany(profile), []);
@@ -102,6 +103,7 @@ export function ServerSession({ children }) {
     () => ({ user, company, api, signIn, signOut, replaceUser, replaceCompany }),
     [user, company, api, signIn, signOut, replaceUser, replaceCompany],
   );
+  if (leaving) return <ServerStatus title="Signing out" message="Closing your session…" />;
   if (loading) return <ServerStatus title="Opening your CRM" message="Checking your account…" />;
   if (error)
     return (
@@ -113,7 +115,14 @@ export function ServerSession({ children }) {
       />
     );
   if (location.pathname === '/activate-invitation')
-    return <InvitationActivation api={api} signedIn={!!user} onJoined={installSession} />;
+    return (
+      <InvitationActivation
+        api={api}
+        signedIn={!!user}
+        onJoined={installSession}
+        onSignOut={signOut}
+      />
+    );
   if (isSignUpPath(location.pathname))
     return <SignupPage api={api} user={user} onVerified={installSignupUser} onSignOut={signOut} />;
   if (!user) return <SignInGate api={api} signIn={signIn} notice={notice} />;

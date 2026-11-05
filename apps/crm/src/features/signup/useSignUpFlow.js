@@ -23,7 +23,7 @@ export function useSignUpFlow({ api, status, language, onVerified }) {
   const [setup, setSetup] = useState({ displayName: '', emirate: '' });
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState('');
-  const [finished, setFinished] = useState(false);
+  const [finished, setFinished] = useState(0);
   const [seconds, setSeconds] = useSignupCountdown(0);
   const bot = useSignupBot(status);
   const setDetail = useCallback((field, value) => {

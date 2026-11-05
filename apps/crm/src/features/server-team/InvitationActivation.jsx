@@ -11,8 +11,9 @@ import { InvitationPasswordForm } from './InvitationPasswordForm.jsx';
  * Joining a team from an invitation link, as the approved mockup's full-screen split screen
  * (design queue item 34): the company to join, who invited you and as what, then a password.
  * Joining signs the person in and opens their workspace (`onJoined` installs the session).
+ * Signing out first keeps this page, so the invitation stays open.
  */
-export function InvitationActivation({ api, signedIn, onJoined }) {
+export function InvitationActivation({ api, signedIn, onJoined, onSignOut }) {
   const { t } = useI18n();
   const location = useLocation();
   const go = useNavigate();
@@ -59,7 +60,7 @@ export function InvitationActivation({ api, signedIn, onJoined }) {
       <AuthShell>
         <h1>{t('auth.invite.signedInTitle')}</h1>
         <p>{t('auth.invite.signedIn')}</p>
-        <Button className="auth-submit" onClick={() => go('/sign-out')}>
+        <Button className="auth-submit" onClick={() => onSignOut()}>
           {t('auth.invite.signOut')}
         </Button>
       </AuthShell>

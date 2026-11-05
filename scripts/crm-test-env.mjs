@@ -35,6 +35,8 @@ export function testEnv() {
     VITE_CRM_MODE: 'server',
     // Offers Arabic in My profile for apps/crm/tests/server-browser/language.spec.js; English stays default.
     VITE_I18N_PREVIEW: 'true',
+    // Signing out leaves for this website stand-in; browser tests answer it (fixtures.js).
+    VITE_WEBSITE_URL: 'http://blaqks-one.test/',
     CRM_API_PROXY: 'http://127.0.0.1:8790',
   };
   Object.assign(env, {

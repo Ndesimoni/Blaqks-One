@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { routePath } from '../../config/routes.js';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { SIGN_IN, isSignUpPath } from '../auth/authPaths.js';
@@ -45,13 +44,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
     if (!status.loading) heading.current?.focus();
   }, [flow.step, status.loading]);
   const step = useSignupAddress(flow, Boolean(user));
-  if (step === 4)
-    return (
-      <TeamStep
-        onInvite={() => navigate(`${routePath('Team & access')}?start=invite`)}
-        onSkip={() => navigate(`${routePath('Start')}?start=tour`)}
-      />
-    );
+  if (step === 4) return <TeamStep canGoBack={createdHere} />;
   if (status.loading)
     return <SignupState title={t('signup.loadingTitle')} body={t('signup.loadingBody')} loading />;
   if (status.error)
