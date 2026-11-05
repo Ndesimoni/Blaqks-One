@@ -1,5 +1,17 @@
 /** The app frame (NAV5): the top bar's page name, Create and search. */
 export default {
+  noAccessTitle: "You don't have access to {section}",
+  noAccessBody:
+    'Your Admin decides which sections each member can open. Ask them if you need {section} for your work.',
+  readyTitle: 'Your workspace is ready',
+  readyBody: 'Your Admin decides which sections each member can open. Ask them when you need more.',
+  goTo: 'Go to {section}',
+  goStart: 'Go to the start page',
+  loading: 'Loading {section}',
+  loadErrorTitle: "{section} couldn't load",
+  loadErrorBody:
+    'Your saved work is safe. Try again. If it keeps happening, contact Blaqks One support.',
+  tryAgain: 'Try again',
   create: 'Create',
   createIn: 'Create in {product}',
   'items.lead': 'Lead',

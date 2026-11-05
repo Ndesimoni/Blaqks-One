@@ -133,7 +133,9 @@ test('whole-team visibility shows the team records but never ungranted sections'
     expect(session.user.financeAccess).toMatchObject({ scope: 'own', teamView: false });
     for (const path of ['/#/messages', '/#/team-access']) {
       await staff.page.goto(path);
-      await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+      await expect(
+        staff.page.getByRole('heading', { name: /^You don't have access to / }),
+      ).toBeVisible();
     }
   } finally {
     await owner.context.close();

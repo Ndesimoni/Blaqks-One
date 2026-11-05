@@ -45,7 +45,7 @@ test('connected Admin navigation restores every group and unfinished routes neve
     await openPage(page, name);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(sectionLabelOf(name));
     await expect(page.getByRole('region', { name: `${name} connection status` })).toContainText(
-      'NOT CONNECTED YET',
+      `${name} is not connected yet`,
     );
     await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);
     await expect(page.locator('.data-table tbody tr')).toHaveCount(0);

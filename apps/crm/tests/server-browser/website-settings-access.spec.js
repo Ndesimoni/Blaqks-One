@@ -25,7 +25,7 @@ test('staff and foreign workspace links cannot load company website controls', a
     await signInMember(staffPage, team.one.user.email);
     await staffPage.goto('/#/website');
     await expect(
-      staffPage.getByRole('heading', { name: 'Access is restricted', exact: true }),
+      staffPage.getByRole('heading', { name: /^You don't have access to / }),
     ).toBeVisible();
     await expect(staffPage.getByRole('button', { name: 'Website', exact: true })).toHaveCount(0);
     await expect(staffPage.getByLabel('Public website name', { exact: true })).toHaveCount(0);

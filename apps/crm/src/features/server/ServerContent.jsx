@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '../../components/ui/Button.jsx';
 import { useSession } from '../../hooks/useSession.js';
 import { useNavigation, useRecords } from '../../hooks/useWorkspace.js';
 import { ContactsPage } from '../contacts/ContactsPage.jsx';
@@ -26,6 +25,7 @@ import { LISTING_SHARE_ROUTE } from './listingShares/listingShareLinks.js';
 import { ServerPerformance } from './performance/ServerPerformance.jsx';
 import { isConnectedSection } from './sectionStatus.js';
 import { ServerUnavailableSection } from './ServerUnavailableSection.jsx';
+import { NoAccessState, RecordsLoadError, RecordsLoading } from './ServerStates.jsx';
 import { IncomingShares } from './shares/IncomingShares.jsx';
 import { ShareLinkPage } from './shares/ShareLinkPage.jsx';
 import { SHARE_ROUTE } from './shares/shareModel.js';
@@ -41,17 +41,7 @@ export function ServerContent({ owner }) {
   if (route === SHARE_ROUTE) return <ShareLinkPage />;
   // `#/listing-shares/{id}`: a listing from another company (record sharing R2).
   if (route === LISTING_SHARE_ROUTE) return <ListingShareLinkPage />;
-  if (!canOpenSection(user, route))
-    return (
-      <section className="panel recovery-panel">
-        <h2>{route === 'Page not found' ? 'Your workspace is ready' : 'Access is restricted'}</h2>
-        <p>
-          Your assigned access determines which connected sections you can open. Contact your team
-          Admin to adjust your permissions.
-        </p>
-        <p>Reports and messaging connections are still being developed.</p>
-      </section>
-    );
+  if (!canOpenSection(user, route)) return <NoAccessState route={route} />;
   if (route === 'Start') return <StartPage />;
   if (route === 'Team & access') return <ServerTeamPage owner={owner} />;
   // One element per site across its sections, so an unsaved content draft survives switching.
@@ -70,16 +60,8 @@ export function ServerContent({ owner }) {
   const own = independentScreen(route, user);
   if (own) return own;
   if (!isConnectedSection(route)) return <ServerUnavailableSection route={route} owner={owner} />;
-  if (loading) return <p role="status">Loading workspace records…</p>;
-  if (error)
-    return (
-      <section className="panel recovery-panel">
-        <p className="field-error" role="alert">
-          {error}
-        </p>
-        <Button onClick={retry}>Retry</Button>
-      </section>
-    );
+  if (loading) return <RecordsLoading route={route} />;
+  if (error) return <RecordsLoadError route={route} error={error} retry={retry} />;
   if (route === 'Dashboard') return <ServerDashboard owner={owner} />;
   if (route === 'Client desk') return <ServerClientDesk />;
   if (route === 'Performance') return <ServerPerformance owner={owner} />;

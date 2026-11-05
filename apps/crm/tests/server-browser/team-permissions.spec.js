@@ -52,7 +52,9 @@ test('owner edits staff access, invalidates the session and retains the new gran
     const profile = await session(staff.page);
     expect(profile.user.channelAccess).toEqual({ email: false, whatsapp: true });
     await staff.page.goto('/#/properties');
-    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { name: /^You don't have access to / }),
+    ).toBeVisible();
   } finally {
     await staff.context.close();
   }
@@ -93,11 +95,15 @@ test('staff with only future finance access get a clear workspace state and no c
       staff.page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
     ).toHaveCount(0);
     await staff.page.goto('/#/workspaces');
-    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { name: /^You don't have access to / }),
+    ).toBeVisible();
     // Staff get their own "My activity" feed (docs/team-activity-design.md), never team events.
     await staff.page.goto('/#/team-activity');
     await expect(staff.page.getByRole('heading', { name: 'My activity' })).toBeVisible();
-    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toHaveCount(0);
+    await expect(
+      staff.page.getByRole('heading', { name: /^You don't have access to / }),
+    ).toHaveCount(0);
   } finally {
     await staff.context.close();
   }

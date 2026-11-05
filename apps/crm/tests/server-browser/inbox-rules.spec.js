@@ -78,5 +78,5 @@ test('staff never see or open the Inbox rules', async ({ page }) => {
   await signInMember(page, invited.email);
   await expect(page.getByRole('button', { name: 'Inbox rules' })).toHaveCount(0);
   await page.goto('/#/inbox-rules');
-  await expect(page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /^You don't have access to / })).toBeVisible();
 });

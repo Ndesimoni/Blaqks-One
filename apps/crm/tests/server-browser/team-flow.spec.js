@@ -53,7 +53,9 @@ test('Admin invites a colleague with multiple positions who signs in to the shar
     expect(identity.user.workspaceId).toBe(owner.user.id);
     expect(identity.user.channelAccess).toEqual({ email: true, whatsapp: false });
     await staff.page.goto('/#/team-access');
-    await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+    await expect(
+      staff.page.getByRole('heading', { name: /^You don't have access to / }),
+    ).toBeVisible();
     await expect(staff.page.getByRole('button', { name: 'Invite teammate' })).toHaveCount(0);
   } finally {
     await staff.context.close();

@@ -94,7 +94,9 @@ test('staff and the Super Admin never see finance settings', async ({ browser })
     const staff = await memberPage(browser, email);
     try {
       await staff.page.goto('/#/team-access');
-      await expect(staff.page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+      await expect(
+        staff.page.getByRole('heading', { name: /^You don't have access to / }),
+      ).toBeVisible();
       await expect(staff.page.getByRole('button', { name: 'Finance settings' })).toHaveCount(0);
     } finally {
       await staff.context.close();

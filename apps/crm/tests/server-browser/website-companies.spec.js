@@ -88,7 +88,7 @@ test('company Admins and staff cannot see the Companies tab or read the list', a
       await signInMember(page, member.user.email);
       // The Companies tab is its own address now; members reach neither it nor the list.
       await page.goto('/#/platform-companies');
-      await expect(page.getByRole('heading', { name: 'Access is restricted' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /^You don't have access to / })).toBeVisible();
       await expect(page.getByRole('navigation', { name: 'Section tabs' })).toHaveCount(0);
       await expect(page.getByLabel('Search companies', { exact: true })).toHaveCount(0);
       expect(reads).toEqual([]);
