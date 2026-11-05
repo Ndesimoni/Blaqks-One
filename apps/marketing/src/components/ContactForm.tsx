@@ -19,6 +19,8 @@ export function ContactForm() {
   const [problems, setProblems] = useState<Problems>({});
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [error, setError] = useState('');
+  // A trap field people never see; bots fill it, and the CRM then stores nothing.
+  const [website, setWebsite] = useState('');
   const set =
     (key: keyof ContactMessage) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -30,7 +32,7 @@ export function ContactForm() {
     const reply = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, website }),
     }).catch(() => null);
     const body = reply ? await reply.json().catch(() => ({})) : {};
     if (reply?.ok) return setState('sent');
@@ -107,6 +109,16 @@ export function ContactForm() {
         </select>,
       )}
       {field('message', 'How can we help?', <textarea {...props('message')} />)}
+      <input
+        type="text"
+        name="website"
+        value={website}
+        onChange={(event) => setWebsite(event.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-10000px', width: 1, height: 1 }}
+      />
       {error && (
         <p className="field-error" role="alert">
           {error}
