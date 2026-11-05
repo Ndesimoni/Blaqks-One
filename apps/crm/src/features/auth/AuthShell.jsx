@@ -7,37 +7,32 @@ import './auth-shell.css';
 import './auth-card.css';
 
 /**
- * Sign-in, sign-up and invitations as the approved website design shows them (owner,
- * 2026-11-05): the Blaqks One wordmark over one centred card, under a gold-rimmed arc, filling
- * the window in light and dark. Each screen keeps its own address (features/auth/authPaths).
- * With a website set up, a link at the top and the wordmark lead back to its home page.
+ * Sign-in, sign-up and invitations (owner, 2026-11-05): the Blaqks One name on the left with a
+ * soft gold glow, and with a website set up a quiet way back to it just beneath; the form
+ * card on the right. On phones the name sits above the form. Light and dark follow the shared
+ * choice. Each screen keeps its own address (features/auth/authPaths).
  */
 export function AuthShell({ children, busy = false }) {
   const { t } = useI18n();
   const home = websiteHome();
-  const mark = (
-    <>
-      {t('auth.brand')}
-      <span aria-hidden="true" />
-    </>
-  );
   return (
     <main className="auth-page">
-      {home && (
-        <a className="auth-home" href={home}>
-          <span aria-hidden="true">←</span> {t('auth.backToSite')}
-        </a>
-      )}
       <SignupUtilities />
-      {home ? (
-        <a className="auth-wordmark u-ltr" href={home} aria-label={t('auth.backToSite')}>
-          {mark}
-        </a>
-      ) : (
-        <p className="auth-wordmark u-ltr">{mark}</p>
-      )}
-      <div className="auth-card" aria-busy={busy || undefined}>
-        {children}
+      <div className="auth-brand-side">
+        <p className="auth-wordmark u-ltr">
+          {t('auth.brand')}
+          <span aria-hidden="true" />
+        </p>
+        {home && (
+          <a className="auth-back" href={home}>
+            <span aria-hidden="true">←</span> {t('auth.backToSite')}
+          </a>
+        )}
+      </div>
+      <div className="auth-form-side">
+        <div className="auth-card" aria-busy={busy || undefined}>
+          {children}
+        </div>
       </div>
     </main>
   );

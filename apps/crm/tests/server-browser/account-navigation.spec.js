@@ -10,7 +10,7 @@ test('sign-out goes home and Back from sign-in passes over signed-in pages', asy
   await page.goto(WEBSITE);
   await page.getByRole('link', { name: 'Sign in' }).click();
   await expect(signInHeading(page)).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByRole('link', { name: 'Blaqks One website' }).first()).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'Back to the website' })).toHaveAttribute(
     'href',
     WEBSITE,
   );

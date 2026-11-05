@@ -1,7 +1,7 @@
 /** The approved mockup's sign-in, brand panel and invitation (design queue item 34). */
 export default {
   brand: 'Blaqks One',
-  backToSite: 'Blaqks One website',
+  backToSite: 'Back to the website',
   'signIn.title': 'Sign in',
   'signIn.body': 'Welcome back. Sign in to your company’s workspace.',
   'signIn.email': 'Email',
