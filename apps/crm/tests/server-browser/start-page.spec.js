@@ -1,11 +1,12 @@
 import { WEBSITE, test, expect } from './fixtures.js';
+import { setTheme } from './assign-helpers.js';
 import { rail } from './product-nav.js';
 
 const greeting = /^Good (morning|afternoon|evening)/;
 
 test('members land on the start page, open products from it and use the account menu', async ({
   page,
-}) => {
+}, testInfo) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
@@ -20,8 +21,18 @@ test('members land on the start page, open products from it and use the account 
     'aria-current',
     'page',
   );
+  // The mockup's start page: Get started for the Admin, the date line, figures and quick actions.
+  const started = page.getByRole('region', { name: 'Get started' });
+  await expect(started).toContainText('Create your workspace');
+  await expect(started.getByRole('status')).toHaveText(/^\d of \d done$/);
+  await expect(page.locator('.start-hello p')).toContainText('across your clients');
   const crm = page.getByRole('article', { name: 'CRM', exact: true });
   await expect(crm).toContainText('follow-ups due');
+  await expect(crm.getByRole('button', { name: 'Add a lead' })).toBeVisible();
+  for (const theme of ['light', 'dark']) {
+    await setTheme(page, theme);
+    await page.screenshot({ path: testInfo.outputPath(`start-${theme}.png`), fullPage: true });
+  }
   await expect(page.getByRole('article', { name: 'Websites', exact: true })).toBeVisible();
   const messages = page.getByRole('navigation', { name: 'Messages', exact: true });
   await expect(messages.getByRole('button', { name: 'Client inbox', exact: true })).toBeVisible();

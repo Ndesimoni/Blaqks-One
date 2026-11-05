@@ -6,41 +6,59 @@ import { useI18n } from '../../../i18n/useI18n.js';
 import { deriveGettingStarted, hideChecklist, readChecklistHidden } from './getStartedModel.js';
 import './get-started.css';
 
-export function GetStartedChecklist({ workspaceId, data, company, firstName }) {
+const label = (id) => `signupSetup.checklist${id[0].toUpperCase()}${id.slice(1)}`;
+
+/**
+ * Get started, as the approved mockup draws it on the start page (design queue item 35): how
+ * many steps are done, a progress bar and one row per step, ticked when done or with Start.
+ * Hide keeps it hidden in this browser.
+ */
+export function GetStartedChecklist({ workspaceId, data, company }) {
   const { navigate } = useNavigation();
   const { t } = useI18n();
   const [hidden, setHidden] = useState(() => readChecklistHidden(workspaceId));
   const tasks = useMemo(() => deriveGettingStarted(data, company), [data, company]);
   if (hidden) return null;
-  const completed = tasks.filter((task) => task.complete).length;
+  const done = tasks.filter((task) => task.complete).length;
   return (
     <section className="panel get-started" aria-labelledby="get-started-title">
-      <div className="get-started-heading">
-        <div>
-          <p className="eyebrow">{t('signupSetup.checklistEyebrow')}</p>
-          <h2 id="get-started-title">{t('signupSetup.checklistTitle', { firstName })}</h2>
-          <p>{t('signupSetup.checklistBody')}</p>
-        </div>
-        <Button
-          variant="light"
+      <div className="get-started-head">
+        <h2 id="get-started-title">{t('signupSetup.checklistTitle')}</h2>
+        <span role="status">
+          {t('signupSetup.checklistProgress', { done, count: tasks.length })}
+        </span>
+        <button
+          type="button"
+          className="start-tour-link"
           onClick={() => {
             hideChecklist(workspaceId);
             setHidden(true);
           }}
         >
           {t('signupSetup.checklistHide')}
-        </Button>
+        </button>
       </div>
-      <p className="get-started-progress" role="status">
-        {t('signupSetup.checklistProgress', { done: completed, count: tasks.length })}
-      </p>
+      <div className="get-started-meter" aria-hidden="true">
+        <span style={{ inlineSize: `${(done / tasks.length) * 100}%` }} />
+      </div>
       <ul className="get-started-list">
         {tasks.map((task) => (
           <li key={task.id} data-complete={task.complete || undefined}>
-            <Icon name={task.complete ? 'check' : 'arrow'} size={17} />
-            <button type="button" onClick={() => navigate(task.route)}>
-              {t(`signupSetup.checklist${task.id[0].toUpperCase()}${task.id.slice(1)}`)}
-            </button>
+            <span className="get-started-tick" aria-hidden="true">
+              {task.complete && <Icon name="check" size={13} />}
+            </span>
+            <span className="get-started-what">{t(label(task.id))}</span>
+            {task.complete ? (
+              <span className="get-started-done">{t('signupSetup.checklistDone')}</span>
+            ) : (
+              <Button
+                variant="light"
+                aria-label={`${t('signupSetup.checklistStart')}: ${t(label(task.id))}`}
+                onClick={() => navigate(task.route)}
+              >
+                {t('signupSetup.checklistStart')}
+              </Button>
+            )}
           </li>
         ))}
       </ul>

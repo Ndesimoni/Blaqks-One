@@ -23,11 +23,12 @@ test('team features follow management access alone', () => {
   assert.equal(hasTeamFeatures(undefined), false);
 });
 
-test('get-started tasks always include the team step', () => {
+test('get-started tasks start with the workspace done and always include the team step', () => {
   const data = { Properties: [{}], Clients: [], 'Follow-ups': [] };
   assert.deepEqual(
     deriveGettingStarted(data, { setupComplete: false }).map(({ id, complete }) => [id, complete]),
     [
+      ['workspace', true],
       ['property', true],
       ['client', false],
       ['followUp', false],
@@ -37,7 +38,7 @@ test('get-started tasks always include the team step', () => {
   );
   assert.deepEqual(
     deriveGettingStarted(data, { setupComplete: true }).map(({ id }) => id),
-    ['property', 'client', 'followUp', 'team'],
+    ['workspace', 'property', 'client', 'followUp', 'team'],
   );
 });
 

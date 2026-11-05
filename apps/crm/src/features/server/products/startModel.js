@@ -6,12 +6,39 @@
 export const START_ROUTE = 'Start';
 const LAST_KEY = 'kws-last-route';
 
+/** Open the product, then the mockup's quick action (`add-lead` opens the lead editor). */
 export const startCards = [
-  { key: 'crm', actions: ['Dashboard', 'Leads', 'Follow-ups'] },
-  { key: 'web', actions: ['Website'] },
-  { key: 'market', actions: ['Marketplace', 'Agreements'] },
+  { key: 'crm', actions: ['Dashboard', 'add-lead'] },
+  { key: 'web', actions: ['Website', 'Website properties'] },
+  { key: 'market', actions: ['Marketplace', 'My requests'] },
   { key: 'platform', actions: ['Workspaces', 'Marketplace applications'] },
 ];
+
+/** The figures each card shows, by `useStartFigures` name (the CRM card has its own). */
+export const CARD_FIGURES = {
+  web: [
+    ['liveListings', 'start.liveListings'],
+    ['enquiries', 'start.enquiries'],
+  ],
+  market: [
+    ['openRequests', 'start.openRequests'],
+    ['agreements', 'start.agreementsWaiting'],
+  ],
+  platform: [
+    ['companies', 'start.companies'],
+    ['applications', 'start.applicationsWaiting'],
+  ],
+};
+
+const ACTION_LABELS = {
+  'add-lead': 'start.addLead',
+  'Website properties': 'start.publishProperty',
+  'My requests': 'start.postRequest',
+};
+
+/** A quick action's label: the mockup's wording, else the page's own name. */
+export const actionLabel = (action, t) =>
+  ACTION_LABELS[action] ? t(ACTION_LABELS[action]) : action;
 
 export const messageLinks = ['Inbox', 'Team chat', 'Marketplace chats'];
 

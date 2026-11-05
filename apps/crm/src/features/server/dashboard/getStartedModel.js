@@ -2,6 +2,7 @@ export const checklistStorageKey = (workspaceId) => `kws-crm-get-started-hidden:
 
 export function deriveGettingStarted(data, company) {
   const tasks = [
+    { id: 'workspace', route: 'Start', complete: true },
     { id: 'property', route: 'Properties', complete: Boolean(data.Properties?.length) },
     { id: 'client', route: 'Clients', complete: Boolean(data.Clients?.length) },
     { id: 'followUp', route: 'Follow-ups', complete: Boolean(data['Follow-ups']?.length) },

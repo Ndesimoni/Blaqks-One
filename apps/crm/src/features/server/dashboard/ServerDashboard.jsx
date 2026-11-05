@@ -6,7 +6,6 @@ import { useFinance } from '../finance/useFinance.js';
 import { ConnectedUpcomingViewings } from './ConnectedUpcomingViewings.jsx';
 import { DashboardToolbar } from './DashboardToolbar.jsx';
 import { FinanceWidgets } from './FinanceWidgets.jsx';
-import { GetStartedChecklist } from './GetStartedChecklist.jsx';
 import { KpiTiles } from './KpiTiles.jsx';
 import { LeadBars } from './LeadBars.jsx';
 import { RecordCountsPanel } from './RecordCountsPanel.jsx';
@@ -60,14 +59,6 @@ export function ServerDashboard({ owner }) {
           today={today}
           clientName={clientName}
           propertyName={propertyName}
-        />
-      )}
-      {user.roleId === 'admin' && (
-        <GetStartedChecklist
-          workspaceId={owner.id}
-          data={visible}
-          company={company}
-          firstName={user.name.trim().split(/\s+/)[0]}
         />
       )}
       {widgets.finance && owner && <FinanceWidgets finance={finance} />}

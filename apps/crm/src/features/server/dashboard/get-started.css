@@ -1,72 +1,77 @@
+/* Get started on the start page, as the approved mockup draws it: the count and Hide on the
+   heading row, a thin progress bar, then one row per step with a tick or Start. */
 .get-started {
   display: grid;
-  gap: 16px;
-  padding: 24px;
+  gap: 10px;
+  padding: 18px;
 }
-.get-started-heading {
+.get-started-head {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
 }
-.get-started-heading :is(h2, p) {
+.get-started-head h2 {
   margin: 0;
-}
-.get-started-heading h2 {
-  margin-block: 4px;
   color: var(--ink);
-  font-size: 20px;
+  font: 600 19px var(--display);
 }
-.get-started-progress {
-  margin: 0;
-  color: var(--muted-dark);
-  font-size: 13px;
+.get-started-head [role='status'] {
+  color: var(--muted);
+  font-size: 14px;
+}
+.get-started-head .start-tour-link {
+  margin-inline-start: auto;
+}
+.get-started-meter {
+  block-size: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--line);
+}
+.get-started-meter span {
+  display: block;
+  block-size: 100%;
+  background: var(--primary);
+  transition: inline-size var(--duration) var(--ease);
 }
 .get-started-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 20px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .get-started-list li {
-  display: flex;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
-  min-block-size: 44px;
-  border-block-start: 1px solid var(--line);
-  color: var(--accent);
-}
-.get-started-list button {
-  padding: 8px 0;
-  border: 0;
-  background: transparent;
+  gap: 10px;
+  min-block-size: 48px;
   color: var(--ink);
-  font: inherit;
-  font-weight: 600;
-  text-align: start;
-  cursor: pointer;
 }
-.get-started-list button:is(:hover, :focus-visible) {
-  color: var(--accent);
+.get-started-tick {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
 }
-.get-started-list li[data-complete] {
-  color: var(--primary);
+.get-started-list li[data-complete] .get-started-tick {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
 }
-.get-started-list li[data-complete] button {
-  color: var(--muted-dark);
-  text-decoration: line-through;
+.get-started-done {
+  color: var(--muted);
+  font-size: 14px;
 }
-@media (max-width: 650px) {
-  .get-started,
-  .get-started-heading {
-    align-items: stretch;
+@media (prefers-reduced-motion: reduce) {
+  .get-started-meter span {
+    transition: none;
   }
-  .get-started-heading {
-    flex-direction: column;
-  }
-  .get-started-list {
-    grid-template-columns: minmax(0, 1fr);
-  }
+}
+.get-started-list .btn {
+  min-block-size: 34px;
+  padding-inline: 14px;
 }
