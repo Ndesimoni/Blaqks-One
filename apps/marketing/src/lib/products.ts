@@ -1,7 +1,7 @@
 /** The four products: the menu line, the product page and its six features. */
 export type ProductKey = 'crm' | 'websites' | 'marketplace' | 'messages';
 export type IconName =
-  'home' | 'crm' | 'web' | 'market' | 'chat' | 'gear' | 'bell' | 'logo' | 'spark';
+  'home' | 'crm' | 'web' | 'market' | 'chat' | 'gear' | 'bell' | 'logo' | 'spark' | 'sun' | 'moon';
 
 export type Product = {
   key: ProductKey;

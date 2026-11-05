@@ -7,6 +7,7 @@ import { products } from '@/lib/products';
 import { links } from '@/lib/site';
 import { Arrow } from './Arrow';
 import { Icon } from './Icon';
+import { ThemeToggle } from './ThemeToggle';
 import { Wordmark } from './Wordmark';
 
 const pages = [
@@ -99,10 +100,12 @@ export function Nav() {
                 </Link>
               ))}
               <a href={links.signIn}>Sign in</a>
+              <ThemeToggle labelled />
             </motion.div>
           )}
         </AnimatePresence>
         <div className="nav-end">
+          <ThemeToggle />
           <a className="btn btn-dark signin" href={links.signIn}>
             Sign in
           </a>

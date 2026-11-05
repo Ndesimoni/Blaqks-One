@@ -10,9 +10,12 @@
   </head>
   <body>
     <script>
-      // Start in the saved theme, so the first screen never flashes dark (useWorkspacePreferences).
+      // Start in the theme shared with the website (b1-theme cookie), else the one saved here,
+      // so the first screen never flashes the other colour (useWorkspacePreferences).
       try {
-        if (JSON.parse(localStorage.getItem('kws-crm-preferences'))?.theme === 'light') {
+        const shared = document.cookie.match(/(?:^|;\s*)b1-theme=(light|dark)(?:;|$)/);
+        const saved = JSON.parse(localStorage.getItem('kws-crm-preferences'))?.theme;
+        if ((shared ? shared[1] : saved) === 'light') {
           document.documentElement.dataset.theme = 'light';
           document.documentElement.style.colorScheme = 'light';
         }

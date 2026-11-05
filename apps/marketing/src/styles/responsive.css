@@ -80,7 +80,8 @@
   .cell.wide {
     grid-column: span 1;
   }
-  .nav-end .signin {
+  .nav-end .signin,
+  .nav-end .theme-toggle {
     display: none;
   }
   .row-art {

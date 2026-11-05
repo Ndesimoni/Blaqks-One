@@ -83,3 +83,33 @@
   font-size: 14px;
   color: var(--text-2);
 }
+/* Light or dark, shared with the CRM: an icon in the top bar, a labelled row in the phone menu. */
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  border: 1px solid var(--edge-2);
+  border-radius: 10px;
+  background: var(--tint-2);
+  color: var(--text-2);
+}
+.theme-toggle:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}
+.theme-toggle.labelled {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  inline-size: auto;
+  block-size: auto;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-weight: 600;
+}
+.theme-toggle.labelled:hover {
+  background: var(--tint-2);
+}
