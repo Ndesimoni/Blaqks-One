@@ -79,7 +79,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 ### Sign-in and shared patterns
 
 34. [x] **Sign in and sign up** (`e306db6`; owner 2026-11-05: centred cards on their own pages instead of the split screen; joining from an invitation signs the person in): the three-step sign-up progress, password rules and the code entry.
-35. [ ] **Start page**: compare with the mockup's product cards, Messages strip and the Get started checklist.
+35. [x] **Start page** (`588c04f`; Get started moved here from the Dashboard with our company-profile step; figures on every card where they can be read; the mockup's quick actions): compare with the mockup's product cards, Messages strip and the Get started checklist.
 36. [ ] **Record slider**: compare with the mockup's large right-hand slider (gallery, fields, private box, activity timeline).
 37. [ ] **Create form slider**: compare with the mockup's create form (sections, step chips, footer).
 38. [ ] **Empty, loading, error and no-access states**: compare with the mockup's state pages and skeletons.
