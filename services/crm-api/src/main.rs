@@ -4,7 +4,7 @@ use kws_crm_api::{
     config::Config,
     records::backfill,
     routes,
-    sample::{self, guard, marker, options::Options},
+    sample::{self, guard, marker, options::Options, options::COMMANDS},
     shutdown, signup,
     state::AppState,
 };
@@ -30,7 +30,7 @@ async fn run() -> Result<(), String> {
     let command = std::env::args().nth(1);
     let args: Vec<String> = std::env::args().skip(2).collect();
     let sample_options = match command.as_deref() {
-        Some(name @ ("seed-sample" | "clear-sample")) => {
+        Some(name) if COMMANDS.contains(&name) => {
             let options = Options::parse(name, &args)?;
             // Before connecting: never reach a database outside local development.
             guard::ensure_local(!config.secure_cookie, &config.database_url)?;
@@ -83,7 +83,8 @@ async fn run() -> Result<(), String> {
     }
     if command.is_some() {
         return Err(
-            "Supported commands: create-user, migrate, media-backfill, seed-sample, clear-sample."
+            "Supported commands: create-user, migrate, media-backfill, seed-sample, clear-sample, \
+             seed-platform-sample, clear-platform-sample."
                 .into(),
         );
     }

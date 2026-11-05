@@ -12,10 +12,12 @@ import { checkBoundaries } from './boundary-rules.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = join(root, 'services/crm-api/src');
 const mapPath = join(root, 'scripts/boundaries.json');
-// Messaging and media modules' tables live in their own file to keep each map small.
+// Messaging, website and the development-only sample tables live in their own files to keep
+// each map small.
 const extraPaths = [
   join(root, 'scripts/boundaries-messaging.json'),
   join(root, 'scripts/boundaries-website.json'),
+  join(root, 'scripts/boundaries-sample.json'),
 ];
 
 async function rustFiles(directory) {

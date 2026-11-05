@@ -79,8 +79,7 @@
       "crm_market_conversations",
       "crm_market_messages",
       "crm_market_notices"
-    ],
-    "sample": ["crm_sample_records", "crm_sample_accounts", "crm_sample_finance", "crm_environment"]
+    ]
   },
   "domainFree": {
     "paths": ["auth/", "workspaces/", "error.rs", "error_tests.rs", "state.rs", "config.rs"],

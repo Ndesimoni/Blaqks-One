@@ -23,6 +23,8 @@
     "crm:create-user": "node scripts/create-crm-user.mjs",
     "crm:sample-data": "node scripts/crm-sample-data.mjs seed",
     "crm:clear-sample": "node scripts/crm-sample-data.mjs clear",
+    "crm:platform-sample": "node scripts/crm-sample-data.mjs platform-seed",
+    "crm:clear-platform-sample": "node scripts/crm-sample-data.mjs platform-clear",
     "demo:backup": "node scripts/create-demo-backup.mjs",
     "test:api": "node scripts/test-crm-api.mjs",
     "test:server:e2e": "node scripts/test-crm-api.mjs --browser",

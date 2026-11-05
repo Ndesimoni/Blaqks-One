@@ -16,6 +16,7 @@ pub mod finance;
 pub mod guard;
 pub mod marker;
 pub mod options;
+pub mod platform;
 pub mod report;
 pub mod safety;
 pub mod seed;
@@ -46,6 +47,9 @@ pub async fn mark_source(tx: &mut Transaction<'_, Postgres>) -> Outcome<()> {
 /// Runs a parsed command against a marked, migrated local database (`database` is its
 /// `host:port/name`); returns the summary.
 pub async fn run(pool: &PgPool, options: Options, database: &str) -> Outcome<String> {
+    if options.platform {
+        return platform::run(pool, options, database).await;
+    }
     let target = target::resolve(pool, options.organisation).await?;
     confirm::confirm(&options, database, &target)?;
     match options.command {

@@ -23,6 +23,8 @@ Optional, to fill your local workspace with clearly fictional test data:
 npm run db:mark-dev       # once: mark this database as a development database
 npm run crm:sample-data   # add sample records
 npm run crm:clear-sample  # remove them again
+npm run crm:platform-sample        # Blaqks One: sample clients, help, chat, team
+npm run crm:clear-platform-sample  # put the Blaqks One samples away
 ```
 
 ### Every day
