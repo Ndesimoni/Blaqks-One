@@ -2,6 +2,19 @@
 
 Native **Next.js 16 / React 19 / TypeScript** application for the general Blaqks One website and company websites. This is separate from the React/Vite CRM and Rust backend. There are no standalone individual-agent websites.
 
+## Main website design
+
+The general platform site now uses the navy/white/gold marketplace design selected by the
+owner on 5 November 2026. It is implemented natively in Next.js; the earlier standalone
+HTML reconstruction is not the runtime. Company themes remain independent. See
+[adoption scope and checks](../../docs/website-marketplace-adoption.md).
+
+Set `WEBSITE_CRM_URL` to the CRM application's absolute public base URL to enable the
+professional sign-in and company signup links. Use HTTPS in production; loopback HTTP is
+accepted for local development. With no value, links lead to professional-access guidance.
+The public API currently has no verified deal-price metadata; deal sections stay empty
+instead of manufacturing discount claims.
+
 ## Run locally
 
 Use Node 24, or Node 22.18 or newer. From the repository root:

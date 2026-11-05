@@ -11,6 +11,8 @@ export function websiteRoute(path: string[] = []): { page: string; id?: string }
     path.length === 1 &&
     [
       'properties',
+      'deals',
+      'professionals',
       'companies',
       'agents',
       'developers',

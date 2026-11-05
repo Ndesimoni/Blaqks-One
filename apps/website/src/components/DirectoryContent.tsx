@@ -2,7 +2,15 @@ import Link from 'next/link';
 import type { Catalogue } from '../lib/types';
 import { AgentCard, CompanyCard } from './Cards';
 
-export function DirectoryContent({ page, catalogue }: { page: string; catalogue: Catalogue }) {
+export function DirectoryContent({
+  page,
+  catalogue,
+  platform = false,
+}: {
+  page: string;
+  catalogue: Catalogue;
+  platform?: boolean;
+}) {
   if (page === 'companies')
     return (
       <div className="people-grid">
@@ -13,9 +21,9 @@ export function DirectoryContent({ page, catalogue }: { page: string; catalogue:
     );
   if (page === 'agents')
     return (
-      <div className="people-grid">
+      <div className={platform ? 'platform-agent-directory' : 'people-grid'}>
         {catalogue.agents.map((agent) => (
-          <AgentCard key={agent.id} agent={agent} catalogue={catalogue} />
+          <AgentCard key={agent.id} agent={agent} catalogue={catalogue} portrait={platform} />
         ))}
       </div>
     );

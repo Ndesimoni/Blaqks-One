@@ -3,17 +3,15 @@ import type { Site } from '../lib/types';
 import { initials } from './ui';
 import { MobileMenu } from './MobileMenu';
 import { SocialLinkList } from './SocialLinkList';
+import { PlatformHeader } from './platform/PlatformHeader';
+import { PlatformFooter } from './platform/PlatformFooter';
 
 export function SiteHeader({ site }: { site: Site }) {
+  if (site.kind === 'platform') return <PlatformHeader site={site} />;
   const links = [
     ['/properties', 'Properties'],
     ['/developers', 'Developers'],
-    ...(site.kind === 'platform'
-      ? [
-          ['/companies', 'Companies'],
-          ['/agents', 'Agents'],
-        ]
-      : [['/agents', 'Our people']]),
+    ['/agents', 'Our people'],
     ['/about', 'About'],
     ['/contact', 'Contact'],
   ];
@@ -21,15 +19,11 @@ export function SiteHeader({ site }: { site: Site }) {
     <header className="site-header">
       <Link className="wordmark" href="/" aria-label={`${site.name} home`}>
         <span className="brand-mark" aria-hidden="true">
-          {site.kind === 'platform' ? 'B' : initials(site.name)}
+          {initials(site.name)}
         </span>
         <span>
           {site.name}
-          <small>
-            {site.kind === 'platform'
-              ? 'A considered way to find home.'
-              : 'Property. With a personal perspective.'}
-          </small>
+          <small>Property. With a personal perspective.</small>
         </span>
       </Link>
       <nav className="desktop-nav" aria-label="Main navigation">
@@ -44,6 +38,7 @@ export function SiteHeader({ site }: { site: Site }) {
   );
 }
 export function SiteFooter({ site }: { site: Site }) {
+  if (site.kind === 'platform') return <PlatformFooter site={site} />;
   return (
     <footer className="site-footer">
       <div>
@@ -61,7 +56,7 @@ export function SiteFooter({ site }: { site: Site }) {
         <p className="eyebrow">EXPLORE</p>
         <Link href="/properties">All properties</Link>
         <Link href="/developers">UAE developers</Link>
-        <Link href="/agents">{site.kind === 'platform' ? 'Meet the agents' : 'Our people'}</Link>
+        <Link href="/agents">Our people</Link>
       </div>
       <div>
         <p className="eyebrow">GET IN TOUCH</p>

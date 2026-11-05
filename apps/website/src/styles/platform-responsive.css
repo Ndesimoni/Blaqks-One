@@ -1,0 +1,114 @@
+@media (max-width: 1100px) {
+  body[data-site-kind='platform'] .platform-header-inner {
+    flex-wrap: wrap;
+    gap: 16px 24px;
+    padding: 18px 0;
+  }
+  body[data-site-kind='platform'] .platform-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+  body[data-site-kind='platform'] .platform-professionals {
+    margin-left: auto;
+  }
+  body[data-site-kind='platform'] .platform-featured-agents {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  body[data-site-kind='platform'] .section,
+  body[data-site-kind='platform'] .platform-header-inner,
+  body[data-site-kind='platform'] .platform-hero-content {
+    width: calc(100% - 40px);
+  }
+  body[data-site-kind='platform'] .platform-header-inner {
+    gap: 12px;
+  }
+  body[data-site-kind='platform'] .platform-wordmark {
+    font-size: 12px;
+    gap: 8px;
+  }
+  body[data-site-kind='platform'] .platform-wordmark small {
+    font-size: 6px;
+    letter-spacing: 0.1em;
+  }
+  body[data-site-kind='platform'] .platform-wordmark .brand-mark {
+    width: 23px;
+    height: 29px;
+    font-size: 18px;
+  }
+  body[data-site-kind='platform'] .platform-search > button {
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
+  }
+  body[data-site-kind='platform'] .platform-professionals summary {
+    max-width: 112px;
+    padding: 11px 9px;
+    font-size: 10px;
+  }
+  body[data-site-kind='platform'] .platform-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 12px;
+    font-size: 13px;
+  }
+  body[data-site-kind='platform'] .platform-nav a {
+    justify-content: center;
+  }
+  body[data-site-kind='platform'] .platform-home-hero {
+    min-height: 430px;
+  }
+  body[data-site-kind='platform'] .platform-hero-content {
+    padding: 48px 0 35px;
+  }
+  body[data-site-kind='platform'] .platform-hero-content h1 {
+    font-size: 50px;
+  }
+  body[data-site-kind='platform'] .platform-hero-content > p:not(.eyebrow) {
+    font-size: 14px;
+  }
+  body[data-site-kind='platform'] .platform-home-search {
+    margin-top: 28px;
+  }
+  body[data-site-kind='platform'] .platform-home-search .search-form {
+    padding: 18px;
+  }
+  body[data-site-kind='platform'] .search-form input,
+  body[data-site-kind='platform'] .search-form select {
+    font-size: 16px;
+  }
+  body[data-site-kind='platform'] .platform-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px;
+    gap: 22px 0;
+  }
+  body[data-site-kind='platform'] .platform-benefits > div {
+    padding-inline: 12px;
+    border-right: 0;
+  }
+  body[data-site-kind='platform'] .platform-story,
+  body[data-site-kind='platform'] .platform-deal-intro,
+  body[data-site-kind='platform'] .platform-footer-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body[data-site-kind='platform'] .platform-story > div {
+    padding: 28px;
+  }
+  body[data-site-kind='platform'] .platform-story > img {
+    min-height: 230px;
+    height: 230px;
+  }
+  body[data-site-kind='platform'] .platform-footer {
+    padding: 40px 24px 24px;
+  }
+  body[data-site-kind='platform'] .platform-footer-top {
+    gap: 36px;
+  }
+  body[data-site-kind='platform'] .platform-footer-columns,
+  body[data-site-kind='platform'] .footer-columns {
+    gap: 16px;
+  }
+}

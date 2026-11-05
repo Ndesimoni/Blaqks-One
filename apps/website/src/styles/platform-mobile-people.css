@@ -1,0 +1,77 @@
+@media (max-width: 760px) {
+  body[data-site-kind='platform'] .platform-featured-agents {
+    gap: 12px;
+  }
+  body[data-site-kind='platform'] .platform-featured-agents .person-card {
+    padding: 15px;
+  }
+  body[data-site-kind='platform'] .platform-featured-agents .platform-agent-portrait {
+    margin: -15px -15px 15px;
+    height: 120px;
+  }
+  body[data-site-kind='platform'] .platform-featured-agents .person-card h3 {
+    font-size: 19px;
+  }
+  body[data-site-kind='platform'] .platform-featured-agents .person-card p {
+    font-size: 12px;
+  }
+  body[data-site-kind='platform'] .platform-featured-agents .platform-agent-portrait svg {
+    height: 105px;
+  }
+  body[data-site-kind='platform'] .platform-agent-directory .person-card {
+    grid-template-columns: 100px minmax(0, 1fr);
+    column-gap: 16px;
+    padding-right: 16px;
+  }
+  body[data-site-kind='platform'] .platform-agent-directory .platform-agent-portrait,
+  body[data-site-kind='platform'] .platform-agent-directory .avatar {
+    grid-row: 1 / 9;
+    min-height: 240px;
+  }
+  body[data-site-kind='platform'] .platform-agent-directory .person-card > h3 {
+    font-size: 23px;
+  }
+  body[data-site-kind='platform'] .platform-agent-directory .person-card > a:last-child {
+    grid-column: 2;
+    grid-row: auto;
+    align-self: start;
+    justify-self: start;
+    margin-bottom: 20px;
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  body[data-site-kind='platform'] .platform-agent-directory .contact-links {
+    margin-bottom: 6px;
+  }
+}
+@media (max-width: 370px) {
+  body[data-site-kind='platform'] .platform-header-inner {
+    gap: 8px;
+  }
+  body[data-site-kind='platform'] .platform-wordmark {
+    font-size: 11px;
+  }
+  body[data-site-kind='platform'] .platform-wordmark small {
+    display: none;
+  }
+  body[data-site-kind='platform'] .platform-search > button {
+    width: 31px;
+    height: 31px;
+  }
+  body[data-site-kind='platform'] .platform-professionals summary {
+    max-width: 104px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body[data-site-kind='platform'] .platform-home-hero {
+    animation: platform-reveal 0.3s ease-out;
+  }
+  @keyframes platform-reveal {
+    from {
+      opacity: 0.65;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
