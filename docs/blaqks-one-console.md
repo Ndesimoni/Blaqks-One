@@ -155,3 +155,21 @@ Owner answers of 2026-11-05: people on the Blaqks One team get **a role as a sta
 **BO1b built 2026-11-05** (`feature/blaqks-one-console`): migrations 0091 (role `platform`, `crm_platform_access`) and 0092 (password-reset account event), the levelled operator guard on every platform route, `/api/crm/platform/team` with invite, edit access, suspend, resend, sign out everywhere, reset password and archive, and Settings → Blaqks One team. Verified: the full API suite (709 passed), 31 browser specs including the team flow, unit and Rust tests, Clippy and the repository checks.
 
 **Account control (owner, 2026-11-05).** Everyone, the Owner included, changes their own password and signs out unknown devices on Settings → My profile → Sign-in and security. The Owner controls a team member's account without ever seeing their password: **Sign out everywhere** revokes all their sessions at once, and **Reset password** makes the old password unusable, signs them out and gives the Owner a one-time link to share, on which the member chooses a new password. Suspend, archive and the activity log stay as they are. No "view as" or signing in as a member (the owner chose the recommended option; both blur who did what).
+
+## 11. Decisions taken while building (2026-11-05)
+
+The owner asked to keep building the agreed plan without stopping for questions, taking the recommended option each time. These are the choices made that way.
+
+**BO1e clients.** The marketing site's contact form relays server to server (its own route checks the browser's origin, like the property website's enquiry relay), so the CRM intake does not check a browser origin; it relies on the relay, a hidden trap field, rate limits and size limits. A sign-up whose email matches a client links the client to the new company and moves it to Signed up.
+
+**BO1f messaging, phase 1 (now).** The Blaqks One team gets its own team chat (channels, direct messages and groups among the Owner and platform staff), reusing the chat module for the Blaqks One organisation only; nobody in it can reach a company's chat. Each client keeps Call, WhatsApp, Email and Text buttons that open the phone's apps, and calls and messages are logged on the client's timeline. **Phase 2 (with the provider work, W1b and E3):** a Blaqks One inbox that sends and receives email and WhatsApp from its own connected mailbox and number, threaded onto its clients, and in-app SMS.
+
+**BO1c help requests.**
+
+- Any member opens **Help** from the account menu: a category (Account and sign-in, Plan and billing, Something is not working, How do I…, Idea, Other), a subject and a message. The form asks for no clients' personal details.
+- Only the requester and the Blaqks One team members with Help requests at View can read a request; the requester's company Admin cannot.
+- States: **Open** (waiting for Blaqks One), **Waiting** (Blaqks One answered, waiting for the member) and **Solved**. A member's reply reopens it; Blaqks One marks it solved; a solved request can be reopened by the member within 30 days.
+- Blaqks One side: Platform → Help requests in the Client inbox's three-pane pattern (list with Open, Waiting, Solved and Assigned to me; the thread; the requester's company, role and seats), assigning a request to a team member, answering (Manage) and solving. The bell and the section show the number of open requests.
+- The member sees their requests and Blaqks One's replies under Help, with an unread count on the account menu.
+- Events for the dashboard: help request opened, answered and solved; the dashboard's help figures (open, solved, median time to first answer) fill in.
+- Attachments wait for the media work.
