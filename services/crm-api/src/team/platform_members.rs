@@ -6,7 +6,10 @@ use crate::{
     auth::{session::Session, sessions},
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use axum::{
     extract::{Path, State},
@@ -80,17 +83,20 @@ fn label(id: &str) -> Option<&'static str> {
 }
 
 /// `GET /api/crm/platform/companies/{workspace}/members`: the company's Admin first, then its
-/// staff by name, archived ones flagged. Live operator only; any company, archived included.
+/// staff by name, archived ones flagged. The live operator viewing companies only; any
+/// company, archived included.
 pub async fn list(
     State(state): State<AppState>,
     session: Session,
     Path(workspace): Path<String>,
 ) -> ApiResult<Json<Value>> {
-    if session.user.role != "super-admin" || workspace == workspaces::ORGANISATION {
+    let (companies, view) = (Area::Companies, Level::View);
+    let allowed = workspaces::platform::areas::allows(&session.user, companies, view);
+    if !allowed || workspace == workspaces::ORGANISATION {
         return Err(ApiError::forbidden());
     }
     let mut tx = state.pool.begin().await?;
-    workspaces::platform::operator(&mut tx, session.user.id).await?;
+    workspaces::platform::operator(&mut tx, session.user.id, companies, view).await?;
     let company: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
          WHERE w.id=$1 AND u.role='admin')",

@@ -1,5 +1,6 @@
-//! `POST /api/crm/workspaces/{company}/marketplace/decision` (packet MK1a): the Super Admin
-//! approves or declines only the pending application, and revokes only an approved company.
+//! `POST /api/crm/workspaces/{company}/marketplace/decision` (packet MK1a): Blaqks One,
+//! managing the marketplace (BO1b), approves or declines only the pending application, and
+//! revokes only an approved company.
 //! Every decision is insert-only evidence with the day and the reviewer.
 use super::{
     decisions::{reviewer, INVALID},
@@ -10,7 +11,7 @@ use crate::{
     auth::{protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces::{self, ORGANISATION},
+    workspaces::{self, platform::Level, ORGANISATION},
 };
 use axum::{
     extract::{rejection::JsonRejection, Path, State as AxumState},
@@ -41,7 +42,7 @@ pub async fn decide(
     Path(company): Path<String>,
     body: Result<Json<Decision>, JsonRejection>,
 ) -> ApiResult<Json<Value>> {
-    reviewer(&session)?;
+    reviewer(&session, Level::Manage)?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
     if company == ORGANISATION {
         return Err(ApiError::missing());
@@ -53,7 +54,7 @@ pub async fn decide(
     let reason = reason(request.reason, &request.decision)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &company).await?;
-    super::decisions::live_reviewer(&mut tx, session.user.id).await?;
+    super::decisions::live_reviewer(&mut tx, session.user.id, Level::Manage).await?;
     let owner = workspaces::owner_of(&mut tx, &company)
         .await
         .map_err(|_| ApiError::missing())?;

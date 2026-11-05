@@ -7,13 +7,19 @@ use super::{
 use crate::team::{access, account_type::seats, audit};
 use crate::{
     assignments::departure,
-    auth::{actions::Actions, sessions},
+    auth::sessions,
     error::{ApiError, ApiResult},
-    finance, workspaces,
+    finance,
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use sqlx::PgPool;
 use uuid::Uuid;
 
+/// `area` is what Blaqks One must manage when it acts on a team it does not own.
+#[allow(clippy::too_many_arguments)]
 pub async fn update(
     pool: &PgPool,
     actor: Uuid,
@@ -21,6 +27,7 @@ pub async fn update(
     workspace: &str,
     id: Uuid,
     manages_admin: bool,
+    area: Area,
     mut request: UpdateRequest,
 ) -> ApiResult<()> {
     let mut transaction = pool.begin().await?;
@@ -28,7 +35,7 @@ pub async fn update(
     access::lock_owner(&mut transaction, owner).await?;
     // Only Blaqks One acts on a team it does not own (BO1a item 8): re-read it live here.
     if actor != owner {
-        workspaces::platform::operator(&mut transaction, actor).await?;
+        workspaces::platform::operator(&mut transaction, actor, area, Level::Manage).await?;
     }
     let home = update_channels::home(&mut transaction, workspace, id, manages_admin).await?;
     let target = sqlx::query_scalar::<_, Uuid>(
@@ -55,13 +62,18 @@ pub async fn update(
             "This member changed. Reload before saving.",
         ));
     }
+    // Invite-Admins staff only cancel pending Admin invitations (BO1b); suspending people
+    // is a company control on Companies.
+    if actor != owner && area == Area::InviteAdmins && !update::cancels(&current, &request) {
+        return Err(ApiError::forbidden());
+    }
     let before = current.user.effective_permissions();
     prepare(&mut request, &current)?;
     let active = request.active.unwrap_or(current.active);
     if !current.active && active {
         seats::ensure(&mut transaction, workspace, Some(id)).await?;
     }
-    let access_changed = grants_changed(&current, &request);
+    let access_changed = update::grants_changed(&current, &request);
     // Admin rows keep '{}' (L-2): their `actions` stays None and COALESCE keeps it.
     sqlx::query(
         "UPDATE crm_users SET name=$2,phone=$3,positions=$4,permissions=$5,channel_access=$6, \
@@ -122,20 +134,4 @@ pub async fn update(
     .await?;
     transaction.commit().await?;
     Ok(())
-}
-
-/// Whether a stored grant changes: modules, actions, record scope or channels.
-fn grants_changed(current: &MemberRow, request: &UpdateRequest) -> bool {
-    let user = &current.user;
-    let channels = request.channel_access.as_ref() != Some(&user.channel_access.0);
-    if user.role != "staff" {
-        return channels;
-    }
-    let scope = request
-        .record_scope
-        .is_some_and(|scope| scope.as_str() != user.record_scope);
-    let actions = request.actions.is_some_and(|requested| {
-        !user.actions_recorded() || requested.actions != Actions::from_stored(&user.actions.0)
-    });
-    channels || scope || actions || request.permissions.as_ref() != Some(&user.permissions.0)
 }

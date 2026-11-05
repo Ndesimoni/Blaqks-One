@@ -34,7 +34,7 @@ pub async fn ensure_recipient(
     }
     let found: Option<String> = sqlx::query_scalar(
         "SELECT workspace_id FROM crm_user_profiles \
-         WHERE id=$1 AND active AND owner_active AND role<>'super-admin'",
+         WHERE id=$1 AND active AND owner_active AND role IN ('admin','staff')",
     )
     .bind(member)
     .fetch_optional(&mut **tx)

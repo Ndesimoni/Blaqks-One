@@ -41,6 +41,8 @@ fn user(role: &str, scope: &str, permissions: Permissions, actions: Value) -> Us
         actions: Json(actions),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 

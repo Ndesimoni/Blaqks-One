@@ -14,6 +14,7 @@ const translated = {
   Agreements: 'agreements',
   'Shared record': 'recordShares',
   'Platform dashboard': 'platformMetrics',
+  'Blaqks One team': 'platformTeam',
 };
 
 /** Pages that render their own main heading; the top bar then names them as plain text. */

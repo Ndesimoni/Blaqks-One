@@ -31,7 +31,7 @@ pub async fn list(
     sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
         .execute(&mut *transaction)
         .await?;
-    let operator = platform::operator(&mut transaction, session.user.id).await?;
+    let operator = platform::owner(&mut transaction, session.user.id).await?;
     let end = (dates::start_micros(filters.days.1 + 1), Uuid::max());
     let window = Window {
         workspace: ORGANISATION.into(),

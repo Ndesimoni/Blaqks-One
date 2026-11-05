@@ -12,6 +12,7 @@ import { filterCompanies, filterCounts, pageOf, PAGE_SIZE } from './companiesMod
 import { useWebsiteCompanies } from './useWebsiteCompanies.js';
 import '../website-lists.css';
 import './website-companies.css';
+import { hasPlatformArea } from '../../platformAccess.js';
 
 function CompaniesList({ api }) {
   const { t } = useI18n();
@@ -116,7 +117,7 @@ export function WebsiteCompanies() {
         <h2 id="website-companies-title">{k('title')}</h2>
         <p>{k('intro')}</p>
       </div>
-      {user.roleId === 'super-admin' ? (
+      {hasPlatformArea(user, 'platform_website') ? (
         <CompaniesList api={api} />
       ) : (
         <section className="panel recovery-panel">

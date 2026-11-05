@@ -18,6 +18,7 @@ import { publishedAt, recordWebsite } from './listingsModel.js';
 import { useWebsiteListings } from './useWebsiteListings.js';
 import { WithdrawListing } from './WithdrawListing.jsx';
 import './website-listings.css';
+import { isPlatformMember } from '../../platformAccess.js';
 
 /** The slider header's Website pill for each status: catalogue key and badge tone. */
 const pills = {
@@ -47,8 +48,7 @@ export function PropertyWebsitePanel({ module, record }) {
     actionCollection(module) === 'Properties'
       ? findEntry(records.entries, 'Properties', record)
       : null;
-  const enabled =
-    Boolean(entry) && !readOnly && owner?.id === workspace && user.roleId !== 'super-admin';
+  const enabled = Boolean(entry) && !readOnly && owner?.id === workspace && !isPlatformMember(user);
   const staff = user.roleId !== 'admin';
   const listings = useWebsiteListings(enabled);
   const own = usePublishers(undefined, enabled && staff);

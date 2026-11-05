@@ -20,6 +20,7 @@ import './team-actions.css';
 import './team-form.css';
 import './team-finance.css';
 import './team-agreements.css';
+import { hasPlatformArea } from '../server/platformAccess.js';
 
 export function ServerTeamPage({ owner }) {
   const { user } = useSession();
@@ -51,7 +52,8 @@ export function ServerTeamPage({ owner }) {
     team.retry();
     refreshDirectory?.();
   };
-  const canInviteAdmin = user.roleId === 'super-admin' && owner.id === 'super-admin-workspace';
+  const canInviteAdmin =
+    hasPlatformArea(user, 'invite_admins', 'manage') && owner.id === 'super-admin-workspace';
   const memberActions = useTeamMemberActions(owner.id, completed);
   return (
     <section className="connected-team" aria-label="Workspace team">

@@ -12,14 +12,14 @@ pub struct LiveMember {
     pub name: String,
 }
 
-/// An active member whose company owner is active; the Super Admin is never included.
+/// An active member whose company owner is active; Blaqks One and its team never are.
 pub async fn live<'e>(
     executor: impl sqlx::PgExecutor<'e>,
     id: Uuid,
 ) -> ApiResult<Option<LiveMember>> {
     Ok(sqlx::query_as(
         "SELECT id,workspace_id,name FROM crm_user_profiles \
-         WHERE id=$1 AND active AND owner_active AND role<>'super-admin'",
+         WHERE id=$1 AND active AND owner_active AND role IN ('admin','staff')",
     )
     .bind(id)
     .fetch_optional(executor)
@@ -34,7 +34,8 @@ pub async fn live_name<'e>(
 ) -> ApiResult<Option<String>> {
     Ok(sqlx::query_scalar(
         "SELECT name FROM crm_user_profiles \
-         WHERE id=$1 AND workspace_id=$2 AND active AND owner_active AND role<>'super-admin'",
+         WHERE id=$1 AND workspace_id=$2 AND active AND owner_active \
+         AND role IN ('admin','staff')",
     )
     .bind(id)
     .bind(workspace)

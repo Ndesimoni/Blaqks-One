@@ -6,6 +6,7 @@ import {
   positionLabel,
   recordScopeLabel,
 } from './profileModel.js';
+import { isPlatformMember } from '../platformAccess.js';
 
 function Chips({ items, label, empty }) {
   if (!items.length) return <span className="acct-muted">{empty}</span>;
@@ -23,7 +24,7 @@ function Chips({ items, label, empty }) {
 /** Read-only account facts. Email, role and access are managed by the member's Admin. */
 export function AccountSummary({ account }) {
   const { user, team } = account;
-  const owner = user.roleId === 'super-admin';
+  const owner = isPlatformMember(user);
   const positions = (user.positions || []).map(positionLabel);
   return (
     <div className="panel acct-card">

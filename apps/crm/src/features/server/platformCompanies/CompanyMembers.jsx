@@ -9,7 +9,7 @@ const TONES = { active: 'green', suspended: 'amber', pending: 'slate', archived:
  * A company's people on Blaqks One's company panel (BO1a): name, email, role and positions,
  * status and last active, with Suspend or Reactivate and Archive. Never their records.
  */
-export function CompanyMembers({ list, onArchive, onToast }) {
+export function CompanyMembers({ list, controls, onArchive, onToast }) {
   const { t, format } = useI18n();
   const k = (key, vars) => t(`platformCompanies.${key}`, vars);
   if (list.error && !list.rows)
@@ -55,7 +55,7 @@ export function CompanyMembers({ list, onArchive, onToast }) {
               </span>
             </div>
             <Badge tone={TONES[member.status] || 'slate'}>{k(`status.${member.status}`)}</Badge>
-            {member.status !== 'archived' && (
+            {controls && member.status !== 'archived' && (
               <div className="company-member-actions">
                 {member.status === 'active' &&
                   action(member, 'suspend', () => toggle(member, false))}

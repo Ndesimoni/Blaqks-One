@@ -29,6 +29,8 @@ fn user(role: &str, scope: &str, module: bool, finance: Value) -> UserRow {
         actions: Json(actions),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 

@@ -1,4 +1,5 @@
 import { fromSocial, toSocial } from './social/socialModel.js';
+import { hasPlatformArea } from '../platformAccess.js';
 
 /** Public website content only; identity contacts, eligibility and private records stay out. */
 export const CONTENT_KEYS = [
@@ -74,7 +75,7 @@ export function websiteStatus(site, platform) {
 }
 
 export function websiteAccess(user, owner, platform) {
-  if (platform) return user?.roleId === 'super-admin';
+  if (platform) return hasPlatformArea(user, 'platform_website');
   return (
     user?.roleId === 'admin' &&
     owner?.status !== 'archived' &&

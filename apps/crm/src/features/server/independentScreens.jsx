@@ -15,15 +15,18 @@ import { ServerWebsiteProfile } from './profile/ServerWebsiteProfile.jsx';
 import { MarketplaceChats } from './marketChats/MarketplaceChats.jsx';
 import { marketView } from './marketplace/marketViews.js';
 import { PlatformDashboard } from './platformDashboard/PlatformDashboard.jsx';
+import { PlatformTeamPage } from './platformTeam/PlatformTeamPage.jsx';
 import { ServerWorkspaces } from './platformCompanies/ServerWorkspaces.jsx';
+import { isPlatformMember } from './platformAccess.js';
 
 /**
  * Pages independent of the selected workspace's records: the member's own account, company
  * settings, messaging, agreements and the Marketplace. Each route's element, or null.
  */
 export function independentScreen(route, user) {
-  if (route === 'Workspaces' && user?.roleId === 'super-admin') return <ServerWorkspaces />;
+  if (route === 'Workspaces' && isPlatformMember(user)) return <ServerWorkspaces />;
   if (route === 'Platform dashboard') return <PlatformDashboard />;
+  if (route === 'Blaqks One team') return <PlatformTeamPage />;
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Website profile') return <ServerWebsiteProfile />;
   if (route === 'Sign-in and security') return <ServerSecurity />;

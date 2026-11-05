@@ -2,6 +2,7 @@ import { descriptions } from '../../config/navigation.js';
 
 import { connectedCollections } from './records.js';
 import { WEBSITE_ROUTES } from './website/websiteRoutes.js';
+import { isPlatformMember } from './platformAccess.js';
 
 const connectedSections = new Set([
   ...Object.keys(WEBSITE_ROUTES),
@@ -9,6 +10,7 @@ const connectedSections = new Set([
   'Leads',
   'Company',
   'Team & access',
+  'Blaqks One team',
   'Dashboard',
   'Client desk',
   // Finance (finance-design §7): Deals, Payments and Expenses come from `GET /finance`.
@@ -54,7 +56,7 @@ const connectedSections = new Set([
 ]);
 /** Workspaces is connected for the Super Admin only, as the platform's company list. */
 export const isConnectedSection = (name, user) =>
-  connectedSections.has(name) || (name === 'Workspaces' && user?.roleId === 'super-admin');
+  connectedSections.has(name) || (name === 'Workspaces' && isPlatformMember(user));
 export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
 
 const purposes = {

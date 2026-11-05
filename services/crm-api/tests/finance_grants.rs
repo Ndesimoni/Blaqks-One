@@ -32,6 +32,8 @@ fn agent(scope: &str, finance: Value) -> MemberRow {
             channel_access: Json(Default::default()),
             language: None,
             guidance_enabled: None,
+            platform_preset: None,
+            platform_access: None,
             record_scope: scope.into(),
             actions: Json(actions),
         },

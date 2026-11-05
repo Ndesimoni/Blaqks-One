@@ -4,6 +4,7 @@ import { useSession } from '../../hooks/useSession.js';
 import { ServerStatus } from './ServerStatus.jsx';
 import { ServerWorkspace } from './ServerWorkspace.jsx';
 import { ServerSignOut } from './ServerSignOut.jsx';
+import { isPlatformMember } from './platformAccess.js';
 
 export function ServerDirectory() {
   const { api, user } = useSession();
@@ -43,7 +44,7 @@ export function ServerDirectory() {
   if (!workspaces)
     return <ServerStatus title="Opening your workspace" message="Loading permitted workspaces…" />;
   // Everyone opens their own workspace only (BO1): no one switches into another company.
-  const own = user.roleId === 'super-admin' ? 'super-admin-workspace' : user.workspaceId || user.id;
+  const own = isPlatformMember(user) ? 'super-admin-workspace' : user.workspaceId || user.id;
   const owner = workspaces.find((workspace) => workspace.id === own) || workspaces[0];
   return (
     <ServerWorkspace

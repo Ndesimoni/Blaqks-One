@@ -18,6 +18,7 @@ import { MessengerContext } from './products/messenger/messengerContext.js';
 import { MessengerPanel } from './products/messenger/MessengerPanel.jsx';
 import { BottomBar } from './products/BottomBar.jsx';
 import { visibleProducts } from './products/productModel.js';
+import { isPlatformMember } from './platformAccess.js';
 
 export function ServerShell({ owner }) {
   const { user } = useSession();
@@ -34,7 +35,7 @@ export function ServerShell({ owner }) {
   const wide = useMediaQuery('(min-width: 1181px)');
   const strip =
     wide &&
-    user.roleId !== 'super-admin' &&
+    !isPlatformMember(user) &&
     (canOpenSection(user, 'Inbox') || canOpenSection(user, 'Team chat'));
   const { toast, setToast, setMobileNav } = useWorkspaceView();
   const openMessenger = (box, id = '') => {

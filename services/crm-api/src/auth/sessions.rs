@@ -53,16 +53,16 @@ pub async fn revoke_member(
     Ok(())
 }
 
-/// Signs out every listed account.
+/// Signs out every listed account; returns how many sessions ended.
 pub async fn revoke_all(
     transaction: &mut Transaction<'_, Postgres>,
     members: &[Uuid],
-) -> ApiResult<()> {
-    sqlx::query("DELETE FROM crm_sessions WHERE user_id=ANY($1)")
+) -> ApiResult<u64> {
+    let ended = sqlx::query("DELETE FROM crm_sessions WHERE user_id=ANY($1)")
         .bind(members)
         .execute(&mut **transaction)
         .await?;
-    Ok(())
+    Ok(ended.rows_affected())
 }
 
 /// When each listed account last used a session it still holds (UTC, ISO 8601), for

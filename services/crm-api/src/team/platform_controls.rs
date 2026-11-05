@@ -1,7 +1,8 @@
 //! Blaqks One suspends or reactivates one person of a company from Companies (BO1a item 8,
-//! owner answer Q1), without opening the company. The company's Admin goes through the
-//! organisation, like every Admin control; an agent goes through the platform resolver. The
-//! member update re-reads the operator and the owner under the workspace lock.
+//! owner answer Q1), without opening the company, managing companies (BO1b).
+//! The company's Admin goes through the organisation, like every Admin control; an agent
+//! goes through the platform resolver. The member update re-reads the operator and the
+//! owner under the workspace lock.
 use super::{
     access,
     members::{update::UpdateRequest, update_store},
@@ -11,7 +12,10 @@ use crate::{
     auth::{protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use axum::{
     extract::{rejection::JsonRejection, Path, State},
@@ -59,11 +63,9 @@ pub async fn set_active(
     };
     let organisation = workspaces::ORGANISATION;
     let (owner, scope, admin) = if id == company_owner {
-        (
-            access::owner(&state, &session, organisation).await?,
-            organisation,
-            true,
-        )
+        let controls = (Area::Companies, Level::Manage);
+        let owner = access::organisation_owner(&state, &session, controls).await?;
+        (owner, organisation, true)
     } else {
         (company_owner, workspace.as_str(), false)
     };
@@ -74,6 +76,7 @@ pub async fn set_active(
         scope,
         id,
         admin,
+        Area::Companies,
         change,
     )
     .await?;

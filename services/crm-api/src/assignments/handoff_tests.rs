@@ -106,6 +106,8 @@ fn staff_without_assign() -> UserRow {
         actions: Json(json!({"relationships": {"create": true}})),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 

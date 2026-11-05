@@ -19,6 +19,8 @@ fn user(role: &str, scope: &str, permissions: Permissions, finance: Value) -> Us
         actions: Json(json!({ "finance": finance })),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 

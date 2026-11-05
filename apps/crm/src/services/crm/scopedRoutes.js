@@ -14,6 +14,7 @@ import { integrationRoutes } from './integrations.js';
 import { marketplaceRoutes } from './marketplace.js';
 import { performanceRoutes } from './performance.js';
 import { platformMetricsRoutes } from './platformMetrics.js';
+import { platformTeamRoutes } from './platformTeam.js';
 import { recordShareRoutes } from './recordShares.js';
 import { websiteRoutes } from './websites.js';
 import { whatsappNumberRoutes } from './whatsappNumbers.js';
@@ -25,6 +26,7 @@ export function scopedRoutes({ request, scope }) {
     ...performanceRoutes({ request, scope }),
     ...companyRoutes({ request, scope }),
     ...platformMetricsRoutes({ request }),
+    ...platformTeamRoutes({ request }),
     ...integrationRoutes({ request, scope }),
     ...inboxRoutes({ request, scope }),
     ...chatRoutes({ request, scope }),

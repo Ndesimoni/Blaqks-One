@@ -40,6 +40,7 @@ export default {
   'sections.marketChats': 'Marketplace chats',
   'sections.platformDashboard': 'Dashboard',
   'sections.workspaces': 'Workspaces',
+  'sections.platformTeam': 'Blaqks One team',
   'sections.applications': 'Marketplace applications',
   'sections.platformWebsite': 'Platform website',
   'sections.company': 'Company',

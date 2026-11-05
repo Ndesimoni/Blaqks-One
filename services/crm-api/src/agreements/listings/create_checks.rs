@@ -90,7 +90,7 @@ pub async fn check(
     }
     let agent: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM crm_user_profiles WHERE id=$1 AND workspace_id=$2 \
-         AND active AND owner_active AND role<>'super-admin')",
+         AND active AND owner_active AND role IN ('admin','staff'))",
     )
     .bind(input.to)
     .bind(&input.to_workspace)

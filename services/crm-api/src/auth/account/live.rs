@@ -28,7 +28,8 @@ pub async fn lock(transaction: &mut Transaction<'_, Postgres>, user: Uuid) -> Ap
     if let Some(owner) = live.owner_id {
         sqlx::query_scalar::<_, Uuid>(
             "SELECT id FROM crm_users WHERE id=$1 AND deleted_at IS NULL \
-             AND ($2<>'staff' OR (active AND role IN ('admin','super-admin'))) FOR SHARE",
+             AND ($2 NOT IN ('staff','platform') OR (active AND role IN ('admin','super-admin'))) \
+             FOR SHARE",
         )
         .bind(owner)
         .bind(&live.role)

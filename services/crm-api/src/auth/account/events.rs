@@ -12,6 +12,8 @@ pub enum Action {
     PasswordChanged,
     SessionsRevoked,
     SessionRevoked,
+    /// The Blaqks One Owner reset a team member's password (BO1b).
+    PasswordReset,
 }
 
 impl Action {
@@ -22,6 +24,7 @@ impl Action {
             Self::PasswordChanged => "password_changed",
             Self::SessionsRevoked => "sessions_revoked",
             Self::SessionRevoked => "session_revoked",
+            Self::PasswordReset => "password_reset",
         }
     }
 }

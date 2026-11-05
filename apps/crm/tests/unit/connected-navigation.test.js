@@ -77,7 +77,11 @@ test('Blaqks One keeps its platform pages and opens nothing of a company (BO1a)'
     'Marketplace applications',
     'Platform website',
   ]);
-  assert.deepEqual(itemsOf(groups, 'company'), ['Team & access', 'Team activity']);
+  assert.deepEqual(itemsOf(groups, 'company'), [
+    'Team & access',
+    'Blaqks One team',
+    'Team activity',
+  ]);
   assert.equal(names(groups).filter((name) => name === 'Workspaces').length, 1);
   for (const name of ['Messages', 'Inbox', 'Team chat', 'Agreements', 'Marketplace', 'Website'])
     assert.ok(!names(groups).includes(name), name);

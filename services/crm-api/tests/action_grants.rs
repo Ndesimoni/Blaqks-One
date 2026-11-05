@@ -26,6 +26,8 @@ fn member(role: &str, scope: &str, positions: &[&str], permissions: Permissions)
             channel_access: Json(Default::default()),
             language: None,
             guidance_enabled: None,
+            platform_preset: None,
+            platform_access: None,
             record_scope: scope.into(),
             actions: Json(actions),
         },

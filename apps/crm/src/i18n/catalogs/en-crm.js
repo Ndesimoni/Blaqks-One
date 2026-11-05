@@ -26,6 +26,7 @@ import enPerformance from './en/performance.js';
 import enPlatformCompanies from './en/platformCompanies.js';
 import enPlatformFigures from './en/platformFigures.js';
 import enPlatformMetrics from './en/platformMetrics.js';
+import enPlatformTeam from './en/platformTeam.js';
 import enProperties from './en/properties.js';
 import enRecordGrid from './en/recordGrid.js';
 import enRecordKeeps from './en/recordKeeps.js';
@@ -62,6 +63,7 @@ export const crmCatalogs = {
   platformCompanies: enPlatformCompanies,
   platformFigures: enPlatformFigures,
   platformMetrics: enPlatformMetrics,
+  platformTeam: enPlatformTeam,
   properties: enProperties,
   recordGrid: enRecordGrid,
   recordKeeps: enRecordKeeps,

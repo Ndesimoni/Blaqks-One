@@ -3,6 +3,8 @@ import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { MarketplaceDecision } from './MarketplaceDecision.jsx';
+import { useSession } from '../../../hooks/useSession.js';
+import { hasPlatformArea } from '../platformAccess.js';
 
 const TONES = {
   pending: 'amber',
@@ -18,7 +20,10 @@ const TONES = {
  */
 export function MarketplaceApplicationRow({ row, onChanged }) {
   const { t, format } = useI18n();
+  const { user } = useSession();
   const [action, setAction] = useState('');
+  // Deciding needs Manage on Marketplace; View reads the queue only (BO1b).
+  const decides = hasPlatformArea(user, 'marketplace', 'manage');
   const pending = row.state === 'pending';
   const counts = row.counts;
   return (
@@ -54,7 +59,7 @@ export function MarketplaceApplicationRow({ row, onChanged }) {
           <span>{t(`marketplace.states.${row.state}`)}</span> {row.reason}
         </p>
       )}
-      <div className="market-actions market-application-actions">
+      <div className="market-actions market-application-actions" hidden={!decides}>
         {pending && (
           <>
             <Button onClick={() => setAction('approved')}>

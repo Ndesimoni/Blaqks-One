@@ -1,12 +1,12 @@
-//! The platform queue (packet MK1a): only the Super Admin reaches it; everyone else gets the
-//! shared not-found. The reviewer sees the company's name, type, age, who applied and the
+//! The platform queue (packet MK1a): only Blaqks One with the marketplace area (BO1b)
+//! reaches it; everyone else gets the shared not-found. The reviewer sees the company's name, type, age, who applied and the
 //! counts, never its records.
 use super::state::{self as market, State};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{self, platform::Area, platform::Level},
 };
 use axum::{
     extract::{Query, State as AxumState},
@@ -33,9 +33,10 @@ struct Applied {
     applied_at: String,
 }
 
-/// Only Blaqks One may read the platform queue.
-pub(super) fn reviewer(session: &Session) -> ApiResult<()> {
-    if session.user.role == "super-admin" {
+/// Only Blaqks One with the marketplace area at `level` reaches the platform queue: View
+/// reads the applications, Manage decides them.
+pub(super) fn reviewer(session: &Session, level: Level) -> ApiResult<()> {
+    if workspaces::platform::areas::allows(&session.user, Area::Marketplace, level) {
         Ok(())
     } else {
         Err(ApiError::missing())
@@ -47,8 +48,9 @@ pub(super) fn reviewer(session: &Session) -> ApiResult<()> {
 pub(super) async fn live_reviewer(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     actor: Uuid,
+    level: Level,
 ) -> ApiResult<()> {
-    match workspaces::platform::operator(tx, actor).await {
+    match workspaces::platform::operator(tx, actor, Area::Marketplace, level).await {
         Err(error) if error.0 == axum::http::StatusCode::FORBIDDEN => Err(ApiError::missing()),
         other => other.map(|_| ()),
     }
@@ -63,14 +65,14 @@ pub async fn list(
     session: Session,
     Query(filter): Query<Filter>,
 ) -> ApiResult<Json<Value>> {
-    reviewer(&session)?;
+    reviewer(&session, Level::View)?;
     let only_pending = match filter.state.as_deref() {
         None | Some("all") => false,
         Some("pending") => true,
         Some(_) => return Err(ApiError::invalid(INVALID)),
     };
     let mut tx = state.pool.begin().await?;
-    live_reviewer(&mut tx, session.user.id).await?;
+    live_reviewer(&mut tx, session.user.id, Level::View).await?;
     let rows: Vec<Applied> = sqlx::query_as(&format!(
         "SELECT id,workspace_id,applied_by,counts,{} AS applied_at \
          FROM marketplace.crm_market_applications \

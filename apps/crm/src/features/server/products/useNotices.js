@@ -5,6 +5,7 @@ import { useChatCounts } from '../chat/useChatCounts.js';
 import { useWaitingCount } from '../useWaitingCount.js';
 import { waitingSources } from '../waitingCounts.js';
 import { noticeRows } from './noticesModel.js';
+import { hasPlatformArea, isPlatformMember } from '../platformAccess.js';
 
 const BELL_POLL_MS = 60_000;
 
@@ -16,13 +17,15 @@ const BELL_POLL_MS = 60_000;
 export function useNotices() {
   const { api, user } = useSession();
   const { route } = useNavigation();
-  const platform = user?.roleId === 'super-admin';
+  // The Blaqks One team reads no company conversations or hand-overs (BO1a, BO1b).
+  const platform = isPlatformMember(user);
   const member = Boolean(user) && !platform;
+  const reviews = hasPlatformArea(user, 'marketplace');
   const counts = {
     mentions: useChatCounts(api, user?.workspaceId, route, member).mentions,
     handovers: useWaitingCount(waitingSources.Deals, member, route, BELL_POLL_MS),
     agreements: useWaitingCount(waitingSources.Agreements, member, route, BELL_POLL_MS),
-    applications: useWaitingCount(waitingSources.Applications, platform, route, BELL_POLL_MS),
+    applications: useWaitingCount(waitingSources.Applications, reviews, route, BELL_POLL_MS),
     clients: useWaitingCount(waitingSources.Clients, member, route, BELL_POLL_MS),
     properties: useWaitingCount(waitingSources.Properties, member, route, BELL_POLL_MS),
     contacts: useWaitingCount(waitingSources.Contacts, member, route, BELL_POLL_MS),

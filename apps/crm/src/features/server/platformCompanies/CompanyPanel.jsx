@@ -2,7 +2,9 @@ import React, { useId, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Drawer } from '../../../components/ui/Drawer.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
+import { useSession } from '../../../hooks/useSession.js';
 import { useI18n } from '../../../i18n/useI18n.js';
+import { hasPlatformArea } from '../platformAccess.js';
 import { SeatLimitDialog } from '../../server-team/SeatLimitDialog.jsx';
 import { TeamArchiveDialog } from '../../server-team/TeamArchiveDialog.jsx';
 import { CompanyMembers } from './CompanyMembers.jsx';
@@ -20,6 +22,9 @@ const archiveScope = (company, member) =>
  */
 export function CompanyPanel({ company, onClose, onChanged, onToast }) {
   const { t, format } = useI18n();
+  const { user } = useSession();
+  // Suspend, archive and seat limits need Manage on Companies (BO1b).
+  const controls = hasPlatformArea(user, 'companies', 'manage');
   const k = (key, vars) => t(`platformCompanies.${key}`, vars);
   const titleId = useId();
   const list = usePlatformMembers(company.id);
@@ -59,7 +64,7 @@ export function CompanyPanel({ company, onClose, onChanged, onToast }) {
                 : k('seats', { used: company.seatsUsed, limit: company.seatLimit })}
             </p>
           </div>
-          {company.status !== 'archived' && (
+          {controls && company.status !== 'archived' && (
             <Button variant="light" onClick={() => setSeatsOpen(true)}>
               {k('changeSeats')}
             </Button>
@@ -68,7 +73,12 @@ export function CompanyPanel({ company, onClose, onChanged, onToast }) {
         <p className="company-panel-note">
           <Icon name="lock" size={16} aria-hidden="true" /> {k('panelPrivacy')}
         </p>
-        <CompanyMembers list={list} onArchive={setArchiving} onToast={onToast} />
+        <CompanyMembers
+          list={list}
+          controls={controls}
+          onArchive={setArchiving}
+          onToast={onToast}
+        />
       </div>
       {seatsOpen && (
         <SeatLimitDialog

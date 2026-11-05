@@ -69,6 +69,7 @@ export const productList = [
     sections: [
       { key: 'company', routes: ['Company'] },
       { key: 'team', routes: ['Team & access'] },
+      { key: 'platformTeam', routes: ['Blaqks One team'] },
       { key: 'activity', routes: ['Team activity'], group: 'company' },
       { key: 'channels', routes: ['Channels'] },
       { key: 'inboxRules', routes: ['Inbox rules'] },

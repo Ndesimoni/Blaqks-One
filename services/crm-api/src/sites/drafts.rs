@@ -3,7 +3,10 @@ use crate::{
     auth::{protection, session::Session},
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use axum::http::HeaderMap;
 use serde::Deserialize;
@@ -21,17 +24,21 @@ pub struct Save {
 pub struct Publish {
     pub version: i64,
 }
+/// The draft's transaction: a company's own Admin, or for the general site the live
+/// Blaqks One operator with the platform website at `level` (View reads, Manage writes).
 async fn begin(
     state: &AppState,
     session: &Session,
     workspace: Option<&str>,
+    level: Level,
 ) -> ApiResult<Transaction<'static, Postgres>> {
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, workspace.unwrap_or(workspaces::ORGANISATION)).await?;
     if let Some(workspace) = workspace {
         access::owner(&mut tx, workspace, session.user.id).await?;
     } else {
-        workspaces::platform::operator(&mut tx, session.user.id).await?;
+        let website = Area::PlatformWebsite;
+        workspaces::platform::operator(&mut tx, session.user.id, website, level).await?;
     }
     Ok(tx)
 }
@@ -40,7 +47,7 @@ pub async fn read(
     session: &Session,
     workspace: Option<&str>,
 ) -> ApiResult<Value> {
-    let mut tx = begin(state, session, workspace).await?;
+    let mut tx = begin(state, session, workspace, Level::View).await?;
     let row: Option<(i64, Value, bool)> =
         sqlx::query_as("SELECT version,body,active FROM sites.crm_website_drafts WHERE scope=$1")
             .bind(workspace.unwrap_or(workspaces::ORGANISATION))
@@ -61,7 +68,7 @@ pub async fn save(
 ) -> ApiResult<Value> {
     protection::mutation(state, headers, &session.csrf_token)?;
     validation::site(&input.site)?;
-    let mut tx = begin(state, session, workspace).await?;
+    let mut tx = begin(state, session, workspace, Level::Manage).await?;
     let scope = workspace.unwrap_or(workspaces::ORGANISATION);
     let prior: Option<i64> = sqlx::query_scalar(
         "SELECT version FROM sites.crm_website_drafts WHERE scope=$1 FOR UPDATE",
@@ -90,7 +97,7 @@ pub async fn publish(
     input: Publish,
 ) -> ApiResult<Value> {
     protection::mutation(state, headers, &session.csrf_token)?;
-    let mut tx = begin(state, session, workspace).await?;
+    let mut tx = begin(state, session, workspace, Level::Manage).await?;
     let scope = workspace.unwrap_or(workspaces::ORGANISATION);
     let (version, body, active): (i64, Value, bool) = sqlx::query_as(
         "SELECT version,body,active FROM sites.crm_website_drafts WHERE scope=$1 FOR UPDATE",

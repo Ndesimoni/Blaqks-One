@@ -1,18 +1,23 @@
-//! Who an archive acts for. Only Blaqks One archives accounts: a company Admin (with their
-//! whole team) through its organisation, or one agent of a company through the platform
-//! resolver, never by opening the company (BO1a item 8, owner answer Q1).
+//! Who an archive acts for. Only Blaqks One archives accounts, managing companies (BO1b): a company Admin (with their whole team) through its organisation, or one
+//! agent of a company through the platform resolver, never by opening the company (BO1a
+//! item 8, owner answer Q1).
 use crate::team::access;
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{
+        self,
+        platform::{areas, Area, Level},
+    },
 };
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
+const CONTROLS: (Area, Level) = (Area::Companies, Level::Manage);
+
 pub struct Scope {
-    /// The live Blaqks One operator, re-read under the archive lock.
+    /// The live Blaqks One operator managing companies, re-read under the archive lock.
     pub operator: Uuid,
     pub owner: Uuid,
     pub workspace: String,
@@ -26,12 +31,12 @@ pub async fn scope(
     workspace: String,
     id: Uuid,
 ) -> ApiResult<Scope> {
-    if session.user.role != "super-admin" || session.user.id == id {
+    if !areas::allows(&session.user, CONTROLS.0, CONTROLS.1) || session.user.id == id {
         return Err(ApiError::forbidden());
     }
-    let manages_admin = access::can_manage_admin(session, &workspace);
+    let manages_admin = workspace == workspaces::ORGANISATION;
     let owner = if manages_admin {
-        access::owner(state, session, &workspace).await?
+        access::organisation_owner(state, session, CONTROLS).await?
     } else {
         access::company_owner(state, session, &workspace).await?
     };
@@ -60,7 +65,8 @@ pub async fn scope(
 pub async fn lock(transaction: &mut Transaction<'_, Postgres>, scope: &Scope) -> ApiResult<()> {
     let both = [scope.workspace.as_str(), scope.target_workspace.as_str()];
     workspaces::lock_all(transaction, &both).await?;
-    workspaces::platform::operator(transaction, scope.operator).await?;
+    let (area, level) = CONTROLS;
+    workspaces::platform::operator(transaction, scope.operator, area, level).await?;
     let available: bool =
         sqlx::query_scalar("SELECT deleted_at IS NULL FROM crm_users WHERE id=$1 FOR SHARE")
             .bind(scope.owner)

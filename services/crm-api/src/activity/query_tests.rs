@@ -19,6 +19,8 @@ fn user(role: &str, scope: &str) -> UserRow {
         actions: Json(json!({})),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 

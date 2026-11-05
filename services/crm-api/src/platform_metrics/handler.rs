@@ -1,13 +1,13 @@
 //! `GET /api/crm/platform/metrics?period=30d|12m|all` (BO1d): Blaqks One's dashboard.
-//! Only the live Blaqks One operator reads it (re-read inside the snapshot); everyone else
-//! gets 403. Every figure is a count or a platform-wide sum from one read-only snapshot;
+//! Only the live Blaqks One operator with the dashboard (view) reads it (re-read inside the
+//! snapshot); everyone else gets 403. Every figure is a count or a platform-wide sum from one read-only snapshot;
 //! per-company rows carry usage only (docs/blaqks-one-console.md §4).
 use super::{companies, figures, gather, growth, period, totals};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces::{self, platform::company_rows},
+    workspaces::platform::{self, company_rows, Area, Level},
 };
 use axum::{
     extract::{rejection::QueryRejection, Query, State},
@@ -27,14 +27,14 @@ pub async fn metrics(
     session: Session,
     query: Result<Query<MetricsQuery>, QueryRejection>,
 ) -> ApiResult<Json<Value>> {
-    if session.user.role != "super-admin" {
+    if !platform::areas::allows(&session.user, Area::Dashboard, Level::View) {
         return Err(ApiError::forbidden());
     }
     let mut tx = state.pool.begin().await?;
     sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
         .execute(&mut *tx)
         .await?;
-    workspaces::platform::operator(&mut tx, session.user.id).await?;
+    platform::operator(&mut tx, session.user.id, Area::Dashboard, Level::View).await?;
     let Query(query) = query.map_err(|_| ApiError::invalid(period::INVALID))?;
     let key = period::key(query.period.as_deref())?;
     let companies = company_rows(&state.pool).await?;

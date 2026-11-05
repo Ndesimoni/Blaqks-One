@@ -58,7 +58,8 @@ pub async fn find(
     let mut tx = state.pool.begin().await?;
     let found = sqlx::query_as::<_, Found>(
         "SELECT id, workspace_id, name FROM crm_user_profiles
-         WHERE email=$1 AND active AND owner_active AND role<>'super-admin' AND workspace_id<>$2",
+         WHERE email=$1 AND active AND owner_active AND role IN ('admin','staff') \
+         AND workspace_id<>$2",
     )
     .bind(&email)
     .bind(&workspace)

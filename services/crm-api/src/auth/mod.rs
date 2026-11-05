@@ -17,6 +17,7 @@ pub mod permissions;
 pub mod policy;
 pub mod profile;
 pub mod protection;
+mod role_label;
 pub mod session;
 pub mod sessions;
 pub mod throttle;

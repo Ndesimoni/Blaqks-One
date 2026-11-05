@@ -1,3 +1,4 @@
+import { hasPlatformArea } from '../platformAccess.js';
 /**
  * The website routes (NAV, owner 2026-10-31 and 2026-11-01). The former in-page tabs of
  * Website and Platform website are routes: sections of the Websites product, and header tabs
@@ -51,7 +52,7 @@ export const websiteRoute = (name) =>
 export function websiteGate(user, name, canOpenClients) {
   const route = websiteRoute(name);
   if (!route) return null;
-  if (route.gate === 'platform') return user?.roleId === 'super-admin';
+  if (route.gate === 'platform') return hasPlatformArea(user, 'platform_website');
   if (user?.roleId !== 'admin') return false;
   return route.gate === 'company' || canOpenClients() === true;
 }

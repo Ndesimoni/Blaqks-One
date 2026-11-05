@@ -1,6 +1,7 @@
 import { routePermissions } from '../../config/team.js';
 import { findEntry, returnsOnly } from './assignment/assignmentModel.js';
 import { websiteGate } from './website/websiteRoutes.js';
+import { canOpenPlatformPage, isPlatformMember } from './platformAccess.js';
 
 export function canManageTeam(user) {
   return user?.roleId === 'admin' || user?.roleId === 'super-admin';
@@ -14,27 +15,10 @@ export function hasTeamFeatures(user) {
 /** Managers read the whole workspace's Team activity; staff read My activity (their own). */
 export const activityLabel = (user) => (hasTeamFeatures(user) ? 'Team activity' : 'My activity');
 
-/**
- * Blaqks One's pages (BO1, owner 2026-11-05): the platform screens, inviting company Admins
- * and the account. Never a company's records, messages, websites or marketplace.
- */
-const PLATFORM_ROUTES = [
-  'Start',
-  'Platform dashboard',
-  'Workspaces',
-  'Marketplace applications',
-  'Platform website',
-  'Platform companies',
-  'Team & access',
-  // The organisation's own team feed (Admin invitations and archives), not a company's.
-  'Team activity',
-  'My profile',
-  'Sign-in and security',
-];
-
 export function canOpenSection(user, route) {
-  if (!['admin', 'super-admin', 'staff'].includes(user?.roleId)) return false;
-  if (user.roleId === 'super-admin') return PLATFORM_ROUTES.includes(route);
+  if (!['admin', 'super-admin', 'staff', 'platform'].includes(user?.roleId)) return false;
+  // The Blaqks One team opens platform pages by area, never a company's (BO1a, BO1b).
+  if (isPlatformMember(user)) return canOpenPlatformPage(user, route);
   // Website routes keep the gates of the tabs they replaced (website/websiteRoutes.js).
   const website = websiteGate(user, route, () => canOpenSection(user, 'Clients'));
   if (website !== null) return website;

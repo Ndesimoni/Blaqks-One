@@ -18,6 +18,7 @@ import './website.css';
 import './website-themes.css';
 import './website-actions.css';
 import './website-publish.css';
+import { hasPlatformArea } from '../platformAccess.js';
 
 const FORM_ID = 'website-content-form';
 
@@ -25,7 +26,7 @@ const FORM_ID = 'website-content-form';
  * One site's editor and its sections (NAV): the sidebar and header tabs choose `section`. The
  * content form stays mounted, hidden, while another section is open, so a draft survives.
  */
-function WebsiteEditor({ api, workspace, platform, section, t }) {
+function WebsiteEditor({ api, workspace, platform, section, viewOnly, t }) {
   const editor = useWebsiteEditor(api, workspace, platform, t);
   const { navigate } = useNavigation();
   const [review, setReview] = useState(false);
@@ -48,13 +49,19 @@ function WebsiteEditor({ api, workspace, platform, section, t }) {
   return (
     <div className="website-page page-stack">
       <div className="website-content page-stack" hidden={tab !== content}>
-        <WebsitePublishBar
-          editor={editor}
-          platform={platform}
-          form={FORM_ID}
-          onReview={() => setReview(true)}
-          t={t}
-        />
+        {viewOnly ? (
+          <p className="finance-note" role="note">
+            {t('websites.viewOnly')}
+          </p>
+        ) : (
+          <WebsitePublishBar
+            editor={editor}
+            platform={platform}
+            form={FORM_ID}
+            onReview={() => setReview(true)}
+            t={t}
+          />
+        )}
         <div className="website-editor-layout">
           <form
             id={FORM_ID}
@@ -63,7 +70,7 @@ function WebsiteEditor({ api, workspace, platform, section, t }) {
               run(event.nativeEvent.submitter?.value || 'save');
             }}
           >
-            <fieldset className="website-editor-fields" disabled={busy}>
+            <fieldset className="website-editor-fields" disabled={busy || viewOnly}>
               <legend className="sr-only">{t('websites.content')}</legend>
               <WebsiteIdentity editor={editor} platform={platform} t={t} />
               {!platform && (
@@ -118,6 +125,8 @@ export function ServerWebsite({ platform = false, section }) {
       workspace={user.workspaceId || user.id}
       platform={platform}
       section={section}
+      // Blaqks One team members with View on the platform website read it without editing.
+      viewOnly={platform && !hasPlatformArea(user, 'platform_website', 'manage')}
       t={t}
     />
   );

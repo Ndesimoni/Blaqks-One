@@ -23,6 +23,8 @@ fn user(role: &str, scope: &str, finance: bool, team_view: bool) -> UserRow {
         actions: Json(json!({"finance": {"teamView": team_view}})),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 

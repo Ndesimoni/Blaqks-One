@@ -37,7 +37,7 @@
       "crm_market_releases_immutable",
       "crm_market_release_guard"
     ],
-    "team": ["crm_users", "crm_team_invitations", "crm_team_activity"],
+    "team": ["crm_users", "crm_team_invitations", "crm_team_activity", "crm_platform_access"],
     "records": ["crm_records", "crm_activity", "crm_record_keeps", "crm_record_shares"],
     "assignments": [
       "crm_assignments",

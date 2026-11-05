@@ -17,6 +17,7 @@ import { ServerMediaProvider } from './media/ServerMediaProvider.jsx';
 import { withKept } from './keptRecords.js';
 import { shareRoute } from './shares/shareModel.js';
 import { listingShareRoute } from './listingShares/listingShareLinks.js';
+import { isPlatformMember } from './platformAccess.js';
 
 /** Share links: a colleague's share (R1) or a listing from another company (R2). */
 const linkRoute = (pathname) => shareRoute(pathname) || listingShareRoute(pathname);
@@ -30,7 +31,7 @@ export function ServerWorkspace({ owner, refreshDirectory }) {
   const navigation = useWorkspaceNavigation('/dashboard', linkRoute);
   const view = useWorkspaceViewState(navigation.route, navigation.initialQuery);
   // Blaqks One has no CRM (BO1): its shell loads no records and no photos.
-  const platform = user.roleId === 'super-admin';
+  const platform = isPlatformMember(user);
   const records = { ...useServerRecords(api, owner.id, !platform), linkFields };
   const readOnly = owner.status === 'archived';
   // Kept listings show their photos too (agreements design §18).

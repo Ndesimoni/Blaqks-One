@@ -1,4 +1,5 @@
 import { nav } from '../../config/navigation.js';
+import { isPlatformMember } from './platformAccess.js';
 import { canManageTeam, canOpenSection } from './access.js';
 import { WEBSITE_ROUTES } from './website/websiteRoutes.js';
 
@@ -10,6 +11,7 @@ const extraIcons = {
   'Website profile': 'monitor',
   'Sign-in and security': 'lock',
   'Team & access': 'shield',
+  'Blaqks One team': 'users',
   Company: 'building',
   Channels: 'chat',
   'Inbox rules': 'sliders',
@@ -66,6 +68,7 @@ export const displayGroups = [
     items: [
       'Company',
       'Team & access',
+      'Blaqks One team',
       'Team activity',
       'Channels',
       'Inbox rules',
@@ -88,8 +91,7 @@ export const isAllowed = (user, name, groupKey) => {
   // own actions under personal account.
   if (name === 'Team activity') return groupKey === (canManageTeam(user) ? 'company' : 'personal');
   // Workspaces follows the viewer's authority, and appears in exactly one group.
-  if (name === 'Workspaces')
-    return groupKey === (user?.roleId === 'super-admin' ? 'platform' : 'company');
+  if (name === 'Workspaces') return groupKey === (isPlatformMember(user) ? 'platform' : 'company');
   return true;
 };
 

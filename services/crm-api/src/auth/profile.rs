@@ -3,6 +3,7 @@ use super::{
     grants::RecordActions,
     permissions::{ChannelAccess, Permissions},
 };
+use crate::workspaces::platform::areas;
 use serde::Serialize;
 use serde_json::Value;
 use sqlx::{types::Json, FromRow};
@@ -32,6 +33,12 @@ pub struct UserRow {
     /// Automatic field hints (migration 0026). Own-account rows only, like `language`.
     #[sqlx(default)]
     pub guidance_enabled: Option<bool>,
+    /// A Blaqks One team member's position and `{area: level}` access (migration 0091),
+    /// from the identity views; every other row leaves them empty.
+    #[sqlx(default)]
+    pub platform_preset: Option<String>,
+    #[sqlx(default)]
+    pub platform_access: Option<Json<Value>>,
 }
 
 impl UserRow {
@@ -91,6 +98,10 @@ pub struct Profile {
     /// Own-account field hint preference; absent from team payloads like `language`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guidance_enabled: Option<bool>,
+    /// The Blaqks One `{area: level}` the browser shows pages for (BO1b): every area at its
+    /// highest level for the Owner, the saved levels for platform staff, none for company
+    /// members. The server decides every request.
+    pub platform_access: BTreeMap<&'static str, &'static str>,
 }
 
 impl From<UserRow> for Profile {
@@ -101,18 +112,15 @@ impl From<UserRow> for Profile {
         let record_actions = user.record_actions();
         let finance_access = user.finance_access();
         let language = user.language.as_deref().map(super::account::language::code);
+        let platform_access = areas::to_map(&areas::granted(&user));
+        let role = user.role_label();
         Self {
             id: user.id,
             name: user.name,
             email: user.email,
             phone: user.phone,
             phone_verified: false,
-            role: match user.role.as_str() {
-                "super-admin" => "Blaqks One",
-                "admin" => "Admin",
-                _ => "Staff",
-            }
-            .into(),
+            role,
             manages_team: matches!(user.role.as_str(), "admin" | "super-admin"),
             role_id: user.role,
             owner_id: user.owner_id.unwrap_or(user.id),
@@ -127,6 +135,7 @@ impl From<UserRow> for Profile {
             finance_access,
             language,
             guidance_enabled: user.guidance_enabled,
+            platform_access,
         }
     }
 }

@@ -2,17 +2,26 @@ use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{
+        self,
+        platform::{areas, Area, Level},
+    },
 };
 use uuid::Uuid;
 
 /// The owner whose team the caller manages in `workspace` (BO1a item 5): Blaqks One only
 /// its organisation (the company Admins it invites), an Admin only their own company. The
 /// owner must be live; archived and suspended owners and every other caller are refused.
+/// Blaqks One staff with the invite-Admins area act for the Owner on the organisation
+/// (BO1b); handlers re-read them live with `workspaces::platform::operator`.
 pub async fn owner(state: &AppState, session: &Session, workspace: &str) -> ApiResult<Uuid> {
     // Role allowlist (L-4): only Admins and Blaqks One manage a team.
     let own = match session.user.role.as_str() {
         "super-admin" => workspace == workspaces::ORGANISATION,
+        "platform" if workspace == workspaces::ORGANISATION => {
+            let invite = (Area::InviteAdmins, Level::Manage);
+            return organisation_owner(state, session, invite).await;
+        }
         "admin" => workspace == session.user.workspace_id && workspace != workspaces::ORGANISATION,
         _ => false,
     };
@@ -34,19 +43,36 @@ pub async fn owner(state: &AppState, session: &Session, workspace: &str) -> ApiR
     Ok(owner)
 }
 
+/// The Owner of the organisation, for a live operator holding `area` at its level: Blaqks
+/// One staff act for the Owner on company Admins (BO1b). Callers re-read the operator
+/// under their locks.
+pub async fn organisation_owner(
+    state: &AppState,
+    session: &Session,
+    (area, level): (Area, Level),
+) -> ApiResult<Uuid> {
+    let mut transaction = state.pool.begin().await?;
+    workspaces::platform::operator(&mut transaction, session.user.id, area, level).await?;
+    let owner = workspaces::owner_of(&mut transaction, workspaces::ORGANISATION).await?;
+    transaction.commit().await?;
+    Ok(owner)
+}
+
 /// The owning Admin of company `workspace`, for Blaqks One's agent controls on Companies
-/// (BO1a item 8): the caller must be the live operator and the company's owner must not be
-/// archived. The organisation is not a company. Callers re-read both under their locks.
+/// (BO1a item 8): the caller must be the live operator managing companies and the
+/// company's owner must not be archived. The organisation is not a company. Callers re-read
+/// both under their locks.
 pub async fn company_owner(
     state: &AppState,
     session: &Session,
     workspace: &str,
 ) -> ApiResult<Uuid> {
-    if session.user.role != "super-admin" || workspace == workspaces::ORGANISATION {
+    let (area, level) = (Area::Companies, Level::Manage);
+    if !areas::allows(&session.user, area, level) || workspace == workspaces::ORGANISATION {
         return Err(ApiError::forbidden());
     }
     let mut transaction = state.pool.begin().await?;
-    workspaces::platform::operator(&mut transaction, session.user.id).await?;
+    workspaces::platform::operator(&mut transaction, session.user.id, area, level).await?;
     let owner = sqlx::query_scalar::<_, Uuid>(
         "SELECT u.id FROM crm_workspaces w JOIN crm_users u ON u.id=w.owner_id \
          WHERE w.id=$1 AND u.role='admin' AND u.deleted_at IS NULL",
@@ -59,8 +85,11 @@ pub async fn company_owner(
     Ok(owner)
 }
 
+/// Whether the caller works on the organisation's company Admins: the Owner, or Blaqks One
+/// staff with the invite-Admins area.
 pub fn can_manage_admin(session: &Session, workspace: &str) -> bool {
-    session.user.role == "super-admin" && workspace == workspaces::ORGANISATION
+    areas::allows(&session.user, Area::InviteAdmins, Level::Manage)
+        && workspace == workspaces::ORGANISATION
 }
 
 pub async fn lock_owner(

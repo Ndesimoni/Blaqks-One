@@ -16,6 +16,8 @@ fn user(role: &str, record_scope: &str) -> UserRow {
         actions: Json(serde_json::json!({})),
         language: None,
         guidance_enabled: None,
+        platform_preset: None,
+        platform_access: None,
     }
 }
 
@@ -90,4 +92,31 @@ fn the_blaqks_one_profile_holds_no_crm_but_manages_its_own_team() {
         .all(|actions| actions.as_object().unwrap().values().all(|on| on == false)));
     assert_eq!(profile["financeAccess"]["scope"], "none");
     assert_eq!(profile["financeAccess"]["teamView"], false);
+}
+
+#[test]
+fn blaqks_one_team_profiles_carry_their_access_and_no_crm() {
+    let mut member = user("platform", "team");
+    member.platform_preset = Some("support".into());
+    let saved = serde_json::json!({"help_requests": "manage", "companies": "view"});
+    member.platform_access = Some(Json(saved.clone()));
+    let profile = serde_json::to_value(Profile::from(member)).unwrap();
+    assert_eq!(profile["role"], "Blaqks One · Support");
+    assert_eq!(profile["roleId"], "platform");
+    assert_eq!(profile["managesTeam"], false);
+    assert_eq!(profile["recordScope"], "assigned");
+    assert_eq!(profile["platformAccess"], saved);
+    assert!(profile["permissions"]
+        .as_object()
+        .unwrap()
+        .values()
+        .all(|grant| grant == false));
+    assert_eq!(profile["financeAccess"]["scope"], "none");
+    let access = |role| serde_json::to_value(Profile::from(user(role, "team"))).unwrap();
+    let owner = access("super-admin");
+    assert_eq!(owner["platformAccess"]["companies"], "manage");
+    assert_eq!(owner["platformAccess"]["dashboard"], "view");
+    assert_eq!(owner["platformAccess"].as_object().unwrap().len(), 7);
+    assert_eq!(access("admin")["platformAccess"], serde_json::json!({}));
+    assert_eq!(access("staff")["platformAccess"], serde_json::json!({}));
 }

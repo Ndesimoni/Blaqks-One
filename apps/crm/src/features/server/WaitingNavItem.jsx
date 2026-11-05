@@ -5,6 +5,7 @@ import { badge } from './chat/chatModel.js';
 import { ServerNavigationItem } from './ServerNavigationItem.jsx';
 import { useWaitingCount } from './useWaitingCount.js';
 import { waitingSources } from './waitingCounts.js';
+import { isPlatformMember } from './platformAccess.js';
 
 /**
  * A sidebar entry with a "waiting for you" badge (agreements design §17), polled like Team
@@ -15,7 +16,7 @@ export function WaitingNavItem({ name, icon, label, route, onSelect, active }) {
   const { user } = useSession();
   const { t } = useI18n();
   const source = waitingSources[name];
-  const count = useWaitingCount(source, user?.roleId !== 'super-admin', route);
+  const count = useWaitingCount(source, !isPlatformMember(user), route);
   return (
     <ServerNavigationItem
       name={name}

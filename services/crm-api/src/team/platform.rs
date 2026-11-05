@@ -8,7 +8,7 @@ use crate::{
     error::{ApiError, ApiResult},
     marketplace::state as market,
     state::AppState,
-    workspaces::{self, platform::company_rows},
+    workspaces::platform::{self, company_rows, Area, Level},
 };
 use axum::{extract::State, Json};
 use serde::Serialize;
@@ -30,11 +30,17 @@ struct Company {
 }
 
 pub async fn companies(State(state): State<AppState>, session: Session) -> ApiResult<Json<Value>> {
-    if session.user.role != "super-admin" {
+    if !platform::areas::allows(&session.user, Area::Companies, Level::View) {
         return Err(ApiError::forbidden());
     }
     let mut transaction = state.pool.begin().await?;
-    workspaces::platform::operator(&mut transaction, session.user.id).await?;
+    platform::operator(
+        &mut transaction,
+        session.user.id,
+        Area::Companies,
+        Level::View,
+    )
+    .await?;
     transaction.commit().await?;
     let mut companies = Vec::new();
     for row in company_rows(&state.pool).await? {
