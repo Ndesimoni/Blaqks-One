@@ -133,3 +133,12 @@ Owner answers of 2026-11-05: people on the Blaqks One team get **a role as a sta
 **Screens.** Settings → Blaqks One team (Owner only): the people with role, areas, status and last active; Invite (name, email, phone, role preset, area ticks); Edit areas; Suspend, Reactivate and Archive. Platform staff see only the pages of their areas, plus My profile and Sign-in and security; the company panel shows its controls only with `company_controls`.
 
 **Security notes.** The role constraint, the access row and the invitation are written in one transaction; an area list is validated against the fixed list; a role or area change and an archive take effect on the next request; the Owner account can never be edited, suspended or archived from this page; the platform activity records who changed whose areas, without other details.
+
+## 9. BO1e Blaqks One's own clients (owner, 2026-11-05)
+
+"We do not post listings, but we can also have clients, and some people with access can work on them, calling them or texting them if they need our services." Owner answers of 2026-11-05: Blaqks One gets **its own sales list**, separate from every company's clients and from the property CRM, built after the team (BO1b) and before help requests (BO1c).
+
+- A client is a brokerage or agent interested in Blaqks One: company name, contact person, phone, email, source (marketing website form, help request, referral, call, other), stage (New, Contacted, Demo booked, Signed up, Customer, Lost), notes and a next follow-up, with Call, WhatsApp and Email buttons. No listings, no property fields.
+- When the client signs up, the record links to their company, which feeds the dashboard's conversion figures.
+- The marketing website's contact form adds a client automatically (today it posts to `CONTACT_WEBHOOK_URL`).
+- Team members with the `clients` area work on them; the Owner always can. It is its own module with its own tables and routes, and it never touches company data.
