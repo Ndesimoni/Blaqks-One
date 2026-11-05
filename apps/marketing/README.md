@@ -17,13 +17,13 @@ npm test && npm run typecheck && npm run build
 
 ## Settings
 
-| Variable | What it sets | Default |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | This site's own address, for links and the sitemap | `http://localhost:3002` |
-| `NEXT_PUBLIC_CRM_URL` | The CRM, for Start free and Sign in | `http://localhost:5173` |
-| `NEXT_PUBLIC_PROPERTY_SITE_URL` | The Blaqks One property site, for Find a property | `http://localhost:3000` |
-| `NEXT_PUBLIC_THEME_COOKIE_DOMAIN` | The parent domain shared with the CRM, so light or dark matches on both (for example `.blaqksone.com`) | not set: this host only |
-| `CONTACT_WEBHOOK_URL` | Where the contact form sends messages | not set: the form says sending is not switched on |
+| Variable                          | What it sets                                                                                           | Default                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`            | This site's own address, for links and the sitemap                                                     | `http://localhost:3002`                           |
+| `NEXT_PUBLIC_CRM_URL`             | The CRM, for Start free and Sign in                                                                    | `http://localhost:5173`                           |
+| `NEXT_PUBLIC_PROPERTY_SITE_URL`   | The Blaqks One property site, for Find a property                                                      | `http://localhost:3000`                           |
+| `NEXT_PUBLIC_THEME_COOKIE_DOMAIN` | The parent domain shared with the CRM, so light or dark matches on both (for example `.blaqksone.com`) | not set: this host only                           |
+| `CONTACT_WEBHOOK_URL`             | Where the contact form sends messages                                                                  | not set: the form says sending is not switched on |
 
 ## Still placeholders
 
