@@ -1,4 +1,4 @@
-use crate::team::{access, audit, members};
+use crate::team::{access, account_type::seats, audit, members};
 use crate::{
     auth::{
         protection,
@@ -6,7 +6,10 @@ use crate::{
     },
     error::{ApiError, ApiResult},
     state::AppState,
-    workspaces,
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use axum::{
     extract::{rejection::JsonRejection, Path, State},
@@ -38,6 +41,11 @@ pub async fn renew(
     let mut transaction = state.pool.begin().await?;
     workspaces::lock(&mut transaction, &workspace).await?;
     access::lock_owner(&mut transaction, owner).await?;
+    if session.user.id != owner {
+        let actor = session.user.id;
+        let manage = Level::Manage;
+        workspaces::platform::operator(&mut transaction, actor, Area::InviteAdmins, manage).await?;
+    }
     let target = sqlx::query_as::<_, (i64, bool)>(
         "SELECT version,accepted_at IS NULL FROM crm_users WHERE id=$1 AND deleted_at IS NULL AND \
          ((role='staff' AND owner_id=$2 AND workspace_id=$3) OR ($4 AND role='admin')) FOR UPDATE",
@@ -59,6 +67,7 @@ pub async fn renew(
             "This account is already activated. Use account recovery instead.",
         ));
     }
+    seats::ensure(&mut transaction, &workspace, Some(id)).await?;
     let token = session::random_token();
     let expires_at: String = sqlx::query_scalar(
         "UPDATE crm_team_invitations SET token_hash=$2,expires_at=now()+interval '48 hours', \

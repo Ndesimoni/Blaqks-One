@@ -1,0 +1,137 @@
+/* Payment/expense details: amount card, grouped facts and the history timeline. */
+.finance-details-body {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+.finance-details-body > .finance-note {
+  margin: 0;
+}
+.finance-amount-card {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.finance-amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+.finance-amount-row dt {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.finance-amount-row dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.finance-amount-row:last-child dd {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.finance-amount-card.is-breakdown .finance-amount-row:last-child {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.finance-amount-row:last-child dt {
+  color: var(--ink);
+  font-weight: 600;
+}
+.finance-amount-card[data-status='void'] dd {
+  color: var(--muted-dark);
+  text-decoration: line-through;
+}
+.finance-detail-section h3,
+.finance-history h3 {
+  margin: 0 0 12px;
+  color: var(--muted-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.finance-details-body .finance-facts {
+  gap: 14px 20px;
+  margin: 0;
+}
+.finance-details-body .finance-fact {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.finance-details-body .finance-fact dd {
+  font-size: 14px;
+  font-weight: 600;
+}
+.finance-details-body .finance-history {
+  margin-top: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.finance-history .finance-calc-head h3 {
+  margin: 0;
+}
+:root[data-theme] .finance-history .finance-calc-head .btn {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.finance-history .finance-history-list {
+  gap: 0;
+  margin-top: 4px;
+}
+.finance-history .finance-history-list > li {
+  position: relative;
+  gap: 2px;
+  padding: 0 0 18px 26px;
+  border: 0;
+  border-radius: 0;
+}
+/* The rail and marker are decorative; the action label carries the meaning. */
+.finance-history .finance-history-list > li::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: -2px;
+  left: 6px;
+  width: 2px;
+  background: var(--line);
+}
+.finance-history .finance-history-list > li:last-child::before {
+  display: none;
+}
+.finance-history .finance-history-list > li::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 1px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--muted-dark);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.finance-history-list > li[data-tone='positive']::after {
+  background: var(--primary);
+}
+.finance-history-list > li[data-tone='negative']::after {
+  background: var(--danger);
+}
+.finance-history-list > li[data-tone='progress']::after {
+  background: var(--gold);
+}
+.finance-history-reason {
+  padding: 8px 10px;
+  border-left: 2px solid var(--line);
+  border-radius: 0 8px 8px 0;
+  background: var(--surface-subtle);
+}

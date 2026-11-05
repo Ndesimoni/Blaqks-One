@@ -1,0 +1,119 @@
+/* Monthly goal cards: figure against target, text percentage, status chip and Admin editor. */
+.connected-goals {
+  --kpi-good: #2d7149;
+  --kpi-good-surface: #e7f3eb;
+}
+:root[data-theme='dark'] .connected-goals {
+  --kpi-good: #9fd6ae;
+  --kpi-good-surface: #22402e;
+}
+.connected-goals .section-top {
+  margin-bottom: 16px;
+}
+.connected-goals .kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 1400px) {
+  .connected-goals .kpi-grid:has(> :nth-child(4)) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .connected-goals .kpi-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+}
+.kpi-head h3 {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.connected-goals .goal-figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.connected-goals .goal-figures b {
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.connected-goals .goal-figures.is-pending b {
+  color: var(--muted);
+}
+.kpi-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--hover);
+}
+.kpi-track > div {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 400ms var(--ease);
+}
+.is-met .kpi-track > div {
+  background: var(--kpi-good);
+}
+.kpi-track.is-loading {
+  background: linear-gradient(90deg, var(--hover) 30%, var(--line) 50%, var(--hover) 70%);
+  background-size: 300% 100%;
+  animation: kpi-shimmer 1.4s linear infinite;
+}
+@keyframes kpi-shimmer {
+  to {
+    background-position: -150% 0;
+  }
+}
+.kpi-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.goal-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+.connected-goals .kpi-grid + .goal-error {
+  margin: 12px 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kpi-track > div {
+    transition: none;
+  }
+  .kpi-track.is-loading {
+    animation: none;
+  }
+}

@@ -1,0 +1,61 @@
+/* Segmented view switch (Kanban | List and similar). */
+.segmented-view-switch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.segmented-view-switch button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-block-size: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.segmented-view-switch button:hover {
+  color: var(--ink);
+}
+.segmented-view-switch button[aria-pressed='true'] {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.segmented-view-switch button:focus-visible {
+  outline: 2px solid var(--focus, var(--gold));
+  outline-offset: 1px;
+}
+/* Icons reinforce the short labels without replacing them on phones. */
+.view-switch-icon {
+  display: none;
+}
+@media (max-width: 760px) {
+  /* As tall as the filter chips beside it, so the row does not grow. */
+  .segmented-view-switch {
+    padding: 0;
+  }
+  .segmented-view-switch button {
+    min-block-size: 36px;
+    min-inline-size: 44px;
+    padding: 0 12px;
+  }
+  .view-switch-icon {
+    display: block;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .segmented-view-switch button {
+    transition: none;
+  }
+}

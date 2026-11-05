@@ -1,0 +1,54 @@
+/* Pending hand-over requests above the Deals list. Loaded after deal-list.css. */
+.deal-handovers .finance-calc-head h2 {
+  font-size: 16px;
+}
+.deal-handover {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.deal-handover-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.deal-handover .finance-handover-text {
+  gap: 4px;
+}
+.deal-handover .finance-handover-text strong {
+  display: block;
+}
+.deal-handover-terms {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: 2px;
+}
+.deal-handover-terms small {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.deal-handover-actions {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+@media (max-width: 750px) {
+  .deal-handover {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+  .deal-handover-actions {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}

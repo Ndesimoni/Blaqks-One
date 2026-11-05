@@ -39,24 +39,9 @@ pub async fn verify(password: String, hash: String) -> ApiResult<bool> {
     .map_err(|_| ApiError::invalid("Password verification failed."))
 }
 
-pub fn valid_length(password: &str) -> bool {
-    password.chars().count() >= 8 && password.len() <= 1024
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn password_length_enforces_character_minimum_and_byte_limit() {
-        assert!(!valid_length("1234567"));
-        assert!(valid_length("12345678"));
-        assert!(!valid_length(&"é".repeat(7)));
-        assert!(valid_length(&"é".repeat(8)));
-        assert!(valid_length(&"a".repeat(1024)));
-        assert!(!valid_length(&"a".repeat(1025)));
-        assert!(!valid_length(&"é".repeat(513)));
-    }
 
     #[tokio::test]
     async fn hashes_are_salted_and_verify_only_correct_password() {

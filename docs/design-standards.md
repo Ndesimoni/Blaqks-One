@@ -6,12 +6,24 @@ These are required working rules for every agent and contributor to Keys with Si
 
 The user-approved [CRM design refresh](design-refresh.md) is the visual baseline for all new and updated screens. Extend its shared patterns consistently. Use the [desktop and mobile reference previews](design-refresh.md#visual-previews) when reviewing a change.
 
-- Preserve the forest-green identity, calm neutral surfaces and restrained warm-gold accents. Dark mode uses green surfaces with gold primary actions; light mode uses white panels with green primary actions. Use the semantic palette in `src/styles/foundation.css` and `src/styles/theme/surfaces.css`.
+- Preserve the forest-green identity, calm neutral surfaces and restrained warm-gold accents. Dark mode uses green surfaces with gold primary actions; light mode uses white panels with green primary actions. Use the semantic palette in `apps/crm/src/styles/foundation.css` and `apps/crm/src/styles/theme/surfaces.css`.
 - Keep layouts compact and useful: clear page titles, concise workspace context, grouped controls, visible results and a clear next action. Give records, priorities and figures visual precedence over decoration.
-- Follow the existing system-font typography, 4px spacing scale, aligned controls, rounded panels, thin borders and restrained shadows. Reuse shared styles in `src/styles/system/` so new screens feel like part of the same product.
+- Follow the existing system-font typography, 4px spacing scale, aligned controls, rounded panels, thin borders and restrained shadows. Reuse shared styles in `apps/crm/src/styles/system/` so new screens feel like part of the same product.
 - Keep scrolling smooth and purposeful. Use natural page scrolling for primary content and bounded scrolling for selectable collections. Keep sidebar settings and modal actions reachable; preserve selection, filters and drafts when content scrolls or collapses.
 - Use the shared brief transitions for colour, border and shadow changes, with clear hover, focus and pressed states. Keep controls stable under the pointer and honour reduced-motion preferences for animations and programmatic scrolling.
 - Carry the same hierarchy and colours across mobile, tablet and desktop, in both themes. Verify readable contrast, keyboard focus, comfortable touch targets and page reflow against the accessibility rules below.
+- Follow Bitrix24's frame (owner, 2026-11-01, NAV5): the product rail and section sidebar on the left; a top bar naming the page as "Product / Page" (the page's one main heading, with no description line below it), search, Create for the current product, the messenger buttons, the notifications bell, the theme switch and the account menu; header tabs for a section's routes; and, from 1181px, the right-hand strip of recent conversations. Pages start with their own tools. Details, search results, notifications and the messenger open as panels from the right edge.
+
+### Premium polish for new work (owner, 2026-10-16)
+
+**Keep the colours; raise the design.** Every new screen, component and redesigned section keeps the palette above unchanged and must look clean, classic, orderly, smooth and premium. Existing screens are not restyled for its own sake; they adopt these rules when they are next changed.
+
+- **Hierarchy through type and space, not boxes:** larger, confident figures with tabular numerals; clear label, value and caption levels; generous, consistent spacing on the 4px scale; fewer nested panels; group with alignment and thin rules.
+- **Restrained depth:** hairline borders and soft, layered shadows; no heavy outlines, gradient washes or decorative banners.
+- **Purposeful data visuals:** small charts beside key figures, and hand-built SVG charts using the existing palette tokens, with text alternatives and both themes (right-to-left is not required: [English only](product-decisions.md#english-only-decided-2026-10-22)). The chart forms and motion in the parked [Design system v2](design-system-v2.md) may be reused **with the current colours only**.
+- **Smooth, calm motion:** brief transitions, skeleton loading in place of spinners or layout jumps, gentle entrance of content; all honour reduced motion.
+- **Consistency:** reuse shared components; one primary action per area; aligned controls; the same states (hover, focus, loading, empty, error) everywhere.
+- Review new work with screenshots at 390px and 1280px in both themes before it is accepted.
 
 When an intentional redesign changes this baseline, update the shared rules and reference previews together. Feature additions should build on the approved appearance through the existing tokens and components.
 
@@ -25,7 +37,7 @@ When an intentional redesign changes this baseline, update the shared rules and 
 
 ## Visual consistency
 
-- Use shared primitives in `src/components/ui` and layout components before introducing another button, modal, filter or pagination pattern.
+- Use shared primitives in `apps/crm/src/components/ui` and layout components before introducing another button, modal, filter or pagination pattern.
 - Use semantic theme tokens for surfaces, text, borders, focus and interaction states. Extend the shared palette when needed; avoid feature-specific hard-coded replacements.
 - Dark mode remains the default. Honour the saved preference and verify every changed screen in both themes.
 - Use a consistent spacing scale based on 4px increments, existing typography, border radii and icon styles. Give headings, labels, supporting text and values a clear hierarchy.
@@ -36,13 +48,18 @@ When an intentional redesign changes this baseline, update the shared rules and 
 
 Follow [Clean collection and option browsing](option-overflow.md) and the shared `OverflowList` modes.
 
-| Context                                      | Required pattern                                                                            |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Main property directory                      | One grid or table, 12 records per page, clear totals and pagination                         |
-| Searchable contacts, recipients and activity | One bounded scrolling list with useful search/filter controls                               |
-| Compact chips, tags and summaries            | Show up to six; More replaces the preview with one scrollable list containing **all** items |
-| Photos and form step navigation              | Horizontal scrolling with visible selection and keyboard access                             |
-| Small complete page sections                 | Natural page scrolling without an unnecessary disclosure                                    |
+| Context                                                        | Required pattern                                                                                                                                                                                                                               |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Main property directory                                        | One grid or table, 12 records per page, clear totals and pagination                                                                                                                                                                            |
+| Searchable contacts, recipients and activity                   | One bounded scrolling list with useful search/filter controls                                                                                                                                                                                  |
+| Compact chips, tags and summaries                              | Show up to six; More replaces the preview with one scrollable list containing **all** items                                                                                                                                                    |
+| Photos and form step navigation                                | Horizontal scrolling with visible selection and keyboard access                                                                                                                                                                                |
+| Small complete page sections                                   | Natural page scrolling without an unnecessary disclosure                                                                                                                                                                                       |
+| Pipelines (Leads, Deals)                                       | Kanban: one column per stage, a remembered Kanban/List switch, cards moved by dragging or each card's ⋯ list, twenty cards per column then Show all (NAV, 2026-10-31)                                                                          |
+| Record directories (Clients, Contacts, Shortlist, Client care) | List grid: one filter bar (search with the active preset as a pill, preset chips, clear, a column chooser remembered per viewer), one bordered grid card whose header row stays under the top bar, and a footer with the total and pager (NAV) |
+| Interaction history                                            | Feed: newest first, one event per row with who, what and when (NAV)                                                                                                                                                                            |
+| Follow-ups                                                     | Deadline list grouped Overdue, Today, Upcoming, No due date and Closed by the Dubai business day, with a remembered Deadline/List switch (NAV)                                                                                                 |
+| Viewings                                                       | Week calendar, Monday to Sunday in Dubai time, with Previous/Today/Next, an Unscheduled section and a remembered Week/List switch (NAV)                                                                                                        |
 
 - Expanded More views contain the initial items and the remaining items. Show one close control; avoid duplicate lists, a lingering More button or a second Show more action inside.
 - Return to the compact view on Close or Escape. Dismiss a floating selector on outside interaction and after a single choice; keep multi-select pickers open while adding choices.
@@ -57,7 +74,7 @@ Follow [Clean collection and option browsing](option-overflow.md) and the shared
 - Use persistent labels, required indicators and concise field guidance. Place actionable errors beside the field and focus the first invalid control.
 - Use appropriate input types and autocomplete. Allow password managers, paste and autofill in sign-in forms.
 - Keep Save, Back and Cancel placement consistent. Protect unsaved work and retain drafts after validation or storage errors.
-- Use the shared centred modal for record details and editors. On narrow screens, use the existing full-screen layout with reachable close and action controls.
+- Open record details in the shared right-edge panel (`Drawer` with `placement="right"`, `features/records/panel/`; NAV, 2026-10-31): the title, status and actions in its header, then the record's facts beside its activity. Editors and other dialogs keep the shared centred modal. On narrow screens, use the existing full-screen layout with reachable close and action controls.
 - Give each modal an accessible title. Keep focus inside it, support Escape, and restore focus to its opener. Route dismissal through the existing unsaved-changes guard.
 - Keep the modal body scrollable while its title and actions remain accessible. Ensure sticky controls never cover content, focused inputs or validation messages.
 
@@ -87,7 +104,7 @@ Design and verify against [WCAG 2.2 AA](https://www.w3.org/WAI/WCAG22/quickref/)
 - Generated artifacts, dependency code, lockfiles and prose documentation are excluded. The archived offline edition is outside the default audit; the same rule applies when changing its hand-written code.
 - Extract meaningful feature components, focused hooks, pure selectors/models, service boundaries and named data modules. Share a component when it represents the same behaviour across features.
 - Define React components at module scope. Keep imports acyclic and dependencies directed from feature UI toward hooks/models/services.
-- Split CSS by responsibility and retain the exact stylesheet import order, selector specificity and theme behaviour. Use `src/styles/index.css` as the ordered entry point.
+- Split CSS by responsibility and retain the exact stylesheet import order, selector specificity and theme behaviour. Use `apps/crm/src/styles/index.css` as the ordered entry point.
 - Keep test scenarios understandable; use shared fixtures/helpers and separate scenario files by behaviour. Never weaken an assertion to meet the limit.
 - Format normally. Do not minify, pack unrelated statements onto one line, strip useful comments or create arbitrary numbered file fragments to satisfy the count.
 - Preserve storage keys, record/workbook mappings, backups, calculations, routes and workspace access during a split. Existing oversized files must be split when changed; remaining violations must be reported.

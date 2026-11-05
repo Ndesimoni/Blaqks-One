@@ -88,8 +88,8 @@ pub async fn active_owner(
     .await?)
 }
 
-/// Staff creators hold what they create; Admins and the Super Admin create for the
-/// workspace owner (the Admin, or the Super Admin in the organisation workspace).
+/// Staff creators hold what they create; Admins create for the workspace owner (the
+/// Admin). Blaqks One never reaches company records (BO1a item 12).
 pub async fn default_holder(
     transaction: &mut Transaction<'_, Postgres>,
     workspace: &str,
@@ -98,7 +98,7 @@ pub async fn default_holder(
     // Role allowlist (L-4); any other role is refused.
     match creator.role.as_str() {
         "staff" => Ok(Some(creator.id)),
-        "admin" | "super-admin" => active_owner(transaction, workspace).await,
+        "admin" => active_owner(transaction, workspace).await,
         _ => Err(crate::error::ApiError::forbidden()),
     }
 }

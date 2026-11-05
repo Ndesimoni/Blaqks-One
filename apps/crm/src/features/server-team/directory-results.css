@@ -1,0 +1,86 @@
+.team-directory-table {
+  min-width: 760px;
+}
+.team-directory-table th {
+  font-size: 12px;
+}
+.team-directory-table td {
+  vertical-align: middle;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+.connected-team .team-directory-table h2 {
+  font-size: 14px;
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.team-directory-contact {
+  display: block;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.team-directory-workspace {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+}
+.team-directory-workspace > span {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.team-directory-table .btn {
+  white-space: nowrap;
+}
+.team-directory-action-list {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+.team-directory-action-list > div {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+.team-directory-danger-action {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.team-directory-actions {
+  --dialog-width: 620px;
+  --dialog-height: 620px;
+}
+/* Account actions dialog: sized to its content on wider screens, a summary card first,
+   then Edit as the main action. Phones keep the shared full-screen layout. */
+.team-actions-summary {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.connected-team .team-actions-summary p,
+.team-actions-summary p {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.team-directory-actions .drawer-top .btn {
+  flex: none;
+}
+@media (min-width: 751px) {
+  .modal-centered > .drawer.team-directory-actions {
+    height: auto;
+  }
+}
+@media (max-width: 750px) {
+  .team-directory-action-list,
+  .team-directory-action-list > div {
+    justify-items: stretch;
+  }
+}

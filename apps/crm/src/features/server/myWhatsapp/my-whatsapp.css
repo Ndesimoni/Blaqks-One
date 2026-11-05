@@ -1,0 +1,13 @@
+/* My WhatsApp (W1a): reuses the My mailbox card; the number reads as a figure. */
+.mailbox-address .my-whatsapp-phone {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+#my-whatsapp-title:focus {
+  outline: none;
+}
+#my-whatsapp-title:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

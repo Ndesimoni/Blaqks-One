@@ -1,0 +1,67 @@
+@media (max-width: 1100px) {
+  .desktop-nav {
+    gap: 16px;
+  }
+  .wordmark {
+    font-size: 21px;
+  }
+  .editorial-block,
+  .contact-layout {
+    gap: 40px;
+  }
+  .detail-layout {
+    gap: 32px;
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+  .card-content {
+    padding: 18px;
+  }
+  .person-card {
+    padding: 24px;
+  }
+}
+@media (max-width: 1000px) {
+  .desktop-nav {
+    display: none;
+  }
+  .mobile-menu {
+    display: block;
+  }
+  .site-header {
+    position: relative;
+  }
+  .search-core {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .search-core .budget-fields {
+    grid-column: span 2;
+  }
+  .search-core > .button {
+    grid-column: span 1;
+  }
+  .advanced-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .property-grid,
+  .people-grid,
+  .developer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .developer-strip {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .enquiry-panel {
+    position: static;
+    max-width: 540px;
+  }
+  .detail-quick-contact {
+    display: block;
+    margin-bottom: 20px;
+  }
+  .detail-quick-contact .contact-links {
+    margin-top: 10px;
+  }
+}

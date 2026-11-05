@@ -1,0 +1,119 @@
+/* WhatsApp (W1a): the Twilio token field, field errors, members' numbers and the dialog. */
+.channel-field [aria-invalid='true'] {
+  border-color: var(--danger);
+}
+.channel-field .channel-field-error,
+.whatsapp-field-error {
+  margin: 0;
+  font-size: 13px;
+}
+.channel-secret {
+  position: relative;
+}
+.channel-field .channel-secret input {
+  padding-inline-end: 48px;
+}
+.channel-reveal {
+  display: grid;
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  place-items: center;
+  inline-size: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0 10px 10px 0;
+  background: transparent;
+  color: var(--muted-dark);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.channel-reveal:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.channel-reveal:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -3px;
+}
+.channel-setup span {
+  color: var(--muted-dark);
+}
+.channel-attention {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+#whatsapp-numbers:focus {
+  outline: none;
+}
+#whatsapp-numbers:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.whatsapp-phone {
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+}
+.whatsapp-empty,
+.whatsapp-explain {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--muted-dark);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.whatsapp-empty strong,
+.whatsapp-explain strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+.whatsapp-empty p,
+.whatsapp-explain p {
+  margin: 0;
+}
+.whatsapp-explain {
+  border-style: solid;
+  background: var(--surface-subtle);
+}
+.whatsapp-explain .channel-actions {
+  margin-block-start: 6px;
+}
+.whatsapp-hint {
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.modal-centered > .drawer.whatsapp-dialog {
+  --dialog-width: 560px;
+}
+@media (min-width: 751px) {
+  .modal-centered > .drawer.whatsapp-dialog {
+    height: auto;
+  }
+}
+.whatsapp-dialog .field {
+  display: grid;
+  gap: 6px;
+}
+@media (max-width: 599px) {
+  .whatsapp-number .channel-actions .btn,
+  .whatsapp-numbers-card .channel-head > .btn {
+    inline-size: 100%;
+    min-block-size: 44px;
+  }
+}

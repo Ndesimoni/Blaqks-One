@@ -1,0 +1,120 @@
+/* Slide-in messenger (NAV3): a right-edge panel, one pane at a time like the phone layout. */
+.modal-root:has(.messenger-drawer) {
+  justify-content: flex-end;
+}
+.drawer.messenger-drawer {
+  inline-size: min(760px, 100vw);
+  block-size: 100vh;
+  block-size: 100dvh;
+  max-block-size: none;
+  border-radius: 0;
+  padding: 0;
+}
+.messenger-panel {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-block-size: 0;
+  background: var(--panel);
+}
+.messenger-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 14px 16px;
+  border-block-end: 1px solid var(--line);
+}
+.messenger-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.messenger-full {
+  margin-inline-start: auto;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.messenger-switch {
+  display: flex;
+  inline-size: 100%;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.messenger-switch button {
+  flex: 1;
+  min-block-size: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+}
+.messenger-switch button[aria-pressed='true'] {
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.messenger-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: hidden;
+}
+/* Inside the panel the Inbox and Team chat always use their one-pane layout. */
+.messenger-body .inbox-page,
+.messenger-body .chat-page {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+.messenger-body .inbox-layout,
+.messenger-body .inbox-layout.has-panel,
+.messenger-body .chat-layout {
+  grid-template-columns: minmax(0, 1fr);
+  block-size: 100%;
+  min-block-size: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.messenger-body .inbox-layout.is-list .inbox-conversation,
+.messenger-body .inbox-layout.is-list .inbox-panel,
+.messenger-body .inbox-layout.is-thread .inbox-list-pane,
+.messenger-body .inbox-layout.is-thread .inbox-panel,
+.messenger-body .inbox-layout.is-details .inbox-list-pane,
+.messenger-body .inbox-layout.is-details .inbox-conversation,
+.messenger-body .chat-layout.is-room .chat-list,
+.messenger-body .chat-layout.is-list .chat-room-pane {
+  display: none;
+}
+.messenger-body .inbox-back,
+.messenger-body .inbox-details,
+.messenger-body .chat-back {
+  display: inline-flex;
+}
+/* Header messenger buttons and their counts. */
+.header-message {
+  position: relative;
+}
+.header-badge {
+  position: absolute;
+  inset-block-start: -4px;
+  inset-inline-end: -4px;
+  min-inline-size: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

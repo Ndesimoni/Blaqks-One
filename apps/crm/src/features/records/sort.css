@@ -1,0 +1,46 @@
+.record-sort {
+  position: relative;
+}
+.record-directory-actions {
+  position: relative;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.record-directory-actions > .record-sort {
+  position: static;
+}
+.record-sort-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  display: grid;
+  gap: 12px;
+  width: min(260px, calc(100vw - 48px));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 0 8px 24px #00000026;
+}
+.record-sort-panel label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+}
+.record-sort-panel select {
+  width: 100%;
+  min-height: 44px;
+}
+.record-sort-fallback {
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 750px) {
+  .record-directory-head {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,80 @@
+/* Section spacing and headings, tick lists and small icon marks. */
+.sec {
+  padding-block: 110px;
+  position: relative;
+}
+.sec.flush {
+  padding-top: 0;
+}
+.sec-head {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto 56px;
+}
+.sec-head h2 {
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.08;
+}
+.sec-head h1 {
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.05;
+}
+.sec-head p {
+  color: var(--text-2);
+  font-size: 18px;
+  max-width: 38em;
+}
+.page-top {
+  padding-top: 84px;
+}
+.ticks {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-2);
+}
+.ticks li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+}
+.ticks li::before {
+  content: '✓';
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-ink);
+  background: rgba(188, 151, 101, 0.16);
+}
+.dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(188, 151, 101, 0.16);
+  color: var(--gold-ink);
+  font-size: 11px;
+  font-weight: 700;
+  flex: none;
+}
+.mark-s {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: rgba(188, 151, 101, 0.14);
+  color: var(--gold-ink);
+  flex: none;
+}

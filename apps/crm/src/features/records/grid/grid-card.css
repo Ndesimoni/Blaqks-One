@@ -1,0 +1,89 @@
+/* Directory grid (Bitrix24 list pattern, NAV): one bordered card holds the table, the phone
+   cards or the feed, then a footer. The card clips without becoming a scroll area, so a table
+   that fits keeps its header row in view below the 72px top bar while the page scrolls. */
+.grid-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  overflow: hidden;
+  overflow: clip;
+}
+.grid-card .grid-scroll:not(.is-wide) {
+  overflow: visible;
+}
+.grid-card .grid-scroll.is-wide:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+:root[data-theme] .grid-card .grid-table th {
+  padding: 10px 14px;
+  border-bottom: 0;
+  box-shadow: inset 0 -1px 0 var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+/* The short ID column keeps its heading on one line. */
+:root[data-theme] .grid-card .grid-table th:first-child {
+  white-space: nowrap;
+}
+.grid-card .grid-scroll:not(.is-wide) .grid-table th {
+  position: sticky;
+  top: 72px;
+  z-index: 2;
+}
+:root[data-theme] .grid-card .table-sort {
+  min-height: 28px;
+  color: inherit;
+}
+:root[data-theme] .grid-card .table-sort:hover {
+  color: var(--ink);
+}
+:root[data-theme] .grid-card .grid-table td {
+  height: 56px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+:root[data-theme] .grid-card .grid-table tbody tr {
+  background: var(--panel);
+  transition: background-color var(--duration) var(--ease);
+}
+:root[data-theme] .grid-card .grid-table tbody tr:hover {
+  background: var(--hover);
+}
+:root[data-theme] .grid-card .grid-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+/* Row controls scroll clear of the sticky header row when they take focus. */
+.grid-card .grid-table tbody :is(button, a) {
+  scroll-margin-top: 132px;
+}
+:root[data-theme] .grid-card .grid-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: end;
+}
+.grid-card .grid-table .row-link {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: var(--muted);
+  vertical-align: middle;
+}
+.grid-card .grid-table .row-link:hover:not(:disabled) {
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink);
+}
+.grid-card .grid-table .row-link:active:not(:disabled) {
+  background: var(--surface-subtle);
+}

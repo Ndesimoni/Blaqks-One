@@ -1,0 +1,103 @@
+/* Agreements page (agreements-design §13): tabs, one primary action and calm record rows. */
+.agreements-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.agreements-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.agreements-tabs {
+  display: flex;
+  gap: 6px;
+  min-inline-size: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.agreements-tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 44px;
+  padding-inline: 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+.agreements-tab:hover {
+  background: var(--hover);
+}
+.agreements-tab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.agreements-tab.is-active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.agreements-tab-count {
+  min-inline-size: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.agreements-tab.is-active .agreements-tab-count {
+  background: color-mix(in srgb, var(--on-primary) 22%, transparent);
+  color: var(--on-primary);
+}
+.agreements-state {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 32px 20px;
+  color: var(--muted-dark);
+  text-align: center;
+}
+.agreements-state strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+.agreements-skeleton {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--line);
+}
+.agreements-skeleton span {
+  display: block;
+  block-size: 72px;
+  background:
+    linear-gradient(90deg, var(--hover) 0 var(--skeleton-width), transparent var(--skeleton-width))
+      16px 22px / calc(100% - 32px) 12px no-repeat,
+    var(--panel);
+  animation: agreements-pulse 1.4s var(--ease) infinite alternate;
+}
+@keyframes agreements-pulse {
+  to {
+    opacity: 0.6;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agreements-skeleton span {
+    animation: none;
+  }
+}

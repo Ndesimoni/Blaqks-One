@@ -1,7 +1,7 @@
 use crate::{
-    auth::password,
+    auth::{accounts, identity_rules, password, password_policy},
     error::{ApiError, ApiResult},
-    workspaces::ORGANISATION,
+    workspaces::{self, ORGANISATION},
 };
 use sqlx::PgPool;
 use std::{
@@ -60,18 +60,7 @@ pub async fn create_user(pool: &PgPool) -> ApiResult<Uuid> {
     let email = required("CRM_BOOTSTRAP_EMAIL")?.to_lowercase();
     let phone = required("CRM_BOOTSTRAP_PHONE")?;
     let role = required("CRM_BOOTSTRAP_ROLE")?;
-    let valid_email = email.split_once('@').is_some_and(|(local, host)| {
-        !local.is_empty() && host.contains('.') && !host.contains('@')
-    });
-    if name.len() > 100
-        || email.len() > 254
-        || !valid_email
-        || email.chars().any(char::is_whitespace)
-        || !phone.starts_with('+')
-        || !(8..=16).contains(&phone.len())
-        || !phone[1..]
-            .chars()
-            .all(|character| character.is_ascii_digit())
+    if identity_rules::identity(&name, &email, &phone).is_err()
         || !matches!(role.as_str(), "super-admin" | "admin")
     {
         return Err(ApiError::invalid(
@@ -79,36 +68,43 @@ pub async fn create_user(pool: &PgPool) -> ApiResult<Uuid> {
         ));
     }
     let password = read_secret("CRM_BOOTSTRAP_PASSWORD", "New account password: ")?;
-    if !password::valid_length(&password) {
-        return Err(ApiError::invalid(
-            "Passwords must contain at least 8 characters and at most 1024 bytes.",
-        ));
-    }
+    // The new-password policy (account-self-service.md) applies to the command line too.
+    password_policy::check(&password, None, &email)?;
     let hash = password::hash(password).await?;
-    let id = Uuid::new_v4();
     let mut transaction = pool.begin().await?;
-    sqlx::query(
-        "INSERT INTO crm_users (id,name,email,phone,password_hash,role) VALUES ($1,$2,$3,$4,$5,$6)",
-    )
-    .bind(id)
-    .bind(name)
-    .bind(email)
-    .bind(phone)
-    .bind(hash)
-    .bind(&role)
-    .execute(&mut *transaction)
-    .await?;
-    sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
-        .bind(id.to_string())
+    let id = if role == "admin" {
+        accounts::create_admin(
+            &mut transaction,
+            accounts::NewAdmin {
+                name: &name,
+                email: &email,
+                phone: &phone,
+                password_hash: &hash,
+                language: "en",
+                email_verified: false,
+            },
+        )
+        .await?
+    } else {
+        // The trusted CLI alone retains the explicit initial Super Admin path.
+        let id = Uuid::new_v4();
+        sqlx::query(
+            "INSERT INTO crm_users (id,name,email,phone,password_hash,role) \
+             VALUES ($1,$2,$3,$4,$5,'super-admin')",
+        )
         .bind(id)
+        .bind(name)
+        .bind(email)
+        .bind(phone)
+        .bind(hash)
         .execute(&mut *transaction)
         .await?;
+        id
+    };
+    let company = workspaces::company::NewCompany::OPERATOR_BROKERAGE;
+    workspaces::create(&mut transaction, &id.to_string(), id, id, company).await?;
     if role == "super-admin" {
-        sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
-            .bind(ORGANISATION)
-            .bind(id)
-            .execute(&mut *transaction)
-            .await?;
+        workspaces::create(&mut transaction, ORGANISATION, id, id, company).await?;
     }
     transaction.commit().await?;
     Ok(id)

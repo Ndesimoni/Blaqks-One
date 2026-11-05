@@ -2,9 +2,10 @@
 //! parents, in one transaction under the workspace lock, with a `deleted` activity row
 //! (source `sample`) for each. Records people created are never removed; when one links
 //! to a sample record the clear is refused. Sample records changed in the app are kept
-//! unless `--include-edited` is passed. Sample staff are suspended, not archived.
+//! unless `--include-edited` is passed. Sample staff are suspended, not archived. Sample
+//! finance goes after the child records and before the clients and properties it links.
 use super::{
-    failed, mark_source,
+    failed, finance, mark_source,
     safety::{self, EDITED, LINKED},
     target::Target,
     target::UNCHANGED,
@@ -12,16 +13,21 @@ use super::{
 };
 use crate::{
     assignments::departure,
-    records::{collections::COLLECTIONS, visibility::ASSIGNABLE},
+    media,
+    records::{collections::COLLECTIONS, media_links, visibility::ASSIGNABLE},
     team::audit,
     workspaces,
 };
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
+/// Records sample finance links to; it is removed before the first of them.
+const PARENTS: [&str; 3] = ["Contacts", "Clients", "Properties"];
+
 pub struct Cleared {
     /// `(collection, removed)` in deletion order.
     pub counts: Vec<(&'static str, i64)>,
+    pub finance: Option<finance::clear::Cleared>,
     pub suspended: u64,
 }
 
@@ -33,35 +39,48 @@ pub async fn clear(pool: &PgPool, target: &Target, include_edited: bool) -> Outc
         .await
         .map_err(|_| format!("The Admin or workspace is no longer active.{UNCHANGED}"))?;
     mark_source(&mut tx).await?;
-    let linked = safety::find(&mut tx, LINKED, workspace).await?;
+    let mut linked = safety::find(&mut tx, LINKED, workspace).await?;
+    linked.extend(safety::find(&mut tx, finance::safety::LINKED, workspace).await?);
     if !linked.is_empty() {
         return Err(safety::linked_message(&linked));
     }
-    let edited = safety::find(&mut tx, EDITED, workspace).await?;
+    let mut edited = safety::find(&mut tx, EDITED, workspace).await?;
+    edited.extend(safety::find(&mut tx, finance::safety::EDITED, workspace).await?);
     if !edited.is_empty() && !include_edited {
         return Err(safety::edited_message(&edited));
     }
-    let mut counts = Vec::new();
+    let (mut counts, mut finance) = (Vec::new(), None);
     for collection in COLLECTIONS.iter().rev().map(|collection| collection.name) {
-        let removed: i64 = sqlx::query_scalar(
+        if finance.is_none() && PARENTS.contains(&collection) {
+            finance = Some(finance::clear::clear(&mut tx, target).await?);
+        }
+        let removed: Vec<Uuid> = sqlx::query_scalar(
             "WITH gone AS (DELETE FROM crm_records r USING crm_sample_records m \
              WHERE m.record_id=r.id AND m.workspace_id=$1 AND r.workspace_id=$1 \
              AND r.collection=$2 RETURNING r.id), \
              logged AS (INSERT INTO crm_activity (id,actor_id,workspace_id,action,collection,\
              record_id) SELECT gen_random_uuid(),$3,$1,'deleted',$2,id FROM gone) \
-             SELECT count(*) FROM gone",
+             SELECT id FROM gone",
         )
         .bind(workspace)
         .bind(collection)
         .bind(target.owner)
-        .fetch_one(&mut *tx)
+        .fetch_all(&mut *tx)
         .await
         .map_err(failed)?;
-        counts.push((collection, removed));
+        // Photos people added to sample properties go with them (packet F2).
+        media::owned::remove_owners(&mut tx, workspace, media_links::KIND, &removed)
+            .await
+            .map_err(failed)?;
+        counts.push((collection, removed.len() as i64));
     }
     let suspended = suspend(&mut tx, target).await?;
     tx.commit().await.map_err(failed)?;
-    Ok(Cleared { counts, suspended })
+    Ok(Cleared {
+        counts,
+        finance,
+        suspended,
+    })
 }
 
 /// Suspends this team's active sample members as the team page does: sessions end,
@@ -90,6 +109,11 @@ async fn suspend(tx: &mut Transaction<'_, Postgres>, target: &Target) -> Outcome
         .map_err(failed)?;
         let workspace = &target.workspace;
         departure::release(tx, workspace, *id, &ASSIGNABLE, target.owner, "departure")
+            .await
+            .map_err(failed)?;
+        // Their mailbox, address and WhatsApp number end too (W1a review L2).
+        let leaving = crate::integrations::Leaving::ALL;
+        crate::integrations::departure(tx, workspace, &[*id], leaving, target.owner)
             .await
             .map_err(failed)?;
         sqlx::query("DELETE FROM crm_sessions WHERE user_id=$1")

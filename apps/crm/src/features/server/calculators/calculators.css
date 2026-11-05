@@ -1,0 +1,129 @@
+/* UAE calculators as the approved mockup (design queue item 12): chips, fields and Result. */
+:root[data-theme] .calc-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+:root[data-theme] .calc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+:root[data-theme] .calc-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+:root[data-theme] .calc-card h3 {
+  margin: 0;
+  font: 600 16px var(--display);
+}
+
+:root[data-theme] .calc-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+:root[data-theme] .calc-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+:root[data-theme] .calc-field {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+:root[data-theme] .calc-field label {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+:root[data-theme] .calc-field small {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+:root[data-theme] .calc-field input {
+  inline-size: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-theme] .calc-field input:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  outline: none;
+}
+
+:root[data-theme] .calc-field input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+:root[data-theme] .calc-card .field-error {
+  margin: 0;
+}
+
+:root[data-theme] .calc-rows {
+  margin: 0;
+}
+
+:root[data-theme] .calc-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 10px;
+  padding-block: 10px;
+  border-block-end: 1px solid var(--line);
+  font-size: 14px;
+}
+
+:root[data-theme] .calc-row.strong {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+:root[data-theme] .calc-row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+:root[data-theme] .calc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  :root[data-theme] .calc-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  :root[data-theme] .calc-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+:root[data-theme] .calc-card > button {
+  justify-self: start;
+}

@@ -1,0 +1,83 @@
+/* Connected Team activity / My activity: page rhythm, the filter row and the feed panel. */
+.connected-activity {
+  gap: 16px;
+}
+/* The mockup's feed filter row: the scope in the field, the kept filters as pills. */
+.activity-scope {
+  flex: 1 1 320px;
+  cursor: default;
+}
+.activity-scope-text strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.activity-scope-text {
+  overflow: hidden;
+  color: var(--muted-dark);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:root[data-theme] .activity-pill input[type='date'] {
+  min-height: 36px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+:root[data-theme] .activity-range-error {
+  margin: 0;
+}
+/* The feed panel: day sections separated by quiet headers. */
+:root[data-theme] .panel.activity-feed {
+  padding: 4px 0 0;
+  overflow: hidden;
+}
+.activity-day + .activity-day {
+  border-top: 1px solid var(--line);
+}
+:root[data-theme] .activity-day-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 14px 20px 6px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+.activity-day-date {
+  color: var(--muted-dark);
+  font-weight: 500;
+}
+.activity-feed-foot {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-subtle);
+}
+:root[data-theme] .activity-feed-foot p {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  text-align: center;
+}
+.activity-feed-foot .btn {
+  min-height: 44px;
+  min-width: 200px;
+}
+@media (max-width: 720px) {
+  :root[data-theme] .activity-day-head {
+    padding: 12px 16px 4px;
+  }
+  .activity-feed-foot .btn {
+    width: 100%;
+  }
+}

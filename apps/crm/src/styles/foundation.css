@@ -1,0 +1,106 @@
+:root {
+  --ink: #1e2e2d;
+  --deep: #132623;
+  --deep2: #1b302d;
+  --muted: #607267;
+  /* Display face for page and panel titles (approved mockup, Bitrix24 frame). */
+  --display: Georgia, 'Times New Roman', serif;
+  --muted-dark: #53665b;
+  --gold: #bc9765;
+  --gold-light: #e4cda5;
+  --bg: #f3f6f4;
+  --panel: #fff;
+  --line: #dce5df;
+  --hover: #edf3ef;
+  --surface-subtle: #f7f9f8;
+  --primary: #28523d;
+  --primary-hover: #1e4331;
+  --on-primary: #ffffff;
+  --accent: #80603a;
+  --accent-subtle: #f7f0e5;
+  --pipeline-active: #477a60;
+  --danger: #a33b37;
+  --danger-surface: #fff0ee;
+  --focus: #477a60;
+  --focus-ring: #477a602b;
+  --sidebar: #12241c;
+  --sidebar-text: #b7c8bd;
+  --duration: 160ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --radius: 14px;
+  --shadow: 0 4px 22px rgba(28, 50, 45, 0.025);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+a {
+  color: inherit;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0;
+}
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.025em;
+}
+p {
+  color: var(--muted);
+}
+svg {
+  flex-shrink: 0;
+}
+input,
+select,
+textarea {
+  background: #fff;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

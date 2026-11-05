@@ -1,0 +1,147 @@
+/* Connected Guide as the approved mockup (design queue item 13): topics, articles, related. */
+:root[data-theme] .guide-groups {
+  display: grid;
+  gap: 16px;
+  max-width: 860px;
+}
+
+:root[data-theme] .guide-groups h3,
+:root[data-theme] .guide-related h3 {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+:root[data-theme] .guide-list {
+  padding: 0;
+  overflow: hidden;
+}
+
+:root[data-theme] .guide-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  inline-size: 100%;
+  padding: 12px 16px;
+  border: 0;
+  border-block-end: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+}
+
+:root[data-theme] .guide-item:last-child {
+  border-block-end: 0;
+}
+
+:root[data-theme] .guide-item:hover {
+  background: var(--hover);
+}
+
+:root[data-theme] .guide-dot {
+  display: grid;
+  place-items: center;
+  inline-size: 34px;
+  block-size: 34px;
+  border-radius: 10px;
+  background: var(--hover);
+  color: var(--primary);
+}
+
+:root[data-theme] .guide-item-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:root[data-theme] .guide-item-text > span,
+:root[data-theme] .guide-meta,
+:root[data-theme] .guide-lead,
+:root[data-theme] .guide-where {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+:root[data-theme] .guide-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 720px) minmax(0, 280px);
+  gap: 14px;
+  align-items: start;
+}
+
+:root[data-theme] .guide-article {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+:root[data-theme] .guide-article h2 {
+  margin: 0;
+  font: 600 26px var(--display);
+  text-wrap: balance;
+}
+
+:root[data-theme] .guide-lead {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 15px;
+}
+
+:root[data-theme] .guide-back {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+:root[data-theme] .guide-back svg {
+  transform: scaleX(-1);
+}
+
+:root[data-theme] .guide-where {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+:root[data-theme] .guide-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+:root[data-theme] .guide-steps,
+:root[data-theme] .guide-points {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-inline-start: 22px;
+  line-height: 1.55;
+}
+
+:root[data-theme] .guide-related {
+  padding: 14px 0 4px;
+}
+
+:root[data-theme] .guide-related h3 {
+  padding-inline: 16px;
+}
+
+@media (max-width: 900px) {
+  :root[data-theme] .guide-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

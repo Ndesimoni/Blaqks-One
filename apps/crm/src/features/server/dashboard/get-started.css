@@ -1,0 +1,77 @@
+/* Get started on the start page, as the approved mockup draws it: the count and Hide on the
+   heading row, a thin progress bar, then one row per step with a tick or Start. */
+.get-started {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+.get-started-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+.get-started-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 19px var(--display);
+}
+.get-started-head [role='status'] {
+  color: var(--muted);
+  font-size: 14px;
+}
+.get-started-head .start-tour-link {
+  margin-inline-start: auto;
+}
+.get-started-meter {
+  block-size: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--line);
+}
+.get-started-meter span {
+  display: block;
+  block-size: 100%;
+  background: var(--primary);
+  transition: inline-size var(--duration) var(--ease);
+}
+.get-started-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.get-started-list li {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-block-size: 48px;
+  color: var(--ink);
+}
+.get-started-tick {
+  display: grid;
+  place-items: center;
+  inline-size: 22px;
+  block-size: 22px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+}
+.get-started-list li[data-complete] .get-started-tick {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.get-started-done {
+  color: var(--muted);
+  font-size: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .get-started-meter span {
+    transition: none;
+  }
+}
+.get-started-list .btn {
+  min-block-size: 34px;
+  padding-inline: 14px;
+}

@@ -6,7 +6,7 @@ Audit date: October 8, 2026. Scope: the active React 18/Vite frontend, its busin
 
 The earlier folder reorganization already established feature pages, shared UI/layout components, schema/configuration modules, and business helpers. Continue from that structure.
 
-`src/main.jsx` mounts `App` in React Strict Mode. `WorkspaceProvider` supplies one context to the application shell and feature pages. `App` selects the current screen through an in-memory route string. Ten data-entry screens share the record directory/table; Properties has a dedicated directory. The shared record editor and detail panel receive their records and callbacks through props.
+`apps/crm/src/main.jsx` mounts `App` in React Strict Mode. `WorkspaceProvider` supplies one context to the application shell and feature pages. `App` selects the current screen through an in-memory route string. Ten data-entry screens share the record directory/table; Properties has a dedicated directory. The shared record editor and detail panel receive their records and callbacks through props.
 
 The schema retains 11 editable modules and 211 fields, including the enhanced property fields. Six report/workflow screens complete the 17-section application. Field names become normalized record keys, while workbook column letters preserve Excel compatibility.
 

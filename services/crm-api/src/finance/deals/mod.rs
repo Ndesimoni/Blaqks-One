@@ -1,0 +1,50 @@
+//! Deals (finance-design §2.2, §2.4, §5, §6.2, §13): typed rows outside the generic
+//! record model, held by one agent or the Admin queue, earned into append-only
+//! snapshots, shaped per caller and handed over only with the receiver's acceptance.
+pub mod assign;
+pub mod assignees;
+pub mod compute;
+pub mod create;
+pub mod delete;
+pub mod details;
+pub mod earn;
+pub mod earn_preview;
+pub mod earn_rules;
+pub mod fields;
+pub mod figures;
+#[cfg(test)]
+pub mod fixtures;
+pub mod gate;
+pub mod handover;
+pub mod handover_checks;
+pub mod handover_decide;
+pub mod handover_evidence;
+pub mod handover_follow;
+pub mod handover_offer;
+pub mod handover_preview;
+pub mod handover_preview_files;
+pub mod handover_preview_listing;
+pub mod handover_preview_view;
+pub mod handover_refs;
+pub mod handover_routes;
+pub mod handover_rows;
+pub mod handover_rules;
+pub mod handover_store;
+pub mod handover_waiting;
+pub mod holder;
+pub mod input;
+pub mod links;
+pub mod list;
+pub mod names;
+pub mod revise;
+pub mod revise_input;
+pub mod row;
+pub mod row_sql;
+pub mod snapshot;
+pub mod split;
+pub mod terms;
+pub mod totals;
+pub mod unearn;
+pub mod update;
+pub mod views;
+pub mod visible;

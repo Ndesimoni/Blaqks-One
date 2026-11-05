@@ -1,0 +1,58 @@
+@media (max-width: 760px) {
+  .hero {
+    margin: 0;
+    height: 340px;
+  }
+  .general-search-wrap {
+    padding-inline: 20px;
+    margin-top: 0;
+  }
+  .general-search-wrap .search-box {
+    padding: 20px 0;
+    background: transparent;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .search-top {
+    gap: 12px;
+  }
+  .search-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 12px;
+    margin-top: 18px;
+  }
+  .search-fields > label:nth-child(3),
+  .search-fields .budget-range,
+  .search-fields > .button {
+    grid-column: 1 / -1;
+  }
+  .search-fields .button {
+    margin-top: 0;
+  }
+  .search-advanced > summary span {
+    font-size: 10px;
+  }
+  .search-advanced-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .results-content .property-grid {
+    grid-template-columns: 1fr;
+  }
+  .result-toolbar {
+    align-items: start;
+  }
+  .sort-label {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .sort-label select {
+    min-width: 0;
+    max-width: 165px;
+    font-size: 11px;
+  }
+  .enquiry-panel {
+    padding: 24px;
+  }
+}

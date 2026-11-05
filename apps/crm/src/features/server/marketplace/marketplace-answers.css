@@ -1,0 +1,136 @@
+/* The request slider's body (packet MK3, marketplace redesign): the round's status and what
+   stays private, the sender's offer form and the private broker conversations as a thread. */
+.market-request-activity,
+.market-conversations,
+.market-message-thread,
+.market-offer-send {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.market-request-activity {
+  gap: 16px;
+}
+.market-request-status {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.market-status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:root[data-theme] .market-status-pills p {
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-theme] .market-status-pills .market-paused {
+  background: var(--market-warn-subtle);
+  color: var(--market-warn);
+}
+:root[data-theme] .marketplace-page .market-private-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--gold);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.market-private-line svg {
+  margin-top: 2px;
+  color: var(--accent);
+}
+.market-offer-pick {
+  max-width: 420px;
+}
+.market-offer-send > .btn,
+.market-request-status > .btn {
+  justify-self: start;
+}
+.market-consent {
+  align-items: flex-start;
+}
+.market-conversation-list,
+.market-message-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-conversation-list:empty {
+  display: none;
+}
+.market-conversation-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.market-conversation-row:last-child {
+  border-bottom: 0;
+}
+.market-conversation-row .btn[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.market-message-thread {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.market-message-list {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 4px 2px;
+  overscroll-behavior: contain;
+}
+.market-message-list li {
+  justify-self: start;
+  max-width: min(85%, 560px);
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--surface-subtle);
+}
+.market-message-list li.is-mine {
+  justify-self: end;
+  border-color: transparent;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--accent-subtle);
+}
+.market-message-list strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+.market-message-list time {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+:root[data-theme] .market-message-list p {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.market-conversations textarea,
+.market-message-thread textarea {
+  width: 100%;
+  resize: vertical;
+}

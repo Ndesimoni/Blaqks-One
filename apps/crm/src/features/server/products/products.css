@@ -1,0 +1,143 @@
+/* Product rail, contextual section sidebar and header tabs (NAV, owner 2026-10-31). */
+.product-rail {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: 41;
+  inline-size: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 6px;
+  background: #0d1f17;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.rail-brand {
+  display: flex;
+  justify-content: center;
+  margin-block-end: 12px;
+}
+.rail-brand .brand-logo {
+  inline-size: 40px;
+  block-size: 40px;
+}
+.rail-item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px 2px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: #bacfc3;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rail-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+.rail-item.active {
+  background: #304f3f;
+  color: #fff2d8;
+}
+.rail-item.active::before {
+  content: '';
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: -6px;
+  inline-size: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--gold);
+}
+.rail-item:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.rail-spacer {
+  flex: 1;
+}
+.connected-shell .section-sidebar {
+  inset-inline-start: 76px;
+  inline-size: 232px;
+  padding-block-start: 22px;
+}
+.section-sidebar-title {
+  margin: 0 8px 16px;
+  color: #f6f4ef;
+  font-size: 19px;
+  font-weight: 700;
+}
+.connected-shell.has-rail .main-area {
+  margin-inline-start: 308px;
+}
+.connected-shell.has-rail.sections-hidden .main-area {
+  margin-inline-start: 76px;
+}
+.section-tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-inline: 26px;
+  background: var(--panel);
+  border-block-end: 1px solid var(--line);
+  scrollbar-width: thin;
+}
+.section-tabs button {
+  flex: none;
+  padding: 12px 14px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.section-tabs button:hover {
+  color: var(--ink);
+}
+.section-tabs button.active {
+  color: var(--ink);
+  border-block-end-color: var(--gold);
+}
+.sidebar-toggle {
+  display: inline-grid;
+}
+@media (max-width: 1270px) {
+  .connected-shell .section-sidebar {
+    inline-size: 208px;
+  }
+  .connected-shell.has-rail .main-area {
+    margin-inline-start: 284px;
+  }
+}
+@media (max-width: 1050px) {
+  .connected-shell.has-rail .main-area,
+  .connected-shell.has-rail.sections-hidden .main-area {
+    margin-inline-start: 0;
+  }
+  .sidebar-toggle {
+    display: none;
+  }
+  .section-tabs {
+    padding-inline: 14px;
+  }
+  /* The phone drawer shows the rail and the sections side by side. */
+  .drawer.navigation-drawer.product-drawer {
+    inline-size: min(340px, 92vw);
+    flex-direction: row;
+  }
+  .product-drawer .product-rail {
+    position: static;
+    flex: none;
+  }
+  .product-drawer .section-sidebar {
+    flex: 1;
+    min-inline-size: 0;
+  }
+}

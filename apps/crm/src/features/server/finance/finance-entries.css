@@ -1,0 +1,123 @@
+/* Payments, expenses, approvals and history (finance-design §7). Loaded after finance-forms.css. */
+.finance-receipt:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* The approvers' count on the Waiting for approval preset chip (design step 2d). */
+.finance-page .grid-chip-count {
+  display: inline-block;
+  min-width: 22px;
+  margin-inline-start: 8px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+.finance-reason,
+.finance-duty {
+  max-width: 280px;
+  overflow-wrap: anywhere;
+}
+.finance-duty {
+  margin: 0;
+}
+.entry-card-decisions:empty {
+  display: none;
+}
+.entry-card-decisions .finance-action-group .btn {
+  flex: 1 1 auto;
+}
+.finance-receipt {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-height: 32px;
+  color: var(--accent);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  text-underline-offset: 3px;
+}
+.finance-receipt small {
+  color: var(--muted-dark);
+  font-weight: 500;
+}
+.finance-entry-status,
+.finance-dialog-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+.finance-history {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+.finance-history-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.finance-history-list > li {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.finance-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+.finance-history-head time {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.finance-history-reason,
+.finance-history-changes {
+  margin: 4px 0 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.finance-history-changes {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  list-style: none;
+  color: var(--muted-dark);
+}
+.finance-change-label {
+  color: var(--ink);
+  font-weight: 600;
+}
+.finance-change-before {
+  text-decoration: line-through;
+}
+.finance-change-after {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+/* Payments and expenses as the mockup's grid (design step 2d): a toolbar row with the scope
+   line and the add button on the right (the mockup's page action), then the filter row. */
+.entries-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.entries-head > .btn {
+  margin-inline-start: auto;
+}
+:root[data-theme] .entries-scope {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}

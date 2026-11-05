@@ -2,17 +2,24 @@ use super::{
     directory::MemberRow,
     prepare::prepare,
     update::{self, UpdateRequest},
+    update_channels,
 };
-use crate::team::{access, audit};
+use crate::team::{access, account_type::seats, audit};
 use crate::{
     assignments::departure,
-    auth::actions::Actions,
+    auth::sessions,
     error::{ApiError, ApiResult},
-    workspaces,
+    finance,
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use sqlx::PgPool;
 use uuid::Uuid;
 
+/// `area` is what Blaqks One must manage when it acts on a team it does not own.
+#[allow(clippy::too_many_arguments)]
 pub async fn update(
     pool: &PgPool,
     actor: Uuid,
@@ -20,11 +27,17 @@ pub async fn update(
     workspace: &str,
     id: Uuid,
     manages_admin: bool,
+    area: Area,
     mut request: UpdateRequest,
 ) -> ApiResult<()> {
     let mut transaction = pool.begin().await?;
     workspaces::lock(&mut transaction, workspace).await?;
     access::lock_owner(&mut transaction, owner).await?;
+    // Only Blaqks One acts on a team it does not own (BO1a item 8): re-read it live here.
+    if actor != owner {
+        workspaces::platform::operator(&mut transaction, actor, area, Level::Manage).await?;
+    }
+    let home = update_channels::home(&mut transaction, workspace, id, manages_admin).await?;
     let target = sqlx::query_scalar::<_, Uuid>(
         "SELECT id FROM crm_users WHERE id=$1 AND deleted_at IS NULL AND \
          ((role='staff' AND owner_id=$2 AND workspace_id=$3) OR ($4 AND role='admin')) FOR UPDATE",
@@ -49,10 +62,18 @@ pub async fn update(
             "This member changed. Reload before saving.",
         ));
     }
+    // Invite-Admins staff only cancel pending Admin invitations (BO1b); suspending people
+    // is a company control on Companies.
+    if actor != owner && area == Area::InviteAdmins && !update::cancels(&current, &request) {
+        return Err(ApiError::forbidden());
+    }
     let before = current.user.effective_permissions();
     prepare(&mut request, &current)?;
     let active = request.active.unwrap_or(current.active);
-    let access_changed = grants_changed(&current, &request);
+    if !current.active && active {
+        seats::ensure(&mut transaction, workspace, Some(id)).await?;
+    }
+    let access_changed = update::grants_changed(&current, &request);
     // Admin rows keep '{}' (L-2): their `actions` stays None and COALESCE keeps it.
     sqlx::query(
         "UPDATE crm_users SET name=$2,phone=$3,positions=$4,permissions=$5,channel_access=$6, \
@@ -67,7 +88,11 @@ pub async fn update(
     .bind(sqlx::types::Json(request.channel_access.as_ref().unwrap()))
     .bind(active)
     .bind(request.record_scope.map(update::RecordScopeGrant::as_str))
-    .bind(request.actions.map(sqlx::types::Json))
+    .bind(
+        request
+            .actions
+            .map(|requested| sqlx::types::Json(requested.actions)),
+    )
     .execute(&mut *transaction)
     .await?;
     if access_changed {
@@ -80,13 +105,21 @@ pub async fn update(
         let after = request.permissions.as_ref().unwrap();
         let (collections, reason) = departure::releases(current.active, active, &before, after);
         departure::release(&mut transaction, workspace, id, &collections, actor, reason).await?;
+        if let Some(reason) = finance::departure::releases(current.active, active, &before, after) {
+            finance::departure::release(&mut transaction, workspace, id, actor, reason).await?;
+        }
     }
     if request.active == Some(false) && !current.accepted {
         sqlx::query("UPDATE crm_team_invitations SET revoked_at=now() WHERE user_id=$1 AND consumed_at IS NULL")
             .bind(id).execute(&mut *transaction).await?;
     }
-    sqlx::query("DELETE FROM crm_sessions WHERE user_id=$1 OR user_id IN (SELECT id FROM crm_users WHERE owner_id=$1)")
-        .bind(id).execute(&mut *transaction).await?;
+    // Suspension or a lost channel grant ends those channels, in the member's own company
+    // workspace (M1, W-M1).
+    let leaving = update_channels::leaving(&current, &request, active);
+    if leaving.any() {
+        crate::integrations::departure(&mut transaction, &home, &[id], leaving, actor).await?;
+    }
+    sessions::revoke_member(&mut transaction, id).await?;
     audit::append(
         &mut transaction,
         actor,
@@ -101,20 +134,4 @@ pub async fn update(
     .await?;
     transaction.commit().await?;
     Ok(())
-}
-
-/// Whether a stored grant changes: modules, actions, record scope or channels.
-fn grants_changed(current: &MemberRow, request: &UpdateRequest) -> bool {
-    let user = &current.user;
-    let channels = request.channel_access.as_ref() != Some(&user.channel_access.0);
-    if user.role != "staff" {
-        return channels;
-    }
-    let scope = request
-        .record_scope
-        .is_some_and(|scope| scope.as_str() != user.record_scope);
-    let actions = request.actions.is_some_and(|actions| {
-        !user.actions_recorded() || actions != Actions::from_stored(&user.actions.0)
-    });
-    channels || scope || actions || request.permissions.as_ref() != Some(&user.permissions.0)
 }

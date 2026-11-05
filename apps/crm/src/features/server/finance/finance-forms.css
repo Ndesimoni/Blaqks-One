@@ -1,0 +1,137 @@
+/* Finance dialog forms, alerts and destructive actions. Loaded after finance-dialogs.css. */
+.finance-dialog-body {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.finance-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.finance-alert {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+.finance-alert p {
+  margin: 0;
+  color: var(--danger);
+}
+.finance-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.finance-note.warning {
+  border-color: var(--accent);
+}
+.finance-choice {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.finance-choice legend {
+  margin-bottom: 4px;
+  font-weight: 700;
+  font-size: 13px;
+}
+.finance-choice label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.finance-choice input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+.finance-choice input:disabled + span {
+  color: var(--muted-dark);
+  text-decoration: line-through;
+}
+.finance-compare {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.finance-compare-row.head {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+.finance-compare-row.head dd {
+  text-align: right;
+}
+.finance-revised-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+.finance-earn-preview {
+  display: grid;
+  gap: 12px;
+}
+.finance-totals {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+.finance-total {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.finance-total dd {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: left;
+}
+.finance-compare-row {
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(90px, auto));
+}
+.btn.finance-danger,
+:root[data-theme] .btn.finance-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--panel);
+}
+.btn.finance-danger-light,
+:root[data-theme] .btn.finance-danger-light {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn.finance-danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+@media (max-width: 750px) {
+  .finance-filters .search-small {
+    grid-column: 1 / -1;
+  }
+  .finance-details-footer .finance-action-group {
+    width: 100%;
+  }
+  .finance-details-footer .finance-action-group .btn {
+    flex: 1 1 auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deal-card > button {
+    transition: none;
+  }
+}

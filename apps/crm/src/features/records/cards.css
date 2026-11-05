@@ -1,0 +1,70 @@
+/* Phone record cards — the table's counterpart below the 750px layout breakpoint (UI3). */
+.record-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.record-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.record-card:last-child {
+  border-bottom: 0;
+}
+.record-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.record-card-identity {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.record-card-title {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.record-card-id {
+  color: var(--muted);
+  font-size: 12px;
+}
+.record-card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+.record-card-facts dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.record-card-facts dd {
+  color: var(--ink);
+  font-size: 13px;
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+.record-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.record-card-foot .row-link {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}

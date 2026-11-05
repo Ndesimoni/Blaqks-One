@@ -1,0 +1,109 @@
+/* Tablets and phones: one column, the phone menu, a shorter hero stage. */
+@media (max-width: 1020px) {
+  .nav .wrap {
+    grid-template-columns: 1fr auto;
+  }
+  .links {
+    display: none;
+  }
+  .menu-toggle {
+    display: inline-flex;
+  }
+  .bento,
+  .who {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cell.tall {
+    grid-row: span 1;
+  }
+  .row,
+  .closing,
+  .compare,
+  .secure,
+  .contact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  .row.flip > :last-child {
+    order: 0;
+  }
+  .prices,
+  .gallery {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 520px;
+    margin-inline: auto;
+  }
+  .foot .wrap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stage {
+    height: 520px;
+  }
+  .closing,
+  .secure {
+    padding: 32px;
+  }
+}
+@media (max-width: 640px) {
+  .nav .wordmark {
+    font-size: 19px;
+  }
+  .sec {
+    padding-block: 72px;
+  }
+  .hero {
+    padding-top: 56px;
+  }
+  .stage {
+    height: 380px;
+    margin-top: 48px;
+  }
+  .dash-holder {
+    top: 110px;
+  }
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dash-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .dash-row .panel-d:last-child,
+  .dash-tabs span:not(.on) {
+    display: none;
+  }
+  .bento,
+  .who,
+  .two,
+  .secure-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cell.wide {
+    grid-column: span 1;
+  }
+  .nav-end .signin,
+  .nav-end .theme-toggle {
+    display: none;
+  }
+  .row-art {
+    min-height: 300px;
+  }
+  .closing,
+  .secure,
+  .contact-form {
+    padding: 24px;
+  }
+  .closing .dash {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .cell,
+  .who-card,
+  .shot svg,
+  .arrow {
+    transition: none;
+  }
+}

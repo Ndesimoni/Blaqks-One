@@ -1,0 +1,33 @@
+/* The agreements board's cards (design queue item 28): kind, other company, state and share. */
+.agreement-card {
+  display: grid;
+  gap: 4px;
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.agreement-card strong {
+  font-size: 14px;
+  font-weight: 650;
+}
+.agreement-card > span {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.agreement-card-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.agreements-toolbar-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}

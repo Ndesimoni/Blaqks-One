@@ -1,0 +1,60 @@
+/* Private-group access expansion dialog. */
+.chat-members-dialog {
+  --dialog-width: 520px;
+  --dialog-height: 680px;
+}
+.chat-members-dialog .drawer-form {
+  min-block-size: 0;
+}
+.chat-members-dialog .drawer-body {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+.chat-members-dialog label:not(.chat-pick-person),
+.chat-current-members strong {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.chat-members-warning,
+.chat-members-confirm p {
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--hover);
+  color: var(--ink);
+  line-height: 1.5;
+}
+.chat-current-members {
+  padding-block-start: 4px;
+  border-block-start: 1px solid var(--line);
+}
+.chat-current-members p,
+.chat-members-confirm h3 {
+  margin: 8px 0 0;
+}
+.chat-members-confirm ul {
+  margin: 16px 0;
+  padding-inline-start: 22px;
+}
+.chat-members-dialog .drawer-footer {
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+}
+.chat-group-action-error {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: end;
+}
+@media (max-width: 750px) {
+  .chat-members-dialog .drawer-top,
+  .chat-members-dialog .drawer-body,
+  .chat-members-dialog .drawer-footer {
+    padding-inline: 18px;
+  }
+  .chat-members-dialog .drawer-footer .btn {
+    min-block-size: 44px;
+  }
+}

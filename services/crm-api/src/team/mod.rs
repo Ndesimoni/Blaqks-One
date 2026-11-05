@@ -1,8 +1,14 @@
 pub mod access;
+pub mod account_type;
 pub mod archive;
 pub mod audit;
 pub mod catalogue;
 pub mod invitations;
 pub mod members;
+pub mod platform;
+pub mod platform_controls;
+pub mod platform_counts;
+pub mod platform_members;
+pub mod platform_team;
 pub mod positions;
-pub mod validation;
+pub mod routes;

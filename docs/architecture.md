@@ -4,7 +4,7 @@ The modern React application is the source of truth for development. It uses fea
 
 ## Connected CRM slice
 
-`src/main.jsx` selects the app at build time using `VITE_CRM_MODE`. Default demo composition and storage contracts stay intact. In `server` mode, `features/server/ServerApp.jsx` composes the same design system, hash router and navigation guard around `ServerSession`, `ServerDirectory` and a workspace provider keyed by authenticated user and selected owner.
+`apps/crm/src/main.jsx` selects the app at build time using `VITE_CRM_MODE`. Default demo composition and storage contracts stay intact. In `server` mode, `features/server/ServerApp.jsx` composes the same design system, hash router and navigation guard around `ServerSession`, `ServerDirectory` and a workspace provider keyed by authenticated user and selected owner.
 
 `services/crm/client.js` uses same-origin cookie requests and an in-memory CSRF token. `useServerRecords` loads every authorised connected collection (`connectedCollections` in `features/server/records.js`); `useServerMutations` waits for server commits and retains failed/conflicting form drafts. Canonical UUID/version metadata stays separate from workbook objects. The shared editor/details/property/contacts components work in both modes. The connected shell restores the familiar navigation groups and Settings links, filtering them by current grants. Clients, Leads, Contacts, Properties, the client workflow collections and Team open their working screens; unfinished routes are labelled **Not connected** and open status-only panels, without demo providers, forms or unsupported record actions. Server failures never fall back to demo identity or data.
 
@@ -21,9 +21,9 @@ The Super Admin migration flow separates source reading/backup export, destinati
 ## Default demo application flow
 
 ```text
-index.html
-  → src/main.jsx
-  → src/app/App.jsx
+apps/crm/index.html
+  → apps/crm/src/main.jsx
+  → apps/crm/src/app/App.jsx
   → TeamProvider → SessionProvider + hash router
   → NavigationGuardProvider → setup/invitation/reset/email previews, sign-in/sign-out, or RequireSession
   → WorkspaceProvider → resolved personal/organisation scope → keyed ScopedWorkspaceProvider
@@ -70,22 +70,22 @@ Context values are memoized. `useRecordActions()` depends on record data and sta
 
 ## Responsibilities
 
-| Folder                   | Put here                                                            |
-| ------------------------ | ------------------------------------------------------------------- |
-| `src/app`                | App composition, workspace orchestration, and actions               |
-| `src/features/<feature>` | Pages and components specific to that feature                       |
-| `src/components/ui`      | Reusable visual controls without workspace state                    |
-| `src/components/layout`  | Persistent navigation, branding, and page chrome                    |
-| `src/hooks`              | Workspace access, React state/effects, and persistence hooks        |
-| `src/services/storage`   | Browser workspace and preference reads/writes                       |
-| `src/services/files`     | JSON backup validation and browser downloads                        |
-| `src/config`             | Navigation definitions, field options, theme, and storage constants |
-| `src/data`               | Workbook schemas and fictional seed records                         |
-| `src/lib`                | Non-React helpers and business rules                                |
-| `src/styles`             | Global design system, responsive layout, and theme styles           |
-| `public`                 | Assets served unchanged by Vite                                     |
-| `tests`                  | Active unit, smoke, and browser regression tests                    |
-| `docs`                   | Developer setup, product documentation, and screenshots             |
+| Folder                            | Put here                                                            |
+| --------------------------------- | ------------------------------------------------------------------- |
+| `apps/crm/src/app`                | App composition, workspace orchestration, and actions               |
+| `apps/crm/src/features/<feature>` | Pages and components specific to that feature                       |
+| `apps/crm/src/components/ui`      | Reusable visual controls without workspace state                    |
+| `apps/crm/src/components/layout`  | Persistent navigation, branding, and page chrome                    |
+| `apps/crm/src/hooks`              | Workspace access, React state/effects, and persistence hooks        |
+| `apps/crm/src/services/storage`   | Browser workspace and preference reads/writes                       |
+| `apps/crm/src/services/files`     | JSON backup validation and browser downloads                        |
+| `apps/crm/src/config`             | Navigation definitions, field options, theme, and storage constants |
+| `apps/crm/src/data`               | Workbook schemas and fictional seed records                         |
+| `apps/crm/src/lib`                | Non-React helpers and business rules                                |
+| `apps/crm/src/styles`             | Global design system, responsive layout, and theme styles           |
+| `public`                          | Assets served unchanged by Vite                                     |
+| `tests`                           | Active unit, smoke, and browser regression tests                    |
+| `docs`                            | Developer setup, product documentation, and screenshots             |
 
 The ten data-entry screens other than Properties share `RecordsPage` and `RecordTable`. `ContactsPage` supplies contact-specific tabs and a pure matching selector to the shared page; it filters the existing Contact type field without changing workbook columns. Properties has its own `PropertyDirectory`, while the record detail and editor components support every data-entry module.
 
@@ -113,9 +113,9 @@ Failed writes keep the in-memory records and activity, expose a persistent expor
 
 JSON restoration validates the backup format/version, records, media, and size before confirmation or replacement. Excel import reads namespace-prefixed or default-namespace OOXML, rich/shared strings, numeric zero, and dates. Missing workbook parts and unmatched sheets fail before replacement. Excel and JSZip are loaded on demand; Excel exports omit attachments while JSON backups retain them.
 
-The repositories remain synchronous and browser-local. Calendar integration is deferred: `WorkspaceProvider` does not mount `useCalendarSync` or `CalendarContext`, and Calendar is absent from navigation and feature loading. Follow-up/viewing forms show local scheduling fields; sync, invitation and provider reminder controls are hidden. Retained integration metadata does not block local edits or change on save. The companion, hook and historical browser scenarios in `tests/deferred/` remain available for a later phase. The separate connected slice implements asynchronous loading and mutation states for its connected collections. Remaining demo modules still need server repositories. Cross-device persistence exists only in connected mode; live cross-tab change notifications are not implemented.
+The repositories remain synchronous and browser-local. Calendar integration is deferred: `WorkspaceProvider` does not mount `useCalendarSync` or `CalendarContext`, and Calendar is absent from navigation and feature loading. Follow-up/viewing forms show local scheduling fields; sync, invitation and provider reminder controls are hidden. Retained integration metadata does not block local edits or change on save. The companion, hook and historical browser scenarios in `apps/crm/tests/deferred/` remain available for a later phase. The separate connected slice implements asynchronous loading and mutation states for its connected collections. Remaining demo modules still need server repositories. Cross-device persistence exists only in connected mode; live cross-tab change notifications are not implemented.
 
-The companion in `backend/` separates HTTP/OAuth handlers (`api/`: session, OAuth, calendars, queue), Google transport (`google/`: OAuth tokens and events), validated events, queue and encrypted atomic storage (`store/`), and the background retry worker (`sync.rs`). Browser-bound OAuth state/PKCE and CSRF protect authorization and mutations. Queued events, stable event IDs and tokens survive service restarts in an encrypted local store; tokens stay out of the browser. Sync is one-way from CRM to Google, and scoped to explicitly enabled follow-ups/viewings. Client meetings and calls reuse follow-up records. See [Google Calendar integration](google-calendar.md) for setup and the local-only boundary.
+The companion in `services/calendar-companion/` separates HTTP/OAuth handlers (`api/`: session, OAuth, calendars, queue), Google transport (`google/`: OAuth tokens and events), validated events, queue and encrypted atomic storage (`store/`), and the background retry worker (`sync.rs`). Browser-bound OAuth state/PKCE and CSRF protect authorization and mutations. Queued events, stable event IDs and tokens survive service restarts in an encrypted local store; tokens stay out of the browser. Sync is one-way from CRM to Google, and scoped to explicitly enabled follow-ups/viewings. Client meetings and calls reuse follow-up records. See [Google Calendar integration](google-calendar.md) for setup and the local-only boundary.
 
 ## Styles
 
@@ -129,7 +129,7 @@ The companion in `backend/` separates HTTP/OAuth handlers (`api/`: session, OAut
 
 `components/ui/OverflowList.jsx` provides disclosure, continuous scrolling and full-collection modes. More replaces a compact six-item summary with one complete list, and the same control becomes Close. Primary property cards use `Pagination.jsx` and normal page scrolling; searchable lists scroll continuously, and photo/step rows scroll horizontally. `lib/overflow.js` preserves original indexes and promotes active single choices without losing displaced options. Use this component for expanding lists; keep full collections in the feature model so validation, totals and exports include hidden entries. See [Clean collection and option browsing](option-overflow.md) for the UI audit, coverage and interaction behavior.
 
-1. Find its page in `src/features`, or add a new feature folder for a distinct screen.
+1. Find its page in `apps/crm/src/features`, or add a new feature folder for a distinct screen.
 2. Put reusable controls in `components/ui` and non-React logic in `lib`.
 3. Update `config/navigation.js` and `app/FeatureRoutes.jsx` when adding navigation.
 4. Keep schema changes compatible with existing record keys and workbook columns.
@@ -143,6 +143,6 @@ The proposed [CRM, website and mobile platform design](platform-system-design.md
 
 `legacy/offline/src/App.jsx` and `legacy/offline/public` belong to the independent, zero-install prototype. Its bundled older runtime uses a hooks adapter. The modern app uses standard React 18 hooks directly.
 
-`npm run build:offline` only rebuilds the legacy app. Vite only copies the root `public/` assets into `dist/`, so the offline HTML and libraries cannot overwrite the modern build.
+`npm run build:offline` only rebuilds the legacy app. Vite only copies the `apps/crm/public/` assets into `dist/`, so the offline HTML and libraries cannot overwrite the modern build.
 
-Historical Python browser scripts live under `legacy/offline/tests` for reference. Active browser checks live under `tests/browser` and resolve their assets relative to the project.
+Historical Python browser scripts live under `legacy/offline/tests` for reference. Active browser checks live under `apps/crm/tests/browser` and resolve their assets relative to the project.

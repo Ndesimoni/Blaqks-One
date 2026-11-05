@@ -1,0 +1,94 @@
+/* The gold listing card and the marketplace offer cards in the feature rows. */
+.gold-card {
+  position: relative;
+  width: 300px;
+  max-width: 80%;
+  aspect-ratio: 1.58;
+  border-radius: 18px;
+  padding: 20px;
+  display: grid;
+  align-content: space-between;
+  color: var(--on-gold);
+  background: linear-gradient(135deg, var(--gold-2), var(--gold));
+  box-shadow: 0 30px 80px var(--glow-1);
+}
+.gold-card .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.gold-card .price-big {
+  font-size: 26px;
+  font-weight: 700;
+}
+.gold-card small {
+  font-size: 13px;
+  opacity: 0.8;
+}
+.sw {
+  width: 42px;
+  height: 24px;
+  border-radius: 99px;
+  background: var(--on-gold);
+  position: relative;
+}
+.sw::after {
+  content: '';
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold-2);
+}
+.offer-stack {
+  position: relative;
+  width: 340px;
+  max-width: 86%;
+  display: grid;
+  gap: 12px;
+}
+.offer {
+  border: 1px solid var(--edge-2);
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 16px 40px rgba(13, 28, 20, 0.12);
+  padding: 16px;
+  display: grid;
+  gap: 6px;
+}
+.offer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 10px;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.split span:first-child {
+  background: var(--gold);
+}
+.split span:last-child {
+  background: var(--leaf);
+}
+.chat-art {
+  place-items: stretch;
+  align-content: center;
+  gap: 10px;
+  padding: 28px;
+}
+.msg.mine {
+  justify-self: end;
+  background: rgba(188, 151, 101, 0.16);
+}
+.msg.mine span {
+  color: var(--text);
+}

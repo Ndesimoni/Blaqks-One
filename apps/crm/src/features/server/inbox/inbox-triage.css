@@ -1,0 +1,111 @@
+/* New-contact review bar, blocked notice, and the Create lead and Link panels (plan U2). */
+.inbox-review {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 12px 20px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-inline-start: 3px solid var(--gold);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.inbox-review.is-blocked {
+  border-inline-start-color: var(--danger);
+}
+.inbox-review-text {
+  display: grid;
+  flex: 1 1 260px;
+  gap: 2px;
+}
+.inbox-review-text span,
+.inbox-review-warning {
+  color: var(--muted);
+  font-size: 13px;
+}
+.inbox-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.inbox-review-block {
+  margin-inline-start: auto;
+}
+/* Desktop buttons stay compact so the messages keep their room; phones get 44px below. */
+.inbox-review-actions .btn {
+  min-block-size: 36px;
+  padding-block: 6px;
+}
+.inbox-panel-form,
+.inbox-panel .inbox-panel-section {
+  align-content: start;
+}
+.inbox-panel-form label,
+.inbox-panel-section > label,
+.inbox-field-label {
+  margin-block-start: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.inbox-panel-form input,
+.inbox-panel-form textarea,
+.inbox-panel-section > input {
+  inline-size: 100%;
+  min-block-size: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+.inbox-panel-form textarea {
+  resize: vertical;
+}
+.inbox-field-value {
+  font-weight: 600;
+}
+.inbox-panel-footer {
+  position: sticky;
+  inset-block-end: 0;
+  margin-inline: -20px;
+  margin-block-end: -20px;
+  padding: 12px 20px;
+  border-block-start: 1px solid var(--line);
+  background: var(--panel);
+}
+.inbox-panel-footer .btn {
+  inline-size: 100%;
+}
+.inbox-link-results {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inbox-link-results button {
+  display: grid;
+  gap: 2px;
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+}
+.inbox-link-results button:hover {
+  background: var(--hover);
+}
+.inbox-link-results small {
+  color: var(--muted);
+}
+@media (max-width: 899px) {
+  .inbox-review-actions .btn {
+    min-block-size: 44px;
+  }
+}

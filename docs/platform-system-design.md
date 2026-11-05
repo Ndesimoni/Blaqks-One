@@ -4,9 +4,11 @@ Implementation update: the first private CRM backend slice now exists with Docke
 
 This is the proposed production system design for Keys with Simoni. The default CRM remains a browser-local frontend prototype alongside the first opt-in private backend slice; this document defines the wider production platform.
 
-Confirmed product decision: **Super Admin approval is required before a property listing appears on the public website or mobile app.**
+**Website decision update (2026-10-28):** [Direct website publishing](product-decisions.md#direct-website-publishing-decided-2026-10-28) replaces the mandatory Super Admin website approval gate described in older sections below. Authorised publishers publish explicit validated public versions directly. Privacy, consent, eligibility, same-property limits and takedown remain; this website decision does not settle separate future mobile-app policy.
 
 Confirmed team model: one agency with Admin-owned workspaces; each Admin may create staff accounts and grant access inside their own workspace. The Super Admin oversees all teams and creates Admins. Staff can hold multiple positions with explicit module and messaging grants. The customer-facing mobile app remains a working assumption. External agencies, cross-Admin delegation and a dedicated staff mobile app would require additional product decisions. See [Admin-owned teams](admin-owned-teams.md).
+
+Company websites (decided 2026-10-20): besides the general website, a company may have its own site served by the same website application. See the [public website plan](public-website-plan.md).
 
 ## One platform, three applications
 

@@ -1,0 +1,60 @@
+/* Platform dashboard figure panels: label and value rows on hairline rules, values right
+   aligned in tabular figures, the period's rows under a small heading. Untracked figures read
+   quieter than real ones so a gap never passes for a zero. */
+.platform-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.figure-group + .figure-group {
+  margin-top: 14px;
+}
+:root[data-theme] .figure-group-title {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.figure-list {
+  display: grid;
+  margin: 0;
+}
+.figure-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.figure-row:last-child {
+  border-bottom: 0;
+}
+.figure-row dt {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.figure-row dt small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.figure-row dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+.figure-row dd.is-untracked {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 500;
+}

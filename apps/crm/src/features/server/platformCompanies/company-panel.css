@@ -1,0 +1,118 @@
+/* Blaqks One's company panel (BO1a): the record slider's right-edge panel and cards. */
+:root[data-theme] .modal-right > .drawer.company-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(720px, calc(100vw - 96px));
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: var(--bg);
+  box-shadow: -18px 0 50px rgba(8, 24, 20, 0.2);
+}
+.company-panel-head {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+:root[data-theme] .company-panel-head h2 {
+  margin: 0;
+  font: 600 22px / 1.25 var(--display);
+}
+.company-panel-head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+:root[data-theme] .company-panel .company-panel-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-start: -56px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--ink);
+}
+.company-panel-body {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 18px 22px 32px;
+  overflow-y: auto;
+}
+.company-panel-card,
+.company-members {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.company-panel-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+:root[data-theme] :is(.company-panel-card, .company-members) h3 {
+  margin: 0 0 4px;
+  font: 600 16px / 1.3 var(--display);
+}
+.company-panel-card p {
+  margin: 0;
+}
+.company-panel-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.company-members ul {
+  display: grid;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.company-members li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.company-member-who {
+  display: grid;
+  flex: 1 1 240px;
+  gap: 2px;
+  min-width: 0;
+}
+.company-member-who span {
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.company-member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 760px) {
+  :root[data-theme] .modal-right > .drawer.company-panel {
+    width: 100vw;
+  }
+  :root[data-theme] .company-panel .company-panel-close {
+    inset-inline: auto 12px;
+  }
+  .company-panel-head {
+    padding-inline-end: 64px;
+  }
+}

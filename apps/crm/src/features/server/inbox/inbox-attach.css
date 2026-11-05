@@ -1,0 +1,5 @@
+/* Email attachments (F3a): files on sent emails in the thread. The chosen files and the
+   "+" sit inside the shared message box (src/features/server/composer/). */
+.inbox-bubble .chat-attachments {
+  margin-block-start: 8px;
+}

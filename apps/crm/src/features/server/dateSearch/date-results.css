@@ -1,0 +1,139 @@
+/* Date search results: one bounded scroll area with sticky month headings and 56px rows. */
+.ds-scroll {
+  max-height: min(560px, 65vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0 -8px;
+  padding: 0 8px;
+  border-radius: 10px;
+}
+.ds-scroll:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.ds-group ul {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.ds-month {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 8px 0;
+  background: var(--panel);
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ds-month span {
+  color: var(--muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ds-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+.ds-row:hover {
+  background: var(--hover);
+}
+.ds-row:active {
+  border-color: var(--line);
+  background: var(--surface-subtle);
+}
+.ds-row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0;
+}
+.ds-day {
+  display: flex;
+  flex: 0 0 40px;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.ds-day b {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.ds-day small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.ds-row-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  color: var(--accent);
+}
+.ds-row-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ds-row-text strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+.ds-row-text :is(strong, small) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-row-text small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.ds-row-date {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.ds-row > svg {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+@media (max-width: 750px) {
+  .ds-row-icon {
+    display: none;
+  }
+  /* The day block shows the date visually; keep the full date for screen readers. */
+  .ds-row-date {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}

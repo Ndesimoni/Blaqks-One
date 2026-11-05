@@ -1,0 +1,138 @@
+@media (max-width: 760px) {
+  .section {
+    width: calc(100% - 40px);
+    margin-bottom: 56px;
+  }
+  .site-header {
+    width: calc(100% - 32px);
+    min-height: 86px;
+    gap: 12px;
+  }
+  .wordmark {
+    font-size: 20px;
+    gap: 9px;
+  }
+  .wordmark small {
+    font-size: 8px;
+  }
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+  .page-top {
+    padding-top: 28px;
+  }
+  h1 {
+    font-size: 40px;
+  }
+  .hero {
+    min-height: 510px;
+    height: 510px;
+  }
+  .hero-content {
+    margin-left: 24px;
+    padding: 78px 24px 50px 0;
+    max-width: 100%;
+  }
+  .hero h1 {
+    font-size: 58px;
+  }
+  .hero-content > p:not(.eyebrow) {
+    max-width: 340px;
+    font-size: 13px;
+  }
+  .home-search {
+    margin-top: 20px;
+  }
+  .search-form {
+    padding: 18px;
+  }
+  .search-core {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 12px;
+  }
+  .search-core > label:first-child,
+  .search-core .budget-fields,
+  .search-core > .button {
+    grid-column: 1 / -1;
+  }
+  .search-core > .button {
+    margin-top: 0;
+  }
+  .advanced-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .advanced-actions {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .advanced-actions .button {
+    flex: 1;
+  }
+  .sort-field {
+    max-width: none;
+  }
+  .property-grid,
+  .people-grid,
+  .developer-grid,
+  .area-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .property-grid {
+    gap: 24px;
+  }
+  .property-image {
+    aspect-ratio: 1.45;
+  }
+  .card-content {
+    padding: 20px;
+  }
+  .section-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .section-heading h2 {
+    font-size: 34px;
+  }
+  .editorial-block,
+  .contact-layout,
+  .profile-intro {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .editorial-block > img {
+    height: 310px;
+  }
+  .editorial-block > div {
+    max-width: none;
+  }
+  .area-card {
+    min-height: 290px;
+  }
+  .developer-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .developer-strip a {
+    font-size: 21px;
+  }
+  .site-footer {
+    padding: 40px 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .site-footer > div:first-child {
+    grid-column: 1 / -1;
+  }
+  .site-footer .footer-bottom {
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+  .footer-bottom > span {
+    width: 100%;
+  }
+}

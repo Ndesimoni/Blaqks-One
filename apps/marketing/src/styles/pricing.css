@@ -1,0 +1,85 @@
+/* Plans and the feature table. */
+.prices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+.price {
+  border: 1px solid var(--edge);
+  border-radius: 22px;
+  padding: 30px;
+  background: linear-gradient(180deg, var(--card-2), var(--card));
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  position: relative;
+}
+.price.best {
+  border-color: rgba(188, 151, 101, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(188, 151, 101, 0.25),
+    0 30px 90px rgba(188, 151, 101, 0.18);
+  background:
+    radial-gradient(380px 200px at 50% 0%, rgba(188, 151, 101, 0.14), transparent 70%),
+    linear-gradient(180deg, var(--card-2), var(--card));
+}
+.price .amt {
+  font-family: var(--display);
+  font-size: 44px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.price .amt small {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 15px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+.price > p {
+  color: var(--text-2);
+  font-size: 15px;
+}
+.price .btn {
+  width: 100%;
+}
+.best-tag {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--edge);
+  border-radius: 20px;
+  background: var(--card);
+  margin-top: 56px;
+}
+.plan-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+  font-size: 15px;
+}
+.plan-table th,
+.plan-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--edge);
+  text-align: center;
+}
+.plan-table th:first-child,
+.plan-table td:first-child {
+  text-align: left;
+  color: var(--text-2);
+}
+.plan-table thead th {
+  font: 600 18px var(--display);
+  color: var(--text);
+}
+.plan-table td.yes {
+  color: var(--gold-ink);
+  font-weight: 700;
+}
+.plan-table tr:last-child td {
+  border-bottom: 0;
+}

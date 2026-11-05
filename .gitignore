@@ -11,7 +11,9 @@ test-results/
 test-results-server/
 __pycache__/
 *.pyc
-backend/target/
-backend/data/
+services/calendar-companion/target/
+services/calendar-companion/data/
 services/crm-api/target/
 *.enc
+.next/
+*.tsbuildinfo

@@ -1,0 +1,146 @@
+{
+  "description": "Golden commission cases for the Rust engine (authoritative) and the JS preview (docs/finance-design.md \u00a73, \u00a710). Rows follow the column lists; null means no value.",
+  "units": "Money in integer fils (1 AED = 100 fils); rates in integer basis points (10000 = 100%); dates ISO YYYY-MM-DD (Asia/Dubai).",
+  "rules": {
+    "hu": "(a*b + 5000) div 10000",
+    "fl": "(a*b) div 10000",
+    "vatRateBp": 500,
+    "receivedShare": "line * min(received, net) div net (0 when net = 0)",
+    "outstanding": "max(0, net - received)"
+  },
+  "teamDefaultBp": 5000,
+  "inputColumns": "id feeBasis agreedValueFils feeRateBp fixedFeeFils partnerShareBp ownerHeld overrideBp agreementBp secondAgentShareBp secondAgentSource vatRegistered",
+  "outputColumns": "id splitSource agentShareBp grossFils partnerFils netFils primaryFils secondFils companyFils vatFils",
+  "cases": {
+    "G1": "Sale, percentage fee, no partner, agreement 60%, VAT on",
+    "G2": "Rental, half-up fee, partner 50%, team default 50%, second agent 25% from the first agent, VAT off",
+    "G3": "G2 with the second agent taken from the company share",
+    "G4": "Fixed fee (rate ignored), Admin override 80% over agreement 70%, VAT on",
+    "G7": "Owner-held deal: no agent lines, the company keeps the whole net",
+    "G8": "Extremes: agreed AED 100bn, rate 100%, agent 100%",
+    "G9": "Zero fee",
+    "G10a": "G2 with second agent 0% (first agent source)",
+    "G10b": "G2 with second agent 100% (first agent source)",
+    "G10c": "G2 with second agent 0% (company source)",
+    "G10d": "G2 with second agent 100% (company source)",
+    "E1": "Half-up at exactly .5 fils for the fee; floor for the agent line",
+    "E2": "Floor at .9999 fils: the agent line is 0 and the company keeps 1 fil",
+    "E3": "VAT half-up at exactly .5 fils",
+    "E4": "Partner half-up at exactly .5 fils"
+  },
+  "inputs": [
+    ["G1", "percentage", 245000000, 200, null, 0, false, null, 6000, null, "first_agent", true],
+    ["G2", "percentage", 8733333, 500, null, 5000, false, null, null, 2500, "first_agent", false],
+    ["G3", "percentage", 8733333, 500, null, 5000, false, null, null, 2500, "company", false],
+    ["G4", "fixed", 99000000, 300, 1500000, 0, false, 8000, 7000, null, "first_agent", true],
+    ["G7", "percentage", 245000000, 200, null, 0, true, null, 6000, null, "first_agent", true],
+    [
+      "G8",
+      "percentage",
+      10000000000000,
+      10000,
+      null,
+      0,
+      false,
+      null,
+      10000,
+      null,
+      "first_agent",
+      true
+    ],
+    ["G9", "percentage", 245000000, 0, null, 0, false, null, 6000, null, "first_agent", true],
+    ["G10a", "percentage", 8733333, 500, null, 5000, false, null, null, 0, "first_agent", false],
+    [
+      "G10b",
+      "percentage",
+      8733333,
+      500,
+      null,
+      5000,
+      false,
+      null,
+      null,
+      10000,
+      "first_agent",
+      false
+    ],
+    ["G10c", "percentage", 8733333, 500, null, 5000, false, null, null, 0, "company", false],
+    ["G10d", "percentage", 8733333, 500, null, 5000, false, null, null, 10000, "company", false],
+    ["E1", "percentage", 1, 5000, null, 0, false, null, null, null, "first_agent", false],
+    ["E2", "fixed", 0, 0, 1, 0, false, 9999, null, null, "first_agent", false],
+    ["E3", "fixed", 0, 0, 10, 0, true, null, null, null, "first_agent", true],
+    ["E4", "fixed", 0, 0, 1, 5000, false, null, null, null, "first_agent", false]
+  ],
+  "outputs": [
+    ["G1", "agreement", 6000, 4900000, 0, 4900000, 2940000, null, 1960000, 245000],
+    ["G2", "team_default", 5000, 436667, 218334, 218333, 81875, 27291, 109167, 0],
+    ["G3", "team_default", 5000, 436667, 218334, 218333, 109166, 27291, 81876, 0],
+    ["G4", "override", 8000, 1500000, 0, 1500000, 1200000, null, 300000, 75000],
+    ["G7", "owner", null, 4900000, 0, 4900000, null, null, 4900000, 245000],
+    [
+      "G8",
+      "agreement",
+      10000,
+      10000000000000,
+      0,
+      10000000000000,
+      10000000000000,
+      null,
+      0,
+      500000000000
+    ],
+    ["G9", "agreement", 6000, 0, 0, 0, 0, null, 0, 0],
+    ["G10a", "team_default", 5000, 436667, 218334, 218333, 109166, 0, 109167, 0],
+    ["G10b", "team_default", 5000, 436667, 218334, 218333, 0, 109166, 109167, 0],
+    ["G10c", "team_default", 5000, 436667, 218334, 218333, 109166, 0, 109167, 0],
+    ["G10d", "team_default", 5000, 436667, 218334, 218333, 109166, 109167, 0, 0],
+    ["E1", "team_default", 5000, 1, 0, 1, 0, null, 1, 0],
+    ["E2", "override", 9999, 1, 0, 1, 0, null, 1, 0],
+    ["E3", "owner", null, 10, 0, 10, null, null, 10, 1],
+    ["E4", "team_default", 5000, 1, 1, 0, 0, null, 0, 0]
+  ],
+  "paymentColumns": "id deal paymentsFils vatFils totalFils receivedFils primaryReceivedFils secondReceivedFils outstandingFils",
+  "paymentCases": {
+    "G5": "Payment of half the receivable on G1 (VAT on)",
+    "G6": "Partial payment on G2 (VAT off)",
+    "G9p": "Zero-fee deal with nothing received: statement line 0"
+  },
+  "payments": [
+    ["G5", "G1", [2450000], [122500], [2572500], 2450000, 1470000, null, 2450000],
+    ["G6", "G2", [100000], [0], [100000], 100000, 37500, 12499, 118333],
+    ["G9p", "G9", [], [], [], 0, 0, null, 0]
+  ],
+  "agreementColumns": "id agentShareBp effectiveFrom effectiveTo",
+  "agreements": [
+    ["A1", 6000, "2026-01-01", "2026-07-01"],
+    ["A2", 6500, "2026-07-01", null]
+  ],
+  "agreementCases": [
+    ["2026-06-30", "A1"],
+    ["2026-07-01", "A2"],
+    ["2025-12-31", null],
+    ["2026-01-01", "A1"],
+    ["2030-01-01", "A2"]
+  ],
+  "property": {
+    "generator": "splitmix64",
+    "seed": 20261014,
+    "cases": 10000,
+    "draws": "Per case, in order, v = next(): feeBasis = v % 2 (0 percentage, 1 fixed); agreedValueFils = v % 10000000000001; feeRateBp = v % 10001; fixedFeeFils = v % 10000000000001; partnerShareBp = v % 10001; ownerHeld = v % 4 == 0; agreementBp = v % 10001 (no override); hasSecond = v % 2 == 1; secondAgentShareBp = v % 10001 (null unless hasSecond); secondAgentSource = v % 2 (0 first_agent, 1 company); vatRegistered = v % 2 == 1; after calculating, receivedFils = v % (2 * netFils + 1).",
+    "invariants": "grossFils = partnerFils + companyFils + primaryFils + secondFils; every value >= 0; deterministic; received shares sum to at most min(receivedFils, netFils).",
+    "sums": {
+      "agentShareBp": "37732945",
+      "grossFils": "37488756136644028",
+      "partnerFils": "19034020666312107",
+      "netFils": "18454735470331921",
+      "primaryFils": "6058195932472015",
+      "secondFils": "1667256169347463",
+      "companyFils": "10729283368512443",
+      "vatFils": "461683245550099",
+      "receivedFils": "18500231048216714",
+      "primaryReceivedFils": "4579606954155328",
+      "secondReceivedFils": "1286023859611737",
+      "outstandingFils": "4558097549169823"
+    }
+  }
+}

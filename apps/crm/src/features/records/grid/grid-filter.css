@@ -1,0 +1,139 @@
+/* Grid filter bar (Bitrix24 list pattern, NAV): the search field carries the active preset as a
+   pill; the other presets follow as chips, then the column chooser and any extra filter
+   (connected "Assigned to", styled in assigned-filter.css). */
+.grid-filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+/* 320px keeps the pill and placeholder whole; long preset rows move to their own line. */
+.grid-filter-field {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 6px 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--muted);
+  cursor: text;
+  transition:
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.grid-filter-field:hover {
+  border-color: var(--muted);
+}
+.grid-filter-field:focus-within {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.grid-preset-pill {
+  flex: 0 1 auto;
+  max-width: 45%;
+  overflow: hidden;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:root[data-theme] .grid-filter-field input {
+  flex: 1 1 0;
+  min-width: 112px;
+  min-height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+}
+/* The field draws the focus ring for its input. */
+:root[data-theme] .grid-filter-field input:focus-visible {
+  outline: none;
+}
+.grid-filter-clear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+}
+.grid-filter-clear:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.grid-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+.grid-chip {
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.grid-chip:hover {
+  border-color: var(--muted);
+  color: var(--ink);
+}
+.grid-chip[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 600;
+}
+.grid-chip:active {
+  filter: brightness(0.95);
+}
+:root[data-theme] .grid-chip:focus-visible {
+  outline-offset: 1px;
+}
+/* Phones: the field on its own row; chips scroll sideways beside the column chooser. */
+@media (max-width: 750px) {
+  .grid-filterbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .grid-filterbar > * {
+    grid-column: 1 / -1;
+  }
+  .grid-filterbar.has-tools:not(.has-presets) > .grid-filter-field,
+  .grid-filterbar.has-presets > .grid-presets {
+    grid-column: 1;
+  }
+  .grid-filterbar.has-tools > .grid-columns {
+    grid-column: 2;
+  }
+  .grid-filter-field {
+    min-height: 44px;
+  }
+  .grid-presets {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 4px;
+    margin: -4px;
+    scrollbar-width: none;
+  }
+  .grid-chip {
+    min-height: 40px;
+  }
+}
