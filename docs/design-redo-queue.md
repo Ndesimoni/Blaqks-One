@@ -82,7 +82,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 35. [x] **Start page** (`588c04f`; Get started moved here from the Dashboard with our company-profile step; figures on every card where they can be read; the mockup's quick actions): compare with the mockup's product cards, Messages strip and the Get started checklist.
 36. [x] **Record slider** (`4efd8cb`; facts list only filled fields with Show N empty fields; Share, then Call and Message as icons; Convert to deal on clients and leads, Add a property on contacts; Delete and Edit record kept): compare with the mockup's large right-hand slider (gallery, fields, private box, activity timeline).
 37. [x] **Create form slider** (`2b06d82`; record and deal forms slide in from the right; pill step chips; one card per step; Save and add another on the last step; our steps and Review kept, so the mockup's one long form becomes our stepped one): compare with the mockup's create form (sections, step chips, footer).
-38. [ ] **Empty, loading, error and no-access states**: compare with the mockup's state pages and skeletons.
+38. [x] **Empty, loading, error and no-access states** (`6feacab`; one state style for every whole-page state; "No clients yet" with Add a client; skeleton rows; "couldn't load" with Try again; "You don't have access to …" with Go to): compare with the mockup's state pages and skeletons.
 
 ## Audit of items 12–38 (2026-11-04)
 
@@ -106,3 +106,5 @@ Screenshots of every remaining screen against the mockup: none matches yet, so n
 - My profile (14): no "Let your Admin manage" card (that delegation, WD1, is not built yet); Language stays its own card (the frozen Arabic preview), not a select inside the form; Public WhatsApp and email stay typed fields, not choices of the member's company number and address.
 - Guide (13): no "Was this helpful?" buttons, since nothing would save the answer; articles show only for sections the person can open.
 - Record slider (4b): the timeline has no "+ Activity" menu (its three add buttons cover it) and no "Published on the website" or "Price set" events (the timeline reads CRM activity only; price history is not recorded). Item 36 left out: a contact's timeline (follow-ups and conversations belong to clients, so a contact has none to show); the mockup's masked phone in a client's facts (the full number stays for people who may see the record); a contact's linked deals and tenants (contacts link only to properties).
+- Create form slider (37): our forms keep their steps and Review, so the mockup's one long form becomes stepped cards; the deal form has no Save and add another (a deal is rarely added twice in a row); the team invitation and import forms keep their centred dialogs.
+- States (38): the Dashboard has no "Your dashboard fills in as you work" page for a new workspace (Get started on the start page covers it); the error page names no support reference, since the server issues none yet.
