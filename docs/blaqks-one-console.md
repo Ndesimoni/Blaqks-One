@@ -142,3 +142,12 @@ Owner answers of 2026-11-05: people on the Blaqks One team get **a role as a sta
 - When the client signs up, the record links to their company, which feeds the dashboard's conversion figures.
 - The marketing website's contact form adds a client automatically (today it posts to `CONTACT_WEBHOOK_URL`).
 - Team members with the `clients` area work on them; the Owner always can. It is its own module with its own tables and routes, and it never touches company data.
+
+## 10. BO1f Blaqks One messaging (owner, 2026-11-05)
+
+"We can also send text messages, so most of the features the Super Admin had will be here too?" Yes, for Blaqks One's own work only: the features that serve Blaqks One's business return, scoped to Blaqks One's own data, and nothing returns that reaches inside a company.
+
+- **Comes back:** Blaqks One's own team chat among its team; its own inbox and channels (its mailbox and WhatsApp number) for messaging its own clients (BO1e); Call, WhatsApp, Email and text buttons on each client (opening the phone's apps at once, as the CRM's Call button does); dashboard, companies, marketplace applications, platform website and help requests as already planned.
+- **Stays out:** any company's clients, contacts, properties, deals, payments, team chat or inbox, and switching into a company.
+- **In-app SMS** needs an SMS provider (Twilio SMS), not connected yet; it follows the WhatsApp sending work (W1b).
+- Order: BO1b team, BO1e clients, BO1f messaging, then BO1c help requests.
