@@ -8,14 +8,19 @@ const modules = ['relationships', 'properties', 'schedule', 'finance', 'reports'
 const full = Object.fromEntries(modules.map((name) => [name, true]));
 
 test('Admins can reach the familiar sections while only implemented screens are live', () => {
-  for (const roleId of ['admin', 'super-admin']) {
-    const user = { roleId, permissions: full };
-    for (const { items } of nav) {
-      for (const [name] of items) assert.equal(canOpenSection(user, name), true, name);
-    }
-    for (const name of ['My profile', 'Team & access', 'Workspaces', 'Team activity'])
-      assert.equal(canOpenSection(user, name), true);
+  const admin = { roleId: 'admin', permissions: full };
+  for (const { items } of nav) {
+    for (const [name] of items) assert.equal(canOpenSection(admin, name), true, name);
   }
+  // Blaqks One opens its platform pages and account, never a company's (BO1a).
+  const platform = { roleId: 'super-admin', permissions: full };
+  for (const name of ['My profile', 'Team & access', 'Workspaces', 'Team activity']) {
+    assert.equal(canOpenSection(admin, name), true, name);
+    assert.equal(canOpenSection(platform, name), true, name);
+  }
+  for (const [name] of nav.flatMap(({ items }) => items).filter(([item]) => item !== 'Workspaces'))
+    if (!['My profile', 'Team & access', 'Team activity'].includes(name))
+      assert.equal(canOpenSection(platform, name), false, name);
   for (const name of [
     'Leads',
     'Clients',

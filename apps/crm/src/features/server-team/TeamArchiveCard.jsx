@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 export function TeamArchiveCard({ member }) {
   return (
@@ -15,14 +14,6 @@ export function TeamArchiveCard({ member }) {
       <p className="muted">
         Records and account history are retained. This account cannot be changed.
       </p>
-      {member.roleId === 'admin' && (
-        <Link
-          className="btn btn-light"
-          to={`/clients?workspace=${encodeURIComponent(member.workspaceId)}`}
-        >
-          View archived records
-        </Link>
-      )}
     </article>
   );
 }

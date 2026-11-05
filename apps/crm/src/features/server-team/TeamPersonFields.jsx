@@ -63,10 +63,9 @@ export function TeamPersonFields({ form, change, editing, canInviteAdmin, busy }
               );
             }}
           >
-            <option value="staff">Teammate in this workspace</option>
             <option value="admin">Admin with a separate workspace</option>
           </select>
-          <small>Only the Super Admin can create Admin accounts.</small>
+          <small>Only Blaqks One can create Admin accounts.</small>
         </div>
       )}
     </div>

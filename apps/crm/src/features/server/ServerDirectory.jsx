@@ -42,27 +42,13 @@ export function ServerDirectory() {
     );
   if (!workspaces)
     return <ServerStatus title="Opening your workspace" message="Loading permitted workspaces…" />;
-  const requested = new URLSearchParams(location.search).get('workspace');
-  const owner =
-    workspaces.find(
-      (workspace) =>
-        workspace.id ===
-        (requested ||
-          (user.roleId === 'super-admin' ? 'super-admin-workspace' : user.workspaceId || user.id)),
-    ) || (!requested ? workspaces[0] : null);
-  if (!owner)
-    return (
-      <ServerStatus
-        title="Workspace access is restricted"
-        message="This account cannot open the selected workspace."
-        retry={() => go('/clients')}
-      />
-    );
+  // Everyone opens their own workspace only (BO1): no one switches into another company.
+  const own = user.roleId === 'super-admin' ? 'super-admin-workspace' : user.workspaceId || user.id;
+  const owner = workspaces.find((workspace) => workspace.id === own) || workspaces[0];
   return (
     <ServerWorkspace
       key={`${user.id}:${owner.id}`}
       owner={owner}
-      workspaces={workspaces}
       refreshDirectory={refreshDirectory}
     />
   );

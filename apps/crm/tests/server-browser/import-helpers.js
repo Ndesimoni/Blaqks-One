@@ -55,8 +55,13 @@ export async function committed(page) {
   ).toBeVisible();
 }
 
-export async function serverRecords(page, workspace = organisation) {
-  const response = await page.request.get(`/api/crm/workspaces/${workspace}/records`);
+/** The signed-in person's own company records, or `workspace`'s (imports land in your own). */
+export async function serverRecords(page, workspace) {
+  const own = async () =>
+    (await (await page.request.get('/api/crm/auth/session')).json()).user.workspaceId;
+  const response = await page.request.get(
+    `/api/crm/workspaces/${workspace || (await own())}/records`,
+  );
   expect(response.status()).toBe(200);
   return (await response.json()).records;
 }

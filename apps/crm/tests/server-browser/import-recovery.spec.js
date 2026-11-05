@@ -12,7 +12,7 @@ import {
 test('a lost commit response retries the same completed import without duplication', async ({
   page,
 }) => {
-  await signIn(page, 'owner');
+  await signIn(page);
   await savedSource(page, migrationData('RETRY'));
   await openImport(page);
   await page.getByLabel('Add demo photos where a property has no uploaded photos').uncheck();
@@ -41,7 +41,7 @@ test('mobile import remains usable in both themes and changing options requires 
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await signIn(page, 'owner');
+  await signIn(page);
   await savedSource(page, migrationData('MOBILE'));
   for (const theme of ['dark', 'light']) {
     if (theme === 'light') await page.getByRole('button', { name: 'Switch to light mode' }).click();

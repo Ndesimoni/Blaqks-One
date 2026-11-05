@@ -1,4 +1,4 @@
-/** Platform → Workspaces, the Super Admin's company list (design queue item 33), in English. */
+/** Platform → Companies, Blaqks One's company list (design queue item 33, BO1a), in English. */
 export default {
   module: 'companies',
   active: 'Active companies',
@@ -18,4 +18,25 @@ export default {
   seatsOpen: '{used} · no limit',
   open: 'Open',
   openNamed: 'Open {name}',
+  // The company panel (BO1a): Blaqks One controls the company and its people, never its data.
+  panelClose: 'Close company',
+  panelAdmin: 'Admin: {name}',
+  panelCreated: 'Joined {date}',
+  panelSeats: 'Seats',
+  changeSeats: 'Change seat limit',
+  panelPrivacy: "Blaqks One sees who works here, never the company's clients, deals or messages.",
+  members: 'People',
+  membersLoading: 'Loading people…',
+  lastActive: 'Last active {date}',
+  neverActive: 'Not signed in yet',
+  'status.active': 'Active',
+  'status.suspended': 'Suspended',
+  'status.pending': 'Invited',
+  'status.archived': 'Archived',
+  suspend: 'Suspend',
+  reactivate: 'Reactivate',
+  archive: 'Archive',
+  actionNamed: '{action} {name}',
+  suspended: '{name} is suspended and can no longer sign in.',
+  reactivated: '{name} can sign in again.',
 };

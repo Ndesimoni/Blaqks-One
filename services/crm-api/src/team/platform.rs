@@ -1,4 +1,4 @@
-//! The Super Admin's Workspaces → Companies list (design queue item 33): each company
+//! Blaqks One's Companies list (design queue item 33): each company
 //! workspace with its Admin, status, seats in use against the limit and its marketplace state.
 //! The rows come from the workspaces module and the state from the marketplace module; no
 //! company's records are read.
@@ -8,7 +8,7 @@ use crate::{
     error::{ApiError, ApiResult},
     marketplace::state as market,
     state::AppState,
-    workspaces::platform::company_rows,
+    workspaces::{self, platform::company_rows},
 };
 use axum::{extract::State, Json};
 use serde::Serialize;
@@ -24,6 +24,8 @@ struct Company {
     created_on: String,
     seats_used: i64,
     seat_limit: Option<i32>,
+    /// The company version the seat-limit change must send back.
+    version: i64,
     marketplace: market::State,
 }
 
@@ -31,9 +33,12 @@ pub async fn companies(State(state): State<AppState>, session: Session) -> ApiRe
     if session.user.role != "super-admin" {
         return Err(ApiError::forbidden());
     }
+    let mut transaction = state.pool.begin().await?;
+    workspaces::platform::operator(&mut transaction, session.user.id).await?;
+    transaction.commit().await?;
     let mut companies = Vec::new();
     for row in company_rows(&state.pool).await? {
-        let (seats_used, seat_limit, _) = seats::usage(&state.pool, &row.id).await?;
+        let (seats_used, seat_limit, version) = seats::usage(&state.pool, &row.id).await?;
         let mut transaction = state.pool.begin().await?;
         let latest = market::latest(&mut transaction, &row.id).await?;
         transaction.commit().await?;
@@ -41,6 +46,7 @@ pub async fn companies(State(state): State<AppState>, session: Session) -> ApiRe
             marketplace: market::state(&latest),
             seats_used,
             seat_limit,
+            version,
             id: row.id,
             name: row.name,
             admin: row.admin,

@@ -21,11 +21,7 @@ fn user(role: &str, record_scope: &str) -> UserRow {
 
 #[test]
 fn admins_and_full_team_staff_have_team_scope() {
-    for (role, scope) in [
-        ("admin", "assigned"),
-        ("super-admin", "assigned"),
-        ("staff", "team"),
-    ] {
+    for (role, scope) in [("admin", "assigned"), ("staff", "team")] {
         let member = user(role, scope);
         assert!(member.has_team_scope(), "{role}/{scope}");
         assert_eq!(member.record_scope_label(), "team");
@@ -36,6 +32,8 @@ fn admins_and_full_team_staff_have_team_scope() {
 fn assigned_staff_and_unknown_roles_are_assigned_only() {
     for (role, scope) in [
         ("staff", "assigned"),
+        ("super-admin", "assigned"),
+        ("super-admin", "team"),
         ("viewer", "assigned"),
         ("viewer", "team"),
         ("", "team"),
@@ -72,4 +70,24 @@ fn profiles_expose_guidance_only_on_own_account_payloads() {
     assert_eq!(shown(Some(false))["guidanceEnabled"], false);
     // Team directory rows omit the preference entirely.
     assert!(shown(None).get("guidanceEnabled").is_none());
+}
+
+#[test]
+fn the_blaqks_one_profile_holds_no_crm_but_manages_its_own_team() {
+    let profile = serde_json::to_value(Profile::from(user("super-admin", "team"))).unwrap();
+    assert_eq!(profile["role"], "Blaqks One");
+    assert_eq!(profile["managesTeam"], true);
+    assert_eq!(profile["recordScope"], "assigned");
+    assert!(profile["permissions"]
+        .as_object()
+        .unwrap()
+        .values()
+        .all(|grant| grant == false));
+    assert!(profile["recordActions"]
+        .as_object()
+        .unwrap()
+        .values()
+        .all(|actions| actions.as_object().unwrap().values().all(|on| on == false)));
+    assert_eq!(profile["financeAccess"]["scope"], "none");
+    assert_eq!(profile["financeAccess"]["teamView"], false);
 }

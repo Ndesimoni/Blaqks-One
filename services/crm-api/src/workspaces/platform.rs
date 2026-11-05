@@ -1,9 +1,25 @@
-//! The platform's company workspaces for the Super Admin's Workspaces list (design queue item
-//! 33): each company with its name, Admin, whether it is active or archived and when it was
-//! created. The team module adds seats and the marketplace state (team/platform.rs).
+//! The platform side of tenancy: the one Blaqks One guard (BO1a item 4) and the company
+//! workspaces for its Companies list (design queue item 33): each company with its name,
+//! Admin, whether it is active or archived and when it was created. The team module adds
+//! seats and the marketplace state (team/platform.rs).
 use super::ORGANISATION;
-use crate::error::ApiResult;
-use sqlx::{FromRow, PgPool};
+use crate::{
+    auth::profile::UserRow,
+    error::{ApiError, ApiResult},
+};
+use sqlx::{FromRow, PgPool, Postgres, Transaction};
+use uuid::Uuid;
+
+/// The live Blaqks One operator: an active member of the organisation with role
+/// `super-admin`, re-read inside the caller's transaction. Every platform handler calls
+/// this; it never opens a company workspace.
+pub async fn operator(tx: &mut Transaction<'_, Postgres>, actor: Uuid) -> ApiResult<UserRow> {
+    let live = super::member(tx, ORGANISATION, actor).await?;
+    if live.role != "super-admin" {
+        return Err(ApiError::forbidden());
+    }
+    Ok(live)
+}
 
 #[derive(FromRow)]
 pub struct CompanyRow {

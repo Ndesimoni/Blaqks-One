@@ -45,7 +45,7 @@ test('records persist, retain workbook fields and enforce optimistic versions', 
   );
 });
 
-test('Super Admin edits retain target ownership and redact immutable activity', async () => {
+test('edits keep workspace ownership and redact immutable activity; Blaqks One cannot edit', async () => {
   const adminB = await login('admin-b');
   const owner = await login('owner');
   const record = await create(adminB, 'Clients', {
@@ -54,12 +54,13 @@ test('Super Admin edits retain target ownership and redact immutable activity', 
     email: 'private@crm-fixture.test',
     internal_notes: 'Private message body',
   });
-  const update = await owner.request(recordsPath(adminB, 'Clients', record.id), {
-    method: 'PATCH',
-    body: { record: { ...record.record, full_name: 'Changed privately' }, version: 1 },
-  });
+  const path = recordsPath(adminB, 'Clients', record.id);
+  const body = { record: { ...record.record, full_name: 'Changed privately' }, version: 1 };
+  assert.equal((await owner.request(path, { method: 'PATCH', body })).status, 403);
+  const update = await adminB.request(path, { method: 'PATCH', body });
   assert.equal(update.status, 200);
-  const response = await owner.request(`/workspaces/${adminB.user.id}/activity`);
+  assert.equal((await owner.request(`/workspaces/${adminB.user.id}/activity`)).status, 403);
+  const response = await adminB.request(`/workspaces/${adminB.user.id}/activity`);
   assert.equal(response.status, 200);
   const serialized = JSON.stringify(response.value);
   assert.ok(!serialized.includes('private@crm-fixture.test'));
@@ -67,7 +68,7 @@ test('Super Admin edits retain target ownership and redact immutable activity', 
   const actor = query(
     `SELECT actor_id FROM crm_activity WHERE record_id='${record.id}' AND action='updated'`,
   );
-  assert.equal(actor, owner.user.id);
+  assert.equal(actor, adminB.user.id);
   assert.equal(
     query(`SELECT workspace_id FROM crm_records WHERE id='${record.id}'`),
     adminB.user.id,

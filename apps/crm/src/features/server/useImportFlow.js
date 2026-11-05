@@ -18,7 +18,7 @@ export function useImportFlow(api, draft) {
   useEffect(() => {
     setPreview(null);
     setError('');
-  }, [draft.source, draft.targetId, draft.demoPhotos]);
+  }, [draft.source, draft.targetId, draft.memberId, draft.demoPhotos]);
   const prepare = async () => {
     if (!draft.source || !draft.targetId || pending.current) return;
     pending.current = true;
@@ -32,6 +32,7 @@ export function useImportFlow(api, draft) {
       const response = validateImportPreview(
         await api.previewImport(draft.targetId, {
           sourceWorkspaceId: draft.source.sourceWorkspaceId,
+          ...(draft.personal ? { memberId: draft.memberId } : {}),
           records,
         }),
       );

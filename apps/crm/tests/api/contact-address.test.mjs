@@ -15,8 +15,8 @@ const place = {
   map_link: 'https://maps.google.com/?q=Marina+Gate+Tower+2',
 };
 
-let owner, admin;
-before(async () => ({ owner, admin } = await fixtures()));
+let admin;
+before(async () => ({ admin } = await fixtures()));
 
 const contactsOf = async (session, workspace) =>
   (await session.request(`/workspaces/${workspace}/records`)).value.records.Contacts;
@@ -70,17 +70,17 @@ test('unsafe, schemeless and nested map links are rejected on create and update'
 
 test('Super Admin import preserves address and map link and rejects bad links', async () => {
   const contact = { contact_id: 'ADDR-IMPORT', full_name: 'Synthetic imported owner', ...place };
-  const plan = await planned(owner, admin.user.id, { ...emptyRecords(), Contacts: [contact] });
-  const result = await commit(owner, admin.user.id, plan.token);
+  const plan = await planned(admin, admin.user.id, { ...emptyRecords(), Contacts: [contact] });
+  const result = await commit(admin, admin.user.id, plan.token);
   assert.equal(result.status, 200, JSON.stringify(result.value));
   assert.equal(result.value.imported.Contacts, 1);
-  const imported = (await contactsOf(owner, admin.user.id)).find(
+  const imported = (await contactsOf(admin, admin.user.id)).find(
     (row) => row.record.contact_id === 'ADDR-IMPORT',
   );
   assert.equal(imported.record.address, place.address);
   assert.equal(imported.record.map_link, place.map_link);
   const bad = { ...contact, contact_id: 'ADDR-BAD', map_link: 'javascript:alert(1)' };
-  const rejected = await preview(owner, admin.user.id, { ...emptyRecords(), Contacts: [bad] });
+  const rejected = await preview(admin, admin.user.id, { ...emptyRecords(), Contacts: [bad] });
   assert.equal(rejected.status, 400);
   assert.equal(rejected.value.message, MAP_LINK);
 });

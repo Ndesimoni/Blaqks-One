@@ -33,12 +33,24 @@ struct Applied {
     applied_at: String,
 }
 
-/// Only the Super Admin may read the platform queue.
+/// Only Blaqks One may read the platform queue.
 pub(super) fn reviewer(session: &Session) -> ApiResult<()> {
     if session.user.role == "super-admin" {
         Ok(())
     } else {
         Err(ApiError::missing())
+    }
+}
+
+/// The same reviewer re-read live inside the handler's transaction (BO1a item 4); anyone
+/// else still gets the shared not-found.
+pub(super) async fn live_reviewer(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    actor: Uuid,
+) -> ApiResult<()> {
+    match workspaces::platform::operator(tx, actor).await {
+        Err(error) if error.0 == axum::http::StatusCode::FORBIDDEN => Err(ApiError::missing()),
+        other => other.map(|_| ()),
     }
 }
 
@@ -58,6 +70,7 @@ pub async fn list(
         Some(_) => return Err(ApiError::invalid(INVALID)),
     };
     let mut tx = state.pool.begin().await?;
+    live_reviewer(&mut tx, session.user.id).await?;
     let rows: Vec<Applied> = sqlx::query_as(&format!(
         "SELECT id,workspace_id,applied_by,counts,{} AS applied_at \
          FROM marketplace.crm_market_applications \

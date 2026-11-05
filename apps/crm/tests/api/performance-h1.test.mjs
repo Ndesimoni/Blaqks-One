@@ -29,7 +29,7 @@ test('writes refuse callers before the body and validate it before the lock', as
   const bad = { surprise: true };
   refused(await put(agent, bad), 403, M.manage, 'forbidden', 'staff');
   refused(await put(supervisor, bad), 403, M.manage, 'forbidden', 'team-scope staff');
-  refused(await put(owner, bad), 403, M.manage, 'forbidden', 'Super Admin');
+  refused(await put(owner, bad), 403, M.denied, 'forbidden', 'Blaqks One');
   refused(await put(desk, bad), 403, M.denied, 'forbidden', 'no reports module');
   refused(await put(other, bad), 403, M.denied, 'forbidden', 'another team');
   const noCsrf = await request(targetsPath(workspace), {

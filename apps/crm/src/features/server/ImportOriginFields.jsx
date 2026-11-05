@@ -47,7 +47,7 @@ export function ImportOriginFields({ draft }) {
               value={draft.backupOwner}
               onChange={(event) => draft.chooseBackupOwner(event.target.value)}
             >
-              <option value={SUPER_WORKSPACE_ID}>Super Admin organisation workspace</option>
+              <option value={SUPER_WORKSPACE_ID}>Company records (organisation set)</option>
               <option value="backup-personal">Personal member workspace</option>
             </select>
             <p>

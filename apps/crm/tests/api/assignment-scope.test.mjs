@@ -15,12 +15,16 @@ before(() => query('TRUNCATE crm_login_limits'));
 const storedScope = (id) => query(`SELECT record_scope FROM crm_users WHERE id='${id}'`);
 
 test('profiles and sessions report record scope, with team scope for Admins', async () => {
-  for (const kind of ['owner', 'admin-a']) {
+  // Blaqks One holds no CRM records, so it has no team scope (BO1a).
+  for (const [kind, scope] of [
+    ['owner', 'assigned'],
+    ['admin-a', 'team'],
+  ]) {
     const session = await login(kind);
-    assert.equal(session.user.recordScope, 'team', kind);
+    assert.equal(session.user.recordScope, scope, kind);
     const current = await session.request('/auth/session');
     assert.equal(current.status, 200);
-    assert.equal(current.value.user.recordScope, 'team');
+    assert.equal(current.value.user.recordScope, scope);
   }
 });
 

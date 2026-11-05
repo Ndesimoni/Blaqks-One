@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { blank } from '../../src/lib/schema.js';
 import { createFullBackup, parseFullBackup } from '../../src/services/files/backup.js';
 import { savedImportSources, readSavedImport } from '../../src/features/server/importSources.js';
-import { importDestination } from '../../src/features/server/importModel.js';
+import { needsMember } from '../../src/features/server/importModel.js';
 
 test('a source download retains every collection in the established full-backup format', () => {
   const data = {
@@ -18,7 +18,7 @@ test('a source download retains every collection in the established full-backup 
     key: () => 'kws-crm-v1',
     getItem: (key) => (key === 'kws-crm-v1' ? raw : null),
   };
-  const user = { role: 'Super Admin', roleId: 'super-admin', managesTeam: true };
+  const user = { role: 'Admin', roleId: 'admin', managesTeam: true };
   const source = readSavedImport(user, savedImportSources(user, () => storage)[0], () => storage);
   const backup = createFullBackup(source.fullData);
   assert.equal(backup.format, 'keys-with-simoni-full-backup');
@@ -29,8 +29,7 @@ test('a source download retains every collection in the established full-backup 
   assert.equal(storage.getItem('kws-crm-v1'), raw);
 });
 
-test('personal imports cannot default to the organisation destination', () => {
-  assert.equal(importDestination('aidah', 'super-admin-workspace'), '');
-  assert.equal(importDestination('backup-personal', 'super-admin-workspace'), '');
-  assert.equal(importDestination('aidah', 'real-aidah'), 'real-aidah');
+test('personal backups always name a receiving member (BO1a)', () => {
+  assert.equal(needsMember('backup-personal'), true);
+  assert.equal(needsMember('super-admin-workspace'), false);
 });

@@ -31,8 +31,7 @@ impl FinanceActions {
         }
     }
 
-    /// Role-based flags for Admins. The Super Admin has no finance actions inside a
-    /// company (§13); it keeps the team view it has by role.
+    /// Role-based flags for Admins. Blaqks One has no finance at all (BO1a item 11).
     pub fn by_role(role: &str) -> Self {
         match role {
             "admin" => Self {
@@ -41,10 +40,6 @@ impl FinanceActions {
                 assign: true,
                 approve: true,
                 team_view: true,
-            },
-            "super-admin" => Self {
-                team_view: true,
-                ..Self::default()
             },
             _ => Self::default(),
         }
@@ -103,13 +98,13 @@ pub struct FinanceAccess {
 }
 
 impl UserRow {
-    /// Role allowlist: Admins hold every finance action and `manage`; the Super Admin
-    /// views only; staff hold their stored grants normalised against the finance module
-    /// and record scope; any other role gets nothing.
+    /// Role allowlist: Admins hold every finance action and `manage`; staff hold their
+    /// stored grants normalised against the finance module and record scope; Blaqks One
+    /// and any other role get nothing (scope none).
     pub fn finance_access(&self) -> FinanceAccess {
         let module = self.effective_permissions().finance;
         let flags = match self.role.as_str() {
-            "admin" | "super-admin" => FinanceActions::by_role(&self.role),
+            "admin" => FinanceActions::by_role(&self.role),
             "staff" => FinanceActions::from_stored(&self.actions.0)
                 .normalised(&self.permissions.0, self.has_team_scope()),
             _ => FinanceActions::default(),

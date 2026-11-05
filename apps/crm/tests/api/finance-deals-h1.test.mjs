@@ -42,7 +42,6 @@ const granted = {
   second: ['create', 'edit', 'handover'],
   viewer: ['create', 'edit', 'handover'],
   approver: ['create', 'edit', 'handover', 'earn'],
-  owner: [],
 };
 
 test('H1: module, then grant or role (403) before any body (400)', async () => {
@@ -56,7 +55,8 @@ test('H1: module, then grant or role (403) before any body (400)', async () => {
     }
   }
   for (const [operation, spec] of Object.entries(operations)) {
-    for (const name of ['desk', 'other']) {
+    // Blaqks One (owner) is refused at the workspace gate, like another company (BO1a).
+    for (const name of ['desk', 'other', 'owner']) {
       const result = await call(teams[name], spec, deal.id);
       refused(result, 403, M.denied, 'forbidden', `${name} ${operation}`);
     }

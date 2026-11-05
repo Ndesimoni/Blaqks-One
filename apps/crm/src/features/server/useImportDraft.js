@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SUPER_WORKSPACE_ID } from '../../config/workspaces.js';
 import { savedImportSources, readSavedImport, readBackupImport } from './importSources.js';
-import { importDestination } from './importModel.js';
+import { needsMember } from './importModel.js';
 import { createFullBackup } from '../../services/files/backup.js';
 import { downloadJson } from '../../services/files/download.js';
 import { dubaiToday } from '../../lib/dubaiDate.js';
@@ -19,12 +19,11 @@ export function useImportDraft(user) {
   const [source, setSource] = useState(null);
   const [file, setFile] = useState(null);
   const [backupOwner, setBackupOwner] = useState(SUPER_WORKSPACE_ID);
-  const [destination, setDestination] = useState('');
+  const [memberId, setMemberId] = useState(user.id);
   const [demoPhotos, setDemoPhotos] = useState(true);
   const [sourceError, setSourceError] = useState('');
   const [reading, setReading] = useState(false);
   const chooseMode = (next) => {
-    setDestination('');
     setMode(next);
     setSource(null);
     setSourceError('');
@@ -32,7 +31,6 @@ export function useImportDraft(user) {
     setSelectedKey('');
   };
   const chooseBrowser = (key) => {
-    setDestination('');
     setSelectedKey(key);
     setSource(null);
     setSourceError('');
@@ -64,16 +62,16 @@ export function useImportDraft(user) {
     }
   };
   const chooseFile = (selected) => {
-    setDestination('');
     setFile(selected);
     readBackup(selected, backupOwner);
   };
   const chooseBackupOwner = (id) => {
-    setDestination('');
     setBackupOwner(id);
     readBackup(file, id);
   };
-  const targetId = importDestination(source?.sourceWorkspaceId || backupOwner, destination);
+  // Always the Admin's own company (BO1a); a personal set also needs its receiving member.
+  const targetId = user.workspaceId || user.id;
+  const personal = needsMember(source?.sourceWorkspaceId || backupOwner);
   const downloadBackup = () => {
     if (!source?.fullData) return;
     const name = source.sourceWorkspaceId.replace(/[^a-z0-9_-]/gi, '-');
@@ -88,7 +86,8 @@ export function useImportDraft(user) {
     selectedKey,
     source,
     backupOwner,
-    destination,
+    memberId,
+    personal,
     demoPhotos,
     sourceError,
     reading,
@@ -97,7 +96,7 @@ export function useImportDraft(user) {
     chooseBrowser,
     chooseFile,
     chooseBackupOwner,
-    setDestination,
+    setMemberId,
     setDemoPhotos,
     downloadBackup,
   };

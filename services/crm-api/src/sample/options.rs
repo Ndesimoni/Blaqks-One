@@ -14,7 +14,8 @@ pub struct Options {
     pub command: Command,
     /// Seed only: create or reactivate the three sample staff accounts (default on).
     pub staff: bool,
-    /// Explicitly allow the Super Admin organisation workspace.
+    /// Names Blaqks One's organisation workspace, which holds no CRM records (BO1a), so
+    /// the command refuses it; kept so the old flag explains itself.
     pub organisation: bool,
     /// Skip the confirmation prompt; required when standard input is not a terminal.
     pub yes: bool,

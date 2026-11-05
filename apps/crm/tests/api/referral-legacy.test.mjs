@@ -5,8 +5,8 @@ import { create, query } from './helpers.mjs';
 import { commit, counts, emptyRecords, planned, preview } from './import-helpers.mjs';
 import { referralRef as ref, referralTeams } from './referral-helpers.mjs';
 
-let owner, admin, other;
-before(async () => ({ owner, admin, other } = await referralTeams('referral-legacy')));
+let admin, other;
+before(async () => ({ admin, other } = await referralTeams('referral-legacy')));
 
 const migration = readFileSync('services/crm-api/migrations/0007_client_referrals.sql', 'utf8');
 const backfill = migration.match(/^WITH referrals[\s\S]*?;/m)[0];
@@ -22,8 +22,8 @@ test('imports accept referrers later in the same batch and reject missing ones',
       { care_id: 'REF-IMP-CARE', client_id: 'REF-IMP-B', referred_client_id: 'REF-IMP-A' },
     ],
   };
-  const plan = await planned(owner, admin.user.id, records);
-  const result = await commit(owner, admin.user.id, plan.token);
+  const plan = await planned(admin, admin.user.id, records);
+  const result = await commit(admin, admin.user.id, plan.token);
   assert.equal(result.status, 200, JSON.stringify(result.value));
   assert.deepEqual(result.value.imported, counts({ Clients: 2, 'Client care': 1 }));
   assert.equal(ref(admin.user.id, 'REF-IMP-A'), 'REF-IMP-B');
@@ -33,7 +33,7 @@ test('imports accept referrers later in the same batch and reject missing ones',
     { 'Client care': [{ care_id: 'REF-IMP-CC', referred_client_id: 'REF-IMP-NONE' }] },
     { Clients: [{ client_id: 'REF-IMP-D', referred_by_client_id: 'REF-IMP-D' }] },
   ]) {
-    const response = await preview(owner, admin.user.id, { ...emptyRecords(), ...rows });
+    const response = await preview(admin, admin.user.id, { ...emptyRecords(), ...rows });
     assert.equal(response.status, 400, JSON.stringify(rows));
   }
 });

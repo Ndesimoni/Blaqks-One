@@ -7,12 +7,12 @@ import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { TeamPersonFields } from './TeamPersonFields.jsx';
 import { TeamAccessFields } from './TeamAccessFields.jsx';
 import { TeamMemberReview } from './TeamMemberReview.jsx';
-import { blankMember, memberError, memberPayload, teamSteps } from './model.js';
+import { blankAdminInvite, blankMember, memberError, memberPayload, teamSteps } from './model.js';
 import './team-panel.css';
 
 export function TeamMemberDialog({ member, roles, workspaceId, canInviteAdmin, onClose, onSaved }) {
   const { api } = useSession();
-  const initial = useRef(blankMember(member));
+  const initial = useRef(member || !canInviteAdmin ? blankMember(member) : blankAdminInvite());
   const [form, setForm] = useState(initial.current);
   const [step, setStep] = useState(0);
   const [error, setError] = useState('');

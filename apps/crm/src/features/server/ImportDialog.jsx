@@ -7,6 +7,7 @@ import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { useSession } from '../../hooks/useSession.js';
 import { useImportDraft } from './useImportDraft.js';
 import { useImportFlow } from './useImportFlow.js';
+import { useImportMembers } from './useImportMembers.js';
 import { ImportSourceFields } from './ImportSourceFields.jsx';
 import { ImportReview } from './ImportReview.jsx';
 import './import.css';
@@ -16,11 +17,12 @@ const steps = [
   { id: 'review', title: 'Review & import' },
 ];
 
-export function ImportDialog({ workspaces, onClose, onImported }) {
+export function ImportDialog({ onClose, onImported }) {
   const { user, api } = useSession();
   const titleId = useId();
   const draft = useImportDraft(user);
   const flow = useImportFlow(api, draft);
+  const members = useImportMembers(api, user);
   const busy = flow.busy || draft.reading;
   useUnsavedChanges(Boolean(draft.source) && !flow.result, busy);
   useEffect(() => {
@@ -72,12 +74,13 @@ export function ImportDialog({ workspaces, onClose, onImported }) {
             preview={flow.preview}
             draft={draft}
             targetName={
-              workspaces.find((workspace) => workspace.id === flow.preview.targetId)?.name ||
-              flow.preview.targetId
+              draft.personal
+                ? members.find((member) => member.id === draft.memberId)?.name || draft.memberId
+                : `${user.name} (you)`
             }
           />
         ) : (
-          <ImportSourceFields draft={draft} workspaces={workspaces} busy={busy} />
+          <ImportSourceFields draft={draft} members={members} busy={busy} />
         )}
       </div>
       <div className="drawer-footer">

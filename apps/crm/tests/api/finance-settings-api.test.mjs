@@ -28,7 +28,7 @@ test('GET /finance is shaped per caller and needs the finance module', async () 
     ...['scope', 'settings', 'statement'],
   ]);
   assert.equal(own.value.scope, 'own');
-  assert.equal((await overview(owner)).value.scope, 'team', 'Super Admin views by role');
+  refused(await overview(owner), 403, M.denied, 'forbidden', 'Blaqks One has no finance');
   refused(await overview(desk), 403, M.denied, 'forbidden', 'no finance module');
   refused(await overview(other), 403, M.denied, 'forbidden', 'another team');
   refused(await overview(agent, `?agent=${agent.user.id}`), 403, M.denied, 'forbidden');
@@ -41,7 +41,7 @@ test('settings writes are Admin-only and checked before the body', async () => {
   const { owner, other, agent, desk, admin } = teams;
   const bad = { surprise: true };
   refused(await put(agent, bad), 403, M.manage, 'forbidden', 'agent');
-  refused(await put(owner, settingsBody()), 403, M.manage, 'forbidden', 'Super Admin');
+  refused(await put(owner, settingsBody()), 403, M.denied, 'forbidden', 'Blaqks One');
   refused(await put(desk, bad), 403, M.denied, 'forbidden', 'no module');
   refused(await put(other, settingsBody()), 403, M.denied, 'forbidden', 'other team');
   const path = financePath(admin, '/settings');
@@ -67,7 +67,7 @@ test('settings writes are Admin-only and checked before the body', async () => {
 });
 
 test('settings save with versions, write history and shape the own view', async () => {
-  const { admin, agent, owner } = teams;
+  const { admin, agent } = teams;
   const first = await put(admin, settingsBody());
   assert.equal(first.status, 200, JSON.stringify(first.value));
   const want = { ...settingsBody(), version: 1, vatRateBp: 500 };
@@ -108,7 +108,7 @@ test('settings save with versions, write history and shape the own view', async 
   );
   const own = await overview(agent);
   assert.deepEqual(own.value.settings, { vatRegistered: true, vatRateBp: 500, trn: null });
-  const team = await overview(owner);
+  const team = await overview(admin);
   assert.equal(team.value.settings.agentShareBp, 6000);
   assert.match(
     failure(`UPDATE crm_finance_settings SET vat_rate_bp=600 WHERE id='${id}'`),

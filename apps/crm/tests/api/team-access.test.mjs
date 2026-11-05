@@ -36,7 +36,7 @@ test('staff share their owner workspace without exposing other Admin teams or co
   assert.equal(records.status, 200);
   assert.ok(records.value.records.Clients.some((item) => item.id === client.id));
   assert.deepEqual(records.value.records.Properties, []);
-  assert.equal((await owner.request(`/workspaces/${adminA.user.id}/records`)).status, 200);
+  assert.equal((await owner.request(`/workspaces/${adminA.user.id}/records`)).status, 403);
   assert.equal((await adminB.request(teamPath(adminA))).status, 403);
   assert.equal((await staff.request(teamPath(adminA))).status, 403);
   assert.equal((await staff.request(`/workspaces/${adminB.user.id}/records`)).status, 403);

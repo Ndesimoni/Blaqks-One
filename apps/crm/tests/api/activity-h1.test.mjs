@@ -65,16 +65,13 @@ test('a suspended member loses access mid-session', async () => {
   assert.ok([401, 403].includes(await status(member, workspace, {})));
 });
 
-test('the Super Admin has parity only: the same feed, no merged companies', async () => {
-  const { owner, admin, other, workspace } = teams;
+test('Blaqks One reads no company feed, only its own organisation team feed (BO1a)', async () => {
+  const { owner, admin, workspace } = teams;
   const params = { limit: '100' };
   const asAdmin = await feed(admin, workspace, params);
-  const asOwner = await feed(owner, workspace, params);
-  assert.deepEqual(asOwner, asAdmin);
-  assert.ok(asOwner.activity.some((item) => item.kind === 'team'));
-  const ids = new Set([admin.user.id, ...asOwner.activity.map((item) => item.actor.id)]);
-  assert.ok(!ids.has(other.user.id));
+  assert.equal((await owner.request(activityPath(workspace, params))).status, 403);
   const organisation = await feed(owner, owner.user.workspaceId, params);
+  assert.ok(organisation.activity.every((item) => item.kind === 'team'));
   const theirs = new Set(asAdmin.activity.map((item) => item.id));
   assert.ok(organisation.activity.every((item) => !theirs.has(item.id)));
 });

@@ -14,21 +14,33 @@ use uuid::Uuid;
 /// One inserted row: its collection, record ID and server row ID.
 pub type Inserted = (&'static str, String, Uuid);
 
+/// Imported parents go to the destination owner (reason `import`); Follow-ups and child
+/// records start unassigned. A suspended owner leaves them in the queue.
 pub async fn insert(
     transaction: &mut Transaction<'_, Postgres>,
     workspace: &str,
     actor: Uuid,
     records: ImportRecords,
 ) -> ApiResult<Vec<Inserted>> {
-    // Imported parents go to the destination owner (reason `import`); Follow-ups and
-    // child records start unassigned. A suspended owner leaves them in the queue.
     let owner = history::active_owner(transaction, workspace).await?;
+    insert_held(transaction, workspace, actor, owner, records).await
+}
+
+/// The same insertion with parents given to `holder`, a member the caller checked under
+/// the workspace lock (`imports::member::holder`), or left in the queue when `None`.
+pub async fn insert_held(
+    transaction: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    actor: Uuid,
+    holder: Option<Uuid>,
+    records: ImportRecords,
+) -> ApiResult<Vec<Inserted>> {
     let mut inserted = Vec::new();
     for (collection, rows) in records.collections() {
         for row in rows {
             let record = validation::validate(collection, row.clone())?;
             let id = Uuid::new_v4();
-            let assignee = owner.filter(|_| PARENTS.contains(&collection));
+            let assignee = holder.filter(|_| PARENTS.contains(&collection));
             // deal_ref is deliberately absent: imported deal IDs stay unlinked payload
             // text ("Linked deal unavailable") and never resolve by matching (L-F7).
             sqlx::query(

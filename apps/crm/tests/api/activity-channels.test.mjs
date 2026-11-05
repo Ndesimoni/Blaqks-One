@@ -94,7 +94,7 @@ test('other filters exclude channel events', async () => {
   );
 });
 
-test('staff, the Super Admin and other companies never see channel events', async () => {
+test('staff, Blaqks One and other companies never see channel events', async () => {
   const { agent, teamAgent, workspace } = teams;
   for (const staff of [agent, teamAgent]) {
     const own = await feed(staff, workspace, { limit: '100' });
@@ -103,9 +103,8 @@ test('staff, the Super Admin and other companies never see channel events', asyn
     assert.equal(named.status, 403);
   }
   const owner = await login('owner');
-  const platform = await feed(owner, workspace, { limit: '100' });
-  assert.ok(platform.activity.every((item) => item.kind !== 'channel'));
-  assert.equal((await owner.request(activityPath(workspace, { kind: 'channel' }))).status, 403);
+  for (const params of [{ limit: '100' }, { kind: 'channel' }])
+    assert.equal((await owner.request(activityPath(workspace, params))).status, 403);
   const other = await login('admin-a');
   assert.equal((await other.request(activityPath(workspace, { kind: 'channel' }))).status, 403);
   const theirs = await feed(other, other.user.workspaceId, { kind: 'channel', limit: '100' });

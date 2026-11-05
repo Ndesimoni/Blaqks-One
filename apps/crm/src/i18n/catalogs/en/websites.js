@@ -7,7 +7,7 @@ export default {
   platformIntro: 'One destination for property and people.',
   introText: 'Keep a private draft, review your content and publish when it is ready.',
   restricted: 'Only the owning company Admin can manage this website.',
-  platformRestricted: 'Only the platform Super Admin can manage this website.',
+  platformRestricted: 'Only the Blaqks One team can manage this website.',
   loading: 'Opening website settings…',
   loadError: 'Website settings could not be loaded. Try again.',
   retry: 'Retry',

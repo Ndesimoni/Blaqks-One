@@ -8,7 +8,7 @@ test('the top bar names the page and Create opens the chosen editor, then return
 }) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await signIn(page, 'owner');
+  await signIn(page);
   const header = page.getByRole('banner');
   await expect(header.getByRole('heading', { level: 1 })).toHaveText('Clients');
   await expect(header.locator('.header-crumb')).toHaveText('CRM /');

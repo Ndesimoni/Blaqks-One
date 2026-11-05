@@ -29,11 +29,11 @@ test('agreements are Admin-written, team-read and validated before the lock', as
   const valid = body(agent.user.id, 6000, day(-200));
   refused(await create(agent, { bad: 1 }), 403, M.manage, 'forbidden', 'agent');
   refused(await create(viewer, valid), 403, M.manage, 'forbidden', 'approver');
-  refused(await create(owner, valid), 403, M.manage, 'forbidden', 'Super Admin');
+  refused(await create(owner, valid), 403, M.denied, 'forbidden', 'Blaqks One');
   refused(await create(desk, valid), 403, M.denied, 'forbidden', 'no module');
   refused(await agent.request(path()), 403, M.denied, 'forbidden', 'own view reads');
   assert.equal((await viewer.request(path())).status, 200);
-  assert.equal((await owner.request(path())).status, 200);
+  assert.equal((await owner.request(path())).status, 403);
   const otherStaff = await activate(await invite(other, 'fin-agree-foreign'));
   for (const [value, message] of [
     [body(admin.user.id, 6000, day(-200)), M.notStaff],

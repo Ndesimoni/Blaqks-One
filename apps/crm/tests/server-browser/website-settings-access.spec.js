@@ -36,11 +36,9 @@ test('staff and foreign workspace links cannot load company website controls', a
       if (request.url().includes(`/workspaces/${team.other.user.workspaceId}/website`))
         foreignReads.push(request.url());
     });
+    // Another company's address is ignored: the Admin stays in their own company (BO1a).
     await page.goto(`/#/website?workspace=${team.other.user.workspaceId}`);
-    await expect(
-      page.getByRole('heading', { name: 'Workspace access is restricted', exact: true }),
-    ).toBeVisible();
-    await expect(page.getByLabel('Public website name', { exact: true })).toHaveCount(0);
+    await expect(page.getByLabel('Public website name', { exact: true })).toBeVisible();
     expect(foreignReads).toEqual([]);
   } finally {
     await staffContext.close();

@@ -21,8 +21,11 @@ test('account archive requires Super Admin, correct scope, current version and e
       (await actor.request(`${teamPath(admin, member.id)}/archive-preview`)).status,
       403,
     );
-    assert.equal((await actor.request(`${teamPath(admin)}?archived=true`)).status, 403);
   }
+  // The archived list is the company Admin's own (BO1a item 6, T10).
+  assert.equal((await admin.request(`${teamPath(admin)}?archived=true`)).status, 200);
+  for (const actor of [other, staff, owner])
+    assert.equal((await actor.request(`${teamPath(admin)}?archived=true`)).status, 403);
   assert.equal((await archive(owner, other, review)).status, 403);
   assert.equal(
     (await archive(owner, admin, review, { confirmationEmail: 'wrong@test.invalid' })).status,
@@ -82,8 +85,16 @@ test('archived staff retain identity and data, disappear from current lists and 
   assert.equal((await archive(owner, admin, review)).status, 200);
   const current = await admin.request(teamPath(admin));
   assert.ok(!current.value.members.some((item) => item.id === member.id));
-  const saved = await owner.request(`${teamPath(admin)}?archived=true`);
+  const saved = await admin.request(`${teamPath(admin)}?archived=true`);
   assert.equal(saved.status, 200);
+  assert.ok(
+    saved.value.members.every(
+      (item) => item.roleId === 'staff' && item.workspaceId === admin.user.workspaceId,
+    ),
+  );
+  const elsewhere = await login('admin-b');
+  const theirs = await elsewhere.request(`${teamPath(elsewhere)}?archived=true`);
+  assert.ok(!theirs.value.members.some((item) => item.id === member.id));
   const archived = saved.value.members.find((item) => item.id === member.id);
   assert.equal(archived.status, 'archived');
   assert.equal(archived.email, invited.email);
@@ -93,24 +104,24 @@ test('archived staff retain identity and data, disappear from current lists and 
     query(`SELECT count(*) FROM crm_records WHERE workspace_id='${admin.user.id}'`),
     recordCount,
   );
-  assert.equal(
-    (
-      await owner.request(teamPath(admin, member.id), {
-        method: 'PATCH',
-        body: { version: archived.version, active: true },
-      })
-    ).status,
-    403,
-  );
-  assert.equal(
-    (
-      await owner.request(`${teamPath(admin, member.id)}/invitations`, {
-        method: 'POST',
-        body: { version: archived.version },
-      })
-    ).status,
-    403,
-  );
+  for (const actor of [owner, admin]) {
+    const restore = await actor.request(teamPath(admin, member.id), {
+      method: 'PATCH',
+      body: { version: archived.version, active: true },
+    });
+    assert.equal(restore.status, 403);
+    const renew = await actor.request(`${teamPath(admin, member.id)}/invitations`, {
+      method: 'POST',
+      body: { version: archived.version },
+    });
+    assert.equal(renew.status, 403);
+  }
+  const platform = `/platform/companies/${admin.user.id}/members/${member.id}/active`;
+  const revived = await owner.request(platform, {
+    method: 'PUT',
+    body: { version: archived.version, active: true },
+  });
+  assert.equal(revived.status, 403);
   assert.ok(
     (
       await request('/auth/invitations/accept', {

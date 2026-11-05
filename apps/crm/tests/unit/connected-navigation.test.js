@@ -68,7 +68,7 @@ test('staff see their own activity under personal account and no company setting
   assert.ok(!names(groups).includes('Platform website'));
 });
 
-test('the Super Admin keeps one administration group and no company conversations', () => {
+test('Blaqks One keeps its platform pages and opens nothing of a company (BO1a)', () => {
   const owner = { roleId: 'super-admin', permissions: full };
   const groups = connectedGroups(owner);
   assert.deepEqual(itemsOf(groups, 'platform'), [
@@ -78,8 +78,9 @@ test('the Super Admin keeps one administration group and no company conversation
   ]);
   assert.deepEqual(itemsOf(groups, 'company'), ['Team & access', 'Team activity']);
   assert.equal(names(groups).filter((name) => name === 'Workspaces').length, 1);
-  assert.ok(names(groups).includes('Messages'));
-  for (const name of ['Inbox', 'Team chat', 'Agreements', 'Marketplace', 'Website'])
+  for (const name of ['Messages', 'Inbox', 'Team chat', 'Agreements', 'Marketplace', 'Website'])
+    assert.ok(!names(groups).includes(name), name);
+  for (const name of ['Dashboard', 'Clients', 'Properties', 'Deals', 'Guide', 'Calculators'])
     assert.ok(!names(groups).includes(name), name);
   assert.equal(navLabel(owner, 'Team activity'), 'Team activity');
 });

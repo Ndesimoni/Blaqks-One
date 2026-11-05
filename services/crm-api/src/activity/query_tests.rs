@@ -36,6 +36,10 @@ fn permission_parameters_are_refused_before_syntax() {
     };
     assert_eq!(check("kind=team", &staff), 403);
     assert_eq!(check("kind=team", &user("admin", "assigned")), 200);
+    assert_eq!(check("kind=team", &user("super-admin", "team")), 403);
+    assert!(Params::parse(Some("kind=team")).team_only() && Params::parse(None).team_only());
+    assert!(!Params::parse(Some("kind=record")).team_only());
+    assert!(!Params::parse(Some("collection=Clients")).team_only());
     assert_eq!(check("actor=not-a-uuid", &staff), 403);
     assert_eq!(check(&format!("actor={me}"), &staff), 200);
     assert_eq!(check("actor=not-a-uuid", &user("staff", "team")), 200);

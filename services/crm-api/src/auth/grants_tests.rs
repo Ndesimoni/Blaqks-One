@@ -59,20 +59,18 @@ fn full_staff(scope: &str) -> UserRow {
 
 #[test]
 fn admins_can_everything_and_unknown_roles_nothing() {
-    for role in ["admin", "super-admin"] {
-        let admin = user(role, "assigned", Permissions::default(), json!({}));
-        for collection in COLLECTIONS {
-            for action in [Action::Create, Action::Edit, Action::Delete] {
-                assert!(admin.can(collection, action), "{role} {collection}");
-            }
+    let admin = user("admin", "assigned", Permissions::default(), json!({}));
+    for collection in COLLECTIONS {
+        for action in [Action::Create, Action::Edit, Action::Delete] {
+            assert!(admin.can(collection, action), "admin {collection}");
         }
-        assert_eq!(
-            admin.profile_actions(),
-            serde_json::to_value(Actions::full(role)).unwrap()
-        );
     }
+    assert_eq!(
+        admin.profile_actions(),
+        serde_json::to_value(Actions::full("admin")).unwrap()
+    );
     let full = full_staff("team");
-    for role in ["viewer", "", "Admin", "STAFF", "owner"] {
+    for role in ["super-admin", "viewer", "", "Admin", "STAFF", "owner"] {
         let mut odd = full.clone();
         odd.role = role.into();
         assert!(!odd.can_collection("Clients"), "{role}");

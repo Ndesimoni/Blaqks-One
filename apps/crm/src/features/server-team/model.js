@@ -47,6 +47,13 @@ export function blankMember(member) {
   return { ...form, actions: memberActions(member, form) };
 }
 
+/** Blaqks One invites company Admins only (BO1a): no staff join the organisation. */
+export function blankAdminInvite() {
+  const form = blankMember();
+  const permissions = Object.fromEntries(Object.keys(form.permissions).map((key) => [key, true]));
+  return { ...form, accountRole: 'admin', positions: [], permissions };
+}
+
 export function positionDefaults(positions, roles) {
   const selected = roles.filter((role) => positions.includes(role.id));
   return {

@@ -24,12 +24,14 @@ const linkRoute = (pathname) => shareRoute(pathname) || listingShareRoute(pathna
 /** Connected pickers for link fields whose targets are not workspace records. */
 const linkFields = Object.freeze({ 'Deal ID': DealLinkField });
 
-export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
+export function ServerWorkspace({ owner, refreshDirectory }) {
   const { api, user } = useSession();
   // `#/shares/{id}` and `#/listing-shares/{id}` open shares; nothing else matches them.
   const navigation = useWorkspaceNavigation('/dashboard', linkRoute);
   const view = useWorkspaceViewState(navigation.route, navigation.initialQuery);
-  const records = { ...useServerRecords(api, owner.id), linkFields };
+  // Blaqks One has no CRM (BO1): its shell loads no records and no photos.
+  const platform = user.roleId === 'super-admin';
+  const records = { ...useServerRecords(api, owner.id, !platform), linkFields };
   const readOnly = owner.status === 'archived';
   // Kept listings show their photos too (agreements design §18).
   const { entries, keptEntries } = records;
@@ -51,9 +53,13 @@ export function ServerWorkspace({ owner, workspaces, refreshDirectory }) {
         <NavigationContext.Provider value={navigation}>
           <ViewContext.Provider value={view}>
             <ActionsContext.Provider value={actions}>
-              <ServerMediaProvider api={api} workspaceId={owner.id} entries={mediaEntries}>
-                <ServerShell owner={owner} workspaces={workspaces} />
-              </ServerMediaProvider>
+              {platform ? (
+                <ServerShell owner={owner} />
+              ) : (
+                <ServerMediaProvider api={api} workspaceId={owner.id} entries={mediaEntries}>
+                  <ServerShell owner={owner} />
+                </ServerMediaProvider>
+              )}
             </ActionsContext.Provider>
           </ViewContext.Provider>
         </NavigationContext.Provider>

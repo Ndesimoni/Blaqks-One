@@ -7,14 +7,18 @@ import {
   readSavedImport,
   readBackupImport,
 } from '../../src/features/server/importSources.js';
-import { prepareServerImport, importDestination } from '../../src/features/server/importModel.js';
+import { prepareServerImport, needsMember } from '../../src/features/server/importModel.js';
 import { connectedCollections } from '../../src/features/server/records.js';
 
 const counts = (values = {}) =>
   Object.fromEntries(connectedCollections.map((name) => [name, values[name] || 0]));
 
-const owner = { role: 'Super Admin', roleId: 'super-admin', managesTeam: true };
-const member = { role: 'Admin', roleId: 'admin', managesTeam: true };
+// Imports belong to the company Admin (BO1a); staff and Blaqks One never read browser sources.
+const owner = { role: 'Admin', roleId: 'admin', managesTeam: true };
+const others = [
+  { role: 'Staff', roleId: 'staff' },
+  { role: 'Blaqks One', roleId: 'super-admin', managesTeam: true },
+];
 const organisation = 'super-admin-workspace';
 function memoryStorage(initial = {}) {
   const values = new Map(Object.entries(initial));
@@ -68,22 +72,24 @@ test('only existing saved keys are offered; absent browser data never generates 
   );
 });
 
-test('server Admins cannot enumerate or read browser sources even when preview role labels claim ownership', () => {
+test('staff and Blaqks One cannot enumerate or read browser sources, whatever their labels', () => {
   let reads = 0;
   const storage = () => {
     reads++;
     return memoryStorage();
   };
-  assert.throws(() => savedImportSources(member, storage), /Super Admin/);
-  assert.throws(() => readSavedImport(member, {}, storage), /Super Admin/);
-  assert.throws(() => readBackupImport(member, '{}', organisation, 'backup.json'), /Super Admin/);
+  for (const member of others) {
+    assert.throws(() => savedImportSources(member, storage), /company Admin/);
+    assert.throws(() => readSavedImport(member, {}, storage), /company Admin/);
+    assert.throws(() => readBackupImport(member, '{}', organisation, 'b.json'), /company Admin/);
+  }
   assert.equal(reads, 0);
 });
 
-test('organisation sources stay locked to their owner and personal destination mapping is explicit', () => {
-  assert.equal(importDestination(organisation, 'aidah-server'), organisation);
-  assert.equal(importDestination('aidah', 'aidah-server'), 'aidah-server');
-  assert.equal(importDestination('backup-personal', 'simoni-server'), 'simoni-server');
+test('a personal source names its receiving member; the organisation set goes to the Admin', () => {
+  assert.equal(needsMember(organisation), false);
+  assert.equal(needsMember('aidah'), true);
+  assert.equal(needsMember('backup-personal'), true);
 });
 
 test('import preparation preserves IDs, links, media and unknown business fields without changing the source', () => {

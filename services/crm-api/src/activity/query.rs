@@ -51,7 +51,7 @@ impl Params {
     /// assigned-only staff may name only themselves as actor, and every collection must
     /// be granted (unknown names included). `workspace` is the path's workspace.
     pub fn authorise(&self, user: &UserRow, workspace: &str, granted: &[&str]) -> ApiResult<()> {
-        let manager = matches!(user.role.as_str(), "admin" | "super-admin");
+        let manager = user.role == "admin";
         let team = self.all("kind").iter().any(|kind| kind == "team");
         let channel = self.all("kind").iter().any(|kind| kind == "channel");
         let foreign_actor = !user.has_team_scope()
@@ -68,6 +68,12 @@ impl Params {
             return Err(ApiError::forbidden());
         }
         Ok(())
+    }
+
+    /// Whether only team events are asked for: no collection and no kind but `team`. The
+    /// organisation's feed (Blaqks One's own team) accepts nothing else.
+    pub fn team_only(&self) -> bool {
+        self.all("collection").is_empty() && self.all("kind").iter().all(|kind| kind == "team")
     }
 
     /// Step 4: one value per known key, valid kinds, actors, actions, dates, limit and

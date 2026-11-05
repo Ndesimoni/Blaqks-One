@@ -105,7 +105,7 @@ test('sample commands refuse other targets and non-local configurations', async 
   });
   assert.equal(pending.status, 201, JSON.stringify(pending.value));
   const cases = [
-    ['owner@crm-fixture.test', /pass --organisation/],
+    ['owner@crm-fixture.test', /holds no CRM records/],
     [staffEmail('sample.layla', 'sample-clear-admin@x.test'), /That is a staff account/],
     ['sample-pending@team-fixture.test', /suspended or has not been activated/],
     ['nobody@crm-fixture.test', /No CRM account uses that email/],
@@ -135,14 +135,13 @@ test('sample commands refuse other targets and non-local configurations', async 
     }
   }
   assert.equal(count('crm_sample_records'), before);
-  // The organisation workspace is used only on request, then cleared again.
-  const organisation = runSample('seed-sample', {
-    email: 'owner@crm-fixture.test',
-    args: ['--organisation', '--no-staff'],
-  });
-  assert.equal(organisation.status, 0, organisation.stderr);
-  assert.equal(sampleRows('super-admin-workspace'), 52);
-  const clearOrg = { email: 'owner@crm-fixture.test', args: ['--organisation'] };
-  assert.equal(runSample('clear-sample', clearOrg).status, 0);
+  // Blaqks One's organisation holds no CRM, so the command refuses it either way (T11).
+  for (const command of ['seed-sample', 'clear-sample']) {
+    for (const email of ['owner@crm-fixture.test', 'admin-a@crm-fixture.test']) {
+      const result = runSample(command, { email, args: ['--organisation'] });
+      assert.equal(result.status, 1, `${command} ${email}`);
+      assert.match(result.stderr, /holds no CRM records/);
+    }
+  }
   assert.equal(sampleRows('super-admin-workspace'), 0);
 });

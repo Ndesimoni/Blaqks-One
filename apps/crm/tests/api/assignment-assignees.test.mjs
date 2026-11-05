@@ -50,12 +50,9 @@ test('assignee options list active teammates with the grant plus the owner, as i
     assert.ok(!clients.includes(hidden.user.id));
   }
   assert.deepEqual(names(await assignees(one, 'Follow-ups')).sort(), [...clients].sort());
-  assert.deepEqual(
-    names(await assignees(owner, 'Properties', admin.user.id)).sort(),
-    names(properties).sort(),
-  );
-  const organisation = names(await assignees(owner, 'Clients'));
-  assert.ok(organisation.includes(owner.user.id));
+  // Blaqks One has no assignees anywhere (BO1a).
+  assert.equal((await assignees(owner, 'Properties', admin.user.id)).status, 403);
+  assert.equal((await assignees(owner, 'Clients')).status, 403);
   for (const collection of ['Viewings', 'Deals', '']) {
     assert.equal((await assignees(admin, collection)).status, 400, collection);
   }

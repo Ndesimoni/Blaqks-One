@@ -24,7 +24,8 @@ test('company details save, survive rereads, and name the directory without rena
   assert.equal(initial[0].actor_id, owner.user.id, 'inviter is the actual actor');
   assert.equal(initial[0].from_type, null);
   assert.equal(initial[0].to_type, 'brokerage');
-  const directory = async () => (await owner.request('/workspaces')).value.workspaces;
+  // Each caller's directory is their own workspace only (BO1a item 3).
+  const directory = async () => (await admin.request('/workspaces')).value.workspaces;
   assert.equal((await directory()).find((row) => row.id === workspace).name, admin.user.name);
   const saved = await putCompany(admin, companyBody({ displayName: '  شركة تجريبية  ' }));
   assert.equal(saved.status, 200, JSON.stringify(saved.value));
@@ -39,7 +40,11 @@ test('company details save, survive rereads, and name the directory without rena
   assert.deepEqual(await readCompany(admin), expected);
   const rows = await directory();
   assert.equal(rows.find((row) => row.id === workspace).name, expected.displayName);
-  assert.equal(rows.find((row) => row.id === owner.user.workspaceId).name, 'Super Admin workspace');
+  const platform = (await owner.request('/workspaces')).value.workspaces;
+  assert.deepEqual(
+    platform.map((row) => [row.id, row.name]),
+    [[owner.user.workspaceId, 'Blaqks One']],
+  );
   assert.equal(
     query(`SELECT name FROM crm_users WHERE id='${admin.user.id}'`),
     invitation.member.name,

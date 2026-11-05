@@ -29,30 +29,37 @@ export async function fixtures() {
   };
 }
 
+/**
+ * The company's owning Admin imports into their own workspace (BO1a). A personal source
+ * names the member who receives the parent records: the importing Admin unless
+ * `options.memberId` says otherwise (`null` sends none).
+ */
 export function preview(
-  owner,
+  actor,
   workspace,
   records,
   sourceWorkspaceId = 'backup-personal',
   options = {},
 ) {
-  return owner.request(importsPath(workspace, 'preview'), {
+  const personal = sourceWorkspaceId !== organisation;
+  const { memberId = personal ? actor.user.id : undefined, ...rest } = options;
+  return actor.request(importsPath(workspace, 'preview'), {
     method: 'POST',
-    body: { sourceWorkspaceId, records },
-    ...options,
+    body: { sourceWorkspaceId, ...(memberId === undefined ? {} : { memberId }), records },
+    ...rest,
   });
 }
 
-export function commit(owner, workspace, token, options = {}) {
-  return owner.request(importsPath(workspace, 'commit'), {
+export function commit(actor, workspace, token, options = {}) {
+  return actor.request(importsPath(workspace, 'commit'), {
     method: 'POST',
     body: { token },
     ...options,
   });
 }
 
-export async function planned(owner, workspace, records, sourceWorkspaceId) {
-  const response = await preview(owner, workspace, records, sourceWorkspaceId);
+export async function planned(actor, workspace, records, sourceWorkspaceId, options) {
+  const response = await preview(actor, workspace, records, sourceWorkspaceId, options);
   assert.equal(response.status, 200, JSON.stringify(response.value));
   assert.match(response.value.token, /^[A-Za-z0-9_-]{43}$/);
   assert.ok(Date.parse(response.value.expiresAt) > Date.now());

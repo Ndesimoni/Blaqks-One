@@ -53,6 +53,7 @@ pub async fn decide(
     let reason = reason(request.reason, &request.decision)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &company).await?;
+    super::decisions::live_reviewer(&mut tx, session.user.id).await?;
     let owner = workspaces::owner_of(&mut tx, &company)
         .await
         .map_err(|_| ApiError::missing())?;

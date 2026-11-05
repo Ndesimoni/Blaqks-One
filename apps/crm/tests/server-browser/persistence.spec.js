@@ -1,6 +1,5 @@
 import { test, expect } from './fixtures.js';
 import { addClient, session, signIn, signOut } from './helpers.js';
-import { selectWorkspace } from './workspace-helpers.js';
 import { openName } from './record-open.js';
 
 test('a client survives reload and another browser but remains private to its admin', async ({
@@ -23,31 +22,29 @@ test('a client survives reload and another browser but remains private to its ad
   await signIn(other, 'admin-b');
   await other.getByLabel('Search Clients', { exact: true }).fill('BROWSER-PERSIST');
   await expect(other.getByRole('button', { name: openName('BROWSER-PERSIST') })).toHaveCount(0);
+  // Another company's address is ignored: admin-b stays in their own company (BO1a).
   await other.goto(`/#/clients?workspace=${identity.user.id}`);
   await expect(
-    other.getByRole('heading', { name: 'Workspace access is restricted' }),
+    other.getByRole('heading', { level: 1, name: 'Clients', exact: true }),
   ).toBeVisible();
+  await expect(other.getByRole('button', { name: openName('BROWSER-PERSIST') })).toHaveCount(0);
   const forged = await other.request.get(`/api/crm/workspaces/${identity.user.id}/records`);
   expect(forged.status()).toBe(403);
   await context.close();
 });
 
-test('Super Admin switches to a member workspace and saves there', async ({ page }) => {
+test('Blaqks One never switches into a company, even through the address (BO1a)', async ({
+  page,
+}) => {
+  await signIn(page, 'admin-b');
+  const { user } = await session(page);
+  await signOut(page);
   await signIn(page, 'owner');
-  await selectWorkspace(page, 'Fixture Admin B');
-  await expect(page.getByRole('region', { name: 'Active workspace' })).toContainText(
-    'Fixture Admin B',
-  );
-  await addClient(page, 'BROWSER-SUPER', 'Created by Super Admin');
-  const workspace = new URLSearchParams(new URL(page.url()).hash.split('?')[1]).get('workspace');
-  const response = await page.request.get(`/api/crm/workspaces/${workspace}/records`);
-  expect(
-    (await response.json()).records.Clients.some(
-      (entry) => entry.record.client_id === 'BROWSER-SUPER',
-    ),
-  ).toBe(true);
-  await selectWorkspace(page, 'Super Admin workspace');
-  await expect(page.getByRole('button', { name: openName('BROWSER-SUPER') })).toHaveCount(0);
+  await page.goto(`/#/clients?workspace=${encodeURIComponent(user.workspaceId)}`);
+  await expect(page.getByRole('heading', { name: /^You don't have access to / })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Workspace', exact: true })).toHaveCount(0);
+  const response = await page.request.get(`/api/crm/workspaces/${user.workspaceId}/records`);
+  expect(response.status()).toBe(403);
 });
 
 test('server unavailability never falls back to browser demo identity or records', async ({

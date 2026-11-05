@@ -18,6 +18,7 @@ pub async fn update(
     body: Result<Json<company::SeatLimitRequest>, JsonRejection>,
 ) -> ApiResult<Json<company::SeatUsage>> {
     protection::mutation(&state, &headers, &session.csrf_token)?;
+    // A platform control (BO1a item 9): the live operator, never the organisation itself.
     if session.user.role != "super-admin" || workspace == workspaces::ORGANISATION {
         return Err(ApiError::forbidden());
     }
@@ -27,9 +28,9 @@ pub async fn update(
     }
     let mut transaction = state.pool.begin().await?;
     workspaces::lock(&mut transaction, &workspace).await?;
-    workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None, None).await?;
-    // A suspended company keeps its seats as they are. A suspension takes the Super Admin's
-    // workspace lock and then this one (W-M1); the owner row lock serialises with it too.
+    workspaces::platform::operator(&mut transaction, session.user.id).await?;
+    // A suspended or archived company keeps its seats as they are. A suspension takes the
+    // organisation's lock and then this one (W-M1); the owner row lock serialises with it.
     let company_owner = workspaces::owner_of(&mut transaction, &workspace).await?;
     accounts::lock_active_admin(&mut transaction, company_owner).await?;
     let current = company::get(&mut *transaction, &workspace).await?;

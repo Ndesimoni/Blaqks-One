@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures.js';
 import { signIn } from './helpers.js';
-import { entries } from './navigation-entries.js';
+import { entries, platformEntries } from './navigation-entries.js';
 import {
   openPage,
   rail,
@@ -26,12 +26,11 @@ test('connected Admin navigation restores every group and unfinished routes neve
       }),
     ),
   );
-  await signIn(page, 'owner');
-  // The Super Admin's rail: the CRM, Messages (the preview), Platform and Settings only.
-  for (const name of ['CRM', 'Messages', 'Platform', 'Settings'])
+  await signIn(page);
+  // A company Admin's rail: the company's products and Settings, never Platform.
+  for (const name of ['CRM', 'Websites', 'Marketplace', 'Messages', 'Settings'])
     await expect(rail(page).getByRole('button', { name, exact: true })).toBeVisible();
-  for (const name of ['Websites', 'Marketplace'])
-    await expect(rail(page).getByRole('button', { name, exact: true })).toHaveCount(0);
+  await expect(rail(page).getByRole('button', { name: 'Platform', exact: true })).toHaveCount(0);
   // Every destination is reachable through product, section and tab, and marked current.
   for (const name of entries) {
     await openPage(page, name);
@@ -40,18 +39,6 @@ test('connected Admin navigation restores every group and unfinished routes neve
       await expect(
         tabs.getByRole('button', { name: tabLabelOf(name), exact: true }),
       ).toHaveAttribute('aria-current', 'page');
-  }
-  for (const name of ['Messages']) {
-    await openPage(page, name);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(sectionLabelOf(name));
-    await expect(page.getByRole('region', { name: `${name} connection status` })).toContainText(
-      `${name} is not connected yet`,
-    );
-    await expect(page.getByText('Navigation demo sentinel', { exact: true })).toHaveCount(0);
-    await expect(page.locator('.data-table tbody tr')).toHaveCount(0);
-    await expect(
-      page.getByRole('button', { name: 'Import saved records', exact: true }),
-    ).toHaveCount(0);
   }
   for (const [name, action] of [
     ['Dashboard', 'Create'],
@@ -76,17 +63,8 @@ test('connected Admin navigation restores every group and unfinished routes neve
   // A restored session opens the workspace before the shell renders; allow for that.
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard', { timeout: 20000 });
   await expect(page.getByRole('region', { name: 'Records in view' })).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Dashboard connection status' })).toHaveCount(0);
-  // Only the Messages preview still says it is not connected.
   await expect(sectionNav(page).locator('.connected-nav-status')).toHaveCount(0);
-  await openPage(page, 'Messages');
-  await expect(
-    sectionButton(page, 'messages', 'Client inbox').locator('.connected-nav-status'),
-  ).toHaveText('Not connected');
   await openPage(page, 'Clients');
-  await expect(
-    page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
-  ).toBeVisible();
   await expect(sectionButton(page, 'crm', 'Clients')).toHaveAttribute('aria-current', 'page');
   await expect(
     sectionTabs(page).getByRole('button', { name: 'All clients', exact: true }),
@@ -94,10 +72,35 @@ test('connected Admin navigation restores every group and unfinished routes neve
   expect(errors).toEqual([]);
 });
 
+test('Blaqks One sees only its platform pages and is refused every company page (BO1a)', async ({
+  page,
+}) => {
+  const errors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await signIn(page, 'owner');
+  for (const name of ['Platform', 'Settings'])
+    await expect(rail(page).getByRole('button', { name, exact: true })).toBeVisible();
+  for (const name of ['CRM', 'Websites', 'Marketplace', 'Messages'])
+    await expect(rail(page).getByRole('button', { name, exact: true })).toHaveCount(0);
+  for (const name of platformEntries) await openPage(page, name);
+  // No company records are ever requested, and a company page says who decides.
+  const asked = [];
+  page.on('request', (request) => {
+    if (/\/records(\?|$)/.test(request.url())) asked.push(request.url());
+  });
+  for (const path of ['/clients', '/deals', '/inbox']) {
+    await page.goto(`/#${path}`);
+    await expect(page.getByRole('heading', { name: /^You don't have access to / })).toBeVisible();
+  }
+  await expect(page.getByRole('button', { name: 'Workspace', exact: true })).toHaveCount(0);
+  expect(asked).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
 test('restored navigation scrolls its active link into view and stays usable on mobile in both themes', async ({
   page,
 }, testInfo) => {
-  await signIn(page, 'owner');
+  await signIn(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const theme of ['dark', 'light']) {
     await page.setViewportSize({ width: 1440, height: 900 });

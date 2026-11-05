@@ -42,7 +42,7 @@ function SectionAccess({ name, children }) {
     return (
       <section className="panel team-flow-message">
         <h2>This section is outside your assigned access</h2>
-        <p>Ask your Super Admin to update your role if you need this section.</p>
+        <p>Ask your Admin to update your role if you need this section.</p>
         <Button variant="light" onClick={() => navigate('Dashboard')}>
           Back to overview
         </Button>

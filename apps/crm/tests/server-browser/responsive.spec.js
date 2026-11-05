@@ -7,7 +7,7 @@ test('connected navigation and shared screens reflow in both themes with keyboar
 }, testInfo) => {
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await signIn(page, 'owner');
+  await signIn(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: 900 });

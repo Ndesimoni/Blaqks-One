@@ -11,8 +11,8 @@ const location = {
   emirate: 'Dubai',
 };
 
-let owner, admin;
-before(async () => ({ owner, admin } = await fixtures()));
+let admin;
+before(async () => ({ admin } = await fixtures()));
 
 const contactsOf = async (session, workspace) =>
   (await session.request(`/workspaces/${workspace}/records`)).value.records.Contacts;
@@ -64,7 +64,7 @@ test('nested location values are rejected on create, update and import', async (
     ...emptyRecords(),
     Contacts: [{ contact_id: 'LOC-BAD', full_name: 'Rejected', community: ['Marina'] }],
   };
-  const rejected = await preview(owner, admin.user.id, records);
+  const rejected = await preview(admin, admin.user.id, records);
   assert.equal(rejected.status, 400);
   assert.equal(rejected.value.message, SCALAR);
 });
@@ -81,11 +81,11 @@ test('Super Admin import preserves Contact location fields', async () => {
       },
     ],
   };
-  const plan = await planned(owner, admin.user.id, records);
-  const result = await commit(owner, admin.user.id, plan.token);
+  const plan = await planned(admin, admin.user.id, records);
+  const result = await commit(admin, admin.user.id, plan.token);
   assert.equal(result.status, 200, JSON.stringify(result.value));
   assert.equal(result.value.imported.Contacts, 1);
-  const contact = (await contactsOf(owner, admin.user.id)).find(
+  const contact = (await contactsOf(admin, admin.user.id)).find(
     (row) => row.record.contact_id === 'LOC-IMPORT',
   );
   assert.equal(contact.record.contact_type, 'Security guard');

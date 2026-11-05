@@ -70,8 +70,8 @@ test('imports keep deal text but always leave deal_ref NULL', async () => {
       { log_id: 'DLI-LOG-3', client_id: 'DLI-CLIENT', deal_id_optional: otherDeal.dealId },
     ],
   };
-  const plan = await planned(t.owner, ws, records);
-  const result = await commit(t.owner, ws, plan.token);
+  const plan = await planned(t.admin, ws, records);
+  const result = await commit(t.admin, ws, plan.token);
   assert.equal(result.status, 200, JSON.stringify(result.value));
   assert.deepEqual(result.value.imported, counts({ Clients: 1, 'Interaction log': 3 }));
   for (const id of ['DLI-LOG-1', 'DLI-LOG-2', 'DLI-LOG-3']) assert.equal(dealRef(ws, id), '-');

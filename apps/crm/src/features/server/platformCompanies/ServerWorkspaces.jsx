@@ -2,30 +2,26 @@ import React, { useState } from 'react';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Empty } from '../../../components/ui/Empty.jsx';
-import { useNavigate } from 'react-router-dom';
-import { routePath } from '../../../config/routes.js';
+import { useWorkspaceView } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { GridFilterBar } from '../../records/grid/GridFilterBar.jsx';
 import '../../records/grid/grid-filter.css';
 import { usePlatformCompanies } from './usePlatformCompanies.js';
+import { CompanyPanel } from './CompanyPanel.jsx';
 
 const MARKET_TONES = { approved: 'green', pending: 'amber', declined: 'red', revoked: 'red' };
 
 /**
- * Platform → Workspaces as the approved mockup's Companies grid (design queue item 33), for the
- * Super Admin: Active companies or Archived, searchable, each with its Admin, seats and
- * marketplace state. Open goes to the company's Team & access, where its seat limit and
- * archive live. No company's records are read here.
+ * Platform → Companies as the approved mockup's grid (design queue item 33), for Blaqks One:
+ * Active companies or Archived, searchable, each with its Admin, seats and marketplace state.
+ * Open shows the company panel (people, seat limit, suspend and archive); Blaqks One never
+ * enters a company or reads its records (BO1a).
  */
 export function ServerWorkspaces() {
   const { t, format } = useI18n();
-  const go = useNavigate();
-  // The connected app selects a workspace by the address, as the workspace banner does.
-  const open = (id) =>
-    go({
-      pathname: routePath('Team & access'),
-      search: `?${new URLSearchParams({ workspace: id })}`,
-    });
+  const { setToast } = useWorkspaceView();
+  const [openId, setOpenId] = useState('');
+  const open = (id) => setOpenId(id);
   const list = usePlatformCompanies();
   const [view, setView] = useState({ archived: false, query: '' });
   const k = (key, vars) => t(`platformCompanies.${key}`, vars);
@@ -105,6 +101,14 @@ export function ServerWorkspaces() {
             </table>
           </div>
         </div>
+      )}
+      {openId && list.rows?.some((row) => row.id === openId) && (
+        <CompanyPanel
+          company={list.rows.find((row) => row.id === openId)}
+          onClose={() => setOpenId('')}
+          onChanged={list.reload}
+          onToast={setToast}
+        />
       )}
     </div>
   );

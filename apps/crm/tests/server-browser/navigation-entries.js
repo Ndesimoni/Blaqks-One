@@ -1,4 +1,4 @@
-/** Every destination the connected navigation offers the Super Admin, by route name (NAV). */
+/** Every destination the connected navigation offers a company Admin, by route name (NAV). */
 export const entries = [
   'Dashboard',
   'Client desk',
@@ -10,7 +10,7 @@ export const entries = [
   'Shortlist',
   'Follow-ups',
   'Viewings',
-  'Messages',
+  'Inbox',
   'Interaction log',
   'Client care',
   'Deals',
@@ -23,7 +23,14 @@ export const entries = [
   'My profile',
   'Team & access',
   'Team activity',
+];
+
+/** Blaqks One's destinations (BO1a): the platform screens and its own account only. */
+export const platformEntries = [
   'Workspaces',
   'Marketplace applications',
   'Platform website',
+  'Team & access',
+  'Team activity',
+  'My profile',
 ];

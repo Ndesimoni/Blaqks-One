@@ -30,8 +30,9 @@ test('profiles expose financeAccess by role; positions preset own-view finance',
   const all = { create: true, edit: true, assign: true, approve: true, teamView: true };
   assert.deepEqual(admin.user.financeAccess, access('team', { ...all, manage: true }));
   assert.deepEqual(admin.user.actions.finance, FINANCE.all);
-  assert.deepEqual(owner.user.financeAccess, access('team', { teamView: true }));
-  assert.deepEqual(owner.user.actions.finance, { ...FINANCE.none, teamView: true });
+  // Blaqks One holds no finance at all (BO1a item 11).
+  assert.deepEqual(owner.user.financeAccess, access('none'));
+  assert.deepEqual(owner.user.actions.finance, FINANCE.none);
   const own = { create: true, edit: true, assign: true };
   assert.deepEqual(agent.user.financeAccess, access('own', own));
   assert.equal(agent.user.permissions.finance, true, 'Property Agent gains own-view finance');

@@ -36,7 +36,6 @@ const granted = {
   agent: ['create', 'edit'],
   viewer: ['create', 'edit'],
   approver: ['create', 'edit', 'approve', 'reject'],
-  owner: [],
 };
 const call = (session, kind, [, method, suffix], id, body = {}) =>
   session.request(entryPath(teams.admin, kind, suffix.replace('ID', id)), { method, body });
@@ -51,7 +50,8 @@ test('H1: the finance module, then the grant or role (403), before any body (400
         else refused(result, 403, spec[0], 'forbidden', label);
       }
     }
-    for (const name of ['desk', 'other']) {
+    // Blaqks One (owner) is refused at the workspace gate, like another company (BO1a).
+    for (const name of ['desk', 'other', 'owner']) {
       for (const spec of Object.values(operations)) {
         refused(
           await call(teams[name], kind, spec, payment.id),

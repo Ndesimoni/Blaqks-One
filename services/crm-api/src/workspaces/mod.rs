@@ -66,8 +66,12 @@ pub async fn owner_of(
         .ok_or_else(ApiError::forbidden)
 }
 
+/// The one gate in front of company data (BO1a item 1): only a company's own Admin and
+/// staff pass, into their own workspace. A role allowlist, so Blaqks One and any later
+/// platform role are refused, and never the organisation, which holds no CRM.
 pub async fn ensure_access(state: &AppState, session: &Session, workspace: &str) -> ApiResult<()> {
-    if session.user.role != "super-admin" && workspace != session.user.workspace_id {
+    let company_member = matches!(session.user.role.as_str(), "admin" | "staff");
+    if !company_member || workspace == ORGANISATION || workspace != session.user.workspace_id {
         return Err(ApiError::forbidden());
     }
     let exists: bool =
@@ -99,7 +103,8 @@ pub async fn frozen(
 }
 
 /// Re-reads the caller's live profile for `workspace` inside `transaction` (H4, L3).
-/// Inactive members, suspended owners and other teams are refused.
+/// Inactive members, suspended owners and other teams are refused; Blaqks One passes only
+/// for its own organisation (BO1a item 2).
 pub async fn member(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     workspace: &str,
@@ -111,7 +116,7 @@ pub async fn member(
     .bind(actor)
     .fetch_optional(&mut **transaction)
     .await?
-    .filter(|user| user.role == "super-admin" || user.workspace_id == workspace)
+    .filter(|user| user.workspace_id == workspace)
     .ok_or_else(ApiError::forbidden)
 }
 

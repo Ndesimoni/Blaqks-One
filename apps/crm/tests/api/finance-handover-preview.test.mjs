@@ -40,10 +40,10 @@ test('the receiver and the Admin review a pending offer; everyone else gets one 
     [viewer, 'team-view staff'],
     [approver, 'an approver not chosen'],
     [backup, 'the chosen approver before the acceptance'],
-    [owner, 'Super Admin'],
   ]) {
     notFound(await preview(who, admin, handover.id), label);
   }
+  assert.equal((await preview(owner, admin, handover.id)).status, 403, 'Blaqks One');
   const home = other.user.workspaceId;
   notFound(await preview(other, admin, handover.id, home), "another company's Admin");
   assert.equal((await preview(other, admin, handover.id)).status, 403, 'not their company');
@@ -81,10 +81,10 @@ test('while an acceptance waits, the approver reviews it only while holding Appr
     [third, 'another agent'],
     [viewer, 'team-view staff'],
     [approver, 'an approver not chosen'],
-    [owner, 'Super Admin'],
   ]) {
     notFound(await preview(who, admin, handover.id), label);
   }
+  assert.equal((await preview(owner, admin, handover.id)).status, 403, 'Blaqks One');
   const demoted = await withoutApprove(admin, backup);
   notFound(await preview(demoted, admin, handover.id), 'the approver without Approve');
   await opens(admin, handover, 'the Admin keeps the request (amendment 14)');

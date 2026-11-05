@@ -111,6 +111,12 @@ test('a self-signed-up Admin stays inside its own company authority', async () =
         body: {},
       })
     ).status,
-    403,
+    400,
+    'the company Admin imports into their own company (BO1a); an empty preview is invalid',
   );
+  const elsewhere = await call('/workspaces/super-admin-workspace/imports/preview', {
+    method: 'POST',
+    body: {},
+  });
+  assert.equal(elsewhere.status, 403, 'never into another workspace');
 });

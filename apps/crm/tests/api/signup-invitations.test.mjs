@@ -13,11 +13,14 @@ const body = (address) => ({
   accountRole: 'staff',
 });
 
+// A company Admin's own team (BO1a: no staff invitations into the Blaqks One organisation).
+const invitations = (admin) => `/workspaces/${admin.user.workspaceId}/team/invitations`;
+
 test('invitation email collisions return the fixed domain contract', async () => {
-  const owner = await login('owner');
-  const response = await owner.request('/workspaces/super-admin-workspace/team/invitations', {
+  const admin = await login('admin-a');
+  const response = await admin.request(invitations(admin), {
     method: 'POST',
-    body: body('admin-a@crm-fixture.test'),
+    body: body('admin-b@crm-fixture.test'),
   });
   assert.equal(response.status, 409);
   assert.deepEqual(response.value, {
@@ -27,13 +30,13 @@ test('invitation email collisions return the fixed domain contract', async () =>
 });
 
 test('each workspace can create at most twenty invitations per day', async () => {
-  const owner = await login('owner');
-  const key = digest('team:invitation:day:super-admin-workspace');
+  const admin = await login('admin-a');
+  const key = digest(`team:invitation:day:${admin.user.workspaceId}`);
   query(
     `INSERT INTO crm_login_limits(key_hash,attempts,window_seconds) VALUES('${key}',20,86400) ` +
       `ON CONFLICT(key_hash) DO UPDATE SET attempts=20,window_started=now(),window_seconds=86400`,
   );
-  const response = await owner.request('/workspaces/super-admin-workspace/team/invitations', {
+  const response = await admin.request(invitations(admin), {
     method: 'POST',
     body: body(email('invitation-budget')),
   });

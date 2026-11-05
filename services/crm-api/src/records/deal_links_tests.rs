@@ -36,10 +36,11 @@ const TEAM_VIEW: fn() -> Value = || json!({"create": true, "teamView": true});
 #[test]
 fn deals_are_linkable_only_under_the_callers_finance_view() {
     let id = Some(Uuid::from_u128(7));
-    for role in ["admin", "super-admin"] {
-        let admin = user(role, "assigned", Permissions::default(), json!({}));
-        assert_eq!(finance_caller(&admin), Some(None), "{role}");
-    }
+    let admin = user("admin", "assigned", Permissions::default(), json!({}));
+    assert_eq!(finance_caller(&admin), Some(None));
+    // Blaqks One holds no finance, so it links no deals (BO1a item 11).
+    let platform = user("super-admin", "team", Permissions::full(), TEAM_VIEW());
+    assert_eq!(finance_caller(&platform), None);
     let schedule_only = user("staff", "team", modules(true, false), TEAM_VIEW());
     assert_eq!(finance_caller(&schedule_only), None);
     let own = user(

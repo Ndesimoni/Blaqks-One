@@ -8,8 +8,8 @@ test('a lost archive response can be checked without deleting twice or losing th
 }) => {
   await signIn(page, 'owner');
   await openTeam(page);
-  const form = await startInvitation(page, 'archive-response');
-  await form.getByRole('checkbox', { name: 'Receptionist', exact: true }).check();
+  // Blaqks One invites company Admins only (BO1a: no staff in the organisation).
+  const form = await startInvitation(page, 'archive-response', true);
   await finishInvitation(page, form);
   await closeInvitation(page);
   await page.getByLabel('Search team').fill('Browser archive-response');

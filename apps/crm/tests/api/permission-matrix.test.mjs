@@ -19,7 +19,8 @@ const none = actions(false);
 // Each caller's expected grants: `full` by role, otherwise staff actions and scope.
 const profiles = {
   admin: { full: true },
-  owner: { full: true },
+  // Blaqks One holds no CRM (BO1a): refused like a caller without modules, no actions.
+  owner: { modules: false },
   assigned: { actions: preset(), team: false },
   teamDelete: { actions: actions(), team: true },
   teamKeep: { actions: preset(), team: true },
@@ -110,7 +111,7 @@ test('bulk moves need team scope, then Assign, before the body is read', async (
     session.request(`/workspaces/${workspace}/assignments/bulk`, { method: 'POST', body });
   const outcomes = {
     admin: 400,
-    owner: 400,
+    owner: MESSAGES.denied,
     teamDelete: 400,
     teamKeep: 400,
     viewOnly: MESSAGES.assign,

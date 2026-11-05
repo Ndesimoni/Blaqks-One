@@ -30,18 +30,16 @@ const ME: Option<Uuid> = Some(Uuid::from_u128(7));
 const OTHER: Option<Uuid> = Some(Uuid::from_u128(8));
 
 #[test]
-fn admins_and_the_super_admin_see_every_target() {
-    for role in ["admin", "super-admin"] {
-        let viewer = user(role, "assigned", false, false);
-        for metric in Metric::ALL {
-            assert!(visible(&viewer, None, metric) && visible(&viewer, OTHER, metric));
-        }
+fn admins_see_every_target_and_blaqks_one_none() {
+    let viewer = user("admin", "assigned", false, false);
+    for metric in Metric::ALL {
+        assert!(visible(&viewer, None, metric) && visible(&viewer, OTHER, metric));
     }
-    assert!(!visible(
-        &user("guest", "team", true, true),
-        None,
-        Metric::Deals
-    ));
+    for role in ["guest", "super-admin"] {
+        let outsider = user(role, "team", true, true);
+        assert!(!visible(&outsider, None, Metric::Deals), "{role}");
+        assert!(!visible(&outsider, OTHER, Metric::Deals), "{role}");
+    }
 }
 
 #[test]

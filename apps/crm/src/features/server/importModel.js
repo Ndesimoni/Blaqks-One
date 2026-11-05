@@ -11,9 +11,9 @@ const credentialKeys = new Set([
   'sessiontoken',
 ]);
 
+/** Imports belong to each company's Admin, into their own company (BO1a). */
 export function requireImportOwner(user) {
-  if (user?.roleId !== 'super-admin')
-    throw Error('Only the Super Admin can import browser records.');
+  if (user?.roleId !== 'admin') throw Error('Only your company Admin can import browser records.');
 }
 
 export function prepareServerImport(data) {
@@ -48,10 +48,9 @@ export function prepareServerImport(data) {
   };
 }
 
-export function importDestination(sourceWorkspaceId, destination) {
-  if (sourceWorkspaceId === SUPER_WORKSPACE_ID) return SUPER_WORKSPACE_ID;
-  return destination === SUPER_WORKSPACE_ID ? '' : destination;
-}
+/** A personal source names the member who receives the records; the organisation set goes
+ * to the importing Admin (BO1a). */
+export const needsMember = (sourceWorkspaceId) => sourceWorkspaceId !== SUPER_WORKSPACE_ID;
 
 export function validateImportPreview(preview) {
   if (

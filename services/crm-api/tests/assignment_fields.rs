@@ -77,7 +77,11 @@ fn assignment_and_projection_keys_are_reserved_in_record_payloads() {
 fn profiles_report_team_scope_for_admins_and_the_grant_for_staff() {
     let scope = |role: &str, value: &str| Profile::from(user(role, value)).record_scope;
     assert_eq!(scope("admin", "assigned"), "team");
-    assert_eq!(scope("super-admin", "assigned"), "team");
+    assert_eq!(
+        scope("super-admin", "team"),
+        "assigned",
+        "Blaqks One holds no CRM"
+    );
     assert_eq!(scope("staff", "assigned"), "assigned");
     assert_eq!(scope("staff", "team"), "team");
     assert!(!user("staff", "assigned").has_team_scope());

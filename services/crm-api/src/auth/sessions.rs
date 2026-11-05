@@ -62,3 +62,21 @@ pub async fn revoke_all(
         .await?;
     Ok(())
 }
+
+/// When each listed account last used a session it still holds (UTC, ISO 8601), for
+/// Blaqks One's members list; accounts with no session are left out. Times only, never
+/// devices or tokens.
+pub async fn last_seen(
+    transaction: &mut Transaction<'_, Postgres>,
+    members: &[Uuid],
+) -> ApiResult<Vec<(Uuid, String)>> {
+    sqlx::query_as(
+        "SELECT user_id,to_char(max(last_seen_at) AT TIME ZONE 'UTC',\
+         'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') FROM crm_sessions WHERE user_id=ANY($1) \
+         GROUP BY user_id",
+    )
+    .bind(members)
+    .fetch_all(&mut **transaction)
+    .await
+    .map_err(Into::into)
+}

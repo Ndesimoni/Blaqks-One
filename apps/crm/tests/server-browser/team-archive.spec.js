@@ -9,13 +9,13 @@ import {
 } from './team-helpers.js';
 import { expectSuspended, openMemberActions, teamCard } from './team-status-helpers.js';
 import { textContrast } from '../browser/helpers/contrast.js';
-import { openName } from './record-open.js';
 
-test('Super Admin deletes an Admin into a read-only archive with their team and all records', async ({
+test('Blaqks One archives an Admin with their team; the records stay kept and unread (BO1a)', async ({
   page,
   browser,
 }, testInfo) => {
-  test.setTimeout(60000);
+  // Six screenshots and two signed-out sessions; slower runners need the same time as team-admin-status.
+  test.setTimeout(120000);
   await signIn(page, 'owner');
   await openTeam(page);
   const form = await startInvitation(page, 'archive-admin', true);
@@ -33,9 +33,10 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     const staffActions = await openMemberActions(admin.page, 'Browser archive-staff');
     await expect(staffActions.getByRole('button', { name: /Delete account/ })).toHaveCount(0);
     await staffActions.getByRole('button', { name: 'Close account actions' }).click();
+    // Admins review their own archived staff (BO1a).
     const adminStatus = admin.page.getByLabel('Account status');
-    await expect(adminStatus.locator('option')).toHaveCount(5);
-    await expect(adminStatus.locator('option[value="archived"]')).toHaveCount(0);
+    await expect(adminStatus.locator('option')).toHaveCount(6);
+    await expect(adminStatus.locator('option[value="archived"]')).toHaveCount(1);
     await closeInvitation(page);
     await page.reload();
     await page.getByLabel('Search team').fill('Browser archive-admin');
@@ -103,30 +104,11 @@ test('Super Admin deletes an Admin into a read-only archive with their team and 
     await page.getByLabel('Account status').selectOption('archived');
     await expect(card).toContainText('Archived · Sign-in blocked');
     await expect(card.getByRole('button')).toHaveCount(0);
-    await card.getByRole('link', { name: 'View archived records' }).click();
-    await expect(page.getByText('ARCHIVED WORKSPACE · READ-ONLY', { exact: true })).toBeVisible();
-    await expect(page.getByText('Archived company client', { exact: true })).toBeVisible();
-    await expect(
-      page.getByRole('banner').getByRole('button', { name: 'Create', exact: true }),
-    ).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Import saved records' })).toHaveCount(0);
-    await page.getByRole('button', { name: openName('ARCHIVED-BROWSER-CLIENT') }).click();
-    const details = page.getByRole('dialog');
-    await expect(details.getByRole('button', { name: /Edit record|Delete/ })).toHaveCount(0);
-    await details.getByRole('button', { name: 'Close', exact: true }).click();
-    await page.goto(`/#/team-access?workspace=${identity.user.id}`);
-    await expect(teamCard(page, 'Browser archive-staff')).toContainText(
-      'Archived · Sign-in blocked',
-    );
-    const frozenStatus = page.getByLabel('Account status');
-    await expect(frozenStatus).toBeDisabled();
-    await expect(frozenStatus).toHaveValue('archived');
-    await expect(frozenStatus.locator('option')).toHaveText([/^Archived \(\d+\)$/]);
-    await expect(
-      page.getByRole('button', {
-        name: /Invite teammate|Renew invitation|Restore account|Edit Browser/,
-      }),
-    ).toHaveCount(0);
+    // Blaqks One never opens the archived company: no link, no switching, no records.
+    await expect(card.getByRole('link')).toHaveCount(0);
+    await page.goto(`/#/clients?workspace=${identity.user.id}`);
+    await expect(page.getByRole('heading', { name: /^You don't have access to / })).toBeVisible();
+    await expect(page.getByText('Archived company client', { exact: true })).toHaveCount(0);
   } finally {
     await staff?.context.close();
     await admin.context.close();

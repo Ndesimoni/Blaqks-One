@@ -80,7 +80,7 @@ test('concurrent activation creates one active account and cannot replace its ch
   assert.equal(members.value.members.filter((member) => member.id === invited.member.id).length, 1);
 });
 
-test('Super Admin can invite an Admin with a separate workspace and that Admin can invite only staff', async () => {
+test('Blaqks One invites an Admin with a separate workspace and that Admin invites only staff', async () => {
   const superAdmin = await login('owner');
   const invited = await invite(superAdmin, 'new-team-admin', {
     accountRole: 'admin',
@@ -96,10 +96,44 @@ test('Super Admin can invite an Admin with a separate workspace and that Admin c
   const staff = await activate(colleague);
   assert.equal(staff.user.workspaceId, admin.user.id);
   assert.equal(staff.user.permissions.properties, true);
-  const catalog = await superAdmin.request(`/workspaces/${admin.user.id}/team`);
-  assert.equal(catalog.status, 200);
-  assert.ok(catalog.value.members.some((member) => member.id === staff.user.id));
+  // Blaqks One sees the company's people on Companies, never through its team (BO1a).
+  assert.equal((await superAdmin.request(`/workspaces/${admin.user.id}/team`)).status, 403);
+  const people = await superAdmin.request(`/platform/companies/${admin.user.id}/members`);
+  assert.ok(people.value.members.some((member) => member.id === staff.user.id));
   const all = await superAdmin.request('/workspaces');
-  assert.ok(all.value.workspaces.some((workspace) => workspace.id === admin.user.id));
-  assert.ok(!all.value.workspaces.some((workspace) => workspace.id === staff.user.id));
+  assert.deepEqual(
+    all.value.workspaces.map((workspace) => workspace.id),
+    ['super-admin-workspace'],
+  );
+});
+
+test('the organisation takes no staff invitations; Admin invitations stay (T11)', async () => {
+  const superAdmin = await login('owner');
+  const before = query(`SELECT count(*) FROM crm_users WHERE role='staff'`);
+  const refused = await superAdmin.request(`${teamPath(superAdmin)}/invitations`, {
+    method: 'POST',
+    body: {
+      name: 'Synthetic organisation staff',
+      email: 'organisation-staff@team-fixture.test',
+      phone: '+971501234567',
+      positions: ['receptionist'],
+    },
+  });
+  assert.equal(refused.status, 403);
+  assert.equal(query(`SELECT count(*) FROM crm_users WHERE role='staff'`), before);
+  const staffRole = await superAdmin.request(`${teamPath(superAdmin)}/invitations`, {
+    method: 'POST',
+    body: {
+      name: 'Synthetic organisation staff',
+      email: 'organisation-staff@team-fixture.test',
+      phone: '+971501234567',
+      accountRole: 'staff',
+    },
+  });
+  assert.equal(staffRole.status, 403);
+  const admin = await invite(superAdmin, 'organisation-admin-ok', {
+    accountRole: 'admin',
+    positions: [],
+  });
+  assert.equal(admin.member.roleId, 'admin');
 });

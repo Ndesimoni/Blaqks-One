@@ -26,6 +26,10 @@ pub async fn update(
     let mut transaction = pool.begin().await?;
     workspaces::lock(&mut transaction, workspace).await?;
     access::lock_owner(&mut transaction, owner).await?;
+    // Only Blaqks One acts on a team it does not own (BO1a item 8): re-read it live here.
+    if actor != owner {
+        workspaces::platform::operator(&mut transaction, actor).await?;
+    }
     let home = update_channels::home(&mut transaction, workspace, id, manages_admin).await?;
     let target = sqlx::query_scalar::<_, Uuid>(
         "SELECT id FROM crm_users WHERE id=$1 AND deleted_at IS NULL AND \

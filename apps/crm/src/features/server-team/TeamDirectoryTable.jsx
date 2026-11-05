@@ -34,7 +34,7 @@ export function TeamDirectoryTable({ members, roles, owner, archived, actions, o
                   <TeamMemberStatus member={member} />
                 </td>
                 <td>
-                  <TeamMemberWorkspace member={member} owner={owner} archived={archived} />
+                  <TeamMemberWorkspace member={member} owner={owner} />
                 </td>
                 <td className="team-directory-actions-cell">
                   <TeamMemberActions

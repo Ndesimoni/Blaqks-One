@@ -31,7 +31,7 @@ async fn begin(
     if let Some(workspace) = workspace {
         access::owner(&mut tx, workspace, session.user.id).await?;
     } else {
-        access::operator(&mut tx, session.user.id).await?;
+        workspaces::platform::operator(&mut tx, session.user.id).await?;
     }
     Ok(tx)
 }

@@ -58,13 +58,13 @@ fn staff_flags_need_the_module_and_team_view_needs_team_scope() {
 }
 
 #[test]
-fn roles_are_an_allowlist_and_the_super_admin_only_views() {
+fn roles_are_an_allowlist_and_blaqks_one_has_no_finance() {
     let admin = user("admin", "assigned", false, json!({})).finance_access();
     assert_eq!(admin.scope, FinanceScope::Team);
     assert!(admin.manage && admin.approve && admin.create && admin.assign);
-    let platform = user("super-admin", "assigned", false, json!({})).finance_access();
-    assert_eq!(platform.scope, FinanceScope::Team);
-    assert!(platform.team_view && !platform.manage && !platform.approve && !platform.create);
+    let platform = user("super-admin", "team", true, all()).finance_access();
+    assert_eq!(platform.scope, FinanceScope::None);
+    assert!(!platform.team_view && !platform.manage && !platform.approve && !platform.create);
     assert!(!platform.edit && !platform.assign);
     for role in ["viewer", "", "Admin", "STAFF"] {
         let odd = user(role, "team", true, all()).finance_access();
@@ -74,8 +74,8 @@ fn roles_are_an_allowlist_and_the_super_admin_only_views() {
     let profile = serde_json::to_value(platform).unwrap();
     assert_eq!(
         profile,
-        json!({"scope":"team","create":false,"edit":false,"assign":false,
-            "approve":false,"teamView":true,"manage":false})
+        json!({"scope":"none","create":false,"edit":false,"assign":false,
+            "approve":false,"teamView":false,"manage":false})
     );
 }
 

@@ -73,7 +73,7 @@ test('account status dropdown reports scoped counts and Clear filters restores d
   expect(errors).toEqual([]);
 });
 
-test('Admins cannot choose archived accounts in the status dropdown', async ({ page }) => {
+test('Admins choose their own archived staff in the status dropdown (BO1a)', async ({ page }) => {
   await signIn(page, 'admin-a');
   await openTeam(page);
   const { status } = filterControls(page);
@@ -84,8 +84,8 @@ test('Admins cannot choose archived accounts in the status dropdown', async ({ p
     /^Suspended \(\d+\)$/,
     /^Pending invite \(\d+\)$/,
     /^Cancelled invite \(\d+\)$/,
+    /^Archived \(\d+\)$/,
   ]);
-  await expect(status.locator('option[value="archived"]')).toHaveCount(0);
 });
 
 test('filter panel stays compact without page overflow on narrow screens', async ({ page }) => {

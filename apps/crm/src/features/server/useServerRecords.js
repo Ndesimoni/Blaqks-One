@@ -8,10 +8,10 @@ import { keptBadge } from './keptRecords.js';
  * `references`, `taskClients`, `listingViewings`, `dealLinks`). Nothing here is written to
  * browser storage.
  */
-export function useServerRecords(api, workspaceId) {
+export function useServerRecords(api, workspaceId, enabled = true) {
   const [entries, setEntries] = useState({});
   const [projections, setProjections] = useState(emptyProjections);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const install = useCallback(({ entries: next, ...rest }) => {
@@ -19,6 +19,8 @@ export function useServerRecords(api, workspaceId) {
     setProjections(rest);
   }, []);
   useEffect(() => {
+    // Blaqks One reads no company records (BO1): nothing is requested at all.
+    if (!enabled) return undefined;
     const controller = new AbortController();
     setEntries({});
     setProjections(emptyProjections);
@@ -36,14 +38,15 @@ export function useServerRecords(api, workspaceId) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [api, workspaceId, attempt, install]);
+  }, [api, workspaceId, attempt, install, enabled]);
   const retry = useCallback(() => setAttempt((previous) => previous + 1), []);
   /** Quietly replaces entries and projections, e.g. after a hand-off or `entry: null`. */
   const refresh = useCallback(async () => {
+    if (!enabled) return { entries: {}, ...emptyProjections };
     const parsed = readServerRecords(await api.records(workspaceId));
     install(parsed);
     return parsed;
-  }, [api, workspaceId, install]);
+  }, [api, workspaceId, install, enabled]);
   const data = useMemo(() => serverWorkspaceData(entries), [entries]);
   const referenceFor = useCallback(
     (collection, id) => linkReference(projections, collection, id),

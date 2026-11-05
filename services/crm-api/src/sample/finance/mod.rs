@@ -40,7 +40,7 @@ impl Seeded {
 const LINKED_LOG: (&str, &str) = ("LG-S01", "DL-S01");
 
 /// Call after the sample records and staff, under the workspace lock with the sample
-/// source set. The organisation workspace has no finance writer, so it gets none.
+/// source set. Blaqks One's organisation holds no CRM (BO1a item 13), so it is refused.
 pub async fn seed(
     tx: &mut Transaction<'_, Postgres>,
     target: &Target,
@@ -48,8 +48,7 @@ pub async fn seed(
 ) -> Outcome<Seeded> {
     let mut seeded = Seeded::default();
     if target.workspace == ORGANISATION {
-        seeded.note("Finance samples are added to Admin team workspaces only.");
-        return Ok(seeded);
+        return Err(super::target::NO_ORGANISATION.into());
     }
     let workspace = target.workspace.as_str();
     let admin = gate::relock(tx, workspace, target.owner, Need::Manage)

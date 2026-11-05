@@ -86,7 +86,7 @@ test('each caller reads only the targets their access allows', async () => {
   const all = await seen(admin);
   assert.equal(all.keys.length, 7);
   assert.equal(all.canEdit, true);
-  assert.deepEqual(await seen(owner), { keys: all.keys, canEdit: false });
+  assert.equal((await get(owner)).status, 403, 'Blaqks One reads no company targets');
   const mine = (session, ...metrics) => metrics.map((m) => `${session.user.id}:${m}`);
   assert.deepEqual((await seen(agent)).keys, mine(agent, 'enquiries', 'fees').sort());
   assert.deepEqual((await seen(lead)).keys, mine(lead, 'viewings'), 'no finance: no fees');

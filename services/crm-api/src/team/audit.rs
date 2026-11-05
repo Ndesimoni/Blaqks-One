@@ -42,8 +42,9 @@ struct Row {
     at: String,
 }
 
-/// One page of team events for the activity feed, newest first. Only Admins and the
-/// Super Admin (re-read live) see team events; anyone else gets an empty page.
+/// One page of team events for the activity feed, newest first. Only Admins and, for its
+/// own organisation, Blaqks One (re-read live) see team events; anyone else gets an
+/// empty page.
 pub async fn page(
     transaction: &mut Transaction<'_, Postgres>,
     window: &Window,

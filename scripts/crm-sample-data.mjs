@@ -1,7 +1,9 @@
 /**
  * Thin wrapper for the local sample-data commands:
- *   npm run crm:sample-data [-- --no-staff] [-- --organisation]       (seed-sample)
- *   npm run crm:clear-sample [-- --include-edited] [-- --organisation] (clear-sample)
+ *   npm run crm:sample-data [-- --no-staff]          (seed-sample)
+ *   npm run crm:clear-sample [-- --include-edited]   (clear-sample)
+ * Sample data goes into a company Admin's workspace only; the Blaqks One organisation is
+ * refused (BO1a).
  * The binary asks for the Admin email (or reads CRM_SAMPLE_ADMIN_EMAIL), shows the
  * database, workspace and Admin, asks to confirm, then prompts for an optional staff
  * password. It refuses outside the local configuration and on an unmarked database.

@@ -27,7 +27,7 @@ export function TeamMemberCard({ member, roles, owner, archived, onEdit, actions
         <div>
           <dt>Workspace</dt>
           <dd>
-            <TeamMemberWorkspace member={member} owner={owner} archived={archived} />
+            <TeamMemberWorkspace member={member} owner={owner} />
           </dd>
         </div>
       </dl>

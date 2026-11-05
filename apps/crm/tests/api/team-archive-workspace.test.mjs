@@ -37,10 +37,13 @@ test('Admin archival freezes the entire team and workspace without losing compan
   assert.equal(review.recordCount, 3);
   const result = await archive(owner, owner, review);
   assert.equal(result.status, 200, JSON.stringify(result.value));
-  const directory = await owner.request('/workspaces');
-  assert.equal(
-    directory.value.workspaces.find((item) => item.id === admin.user.id).status,
-    'archived',
+  // Blaqks One sees the company as archived on Companies, never its records (BO1a, T4).
+  const companies = (await owner.request('/platform/companies')).value.companies;
+  assert.equal(companies.find((item) => item.id === admin.user.id).status, 'archived');
+  assert.ok(
+    !(await owner.request('/workspaces')).value.workspaces.some(
+      (item) => item.id === admin.user.id,
+    ),
   );
   assert.equal((await admin.request('/auth/session')).status, 401);
   assert.equal((await staff.request('/auth/session')).status, 401);
@@ -51,28 +54,20 @@ test('Admin archival freezes the entire team and workspace without losing compan
       401,
     );
   }
-  const records = await owner.request(recordsPath(admin));
-  assert.equal(records.status, 200);
+  assert.equal((await owner.request(recordsPath(admin))).status, 403);
   for (const [collection, entry] of [
     ['Contacts', contact],
     ['Properties', property],
     ['Clients', client],
   ]) {
-    assert.deepEqual(records.value.records[collection][0], entry);
+    const kept = query(`SELECT version FROM crm_records WHERE id='${entry.id}'`);
+    assert.equal(Number(kept), entry.version, 'the record is kept unchanged');
     const path = recordsPath(admin, collection, entry.id);
-    assert.equal(
-      (
-        await owner.request(path, {
-          method: 'PATCH',
-          body: { version: entry.version, record: entry.record },
-        })
-      ).status,
-      403,
-    );
-    assert.equal(
-      (await owner.request(path, { method: 'DELETE', body: { version: entry.version } })).status,
-      403,
-    );
+    for (const options of [
+      { method: 'PATCH', body: { version: entry.version, record: entry.record } },
+      { method: 'DELETE', body: { version: entry.version } },
+    ])
+      assert.equal((await owner.request(path, options)).status, 403);
   }
   assert.equal(
     (
@@ -83,8 +78,15 @@ test('Admin archival freezes the entire team and workspace without losing compan
     ).status,
     403,
   );
-  assert.equal((await owner.request(`${teamPath(admin)}?archived=true`)).value.members.length, 2);
-  assert.equal((await owner.request(teamPath(admin))).value.members.length, 0);
+  assert.equal((await owner.request(`${teamPath(admin)}?archived=true`)).status, 403);
+  assert.equal((await owner.request(teamPath(admin))).status, 403);
+  const archivedAdmins = (await owner.request(`${teamPath(owner)}?archived=true`)).value.members;
+  assert.ok(archivedAdmins.some((item) => item.id === admin.user.id));
+  const people = (await owner.request(`/platform/companies/${admin.user.id}/members`)).value;
+  assert.deepEqual(
+    people.members.map((item) => item.status),
+    ['archived', 'archived', 'archived'],
+  );
   assert.equal(
     (
       await owner.request(`${teamPath(admin)}/invitations`, {
@@ -107,11 +109,16 @@ test('Admin archival freezes the entire team and workspace without losing compan
       })
     ).status >= 400,
   );
-  // The archived feed stays readable by the Super Admin only (team-activity-design.md).
-  const feed = (kind) => owner.request(`/workspaces/${admin.user.id}/activity?kind=${kind}`);
-  assert.equal((await feed('record')).value.activity.length, 3);
-  const team = (await feed('team')).value.activity;
-  assert.equal(team.filter((item) => item.action === 'archived').length, 3);
+  // The archived company's feed stays kept and unread, Blaqks One included.
+  for (const kind of ['record', 'team'])
+    assert.equal(
+      (await owner.request(`/workspaces/${admin.user.id}/activity?kind=${kind}`)).status,
+      403,
+    );
+  assert.equal(
+    query(`SELECT count(*) FROM crm_activity WHERE workspace_id='${admin.user.id}'`),
+    '3',
+  );
   assert.equal(
     query(
       `SELECT count(*) FROM crm_users WHERE (id='${admin.user.id}' OR owner_id='${admin.user.id}') AND deleted_at IS NOT NULL AND NOT active`,

@@ -42,9 +42,13 @@ test('workspace scope blocks forged paths, record IDs and cross-owner contact li
     own.value.workspaces.map((entry) => entry.id),
     [adminA.user.id],
   );
-  const all = await owner.request('/workspaces');
-  assert.ok(all.value.workspaces.some((entry) => entry.id === 'super-admin-workspace'));
-  assert.equal((await owner.request(recordsPath(adminB))).status, 200);
+  // Blaqks One lists only its own organisation and opens no company (BO1a, T1).
+  const platform = await owner.request('/workspaces');
+  assert.deepEqual(
+    platform.value.workspaces.map((entry) => [entry.id, entry.name]),
+    [['super-admin-workspace', 'Blaqks One']],
+  );
+  assert.equal((await owner.request(recordsPath(adminB))).status, 403);
   assert.equal((await adminA.request('/workspaces/super-admin-workspace/records')).status, 403);
 });
 

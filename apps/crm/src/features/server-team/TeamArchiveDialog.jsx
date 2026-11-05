@@ -54,7 +54,7 @@ export function TeamArchiveDialog({ workspaceId, member, onClose, onArchived }) 
               </dl>
               <p>
                 This account will leave the current account list. Existing sessions and invitation
-                links will end immediately. Archived data is read-only for the Super Admin.
+                links will end immediately. Archived data is kept and stays read-only.
               </p>
               <p>
                 {reviewed.roleId === 'admin'

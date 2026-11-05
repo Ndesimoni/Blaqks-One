@@ -1,22 +1,6 @@
-.connected-shell .connected-workspace-picker {
-  margin-left: auto;
-  min-width: 180px;
-  max-width: 320px;
-}
-.connected-shell .connected-workspace-picker select {
-  min-height: 44px;
-}
 .connected-shell .main-footer {
   flex-wrap: wrap;
   gap: 12px;
-}
-@media (max-width: 650px) {
-  .connected-shell .connected-workspace-picker {
-    margin-left: 0;
-    min-width: 0;
-    width: 100%;
-    max-width: none;
-  }
 }
 .connected-shell .top-left {
   min-inline-size: 0;
@@ -40,16 +24,9 @@
   min-block-size: 0;
   padding: 0;
 }
-.main-area.is-full-height .workspace-banner {
-  flex: 0 0 auto;
-  margin-block-end: 12px;
-}
 /* Phones: the conversation runs edge to edge, as in messenger apps. */
 @media (max-width: 899px) {
   :root[data-theme] .main-area.is-full-height > .main-content {
     padding: 0;
-  }
-  .main-area.is-full-height .workspace-banner {
-    margin: 12px;
   }
 }

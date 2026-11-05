@@ -18,6 +18,8 @@ export async function signIn(page, account = 'admin-a') {
   await expect(
     page.getByRole('heading', { level: 1, name: /^Good (morning|afternoon|evening)/ }),
   ).toBeVisible();
+  // Blaqks One has no CRM (BO1a): its tests start from the start page.
+  if (account === 'owner') return;
   await page.goto('/#/clients');
   await expect(page.getByRole('heading', { level: 1, name: 'Clients', exact: true })).toBeVisible();
   await expect(

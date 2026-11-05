@@ -30,17 +30,14 @@ test('preview dates are dates only; free text in them never shows', async () => 
   assert.doesNotMatch(JSON.stringify(result.value), /zqx|971501112233/i);
 });
 
-test('the Super Admin sees no agreement details of hand-overs in the finance overview', async () => {
+test('Blaqks One reads no hand-overs or agreements in a company finance overview', async () => {
   const { admin, agent, second, approver, owner } = teams;
   const client = await heldClient(agent);
   const deal = await createDeal(agent, client);
   const handover = await offered(admin, agent, deal, second, { approver });
   const team = (await overview(admin)).handovers.find((row) => row.id === handover.id);
   assert.ok(team.agreementId && team.expiresAt && team.approval, JSON.stringify(team));
-  const seen = (await overview(owner, admin)).handovers.find((row) => row.id === handover.id);
-  assert.ok(seen, 'the Super Admin still sees the request itself');
-  assert.deepEqual(
-    { agreementId: seen.agreementId, expiresAt: seen.expiresAt, approval: seen.approval },
-    { agreementId: null, expiresAt: null, approval: null },
-  );
+  const refused = await owner.request(`/workspaces/${admin.user.workspaceId}/finance`);
+  assert.equal(refused.status, 403);
+  assert.doesNotMatch(JSON.stringify(refused.value), new RegExp(handover.id));
 });

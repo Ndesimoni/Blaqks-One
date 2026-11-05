@@ -28,8 +28,8 @@ export function TeamAccessFields({ form, change, roles, member, busy }) {
         <section>
           <h3>Admin access</h3>
           <p>
-            This person manages their own workspace and team. They cannot create another Admin or
-            Super Admin.
+            This person manages their own workspace and team. They cannot create another Admin or a
+            Blaqks One account.
           </p>
         </section>
         {member && <TeamAccountStatus form={form} change={change} member={member} busy={busy} />}

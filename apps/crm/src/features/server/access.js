@@ -14,8 +14,26 @@ export function hasTeamFeatures(user) {
 /** Managers read the whole workspace's Team activity; staff read My activity (their own). */
 export const activityLabel = (user) => (hasTeamFeatures(user) ? 'Team activity' : 'My activity');
 
+/**
+ * Blaqks One's pages (BO1, owner 2026-11-05): the platform screens, inviting company Admins
+ * and the account. Never a company's records, messages, websites or marketplace.
+ */
+const PLATFORM_ROUTES = [
+  'Start',
+  'Workspaces',
+  'Marketplace applications',
+  'Platform website',
+  'Platform companies',
+  'Team & access',
+  // The organisation's own team feed (Admin invitations and archives), not a company's.
+  'Team activity',
+  'My profile',
+  'Sign-in and security',
+];
+
 export function canOpenSection(user, route) {
   if (!['admin', 'super-admin', 'staff'].includes(user?.roleId)) return false;
+  if (user.roleId === 'super-admin') return PLATFORM_ROUTES.includes(route);
   // Website routes keep the gates of the tabs they replaced (website/websiteRoutes.js).
   const website = websiteGate(user, route, () => canOpenSection(user, 'Clients'));
   if (website !== null) return website;

@@ -86,8 +86,8 @@ test('company metadata and events survive archival and already-authenticated que
   assert.equal((await writing).status, 403);
   assert.equal(snapshot(workspace), before);
   assert.equal((await putCompany(admin, companyBody({ version: 2 }))).status, 401);
-  const directory = await owner.request('/workspaces');
-  const row = directory.value.workspaces.find((item) => item.id === workspace);
+  const directory = await owner.request('/platform/companies');
+  const row = directory.value.companies.find((item) => item.id === workspace);
   assert.equal(row.status, 'archived');
   assert.equal(row.name, 'Synthetic Company');
   assert.equal((await owner.request(`/workspaces/${workspace}/company`)).status, 403);

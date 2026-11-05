@@ -1,17 +1,14 @@
 import React from 'react';
-import { SUPER_WORKSPACE_ID } from '../../config/workspaces.js';
 import { ImportCounts } from './ImportCounts.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { ImportOriginFields } from './ImportOriginFields.jsx';
 
-export function ImportSourceFields({ draft, workspaces, busy }) {
-  const { source, mode, targetId } = draft;
-  const organisation =
-    source?.sourceWorkspaceId === SUPER_WORKSPACE_ID ||
-    (mode === 'backup' && draft.backupOwner === SUPER_WORKSPACE_ID);
-  const destinations = workspaces.filter(({ id }) =>
-    organisation ? id === SUPER_WORKSPACE_ID : id !== SUPER_WORKSPACE_ID,
-  );
+/**
+ * Where the records come from, and for a personal set the active member of the Admin's own
+ * company who receives them (BO1a); the organisation set goes to the Admin.
+ */
+export function ImportSourceFields({ draft, members, busy }) {
+  const { source, mode } = draft;
   return (
     <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
       <div className="tabs" role="group" aria-label="Import source type">
@@ -36,25 +33,26 @@ export function ImportSourceFields({ draft, workspaces, busy }) {
         <div className="form-grid">
           <ImportOriginFields draft={draft} />
           <div className="field span-all">
-            <label htmlFor="import-target">Destination workspace</label>
+            <label htmlFor="import-member">Give the records to</label>
             <select
-              id="import-target"
-              value={targetId}
-              disabled={
-                organisation || (mode === 'backup' && draft.backupOwner === SUPER_WORKSPACE_ID)
-              }
-              onChange={(event) => draft.setDestination(event.target.value)}
+              id="import-member"
+              value={draft.personal ? draft.memberId : ''}
+              disabled={!draft.personal}
+              onChange={(event) => draft.setMemberId(event.target.value)}
             >
-              <option value="">Choose destination workspace</option>
-              {destinations.map((workspace) => (
-                <option key={workspace.id} value={workspace.id}>
-                  {workspace.name}
-                </option>
-              ))}
+              {!draft.personal && <option value="">You, the company Admin</option>}
+              {draft.personal &&
+                members.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
             </select>
-            {organisation && (
-              <p>Organisation records stay in the Super Admin’s organisation workspace.</p>
-            )}
+            <p>
+              {draft.personal
+                ? 'The records join your company and are held by this member.'
+                : 'Organisation records join your company and are held by you.'}
+            </p>
           </div>
           <div className="field span-all">
             <label className="import-photo-choice">

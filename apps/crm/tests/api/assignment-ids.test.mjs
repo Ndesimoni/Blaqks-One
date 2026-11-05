@@ -4,8 +4,8 @@ import { query } from './helpers.mjs';
 import { commit, emptyRecords, planned } from './import-helpers.mjs';
 import { add, assignmentTeams, history, list, workspacePath } from './assignment-helpers.mjs';
 
-let owner, admin, other, one;
-before(async () => ({ owner, admin, other, one } = await assignmentTeams('issued')));
+let admin, other, one;
+before(async () => ({ admin, other, one } = await assignmentTeams('issued')));
 
 const post = (session, collection, record) =>
   session.request(workspacePath(session, collection), { method: 'POST', body: { record } });
@@ -55,7 +55,7 @@ test('twenty parallel creates receive distinct sequential IDs', async () => {
   assert.equal((await list(one)).records['Follow-ups'].length, 20);
 });
 
-test('imported parents go to the destination owner with import history', async () => {
+test('imported parents go to the importing Admin with import history', async () => {
   const records = {
     ...emptyRecords(),
     Clients: [{ client_id: 'IMP-ASSIGN-CL' }],
@@ -64,8 +64,8 @@ test('imported parents go to the destination owner with import history', async (
     'Follow-ups': [{ activity_id: 'IMP-ASSIGN-FU' }],
     Viewings: [{ viewing_id: 'IMP-ASSIGN-VW', client_id: 'IMP-ASSIGN-CL' }],
   };
-  const plan = await planned(owner, other.user.id, records);
-  assert.equal((await commit(owner, other.user.id, plan.token)).status, 200);
+  const plan = await planned(other, other.user.id, records);
+  assert.equal((await commit(other, other.user.id, plan.token)).status, 200);
   const rows = query(
     `SELECT string_agg(legacy_id || '=' || coalesce(assignee_id::text,'-'), ',' ORDER BY legacy_id)
      FROM crm_records WHERE workspace_id='${other.user.id}' AND legacy_id LIKE 'IMP-ASSIGN-%'`,
@@ -78,5 +78,5 @@ test('imported parents go to the destination owner with import history', async (
   const client = query(
     `SELECT id FROM crm_records WHERE workspace_id='${holder}' AND legacy_id='IMP-ASSIGN-CL'`,
   );
-  assert.equal(history(client), `import:${holder}:${owner.user.id}`);
+  assert.equal(history(client), `import:${holder}:${other.user.id}`);
 });

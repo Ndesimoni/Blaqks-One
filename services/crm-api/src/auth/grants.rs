@@ -45,11 +45,11 @@ pub struct RecordActions {
 }
 
 impl UserRow {
-    /// Role allowlist: Admins and the Super Admin hold every action by role, staff hold
-    /// their stored grants normalised against modules and scope, any other role nothing.
+    /// Role allowlist: Admins hold every action by role, staff hold their stored grants
+    /// normalised against modules and scope, Blaqks One and any other role nothing.
     pub fn effective_actions(&self) -> Actions {
         match self.role.as_str() {
-            "admin" | "super-admin" => Actions::full(&self.role),
+            "admin" => Actions::full(&self.role),
             "staff" => Actions::from_stored(&self.actions.0)
                 .normalised(&self.permissions.0, self.has_team_scope()),
             _ => Actions::default(),

@@ -28,13 +28,6 @@ pub async fn owner(
     }
     Ok(live)
 }
-pub async fn operator(tx: &mut Transaction<'_, Postgres>, actor: Uuid) -> ApiResult<()> {
-    let live = workspaces::member(tx, workspaces::ORGANISATION, actor).await?;
-    if live.role != "super-admin" {
-        return Err(ApiError::forbidden());
-    }
-    Ok(())
-}
 pub async fn live_profile_member(
     tx: &mut Transaction<'_, Postgres>,
     workspace: &str,

@@ -46,9 +46,7 @@ test('hand-over counts follow each step for the receiver, the approver and the A
     zero,
     zero,
   ]);
-  const superAdmin = await waiting(owner, admin);
-  if (superAdmin.status === 200) assert.deepEqual(superAdmin.value, zero, 'Super Admin');
-  else assert.equal(superAdmin.status, 403, JSON.stringify(superAdmin.value));
+  assert.equal((await waiting(owner, admin)).status, 403, 'Blaqks One');
   assert.equal((await waiting(desk, admin)).status, 403, 'no finance module');
   const version = await shownVersion(approver, admin, checked);
   const approved = await decide(approver, admin, checked, 'approve-acceptance', version);
@@ -105,6 +103,6 @@ test('agreement counts show offers from other companies to whoever must answer',
   assert.deepEqual(await answers(theirStaff, admin, other), [0, 1, 0]);
   for (const workspace of [owner.user.workspaceId, admin.user.workspaceId]) {
     const refused = await agreementsWaiting(owner, workspace);
-    assert.equal(refused.status, 403, `Super Admin in ${workspace}`);
+    assert.equal(refused.status, 403, `Blaqks One in ${workspace}`);
   }
 });

@@ -24,7 +24,8 @@ import './team-agreements.css';
 export function ServerTeamPage({ owner }) {
   const { user } = useSession();
   const { refreshDirectory } = useContext(WorkspaceScopeContext);
-  const canReviewArchive = user.roleId === 'super-admin';
+  // Admins review their own archived staff; Blaqks One its archived company Admins (BO1a).
+  const canReviewArchive = user.roleId === 'super-admin' || user.roleId === 'admin';
   const frozen = owner.status === 'archived';
   const team = useServerTeam(owner.id, canReviewArchive);
   const directory = useTeamDirectory(team, frozen);

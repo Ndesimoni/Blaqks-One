@@ -35,11 +35,10 @@ pub struct UserRow {
 }
 
 impl UserRow {
-    /// Admins and the Super Admin see their whole team by role; staff need the grant.
-    /// An allowlist, so any other role string falls back to assigned-only.
+    /// Admins see their whole team by role; staff need the grant. An allowlist, so Blaqks
+    /// One (which holds no CRM, BO1a item 11) and any other role fall back to assigned-only.
     pub fn has_team_scope(&self) -> bool {
-        matches!(self.role.as_str(), "admin" | "super-admin")
-            || (self.role == "staff" && self.record_scope == "team")
+        self.role == "admin" || (self.role == "staff" && self.record_scope == "team")
     }
 
     pub fn record_scope_label(&self) -> &'static str {
@@ -50,10 +49,11 @@ impl UserRow {
         }
     }
 
-    /// Role allowlist: any role other than the three known ones gets nothing.
+    /// Role allowlist: Admins hold every module and staff their grants; Blaqks One and any
+    /// other role get nothing (BO1a item 11).
     pub fn effective_permissions(&self) -> Permissions {
         match self.role.as_str() {
-            "admin" | "super-admin" => Permissions::full(),
+            "admin" => Permissions::full(),
             "staff" => self.permissions.0.clone(),
             _ => Permissions::default(),
         }
@@ -108,7 +108,7 @@ impl From<UserRow> for Profile {
             phone: user.phone,
             phone_verified: false,
             role: match user.role.as_str() {
-                "super-admin" => "Super Admin",
+                "super-admin" => "Blaqks One",
                 "admin" => "Admin",
                 _ => "Staff",
             }

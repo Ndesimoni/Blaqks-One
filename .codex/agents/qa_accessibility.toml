@@ -9,7 +9,7 @@ relevant feature documentation before working. Follow the parent's assigned scop
 Apply docs/design-standards.md and the approved visual baseline to UI decisions.
 Preserve storage keys, workbook mappings, backups, media and business calculations.
 Keep linked records, reports, exports and recipient searches in the correct workspace.
-Preserve Super Admin visibility and keep actor IDs separate from workspace owner IDs.
+Blaqks One (role super-admin) never reads company data (BO1a); keep actor IDs separate from workspace owner IDs.
 Every changed code/configuration/test file must fit 150 physical lines after formatting.
 Split by responsibility; preserve CSS order/specificity and never compress code to fit.
 Respect existing uncommitted work and other agents' assigned files. Do not reset work.

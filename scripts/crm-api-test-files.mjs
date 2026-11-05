@@ -16,6 +16,7 @@ export const apiTestFiles = [
   'apps/crm/tests/api/referral-legacy.test.mjs',
   'apps/crm/tests/api/link-messages.test.mjs',
   'apps/crm/tests/api/scope.test.mjs',
+  'apps/crm/tests/api/blaqks-one-lockdown.test.mjs',
   'apps/crm/tests/api/validation.test.mjs',
   'apps/crm/tests/api/import-access.test.mjs',
   'apps/crm/tests/api/import-validation.test.mjs',

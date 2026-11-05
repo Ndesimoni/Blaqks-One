@@ -23,7 +23,7 @@ export function savedImportSources(user, getStorage = () => globalThis.localStor
   for (let index = 0; index < storage.length; index++) {
     const key = storage.key(index);
     if (key === STORAGE)
-      sources.push({ key, id: SUPER_WORKSPACE_ID, label: 'Super Admin organisation workspace' });
+      sources.push({ key, id: SUPER_WORKSPACE_ID, label: 'Company records (organisation set)' });
     else if (key?.startsWith(`${STORAGE}:workspace:`)) {
       let id;
       try {

@@ -16,11 +16,13 @@ import {
 test('download creates a complete backup and import keeps linked records, demo photos and browser source', async ({
   page,
 }, testInfo) => {
-  await signIn(page, 'owner');
+  // Imports belong to the company Admin, into their own company (BO1a).
+  await signIn(page);
   const data = migrationData('BACKUP');
   const original = await savedSource(page, data);
   await openImport(page);
-  await expect(page.getByLabel('Destination workspace')).toBeDisabled();
+  // The organisation set joins the Admin's own company, held by the Admin.
+  await expect(page.getByLabel('Give the records to')).toBeDisabled();
   await expect(page.getByText('Other records stay in your source')).toBeVisible();
   const [download] = await Promise.all([
     page.waitForEvent('download'),
@@ -68,7 +70,7 @@ test('download creates a complete backup and import keeps linked records, demo p
 test('full backup files preserve uploaded media and corrupt files never enable import', async ({
   page,
 }) => {
-  await signIn(page, 'owner');
+  await signIn(page);
   await page.getByRole('button', { name: 'Import saved records', exact: true }).click();
   await page.getByRole('button', { name: 'Full JSON backup', exact: true }).click();
   const input = page.getByLabel('Full JSON backup', { exact: true });

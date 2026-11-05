@@ -53,6 +53,10 @@ pub async fn create(
     identity_rules::identity(&request.name, &request.email, &request.phone)?;
     let role = request.account_role.as_deref().unwrap_or("staff");
     let (permissions, actions) = match role {
+        // The organisation has no staff (BO1a item 7, owner answer Q5).
+        "staff" if workspace == crate::workspaces::ORGANISATION => {
+            return Err(ApiError::forbidden())
+        }
         "staff" => {
             let defaults = catalogue::defaults(&request.positions)
                 .ok_or_else(|| ApiError::invalid("Select valid, distinct team positions."))?;

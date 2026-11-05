@@ -11,7 +11,6 @@ import { ServerDialogs } from './ServerDialogs.jsx';
 import { ServerHeader } from './ServerHeader.jsx';
 import { ServerNavigation } from './ServerNavigation.jsx';
 import { ServerPageActions } from './ServerPageActions.jsx';
-import { ServerWorkspaceBanner } from './ServerWorkspaceBanner.jsx';
 import { SectionTabs } from './products/SectionTabs.jsx';
 import { useProductNav } from './products/useProductNav.js';
 import { ChatStrip } from './products/messenger/ChatStrip.jsx';
@@ -20,7 +19,7 @@ import { MessengerPanel } from './products/messenger/MessengerPanel.jsx';
 import { BottomBar } from './products/BottomBar.jsx';
 import { visibleProducts } from './products/productModel.js';
 
-export function ServerShell({ owner, workspaces }) {
+export function ServerShell({ owner }) {
   const { user } = useSession();
   const { t } = useI18n();
   const { route, navigate } = useNavigation();
@@ -76,10 +75,7 @@ export function ServerShell({ owner, workspaces }) {
           />
           <SectionTabs user={user} section={nav.here?.section} route={route} navigate={navigate} />
           <main className="main-content" id="main-content" tabIndex={-1}>
-            <ServerWorkspaceBanner owner={owner} workspaces={workspaces} platform={platform} />
-            {!fullHeight && route !== 'Start' && (
-              <ServerPageActions owner={owner} workspaces={workspaces} />
-            )}
+            {!fullHeight && route !== 'Start' && <ServerPageActions owner={owner} />}
             <ServerContent owner={owner} />
             {!fullHeight && (
               <footer className="main-footer">

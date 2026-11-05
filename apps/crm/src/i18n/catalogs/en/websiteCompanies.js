@@ -3,7 +3,7 @@ export default {
   title: 'Company websites',
   intro:
     'Turn each company’s website and listing eligibility on or off after checking it outside the CRM.',
-  restricted: 'Only the platform Super Admin can manage company websites.',
+  restricted: 'Only the Blaqks One team can manage company websites.',
   loading: 'Loading company websites…',
   loadError: 'Company websites could not be loaded. Try again.',
   retry: 'Retry',

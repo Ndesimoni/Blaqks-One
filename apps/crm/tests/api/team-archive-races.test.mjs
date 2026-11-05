@@ -43,7 +43,8 @@ test('already authenticated writes queued behind Admin and staff archival are re
   const staff = await activate(person);
   for (const [actor, scope, member, id] of [
     [staff, admin, await findMember(admin, staff.user.id), 'ARCHIVE-STAFF-RACE'],
-    [owner, owner, await findMember(owner, admin.user.id), 'ARCHIVE-ADMIN-RACE'],
+    // The Admin's own write, queued behind their archive (Blaqks One writes nothing, BO1a).
+    [admin, owner, await findMember(owner, admin.user.id), 'ARCHIVE-ADMIN-RACE'],
   ]) {
     const review = await archiveReview(owner, scope, member);
     const release = await holdWorkspaceLock(admin.user.id);

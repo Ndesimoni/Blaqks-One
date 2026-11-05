@@ -6,5 +6,7 @@ pub mod catalogue;
 pub mod invitations;
 pub mod members;
 pub mod platform;
+pub mod platform_controls;
+pub mod platform_members;
 pub mod positions;
 pub mod routes;

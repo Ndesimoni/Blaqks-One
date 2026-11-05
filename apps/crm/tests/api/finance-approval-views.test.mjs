@@ -70,7 +70,7 @@ test('the own view lists own rows with exact keys and never names other approver
 });
 
 test('team views list every row with approvers, pending counts and approved expenses', async () => {
-  for (const name of ['admin', 'approver', 'viewer', 'owner']) {
+  for (const name of ['admin', 'approver', 'viewer']) {
     const view = await overview(teams[name], teams.admin);
     assert.equal(view.payments.length, 3, name);
     assert.equal(view.expenses.length, 3, name);
@@ -82,9 +82,9 @@ test('team views list every row with approvers, pending counts and approved expe
     assert.equal(view.teamTotals.expensesApprovedFils, 450_000, name);
     assert.equal(view.teamTotals.receivedFils, 1_000_000, name);
   }
-  const owner = await overview(teams.owner, teams.admin);
-  const allowed = owner.payments.find((row) => row.id === waiting.id).allowed;
-  assert.deepEqual(allowed, { edit: false, approve: false, reject: false, void: false });
+  // Blaqks One reads no company finance (BO1a).
+  const platform = await teams.owner.request(`/workspaces/${teams.admin.user.workspaceId}/finance`);
+  assert.equal(platform.status, 403);
   const viewer = (await overview(teams.viewer, teams.admin)).payments.find(
     (r) => r.id === waiting.id,
   );
