@@ -151,3 +151,5 @@ Owner answers of 2026-11-05: people on the Blaqks One team get **a role as a sta
 - **Stays out:** any company's clients, contacts, properties, deals, payments, team chat or inbox, and switching into a company.
 - **In-app SMS** needs an SMS provider (Twilio SMS), not connected yet; it follows the WhatsApp sending work (W1b).
 - Order: BO1b team, BO1e clients, BO1f messaging, then BO1c help requests.
+
+**Account control (owner, 2026-11-05).** Everyone, the Owner included, changes their own password and signs out unknown devices on Settings → My profile → Sign-in and security. The Owner controls a team member's account without ever seeing their password: **Sign out everywhere** revokes all their sessions at once, and **Reset password** makes the old password unusable, signs them out and gives the Owner a one-time link to share, on which the member chooses a new password. Suspend, archive and the activity log stay as they are. No "view as" or signing in as a member (the owner chose the recommended option; both blur who did what).
