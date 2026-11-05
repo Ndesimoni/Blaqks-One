@@ -44,6 +44,7 @@ pub mod matching;
 pub mod me;
 pub mod notices;
 pub mod photo;
+pub mod platform_counts;
 pub mod profile;
 pub mod profile_read;
 pub mod profile_view;

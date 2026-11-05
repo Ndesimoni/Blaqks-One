@@ -3,6 +3,7 @@
  * their shares must total exactly 100%. Amounts come from cumulative shares so every fils is
  * allocated once and the final milestone absorbs rounding. Nothing is saved to a property.
  */
+import { csvLine } from '../csv.js';
 import { hu } from './commission.js';
 import { bpToPercent, filsToAed, isBp, isFils } from './money.js';
 
@@ -47,10 +48,6 @@ export function offPlanSchedule({ priceFils, milestones }) {
 }
 
 const HEADERS = ['Milestone', 'Date', 'Share %', 'Amount (AED)'];
-// A leading = + - @ or control character would run as a spreadsheet formula.
-const inert = (text) => (/^[=+\-@\t\r]/.test(text) ? `'${text}` : text);
-const cell = (value) => `"${inert(String(value)).replaceAll('"', '""')}"`;
-const line = (values) => values.map(cell).join(',');
 
 /**
  * A readable CSV schedule. `headers` and `totalLabel` let the screen export translated
@@ -58,7 +55,7 @@ const line = (values) => values.map(cell).join(',');
  */
 export function scheduleCsv(milestones, headers = HEADERS, totalLabel = 'Total') {
   const rows = milestones.map((milestone) =>
-    line([
+    csvLine([
       milestone.label,
       milestone.date,
       bpToPercent(milestone.percentBp),
@@ -66,5 +63,5 @@ export function scheduleCsv(milestones, headers = HEADERS, totalLabel = 'Total')
     ]),
   );
   const total = milestones.reduce((sum, milestone) => sum + milestone.amountFils, 0);
-  return [line(headers), ...rows, line([totalLabel, '', '100', filsToAed(total)])].join('\n');
+  return [csvLine(headers), ...rows, csvLine([totalLabel, '', '100', filsToAed(total)])].join('\n');
 }

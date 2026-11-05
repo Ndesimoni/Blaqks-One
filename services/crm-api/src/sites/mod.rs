@@ -4,6 +4,7 @@ pub mod draft_handlers;
 pub mod drafts;
 pub mod handlers;
 pub mod model;
+pub mod platform_counts;
 pub mod profile_rules;
 pub mod profiles;
 pub mod read;

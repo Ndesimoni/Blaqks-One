@@ -6,6 +6,7 @@ use crate::{
         session, sessions, throttle,
     },
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     state::AppState,
     workspaces,
 };
@@ -118,6 +119,9 @@ pub async fn accept(
     let label = device::label(agent);
     let issued = sessions::issue(&mut transaction, invitation.user_id, label.as_deref()).await?;
     let profile = accounts::live_profile(&mut transaction, invitation.user_id).await?;
+    let (team, role) = (profile.workspace_id.as_str(), Some(profile.role.as_str()));
+    let accepted = Event::usage(names::INVITATION_ACCEPTED, team, role, Source::Crm);
+    platform_metrics::record(&mut transaction, accepted).await?;
     let company = workspaces::company::get(&mut *transaction, &profile.workspace_id).await?;
     transaction.commit().await?;
     let mut response_headers = HeaderMap::new();

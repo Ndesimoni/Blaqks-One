@@ -72,6 +72,7 @@ test('Blaqks One keeps its platform pages and opens nothing of a company (BO1a)'
   const owner = { roleId: 'super-admin', permissions: full };
   const groups = connectedGroups(owner);
   assert.deepEqual(itemsOf(groups, 'platform'), [
+    'Platform dashboard',
     'Workspaces',
     'Marketplace applications',
     'Platform website',

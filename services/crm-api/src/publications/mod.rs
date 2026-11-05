@@ -1,6 +1,7 @@
 pub mod capacity;
 pub mod handlers;
 pub mod model;
+pub mod platform_counts;
 pub mod prepare;
 pub mod read;
 pub mod routes;

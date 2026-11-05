@@ -57,6 +57,7 @@ export const productList = [
     key: 'platform',
     icon: 'building',
     sections: [
+      { key: 'platformDashboard', routes: ['Platform dashboard'] },
       { key: 'workspaces', routes: ['Workspaces'], group: 'platform' },
       { key: 'applications', routes: ['Marketplace applications'] },
       { key: 'platformWebsite', routes: ['Platform website', 'Platform companies'] },

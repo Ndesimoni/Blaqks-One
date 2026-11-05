@@ -32,6 +32,7 @@ mod payment_read;
 mod payment_routes;
 mod payment_store;
 mod payment_write;
+pub mod platform_counts;
 mod recipients;
 mod respond;
 mod revise;

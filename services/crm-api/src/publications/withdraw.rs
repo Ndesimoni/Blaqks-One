@@ -2,6 +2,7 @@ use super::model::{Publication, WithdrawInput, COLUMNS};
 use crate::{
     auth::{protection, session::Session},
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     sites,
     state::AppState,
     workspaces,
@@ -62,6 +63,13 @@ pub async fn withdraw(
         row.record,
     )
     .await?;
+    let event = Event::usage(
+        names::LISTING_WITHDRAWN,
+        &workspace,
+        Some(&live.role),
+        Source::Crm,
+    );
+    platform_metrics::record(&mut tx, event).await?;
     tx.commit().await?;
     Ok(Json(
         json!({"publication":{"id":id,"version":row.version+1,"state":"withdrawn"}}),

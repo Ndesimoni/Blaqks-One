@@ -26,6 +26,7 @@ pub mod market_requirements_read;
 pub mod media_links;
 pub mod mutation;
 pub mod outside_facts;
+pub mod platform_counts;
 pub mod projections;
 pub mod publication_source;
 pub mod publication_source_fields;

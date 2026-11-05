@@ -14,6 +14,7 @@ import { ServerTeamChat } from './chat/ServerTeamChat.jsx';
 import { ServerWebsiteProfile } from './profile/ServerWebsiteProfile.jsx';
 import { MarketplaceChats } from './marketChats/MarketplaceChats.jsx';
 import { marketView } from './marketplace/marketViews.js';
+import { PlatformDashboard } from './platformDashboard/PlatformDashboard.jsx';
 import { ServerWorkspaces } from './platformCompanies/ServerWorkspaces.jsx';
 
 /**
@@ -22,6 +23,7 @@ import { ServerWorkspaces } from './platformCompanies/ServerWorkspaces.jsx';
  */
 export function independentScreen(route, user) {
   if (route === 'Workspaces' && user?.roleId === 'super-admin') return <ServerWorkspaces />;
+  if (route === 'Platform dashboard') return <PlatformDashboard />;
   if (route === 'My profile') return <ServerProfile />;
   if (route === 'Website profile') return <ServerWebsiteProfile />;
   if (route === 'Sign-in and security') return <ServerSecurity />;

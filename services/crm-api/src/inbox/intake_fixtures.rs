@@ -62,9 +62,15 @@ impl Company {
     /// A record created by the owner through the records module; returns its server ID.
     pub async fn record(&self, collection: &str, payload: Value) -> (Uuid, String) {
         let record = validate_new(collection, payload).unwrap();
-        let saved = create(&self.pool, self.owner, &self.workspace, collection, record)
-            .await
-            .unwrap();
+        let saved = create(
+            &self.pool,
+            (self.owner, "admin"),
+            &self.workspace,
+            collection,
+            record,
+        )
+        .await
+        .unwrap();
         let key = if collection == "Properties" {
             "property_id"
         } else {

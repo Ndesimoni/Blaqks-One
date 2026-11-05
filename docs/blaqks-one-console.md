@@ -62,6 +62,8 @@ The internal role name `super-admin` stays in the database for the Owner (renami
 - **Website visitors** are counted by the website relay as page views and daily unique visitors per site, with a daily rotating salt instead of storing IP addresses or cookies.
 - **Keeping it useful:** events are kept for at least five years; the dashboard reads daily summaries built from them; the Owner can download the summaries as CSV. New events are added in the module that owns the action, with a test that no personal or business content is stored.
 
+**BO1d built 2026-11-05** (`feature/blaqks-one-console`): the `platform_metrics` module in its own PostgreSQL schema (migration 0090: the immutable event log, money events without the company enforced by a check constraint, and daily active users), `platform_counts` functions in each owning module, `GET /api/crm/platform/metrics`, and Platform → Dashboard with the period switch, Download CSV, tiles, twelve-month trends, the figure panels and the company usage grid. Website visitors and the median days to a first earned deal show "Not tracked yet" until their data exists. Verified: the full API suite (687 passed; the restart check now signs in as a company Admin), the dashboard browser spec in both themes at 390 and 1280, unit and Rust tests, Clippy and the repository checks.
+
 ## 4. Security notes for review
 
 - The lockdown is the dangerous part: the review lists every `super-admin` special case (about 35 sites in `services/crm-api/src`) and the test plan proves refusal for records, finance, activity, sites, media, imports and record history from the Blaqks One account, while companies' own access is unchanged.
@@ -103,3 +105,15 @@ The security engineer's review traced every path from the Blaqks One account (`s
 19. "Super Admin" reads "Blaqks One" everywhere outside the frozen Arabic catalogue; AGENTS.md, data migration, private workspaces and the security engineer's instructions are updated with the new rules.
 
 **Tests (apps/crm/tests/api)**: T1 the workspace list is the caller's own; T2 every data family refuses Blaqks One on a company workspace; T3 the same on the organisation, leftover rows untouched; T4 an archived company stays unreadable; T5 regression refusals for the already-refused families; T6 platform powers still work (companies, seat limits, inviting Admins, archiving agents and Admins, marketplace decisions, platform website); T7 the Blaqks One profile has no CRM permissions; T8 companies' own access and isolation unchanged; T9 imports by the owning Admin with the member checks and refusals; T10 the Admin's archived list is their own staff only; T11 no staff invitation into the organisation, and the sample command refuses it.
+
+## 7. BO1d metrics contract (2026-11-05)
+
+`GET /api/crm/platform/metrics?period=30d|12m|all` (default `30d`), for the live Blaqks One account only (`workspaces::platform::operator`); everyone else gets 403. Money is in integer fils; `null` means not tracked yet and is shown as such, never as 0. The organisation workspace and the Blaqks One account are excluded from every company and user figure.
+
+- `totals`: companies (total, active, archived); users (total, admins, staff, pending); active users (today, last 7 and 30 days, from `crm_user_active_days`); records (total and by collection); websites (company sites live, general site live, listings live); deals (recorded, open, earned, lost, earned and open value, commission earned, average earned value); payments (recorded, approved total); between brokers (agreements, accepted, completed, value, commission shared); marketplace (companies approved, members, requests posted, answers); outside agents; website visitors.
+- `inPeriod`: new companies and users, records added, enquiries and those that became leads, viewings, deals earned and their value, property sold through the websites (count and value), agreements between brokers and their value, emails, WhatsApp and team chat messages sent, sign-ins.
+- `trends`: twelve months, oldest first: new companies, new users, monthly active users, records added, enquiries, deals earned and their value, agreements between brokers.
+- `growth`: companies active this month and last month, companies that stopped (no member active for 30 days), median days from a company's sign-up to its first earned deal.
+- `companies`: per company name, Admin, joined, status, seats used and limit, active users in 30 days, last active, number of records. No money.
+
+The screen is Platform → Dashboard (`/platform-dashboard`): the period switch and Download CSV, figure tiles, twelve-month trend panels, panels for websites, deals and money, transactions between brokers, marketplace, growth, messages and activity and users outside the companies, then the per-company usage grid.

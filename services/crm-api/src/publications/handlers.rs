@@ -3,6 +3,7 @@ use crate::{
     auth::{protection, session::Session},
     error::ApiResult,
     media,
+    platform_metrics::{self, names, Event, Source},
     state::AppState,
     workspaces,
 };
@@ -42,6 +43,9 @@ pub async fn publish(
         workspaces::lock(&mut tx, &workspace).await?;
         let prepared = prepare::read(&mut tx, &workspace, session.user.id, &input).await?;
         let published = store::publish(&mut tx, &workspace, &prepared, &input, &copies).await?;
+        let role = Some(session.user.role.as_str());
+        let event = Event::usage(names::LISTING_PUBLISHED, &workspace, role, Source::Crm);
+        platform_metrics::record(&mut tx, event).await?;
         tx.commit().await?;
         Ok(Json(published))
     }

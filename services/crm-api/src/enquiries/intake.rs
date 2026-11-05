@@ -1,6 +1,7 @@
 use super::{input, recipient, store};
 use crate::{
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     records::website_lead,
     sites,
     state::AppState,
@@ -81,6 +82,14 @@ pub async fn submit(
     )
     .await?;
     let receipt = store::save(&mut tx, &site, &key, &hash, &body, &current, &lead).await?;
+    let source = match site.kind.as_str() {
+        "platform" => Source::GeneralSite,
+        _ => Source::CompanySite,
+    };
+    for name in [names::ENQUIRY_RECEIVED, names::ENQUIRY_LEAD_CREATED] {
+        let event = Event::usage(name, &current.workspace, None, source);
+        platform_metrics::record(&mut tx, event).await?;
+    }
     tx.commit().await?;
     Ok((
         StatusCode::CREATED,

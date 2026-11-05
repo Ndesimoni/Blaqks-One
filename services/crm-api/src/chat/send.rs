@@ -9,6 +9,7 @@ use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     media::owned,
+    platform_metrics::{self, names, Event, Source},
     state::AppState,
     workspaces,
 };
@@ -84,6 +85,13 @@ pub async fn send(
         mentions::store(&mut tx, room.id, message.id, &mentioned).await?;
     }
     super::read::mark(&mut tx, room.id, user.id).await?;
+    let sent = Event::usage(
+        names::CHAT_MESSAGE_SENT,
+        &workspace,
+        Some(&user.role),
+        Source::Crm,
+    );
+    platform_metrics::record(&mut tx, sent).await?;
     let view = super::view::views(&mut tx, std::slice::from_ref(&message)).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(json!({ "message": view[0] }))))

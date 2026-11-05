@@ -1,5 +1,9 @@
 use super::{audit, target, visibility::RecordScope};
-use crate::{auth::grants::Action, error::ApiResult};
+use crate::{
+    auth::grants::Action,
+    error::ApiResult,
+    platform_metrics::{self, names, Event, Source},
+};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -46,6 +50,9 @@ pub async fn delete(
         id,
     )
     .await?;
+    let name = names::record_event(names::RECORD_DELETED, collection);
+    let event = Event::usage(&name, workspace, Some(&user.role), Source::Crm);
+    platform_metrics::record(&mut transaction, event).await?;
     transaction.commit().await?;
     Ok(())
 }

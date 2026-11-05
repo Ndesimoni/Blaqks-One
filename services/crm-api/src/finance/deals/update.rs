@@ -17,6 +17,7 @@ use crate::{
         events::{self, Action, Entity},
         wire,
     },
+    platform_metrics::{self, names, Event, Source},
     records::audit,
     state::AppState,
 };
@@ -112,6 +113,10 @@ pub async fn update(
         )
         .await?;
         audit::append(&mut tx, actor, ws, "updated", "Deals", deal_id).await?;
+        if input.stage == "Lost" && before.stage != "Lost" {
+            let lost = Event::usage(names::DEAL_LOST, ws, Some(&live.role), Source::Crm);
+            platform_metrics::record(&mut tx, lost).await?;
+        }
     }
     let entry = list::entry(&mut tx, &workspace, &live, id).await?;
     tx.commit().await?;

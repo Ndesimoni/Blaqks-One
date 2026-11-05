@@ -16,6 +16,7 @@ pub mod marketplace;
 pub mod media;
 pub mod outbox;
 pub mod performance;
+pub mod platform_metrics;
 pub mod publications;
 pub mod records;
 pub mod routes;

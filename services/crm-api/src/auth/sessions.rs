@@ -33,6 +33,8 @@ pub async fn issue(
     .bind(device)
     .execute(&mut **transaction)
     .await?;
+    // Signing in is using the CRM today (BO1d daily active users).
+    crate::platform_metrics::active_days::mark(&mut **transaction, user).await?;
     Ok(issued)
 }
 
@@ -76,6 +78,21 @@ pub async fn last_seen(
          GROUP BY user_id",
     )
     .bind(members)
+    .fetch_all(&mut **transaction)
+    .await
+    .map_err(Into::into)
+}
+
+/// When someone in each company last used a session that is still stored (UTC, ISO 8601),
+/// for Blaqks One's dashboard; workspaces with no stored session are left out. Times only.
+pub async fn last_seen_by_workspace(
+    transaction: &mut Transaction<'_, Postgres>,
+) -> ApiResult<Vec<(String, String)>> {
+    sqlx::query_as(
+        "SELECT p.workspace_id,to_char(max(s.last_seen_at) AT TIME ZONE 'UTC',\
+         'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"') FROM crm_sessions s \
+         JOIN crm_all_user_profiles p ON p.id=s.user_id GROUP BY p.workspace_id",
+    )
     .fetch_all(&mut **transaction)
     .await
     .map_err(Into::into)

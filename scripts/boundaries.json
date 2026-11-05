@@ -59,6 +59,7 @@
       "crm_agreement_applies_to_earned"
     ],
     "imports": ["crm_import_plans"],
+    "platform_metrics": ["crm_platform_events", "crm_user_active_days"],
     "performance": ["crm_targets", "crm_targets_identity_fixed"],
     "marketplace": [
       "crm_market_applications",

@@ -14,6 +14,7 @@ use super::{
 use crate::{
     auth::{profile::UserRow, session::Session},
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     records::audit,
     state::AppState,
 };
@@ -112,6 +113,8 @@ pub async fn apply(
         let after = funds.vat(row.amount_fils, false)?;
         changes = changes.pair("vatFils", before, after);
         vat = Some(after);
+        let approved = Event::money(names::PAYMENT_APPROVED, row.amount_fils, Source::Crm);
+        platform_metrics::record(tx, approved).await?;
     }
     if verdict == Verdict::Void {
         admin::admin_path(tx, live).await?;

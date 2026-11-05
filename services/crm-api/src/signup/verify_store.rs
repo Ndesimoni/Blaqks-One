@@ -10,6 +10,7 @@ use crate::{
         consents, sessions,
     },
     error::ApiResult,
+    platform_metrics::{self, names, Event, Source},
     workspaces::{self, company::AccountType},
 };
 use sqlx::{Postgres, Transaction};
@@ -122,6 +123,13 @@ pub async fn verify(
         .bind(&pending.email)
         .execute(&mut *transaction)
         .await?;
+    let finished = Event::usage(
+        names::SIGN_UP_FINISHED,
+        &workspace,
+        Some("admin"),
+        Source::Crm,
+    );
+    platform_metrics::record(&mut transaction, finished).await?;
     let issued = sessions::issue(&mut transaction, user, device).await?;
     let profile = accounts::live_profile(&mut transaction, user).await?;
     let company = workspaces::company::get(&mut *transaction, &workspace).await?;

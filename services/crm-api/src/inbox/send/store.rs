@@ -1,6 +1,10 @@
 //! SQL for queuing outbound email: the conversation's sending details and the queued
 //! message with its outbox job, committed together (design §5).
-use crate::{error::ApiResult, outbox::enqueue::enqueue};
+use crate::{
+    error::ApiResult,
+    outbox::enqueue::enqueue,
+    platform_metrics::{self, names, Event, Source},
+};
 use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
@@ -53,14 +57,20 @@ pub async fn queue(
     .fetch_one(&mut **tx)
     .await?;
     enqueue(tx, workspace, "inbox", id).await?;
-    sqlx::query(
+    let channel: String = sqlx::query_scalar(
         "UPDATE inbox.crm_inbox_conversations SET last_activity_at=now(),updated_at=now(), \
            state=CASE WHEN state IN ('new','open','resolved') THEN 'waiting' ELSE state END, \
-           version=version+1 WHERE id=$1",
+           version=version+1 WHERE id=$1 RETURNING channel",
     )
     .bind(conversation)
-    .execute(&mut **tx)
+    .fetch_one(&mut **tx)
     .await?;
+    let name = match channel.as_str() {
+        "email" => names::EMAIL_SENT,
+        "whatsapp" => names::WHATSAPP_SENT,
+        _ => names::MESSAGE_SENT,
+    };
+    platform_metrics::record(tx, Event::usage(name, workspace, None, Source::Crm)).await?;
     Ok(serde_json::json!({
         "id": id, "direction": "outbound", "status": "queued", "body": body,
         "hasMedia": false, "authorId": author, "failureReason": null, "at": at,

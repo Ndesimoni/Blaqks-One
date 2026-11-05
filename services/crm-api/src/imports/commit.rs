@@ -10,6 +10,7 @@ use crate::{
         session::{self, Session},
     },
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     state::AppState,
     workspaces,
 };
@@ -98,6 +99,9 @@ pub async fn commit(
         .bind(token_hash)
         .execute(&mut *transaction)
         .await?;
+    let role = Some(session.user.role.as_str());
+    let event = Event::usage(names::IMPORT_COMMITTED, &workspace, role, Source::Crm);
+    platform_metrics::record(&mut transaction, event).await?;
     transaction.commit().await?;
     Ok(Json(result))
 }

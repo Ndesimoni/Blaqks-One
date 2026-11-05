@@ -16,6 +16,7 @@ use crate::{
         events::{self, Action, Changes, Entity},
         wire,
     },
+    platform_metrics::{self, names, Event, Source},
     records::audit,
     state::AppState,
 };
@@ -103,5 +104,7 @@ pub async fn apply(
     )
     .await?;
     audit::append(tx, actor, workspace, "earned", "Deals", deal.id).await?;
+    let earned = Event::money(names::DEAL_EARNED, deal.agreed_value_fils, Source::Crm);
+    platform_metrics::record(tx, earned).await?;
     Ok(warnings)
 }

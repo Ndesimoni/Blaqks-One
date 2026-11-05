@@ -20,6 +20,7 @@ export const activityLabel = (user) => (hasTeamFeatures(user) ? 'Team activity' 
  */
 const PLATFORM_ROUTES = [
   'Start',
+  'Platform dashboard',
   'Workspaces',
   'Marketplace applications',
   'Platform website',

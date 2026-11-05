@@ -5,6 +5,7 @@ use super::{events, gate, limits, request, request_view, requests, requests_clos
 use crate::{
     auth::{session::Session, throttle},
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     records::market_requirements,
     state::AppState,
 };
@@ -75,6 +76,14 @@ pub async fn post(
     let row = requests::insert(&mut tx, &workspace, user.id, &valid).await?;
     sources::insert(&mut tx, row.id, &workspace, client).await?;
     events::append(&mut tx, &workspace, user.id, user.id, "request_posted").await?;
+    let role = Some(user.role.as_str());
+    let posted = Event::usage(
+        names::MARKET_REQUEST_POSTED,
+        &workspace,
+        role,
+        Source::Marketplace,
+    );
+    platform_metrics::record(&mut tx, posted).await?;
     tx.commit().await?;
     Ok((
         StatusCode::CREATED,

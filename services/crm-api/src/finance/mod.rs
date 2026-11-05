@@ -25,6 +25,7 @@ pub mod history;
 pub mod ids;
 pub mod overview;
 pub mod payments;
+pub mod platform_counts;
 pub mod receipts;
 pub mod references;
 pub mod routes;

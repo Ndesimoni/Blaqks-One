@@ -3,6 +3,7 @@ use super::{answer_access, gate, matching};
 use crate::{
     auth::profile::UserRow,
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
 };
 use serde_json::{Map, Value};
 use sqlx::{Postgres, Transaction};
@@ -61,6 +62,13 @@ impl Context {
         sqlx::query("INSERT INTO marketplace.crm_market_answers(id,request_id,workspace_id,member_id,source_record_id,share_id,slot,checklist) VALUES($1,$2,$3,$4,$5,$6,$7,$8)")
             .bind(Uuid::new_v4()).bind(self.request).bind(&user.workspace_id).bind(user.id).bind(self.record).bind(share).bind(slot).bind(checklist).execute(&mut **tx).await?;
         super::events::append(tx, &user.workspace_id, user.id, user.id, "answer_sent").await?;
-        Ok(())
+        let (workspace, role) = (&user.workspace_id, Some(user.role.as_str()));
+        let sent = Event::usage(
+            names::MARKET_ANSWER_SENT,
+            workspace,
+            role,
+            Source::Marketplace,
+        );
+        platform_metrics::record(tx, sent).await
     }
 }

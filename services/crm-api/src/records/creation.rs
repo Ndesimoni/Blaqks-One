@@ -10,6 +10,7 @@ use super::{
 use crate::{
     auth::grants::Action,
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
 };
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
@@ -25,9 +26,10 @@ pub fn ensure_id_allowed(scope: RecordScope, record: &ValidatedRecord) -> ApiRes
 }
 
 /// Steps 4, ID allocation, then 8–10 of a create (contract §4); the handler has run 1–3.
+/// `role` is the caller's role, for the platform event log (BO1d).
 pub async fn create(
     pool: &PgPool,
-    actor: Uuid,
+    (actor, role): (Uuid, &str),
     workspace: &str,
     collection: &str,
     record: ValidatedRecord,
@@ -35,6 +37,9 @@ pub async fn create(
     let mut transaction = pool.begin().await?;
     crate::workspaces::lock(&mut transaction, workspace).await?;
     let saved = create_in(&mut transaction, actor, workspace, collection, record).await?;
+    let name = names::record_event(names::RECORD_CREATED, collection);
+    let event = Event::usage(&name, workspace, Some(role), Source::Crm);
+    platform_metrics::record(&mut transaction, event).await?;
     transaction.commit().await?;
     Ok(saved)
 }

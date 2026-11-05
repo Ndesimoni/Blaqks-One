@@ -11,6 +11,7 @@ export const settingsRoutes = [
   { name: 'My profile', path: '/my-profile' },
   { name: 'Channels', path: '/channels' },
   { name: 'Workspaces', path: '/workspaces' },
+  { name: 'Platform dashboard', path: '/platform-dashboard' },
   { name: 'Team activity', path: '/team-activity' },
   { name: 'Marketplace applications', path: '/marketplace-applications' },
 ];

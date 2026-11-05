@@ -49,6 +49,8 @@ const connectedSections = new Set([
   'Broker profile',
   'Marketplace chats',
   'Marketplace applications',
+  // `/platform/metrics`: Blaqks One's platform figures (BO1d).
+  'Platform dashboard',
 ]);
 /** Workspaces is connected for the Super Admin only, as the platform's company list. */
 export const isConnectedSection = (name, user) =>

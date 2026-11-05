@@ -51,7 +51,7 @@ async fn inline_property() -> (PgPool, String, Uuid, Uuid) {
     let payload = json!({"listing_title": "Synthetic stale listing",
         "media_photos": [{"name": "Front", "src": src}]});
     let record = validate_new("Properties", payload).unwrap();
-    let saved = create(&pool, owner, &workspace, "Properties", record)
+    let saved = create(&pool, (owner, "admin"), &workspace, "Properties", record)
         .await
         .unwrap();
     (pool, workspace, owner, saved.id)

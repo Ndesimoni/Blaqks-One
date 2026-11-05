@@ -7,13 +7,19 @@ use super::{
     ledger::{self, Response},
     store,
 };
-use crate::{auth::session::Session, error::ApiResult, state::AppState};
+use crate::{
+    auth::session::Session,
+    error::ApiResult,
+    platform_metrics::{self, names, Event, Source},
+    state::AppState,
+};
 use axum::{
     extract::{rejection::JsonRejection, Path, State},
     http::HeaderMap,
     Json,
 };
 use serde_json::{json, Value};
+use sqlx::{Postgres, Transaction};
 
 const VERSION: [&str; 1] = ["expectedVersion"];
 
@@ -47,6 +53,9 @@ async fn answer(
     ledger::respond(tx, &response).await?;
     if accepted {
         super::listings::market_release::accept(tx, id, revision.id, &revision.digest).await?;
+        if command.row.workspace_id != command.row.recipient_workspace_id {
+            money_events(tx, &revision.terms).await?;
+        }
     }
     let extra = if accepted {
         json!({ "digest": revision.digest })
@@ -54,6 +63,18 @@ async fn answer(
         json!({})
     };
     command.commit(action, version, extra).await
+}
+
+/// An agreement between two companies was accepted: the deal's value and the commission
+/// being shared go to the platform log as amounts only, never with either company (BO1d).
+async fn money_events(tx: &mut Transaction<'_, Postgres>, terms: &Value) -> ApiResult<()> {
+    let amount = |at| terms.pointer(at).and_then(Value::as_i64).unwrap_or(0);
+    let value = amount("/subject/property/askingPriceFils");
+    let value = Event::money(names::AGREEMENT_ACCEPTED, value, Source::Crm);
+    platform_metrics::record(tx, value).await?;
+    let shared = amount("/money/amountFils");
+    let shared = Event::money(names::COMMISSION_SHARED, shared, Source::Crm);
+    platform_metrics::record(tx, shared).await
 }
 
 pub async fn accept(

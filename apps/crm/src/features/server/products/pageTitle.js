@@ -13,6 +13,7 @@ const translated = {
   'My WhatsApp': 'myWhatsapp',
   Agreements: 'agreements',
   'Shared record': 'recordShares',
+  'Platform dashboard': 'platformMetrics',
 };
 
 /** Pages that render their own main heading; the top bar then names them as plain text. */

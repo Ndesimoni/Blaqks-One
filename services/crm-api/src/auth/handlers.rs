@@ -7,6 +7,7 @@ use super::{
 };
 use crate::{
     error::{ApiError, ApiResult},
+    platform_metrics::{self as metrics, names, Event, Source},
     state::AppState,
 };
 use axum::{
@@ -84,6 +85,9 @@ pub async fn login(
         .and_then(|value| value.to_str().ok());
     let label = device::label(agent);
     let issued = sessions::issue(&mut transaction, user.user.id, label.as_deref()).await?;
+    let (workspace, role) = (&live_user.workspace_id, Some(live_user.role.as_str()));
+    let signed_in = Event::usage(names::SIGN_IN, workspace, role, Source::Crm);
+    metrics::record(&mut transaction, signed_in).await?;
     let company =
         crate::workspaces::company::get(&mut *transaction, &live_user.workspace_id).await?;
     transaction.commit().await?;

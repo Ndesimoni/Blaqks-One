@@ -23,6 +23,7 @@ pub mod list;
 pub mod matching;
 pub mod normalize;
 pub mod notes;
+pub mod platform_counts;
 pub mod read;
 pub mod routes;
 pub mod rules;

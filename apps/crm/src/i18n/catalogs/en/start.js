@@ -23,7 +23,8 @@ export default {
   viewings: { one: 'upcoming viewing', other: 'upcoming viewings' },
   'about.web': 'Your company website, with its listings, team profiles and enquiries.',
   'about.market': 'Client requests from other brokers, your offers and your agreements.',
-  'about.platform': 'Companies, seat limits, marketplace applications and the Blaqks One site.',
+  'about.platform':
+    'Platform figures, companies, seat limits, marketplace applications and the Blaqks One site.',
   open: 'Open {product}',
   continue: 'Continue where you left off',
   continueAction: 'Continue',
@@ -49,7 +50,8 @@ export default {
   'tour.messages.body':
     'Client WhatsApp and email, team chat and private chats with other brokers, in one place.',
   'tour.platform.title': 'Platform',
-  'tour.platform.body': 'Companies, marketplace applications and the Blaqks One website.',
+  'tour.platform.body':
+    'Platform figures, companies, marketplace applications and the Blaqks One website.',
   'tour.settings.title': 'Settings',
   'tour.settings.body':
     'Your company details, team and access, WhatsApp and email channels, and your own profile.',

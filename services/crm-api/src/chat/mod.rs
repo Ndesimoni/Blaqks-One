@@ -12,6 +12,7 @@ mod leave;
 mod mentions;
 mod messages;
 mod participants;
+pub mod platform_counts;
 mod read;
 mod rooms;
 pub mod routes;

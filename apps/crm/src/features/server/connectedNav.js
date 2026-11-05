@@ -25,6 +25,7 @@ const extraIcons = {
   'Broker profile': 'person',
   'Marketplace chats': 'chat',
   Workspaces: 'building',
+  'Platform dashboard': 'chart',
   'Marketplace applications': 'layers',
 };
 export const navIcons = { ...sharedIcons, ...extraIcons };
@@ -75,7 +76,7 @@ export const displayGroups = [
   {
     key: 'platform',
     pinned: true,
-    items: ['Workspaces', 'Marketplace applications', 'Platform website'],
+    items: ['Platform dashboard', 'Workspaces', 'Marketplace applications', 'Platform website'],
   },
 ];
 

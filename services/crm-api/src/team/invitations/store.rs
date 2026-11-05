@@ -3,6 +3,7 @@ use crate::team::{access, account_type::seats, audit};
 use crate::{
     auth::{actions::Actions, permissions::Permissions, session},
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     workspaces,
 };
 use sqlx::PgPool;
@@ -79,6 +80,14 @@ pub async fn create(
     .fetch_one(&mut *transaction)
     .await?;
     audit::append(&mut transaction, actor, workspace, id, "invited").await?;
+    // An Admin invitation starts a new company: the event belongs to that company.
+    let team = if staff {
+        workspace.to_owned()
+    } else {
+        id.to_string()
+    };
+    let sent = Event::usage(names::INVITATION_SENT, &team, None, Source::Crm);
+    platform_metrics::record(&mut transaction, sent).await?;
     transaction.commit().await?;
     Ok(Created {
         id,

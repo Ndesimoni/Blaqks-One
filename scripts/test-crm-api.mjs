@@ -76,7 +76,8 @@ try {
       method: 'POST',
       headers: { Origin: env.CRM_APP_ORIGIN, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'owner@crm-fixture.test',
+        // A company Admin reading their own records (Blaqks One reads none, BO1a).
+        email: 'admin-a@crm-fixture.test',
         password: env.CRM_FIXTURE_PASSWORD,
       }),
     });
