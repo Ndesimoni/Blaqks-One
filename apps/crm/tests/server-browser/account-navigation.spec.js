@@ -53,17 +53,6 @@ test('Back works on every sign-up step', async ({ page }) => {
   const { requestId } = await (await started).json();
   await page.getByLabel('Code', { exact: true }).fill(codeFor(requestId));
   await expect(page).toHaveURL(/#\/sign-up\/company$/);
-  await page.getByLabel('Company name').fill('Synthetic Back Realty');
-  await page.getByLabel('Emirate').selectOption('dubai');
-  await page.getByRole('button', { name: 'Create my workspace' }).click();
-  await expect(page).toHaveURL(/#\/sign-up\/team$/);
-  // Back from the team returns to the company, kept as saved; saving again moves on.
-  await page.goBack();
-  await expect(page.getByLabel('Company name')).toHaveValue('Synthetic Back Realty');
-  await page.getByRole('button', { name: 'Create my workspace' }).click();
-  await expect(page.getByRole('heading', { name: 'Invite your team' })).toBeVisible();
-  await page.getByRole('button', { name: 'Back' }).click();
-  await expect(page).toHaveURL(/#\/sign-up\/company$/);
   // The code is used up, so Back from the company opens the new workspace.
   await page.goBack();
   await expect(page).toHaveURL(/#\/start$/);

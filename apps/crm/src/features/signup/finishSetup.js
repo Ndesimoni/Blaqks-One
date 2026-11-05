@@ -19,8 +19,7 @@ export async function finishSetup({
   try {
     const saved = await api.updateCompany(user.workspaceId, companyPayload(company, setup));
     setCompany(saved);
-    // A count, so saving again after going Back from the team step moves on again.
-    setFinished((count) => count + 1);
+    setFinished(true);
   } catch (failure) {
     setError({ key: errorKey(failure) });
   } finally {

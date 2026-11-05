@@ -1,7 +1,7 @@
 import React from 'react';
 import { useI18n } from '../../i18n/useI18n.js';
 
-const TITLES = ['stepOne', 'stepTwo', 'stepThree', 'stepFour'];
+const TITLES = ['stepOne', 'stepTwo', 'stepThree'];
 
 export function SignupProgress({ step }) {
   const { t } = useI18n();

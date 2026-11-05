@@ -10,7 +10,6 @@ import { bidiIsolate } from './signupModel.js';
 import { SignupProgress } from './SignupProgress.jsx';
 import { SignupShell } from './SignupShell.jsx';
 import { SignupState } from './SignupState.jsx';
-import { TeamStep } from './TeamStep.jsx';
 import { useSignupAddress } from './useSignupAddress.js';
 import { useSignUpFlow } from './useSignUpFlow.js';
 import { useSignupStatus } from './useSignupStatus.js';
@@ -20,9 +19,9 @@ const STEP_TITLES = ['detailsTitle', 'verifyTitle'];
 const PENDING = { enabled: true, terms: {}, privacy: {}, botCheck: null, mode: '' };
 
 /**
- * Sign-up's four steps, each its own full-screen page (owner, 2026-11-05): your details at
- * /sign-up, email verification at /sign-up/verify, the company at /sign-up/company and
- * inviting the team at /sign-up/team (useSignupAddress keeps the address and the step together).
+ * Sign-up's three steps, each its own full-screen page (owner, 2026-11-05): your details at
+ * /sign-up, email verification at /sign-up/verify and the company at /sign-up/company, then
+ * the start page and its tour (useSignupAddress keeps the address and the step together).
  */
 export function SignupPage({ api, user, onVerified, onSignOut }) {
   const { language, t } = useI18n();
@@ -42,8 +41,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
   });
   useUnsavedChanges(flow.dirty, Boolean(flow.busy), '', isSignUpPath);
   useEffect(() => heading.current?.focus(), [flow.step]);
-  const step = useSignupAddress(flow, Boolean(user));
-  if (step === 4) return <TeamStep canGoBack={createdHere} />;
+  useSignupAddress(flow);
   // The form shows at once; Continue waits for the server's sign-up settings.
   const info = status.value ?? PENDING;
   if (status.error)

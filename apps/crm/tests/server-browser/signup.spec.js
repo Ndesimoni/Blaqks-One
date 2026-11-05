@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { test, expect } from './fixtures.js';
 import { query } from '../api/helpers.mjs';
 import { codeFor, resetSignup } from '../api/signup-helpers.mjs';
+import { openPage } from './product-nav.js';
 
 const password = 'Synth3tic!Signup';
 const address = (kind) => `${kind}-${randomUUID()}@example.test`;
@@ -52,14 +53,10 @@ test('an account creates its company and opens the three-seat Team page', async 
   await page.getByLabel('Company name').fill('Synthetic Horizon Realty');
   await page.getByLabel('Emirate').selectOption('dubai');
   await page.getByRole('button', { name: 'Create my workspace' }).click();
-  // The last step offers the team: Invite colleagues opens Team & access's invitation form.
-  await expect(page.getByRole('heading', { name: 'Invite your team' })).toBeVisible();
-  await expect(page).toHaveURL(/#\/sign-up\/team$/);
-  await expect(page.getByText('Step 4 of 4 · Your team')).toBeVisible();
-  await page.getByRole('button', { name: 'Invite colleagues' }).click();
-  await expect(page).toHaveURL(/#\/team-access$/);
-  await expect(page.getByRole('dialog', { name: 'Invite teammate' })).toBeVisible();
-  await page.keyboard.press('Escape');
+  // Setting up the company opens the start page with its tour; the team is invited later.
+  await expect(page).toHaveURL(/#\/start$/);
+  await expect(page.getByRole('dialog', { name: 'Home' })).toBeVisible();
+  await page.getByRole('button', { name: 'Skip' }).click();
   await expectSession(page, email);
   expect(
     query(
@@ -69,6 +66,7 @@ test('an account creates its company and opens the three-seat Team page', async 
         `(SELECT id FROM crm_users WHERE email='${email}'))`,
     ),
   ).toBe('brokerage:Synthetic Horizon Realty:dubai:3');
+  await openPage(page, 'Team & access');
   await expect(page.getByText('Free plan', { exact: true })).toBeVisible();
   await expect(page.getByText('1 of 3 seats used', { exact: true })).toBeVisible();
 });

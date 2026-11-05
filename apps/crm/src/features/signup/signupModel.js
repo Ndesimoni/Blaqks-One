@@ -67,11 +67,14 @@ export function setupError(values) {
   return null;
 }
 
-/** Steps 1 and 3 hold unsaved input; step 2 and a finished setup do not. */
-export function isDirty({ step, finished, details, setup }) {
+/**
+ * Steps 1 and 3 hold unsaved input; step 2 and a finished setup do not. The company name starts
+ * as the person's own name (`prefill`), which is not their input until they change it.
+ */
+export function isDirty({ step, finished, details, setup, prefill = '' }) {
   if (finished) return false;
   if (step === 1) return Object.values(details).some(Boolean);
-  return step === 3 && (Boolean(setup.displayName) || Boolean(setup.emirate));
+  return step === 3 && (setup.displayName !== prefill || Boolean(setup.emirate));
 }
 
 const ERROR_KEYS = {
