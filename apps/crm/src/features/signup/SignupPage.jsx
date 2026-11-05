@@ -17,6 +17,7 @@ import { useSignupStatus } from './useSignupStatus.js';
 import { VerifyStep } from './VerifyStep.jsx';
 
 const STEP_TITLES = ['detailsTitle', 'verifyTitle'];
+const PENDING = { enabled: true, terms: {}, privacy: {}, botCheck: null, mode: '' };
 
 /**
  * Sign-up's four steps, each its own full-screen page (owner, 2026-11-05): your details at
@@ -40,13 +41,11 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
     onVerified: verified,
   });
   useUnsavedChanges(flow.dirty, Boolean(flow.busy), '', isSignUpPath);
-  useEffect(() => {
-    if (!status.loading) heading.current?.focus();
-  }, [flow.step, status.loading]);
+  useEffect(() => heading.current?.focus(), [flow.step]);
   const step = useSignupAddress(flow, Boolean(user));
   if (step === 4) return <TeamStep canGoBack={createdHere} />;
-  if (status.loading)
-    return <SignupState title={t('signup.loadingTitle')} body={t('signup.loadingBody')} loading />;
+  // The form shows at once; Continue waits for the server's sign-up settings.
+  const info = status.value ?? PENDING;
   if (status.error)
     return (
       <SignupState
@@ -56,7 +55,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
         onAction={status.retry}
       />
     );
-  if (!status.value?.enabled)
+  if (!status.loading && !info.enabled)
     return (
       <SignupState
         title={t('signup.offTitle')}
@@ -77,11 +76,11 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
   const title =
     flow.step === 3 ? t('signupSetup.brokerageTitle') : t(`signup.${STEP_TITLES[flow.step - 1]}`);
   const bot = {
-    provider: status.value.botCheck?.provider,
-    siteKey: status.value.botCheck?.siteKey,
+    provider: info.botCheck?.provider,
+    siteKey: info.botCheck?.siteKey,
     onToken: flow.setBotToken,
     resetKey: flow.botReset,
-    ready: flow.botReady,
+    ready: flow.botReady && Boolean(status.value),
   };
   return (
     <SignupShell>
@@ -101,7 +100,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
         {flow.step === 1 && (
           <DetailsStep
             values={flow.details}
-            status={status.value}
+            status={info}
             bot={{ ...bot, action: 'signup_start' }}
             error={flow.error}
             busy={flow.busy === 'start'}
@@ -125,7 +124,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
             onResend={flow.resend}
             onDifferent={flow.differentEmail}
             bot={{ ...bot, action: 'signup_resend' }}
-            mode={status.value.mode}
+            mode={info.mode}
           />
         )}
         {flow.step === 3 && (

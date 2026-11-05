@@ -5,6 +5,8 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   timeout: 60000,
+  // The tests run against the development server, which sends every CRM file separately.
+  expect: { timeout: 15_000 },
   forbidOnly: Boolean(process.env.CI),
   reporter: 'list',
   outputDir: 'test-results-server',

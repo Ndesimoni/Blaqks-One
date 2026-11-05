@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { ErrorBoundary } from '../../components/ui/ErrorBoundary.jsx';
 import { ErrorBoundaryFallback } from '../../components/ui/ErrorBoundaryFallback.jsx';
@@ -7,7 +7,8 @@ import { PreferencesContext } from '../../app/WorkspaceContext.js';
 import { useWorkspacePreferences } from '../../hooks/useWorkspacePreferences.js';
 import { adoptDubaiCalendar } from '../../lib/dates.js';
 import { ServerSession } from './ServerSession.jsx';
-import { ServerDirectory } from './ServerDirectory.jsx';
+import { BootSplash } from '../../components/layout/BootSplash.jsx';
+import { ServerDirectory } from './workspaceLoader.js';
 import './shell.css';
 import '../server-team/team.css';
 
@@ -17,7 +18,9 @@ adoptDubaiCalendar();
 function ConnectedRoot() {
   return (
     <ServerSession>
-      <ServerDirectory />
+      <Suspense fallback={<BootSplash />}>
+        <ServerDirectory />
+      </Suspense>
     </ServerSession>
   );
 }

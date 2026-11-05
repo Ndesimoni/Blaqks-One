@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
         '/api/crm': env.CRM_API_PROXY || 'http://127.0.0.1:8788',
       },
     },
-    preview: { port: 4173 },
+    // The production build served locally talks to the same API as development.
+    preview: { port: 4173, proxy: { '/api/crm': env.CRM_API_PROXY || 'http://127.0.0.1:8788' } },
   };
 });

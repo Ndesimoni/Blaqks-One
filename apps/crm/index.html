@@ -9,6 +9,15 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
+    <script>
+      // Start in the saved theme, so the first screen never flashes dark (useWorkspacePreferences).
+      try {
+        if (JSON.parse(localStorage.getItem('kws-crm-preferences'))?.theme === 'light') {
+          document.documentElement.dataset.theme = 'light';
+          document.documentElement.style.colorScheme = 'light';
+        }
+      } catch {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
