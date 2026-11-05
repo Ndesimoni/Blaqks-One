@@ -17,4 +17,29 @@ export default {
   account: 'Account menu, {name}',
   signOut: 'Sign out',
   home: 'Home',
+  'tour.take': 'Take the tour',
+  'tour.count': '{step} of {count}',
+  'tour.next': 'Next',
+  'tour.done': 'Done',
+  'tour.skip': 'Skip',
+  'tour.home.title': 'Home',
+  'tour.home.body': 'Your start page: what needs you today across every product.',
+  'tour.crm.title': 'CRM',
+  'tour.crm.body': 'Leads, clients, contacts, properties, viewings, follow-ups, deals and reports.',
+  'tour.web.title': 'Websites',
+  'tour.web.body':
+    'Your company website: publish listings, edit team profiles and answer website enquiries.',
+  'tour.market.title': 'Marketplace',
+  'tour.market.body':
+    'Post what your clients are looking for, get offers from other brokers and agree the split.',
+  'tour.messages.title': 'Messages',
+  'tour.messages.body':
+    'Client WhatsApp and email, team chat and private chats with other brokers, in one place.',
+  'tour.platform.title': 'Platform',
+  'tour.platform.body': 'Companies, marketplace applications and the Blaqks One website.',
+  'tour.settings.title': 'Settings',
+  'tour.settings.body':
+    'Your company details, team and access, WhatsApp and email channels, and your own profile.',
+  'tour.search.title': 'Search',
+  'tour.search.body': 'Find any client, contact or property from any page.',
 };

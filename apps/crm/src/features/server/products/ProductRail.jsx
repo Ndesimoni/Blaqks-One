@@ -17,6 +17,7 @@ export function ProductRail({ products, current, sidebarOpen, onOpen, home, onHo
       <button
         type="button"
         key={product.key}
+        data-tour={product.key}
         className={'rail-item' + (here ? ' active' : '')}
         aria-current={here ? 'page' : undefined}
         aria-expanded={here ? sidebarOpen : undefined}
@@ -37,6 +38,7 @@ export function ProductRail({ products, current, sidebarOpen, onOpen, home, onHo
       </div>
       <button
         type="button"
+        data-tour="home"
         className={'rail-item' + (home ? ' active' : '')}
         aria-current={home ? 'page' : undefined}
         onClick={onHome}

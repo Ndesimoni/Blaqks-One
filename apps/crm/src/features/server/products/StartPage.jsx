@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useSession } from '../../../hooks/useSession.js';
@@ -8,6 +8,8 @@ import { canOpenSection } from '../access.js';
 import { selectConnectedDashboard } from '../dashboard/dashboardModel.js';
 import { locate, productList, visibleProducts } from './productModel.js';
 import { firstName, greetingKey, lastRoute, messageLinks, startCards } from './startModel.js';
+import { StartTour } from './StartTour.jsx';
+import { useStartRequest } from './useStartRequest.js';
 import './start.css';
 
 const MESSAGE_SECTIONS = {
@@ -53,12 +55,24 @@ export function StartPage() {
   const lastPlace = last && last !== 'Start' && allowed(last) ? locate(user, last) : null;
   const name = firstName(user.name);
   const greeting = t(greetingKey(new Date().getHours()));
+  // The tour runs from Take the tour, and once on arrival from sign-up (`?start=tour`).
+  const [tour, setTour] = useState(0);
+  const askedTour = useStartRequest('tour');
+  useEffect(() => {
+    if (askedTour) setTour((value) => value + 1);
+  }, [askedTour]);
   return (
     <div className="start-page">
       <header className="start-hello">
         <h1>{name ? t('start.greeting', { greeting, name }) : greeting}</h1>
-        <p>{t('start.intro')}</p>
+        <p>
+          {t('start.intro')}{' '}
+          <button type="button" className="start-tour-link" onClick={() => setTour(tour + 1)}>
+            {t('start.tour.take')}
+          </button>
+        </p>
       </header>
+      <StartTour run={tour} />
       <div className="start-cards">
         {cards.map(({ key, actions }) => (
           <article className="panel start-card" key={key} aria-labelledby={`start-${key}`}>

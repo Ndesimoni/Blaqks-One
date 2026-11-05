@@ -52,6 +52,7 @@ export function BottomBar({ products, current, route, onOpen, onHome, onSections
     <button
       type="button"
       key={key}
+      data-tour={key}
       className={here ? 'active' : undefined}
       aria-current={here ? 'page' : undefined}
       onClick={onClick}

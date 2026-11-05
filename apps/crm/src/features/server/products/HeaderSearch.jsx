@@ -53,7 +53,7 @@ export function HeaderSearch() {
     else items[Math.min(next, items.length - 1)]?.focus();
   };
   return (
-    <div className="header-search" ref={root}>
+    <div className="header-search" ref={root} data-tour="search">
       <label className="search-box">
         <Icon name="search" size={16} />
         <input

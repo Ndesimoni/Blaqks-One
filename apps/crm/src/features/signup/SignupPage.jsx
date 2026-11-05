@@ -49,7 +49,7 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
     return (
       <TeamStep
         onInvite={() => navigate(`${routePath('Team & access')}?start=invite`)}
-        onSkip={() => navigate('/dashboard')}
+        onSkip={() => navigate(`${routePath('Start')}?start=tour`)}
       />
     );
   if (status.loading)

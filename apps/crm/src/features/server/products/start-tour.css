@@ -1,0 +1,89 @@
+/* The start page tour: a dark bubble with an arrow beside each part of the app, and a gold
+   ring around the part it describes (the same in light and dark, like a tooltip). */
+.start-tour {
+  position: fixed;
+  z-index: 60;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #0d1c14;
+  color: #eef3ee;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  font-size: 14px;
+}
+.start-tour p {
+  margin: 0;
+  color: #c9d4cc;
+}
+.start-tour::before {
+  content: '';
+  position: absolute;
+  inline-size: 14px;
+  block-size: 14px;
+  background: #0d1c14;
+  transform: rotate(45deg);
+}
+.start-tour.is-right::before {
+  inset-inline-start: -7px;
+  inset-block-start: var(--tour-arrow);
+}
+.start-tour.is-below::before {
+  inset-block-start: -7px;
+  inset-inline-start: var(--tour-arrow);
+}
+.start-tour.is-above::before {
+  inset-block-end: -7px;
+  inset-inline-start: var(--tour-arrow);
+}
+.start-tour-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: #a7b8ac;
+  font-size: 12.5px;
+}
+.start-tour-next,
+.start-tour-skip {
+  min-block-size: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.start-tour-next {
+  background: #e4cda5;
+  color: #17251c;
+}
+.start-tour-skip {
+  background: none;
+  color: #a7b8ac;
+}
+.tour-target {
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 3px #e4cda5,
+    0 0 24px rgba(228, 205, 165, 0.5) !important;
+}
+.start-tour-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .start-tour {
+    animation: start-tour-in 0.2s ease-out;
+  }
+}
+@keyframes start-tour-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
