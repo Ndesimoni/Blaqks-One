@@ -1,0 +1,51 @@
+.enquiry-card {
+  align-self: start;
+  position: sticky;
+  top: 24px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.enquiry-card h2 {
+  font-size: 29px;
+}
+
+.enquiry-card p {
+  font-size: 13px;
+}
+
+.enquiry-card .button {
+  display: flex;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.whatsapp {
+  background: #e7f4ec;
+  color: #17613c;
+  border-color: #bdd6c6;
+}
+
+.media-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.media-slots>div {
+  background: var(--paper);
+  padding: 20px;
+}
+
+.map-placeholder {
+  padding: 35px;
+  background: #ecf1ee;
+  text-align: center;
+  border: 1px solid var(--line);
+}
+
+.map-placeholder>span {
+  font-size: 40px;
+  color: #89682d;
+}

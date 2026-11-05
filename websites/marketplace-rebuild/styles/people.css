@@ -1,0 +1,76 @@
+.portrait {
+  background: linear-gradient(135deg,#e6e3d9,#f3f0e8);
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  height: 180px;
+}
+
+.portrait svg {
+  height: 135px;
+  max-width: 100%;
+  margin: 25px auto 0;
+  fill: #d6d2c7;
+  stroke: #b9b8af;
+}
+
+.portrait>span {
+  position: absolute;
+  top: 12px;
+  left: 15px;
+  color: #7d735e;
+  font-family: Georgia,serif;
+}
+
+.portrait small {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 8px;
+  letter-spacing: .12em;
+  color: #766f60;
+}
+
+.agent-strip {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 18px;
+}
+
+.mini-agent {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.mini-agent .portrait {
+  height: 120px;
+}
+
+.mini-agent .portrait svg {
+  height: 80px;
+}
+
+.mini-agent .portrait small {
+  font-size: 5px;
+}
+
+.mini-agent>div:last-child {
+  padding: 18px 8px 10px 0;
+}
+
+.mini-agent h3 {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.mini-agent p, .mini-agent small {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}

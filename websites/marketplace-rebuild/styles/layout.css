@@ -1,0 +1,33 @@
+.section {
+  padding: 64px 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.section-heading>a {
+  font-size: 13px;
+  color: #89682d;
+  white-space: nowrap;
+}
+
+
+#main {
+  animation: enter-page .25s ease-out;
+}
+
+@keyframes enter-page {
+  from {
+    opacity: .6;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

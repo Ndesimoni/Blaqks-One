@@ -1,0 +1,105 @@
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.auth-shell>aside {
+  background: linear-gradient(145deg,#062338,#17465e);
+  color: white;
+  padding: 50px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.auth-shell>aside h2 {
+  font-size: clamp(35px,4vw,56px);
+}
+
+.auth-shell>aside p:not(.eyebrow) {
+  max-width: 360px;
+  color: #d0dce2;
+}
+
+.auth-shell>aside .eyebrow {
+  color: #d8b675;
+}
+
+.auth-form {
+  width: min(460px,calc(100% - 60px));
+  margin: auto;
+  padding: 50px 0;
+}
+
+.auth-form h1 {
+  font-size: 48px;
+}
+
+.auth-form p {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.auth-form label {
+  margin: 18px 0;
+}
+
+.auth-form form .button {
+  margin: 20px 0;
+}
+
+.auth-back {
+  display: block;
+  margin-bottom: 45px;
+  font-size: 12px;
+}
+
+.social-buttons {
+  display: grid;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+.social-buttons button {
+  padding: 13px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.divider {
+  text-align: center;
+  font-size: 12px;
+}
+
+.password-field {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5db;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.password-field input {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.password-field button {
+  padding: 10px;
+  font-size: 12px;
+  background: transparent;
+  border: 0;
+}
+
+.onboarding-checklist {
+  background: var(--paper);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+#auth-error {
+  color: #a32c25;
+}

@@ -1,0 +1,142 @@
+@media (max-width: 1100px) {
+  .header-inner {
+    flex-wrap: wrap;
+    padding: 20px 0;
+    gap: 18px;
+  }
+  .header-inner nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+  }
+  .professional-menu {
+    margin-left: auto;
+  }
+  .hero-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hero-fields .button {
+    grid-column: 1 / -1;
+  }
+  .agent-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr) 290px;
+    gap: 25px;
+  }
+  .footer-top {
+    gap: 35px;
+  }
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    width: calc(100% - 36px);
+  }
+  .header-inner {
+    gap: 12px;
+  }
+  .brand {
+    font-size: 13px;
+  }
+  .brand small {
+    font-size: 6px;
+  }
+  .brand-mark {
+    font-size: 27px;
+  }
+  .professional-menu summary {
+    font-size: 10px;
+    padding: 12px 9px;
+    max-width: 120px;
+  }
+  .header-inner nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+    gap: 2px 12px;
+    font-size: 13px;
+  }
+  .header-inner nav a {
+    padding: 9px 0;
+  }
+  .hero {
+    padding: 45px 0;
+  }
+  .hero h1 {
+    font-size: 49px;
+  }
+  .hero-description br {
+    display: none;
+  }
+  .hero-search {
+    padding: 18px;
+  }
+  .hero-fields {
+    gap: 12px;
+  }
+  input, select, textarea {
+    font-size: 16px;
+  }
+  .benefits, .property-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .benefits {
+    padding: 10px;
+  }
+  .benefits > div {
+    padding: 15px 10px;
+    border: 0;
+  }
+  .section {
+    padding: 40px 0;
+  }
+  .section-heading {
+    display: block;
+  }
+  .section-heading > a {
+    display: inline-block;
+    padding: 10px 0;
+  }
+  .property-grid, .results .property-grid, .story-banner,
+  .deal-intro, .listing-layout, .detail-layout, .footer-top,
+  .contact-layout, .auth-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .listing-layout {
+    gap: 24px;
+  }
+  .story-banner > div {
+    padding: 26px;
+  }
+  .story-banner img {
+    height: 210px;
+  }
+  .newsletter, .newsletter form {
+    display: block;
+  }
+  .newsletter .button {
+    margin-top: 12px;
+  }
+  .page-heading {
+    padding: 38px 0 28px;
+  }
+  .gallery {
+    height: 330px;
+    grid-template-columns: 1fr;
+  }
+  .gallery > div {
+    display: none;
+  }
+  .enquiry-card {
+    position: static;
+  }
+  .footer-top {
+    padding: 40px 0;
+  }
+  .footer-links {
+    gap: 16px;
+  }
+}
