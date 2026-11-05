@@ -57,6 +57,9 @@ export function ServerDialogs() {
           onClose={() => setDrawer(null)}
           onSave={saveRecord}
           onReload={reloadRecord}
+          onAnother={() =>
+            setDrawer({ ...drawer, original: null, revision: (drawer.revision || 0) + 1 })
+          }
           storageMode="server"
           idPolicy={serverIdPolicy(scope, drawer.original)}
         />

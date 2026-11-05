@@ -1,5 +1,6 @@
 import React, { useId, useMemo } from 'react';
 import { Drawer } from '../../../components/ui/Drawer.jsx';
+import { FormSliderHead } from '../../../components/ui/FormSliderHead.jsx';
 import { FormStepper } from '../../../components/ui/FormStepper.jsx';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
@@ -35,29 +36,18 @@ export function DealEditor({ deal, clientId = '', onClose, onDone }) {
   const { step, review, busy } = state;
   return (
     <Drawer
-      className="editor-drawer wizard-editor finance-editor"
+      className="editor-drawer wizard-editor finance-editor form-slider"
+      placement="right"
       titleId={titleId}
       onClose={state.requestClose}
     >
-      <div className="drawer-top">
-        <div>
-          <div className="eyebrow">DEALS · {deal ? 'EDIT DEAL' : 'NEW DEAL'}</div>
-          <h2 id={titleId}>{deal ? `Edit ${deal.dealId}` : 'New deal'}</h2>
-          <p>
-            {deal
-              ? 'Update the deal terms, then review and save.'
-              : 'The deal ID is issued when you save.'}
-          </p>
-        </div>
-        <button
-          className="icon-btn"
-          aria-label="Close deal editor"
-          disabled={busy}
-          onClick={state.requestClose}
-        >
-          <Icon name="close" size={21} />
-        </button>
-      </div>
+      <FormSliderHead
+        titleId={titleId}
+        title={deal ? `Edit ${deal.dealId}` : 'New deal'}
+        closeLabel="Close deal editor"
+        busy={busy}
+        onClose={state.requestClose}
+      />
       <form
         noValidate
         className="drawer-form"
@@ -90,27 +80,29 @@ export function DealEditor({ deal, clientId = '', onClose, onDone }) {
               Reload latest deal
             </Button>
           )}
-          <h3
-            id={stepTitleId}
-            className="form-heading form-step-title"
-            tabIndex={-1}
-            ref={state.headingRef}
-          >
-            <span>{pad(step + 1)}</span>
-            {dealSteps[step].title}
-          </h3>
-          <fieldset disabled={busy} className="finance-fieldset">
-            {review ? (
-              <DealEditorReview form={state.form} options={options} onEdit={state.select} />
-            ) : (
-              <DealEditorFields
-                stepId={dealSteps[step].id}
-                state={state}
-                options={options}
-                labelledBy={stepTitleId}
-              />
-            )}
-          </fieldset>
+          <div className="form-card">
+            <h3
+              id={stepTitleId}
+              className="form-heading form-step-title"
+              tabIndex={-1}
+              ref={state.headingRef}
+            >
+              <span>{pad(step + 1)}</span>
+              {dealSteps[step].title}
+            </h3>
+            <fieldset disabled={busy} className="finance-fieldset">
+              {review ? (
+                <DealEditorReview form={state.form} options={options} onEdit={state.select} />
+              ) : (
+                <DealEditorFields
+                  stepId={dealSteps[step].id}
+                  state={state}
+                  options={options}
+                  labelledBy={stepTitleId}
+                />
+              )}
+            </fieldset>
+          </div>
           {step > 0 && <DealEstimatePanel form={state.form} deal={latest ?? deal} />}
         </div>
         <div className="drawer-footer">

@@ -45,7 +45,7 @@ test('the top bar names the page and Create opens the chosen editor, then return
   // A lead from the top bar is saved as a client at stage New, as Add lead on Leads saves it.
   await create.click();
   await panel.getByRole('button', { name: 'Lead', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'New client' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'New lead' })).toBeVisible();
   await editor.getByLabel('Full name').fill('Top bar lead');
   await saveRecordForm(page);
   await expect(editor).toHaveCount(0);

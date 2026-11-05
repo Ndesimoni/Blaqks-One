@@ -41,6 +41,8 @@ export default {
   emailSent: "Email sent to {name}. It's in your Client inbox.",
   emailSentPlain: "Email sent. It's in your Client inbox.",
   convertToDeal: 'Convert to deal',
+  requiredFields: 'Fields marked * are required',
+  saveAnother: 'Save and add another',
   addProperty: 'Add a property',
   share: 'Share',
   shareWith: 'Share with',

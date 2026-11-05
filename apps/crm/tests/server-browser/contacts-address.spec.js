@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { assignTeam } from './assign-fixtures.js';
 import { createRecord, session } from './helpers.js';
+import { openName } from './record-open.js';
 import {
   assignInBrowser,
   memberPage,
@@ -70,7 +71,8 @@ test('an Admin saves a contact address and map link that survive reload, search 
     for (const query of ['tower 2 lobby', 'MARINA WALK']) {
       await search.fill(query);
       await expect(rows).toHaveCount(1);
-      await expect(rows).toContainText('CT-ADDR-1');
+      // The ID column is off by default; the row's open button names the record.
+      await expect(rows.getByRole('button', { name: openName('CT-ADDR-1') })).toHaveCount(1);
     }
     await search.fill('');
     const details = await openRecord(page, 'CT-ADDR-1');

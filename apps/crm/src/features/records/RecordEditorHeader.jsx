@@ -1,58 +1,47 @@
 import React from 'react';
+import { FormSliderHead } from '../../components/ui/FormSliderHead.jsx';
 import { get } from '../../lib/records.js';
-import { Icon } from '../../components/ui/Icon.jsx';
 
+const nouns = {
+  Properties: 'property',
+  'Client care': 'touchpoint',
+  'Interaction log': 'conversation',
+  Shortlist: 'match',
+};
+
+/** The editor's title: Edit and the record's ID, or New and what is being added. */
+function editorTitle({ module, original, lead, form, idField }) {
+  if (original) return 'Edit ' + get(original, idField.name);
+  if (lead) return 'New lead';
+  if (module === 'Follow-ups')
+    return ['Call', 'Meeting'].includes(form.calendar_activity)
+      ? 'New ' + form.calendar_activity.toLowerCase()
+      : 'New follow-up';
+  return 'New ' + (nouns[module] || module.toLowerCase().replace(/s$/, ''));
+}
+
+/**
+ * The record editor's header as the approved mockup's form slider: the title, "Fields marked
+ * * are required" and the close button. A listing starts focus on its title.
+ */
 export function RecordEditorHeader({
   module,
   original,
   lead,
   form,
   idField,
-  multiStep,
   titleId,
   busy,
   requestClose,
 }) {
   return (
-    <div className="drawer-top">
-      <div>
-        <div className="eyebrow">
-          {(lead ? 'Leads' : module).toUpperCase()} · {original ? 'EDIT RECORD' : 'NEW ENTRY'}
-        </div>
-        <h2
-          id={titleId}
-          tabIndex={module === 'Properties' ? -1 : undefined}
-          data-initial-focus={module === 'Properties' ? true : undefined}
-        >
-          {original
-            ? 'Edit ' + get(original, idField.name)
-            : 'New ' +
-              (lead
-                ? 'lead'
-                : {
-                    Properties: 'property',
-                    'Client care': 'touchpoint',
-                    'Interaction log': 'conversation',
-                    Shortlist: 'match',
-                    'Follow-ups': ['Call', 'Meeting'].includes(form.calendar_activity)
-                      ? form.calendar_activity.toLowerCase()
-                      : 'follow-up',
-                  }[module] || module.toLowerCase().replace(/s$/, ''))}
-        </h2>
-        <p>
-          {multiStep
-            ? 'Complete each section, then review and save your record.'
-            : 'Calculated fields update automatically.'}
-        </p>
-      </div>
-      <button
-        className="icon-btn"
-        aria-label="Close record editor"
-        disabled={busy}
-        onClick={requestClose}
-      >
-        <Icon name="close" size={21} />
-      </button>
-    </div>
+    <FormSliderHead
+      titleId={titleId}
+      title={editorTitle({ module, original, lead, form, idField })}
+      closeLabel="Close record editor"
+      busy={busy}
+      onClose={requestClose}
+      focusTitle={module === 'Properties'}
+    />
   );
 }

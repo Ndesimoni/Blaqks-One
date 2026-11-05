@@ -2,7 +2,15 @@ import { useMemo, useRef, useState } from 'react';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { useRecordFormSteps } from '../../hooks/useRecordFormSteps.js';
 
-export function useRecordEditor({ drawer, data, onClose, onSave, onReload, idOptional }) {
+export function useRecordEditor({
+  drawer,
+  data,
+  onClose,
+  onSave,
+  onReload,
+  onAnother,
+  idOptional,
+}) {
   const { module, original } = drawer;
   const [form, setForm] = useState({ ...drawer.record });
   const [uploading, setUploading] = useState(false);
@@ -48,8 +56,8 @@ export function useRecordEditor({ drawer, data, onClose, onSave, onReload, idOpt
     if (dirty && !confirm('Discard your unsaved changes?')) return;
     onClose();
   };
-  const submit = async (event) => {
-    event.preventDefault();
+  const submit = async (event, another = false) => {
+    event?.preventDefault();
     if (busy || savingRef.current) return;
     if (steps.multiStep && !steps.review) {
       steps.next();
@@ -60,6 +68,7 @@ export function useRecordEditor({ drawer, data, onClose, onSave, onReload, idOpt
     setSaving(true);
     try {
       const result = await onSave(module, form, original);
+      if (result?.workspace && another) onAnother?.();
       if (!result?.workspace) {
         steps.reportErrors(result?.errors || {});
         setSaveError(result?.message || 'Check the highlighted fields.');
@@ -99,6 +108,8 @@ export function useRecordEditor({ drawer, data, onClose, onSave, onReload, idOpt
     change,
     requestClose,
     submit,
+    // Save and add another: saves, then a fresh form with the same starting values.
+    submitAnother: () => submit(null, true),
     reload,
   };
 }
