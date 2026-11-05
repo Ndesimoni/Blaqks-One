@@ -37,13 +37,13 @@ pub async fn add(
     if target.kind != "group" {
         return Err(ApiError::invalid(INVALID));
     }
-    if target.created_by != actor.id && actor.role != "admin" {
+    if target.created_by != actor.id && !access::moderates(&actor) {
         return Err(ApiError::forbidden());
     }
     let requested = colleagues(map.get("memberIds"), actor.id, 1..=20, INVALID)?;
     let valid: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM crm_user_profiles WHERE id=ANY($1) \
-        AND workspace_id=$2 AND active AND owner_active AND role<>'super-admin'",
+        AND workspace_id=$2 AND active AND owner_active",
     )
     .bind(&requested)
     .bind(&workspace)

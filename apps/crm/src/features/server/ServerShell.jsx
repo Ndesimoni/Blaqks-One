@@ -18,7 +18,6 @@ import { MessengerContext } from './products/messenger/messengerContext.js';
 import { MessengerPanel } from './products/messenger/MessengerPanel.jsx';
 import { BottomBar } from './products/BottomBar.jsx';
 import { visibleProducts } from './products/productModel.js';
-import { isPlatformMember } from './platformAccess.js';
 
 export function ServerShell({ owner }) {
   const { user } = useSession();
@@ -33,10 +32,7 @@ export function ServerShell({ owner }) {
   // Bitrix24's right panel (NAV5) on wide screens, the messenger pages included as in the
   // approved mockup; the Super Admin reads no company conversations.
   const wide = useMediaQuery('(min-width: 1181px)');
-  const strip =
-    wide &&
-    !isPlatformMember(user) &&
-    (canOpenSection(user, 'Inbox') || canOpenSection(user, 'Team chat'));
+  const strip = wide && (canOpenSection(user, 'Inbox') || canOpenSection(user, 'Team chat'));
   const { toast, setToast, setMobileNav } = useWorkspaceView();
   const openMessenger = (box, id = '') => {
     setStart(id);

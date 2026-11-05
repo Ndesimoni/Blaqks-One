@@ -42,7 +42,7 @@ pub async fn check(tx: &mut Tx<'_>, workspace: &str, room: &Room, ids: &[Uuid]) 
     }
     let valid: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM crm_user_profiles u WHERE u.id=ANY($1) AND u.workspace_id=$2 \
-         AND u.active AND u.owner_active AND u.role<>'super-admin' AND ($3='channel' OR \
+         AND u.active AND u.owner_active AND ($3='channel' OR \
          EXISTS (SELECT 1 FROM chat.crm_chat_participants p \
                  WHERE p.room_id=$4 AND p.member_id=u.id))",
     )

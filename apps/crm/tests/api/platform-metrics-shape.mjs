@@ -24,11 +24,13 @@ export function assertShape(value) {
     'activeUsers',
     'companies',
     'deals',
+    'help',
     'interBroker',
     'marketplace',
     'outsideAgents',
     'payments',
     'records',
+    'sales',
     'users',
     'websiteVisitors',
     'websites',
@@ -48,7 +50,7 @@ export function assertShape(value) {
   assert.equal(value.trends.months.length, 12);
   assert.equal(value.trends.months.at(-1), thisMonth());
   for (const [name, series] of Object.entries(value.trends)) assert.equal(series.length, 12, name);
-  assert.equal(keys(value.inPeriod).length, 15);
+  assert.equal(keys(value.inPeriod).length, 17);
   assert.equal(keys(value.growth).length, 4);
   for (const row of value.companies) {
     assert.deepEqual(keys(row), COMPANY_KEYS, 'usage only, never money');

@@ -60,6 +60,8 @@
     ],
     "imports": ["crm_import_plans"],
     "platform_metrics": ["crm_platform_events", "crm_user_active_days"],
+    "support": ["crm_support_requests", "crm_support_messages"],
+    "platform_clients": ["crm_platform_clients", "crm_platform_client_timeline"],
     "performance": ["crm_targets", "crm_targets_identity_fixed"],
     "marketplace": [
       "crm_market_applications",
@@ -101,7 +103,9 @@
       "sites",
       "publications",
       "catalogue",
-      "enquiries"
+      "enquiries",
+      "platform_clients",
+      "support"
     ]
   },
   "published": ["crm_user_profiles", "crm_all_user_profiles", "crm_member_profiles"],

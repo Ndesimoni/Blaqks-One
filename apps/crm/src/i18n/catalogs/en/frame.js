@@ -62,6 +62,10 @@ export default {
     one: 'A marketplace application is waiting for a decision',
     other: '{count} marketplace applications are waiting for a decision',
   },
+  'notices.help': {
+    one: '{count} open help request',
+    other: '{count} open help requests',
+  },
   'notices.clients': {
     one: 'A colleague shared a client or lead with you',
     other: 'Colleagues shared {count} clients or leads with you',

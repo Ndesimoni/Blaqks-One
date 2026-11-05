@@ -60,7 +60,16 @@ export function canOpenSection(user, route) {
     return (
       user.roleId === 'admin' || (user.roleId === 'staff' && user.permissions?.properties === true)
     );
-  const open = ['Start', 'Dashboard', 'Guide', 'Calculators', 'My profile', 'Team activity'];
+  // Help (BO1c): every company member may ask Blaqks One for help.
+  const open = [
+    'Start',
+    'Dashboard',
+    'Guide',
+    'Calculators',
+    'My profile',
+    'Team activity',
+    'Help',
+  ];
   if ([...open, 'Sign-in and security'].includes(route)) return true;
   if (route === 'Messages')
     return (

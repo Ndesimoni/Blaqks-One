@@ -130,6 +130,7 @@ pub async fn verify(
         Source::Crm,
     );
     platform_metrics::record(&mut transaction, finished).await?;
+    crate::platform_clients::link_signup(&mut transaction, &pending.email, &workspace).await?;
     let issued = sessions::issue(&mut transaction, user, device).await?;
     let profile = accounts::live_profile(&mut transaction, user).await?;
     let company = workspaces::company::get(&mut *transaction, &workspace).await?;

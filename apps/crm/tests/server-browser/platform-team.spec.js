@@ -70,6 +70,7 @@ test('the Owner invites an Analyst who opens only the areas ticked, then widens 
     await expect(analyst.page.getByRole('table', { name: 'Companies' })).toBeVisible();
     // View on Companies shows a company's people but none of the Manage controls.
     await analyst.page
+      .getByRole('table', { name: 'Companies' })
       .getByRole('button', { name: /^Open / })
       .first()
       .click();

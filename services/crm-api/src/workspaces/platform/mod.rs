@@ -13,6 +13,7 @@ use crate::{
     error::{ApiError, ApiResult},
 };
 use sqlx::{FromRow, PgPool, Postgres, Transaction};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 /// The live Blaqks One operator for `area` at `level`, re-read inside the caller's
@@ -66,4 +67,24 @@ pub async fn company_rows(pool: &PgPool) -> ApiResult<Vec<CompanyRow>> {
     .fetch_all(pool)
     .await
     .map_err(Into::into)
+}
+
+/// Company names (the company's display name, else its Admin's) for these workspaces, by
+/// ID, for Blaqks One's own clients linked to a company at sign-up (BO1e). Never the
+/// organisation, and nothing else about the company.
+pub async fn company_names(
+    tx: &mut Transaction<'_, Postgres>,
+    ids: &[String],
+) -> ApiResult<HashMap<String, String>> {
+    let rows: Vec<(String, String)> = sqlx::query_as(
+        "SELECT w.id,COALESCE(c.display_name,u.name) FROM crm_workspaces w \
+         JOIN crm_users u ON u.id=w.owner_id \
+         LEFT JOIN crm_company_profiles c ON c.workspace_id=w.id \
+         WHERE w.id=ANY($1) AND w.id<>$2",
+    )
+    .bind(ids)
+    .bind(ORGANISATION)
+    .fetch_all(&mut **tx)
+    .await?;
+    Ok(rows.into_iter().collect())
 }

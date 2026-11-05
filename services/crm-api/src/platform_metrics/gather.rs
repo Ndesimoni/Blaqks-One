@@ -6,8 +6,10 @@ use crate::{
     agreements::platform_counts as agreements, auth::sessions, chat::platform_counts as chat,
     enquiries::platform_counts as enquiries, error::ApiResult, finance::platform_counts as finance,
     inbox::platform_counts as inbox, marketplace::platform_counts as marketplace,
+    platform_clients::platform_counts as own_clients,
     publications::platform_counts as publications, records::platform_counts as records,
-    sites::platform_counts as sites, team::platform_counts as team, workspaces::ORGANISATION,
+    sites::platform_counts as sites, support::platform_counts as support,
+    team::platform_counts as team, workspaces::ORGANISATION,
 };
 use sqlx::{Postgres, Transaction};
 use std::collections::HashSet;
@@ -41,6 +43,8 @@ pub struct Gathered {
     pub messages: (i64, i64),
     pub chat: i64,
     pub sign_ins: i64,
+    pub help: support::Help,
+    pub sales: own_clients::Sales,
 }
 
 pub async fn gather(tx: &mut Transaction<'_, Postgres>, period: &Period) -> ApiResult<Gathered> {
@@ -75,6 +79,8 @@ pub async fn gather(tx: &mut Transaction<'_, Postgres>, period: &Period) -> ApiR
         messages: inbox::sent(tx, org, since).await?,
         chat: chat::sent(tx, org, since).await?,
         sign_ins: log::count(tx, org, names::SIGN_IN, since).await?,
+        help: support::help(tx, since).await?,
+        sales: own_clients::sales(tx, since).await?,
     })
 }
 

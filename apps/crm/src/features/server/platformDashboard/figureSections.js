@@ -75,6 +75,27 @@ export const figureSections = [
     ],
   },
   {
+    key: 'sales',
+    rows: [
+      row('salesClients', (m) => totals(m).sales.clients),
+      row('salesBecameCompanies', (m) => totals(m).sales.becameCompanies),
+      row('salesCustomers', (m) => totals(m).sales.customers),
+      row('salesLost', (m) => totals(m).sales.lost),
+      inPeriod('salesAdded', (m) => m.inPeriod.sales.clientsAdded),
+      inPeriod('salesFromWebsite', (m) => m.inPeriod.sales.fromWebsite),
+    ],
+  },
+  {
+    key: 'help',
+    rows: [
+      row('helpOpen', (m) => totals(m).help.open),
+      row('helpWaiting', (m) => totals(m).help.waiting),
+      inPeriod('helpOpened', (m) => m.inPeriod.help.opened),
+      inPeriod('helpSolved', (m) => m.inPeriod.help.solved),
+      inPeriod('helpFirstAnswer', (m) => m.inPeriod.help.medianFirstAnswerMinutes, 'minutes'),
+    ],
+  },
+  {
     key: 'growth',
     rows: [
       row('activeThisMonth', (m) => m.growth.companiesActiveThisMonth),

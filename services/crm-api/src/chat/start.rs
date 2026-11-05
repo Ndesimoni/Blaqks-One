@@ -47,7 +47,7 @@ pub async fn channel(
     workspaces::lock(&mut tx, &workspace).await?;
     let user = access::live(&mut tx, &workspace, session.user.id).await?;
     // Only the Admin creates channels (owner decision 2026-10-21).
-    if user.role != "admin" {
+    if !access::moderates(&user) {
         return Err(ApiError::forbidden());
     }
     let id = Uuid::new_v4();

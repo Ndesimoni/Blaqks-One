@@ -1,5 +1,6 @@
-//! Who may use team chat (docs/team-chat.md). Live members of the company only; the Super
-//! Admin reads no company chat. Channels are open to every member; a direct conversation
+//! Who may use team chat (docs/team-chat.md). Live members of the company only; Blaqks One
+//! reads no company chat. The Blaqks One organisation has its own team chat for the Owner
+//! and platform staff (BO1f, docs/blaqks-one-console.md §11), which no company member reaches. Channels are open to every member; a direct conversation
 //! only to its two members — not even the Admin (owner decision 2026-10-21). Foreign,
 //! hidden and malformed IDs all return the same not-found.
 use crate::{
@@ -21,9 +22,15 @@ pub async fn ensure(
     headers: Option<&HeaderMap>,
     workspace: &str,
 ) -> ApiResult<()> {
-    workspaces::ensure_access(state, session, workspace).await?;
-    if session.user.role == "super-admin" || session.user.workspace_id != workspace {
-        return Err(ApiError::forbidden());
+    if workspace == workspaces::ORGANISATION {
+        if !is_platform(&session.user.role) || session.user.workspace_id != workspace {
+            return Err(ApiError::forbidden());
+        }
+    } else {
+        workspaces::ensure_access(state, session, workspace).await?;
+        if is_platform(&session.user.role) || session.user.workspace_id != workspace {
+            return Err(ApiError::forbidden());
+        }
     }
     match headers {
         Some(headers) => protection::mutation(state, headers, &session.csrf_token),
@@ -34,10 +41,22 @@ pub async fn ensure(
 /// The live member, re-read inside the transaction (after the workspace lock for writes).
 pub async fn live(tx: &mut Tx<'_>, workspace: &str, actor: Uuid) -> ApiResult<UserRow> {
     let user = workspaces::member(tx, workspace, actor).await?;
-    if user.role == "super-admin" || user.workspace_id != workspace {
+    let organisation = workspace == workspaces::ORGANISATION;
+    if is_platform(&user.role) != organisation || user.workspace_id != workspace {
         return Err(ApiError::forbidden());
     }
     Ok(user)
+}
+
+/// The Blaqks One team: the Owner and platform staff, who chat only in the organisation.
+fn is_platform(role: &str) -> bool {
+    matches!(role, "super-admin" | "platform")
+}
+
+/// Who moderates channels and creates them: a company's Admin, and in the Blaqks One
+/// organisation its Owner.
+pub fn moderates(user: &UserRow) -> bool {
+    matches!(user.role.as_str(), "admin" | "super-admin")
 }
 
 #[derive(Clone, Debug, FromRow)]

@@ -27,6 +27,7 @@ test('My WhatsApp is for the Admin and staff with the WhatsApp grant, never the 
     'My profile',
     'My WhatsApp',
     'Team activity',
+    'Help',
   ]);
   assert.ok(personal({ roleId: 'admin', permissions: {} }).includes('My WhatsApp'));
   assert.ok(!personal({ roleId: 'super-admin', permissions: {} }).includes('My WhatsApp'));

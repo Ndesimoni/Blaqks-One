@@ -11,7 +11,10 @@ export const startCards = [
   { key: 'crm', actions: ['Dashboard', 'add-lead'] },
   { key: 'web', actions: ['Website', 'Website properties'] },
   { key: 'market', actions: ['Marketplace', 'My requests'] },
-  { key: 'platform', actions: ['Platform dashboard', 'Workspaces', 'Marketplace applications'] },
+  {
+    key: 'platform',
+    actions: ['Platform dashboard', 'Blaqks One clients', 'Workspaces', 'Marketplace applications'],
+  },
 ];
 
 /** The figures each card shows, by `useStartFigures` name (the CRM card has its own). */

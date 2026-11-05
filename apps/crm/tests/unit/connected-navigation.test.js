@@ -60,7 +60,7 @@ test('staff see their own activity under personal account and no company setting
     groups.map((group) => group.key),
     ['overview', 'relationships', 'inventory', 'work', 'resources', 'personal'],
   );
-  assert.deepEqual(itemsOf(groups, 'personal'), ['My profile', 'Team activity']);
+  assert.deepEqual(itemsOf(groups, 'personal'), ['My profile', 'Team activity', 'Help']);
   assert.equal(navLabel(staff, 'Team activity'), 'My activity');
   assert.equal(navLabel({ roleId: 'admin' }, 'Team activity'), 'Team activity');
   assert.ok(!names(groups).includes('Channels'));
@@ -73,6 +73,8 @@ test('Blaqks One keeps its platform pages and opens nothing of a company (BO1a)'
   const groups = connectedGroups(owner);
   assert.deepEqual(itemsOf(groups, 'platform'), [
     'Platform dashboard',
+    'Blaqks One clients',
+    'Help requests',
     'Workspaces',
     'Marketplace applications',
     'Platform website',
@@ -83,7 +85,9 @@ test('Blaqks One keeps its platform pages and opens nothing of a company (BO1a)'
     'Team activity',
   ]);
   assert.equal(names(groups).filter((name) => name === 'Workspaces').length, 1);
-  for (const name of ['Messages', 'Inbox', 'Team chat', 'Agreements', 'Marketplace', 'Website'])
+  // Its own team chat (BO1f), never a company's inbox, agreements, marketplace or website.
+  assert.ok(names(groups).includes('Team chat'));
+  for (const name of ['Messages', 'Inbox', 'Agreements', 'Marketplace', 'Website'])
     assert.ok(!names(groups).includes(name), name);
   for (const name of ['Dashboard', 'Clients', 'Properties', 'Deals', 'Guide', 'Calculators'])
     assert.ok(!names(groups).includes(name), name);

@@ -58,6 +58,8 @@ export const productList = [
     icon: 'building',
     sections: [
       { key: 'platformDashboard', routes: ['Platform dashboard'] },
+      { key: 'platformClients', routes: ['Blaqks One clients'] },
+      { key: 'platformHelp', routes: ['Help requests'] },
       { key: 'workspaces', routes: ['Workspaces'], group: 'platform' },
       { key: 'applications', routes: ['Marketplace applications'] },
       { key: 'platformWebsite', routes: ['Platform website', 'Platform companies'] },
@@ -82,6 +84,7 @@ export const productList = [
       { key: 'myActivity', routes: ['Team activity'], group: 'personal', personal: true },
       { key: 'mailbox', routes: ['My mailbox'], personal: true },
       { key: 'whatsapp', routes: ['My WhatsApp'], personal: true },
+      { key: 'help', routes: ['Help'], personal: true },
     ],
   },
 ];

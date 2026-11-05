@@ -82,7 +82,7 @@ pub async fn list(
     .await?;
     let people: Vec<Person> = sqlx::query_as(
         "SELECT id,name FROM crm_user_profiles WHERE workspace_id=$1 AND active \
-         AND owner_active AND role<>'super-admin' AND id<>$2 ORDER BY name,id",
+         AND owner_active AND id<>$2 ORDER BY name,id",
     )
     .bind(&workspace)
     .bind(user.id)
@@ -109,6 +109,6 @@ pub async fn list(
     Ok(Json(json!({
         "rooms": rooms,
         "people": people,
-        "canCreateChannel": user.role == "admin",
+        "canCreateChannel": access::moderates(&user),
     })))
 }

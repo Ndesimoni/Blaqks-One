@@ -39,7 +39,7 @@ pub async fn create(
     // Every chosen colleague must be a live member of the same company now.
     let colleagues: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM crm_user_profiles WHERE id=ANY($1) AND workspace_id=$2 \
-         AND active AND owner_active AND role<>'super-admin'",
+         AND active AND owner_active",
     )
     .bind(&ids)
     .bind(&workspace)

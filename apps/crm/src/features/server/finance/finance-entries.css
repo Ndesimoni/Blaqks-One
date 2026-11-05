@@ -3,18 +3,6 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-/* The approvers' count on the Waiting for approval preset chip (design step 2d). */
-.finance-page .grid-chip-count {
-  display: inline-block;
-  min-width: 22px;
-  margin-inline-start: 8px;
-  padding: 0 7px;
-  border-radius: 999px;
-  background: var(--surface-subtle);
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
 .finance-reason,
 .finance-duty {
   max-width: 280px;

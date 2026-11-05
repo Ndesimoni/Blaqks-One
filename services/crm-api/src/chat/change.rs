@@ -83,7 +83,7 @@ pub async fn delete(
     let user = access::live(&mut tx, &workspace, session.user.id).await?;
     let room = access::room(&mut tx, &workspace, user.id, &room, false).await?;
     // The Admin may remove anyone's message in a channel, never in a direct conversation.
-    let moderator = user.role == "admin" && room.kind == "channel";
+    let moderator = access::moderates(&user) && room.kind == "channel";
     let removed: Option<Message> = sqlx::query_as(&format!(
         "UPDATE chat.crm_chat_messages m SET body='',deleted_at=now() \
          WHERE m.id=$1 AND m.room_id=$2 AND (m.author_id=$3 OR $4) AND m.deleted_at IS NULL \

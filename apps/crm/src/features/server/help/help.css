@@ -1,0 +1,129 @@
+/* Help (BO1c): the list beside the conversation, like the Client inbox; one column on phones. */
+.help-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.help-head p,
+.help-intro {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--muted);
+}
+.help-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.help-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  list-style: none;
+  overflow: hidden;
+}
+.help-list li + li {
+  border-top: 1px solid var(--line);
+}
+.help-list button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  text-align: start;
+}
+.help-list button:hover {
+  background: var(--hover);
+}
+.help-list button[aria-current='true'] {
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+.help-list button > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.help-list-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.help-thread,
+.help-pick {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.help-pick {
+  color: var(--muted);
+}
+.help-thread-head {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+:root[data-theme] .help-thread-head h2 {
+  margin: 0;
+  font: 600 20px / 1.3 var(--display);
+}
+.help-thread-head > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.help-messages {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.help-message {
+  justify-self: start;
+  max-width: min(560px, 92%);
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--hover);
+}
+.help-message.is-mine {
+  justify-self: end;
+  background: color-mix(in srgb, var(--gold) 16%, var(--panel));
+}
+.help-message p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.help-message-who,
+.help-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+.help-note {
+  margin: 0;
+}
+.help-reply {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+.help-reply .field {
+  width: 100%;
+}
+@media (max-width: 860px) {
+  .help-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

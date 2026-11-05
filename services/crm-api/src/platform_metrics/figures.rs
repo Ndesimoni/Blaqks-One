@@ -29,6 +29,11 @@ pub fn in_period(g: &Gathered, companies: &[CompanyRow], period: &Period) -> Val
         "whatsappSent": g.messages.1,
         "chatMessages": g.chat,
         "signIns": g.sign_ins,
+        "help": {
+            "opened": g.help.opened, "solved": g.help.solved,
+            "medianFirstAnswerMinutes": g.help.first_answer_minutes,
+        },
+        "sales": {"clientsAdded": g.sales.added, "fromWebsite": g.sales.from_website},
     })
 }
 

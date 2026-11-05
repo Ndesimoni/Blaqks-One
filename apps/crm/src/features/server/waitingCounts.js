@@ -78,6 +78,13 @@ export const waitingSources = Object.freeze({
         .then((value) => (Array.isArray(value?.applications) ? value.applications.length : 0)),
     labelKey: 'frame.notices.applications',
   },
+  // Blaqks One's open help requests (BO1c), for the team with Help requests.
+  'Help requests': {
+    read: (api, _workspace, signal) =>
+      api.helpOpenCount(signal).then((value) => count(value?.open)),
+    labelKey: 'frame.notices.help',
+    platform: true,
+  },
   // Leads and Clients are one collection, so both show the leads shared with the caller.
   Leads: shareSource('Clients'),
   Clients: shareSource('Clients'),

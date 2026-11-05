@@ -16,7 +16,8 @@ export function WaitingNavItem({ name, icon, label, route, onSelect, active }) {
   const { user } = useSession();
   const { t } = useI18n();
   const source = waitingSources[name];
-  const count = useWaitingCount(source, !isPlatformMember(user), route);
+  // Company badges for company members; Blaqks One's own (help requests) for its team.
+  const count = useWaitingCount(source, Boolean(source.platform) === isPlatformMember(user), route);
   return (
     <ServerNavigationItem
       name={name}

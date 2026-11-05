@@ -11,6 +11,8 @@ const connectedSections = new Set([
   'Company',
   'Team & access',
   'Blaqks One team',
+  'Help',
+  'Help requests',
   'Dashboard',
   'Client desk',
   // Finance (finance-design §7): Deals, Payments and Expenses come from `GET /finance`.
@@ -53,6 +55,8 @@ const connectedSections = new Set([
   'Marketplace applications',
   // `/platform/metrics`: Blaqks One's platform figures (BO1d).
   'Platform dashboard',
+  // `/platform/clients`: Blaqks One's own sales clients (BO1e).
+  'Blaqks One clients',
 ]);
 /** Workspaces is connected for the Super Admin only, as the platform's company list. */
 export const isConnectedSection = (name, user) =>
@@ -75,6 +79,8 @@ const purposes = {
   'My activity': 'Review the changes you have made in this workspace.',
   Marketplace:
     'Post what your clients are looking for; brokers with a matching property answer privately.',
+  'Blaqks One clients':
+    'Brokerages and agents interested in Blaqks One, worked by your team. Never a company’s clients.',
   'Marketplace applications':
     'Companies that asked for marketplace access. You see their names, ages, who applied and the counts, never their records.',
 };

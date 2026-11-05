@@ -49,6 +49,8 @@ export function platformRoutes(company) {
         reason: 'Synthetic level check',
       },
     ],
+    ['clients', 'view', 'GET', '/platform/clients'],
+    ['clients', 'view', 'GET', '/platform/clients/owners'],
     ['platform_website', 'view', 'GET', '/platform/websites/general'],
     ['platform_website', 'view', 'GET', '/platform/websites/general/draft'],
     ['platform_website', 'view', 'GET', '/platform/websites/companies'],
@@ -62,11 +64,21 @@ export function platformRoutes(company) {
   ];
 }
 
-/** Company data and the organisation's CRM: refused to every platform member. */
+/**
+ * Company data (its chat included) and the organisation's CRM: refused to every platform
+ * member. The organisation's own Team chat is theirs (BO1f phase 1), so it is not listed.
+ */
 export function companyData(company) {
   const workspace = company.user.workspaceId;
-  const paths = ['/records', '/finance', '/activity', '/team', '/assignees?collection=Clients'];
-  const own = ['/records', '/activity', '/chat', '/mailbox', '/inbox/conversations', '/agreements'];
+  const paths = [
+    '/records',
+    '/finance',
+    '/activity',
+    '/team',
+    '/chat',
+    '/assignees?collection=Clients',
+  ];
+  const own = ['/records', '/activity', '/mailbox', '/inbox/conversations', '/agreements'];
   return [
     ...paths.map((path) => `/workspaces/${workspace}${path}`),
     ...own.map((path) => `/workspaces/${ORGANISATION}${path}`),

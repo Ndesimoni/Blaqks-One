@@ -12,6 +12,8 @@ const extraIcons = {
   'Sign-in and security': 'lock',
   'Team & access': 'shield',
   'Blaqks One team': 'users',
+  Help: 'help',
+  'Help requests': 'help',
   Company: 'building',
   Channels: 'chat',
   'Inbox rules': 'sliders',
@@ -28,6 +30,7 @@ const extraIcons = {
   'Marketplace chats': 'chat',
   Workspaces: 'building',
   'Platform dashboard': 'chart',
+  'Blaqks One clients': 'briefcase',
   'Marketplace applications': 'layers',
 };
 export const navIcons = { ...sharedIcons, ...extraIcons };
@@ -60,7 +63,7 @@ export const displayGroups = [
   {
     key: 'personal',
     pinned: true,
-    items: ['My profile', 'My mailbox', 'My WhatsApp', 'Team activity'],
+    items: ['My profile', 'My mailbox', 'My WhatsApp', 'Team activity', 'Help'],
   },
   {
     key: 'company',
@@ -79,7 +82,14 @@ export const displayGroups = [
   {
     key: 'platform',
     pinned: true,
-    items: ['Platform dashboard', 'Workspaces', 'Marketplace applications', 'Platform website'],
+    items: [
+      'Platform dashboard',
+      'Blaqks One clients',
+      'Help requests',
+      'Workspaces',
+      'Marketplace applications',
+      'Platform website',
+    ],
   },
 ];
 

@@ -4,9 +4,11 @@ import { useSession } from '../../../hooks/useSession.js';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { canOpenSection } from '../access.js';
+import { useHelpUnread } from '../help/useHelpUnread.js';
 import { productSections } from './productModel.js';
 import { useDisclosure } from './useDisclosure.js';
 import './start.css';
+import './account-help.css';
 
 const initials = (name) =>
   String(name || '?')
@@ -29,6 +31,8 @@ export function AccountMenu({ busy }) {
   const go = useNavigate();
   const { open, setOpen, root, opener } = useDisclosure();
   const personal = productSections(user, 'settings').filter((section) => section.personal);
+  // New answers to the member's help requests (BO1c).
+  const helpUnread = useHelpUnread(canOpenSection(user, 'Help'));
   const choose = (route) => {
     setOpen(false);
     navigate(route);
@@ -45,6 +49,7 @@ export function AccountMenu({ busy }) {
         onClick={() => setOpen((value) => !value)}
       >
         {initials(user.name)}
+        {helpUnread > 0 && <span className="account-dot" aria-hidden="true" />}
       </button>
       {open && (
         <div className="account-panel" id="account-panel">
@@ -57,6 +62,9 @@ export function AccountMenu({ busy }) {
             .map((section) => (
               <button type="button" key={section.key} onClick={() => choose(section.routes[0])}>
                 {t(`products.sections.${section.key}`)}
+                {section.key === 'help' && helpUnread > 0 && (
+                  <span className="account-count">{helpUnread}</span>
+                )}
               </button>
             ))}
           <hr />

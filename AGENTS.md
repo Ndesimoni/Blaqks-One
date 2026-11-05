@@ -48,6 +48,7 @@ Professional real estate CRM focused on the UAE market.
 - Cross-company deal agreements (hand-over, referral, co-broking) with frozen, evidence-bearing revisions on an Agreements screen; see docs/agreements-design.md
 - Sharing one record with a colleague (R1), and a listing with an agent at another company: view only, until a chosen day, recorded as proof of introduction (R2a), which either named person can turn into a co-broking agreement; see docs/record-sharing.md
 - Broker marketplace MK1: a company applies with its eligibility checklist, the Blaqks One Super Admin approves, declines or revokes, the company Admin turns it on or off, and members join with a profile, photo, four commitments, publication consent and versioned terms; see docs/broker-marketplace.md
+- Blaqks One console: platform dashboard and investor metrics, companies, the Blaqks One team with per-area View/Manage access, Blaqks One's own sales clients, its own team chat and help requests from company members; never a company's business data; see docs/blaqks-one-console.md
 - Responsive desktop/mobile interface
 - Opt-in connected Clients, Contacts, Properties, Leads, Follow-ups, Viewings, Shortlist, Interaction log, Client care, Deals, Payments and Expenses with server sessions, scoped CRUD, optimistic versions, redacted transactional activity and assigned-only staff visibility; see docs/backend-foundation.md and docs/assignments-design.md
 

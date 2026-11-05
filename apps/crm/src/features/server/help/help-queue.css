@@ -1,0 +1,31 @@
+/* The Blaqks One help queue's filters and the request card's actions (BO1c). */
+.help-filters,
+.help-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.help-chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 13px;
+}
+.help-chip[aria-pressed='true'] {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.help-request-actions {
+  align-items: flex-end;
+}
+.help-request-card p {
+  margin: 0 0 8px;
+  font-size: 13px;
+}

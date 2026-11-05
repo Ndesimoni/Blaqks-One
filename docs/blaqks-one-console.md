@@ -164,12 +164,22 @@ The owner asked to keep building the agreed plan without stopping for questions,
 
 **BO1f messaging, phase 1 (now).** The Blaqks One team gets its own team chat (channels, direct messages and groups among the Owner and platform staff), reusing the chat module for the Blaqks One organisation only; nobody in it can reach a company's chat. Each client keeps Call, WhatsApp, Email and Text buttons that open the phone's apps, and calls and messages are logged on the client's timeline. **Phase 2 (with the provider work, W1b and E3):** a Blaqks One inbox that sends and receives email and WhatsApp from its own connected mailbox and number, threaded onto its clients, and in-app SMS.
 
+**Who Blaqks One talks to (owner, 2026-11-05):** "Blaqks One can only talk to its own team members and not outsiders using our app." The Blaqks One team chat holds only the Owner and platform staff: no company user can be added, messaged or mentioned there, and the team never reads a company's chat. Help requests stay the one way a company reaches Blaqks One inside the app, as support tickets answered in their thread (the owner's earlier choice), not chat.
+
 **BO1c help requests.**
 
 - Any member opens **Help** from the account menu: a category (Account and sign-in, Plan and billing, Something is not working, How do I…, Idea, Other), a subject and a message. The form asks for no clients' personal details.
 - Only the requester and the Blaqks One team members with Help requests at View can read a request; the requester's company Admin cannot.
 - States: **Open** (waiting for Blaqks One), **Waiting** (Blaqks One answered, waiting for the member) and **Solved**. A member's reply reopens it; Blaqks One marks it solved; a solved request can be reopened by the member within 30 days.
-- Blaqks One side: Platform → Help requests in the Client inbox's three-pane pattern (list with Open, Waiting, Solved and Assigned to me; the thread; the requester's company, role and seats), assigning a request to a team member, answering (Manage) and solving. The bell and the section show the number of open requests.
+- Blaqks One side: Platform → Help requests with a list (Open, Answered, Solved, All and Assigned to me) beside the thread and the requester's name, role and company; assigning a request to a team member with Help requests at Manage, answering (Manage) and solving. Whoever answers an unassigned request first is assigned it. The bell and the section show the number of open requests.
 - The member sees their requests and Blaqks One's replies under Help, with an unread count on the account menu.
 - Events for the dashboard: help request opened, answered and solved; the dashboard's help figures (open, solved, median time to first answer) fill in.
 - Attachments wait for the media work.
+
+**Dashboard additions.** Platform → Dashboard gains two panels: **Blaqks One sales** (clients, those that became companies, customers and lost today; clients added and those from the website form in the period) and **Help requests** (waiting for our answer and answered today; opened, solved and the median time to a first answer in the period). The figures come from count functions in `platform_clients` and `support`; the dashboard still reads no other module's tables.
+
+**BO1e built 2026-11-06** (`feature/blaqks-one-console`): migration 0093 (schema `platform_clients`: clients and their append-only timeline), the `platform_clients` module with `/api/crm/platform/clients` (list with search, stage and owner filters; add, edit, assign and archive; log a call, WhatsApp, email, text or note) and the public intake `POST /api/public/blaqks-one/contact`, the sign-up link, and Platform → Clients on the CRM grid and record slider. The marketing site's contact form relays to the intake (`BLAQKS_ONE_API_ORIGIN`).
+
+**BO1f phase 1 built 2026-11-06:** Team chat for the Blaqks One organisation (the Owner and platform staff only, with #general, groups, direct messages and @mentions); company users get 403 on it and Blaqks One gets 403 on every company's chat.
+
+**BO1c built 2026-11-06:** migration 0094 (schema `support`: requests and append-only messages), the `support` module with the member routes under `/api/crm/workspaces/{workspace}/help` and the team routes under `/api/crm/platform/help`, Help in the account menu with an unread dot, and Platform → Help requests with its badge.

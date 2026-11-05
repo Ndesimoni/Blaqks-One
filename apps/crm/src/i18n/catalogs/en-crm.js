@@ -23,10 +23,12 @@ import enListingShareViews from './en/listingShareViews.js';
 import enListingShares from './en/listingShares.js';
 import enMarketChats from './en/marketChats.js';
 import enPerformance from './en/performance.js';
+import enPlatformClients from './en/platformClients.js';
 import enPlatformCompanies from './en/platformCompanies.js';
 import enPlatformFigures from './en/platformFigures.js';
 import enPlatformMetrics from './en/platformMetrics.js';
 import enPlatformTeam from './en/platformTeam.js';
+import enHelp from './en/help.js';
 import enProperties from './en/properties.js';
 import enRecordGrid from './en/recordGrid.js';
 import enRecordKeeps from './en/recordKeeps.js';
@@ -60,10 +62,12 @@ export const crmCatalogs = {
   marketChats: enMarketChats,
   listingShareViews: enListingShareViews,
   performance: enPerformance,
+  platformClients: enPlatformClients,
   platformCompanies: enPlatformCompanies,
   platformFigures: enPlatformFigures,
   platformMetrics: enPlatformMetrics,
   platformTeam: enPlatformTeam,
+  help: enHelp,
   properties: enProperties,
   recordGrid: enRecordGrid,
   recordKeeps: enRecordKeeps,

@@ -22,8 +22,11 @@ const AREA_ROUTES = {
   companies: ['Workspaces'],
   marketplace: ['Marketplace applications'],
   platform_website: ['Platform website', 'Platform companies'],
+  help_requests: ['Help requests'],
+  clients: ['Blaqks One clients'],
 };
-const ALWAYS = ['Start', 'My profile', 'Sign-in and security'];
+// The team's own chat among the Owner and platform staff (BO1f), never a company's.
+const ALWAYS = ['Start', 'My profile', 'Sign-in and security', 'Team chat'];
 // The organisation's own team feed and the Blaqks One team are the Owner's alone.
 const OWNER_ONLY = ['Team activity', 'Blaqks One team'];
 

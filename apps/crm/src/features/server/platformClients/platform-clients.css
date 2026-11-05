@@ -1,0 +1,135 @@
+/* Platform → Clients (BO1e): Blaqks One's own sales list on the CRM grid and record slider.
+   Shared grid, card, panel and timeline styles come from features/records; this file only
+   adds what the clients screen needs on top of them. */
+.platform-clients-add {
+  flex: none;
+  margin-inline-start: auto;
+}
+.platform-clients-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+}
+/* A new view keeps the rows shown until it arrives, quietly dimmed. */
+.platform-clients-grid.is-loading :is(.grid-scroll, .record-cards) {
+  opacity: 0.6;
+  transition: opacity var(--duration) var(--ease);
+}
+.platform-clients-updating {
+  color: var(--muted);
+  font-size: 13px;
+}
+.platform-clients-more-error {
+  margin: 0;
+  padding: 0 14px 12px;
+}
+:root[data-theme] .platform-clients-table td {
+  white-space: nowrap;
+}
+:root[data-theme] .platform-clients-table td:first-child {
+  white-space: normal;
+}
+.platform-clients-table tbody tr,
+.platform-client-cards .record-card {
+  cursor: pointer;
+}
+.platform-client-cards .record-card:hover {
+  background: var(--hover);
+}
+/* A follow-up date already past reads as due. */
+.platform-client-due {
+  color: var(--danger);
+  font-weight: 600;
+}
+/* Slider: Call, WhatsApp, Email and Text as one group of square icon links. */
+.platform-client-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:root[data-theme] .record-panel .platform-client-contact a.btn {
+  inline-size: 44px;
+  padding-inline: 0;
+  text-decoration: none;
+}
+.platform-client-contact a.btn > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+/* Assign and Archive ask in place of the action row. */
+:root[data-theme] .record-panel .platform-client-ask {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+:root[data-theme] .platform-client-ask > p {
+  flex: 1 1 220px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.platform-client-problem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.platform-client-problem .field-error {
+  margin: 0;
+}
+:root[data-theme] .platform-client-notes {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+/* Log a call, message or note, above the timeline. */
+.platform-client-log {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+}
+:root[data-theme] .platform-client-log-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+.platform-client-log-row {
+  display: grid;
+  grid-template-columns: minmax(0, 160px) minmax(0, 1fr);
+  gap: 10px;
+}
+.platform-client-log .field-error {
+  margin: 0;
+}
+.platform-client-log-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 750px) {
+  .platform-clients .grid-filterbar > .grid-kept-filters {
+    grid-column: 1;
+  }
+  .platform-clients .grid-filterbar > .platform-clients-add {
+    grid-column: 2;
+    grid-row: span 1;
+  }
+  .platform-client-log-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .platform-client-form .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

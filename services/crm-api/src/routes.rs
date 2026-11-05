@@ -127,6 +127,8 @@ pub fn app(state: AppState) -> Router {
         .merge(finance::routes::router())
         .merge(performance::routes::router())
         .merge(crate::platform_metrics::routes::router())
+        .merge(crate::platform_clients::routes::router())
+        .merge(crate::support::routes::router())
         .merge(activity::routes::router())
         .merge(crate::records::shares::routes::router())
         .merge(team::routes::router())

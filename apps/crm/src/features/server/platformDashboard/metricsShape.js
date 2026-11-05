@@ -53,6 +53,8 @@ export const SHAPE = {
       'commissionSharedFils',
     ),
     marketplace: figures('companiesApproved', 'members', 'requestsPosted', 'answers'),
+    help: figures('open', 'waiting'),
+    sales: figures('clients', 'becameCompanies', 'customers', 'lost'),
     ...figures('outsideAgents', 'websiteVisitors'),
   },
   inPeriod: {
@@ -73,6 +75,8 @@ export const SHAPE = {
       'signIns',
     ),
     websiteSales: figures('deals', 'valueFils'),
+    help: figures('opened', 'solved', 'medianFirstAnswerMinutes'),
+    sales: figures('clientsAdded', 'fromWebsite'),
   },
   growth: figures(
     'companiesActiveThisMonth',

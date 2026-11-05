@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { useI18n } from '../../../i18n/useI18n.js';
 import './grid-filter.css';
+import './grid-chip-count.css';
 
 /**
  * The grid's filter bar (the approved mockup's grid view): one field showing the active preset

@@ -78,9 +78,10 @@ test('Blaqks One sees only its platform pages and is refused every company page 
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await signIn(page, 'owner');
-  for (const name of ['Platform', 'Settings'])
+  // Messages holds only Blaqks One's own Team chat (BO1f phase 1); Client inbox stays refused.
+  for (const name of ['Platform', 'Messages', 'Settings'])
     await expect(rail(page).getByRole('button', { name, exact: true })).toBeVisible();
-  for (const name of ['CRM', 'Websites', 'Marketplace', 'Messages'])
+  for (const name of ['CRM', 'Websites', 'Marketplace'])
     await expect(rail(page).getByRole('button', { name, exact: true })).toHaveCount(0);
   for (const name of platformEntries) await openPage(page, name);
   // No company records are ever requested, and a company page says who decides.

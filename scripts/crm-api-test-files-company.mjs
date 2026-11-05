@@ -15,6 +15,10 @@ export const companyTestFiles = [
   'apps/crm/tests/api/platform-metrics.test.mjs',
   'apps/crm/tests/api/platform-events.test.mjs',
   'apps/crm/tests/api/platform-metrics-websites.test.mjs',
+  'apps/crm/tests/api/platform-clients.test.mjs',
+  'apps/crm/tests/api/platform-clients-lifecycle.test.mjs',
+  'apps/crm/tests/api/platform-clients-access.test.mjs',
+  'apps/crm/tests/api/platform-clients-intake.test.mjs',
 ];
 
 export const signupTestFiles = [
@@ -25,4 +29,5 @@ export const signupTestFiles = [
   'apps/crm/tests/api/signup-races.test.mjs',
   'apps/crm/tests/api/signup-release-races.test.mjs',
   'apps/crm/tests/api/signup-invitations.test.mjs',
+  'apps/crm/tests/api/platform-clients-signup.test.mjs',
 ];

@@ -22,7 +22,8 @@ export function useNotices() {
   const member = Boolean(user) && !platform;
   const reviews = hasPlatformArea(user, 'marketplace');
   const counts = {
-    mentions: useChatCounts(api, user?.workspaceId, route, member).mentions,
+    // Mentions come from the person's own team chat: their company's, or Blaqks One's (BO1f).
+    mentions: useChatCounts(api, user?.workspaceId, route, Boolean(user)).mentions,
     handovers: useWaitingCount(waitingSources.Deals, member, route, BELL_POLL_MS),
     agreements: useWaitingCount(waitingSources.Agreements, member, route, BELL_POLL_MS),
     applications: useWaitingCount(waitingSources.Applications, reviews, route, BELL_POLL_MS),

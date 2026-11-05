@@ -22,12 +22,16 @@ test('figures read as counts, AED from whole fils, days and live flags', () => {
   assert.equal(figureText('money', 0, i18n), 'AED 0.00');
   assert.equal(figureText('days', 18.5, i18n), '18.5 days');
   assert.equal(figureText('days', 1, i18n), '1 day');
+  assert.equal(figureText('minutes', 1, i18n), '1 minute');
+  assert.equal(figureText('minutes', 45, i18n), '45 minutes');
+  assert.equal(figureText('minutes', 150, i18n), '2.5 hours');
+  assert.equal(figureText('minutes', 60, i18n), '1 hour');
   assert.equal(figureText('flag', true, i18n), 'Live');
   assert.equal(figureText('flag', 0, i18n), 'Not live');
 });
 
 test('an untracked figure is null on screen and says so in the CSV, never zero', () => {
-  for (const kind of ['count', 'money', 'days', 'flag']) {
+  for (const kind of ['count', 'money', 'days', 'minutes', 'flag']) {
     assert.equal(figureText(kind, null, i18n), null);
     assert.equal(csvValue(kind, null, t), 'Not tracked yet');
   }

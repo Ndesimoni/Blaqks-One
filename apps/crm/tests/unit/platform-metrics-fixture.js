@@ -59,6 +59,8 @@ export function sampleMetrics() {
         commissionSharedFils: 3_000_000,
       },
       marketplace: { companiesApproved: 4, members: 11, requestsPosted: 7, answers: 9 },
+      help: { open: 2, waiting: 1 },
+      sales: { clients: 12, becameCompanies: 3, customers: 2, lost: 1 },
       outsideAgents: 0,
       websiteVisitors: null,
     },
@@ -78,6 +80,8 @@ export function sampleMetrics() {
       whatsappSent: 75,
       chatMessages: 380,
       signIns: 160,
+      help: { opened: 5, solved: 4, medianFirstAnswerMinutes: 150 },
+      sales: { clientsAdded: 4, fromWebsite: 2 },
     },
     trends: {
       months,

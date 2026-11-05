@@ -13,9 +13,11 @@ import { inboxRoutes } from './inbox.js';
 import { integrationRoutes } from './integrations.js';
 import { marketplaceRoutes } from './marketplace.js';
 import { performanceRoutes } from './performance.js';
+import { platformClientRoutes } from './platformClients.js';
 import { platformMetricsRoutes } from './platformMetrics.js';
 import { platformTeamRoutes } from './platformTeam.js';
 import { recordShareRoutes } from './recordShares.js';
+import { supportRoutes } from './support.js';
 import { websiteRoutes } from './websites.js';
 import { whatsappNumberRoutes } from './whatsappNumbers.js';
 
@@ -27,6 +29,7 @@ export function scopedRoutes({ request, scope }) {
     ...companyRoutes({ request, scope }),
     ...platformMetricsRoutes({ request }),
     ...platformTeamRoutes({ request }),
+    ...platformClientRoutes({ request }),
     ...integrationRoutes({ request, scope }),
     ...inboxRoutes({ request, scope }),
     ...chatRoutes({ request, scope }),
@@ -34,6 +37,7 @@ export function scopedRoutes({ request, scope }) {
     ...marketplaceRoutes({ request, scope }),
     ...importRoutes({ request, scope }),
     ...recordShareRoutes({ request, scope }),
+    ...supportRoutes({ request, scope }),
     ...websiteRoutes({ request, scope }),
     ...whatsappNumberRoutes({ request, scope }),
   };

@@ -15,6 +15,9 @@ const translated = {
   'Shared record': 'recordShares',
   'Platform dashboard': 'platformMetrics',
   'Blaqks One team': 'platformTeam',
+  Help: 'help',
+  'Help requests': 'help',
+  'Blaqks One clients': 'platformClients',
 };
 
 /** Pages that render their own main heading; the top bar then names them as plain text. */

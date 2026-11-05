@@ -65,6 +65,11 @@ pub fn totals(g: &Gathered, companies: &[CompanyRow]) -> Value {
             "companiesApproved": market.companies_approved, "members": market.members,
             "requestsPosted": market.requests_posted, "answers": market.answers,
         },
+        "help": {"open": g.help.open, "waiting": g.help.waiting},
+        "sales": {
+            "clients": g.sales.clients, "becameCompanies": g.sales.became_companies,
+            "customers": g.sales.customers, "lost": g.sales.lost,
+        },
         "outsideAgents": 0,
         "websiteVisitors": null,
     })

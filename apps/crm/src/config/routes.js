@@ -13,6 +13,11 @@ export const settingsRoutes = [
   { name: 'Workspaces', path: '/workspaces' },
   { name: 'Platform dashboard', path: '/platform-dashboard' },
   { name: 'Blaqks One team', path: '/blaqks-one-team' },
+  // Help requests (BO1c): every member's Help, and Blaqks One's queue.
+  { name: 'Help', path: '/help' },
+  { name: 'Help requests', path: '/platform-help' },
+  // Blaqks One's own sales clients (BO1e), never a company's.
+  { name: 'Blaqks One clients', path: '/platform-clients' },
   { name: 'Team activity', path: '/team-activity' },
   { name: 'Marketplace applications', path: '/marketplace-applications' },
 ];

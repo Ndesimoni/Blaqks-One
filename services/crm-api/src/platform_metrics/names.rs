@@ -33,6 +33,18 @@ pub const WHATSAPP_SENT: &str = "whatsapp_sent";
 pub const MESSAGE_SENT: &str = "message_sent";
 pub const CHAT_MESSAGE_SENT: &str = "chat_message_sent";
 
+// Blaqks One's own clients (BO1e; usage events of the organisation, never a name or contact
+// detail): `client_created_website_form` names the client's source and
+// `client_stage_changed_contacted` the new stage.
+pub const CLIENT_CREATED: &str = "client_created";
+pub const CLIENT_STAGE_CHANGED: &str = "client_stage_changed";
+pub const CLIENT_LINKED: &str = "client_linked";
+
+// Help requests (BO1c): usage events of the requester's company, never a subject or message.
+pub const HELP_REQUEST_OPENED: &str = "help_request_opened";
+pub const HELP_REQUEST_ANSWERED: &str = "help_request_answered";
+pub const HELP_REQUEST_SOLVED: &str = "help_request_solved";
+
 /// The event for a record created in or deleted from `collection`, as in
 /// `record_created_follow_ups`.
 pub fn record_event(base: &str, collection: &str) -> String {

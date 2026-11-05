@@ -8,7 +8,7 @@ import { TREND_SERIES } from './metricsModel.js';
  * the twelve-month trends and each company's usage (never money). Money is AED with two
  * decimals so a spreadsheet can sum it; untracked figures say so instead of reading zero.
  */
-const UNITS = { money: 'AED', days: 'days' };
+const UNITS = { money: 'AED', days: 'days', minutes: 'minutes' };
 const MONEY_SERIES = (key) => key.endsWith('Fils');
 
 export const metricsCsvName = (period, day) => `Blaqks_One_metrics_${period}_${day}.csv`;

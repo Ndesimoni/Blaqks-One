@@ -16,6 +16,7 @@ pub mod marketplace;
 pub mod media;
 pub mod outbox;
 pub mod performance;
+pub mod platform_clients;
 pub mod platform_metrics;
 pub mod publications;
 pub mod records;
@@ -25,6 +26,7 @@ pub mod shutdown;
 pub mod signup;
 pub mod sites;
 pub mod state;
+pub mod support;
 pub mod team;
 pub mod workspaces;
 
