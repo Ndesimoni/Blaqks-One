@@ -41,6 +41,9 @@ test('an Admin links a visible deal and must clear one that is unavailable', asy
   const { page, context } = await memberPage(browser, team.people.admin.email);
   try {
     let details = await openLog(page, plain);
+    // An empty deal field stays out of the facts until "Show N empty fields" (mockup).
+    await expect(detailDeal(details)).toHaveCount(0);
+    await details.getByRole('button', { name: /^Show \d+ empty fields?$/ }).click();
     await expect(detailDeal(details)).toHaveText('—');
     let form = await editLog(page, details);
     const field = form.getByLabel(DEAL_FIELD, { exact: true });

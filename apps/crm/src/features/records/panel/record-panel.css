@@ -58,3 +58,17 @@
     box-shadow: none;
   }
 }
+/* Call, Message and Delete as square icon buttons in the slider header (approved mockup); the
+   name stays for screen readers and shows as the tooltip. */
+:root[data-theme] .record-panel .record-panel-actions .btn.record-icon-action {
+  inline-size: 44px;
+  padding-inline: 0;
+}
+.record-panel-actions .record-icon-action > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

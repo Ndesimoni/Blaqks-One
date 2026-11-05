@@ -8,6 +8,7 @@ import { KeptNotice } from './KeptNotice.jsx';
 import { RecordSharing } from './shares/RecordSharing.jsx';
 import { OutsideSharing } from './listingShares/OutsideSharing.jsx';
 import { PropertyWebsitePanel } from './website/listings/PropertyWebsitePanel.jsx';
+import { RecordQuickAction } from './quickActions/RecordQuickAction.jsx';
 import { actionCollection, serverIdPolicy } from './access.js';
 
 export function ServerDialogs() {
@@ -32,6 +33,7 @@ export function ServerDialogs() {
             ) : (
               <>
                 <ContactActions module={detail.module} record={detail.record} />
+                <RecordQuickAction module={detail.module} record={detail.record} />
                 <AssignmentDetails module={detail.module} record={detail.record} />
                 <RecordSharing module={detail.module} record={detail.record} />
                 <OutsideSharing module={detail.module} record={detail.record} />

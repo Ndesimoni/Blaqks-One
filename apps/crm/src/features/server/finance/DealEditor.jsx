@@ -18,19 +18,19 @@ import { DealEstimatePanel } from './DealEstimatePanel.jsx';
  * stepper. The live estimate is labelled as an estimate; the server fixes the figures when
  * the deal is earned. Money is typed as AED text and sent only as integer fils.
  */
-export function DealEditor({ deal, onClose, onDone }) {
+export function DealEditor({ deal, clientId = '', onClose, onDone }) {
   const { actions, overview, user, access } = useFinanceContext();
   const { entries } = useRecords();
   const latest = deal ? overview.deals.find((row) => row.id === deal.id) : null;
-  const state = useDealEditor({ deal, latest, actions, onDone, onClose });
+  const state = useDealEditor({ deal, clientId, latest, actions, onDone, onClose });
   const titleId = useId();
   const stepTitleId = useId();
   const options = useMemo(
     () => ({
-      clients: clientOptions(entries, user, access, deal?.clientId ?? ''),
+      clients: clientOptions(entries, user, access, deal?.clientId ?? clientId),
       properties: propertyOptions(entries, deal?.propertyId ?? ''),
     }),
-    [entries, user, access, deal],
+    [entries, user, access, deal, clientId],
   );
   const { step, review, busy } = state;
   return (

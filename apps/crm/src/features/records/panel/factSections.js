@@ -1,3 +1,4 @@
+import { valueOf } from '../../../lib/crm.js';
 import { recordDetailFields, recordFormSections } from '../formSections.js';
 
 const ADDITIONAL = 'additional';
@@ -24,4 +25,14 @@ export function factSections(module, calculatedTitle) {
   if (remaining.size)
     sections.push({ id: 'calculated', title: calculatedTitle, fields: [...remaining.values()] });
   return sections.filter((section) => section.fields.length);
+}
+
+/**
+ * True when a fact has nothing to show (approved mockup: the slider lists only filled facts).
+ * Calculated facts count by their computed value; a conversation's deal by its stored link.
+ */
+export function emptyFact(data, module, record, field) {
+  if (module === 'Interaction log' && field.key === 'deal_id_optional') return !record[field.key];
+  const value = valueOf(data, module, record, field);
+  return value === undefined || value === null || value === '' || value === '—';
 }

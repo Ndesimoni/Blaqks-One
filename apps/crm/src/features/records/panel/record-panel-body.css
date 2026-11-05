@@ -72,10 +72,25 @@
   font-weight: 500;
   line-height: 1.5;
 }
+/* "Show N empty fields": a quiet link under the facts. */
+.record-facts-toggle {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.record-facts-toggle:hover {
+  color: var(--ink);
+}
 /* Wide panels: facts on the left, related content on the right; facts alone fill the row. */
 @media (min-width: 1024px) {
   .record-panel-columns {
-    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
   }
   .record-panel-columns:has(> .record-panel-side:empty) {
     grid-template-columns: minmax(0, 1fr);

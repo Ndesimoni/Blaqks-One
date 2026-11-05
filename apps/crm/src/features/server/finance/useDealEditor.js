@@ -14,9 +14,9 @@ const fieldOrder = dealSteps.flatMap((step) => step.fields);
  * validates before advancing and moving back keeps every entry. A refused or failed save
  * keeps the whole draft; a version conflict offers to reload the latest saved deal.
  */
-export function useDealEditor({ deal, latest, actions, onDone, onClose }) {
+export function useDealEditor({ deal, clientId = '', latest, actions, onDone, onClose }) {
   const [base, setBase] = useState(deal);
-  const [initial, setInitial] = useState(() => draftFromDeal(deal));
+  const [initial, setInitial] = useState(() => draftFromDeal(deal, clientId));
   const [form, setForm] = useState(initial);
   const [step, setStep] = useState(0);
   const [reached, setReached] = useState(0);

@@ -8,12 +8,13 @@ import { ContactCommand } from './ContactCommand.jsx';
 import { ShareChoice } from './ShareChoice.jsx';
 
 /**
- * The record's actions in the panel header. The rules are unchanged from the former footer:
+ * The record's actions in the panel header (approved mockup: Share, then Call and Message as
+ * icons, then the primary). The rules are unchanged from the former footer:
  * Delete and Edit follow the caller's permissions, and a record nobody may change offers only
  * Close. The group keeps the `drawer-footer` class, the shared hook for a dialog's record
- * actions that browser checks read. Sections' `commands` add Call and Message
- * and the mockup's Share before it and, for a listing, Publish on website after it, which then
- * takes the one primary place from Edit.
+ * actions that browser checks read. Sections' `commands` add Share, Call and Message
+ * before it and, after it, a listing's Publish on website or the quick
+ * action (Convert to deal, Add a property), which then takes the one primary place from Edit.
  */
 export function RecordPanelActions({
   module,
@@ -34,15 +35,16 @@ export function RecordPanelActions({
   const { user } = useSession();
   const hintId = useId();
   const changeable = !readOnly && (canDelete || canEdit);
-  const publish = commands.publish?.run ? commands.publish : null;
+  // Publish on website, or the quick action (Convert to deal, Add a property), takes the primary.
+  const publish = [commands.publish, commands.quick].find((command) => command?.run) || null;
   const shares = [commands.shareColleague, commands.shareCompany].filter((c) => c?.run);
   const contact = [commands.call, commands.message].filter((c) => c?.run || c?.href);
   return (
     <div className="record-panel-actions">
-      {contact.map((command) => (
-        <ContactCommand key={command.label} command={command} />
-      ))}
       <ShareChoice choices={shares} />
+      {contact.map((command) => (
+        <ContactCommand key={command.label} command={command} iconOnly />
+      ))}
       <div className="drawer-footer" role="group" aria-label={t('recordPanel.actions')}>
         {module === 'Clients' && showMessaging && !readOnly && (
           <>
@@ -69,6 +71,8 @@ export function RecordPanelActions({
         {changeable && canDelete && (
           <Button
             variant="danger-light"
+            className="record-icon-action"
+            title={t('recordPanel.delete')}
             icon="trash"
             disabled={busy}
             onClick={() => remove(module, record)}
@@ -91,7 +95,11 @@ export function RecordPanelActions({
         )}
       </div>
       {publish && (
-        <Button icon="monitor" disabled={busy || publish.disabled} onClick={publish.run}>
+        <Button
+          icon={publish.icon || 'monitor'}
+          disabled={busy || publish.disabled}
+          onClick={publish.run}
+        >
           {publish.label}
         </Button>
       )}

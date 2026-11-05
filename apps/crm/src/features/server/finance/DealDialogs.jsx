@@ -15,7 +15,8 @@ import { FinanceDialog } from './FinanceDialog.jsx';
 export function DealDialogs({ dialog, close }) {
   const { overview } = useFinanceContext();
   if (!dialog) return null;
-  if (dialog.kind === 'create') return <DealEditor deal={null} onClose={close} onDone={close} />;
+  if (dialog.kind === 'create')
+    return <DealEditor deal={null} clientId={dialog.clientId} onClose={close} onDone={close} />;
   // The latest view of the request decides its status and `allowed` flags.
   const handover =
     dialog.handover &&

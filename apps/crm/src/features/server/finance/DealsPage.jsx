@@ -15,6 +15,7 @@ import { HandoverRequests } from './HandoverRequests.jsx';
 import { CommissionStatement } from './CommissionStatement.jsx';
 import { DealsBoard } from './DealsBoard.jsx';
 import { useEntryColumns } from './useEntryColumns.js';
+import { useDealStartRequest } from './useDealStartRequest.js';
 
 const dealViews = ['kanban', 'list'];
 const tabs = [
@@ -53,6 +54,7 @@ export function DealsPage() {
   };
   const open = (kind, deal = null, extra = {}) => setDialog({ kind, dealId: deal?.id, ...extra });
   const add = actions.can('createDeal') ? () => open('create') : null;
+  useDealStartRequest((clientId) => open('create', null, { clientId }), Boolean(add));
   const reset = () => changeFilters(emptyDealFilters);
   const empty = deals.length ? (
     <Empty
