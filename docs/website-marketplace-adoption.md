@@ -1,51 +1,72 @@
-# Main Next.js marketplace design adoption — 5 November 2026
+# Approved marketplace design in Next.js
 
-The owner selected the navy/white/gold Blaqks One marketplace as the general website,
-replacing the earlier green general-site presentation. The implementation stays in
-`apps/website` with Next.js 16, React 19 and TypeScript. The standalone source
-reconstruction on `website/marketplace-source-rebuild` is a reference, not the active runtime.
+The main public website (`apps/website`, platform hosts) now mounts the recovered approved
+Blaqks One presentation inside the Next.js App Router. It replaces the earlier partial
+marketplace reconstruction. Company websites retain their independent compositions;
+`apps/marketing` and the CRM are unchanged.
 
-## What changed
+## Design source and implementation
 
-- Platform-only Home, header, expandable left-side search and footer components; navy/gold
-  visual tokens apply across existing general-site property, directory and detail routes.
-- Three featured listings, benefits, editorial panel, opportunity sections, neighbourhoods,
-  professional workspace introduction and one compact featured-agent strip last before footer.
-- General agent directory uses five records per page. The Next server adapts the existing
-  twelve-item API pages, fetching a second public page only across a boundary; no backend
-  response or private API contract changed. Company directories keep their existing pagination.
-- `/deals` and `/professionals` are general-site routes; company hosts reject them.
-- `WEBSITE_CRM_URL` configures the real professional app entry; only HTTPS or loopback HTTP
-  without credentials/query/hash is accepted. Signup continues to the CRM's actual hash route.
-  When no CRM URL is configured, visitors receive the professional-access page.
-- Existing public catalogue projection, scoped host resolution, fail-closed API handling,
-  enquiry routing, social links, CMS hero overrides and company themes remain.
+The canonical source is the original Site `appgprj_6aeba4d0ffb08191ac1948cb6b0c29d4`,
+revision `b939501e40fb3e1a5319c8f1f401ec138bed2fc9`, previously published at
+<https://blaqks-one-welcome-design.cocoamoat2.chatgpt.site/>.
+Its complete source is retained in `apps/website/reference/approved-source.tar.gz`.
+All five original JPG assets are copied without modification; tests compare their bytes
+with the archive. The original typography, styles, layouts and interactions are reused.
 
-## Truthful limits
+This is a Next.js integration of the recovered renderer, not a JSX rewrite of every
+original template. A React client boundary mounts the original view engine, with Next
+routing, public catalogue binding and a native connected enquiry form. There is no iframe.
+Build preparation generates sample SSR snapshots, scoped CSS, a browser bundle and fixture
+JSON. Generated files are ignored and rebuilt by predev/pretest/pretypecheck/prebuild.
+The earlier partial platform components/styles have been removed. Existing company styles
+are loaded separately, so they cannot blend into the approved marketplace presentation.
 
-The current public listing contract does not publish deal type, price-history/reference
-figures or listing-status fields. Deal sections intentionally show no verified listings;
-no sample discounts, distressed sellers or stale records are invented in API mode.
-An explicit public-field/backend change is needed before the original preview's three
-sample distress cards can become live deals.
+To inspect or edit the original source, extract the archive into a temporary directory:
 
-This packet does not port the standalone prototype's browser-local saved/recent/comparison
-or simulated social/account flows into the connected application. It keeps real CRM entry
-and the existing live enquiry workflow. Those prototype extras need separate scoped work.
-It does not deploy the app, activate domains, merge the GitHub main branch or change a
-company website's template. Exact screenshot parity with the inaccessible original source
-is not claimed.
+```bash
+mkdir -p /tmp/blaqks-approved
+ tar -xzf apps/website/reference/approved-source.tar.gz -C /tmp/blaqks-approved
+```
 
-## Verification
+The original files live under `dist/`. Repack intentional canonical edits using
+`tar -czf apps/website/reference/approved-source.tar.gz -C /tmp/blaqks-approved dist`.
+Integration adjustments belong in `apps/website/scripts/reference-*.mjs`; do not edit
+generated `public/approved` or `src/generated` outputs.
 
-Website model/decoder/API tests, typecheck and production build pass; the expanded directory
-checks cover boundary continuity, no duplicates, clamping and failed/changed upstream data.
-CRM regression: 578 tests and production build pass. Formatting and the size baseline pass;
-36 pre-existing oversized repository files remain. No private database was touched.
+## Included presentation
 
-Managed Next preview could not start because the preview service adds Vite-only CLI flags.
-Visual review used separate ReactDOMServer fixtures of the actual components and styles,
-with synthetic catalogue data. Platform home, agents, property results and all four company
-home themes showed no horizontal overflow at 375px content width. This is component/layout
-verification, not hydrated Next navigation, live enquiry delivery or browser end-to-end proof.
-Full connected website checks remain for CI/deployment infrastructure.
+The recovered home, property results/details, gallery, filters, agents/companies and
+profiles, deals, featured sections, headers/footers, About/Contact/help/professional pages,
+saved/recent/compare tools and account/onboarding screens are included. Agent pagination
+and the compact featured-agent strip retain the original design. Existing community and
+developer routes use the same recovered visual components.
+
+Sample mode is explicit and restricted to recognised local hosts. Sample data, deals and
+account/social/verification screens are design previews, with the original preview notices;
+they do not create real accounts or send provider messages. Browser-local property tools
+are scoped by site identity. Live professional signup/signin entry links use the configured
+CRM URL. A direct account preview route is not evidence of real authentication.
+
+API mode still resolves the host and public page through the existing server-only API
+adapter before rendering. Unknown hosts/foreign IDs fail closed; API errors never fall
+back to fictional catalogue data. Only projected public records reach the browser.
+Live enquiry intake retains the existing Next endpoint and target/ownership validation.
+The public contract does not expose verified discount/distress metadata, so live deals
+are not fabricated. Final legal text, provider authentication/delivery, broader content
+binding and production deployment remain separate work.
+
+## Verification and limits
+
+The focused website suite includes 36 model/design checks plus one synthetic public API
+consumer integration. The tests cover original image bytes, page snapshots, route mapping,
+site-scoped identity and embedded JSON escaping, alongside existing public-contract checks.
+Type generation/typecheck and the production webpack build pass. The repository file-size
+baseline has no new violations; 36 pre-existing oversized files remain. CRM source and
+private data were not changed.
+
+A browser security-policy rejection prevented the final rendered browser review in this
+session. Pixel-for-pixel parity, hydrated navigation across every route, mobile visual QA
+and connected end-to-end delivery are therefore not certified. The recovered assets and
+presentation source are exact; the Next integration still needs that visual acceptance pass.
+This change does not deploy the website, activate domains or merge the default branch.

@@ -4,10 +4,17 @@ Native **Next.js 16 / React 19 / TypeScript** application for the general Blaqks
 
 ## Main website design
 
-The general platform site now uses the navy/white/gold marketplace design selected by the
-owner on 5 November 2026. It is implemented natively in Next.js; the earlier standalone
-HTML reconstruction is not the runtime. Company themes remain independent. See
-[adoption scope and checks](../../docs/website-marketplace-adoption.md).
+The general platform site now mounts the complete recovered approved navy/white/gold
+presentation in a Next.js client boundary. The original HTML/JavaScript renderer and all
+five original property pictures are preserved; this is not a JSX rewrite of each template.
+Next supplies routing, host resolution, public API projection and connected enquiry intake.
+Company themes remain independent. See [source, scope and checks](../../docs/website-marketplace-adoption.md).
+
+`npm run prepare:reference` generates the approved runtime, styles and SSR sample snapshots
+from `reference/approved-source.tar.gz`. The normal dev/test/typecheck/build commands run
+this automatically. Do not edit the generated `public/approved` or `src/generated` files.
+Saved/recent/compare and the full original account/onboarding UI are included. Social login
+and email verification in sample mode remain labelled simulations, not connected providers.
 
 Set `WEBSITE_CRM_URL` to the CRM application's absolute public base URL to enable the
 professional sign-in and company signup links. Use HTTPS in production; loopback HTTP is

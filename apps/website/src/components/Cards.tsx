@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Agent, Catalogue, Company, Listing } from '../lib/types';
 import { ContactLinks, initials, money } from './ui';
-import { AgentPortrait } from './platform/AgentPortrait';
 
 export function PropertyCard({ listing, catalogue }: { listing: Listing; catalogue: Catalogue }) {
   const agent = catalogue.agents.find((item) => item.id === listing.agent);
@@ -63,25 +62,13 @@ export function PropertyGrid({
     </div>
   );
 }
-export function AgentCard({
-  agent,
-  catalogue,
-  portrait = false,
-}: {
-  agent: Agent;
-  catalogue: Catalogue;
-  portrait?: boolean;
-}) {
+export function AgentCard({ agent, catalogue }: { agent: Agent; catalogue: Catalogue }) {
   const company = catalogue.companies.find((item) => item.id === agent.company);
   return (
     <article className="person-card">
-      {portrait ? (
-        <AgentPortrait agent={agent} />
-      ) : (
-        <span className="avatar" aria-hidden="true">
-          {initials(agent.name)}
-        </span>
-      )}
+      <span className="avatar" aria-hidden="true">
+        {initials(agent.name)}
+      </span>
       <p className="eyebrow">{agent.specialty}</p>
       <h3>
         <Link href={`/agents/${encodeURIComponent(agent.id)}`}>{agent.name}</Link>

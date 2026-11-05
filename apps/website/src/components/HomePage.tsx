@@ -3,11 +3,8 @@ import type { PageData } from '../lib/types';
 import { SearchForm } from './SearchForm';
 import { AgentCard, PropertyGrid } from './Cards';
 import { HomeHero } from './HomeHero';
-import { PlatformHome } from './platform/PlatformHome';
 
-export function HomePage(data: PageData) {
-  const { site, catalogue } = data;
-  if (site.kind === 'platform') return <PlatformHome {...data} />;
+export function HomePage({ site, catalogue }: PageData) {
   return (
     <>
       <HomeHero site={site} catalogue={catalogue} />
@@ -77,7 +74,9 @@ export function HomePage(data: PageData) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">PEOPLE WHO GUIDE YOU</p>
-            <h2>A personal introduction.</h2>
+            <h2>
+              {site.kind === 'platform' ? 'Meet the professionals.' : 'A personal introduction.'}
+            </h2>
           </div>
           <Link href="/agents">Meet the team →</Link>
         </div>

@@ -6,11 +6,25 @@ import { DirectoryPage } from './DirectoryPage';
 import { ProfilePage } from './ProfilePage';
 import { InfoPage } from './InfoPage';
 import { EnquiryPage } from './EnquiryPage';
-import { PlatformDeals, PlatformProfessionals } from './platform/PlatformPages';
+import { ReferenceWebsite } from './reference/ReferenceWebsite';
+import { crmEntry } from '../lib/crm-entry';
+import approvedPages from '../generated/approved-pages.json';
+import { referenceRoute } from '../lib/reference/navigation';
 
 export function WebsitePage(data: PageData) {
-  if (data.page === 'deals') return <PlatformDeals />;
-  if (data.page === 'professionals') return <PlatformProfessionals />;
+  if (data.site.kind === 'platform')
+    return (
+      <ReferenceWebsite
+        data={data}
+        crm={crmEntry()}
+        initialHTML={
+          data.site.sample
+            ? (approvedPages as Record<string, string>)[referenceRoute(data)] ||
+              '<p role="status">Opening Blaqks One…</p>'
+            : '<p role="status">Opening Blaqks One…</p>'
+        }
+      />
+    );
   if (data.page === 'home') return <HomePage {...data} />;
   if (data.page === 'properties') return <PropertiesPage {...data} />;
   if (data.page === 'property') return <PropertyPage {...data} />;

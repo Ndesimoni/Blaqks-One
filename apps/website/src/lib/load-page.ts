@@ -9,15 +9,45 @@ import { samplePage } from './page-model.ts';
 import { livePage } from './live-page.ts';
 import { PublicNotFound } from './public-api.ts';
 import { platformAgents } from './agent-directory.ts';
+import { referenceSampleCatalogue } from './reference/sample.ts';
 
 export const loadPage = cache(async (pathname: string, serializedQuery: string) => {
   const route = websiteRoute(pathname ? pathname.split('/') : []);
   if (!route) notFound();
   const { site, host } = await currentSite();
-  if (['deals', 'professionals'].includes(route.page) && site.kind !== 'platform') notFound();
+  if (
+    [
+      'deals',
+      'professionals',
+      'saved',
+      'recent',
+      'compare',
+      'signup',
+      'signin',
+      'verify',
+      'company-setup',
+      'invite',
+      'ready',
+      'workspace',
+      'reset',
+      'reset-sent',
+      'expired',
+      'help',
+      'distress-deals',
+      'discount-deals',
+    ].includes(route.page) &&
+    site.kind !== 'platform'
+  )
+    notFound();
   const query = JSON.parse(serializedQuery) as Query;
   if (site.sample) {
-    const data = samplePage(site, sampleCatalogue(site), route.page, query, route.id);
+    const data = samplePage(
+      site,
+      site.kind === 'platform' ? referenceSampleCatalogue() : sampleCatalogue(site),
+      route.page,
+      query,
+      route.id,
+    );
     if (!data) notFound();
     return data;
   }

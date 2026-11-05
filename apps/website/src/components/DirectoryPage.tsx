@@ -46,7 +46,7 @@ export function DirectoryPage({ page, catalogue, query, site, directory }: PageD
       {count === 0 ? (
         <Empty title="No matches found." text="Try another search or emirate." />
       ) : (
-        <DirectoryContent page={page} catalogue={catalogue} platform={site.kind === 'platform'} />
+        <DirectoryContent page={page} catalogue={catalogue} />
       )}
       {pages > 1 && (
         <nav className="pagination" aria-label="Directory pages">
