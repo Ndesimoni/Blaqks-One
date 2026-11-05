@@ -80,7 +80,7 @@ The reference is the approved clickable mockup (link in [product decisions](prod
 
 34. [x] **Sign in and sign up** (`e306db6`; owner 2026-11-05: centred cards on their own pages instead of the split screen; joining from an invitation signs the person in): the three-step sign-up progress, password rules and the code entry.
 35. [x] **Start page** (`588c04f`; Get started moved here from the Dashboard with our company-profile step; figures on every card where they can be read; the mockup's quick actions): compare with the mockup's product cards, Messages strip and the Get started checklist.
-36. [ ] **Record slider**: compare with the mockup's large right-hand slider (gallery, fields, private box, activity timeline).
+36. [x] **Record slider** (`4efd8cb`; facts list only filled fields with Show N empty fields; Share, then Call and Message as icons; Convert to deal on clients and leads, Add a property on contacts; Delete and Edit record kept): compare with the mockup's large right-hand slider (gallery, fields, private box, activity timeline).
 37. [ ] **Create form slider**: compare with the mockup's create form (sections, step chips, footer).
 38. [ ] **Empty, loading, error and no-access states**: compare with the mockup's state pages and skeletons.
 
@@ -105,4 +105,4 @@ Screenshots of every remaining screen against the mockup: none matches yet, so n
 - Company (15): the save bar shows the version, not who saved it or when (the company's history keeps the actor, but not for display yet); seats show the total in use without the number of invitations.
 - My profile (14): no "Let your Admin manage" card (that delegation, WD1, is not built yet); Language stays its own card (the frozen Arabic preview), not a select inside the form; Public WhatsApp and email stay typed fields, not choices of the member's company number and address.
 - Guide (13): no "Was this helpful?" buttons, since nothing would save the answer; articles show only for sections the person can open.
-- Record slider (4b): the timeline has no "+ Activity" menu (its three add buttons cover it) and no "Published on the website" or "Price set" events (the timeline reads CRM activity only; price history is not recorded). Contact and client sliders (Call, Message, linked records) remain under item 36.
+- Record slider (4b): the timeline has no "+ Activity" menu (its three add buttons cover it) and no "Published on the website" or "Price set" events (the timeline reads CRM activity only; price history is not recorded). Item 36 left out: a contact's timeline (follow-ups and conversations belong to clients, so a contact has none to show); the mockup's masked phone in a client's facts (the full number stays for people who may see the record); a contact's linked deals and tenants (contacts link only to properties).
