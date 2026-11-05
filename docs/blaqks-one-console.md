@@ -117,3 +117,19 @@ The security engineer's review traced every path from the Blaqks One account (`s
 - `companies`: per company name, Admin, joined, status, seats used and limit, active users in 30 days, last active, number of records. No money.
 
 The screen is Platform → Dashboard (`/platform-dashboard`): the period switch and Download CSV, figure tiles, twelve-month trend panels, panels for websites, deals and money, transactions between brokers, marketplace, growth, messages and activity and users outside the companies, then the per-company usage grid.
+
+## 8. BO1b Blaqks One team: roles and areas (owner, 2026-11-05)
+
+Owner answers of 2026-11-05: people on the Blaqks One team get **a role as a starting preset plus ticks for exactly the areas they may use**, and the team is built before help requests. They never see a company's clients, deals or messages, whatever they are given.
+
+**Areas.** `dashboard` (Platform → Dashboard and its CSV), `companies` (the company list and the company panel's people, read only), `company_controls` (suspend, reactivate and archive a company's people, change seat limits), `invite_admins` (Team & access: invite and cancel invitations of companies' owning Admins), `marketplace` (marketplace applications: approve, decline, revoke), `platform_website` (the general site's content and company website eligibility), `help_requests` (BO1c; reserved until it ships). `company_controls` needs `companies`.
+
+**Presets.** Support: companies, help requests. Analyst: dashboard. Platform admin: every area. The preset only fills the ticks; the saved ticks decide.
+
+**Accounts.** A new role `platform` in the Blaqks One organisation, with a row in `crm_platform_access` (owned by `team`: user, preset, areas, version). Only the Owner (`super-admin`) invites, edits, suspends, reactivates and archives platform staff, on Settings → Blaqks One team, through the existing invitation and activation flow. Platform staff never manage the team, never change their own areas, never invite platform staff, and are never offered company positions, module grants or a CRM workspace; company forms never offer the platform role.
+
+**Enforcement.** `workspaces::platform::operator(tx, actor, area)` re-reads the live account inside the handler's transaction: the Owner passes every area; a live `platform` member passes only an area in their saved ticks; everyone else is refused. Every platform handler names its area. `ensure_access` keeps refusing the platform role (its allowlist is admin and staff). The profile sent to the browser carries `platformAreas` for showing pages; the server decides every request.
+
+**Screens.** Settings → Blaqks One team (Owner only): the people with role, areas, status and last active; Invite (name, email, phone, role preset, area ticks); Edit areas; Suspend, Reactivate and Archive. Platform staff see only the pages of their areas, plus My profile and Sign-in and security; the company panel shows its controls only with `company_controls`.
+
+**Security notes.** The role constraint, the access row and the invitation are written in one transaction; an area list is validated against the fixed list; a role or area change and an archive take effect on the next request; the Owner account can never be edited, suspended or archived from this page; the platform activity records who changed whose areas, without other details.
