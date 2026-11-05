@@ -71,3 +71,34 @@ The internal role name `super-admin` stays in the database for the Owner (renami
 ## 5. Screens
 
 The platform dashboard follows the CRM Dashboard's figure tiles and panels: a row of figure tiles (companies, active users, listings live, deals this month with their AED total), the trend charts, Help requests waiting, newest companies, and the per-company usage grid with search and the shared grid footer. Help requests use the Client inbox's three-pane pattern (list, thread, company card with plan and seats). Everything follows the approved mockup's style, light and dark, phones included.
+
+## 6. BO1a security review (2026-11-05) and the implementation checklist
+
+The security engineer's review traced every path from the Blaqks One account (`super-admin`, workspace `super-admin-workspace` = `workspaces::ORGANISATION`) into company data. Answers to its open questions (owner 2026-11-05 for Q3; the rest follow the owner's earlier answers): **Q1** Blaqks One keeps suspending and archiving a company's individual agents, through a platform route on Companies, never by entering the company; **Q2** there is no restore yet, so it is not part of BO1 (a later, separately reviewed packet); **Q3** any company Admin may import the organisation browser set into their own company; **Q4** an archived agent's records still go to the Admin queue and stay editable company records, only the account is read-only; **Q5** no organisation staff exist; staff invitations into the organisation are refused; **Q6** the Owner keeps the organisation's own team feed until the platform activity log exists; **Q7** marketplace application review keeps its per-type record counts, which the MK1 eligibility check needs.
+
+**API (services/crm-api/src)**
+
+1. `workspaces::ensure_access` passes only the caller's own workspace, for roles `admin` and `staff` (an allowlist, so later platform roles are refused by default), never `ORGANISATION`. This one gate covers records, files, assignments, activity, finance, performance, team and imports.
+2. `workspaces::member` (and `ensure_writable`) drops the `super-admin` exception.
+3. `GET /workspaces` returns the caller's own workspace only; the organisation is labelled "Blaqks One".
+4. A single platform guard `workspaces::platform::operator(tx, actor)` (the live organisation member with role `super-admin`), re-read inside each platform handler's transaction; sites, seat limits, marketplace decisions and the new agent controls use it.
+5. `team::access::resolve_owner`: the Blaqks One account resolves only the organisation; an Admin only their own workspace; no archived owners.
+6. The archived member list moves to the Admin for their own workspace; the Owner keeps archived Admins in the organisation.
+7. Staff invitations into the organisation are refused; Admin invitations stay.
+8. Archiving or suspending a company's agent goes through a platform route (operator, live company owner, target must be that owner's member), re-reading the operator under the archive lock.
+9. Seat limits use the operator guard and `lock_active_admin`, not `ensure_writable`.
+10. Imports: the live owning Admin into their own workspace only; staff and Blaqks One refused; a personal source names a live, accepted member of the same company (checked at preview and again at commit under the lock, and stored with the plan); the organisation source imports into the Admin's own company; parents go to the chosen member.
+11. The Blaqks One profile carries no CRM permissions, record actions or finance scope (`Permissions::default`, finance scope none); `manages_team` stays for its own team.
+12. Remove the dead `super-admin` branches in records history, finance overview, performance visibility and activity query.
+13. The sample-data command refuses the organisation.
+14. Already refused today and kept with regression tests: media upload, record shares, inbox, chat, agreements, listing shares, integrations, mailbox, numbers, company sites, enquiries, marketplace member routes, company profile.
+
+**Frontend (apps/crm/src)**
+
+15. `ServerDirectory` always uses the caller's own workspace (no `?workspace=`); Blaqks One gets a platform shell that never loads records or media.
+16. The workspace switcher, picker dialog and every "Open" link into a company are removed; seat limits and agent controls live on Companies.
+17. `canOpenSection`: Blaqks One opens only the platform routes, My profile and Sign-in and security; the product rail, settings groups and Start follow.
+18. Team & access: the archived tab for the Admin's own staff; imports become the Admin's, choosing a member of their company instead of a workspace.
+19. "Super Admin" reads "Blaqks One" everywhere outside the frozen Arabic catalogue; AGENTS.md, data migration, private workspaces and the security engineer's instructions are updated with the new rules.
+
+**Tests (apps/crm/tests/api)**: T1 the workspace list is the caller's own; T2 every data family refuses Blaqks One on a company workspace; T3 the same on the organisation, leftover rows untouched; T4 an archived company stays unreadable; T5 regression refusals for the already-refused families; T6 platform powers still work (companies, seat limits, inviting Admins, archiving agents and Admins, marketplace decisions, platform website); T7 the Blaqks One profile has no CRM permissions; T8 companies' own access and isolation unchanged; T9 imports by the owning Admin with the member checks and refusals; T10 the Admin's archived list is their own staff only; T11 no staff invitation into the organisation, and the sample command refuses it.
