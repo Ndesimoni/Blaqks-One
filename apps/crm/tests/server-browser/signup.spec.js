@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import { test, expect } from './fixtures.js';
-import { openPage } from './product-nav.js';
 import { query } from '../api/helpers.mjs';
 import { codeFor, resetSignup } from '../api/signup-helpers.mjs';
 
@@ -36,7 +35,6 @@ async function verify(page) {
 }
 
 async function expectSession(page, email) {
-  await expect(page).toHaveURL(/#\/dashboard$/);
   const response = await page.request.get('/api/crm/auth/session');
   expect(response.status()).toBe(200);
   expect((await response.json()).user.email).toBe(email);
@@ -54,6 +52,14 @@ test('an account creates its company and opens the three-seat Team page', async 
   await page.getByLabel('Company name').fill('Synthetic Horizon Realty');
   await page.getByLabel('Emirate').selectOption('dubai');
   await page.getByRole('button', { name: 'Create my workspace' }).click();
+  // The last step offers the team: Invite colleagues opens Team & access's invitation form.
+  await expect(page.getByRole('heading', { name: 'Invite your team' })).toBeVisible();
+  await expect(page).toHaveURL(/#\/sign-up\/team$/);
+  await expect(page.getByText('Step 4 of 4 · Your team')).toBeVisible();
+  await page.getByRole('button', { name: 'Invite colleagues' }).click();
+  await expect(page).toHaveURL(/#\/team-access$/);
+  await expect(page.getByRole('dialog', { name: 'Invite teammate' })).toBeVisible();
+  await page.keyboard.press('Escape');
   await expectSession(page, email);
   expect(
     query(
@@ -63,7 +69,6 @@ test('an account creates its company and opens the three-seat Team page', async 
         `(SELECT id FROM crm_users WHERE email='${email}'))`,
     ),
   ).toBe('brokerage:Synthetic Horizon Realty:dubai:3');
-  await openPage(page, 'Team & access');
   await expect(page.getByText('Free plan', { exact: true })).toBeVisible();
   await expect(page.getByText('1 of 3 seats used', { exact: true })).toBeVisible();
 });

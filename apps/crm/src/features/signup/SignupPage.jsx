@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { routePath } from '../../config/routes.js';
 import { useUnsavedChanges } from '../../hooks/useUnsavedChanges.js';
 import { useI18n } from '../../i18n/useI18n.js';
 import { SIGN_IN, isSignUpPath } from '../auth/authPaths.js';
@@ -10,6 +11,7 @@ import { bidiIsolate } from './signupModel.js';
 import { SignupProgress } from './SignupProgress.jsx';
 import { SignupShell } from './SignupShell.jsx';
 import { SignupState } from './SignupState.jsx';
+import { TeamStep } from './TeamStep.jsx';
 import { useSignupAddress } from './useSignupAddress.js';
 import { useSignUpFlow } from './useSignUpFlow.js';
 import { useSignupStatus } from './useSignupStatus.js';
@@ -18,9 +20,9 @@ import { VerifyStep } from './VerifyStep.jsx';
 const STEP_TITLES = ['detailsTitle', 'verifyTitle'];
 
 /**
- * Sign-up's three steps, each its own full-screen page (owner, 2026-11-05): your details at
- * /sign-up, email verification at /sign-up/verify and the company at /sign-up/company
- * (useSignupAddress keeps the address and the step together).
+ * Sign-up's four steps, each its own full-screen page (owner, 2026-11-05): your details at
+ * /sign-up, email verification at /sign-up/verify, the company at /sign-up/company and
+ * inviting the team at /sign-up/team (useSignupAddress keeps the address and the step together).
  */
 export function SignupPage({ api, user, onVerified, onSignOut }) {
   const { language, t } = useI18n();
@@ -40,12 +42,16 @@ export function SignupPage({ api, user, onVerified, onSignOut }) {
   });
   useUnsavedChanges(flow.dirty, Boolean(flow.busy), '', isSignUpPath);
   useEffect(() => {
-    if (flow.finished) navigate('/dashboard');
-  }, [flow.finished, navigate]);
-  useEffect(() => {
     if (!status.loading) heading.current?.focus();
   }, [flow.step, status.loading]);
-  useSignupAddress(flow);
+  const step = useSignupAddress(flow, Boolean(user));
+  if (step === 4)
+    return (
+      <TeamStep
+        onInvite={() => navigate(`${routePath('Team & access')}?start=invite`)}
+        onSkip={() => navigate('/dashboard')}
+      />
+    );
   if (status.loading)
     return <SignupState title={t('signup.loadingTitle')} body={t('signup.loadingBody')} loading />;
   if (status.error)

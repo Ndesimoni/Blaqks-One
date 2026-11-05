@@ -1,6 +1,6 @@
 /** The account pages, each at its own address (owner, 2026-11-05: industry-standard pages). */
 export const SIGN_IN = '/sign-in';
-export const SIGN_UP_STEPS = ['/sign-up', '/sign-up/verify', '/sign-up/company'];
+export const SIGN_UP_STEPS = ['/sign-up', '/sign-up/verify', '/sign-up/company', '/sign-up/team'];
 
 /** Pages a person is never sent back to after signing in. */
 const accountPage = (path) =>

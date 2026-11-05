@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { WorkspaceScopeContext } from '../../app/WorkspaceScopeContext.js';
 import { useSession } from '../../hooks/useSession.js';
+import { useInviteRequest } from './useInviteRequest.js';
 import { useServerTeam } from './useServerTeam.js';
 import { TeamMemberDialog } from './TeamMemberDialog.jsx';
 import { TeamInvitationLink } from './TeamInvitationLink.jsx';
@@ -31,6 +32,7 @@ export function ServerTeamPage({ owner }) {
   const archived = directory.filters.status === 'archived';
   const { setToast } = useWorkspaceView();
   const [editing, setEditing] = useState(null);
+  useInviteRequest(!frozen, () => setEditing({ member: null }));
   const [invitation, setInvitation] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [limitOpen, setLimitOpen] = useState(false);

@@ -96,3 +96,10 @@
     padding: 22px;
   }
 }
+.signup-team-points {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-inline-start: 20px;
+  color: var(--muted);
+}
