@@ -71,13 +71,12 @@ export function HelpPage() {
   return (
     <div className="page-stack help-page">
       <div className="help-head">
-        <p>{k('intro')}</p>
         <Button icon="plus" onClick={() => setAsking(true)}>
           {k('ask')}
         </Button>
       </div>
       {rows.length ? (
-        <div className="help-layout">
+        <div className={'help-layout' + (selected ? ' has-selection' : '')}>
           <HelpList rows={rows} selected={selected} onSelect={setSelected} label={k('list')} />
           {thread.thread ? (
             <HelpThread
@@ -87,6 +86,7 @@ export function HelpPage() {
               error={thread.error}
               canReply={!thread.thread.request.closed}
               replyLabel={k('reply')}
+              onBack={() => setSelected('')}
               onReply={async (body) => (await thread.post(body)) && (reload(), true)}
             />
           ) : (

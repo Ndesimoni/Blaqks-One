@@ -50,10 +50,8 @@ export function ClientSliderHead({
     if (!active || active === document.body || !active.isConnected) heading.current?.focus();
   }, []);
   const name = client.contactName || client.companyName;
-  const subtitle = [
-    client.contactName ? client.companyName : '',
-    k(`source.${client.source}`),
-  ].filter(Boolean);
+  // The company under the contact's name; the source is in Details.
+  const subtitle = client.contactName ? [client.companyName].filter(Boolean) : [];
   const stage = (key) => k(`stage.${key}`);
   return (
     <header className="drawer-top record-panel-head">

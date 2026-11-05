@@ -5,19 +5,11 @@ import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { canOpenSection } from '../access.js';
 import { useHelpUnread } from '../help/useHelpUnread.js';
+import { initials } from '../profile/profileModel.js';
 import { productSections } from './productModel.js';
 import { useDisclosure } from './useDisclosure.js';
 import './start.css';
 import './account-help.css';
-
-const initials = (name) =>
-  String(name || '?')
-    .trim()
-    .split(/\s+/)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 
 /**
  * The account menu on the person's initials (NAV1b): their personal settings and Sign out.

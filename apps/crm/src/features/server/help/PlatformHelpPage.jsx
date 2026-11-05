@@ -8,6 +8,7 @@ import { HelpList } from './HelpList.jsx';
 import { HelpQueueFilters } from './HelpQueueFilters.jsx';
 import { HelpRequestActions } from './HelpRequestActions.jsx';
 import { HelpThread } from './HelpThread.jsx';
+import { matchesQuery } from './helpModel.js';
 import { usePlatformHelp } from './usePlatformHelp.js';
 import { useHelpThread } from './useHelpThread.js';
 import './help.css';
@@ -24,6 +25,7 @@ export function PlatformHelpPage() {
   const manage = hasPlatformArea(user, 'help_requests', 'manage');
   const queue = usePlatformHelp();
   const [selected, setSelected] = useState('');
+  const [query, setQuery] = useState('');
   const thread = useHelpThread(
     selected,
     (id, signal) => api.helpRequest(id, signal),
@@ -51,14 +53,20 @@ export function PlatformHelpPage() {
       </StateView>
     );
   if (!queue.rows) return <StateSkeleton label={k('queueLoading')} rows={4} />;
+  const rows = queue.rows.filter((row) => matchesQuery(row, query));
   return (
     <div className="page-stack help-page">
-      <p className="help-intro">{k('queueIntro')}</p>
-      <HelpQueueFilters filter={queue.filter} counts={queue.counts} onChange={queue.setFilter} />
-      <div className="help-layout">
-        {queue.rows.length ? (
+      <HelpQueueFilters
+        filter={queue.filter}
+        counts={queue.counts}
+        query={query}
+        onQuery={setQuery}
+        onChange={queue.setFilter}
+      />
+      <div className={'help-layout' + (selected ? ' has-selection' : '')}>
+        {rows.length ? (
           <HelpList
-            rows={queue.rows}
+            rows={rows}
             selected={selected}
             onSelect={setSelected}
             label={k('queueTitle')}
@@ -75,6 +83,7 @@ export function PlatformHelpPage() {
             error={thread.error}
             canReply={manage}
             replyLabel={k('answer')}
+            onBack={() => setSelected('')}
             onReply={async (body) => (await thread.post(body)) && (queue.reload(), true)}
           >
             <HelpRequestActions

@@ -5,15 +5,16 @@ import { useWideTable } from '../../records/grid/useWideTable.js';
 import { FollowUpDate, OwnerName, SourceName, StagePill } from './ClientCells.jsx';
 import { clientName } from './clientsModel.js';
 
-const COLUMNS = ['company', 'contact', 'stage', 'nextFollowUp', 'owner', 'source', 'updated'];
+const COLUMNS = ['company', 'stage', 'nextFollowUp', 'owner', 'source'];
 
 /**
- * The desktop grid, drawn as the CRM's mockup rows: the company cell opens the client (and is
- * its keyboard stop), the whole row is clickable, the contact shows with initials and the
- * stage as a pill. A table wider than its card scrolls sideways in a labelled region.
+ * The desktop grid, drawn as the CRM's mockup rows: the first cell opens the client (and is
+ * its keyboard stop) with the company's initials, its name and the contact person below, so
+ * each row stays one line; the whole row is clickable and the stage shows as a pill. A table
+ * wider than its card scrolls sideways in a labelled region.
  */
 export function ClientsTable({ rows, onOpen }) {
-  const { t, format } = useI18n();
+  const { t } = useI18n();
   const k = (key, vars) => t(`platformClients.${key}`, vars);
   const scroll = useRef(null);
   const wide = useWideTable(scroll);
@@ -39,20 +40,20 @@ export function ClientsTable({ rows, onOpen }) {
           {rows.map((client) => (
             <tr key={client.id} onClick={() => onOpen(client.id)}>
               <td>
-                <button
-                  type="button"
-                  className="grid-open"
-                  aria-label={k('openNamed', { name: clientName(client) })}
-                >
-                  <span className="cell-strong">{clientName(client)}</span>
-                </button>
-              </td>
-              <td>
-                {client.contactName ? (
-                  <GridPerson name={client.contactName}>{client.contactName}</GridPerson>
-                ) : (
-                  <span className="muted">—</span>
-                )}
+                <GridPerson name={clientName(client)}>
+                  <span className="platform-client-who">
+                    <button
+                      type="button"
+                      className="grid-open"
+                      aria-label={k('openNamed', { name: clientName(client) })}
+                    >
+                      <span className="cell-strong">{clientName(client)}</span>
+                    </button>
+                    {client.companyName && client.contactName && (
+                      <span className="muted">{client.contactName}</span>
+                    )}
+                  </span>
+                </GridPerson>
               </td>
               <td>
                 <StagePill stage={client.stage} />
@@ -66,7 +67,6 @@ export function ClientsTable({ rows, onOpen }) {
               <td>
                 <SourceName source={client.source} />
               </td>
-              <td>{client.updatedAt ? format.date(client.updatedAt) : '—'}</td>
             </tr>
           ))}
         </tbody>

@@ -7,13 +7,15 @@ const slug = (str) =>
 
 const get = (rec, label) => rec?.[slug(label)];
 
+/** Up to two initials, from words with a letter or digit (a "·" separator is skipped). */
 const initials = (t) =>
   String(t || 'K')
     .split(/\s+/)
+    .filter((word) => /[\p{L}\p{N}]/u.test(word))
     .slice(0, 2)
-    .map((v) => v[0])
+    .map((v) => [...v][0])
     .join('')
-    .toUpperCase();
+    .toUpperCase() || 'K';
 
 const tidy = (s) => String(s || '').replaceAll('_', ' ');
 

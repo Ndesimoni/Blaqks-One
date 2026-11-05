@@ -39,9 +39,10 @@ test('the Owner adds a Blaqks One client, moves its stage and logs a call', asyn
   await form.getByRole('button', { name: 'Add client', exact: true }).click();
   await expect(page.locator('.toast')).toContainText(`Added ${company}`);
 
-  // The new client opens in the slider: name, "Company · Source" and the stage track.
+  // The new client opens in the slider: the contact's name, the company below it (the source
+  // is in Details) and the stage track.
   const panel = page.getByRole('dialog', { name: 'Synthetic Contact' });
-  await expect(panel).toContainText(`${company} · Referral`);
+  await expect(panel.locator('.record-panel-title p')).toHaveText(company);
   await expect(panel.getByRole('list', { name: 'Stage: New' })).toBeVisible();
   const link = (name) => panel.getByRole('link', { name: `${name} Synthetic Contact` });
   await expect(link('Call')).toHaveAttribute('href', 'tel:+971501234567');

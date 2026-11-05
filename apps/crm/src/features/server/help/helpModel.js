@@ -24,3 +24,13 @@ export function readThread(value) {
     throw Error('The help request was incomplete.');
   return value;
 }
+
+/** Whether a queue row matches the search: its subject, who asked or their company. */
+export function matchesQuery(row, query) {
+  const wanted = String(query || '')
+    .trim()
+    .toLowerCase();
+  if (!wanted) return true;
+  const text = [row.subject, row.requesterName, row.company?.name].filter(Boolean).join(' ');
+  return text.toLowerCase().includes(wanted);
+}

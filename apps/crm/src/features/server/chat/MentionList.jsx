@@ -1,13 +1,6 @@
 import React from 'react';
 import { useI18n } from '../../../i18n/useI18n.js';
-
-const initials = (name = '') =>
-  name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0].toUpperCase())
-    .join('');
+import { initials } from '../profile/profileModel.js';
 
 /**
  * The colleagues to mention, above the composer (packet C3). The text field keeps focus:

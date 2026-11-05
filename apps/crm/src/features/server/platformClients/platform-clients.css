@@ -28,8 +28,18 @@
 :root[data-theme] .platform-clients-table td {
   white-space: nowrap;
 }
-:root[data-theme] .platform-clients-table td:first-child {
-  white-space: normal;
+/* The company with its contact below: one line each, cut short with an ellipsis. */
+.platform-client-who {
+  display: grid;
+  min-width: 0;
+  max-width: 260px;
+}
+.platform-client-who > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.platform-client-who > .muted {
+  font-size: 12.5px;
 }
 .platform-clients-table tbody tr,
 .platform-client-cards .record-card {

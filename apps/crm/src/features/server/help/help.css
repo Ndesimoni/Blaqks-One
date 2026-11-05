@@ -1,16 +1,8 @@
 /* Help (BO1c): the list beside the conversation, like the Client inbox; one column on phones. */
+/* The page starts with its own tool: Ask for help on the right. */
 .help-head {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.help-head p,
-.help-intro {
-  max-width: 64ch;
-  margin: 0;
-  color: var(--muted);
+  justify-content: flex-end;
 }
 .help-layout {
   display: grid;
@@ -122,8 +114,23 @@
 .help-reply .field {
   width: 100%;
 }
+.help-back {
+  display: none;
+}
+/* Phones show one pane at a time, as the messengers do: the list, or the open request. */
 @media (max-width: 860px) {
   .help-layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .help-layout.has-selection > .help-list,
+  .help-layout.has-selection > .state-view {
+    display: none;
+  }
+  :root[data-theme] .help-back {
+    display: inline-flex;
+    justify-self: start;
+  }
+  [dir='ltr'] .help-back svg {
+    transform: scaleX(-1);
   }
 }

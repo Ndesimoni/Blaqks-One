@@ -62,11 +62,12 @@ export function detailsFieldError(field, form) {
 export const detailsError = (form) =>
   detailsFieldError('name', form) || detailsFieldError('phone', form);
 
-/** Up to two initials for the avatar. */
+/** Up to two initials for the avatar, from words with a letter or digit ("·" is skipped). */
 export const initials = (name) =>
   String(name || '?')
     .trim()
     .split(/\s+/)
+    .filter((word) => /[\p{L}\p{N}]/u.test(word))
     .slice(0, 2)
     .map((word) => [...word][0]?.toUpperCase() || '')
     .join('') || '?';

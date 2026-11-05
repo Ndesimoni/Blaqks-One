@@ -50,6 +50,7 @@ export function HelpRequestForm({ onSend, onClose }) {
             </p>
           )}
           <div className="form-card">
+            <p className="help-note">{k('intro')}</p>
             <div className="field">
               <label htmlFor="help-category">{k('category')}</label>
               <select

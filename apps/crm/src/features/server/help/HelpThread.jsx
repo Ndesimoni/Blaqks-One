@@ -7,9 +7,19 @@ import { STATE_TONES } from './helpModel.js';
 /**
  * A help request's conversation for either side (`side` is 'member' or 'platform'): the
  * subject and state, `children` (the requester card and actions), the messages oldest first,
- * and a reply box when `canReply`.
+ * and a reply box when `canReply`. On phones `onBack` returns to the list.
  */
-export function HelpThread({ thread, side, busy, error, canReply, onReply, replyLabel, children }) {
+export function HelpThread({
+  thread,
+  side,
+  busy,
+  error,
+  canReply,
+  onReply,
+  replyLabel,
+  onBack,
+  children,
+}) {
   const { t, format } = useI18n();
   const k = (key, vars) => t(`help.${key}`, vars);
   const replyId = useId();
@@ -28,6 +38,11 @@ export function HelpThread({ thread, side, busy, error, canReply, onReply, reply
   return (
     <section className="help-thread" aria-label={k('thread')}>
       <header className="help-thread-head">
+        {onBack && (
+          <Button variant="light" icon="arrow" className="help-back" onClick={onBack}>
+            {k('back')}
+          </Button>
+        )}
         <h2>{request.subject}</h2>
         <span>
           {k(`category.${request.category}`)} ·{' '}
