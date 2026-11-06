@@ -50,13 +50,17 @@ pub async fn conversation(
     Ok(json!({
         "numberId": thread.whatsapp_number_id,
         "numberOwnerId": held.as_ref().map(|held| held.member_id),
-        "numberPhone": held.as_ref().map(|held| held.phone.clone()),
+        // A colleague's own number is theirs to share (W1b review L3).
+        "numberPhone": held
+            .as_ref()
+            .filter(|held| held.member_id == user.id || user.role == "admin")
+            .map(|held| held.phone.clone()),
         "canSend": can_send,
         "canSendText": can_send && window.is_some(),
         "canSendTemplate": can_send && opted == Some("opt_in") && !templates.is_empty(),
         "refusal": refusal,
         "window": {"open": window.is_some(), "until": window.and_then(rules::until)},
-        "consent": consent::view(current.as_ref()),
+        "consent": consent::view(current.as_ref(), user),
         "templates": templates,
     }))
 }
@@ -128,7 +132,7 @@ pub async fn start(
     Ok(Some(json!({
         "number": number.map(|number| json!({"id": number.id, "phone": number.phone})),
         "contact": key.map(|phone| json!({"phone": phone})),
-        "consent": consent::view(current.as_ref()),
+        "consent": consent::view(current.as_ref(), user),
         "canStart": refusal.is_none(),
         "refusal": refusal,
         "conversationId": conversation,

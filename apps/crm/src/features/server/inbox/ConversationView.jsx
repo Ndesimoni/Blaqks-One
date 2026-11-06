@@ -115,6 +115,11 @@ export function ConversationView({
           mailbox={mailbox}
           onNote={conversation.addNote}
           onReply={conversation.reply}
+          whatsapp={{
+            members,
+            sendTemplate: conversation.sendTemplate,
+            consent: conversation.consent,
+          }}
         />
       )}
     </>

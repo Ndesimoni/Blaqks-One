@@ -7,13 +7,14 @@ use super::{
     content, whatsapp,
     whatsapp_queue::{prepare, queue},
     whatsapp_rules as rules,
+    whatsapp_target::{confirmed, expected, record, START},
 };
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
     inbox::{
         access::{self, Viewer},
-        events, normalize,
+        events,
         read::load,
     },
     records::recipient,
@@ -21,24 +22,10 @@ use crate::{
     workspaces,
 };
 use axum::{http::StatusCode, Json};
-use serde_json::{json, Map, Value};
+use serde_json::{json, Value};
 use uuid::Uuid;
 
-pub const START: &str = "Choose a client or contact and a WhatsApp template or message.";
-pub const NO_PHONE: &str = "This record has no valid mobile number for WhatsApp.";
 pub const HELD: &str = "A colleague holds this client's conversation on your number.";
-
-/// `collection` and `recordId`, taken out of the request.
-pub fn record(map: &mut Map<String, Value>) -> ApiResult<(String, Uuid)> {
-    let collection = map
-        .remove("collection")
-        .and_then(|value| value.as_str().map(str::to_owned))
-        .filter(|value| matches!(value.as_str(), "Clients" | "Contacts"));
-    let record = map
-        .remove("recordId")
-        .and_then(|value| value.as_str().and_then(|text| Uuid::parse_str(text).ok()));
-    collection.zip(record).ok_or(ApiError::invalid(START))
-}
 
 pub async fn start(
     state: &AppState,
@@ -56,6 +43,7 @@ pub async fn start(
         return Err(ApiError::invalid(whatsapp::ATTACHMENTS));
     }
     let (collection, record) = record(&mut map)?;
+    let expected = expected(&mut map);
     if !map.contains_key("body") && !map.contains_key("template") {
         return Err(ApiError::invalid(START));
     }
@@ -68,11 +56,7 @@ pub async fn start(
     let found = recipient::recipient(&mut tx, workspace, &user, &collection, record)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let key = found
-        .phone
-        .as_deref()
-        .and_then(normalize::whatsapp_key)
-        .ok_or(ApiError::invalid(NO_PHONE))?;
+    let key = confirmed(found.phone.as_deref(), expected.as_deref())?;
     let thread = format!("wa:{}:{key}", number.id);
     let existing: Option<Uuid> = sqlx::query_scalar(
         "SELECT id FROM inbox.crm_inbox_conversations \

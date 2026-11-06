@@ -10,6 +10,11 @@ ALTER TABLE integrations.crm_channel_connections
     ADD COLUMN templates_checked_at timestamptz,
     ADD COLUMN templates_synced_at timestamptz;
 
+-- A change the CRM finds by itself (Twilio refuses the token during a send or a template
+-- read, or the worker's recheck finds a number gone) names no person (W1b review).
+ALTER TABLE integrations.crm_integration_events ALTER COLUMN actor_id DROP NOT NULL;
+ALTER TABLE integrations.crm_whatsapp_numbers ALTER COLUMN updated_by DROP NOT NULL;
+
 ALTER TABLE integrations.crm_whatsapp_numbers
     ADD CONSTRAINT crm_whatsapp_numbers_connection_scope
         FOREIGN KEY (connection_id, workspace_id)

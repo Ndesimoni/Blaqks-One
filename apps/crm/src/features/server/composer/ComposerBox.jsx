@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { AttachButton } from './AttachButton.jsx';
+import { AttachButton, AttachOff } from './AttachButton.jsx';
 import { ComposerFiles } from './ComposerFiles.jsx';
 import { useAutoGrow } from './useAutoGrow.js';
 import './composer.css';
@@ -13,11 +13,13 @@ import './composer-phone.css';
  * side, the rounded typing box with any chosen files inside above the text, and the send
  * action on the end side, all aligned to the bottom as the box grows. The short `meta` note
  * sits under the row. Pass `files` from useAttachments only where attachments are allowed,
- * and `tools` (saved replies) for icons inside the box on its end side.
+ * and `tools` (saved replies) for icons inside the box on its end side. `attachOff` keeps a
+ * disabled "+" with its reason where files are not allowed yet.
  */
 export function ComposerBox({
   files,
   attachDisabled,
+  attachOff = '',
   meta,
   action,
   tools,
@@ -32,9 +34,10 @@ export function ComposerBox({
       event.currentTarget.querySelector('textarea')?.focus();
   };
   return (
-    <div className={'composer-group' + (files ? ' has-attach' : '')}>
+    <div className={'composer-group' + (files || attachOff ? ' has-attach' : '')}>
       <div className="composer-row">
         {files && <AttachButton files={files} disabled={attachDisabled} />}
+        {!files && attachOff && <AttachOff reason={attachOff} />}
         <div
           ref={box}
           className={('composer-box ' + (tools ? 'has-tools ' : '') + className).trim()}

@@ -26,6 +26,8 @@ export function sendingMailbox(data, admin = false) {
 
 export function replyState({ conversation, user, mailbox, health }) {
   const channel = conversation.channel;
+  // The server describes each WhatsApp conversation's composer, refusals included (W1b).
+  if (channel === 'whatsapp' && conversation.whatsapp) return 'whatsapp';
   if (channel !== 'email') {
     if (health === 'off') return 'disconnected';
     return canReplyOn(user, channel) ? 'comingSoon' : 'noPermission';

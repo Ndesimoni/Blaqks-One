@@ -23,6 +23,8 @@ pub async fn send(
 ) -> ApiResult<Sent> {
     let failed = |code| Ok(Sent::Failed { code });
     let mut tx = pool.begin().await?;
+    // The same lock every number, grant and connection change takes (design §4, §18).
+    workspaces::lock(&mut tx, out.workspace).await?;
     let number = super::whatsapp::number(&mut tx, out.workspace, out.number).await?;
     let number = number.filter(|row| {
         row.active && row.member_id == out.author && row.connection_id == out.connection

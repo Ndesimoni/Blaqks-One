@@ -13,14 +13,15 @@ use sqlx::PgPool;
 use std::time::Duration;
 use uuid::Uuid;
 
-/// Reads and stores the connection's templates; `actor` is who learns of a refused token.
+/// Reads and stores the connection's templates; `actor` is the Admin who asked, or `None`
+/// for the worker's daily read.
 pub async fn sync(
     pool: &PgPool,
     key: &MessagingKey,
     config: &TwilioConfig,
     workspace: &str,
     connection: Uuid,
-    actor: Uuid,
+    actor: Option<Uuid>,
 ) -> ApiResult<Result<(), Failure>> {
     let mut tx = pool.begin().await?;
     let row = connections::load(&mut tx, workspace, connection).await?;
@@ -57,7 +58,7 @@ pub async fn sync(
         }
         Err(Failure::Refused) => {
             if store_write::set_reconnect_required(&mut tx, workspace, connection).await? {
-                store_write::event(&mut tx, workspace, connection, "reconnect_required", actor)
+                store_write::event_by(&mut tx, workspace, connection, "reconnect_required", actor)
                     .await?;
             }
             Err(Failure::Refused)
@@ -89,8 +90,7 @@ pub async fn round(pool: &PgPool, key: &MessagingKey, config: &TwilioConfig) -> 
     .fetch_all(pool)
     .await?;
     for (workspace, id) in due {
-        // No person found a refused token here; the connection stands in as the actor.
-        if sync(pool, key, config, &workspace, id, id).await.is_err() {
+        if sync(pool, key, config, &workspace, id, None).await.is_err() {
             eprintln!("CRM template sync failed for one Twilio account.");
         }
     }

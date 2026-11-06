@@ -6,7 +6,8 @@
 // hex) with a well-formed Auth Token (32 hex) is an active account, except tokens starting
 // `0000` (refused) and SIDs ending `dead` (suspended). Numbers use the unassigned country
 // code +999, so nothing can reach a real phone: by default four senders per SID (the last
-// `OFFLINE`); `POST /test/senders?sid=` and `/test/templates?sid=` set them, and
+// `OFFLINE`); `POST /test/senders?sid=` (with `shape=empty` for a `{}` answer) and
+// `/test/templates?sid=` set them, and
 // `POST /test/revoke?sid=` makes the account refuse its token. Nothing reaches WhatsApp.
 import { createServer } from 'node:http';
 import { createContent } from './fake-twilio-content.mjs';
@@ -29,11 +30,12 @@ export function parseBasic(header = '') {
 export async function startFakeTwilio({ port }) {
   const origin = `http://127.0.0.1:${port}`;
   const configured = new Map();
+  const broken = new Set();
   const revoked = new Set();
   const calls = [];
   const timers = new Set();
   const content = createContent(origin);
-  const sendersFor = (sid) => configured.get(sid) ?? defaultSenders(sid);
+  const sendersFor = (sid) => (broken.has(sid) ? [] : (configured.get(sid) ?? defaultSenders(sid)));
   const messages = createMessages({ sendersFor, timers });
   const json = (response, status, value) => {
     response.writeHead(status, { 'Content-Type': 'application/json' });
@@ -58,12 +60,26 @@ export async function startFakeTwilio({ port }) {
     }
     const url = new URL(request.url, origin);
     const sid = url.searchParams.get('sid');
+    // The test controls answer scripts only, never a web page (W1b review): a browser sends
+    // an Origin, and only the stand-in's own may drive them.
+    const from = request.headers.origin;
+    if (
+      url.pathname.startsWith('/test/') &&
+      from &&
+      from !== origin &&
+      from !== `http://localhost:${port}`
+    ) {
+      return json(response, 403, { message: 'Forbidden' });
+    }
     if (url.pathname === '/test/state') return json(response, 200, { calls, sent: messages.sent });
     if (request.method === 'POST' && url.pathname === '/test/revoke' && SID.test(sid ?? '')) {
       revoked.add(sid);
       return json(response, 200, {});
     }
     if (request.method === 'POST' && url.pathname === '/test/senders' && SID.test(sid ?? '')) {
+      // `shape=empty` answers the senders list with `{}`, which is not Twilio's shape.
+      if (url.searchParams.get('shape') === 'empty') broken.add(sid);
+      else broken.delete(sid);
       configured.set(sid, await body(request));
       return json(response, 200, {});
     }
@@ -92,6 +108,7 @@ export async function startFakeTwilio({ port }) {
       return content.list(response, url, auth, json);
     }
     if (request.method === 'GET' && url.pathname === SENDERS) {
+      if (broken.has(auth.sid)) return json(response, 200, {});
       return sendersList(response, url, origin, sendersFor(auth.sid), auth.sid, json);
     }
     return json(response, 404, { code: 20404, message: 'Not found', status: 404 });

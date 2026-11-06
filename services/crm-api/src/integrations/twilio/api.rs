@@ -18,27 +18,14 @@ pub struct Account {
     pub status: String,
 }
 
+/// One WhatsApp sender; `sender_id` is required (W1b review L1).
 #[derive(Deserialize)]
 pub struct Sender {
     #[serde(default)]
     pub sid: String,
     #[serde(default)]
     pub status: String,
-    #[serde(default)]
     pub sender_id: String,
-}
-
-#[derive(Deserialize)]
-struct Page {
-    #[serde(default)]
-    senders: Vec<Sender>,
-    #[serde(default)]
-    meta: Meta,
-}
-
-#[derive(Default, Deserialize)]
-struct Meta {
-    next_page_url: Option<String>,
 }
 
 /// `GET /2010-04-01/Accounts/{sid}.json`, authenticated as that account.
@@ -52,8 +39,9 @@ pub async fn account(config: &TwilioConfig, sid: &str, token: &str) -> Result<Ac
 }
 
 /// The account's WhatsApp senders, following Twilio's next-page links for at most
-/// `MAX_PAGES` pages, and whether the list was read to its end. A link that leaves the
-/// senders list is refused, so the token is never sent anywhere else.
+/// `MAX_PAGES` pages, and whether the list is complete: read to its end, every page in
+/// Twilio's shape and every sender readable (W1b review L1). A link that leaves the senders
+/// list is refused, so the token is never sent anywhere else.
 pub async fn senders(
     config: &TwilioConfig,
     sid: &str,
@@ -63,21 +51,24 @@ pub async fn senders(
         "{}{SENDERS}?Channel=whatsapp&PageSize=50",
         config.messaging_url
     ));
-    let mut found = Vec::new();
+    let (mut found, mut readable) = (Vec::new(), true);
     for _ in 0..MAX_PAGES {
         let Some(next) = url.take() else {
             break;
         };
         let sent = client().get(next).basic_auth(sid, Some(token)).send().await;
-        let page: Page = large(sent).await?;
+        let Some(page) = super::sender_page::page(large(sent).await?) else {
+            return Ok((found, false));
+        };
+        readable &= page.readable;
         found.extend(page.senders);
-        url = match page.meta.next_page_url.filter(|next| !next.is_empty()) {
+        url = match page.next.filter(|next| !next.is_empty()) {
             Some(next) if same_list(config, &next) => Some(next),
             Some(_) => return Err(Failure::Invalid),
             None => None,
         };
     }
-    Ok((found, url.is_none()))
+    Ok((found, readable && url.is_none()))
 }
 
 /// Whether `next` is another page of this host's senders list.

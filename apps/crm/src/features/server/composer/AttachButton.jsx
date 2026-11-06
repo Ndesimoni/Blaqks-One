@@ -36,3 +36,29 @@ export function AttachButton({ files, disabled }) {
     </>
   );
 }
+
+/**
+ * The "+" where files cannot go yet (WhatsApp until its media packet): it stays in place,
+ * disabled, and says why in its tooltip and description.
+ */
+export function AttachOff({ reason }) {
+  const { t } = useI18n();
+  const hintId = useId();
+  return (
+    <>
+      <button
+        type="button"
+        className="composer-attach is-disabled"
+        aria-disabled="true"
+        aria-label={t('chat.files.add')}
+        aria-describedby={hintId}
+        title={reason}
+      >
+        <Icon name="plus" size={20} strokeWidth={2} />
+      </button>
+      <span id={hintId} className="sr-only">
+        {reason}
+      </span>
+    </>
+  );
+}

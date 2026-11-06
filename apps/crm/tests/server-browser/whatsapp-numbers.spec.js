@@ -1,6 +1,7 @@
 import { test, expect } from './fixtures.js';
 import { memberPage, signInMember } from './assign-helpers.js';
 import { shots } from './sendgrid-helpers.js';
+import { themeShots as dialogShots } from './whatsapp-browser.js';
 import { freshAdmin } from '../api/sendgrid-helpers.mjs';
 import { activate, findMember, invite, memberUpdate, teamPath } from '../api/team-helpers.mjs';
 
@@ -29,21 +30,6 @@ async function whatsappCompany(label) {
   };
 }
 
-/** The open dialog makes the theme switch inert, so its shots set the theme attribute. */
-async function dialogShots(page, testInfo, name) {
-  const theme = await page.locator('html').getAttribute('data-theme');
-  for (const width of [1280, 390]) {
-    await page.setViewportSize({ width, height: 900 });
-    for (const next of ['light', 'dark']) {
-      await page.evaluate((value) => (document.documentElement.dataset.theme = value), next);
-      await page.waitForTimeout(250);
-      await page.screenshot({ path: testInfo.outputPath(`${name}-${width}-${next}.png`) });
-    }
-  }
-  await page.evaluate((value) => (document.documentElement.dataset.theme = value), theme);
-  await page.setViewportSize({ width: 1280, height: 900 });
-}
-
 const whatsappCard = (page) => page.getByRole('article', { name: 'WhatsApp', exact: true });
 const whatsappPanel = (page) => page.getByRole('dialog', { name: 'WhatsApp', exact: true });
 const numbersRegion = (page) => page.getByRole('region', { name: "Members' numbers" });
@@ -52,6 +38,8 @@ test('an Admin connects Twilio, gives a member a number and disconnects it', asy
   page,
   browser,
 }, testInfo) => {
+  // Two sign-ins and over twenty screenshots: more than the default minute.
+  test.setTimeout(180000);
   const company = await whatsappCompany('w1a-ui');
   await signInMember(page, company.admin);
   await page.goto('/#/channels');

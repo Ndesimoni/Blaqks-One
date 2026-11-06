@@ -76,6 +76,8 @@ pub async fn deliver(sender: &InboxSender, job: &Job) -> ApiResult<Outcome> {
 /// Loads the queued message, refuses what may no longer be sent, and commits `sending`.
 async fn prepare(sender: &InboxSender, job: &Job) -> ApiResult<Result<(Queued, Uuid), Outcome>> {
     let mut tx = sender.pool.begin().await?;
+    // After any consent, block or Spam change in progress commits (design §18).
+    crate::workspaces::lock(&mut tx, &job.workspace_id).await?;
     let queued: Option<Queued> = sqlx::query_as(LOAD)
         .bind(job.object_id)
         .bind(&job.workspace_id)

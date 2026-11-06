@@ -46,7 +46,7 @@ pub async fn disconnect(
     if found.version != expected {
         return Err(ApiError::stale(RELOAD));
     }
-    let row = write::disconnect(&mut tx, &workspace, &found, session.user.id)
+    let row = write::disconnect(&mut tx, &workspace, &found, Some(session.user.id))
         .await?
         .ok_or_else(|| ApiError::stale(RELOAD))?;
     tx.commit().await?;

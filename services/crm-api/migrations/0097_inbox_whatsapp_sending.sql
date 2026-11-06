@@ -34,10 +34,17 @@ CREATE TABLE inbox.crm_inbox_consents (
     reason text CHECK (reason IS NULL OR char_length(reason) BETWEEN 1 AND 500),
     source_message_sid text CHECK (source_message_sid IS NULL OR source_message_sid ~ '^[SM]M[0-9a-f]{32}$'),
     recorded_by uuid,
+    -- Where it was recorded, so the Admin can trace who stopped whom (W1b review L2): the
+    -- record of a record's consent, or the conversation (stored IDs, no foreign keys).
+    via_collection text CHECK (via_collection IS NULL OR via_collection IN ('Clients', 'Contacts')),
+    via_record_id uuid,
+    via_conversation_id uuid,
     recorded_at timestamptz NOT NULL DEFAULT clock_timestamp(),
     CHECK ((state = 'opt_out') = (source IN ('client_stop', 'recorded_stop'))),
     CHECK ((source = 'admin_restored') = (reason IS NOT NULL)),
-    CHECK ((recorded_by IS NULL) = (source IN ('client_first', 'client_stop', 'client_start')))
+    CHECK ((recorded_by IS NULL) = (source IN ('client_first', 'client_stop', 'client_start'))),
+    CHECK ((via_collection IS NULL) = (via_record_id IS NULL)),
+    CHECK ((via_record_id IS NULL) <> (via_conversation_id IS NULL))
 );
 
 CREATE INDEX crm_inbox_consents_latest
@@ -52,3 +59,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER crm_inbox_consents_immutable
     BEFORE UPDATE OR DELETE ON inbox.crm_inbox_consents
     FOR EACH ROW EXECUTE FUNCTION inbox.crm_inbox_consents_immutable();
+
+CREATE TRIGGER crm_inbox_consents_no_truncate
+    BEFORE TRUNCATE ON inbox.crm_inbox_consents
+    FOR EACH STATEMENT EXECUTE FUNCTION inbox.crm_inbox_consents_immutable();

@@ -51,8 +51,21 @@ pub fn phone(value: &str) -> Option<String> {
 }
 
 /// The canonical WhatsApp key of a phone: `+` and its E.164 digits, never starting `+0`.
-/// Consents, conversations and Twilio's `From` and `To` all use it.
+/// Consents, conversations and Twilio's `From` and `To` all use it. International forms
+/// (`+…`, `00…`) are taken as written. A national form is read only as a UAE mobile (`05…`
+/// or `5…`: nine digits after the 0, giving `+9715…`), which the member confirms before
+/// sending (`expectedPhone`); any other national form is refused, so the default region
+/// never decides who receives a message (W1b security review M1, refining decision O6).
 pub fn whatsapp_key(value: &str) -> Option<String> {
+    let digits: String = value.chars().filter(char::is_ascii_digit).collect();
+    let typed = value.trim();
+    let typed = typed.strip_prefix("whatsapp:").unwrap_or(typed).trim();
+    if !typed.starts_with('+') && !digits.starts_with("00") {
+        let national = digits.strip_prefix('0').unwrap_or(&digits);
+        if national.len() != 9 || !national.starts_with('5') {
+            return None;
+        }
+    }
     phone(value)
         .filter(|digits| !digits.starts_with('0'))
         .map(|digits| format!("+{digits}"))
@@ -75,10 +88,10 @@ pub fn email(value: &str) -> Option<String> {
 /// The sender for a message on `channel`, or `None` when it cannot be normalised.
 pub fn contact(channel: &str, from: &str) -> Option<Contact> {
     match channel {
-        "whatsapp" => phone(from).map(|digits| Contact {
-            key: format!("+{digits}"),
-            display: format!("+{digits}"),
-            phone_digits: Some(digits),
+        "whatsapp" => whatsapp_key(from).map(|key| Contact {
+            phone_digits: Some(key[1..].to_owned()),
+            display: key.clone(),
+            key,
             email: None,
         }),
         "email" => email(from).map(|address| Contact {

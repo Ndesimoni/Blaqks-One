@@ -34,15 +34,7 @@ pub async fn settle(
             // The number may have moved to another Twilio account (W1a review L3).
             if code == twilio::codes::NOT_SET_UP {
                 let (pool, key, config) = (pool.clone(), key.clone(), config.clone());
-                let (workspace, number) = (out.workspace.to_owned(), number);
-                let author = out.author;
-                tokio::spawn(async move {
-                    let checked =
-                        numbers::recheck::recheck(&pool, &key, &config, &workspace, number, author);
-                    if checked.await.is_err() {
-                        eprintln!("CRM could not recheck one WhatsApp number.");
-                    }
-                });
+                numbers::recheck::spawn(pool, key, config, out.workspace.to_owned(), number);
             }
             Sent::Failed { code }
         }
@@ -60,15 +52,10 @@ pub async fn settle(
 /// Twilio no longer honours the company's token: the account needs reconnecting.
 async fn reconnect(pool: &PgPool, out: &Outgoing<'_>) -> ApiResult<Sent> {
     let mut tx = pool.begin().await?;
+    // Twilio refused the company's token; the author did not change anything.
     if store_write::set_reconnect_required(&mut tx, out.workspace, out.connection).await? {
-        store_write::event(
-            &mut tx,
-            out.workspace,
-            out.connection,
-            "reconnect_required",
-            out.author,
-        )
-        .await?;
+        let (workspace, connection) = (out.workspace, out.connection);
+        store_write::event_by(&mut tx, workspace, connection, "reconnect_required", None).await?;
     }
     tx.commit().await?;
     Ok(Sent::Failed {

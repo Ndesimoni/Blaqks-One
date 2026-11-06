@@ -59,7 +59,7 @@ pub async fn refresh(
         config,
         &workspace,
         row.id,
-        session.user.id,
+        Some(session.user.id),
     );
     match synced.await? {
         Ok(()) => Ok(Json(view(&state.pool, &workspace).await?)),
@@ -78,6 +78,7 @@ pub async fn after_connect(
     connection: Uuid,
     actor: Uuid,
 ) -> &'static str {
+    let actor = Some(actor);
     match sync::sync(pool, key, config, workspace, connection, actor).await {
         Ok(Ok(())) => "synced",
         _ => "failed",

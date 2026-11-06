@@ -1,9 +1,10 @@
 //! Carried finding L3 of the W1a review (design §17): a number moved to another Twilio
 //! account stays active here until someone notices. When a send fails because Twilio says
 //! the number is not a WhatsApp sender of this account (21606, 63007), the worker reads the
-//! account's sender list again; only if that list was read to its end and does not list the
-//! number at all is the number disconnected, freeing it for the account that now holds it.
-//! A failed or partial read changes nothing.
+//! account's sender list again. Only a complete list, read to its end in Twilio's shape
+//! with every sender readable, that does not list the number at all disconnects it (W1b
+//! review L1); a failed, partial or odd read changes nothing. One recheck per number runs
+//! at a time, and the change names no person: the CRM found it.
 use super::{store, write};
 use crate::{
     config::{messaging_settings::MessagingKey, twilio_settings::TwilioConfig},
@@ -12,7 +13,51 @@ use crate::{
     workspaces,
 };
 use sqlx::PgPool;
+use std::{
+    collections::HashSet,
+    sync::{Mutex, OnceLock},
+};
 use uuid::Uuid;
+
+fn running() -> &'static Mutex<HashSet<Uuid>> {
+    static RUNNING: OnceLock<Mutex<HashSet<Uuid>>> = OnceLock::new();
+    RUNNING.get_or_init(|| Mutex::new(HashSet::new()))
+}
+
+/// Frees the number's slot when its recheck ends, however it ends.
+struct Slot(Uuid);
+
+impl Drop for Slot {
+    fn drop(&mut self) {
+        if let Ok(mut set) = running().lock() {
+            set.remove(&self.0);
+        }
+    }
+}
+
+/// Starts a recheck of `number` unless one is already running in this process.
+pub fn spawn(
+    pool: PgPool,
+    key: MessagingKey,
+    config: TwilioConfig,
+    workspace: String,
+    number: Uuid,
+) {
+    let fresh = running().lock().is_ok_and(|mut set| set.insert(number));
+    if !fresh {
+        return;
+    }
+    let slot = Slot(number);
+    tokio::spawn(async move {
+        let _slot = slot;
+        if recheck(&pool, &key, &config, &workspace, number)
+            .await
+            .is_err()
+        {
+            eprintln!("CRM could not recheck one WhatsApp number.");
+        }
+    });
+}
 
 pub async fn recheck(
     pool: &PgPool,
@@ -20,7 +65,6 @@ pub async fn recheck(
     config: &TwilioConfig,
     workspace: &str,
     number: Uuid,
-    actor: Uuid,
 ) -> ApiResult<bool> {
     let mut tx = pool.begin().await?;
     let found = super::super::whatsapp::number(&mut tx, workspace, number).await?;
@@ -50,7 +94,7 @@ pub async fn recheck(
     let Some(current) = current.filter(|row| row.state == "active") else {
         return Ok(false);
     };
-    let ended = write::disconnect(&mut tx, workspace, &current, actor).await?;
+    let ended = write::disconnect(&mut tx, workspace, &current, None).await?;
     tx.commit().await?;
     Ok(ended.is_some())
 }

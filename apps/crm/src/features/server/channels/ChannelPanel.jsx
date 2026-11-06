@@ -8,11 +8,13 @@ import { ConnectionRow } from './ConnectionRow.jsx';
 import { SendingAddresses } from './SendingAddresses.jsx';
 import { TwilioForm } from './TwilioForm.jsx';
 import { WhatsappNumbers } from './WhatsappNumbers.jsx';
+import { WhatsappTemplates } from './WhatsappTemplates.jsx';
 
 /**
  * A channel's panel from the right edge (the approved mockup's channel slider, design queue
  * item 17). With nothing live it holds the connect form; once connected, the account with
- * Reconnect and Disconnect, then the members' WhatsApp numbers (Twilio) or sending addresses
+ * Reconnect and Disconnect, then the members' WhatsApp numbers and the account's templates
+ * (Twilio) or sending addresses
  * (SendGrid). A channel holds one live connection per company; each handler resolves to ''
  * on success or the reason it failed.
  */
@@ -97,6 +99,9 @@ export function ChannelPanel({ entry, connections, page, onClose }) {
             admin={user}
             t={t}
           />
+        )}
+        {twilio && (
+          <WhatsappTemplates api={api} workspaceId={workspaceId} connection={twilio} t={t} />
         )}
         {sendgrid && (
           <SendingAddresses

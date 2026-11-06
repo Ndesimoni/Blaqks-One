@@ -30,6 +30,43 @@ fn every_common_uae_phone_form_becomes_the_same_digits() {
 }
 
 #[test]
+fn whatsapp_keys_guess_only_a_uae_mobile_from_a_national_form() {
+    for mobile in ["050 123 4567", "0501234567", "501234567", "(050) 123-4567"] {
+        assert_eq!(
+            whatsapp_key(mobile).as_deref(),
+            Some("+971501234567"),
+            "{mobile}"
+        );
+    }
+    // Landlines, other lengths and other countries' national forms are refused.
+    for national in [
+        "4 123 4567",
+        "04 123 4567",
+        "02 123 4567",
+        "0612345678",
+        "50123456",
+    ] {
+        assert_eq!(whatsapp_key(national), None, "{national}");
+    }
+    assert_eq!(
+        whatsapp_key("+966 51 234 5678").as_deref(),
+        Some("+966512345678")
+    );
+    assert_eq!(
+        whatsapp_key("00966 51 234 5678").as_deref(),
+        Some("+966512345678")
+    );
+    assert_eq!(
+        whatsapp_key("+971 4 123 4567").as_deref(),
+        Some("+97141234567")
+    );
+    assert!(contact("whatsapp", "4 123 4567").is_none());
+    let sender = contact("whatsapp", "whatsapp:+971501234567").unwrap();
+    assert_eq!(sender.key, "+971501234567");
+    assert_eq!(sender.phone_digits.as_deref(), Some("971501234567"));
+}
+
+#[test]
 fn invalid_phones_never_match() {
     for bad in [
         "",

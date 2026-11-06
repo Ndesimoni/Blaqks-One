@@ -1,0 +1,88 @@
+/* Start message on WhatsApp (W1b): the channel tabs, From and To, then the agreement and the
+   template; then phone sizes and reduced motion for every WhatsApp part. */
+.inbox-start-channels {
+  flex: none;
+  padding: 12px 28px 0;
+}
+.inbox-start-body[hidden] {
+  display: none;
+}
+.wa-start {
+  gap: 14px;
+}
+.wa-route {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wa-route div {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.wa-route dd {
+  display: grid;
+  margin: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.wa-route dd span {
+  color: var(--muted);
+}
+.wa-existing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border-inline-start: 3px solid var(--gold);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.wa-start .wa-preview {
+  justify-self: stretch;
+}
+.wa-start-loading {
+  display: grid;
+  gap: 10px;
+}
+.wa-start-loading span {
+  block-size: 44px;
+  border-radius: 12px;
+  background: var(--hover);
+  animation: wa-pulse 1.4s ease-in-out infinite;
+}
+@keyframes wa-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (max-width: 599px) {
+  .inbox-start-channels {
+    padding-inline: 17px;
+  }
+  .wa-status-actions {
+    margin-inline-start: 0;
+  }
+  .wa-template-foot .btn,
+  .wa-agreement-actions .btn {
+    min-block-size: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-link,
+  .wa-source {
+    transition: none;
+  }
+  .wa-start-loading span {
+    animation: none;
+  }
+}

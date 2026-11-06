@@ -76,6 +76,9 @@ export function useConversation(api, workspaceId, id, onChanged) {
           attachments.length ? { body, attachments } : { body },
         ),
       ),
+    /** WhatsApp (W1b): an approved template `{id, variables}`, and the client's agreement. */
+    sendTemplate: (template) => run(() => api.replyToConversation(workspaceId, id, { template })),
+    consent: (change) => run(() => api.recordConversationConsent(workspaceId, id, change)),
     /** Where one of a message's attachments opens (F3a). */
     fileUrl: (message, file) => api.inboxFileUrl(workspaceId, id, message, file),
     sendAgain: (message) => run(() => api.sendMessageAgain(workspaceId, id, message)),

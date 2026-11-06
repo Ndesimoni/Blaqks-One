@@ -11,6 +11,10 @@ import enMailbox from './en/mailbox.js';
 import enMyWhatsapp from './en/myWhatsapp.js';
 import enWhatsappAccount from './en/whatsappAccount.js';
 import enWhatsappNumbers from './en/whatsappNumbers.js';
+import enWhatsappReasons from './en/whatsappReasons.js';
+import enWhatsappSend from './en/whatsappSend.js';
+import enWhatsappStart from './en/whatsappStart.js';
+import enWhatsappTemplates from './en/whatsappTemplates.js';
 
 export const messagesCatalogs = {
   channels: enChannels,
@@ -25,4 +29,8 @@ export const messagesCatalogs = {
   myWhatsapp: enMyWhatsapp,
   whatsappAccount: enWhatsappAccount,
   whatsappNumbers: enWhatsappNumbers,
+  whatsappReasons: enWhatsappReasons,
+  whatsappSend: enWhatsappSend,
+  whatsappStart: enWhatsappStart,
+  whatsappTemplates: enWhatsappTemplates,
 };

@@ -3,6 +3,7 @@ import { Button } from '../../../components/ui/Button.jsx';
 import { useNavigation } from '../../../hooks/useWorkspace.js';
 import { useI18n } from '../../../i18n/useI18n.js';
 import { ReplyForm } from './ReplyForm.jsx';
+import { WhatsappReply } from './whatsapp/WhatsappReply.jsx';
 
 /** Why this member cannot reply here, with the way to fix it when there is one. */
 function ReplyNotice({ state, channel }) {
@@ -40,9 +41,24 @@ function ReplyNotice({ state, channel }) {
 /**
  * The Reply tab (E1d): the reply form when the member may send from this conversation's
  * mailbox (O9), otherwise an honest notice. The form is keyed by conversation, so moving to
- * another conversation saves this draft and opens that one's (N2).
+ * another conversation saves this draft and opens that one's (N2). WhatsApp conversations
+ * get their own composer (W1b), keyed the same way.
  */
-export function ReplyPanel({ id, state, conversation, mailbox, toolSlot, onPicked, onReply }) {
+export function ReplyPanel(props) {
+  const { id, state, conversation, mailbox, toolSlot, onPicked, onReply, whatsapp } = props;
+  if (state === 'whatsapp')
+    return (
+      <WhatsappReply
+        key={conversation.id}
+        id={id}
+        conversation={conversation}
+        user={whatsapp.user}
+        members={whatsapp.members}
+        toolSlot={toolSlot}
+        onPicked={onPicked}
+        actions={{ reply: onReply, sendTemplate: whatsapp.sendTemplate, consent: whatsapp.consent }}
+      />
+    );
   if (state !== 'send') return <ReplyNotice state={state} channel={conversation.channel} />;
   return (
     <ReplyForm

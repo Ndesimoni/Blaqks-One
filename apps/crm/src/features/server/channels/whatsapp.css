@@ -117,3 +117,12 @@
     min-block-size: 44px;
   }
 }
+/* Message templates (W1b): the template's own text under its name, quieter than the facts. */
+.whatsapp-template-body {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

@@ -63,8 +63,9 @@ test('the Inbox lists, opens and annotates conversations without claiming to sen
   await expect(note).toContainText('INTERNAL NOTE · ONLY YOUR TEAM SEES THIS');
   await expect(page.locator('.inbox-bubble', { hasText: 'Synthetic note' })).toHaveCount(0);
   await page.getByRole('tab', { name: 'Reply' }).click();
+  // Seeded without a member's number (W1b), so the server explains why it cannot send.
   await expect(page.locator('.inbox-reply-notice')).toContainText(
-    'Replying on WhatsApp from the CRM arrives',
+    'This conversation isn’t on a team member’s WhatsApp number',
   );
   await page.getByLabel('Assigned to', { exact: true }).selectOption(me);
   await expect(page.locator('.inbox-head')).toContainText('· You');

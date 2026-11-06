@@ -15,6 +15,8 @@ import {
 } from './whatsapp-send-helpers.mjs';
 
 // Agreement to WhatsApp messages (WQ2, docs/whatsapp-design.md §3, §10 and §18).
+const NO_PHONE =
+  'This record has no number WhatsApp can use. Save it in international form, starting with + or 00.';
 let company;
 let ungranted;
 const stop = { change: 'stopped' };
@@ -69,6 +71,7 @@ test('agreement, STOP and restore follow who may do what', async () => {
   assert.equal(reason, 'Client asked again by phone.');
   assert.throws(() => query(`UPDATE inbox.crm_inbox_consents SET state='opt_in'`), /insert-only/);
   assert.throws(() => query(`DELETE FROM inbox.crm_inbox_consents`), /insert-only/);
+  assert.throws(() => query(`TRUNCATE inbox.crm_inbox_consents`), /insert-only/);
 });
 
 test('staff without the grant may record STOP but not agreement', async () => {
@@ -94,7 +97,7 @@ test('consent is keyed by the canonical number, not the record', async () => {
   const noPhone = await clientWith(company.agent, 'not a phone');
   const missing = await agree(company.agent, noPhone);
   assert.equal(missing.status, 400);
-  assert.equal(missing.value.message, 'This record has no valid mobile number for WhatsApp.');
+  assert.equal(missing.value.message, NO_PHONE);
   assert.equal((await startState(company.agent, noPhone)).value.refusal, 'no_phone');
 });
 

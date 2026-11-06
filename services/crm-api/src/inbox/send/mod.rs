@@ -19,6 +19,7 @@ pub mod whatsapp;
 mod whatsapp_queue;
 pub mod whatsapp_rules;
 pub mod whatsapp_start;
+pub mod whatsapp_target;
 
 pub use again::again;
 pub use reply::reply;

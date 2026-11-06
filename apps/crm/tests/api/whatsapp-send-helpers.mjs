@@ -58,19 +58,32 @@ export const templateId = async (admin, name) =>
 
 export const startState = (session, record) =>
   session.request(inbox(session, `/whatsapp/start?collection=Clients&recordId=${record.id}`));
-export const agree = (session, record, change = { change: 'agreed', source: 'phone' }) =>
-  session.request(inbox(session, '/whatsapp/consent'), {
+/** The number the start state shows for `record`, which the composer sends back. */
+const shown = async (session, record) =>
+  (await startState(session, record)).value?.contact?.phone ?? undefined;
+export const agree = async (session, record, change = { change: 'agreed', source: 'phone' }) => {
+  const expectedPhone = 'expectedPhone' in change ? undefined : await shown(session, record);
+  return session.request(inbox(session, '/whatsapp/consent'), {
     method: 'POST',
-    body: { collection: 'Clients', recordId: record.id, ...change },
+    body: { collection: 'Clients', recordId: record.id, expectedPhone, ...change },
   });
+};
 export const threadConsent = (session, id, change) =>
   session.request(inbox(session, `/conversations/${id}/consent`), { method: 'POST', body: change });
 
-export const start = (session, record, content) =>
-  session.request(inbox(session, '/conversations'), {
+export const start = async (session, record, content) => {
+  const expectedPhone = 'expectedPhone' in content ? undefined : await shown(session, record);
+  return session.request(inbox(session, '/conversations'), {
     method: 'POST',
-    body: { channel: 'whatsapp', collection: 'Clients', recordId: record.id, ...content },
+    body: {
+      channel: 'whatsapp',
+      collection: 'Clients',
+      recordId: record.id,
+      expectedPhone,
+      ...content,
+    },
   });
+};
 export const reply = (session, id, content) =>
   session.request(inbox(session, `/conversations/${id}/messages`), {
     method: 'POST',

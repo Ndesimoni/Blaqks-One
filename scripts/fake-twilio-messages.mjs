@@ -10,6 +10,7 @@ export const RESERVED = {
   outsideWindow: '+99900000002', // `400` with 63016
   timeout: '+99900000003', // accepted but never answered (the CRM times out: unknown)
   limited: '+99900000004', // `429` with Retry-After on the first attempt of each message
+  held: '+99900000005', // the same with Retry-After: 5, so a test can change state meanwhile
   quiet: '+99900000006', // accepted with no callbacks, so tests post their own
 };
 
@@ -67,10 +68,11 @@ export function createMessages({ sendersFor, timers }) {
     if (!record.to?.startsWith('whatsapp:+')) return refuse(400, 21211);
     if (to === RESERVED.outsideWindow) return refuse(400, 63016);
     const attempt = record.statusCallback ?? to;
-    if (to === RESERVED.limited && !limited.has(attempt)) {
+    const wait = { [RESERVED.limited]: '1', [RESERVED.held]: '5' }[to];
+    if (wait && !limited.has(attempt)) {
       limited.add(attempt);
       record.answer = 429;
-      response.writeHead(429, { 'Content-Type': 'application/json', 'Retry-After': '1' });
+      response.writeHead(429, { 'Content-Type': 'application/json', 'Retry-After': wait });
       return response.end(JSON.stringify({ code: 20429, status: 429 }));
     }
     record.sid = `SM${randomBytes(16).toString('hex')}`;

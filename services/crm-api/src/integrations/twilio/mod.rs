@@ -12,6 +12,7 @@ pub mod content;
 pub mod messages;
 mod pages;
 pub mod placeholders;
+pub mod sender_page;
 pub mod senders;
 pub mod shape;
 pub mod signature;

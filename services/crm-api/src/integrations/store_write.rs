@@ -85,6 +85,17 @@ pub async fn event(
     action: &str,
     actor: Uuid,
 ) -> ApiResult<()> {
+    event_by(tx, workspace, connection, action, Some(actor)).await
+}
+
+/// As `event`; `None` when the CRM itself found the change (migration 0096).
+pub async fn event_by(
+    tx: &mut Transaction<'_, Postgres>,
+    workspace: &str,
+    connection: Uuid,
+    action: &str,
+    actor: Option<Uuid>,
+) -> ApiResult<()> {
     sqlx::query(
         "INSERT INTO integrations.crm_integration_events
          (id,workspace_id,connection_id,action,actor_id)

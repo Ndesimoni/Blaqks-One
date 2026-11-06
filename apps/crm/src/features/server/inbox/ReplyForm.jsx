@@ -14,9 +14,12 @@ import { useDraft } from './useDraft.js';
 /**
  * The email reply form (E1d, N2): the member's private draft comes back here, saved replies
  * go in from the Saved replies tab (`toolSlot`, the composer's tab row), and sending first waits for any draft save, so a sent reply
- * never returns as a draft (docs/saved-replies-drafts.md, review H1).
+ * never returns as a draft (docs/saved-replies-drafts.md, review H1). WhatsApp free text uses
+ * it too (W1b) with its own `maxLength` and the disabled "+" (`attachOff`).
  */
-export function ReplyForm({ id, conversation, mailbox, toolSlot, onPicked, onReply }) {
+export function ReplyForm(props) {
+  const { id, conversation, mailbox, toolSlot, onPicked, onReply } = props;
+  const { maxLength = 20000, attachOff = '' } = props;
   const { t } = useI18n();
   const textRef = useRef(null);
   const [text, setText] = useState('');
@@ -62,8 +65,9 @@ export function ReplyForm({ id, conversation, mailbox, toolSlot, onPicked, onRep
       </label>
       {/* Attachments go through company email only (F3a). */}
       <ComposerBox
-        files={mailbox.company ? files : null}
+        files={mailbox?.company ? files : null}
         attachDisabled={busy}
+        attachOff={attachOff}
         meta={<DraftStatus draft={draft} fillIns={leftFillIns(text)} />}
         tools={toolSlot ? null : saved}
         action={
@@ -77,7 +81,7 @@ export function ReplyForm({ id, conversation, mailbox, toolSlot, onPicked, onRep
           ref={textRef}
           className="composer-input"
           rows={1}
-          maxLength={20000}
+          maxLength={maxLength}
           value={text}
           placeholder={t('inboxSend.reply.placeholder')}
           onChange={(event) => setText(event.target.value)}

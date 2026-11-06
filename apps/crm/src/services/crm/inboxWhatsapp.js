@@ -3,6 +3,8 @@
  * shared Inbox routes with `{body}` or `{template: {id, variables}}`; a conversation's read
  * carries `conversation.whatsapp` (window, agreement, templates and whether the caller may
  * send). These add the Start message state, Start on WhatsApp and the client's agreement.
+ * Start and a record's consent send back `expectedPhone`, the `contact.phone` the start
+ * state showed; a changed or missing value is `409 phone_changed` (W1b review M1).
  */
 export function inboxWhatsappRoutes({ request, scope }) {
   const whatsapp = (workspace, suffix) => `${scope(workspace)}/inbox/whatsapp${suffix}`;
@@ -15,7 +17,7 @@ export function inboxWhatsappRoutes({ request, scope }) {
         whatsapp(workspace, `/start?${new URLSearchParams({ collection, recordId }).toString()}`),
         { signal },
       ),
-    /** `{collection, recordId, template: {id, variables}}`, or `body` in an open window. */
+    /** `{collection, recordId, expectedPhone, template: {id, variables}}`, or `body`. */
     startWhatsappConversation: (workspace, body) =>
       request(`${scope(workspace)}/inbox/conversations`, {
         method: 'POST',
@@ -24,7 +26,7 @@ export function inboxWhatsappRoutes({ request, scope }) {
     /** `{change: 'agreed', source}`, `{change: 'stopped'}` or `{change: 'restored', reason}`. */
     recordConversationConsent: (workspace, id, body) =>
       request(`${conversation(workspace, id)}/consent`, { method: 'POST', body }),
-    /** The same for a record's number, before any conversation exists. */
+    /** The same for a record's number, with `expectedPhone`; the reply names `phone`. */
     recordWhatsappConsent: (workspace, { collection, recordId, ...change }) =>
       request(whatsapp(workspace, '/consent'), {
         method: 'POST',

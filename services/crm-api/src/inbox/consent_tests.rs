@@ -45,14 +45,20 @@ fn each_change_has_exactly_its_own_fields() {
 
 #[test]
 fn the_view_says_none_until_something_is_recorded() {
-    assert_eq!(view(None)["state"], "none");
+    assert_eq!(shown(None, true)["state"], "none");
     let found = Consent {
         state: "opt_out".into(),
         source: "recorded_stop".into(),
         at: "2026-11-06T10:00:00.000Z".into(),
+        recorded_by: None,
     };
+    // Without the right to see how it was recorded, only the state shows (review L2).
     assert_eq!(
-        view(Some(&found)),
+        shown(Some(&found), false),
+        json!({"state": "opt_out", "source": null, "at": null})
+    );
+    assert_eq!(
+        shown(Some(&found), true),
         json!({"state": "opt_out", "source": "recorded_stop", "at": "2026-11-06T10:00:00.000Z"})
     );
 }

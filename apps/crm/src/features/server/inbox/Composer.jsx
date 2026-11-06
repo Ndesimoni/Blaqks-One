@@ -9,22 +9,23 @@ import { ReplyPanel } from './ReplyPanel.jsx';
 /**
  * Reply, Internal note and, as the mockup's third tab, Saved replies (the reply form puts its
  * picker button in the tab row; choosing a reply opens Reply). Notes save now. Email replies send from the member's own
- * mailbox (E1d); otherwise the Reply tab says why not: the channel is off, the member lacks
- * the permission or a mailbox, or sending for this channel arrives with its packet (W1).
+ * mailbox (E1d) and WhatsApp from the member's own number (W1b, `whatsapp` holds its actions
+ * and the team for names); otherwise the Reply tab says why not.
  */
-export function Composer({ conversation, user, channels, mailbox, onNote, onReply }) {
+export function Composer({ conversation, user, channels, mailbox, onNote, onReply, whatsapp }) {
   const { t } = useI18n();
   const id = useId();
   const health = channelHealth(channels, conversation.channel);
   const state = replyState({ conversation, user, mailbox, health });
-  const [mode, setMode] = useState(state === 'send' ? 'reply' : 'note');
+  const sendable = state === 'send' || (state === 'whatsapp' && conversation.whatsapp.canSend);
+  const [mode, setMode] = useState(sendable ? 'reply' : 'note');
   const [chosen, setChosen] = useState(false);
   const [slot, setSlot] = useState(null);
   // The mailbox loads after the first render: open on Reply once sending is possible, unless
   // the member already picked a tab, so a reload shows their draft (N2).
   useEffect(() => {
-    if (!chosen && state === 'send') setMode('reply');
-  }, [chosen, state]);
+    if (!chosen && sendable) setMode('reply');
+  }, [chosen, sendable]);
   const [text, setText] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -91,6 +92,7 @@ export function Composer({ conversation, user, channels, mailbox, onNote, onRepl
               setMode('reply');
             }}
             onReply={onReply}
+            whatsapp={{ ...whatsapp, user }}
           />
         </div>
         {mode === 'note' && (

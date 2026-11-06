@@ -9,6 +9,7 @@ pub mod commands;
 pub mod company_usage;
 pub mod composer;
 pub mod consent;
+mod consent_record;
 mod draft_input;
 pub mod draft_sent;
 pub mod drafts;

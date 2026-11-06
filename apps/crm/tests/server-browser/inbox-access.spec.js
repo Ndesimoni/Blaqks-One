@@ -57,12 +57,17 @@ test('a staff member reads their Inbox in Arabic, right to left', async ({ page 
   );
   await page.locator('.inbox-row', { hasText: 'Synthetic Arabic Client' }).click();
   await expect(page.locator('.inbox-thread')).toContainText('مرحبا، هل الشقة متاحة؟');
-  await expect(page.locator('.inbox-reply-notice')).toHaveCount(0);
+  // The Note tab is open; the Reply tab's notice stays loaded but hidden until Reply opens.
+  await expect(page.locator('.inbox-reply-notice')).toBeHidden();
   // Assigned-only staff may only claim or release, as the server allows.
   await expect(page.getByLabel('إسناد إلى')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'تخلَّ عنها' })).toBeVisible();
   await page.getByRole('tab', { name: 'رد' }).click();
-  await expect(page.locator('.inbox-reply-notice')).toContainText('واتساب غير مرتبط');
+  // New W1b wording is English only (the Arabic catalogue is frozen): this member has no
+  // WhatsApp permission, which the server names before the missing connection.
+  await expect(page.locator('.inbox-reply-notice')).toContainText(
+    'Sending on WhatsApp needs the WhatsApp permission from your Admin.',
+  );
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     await noPageOverflow(page);

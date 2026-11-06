@@ -597,3 +597,40 @@ synchronous `400` or a callback (both are handled); that Twilio signs the callba
 its `?m=` query exactly as given; `Retry-After` on `429`; the order callbacks arrive in
 (statuses only move forward, so any order is safe); and 21606 versus 63007 for a sender
 that moved accounts.
+
+## 19. W1b security review (2026-11-06)
+
+A separate, read-only security review of the W1b backend commit found no High findings, one
+Medium and five Low. All are fixed in the same packet, with tests:
+
+- **W1b-M1 (Medium): the UAE default-region guess chose who receives a message.** A Saudi
+  `05x…` saved without a country code became `+9715…`. For WhatsApp consent and sending
+  (`normalize::whatsapp_key`), a national form is accepted only as a UAE mobile (nine digits
+  starting with 5 after a leading 0); anything else answers `no_phone`, asking for the
+  number in `+` or `00` form. Record matching keeps the earlier rule (O6). Start and a
+  record's consent must send back `expectedPhone`, the number the start state showed; a
+  missing or different value is `409 phone_changed` ("The client's number changed. Check it
+  and try again."), and the consent reply names the number. Tests: `whatsapp-phone`.
+- **W1b-L1: a recheck could read any 2xx as a complete senders list.** The recheck path now
+  needs Twilio's `senders` array and `meta`; an unreadable item makes the list incomplete,
+  and at most one recheck runs per number (`numbers/recheck.rs`, `twilio/sender_page.rs`).
+- **W1b-L2: consent as a cross-scope lookup.** Staff without team scope see a colleague's
+  consent state only, never its source or date, unless they recorded it. Every consent row
+  stores the record (`via_collection`, `via_record_id`) or conversation
+  (`via_conversation_id`) it was recorded through, so the Admin can trace a STOP. Tests:
+  `whatsapp-consent-scope`.
+- **W1b-L3: `numberPhone` showed a colleague's number.** It is returned only to the number's
+  member and the Admin; "Sent from {owner}'s number" uses `numberOwnerId`.
+- **W1b-L4:** the consents table also refuses `TRUNCATE`.
+- **W1b-L5: the worker's re-checks were untested.** `whatsapp-send-rechecks` changes state
+  between queuing and sending (STOP, number disconnected, grant removed, template forgotten,
+  window closed); each ends `failed` with its reason and no send reaches the stand-in.
+- **Info, done:** `normalize::contact("whatsapp")` uses `whatsapp_key()`; the stand-in's
+  `/test/*` routes check `Origin`; the recheck disconnect, the 401 `reconnect_required` event
+  and the scheduled template sync record no person as actor; the worker's re-check takes the
+  workspace lock, as §4 says.
+- **Info, carried:** one Twilio message SID can sit on two messages only through a signed
+  callback from the token holder; a unique index needs `connection_id` on messages (W2a).
+  Before hosting, the reverse proxy must enforce request and body-read timeouts on the
+  public status route, which answers an unknown connection sooner than a known one (the IDs
+  are random UUIDs). Connect and Refresh wait for the template sync (up to ten pages).

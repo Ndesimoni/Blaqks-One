@@ -1,15 +1,15 @@
 //! WhatsApp routes of the Inbox (W1b, design §10 and §18): consent for a visible
 //! conversation (`POST …/conversations/{id}/consent`) or a visible record (`POST
-//! /inbox/whatsapp/consent`), and the Start message state (`GET /inbox/whatsapp/start`).
+//! /inbox/whatsapp/consent`, with the `expectedPhone` the member confirmed), and the Start
+//! message state (`GET /inbox/whatsapp/start`). Replies name the number the consent is for.
 //! Writes take the workspace lock and re-read the live member (H4); hidden, foreign and
 //! malformed IDs are the same not-found.
 use super::{
     access::{self, Viewer},
     composer,
-    consent::{self, Change},
-    normalize,
+    consent::{self, Change, Via},
     read::load,
-    send::{whatsapp, whatsapp_start},
+    send::{whatsapp, whatsapp_target as target},
 };
 use crate::{
     auth::session::Session,
@@ -63,7 +63,7 @@ pub async fn conversation(
         ));
     }
     let key = thread.contact_key;
-    reply(tx, &workspace, &key, &user, change).await
+    reply(tx, &workspace, &key, &user, (change, Via::Conversation(id))).await
 }
 
 /// `POST /inbox/whatsapp/consent` `{collection, recordId, change, source?, reason?}`.
@@ -76,7 +76,8 @@ pub async fn record(
 ) -> ApiResult<Json<Value>> {
     access::ensure_writer(&state, &session, &headers, &workspace).await?;
     let mut map = map(body)?;
-    let (collection, record) = whatsapp_start::record(&mut map)?;
+    let (collection, record) = target::record(&mut map)?;
+    let expected = target::expected(&mut map);
     let change = consent::parse(&map)?;
     let mut tx = state.pool.begin().await?;
     workspaces::lock(&mut tx, &workspace).await?;
@@ -84,12 +85,10 @@ pub async fn record(
     let found = recipient::recipient(&mut tx, &workspace, &user, &collection, record)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let key = found
-        .phone
-        .as_deref()
-        .and_then(normalize::whatsapp_key)
-        .ok_or(ApiError::invalid(whatsapp_start::NO_PHONE))?;
-    reply(tx, &workspace, &key, &user, change).await
+    // The member confirms the number the CRM derived from the record (review M1).
+    let key = target::confirmed(found.phone.as_deref(), expected.as_deref())?;
+    let via = Via::Record(&collection, record);
+    reply(tx, &workspace, &key, &user, (change, via)).await
 }
 
 async fn reply(
@@ -97,11 +96,12 @@ async fn reply(
     workspace: &str,
     key: &str,
     user: &crate::auth::profile::UserRow,
-    change: Change,
+    (change, via): (Change, Via<'_>),
 ) -> ApiResult<Json<Value>> {
-    let current = consent::record(&mut tx, workspace, key, user, change).await?;
+    let current = consent::record(&mut tx, workspace, key, user, change, via).await?;
     tx.commit().await?;
-    Ok(Json(json!({ "consent": consent::view(current.as_ref()) })))
+    let consent = consent::view(current.as_ref(), user);
+    Ok(Json(json!({ "consent": consent, "phone": key })))
 }
 
 #[derive(Deserialize)]

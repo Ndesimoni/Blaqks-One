@@ -12,12 +12,13 @@ type Tx<'a, 'b> = &'a mut Transaction<'b, Postgres>;
 pub const CONNECTED: &str = "number_connected";
 pub const DISCONNECTED: &str = "number_disconnected";
 
-/// `None` when the number changed since `found` was read.
+/// `None` when the number changed since `found` was read; `actor` is `None` when the CRM
+/// found the number gone (W1b review L3 recheck).
 pub async fn disconnect(
     tx: Tx<'_, '_>,
     workspace: &str,
     found: &NumberRow,
-    actor: Uuid,
+    actor: Option<Uuid>,
 ) -> ApiResult<Option<NumberRow>> {
     let ended: Vec<Uuid> = sqlx::query_scalar(
         "UPDATE integrations.crm_whatsapp_numbers
@@ -57,7 +58,7 @@ pub async fn end_members(
     .bind(actor)
     .fetch_all(&mut **tx)
     .await?;
-    events(tx, workspace, &ended, actor).await
+    events(tx, workspace, &ended, Some(actor)).await
 }
 
 /// Disconnecting the company's Twilio account disconnects every number on it. Called from
@@ -79,12 +80,17 @@ pub async fn end_connection(
     .bind(actor)
     .fetch_all(&mut **tx)
     .await?;
-    events(tx, workspace, &ended, actor).await
+    events(tx, workspace, &ended, Some(actor)).await
 }
 
-async fn events(tx: Tx<'_, '_>, workspace: &str, ended: &[Uuid], actor: Uuid) -> ApiResult<()> {
+async fn events(
+    tx: Tx<'_, '_>,
+    workspace: &str,
+    ended: &[Uuid],
+    actor: Option<Uuid>,
+) -> ApiResult<()> {
     for connection in ended {
-        store_write::event(tx, workspace, *connection, DISCONNECTED, actor).await?;
+        store_write::event_by(tx, workspace, *connection, DISCONNECTED, actor).await?;
     }
     Ok(())
 }
