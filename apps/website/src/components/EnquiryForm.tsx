@@ -2,15 +2,18 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
+import { EnquiryIdentity } from './EnquiryIdentity';
 
 export function EnquiryForm({
   listingId,
   agentId,
   companyId,
+  compact = false,
 }: {
   listingId?: string;
   agentId?: string;
   companyId?: string;
+  compact?: boolean;
 }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
@@ -61,25 +64,17 @@ export function EnquiryForm({
       </div>
     );
   return (
-    <form className="public-enquiry-form" method="post" action="/api/enquiries" onSubmit={submit}>
+    <form
+      className={`public-enquiry-form${compact ? ' v-compact-form' : ''}`}
+      method="post"
+      action="/api/enquiries"
+      onSubmit={submit}
+    >
       <h2>Tell us what you’re looking for.</h2>
       <noscript>
         Enable JavaScript to submit this form, or use the representative’s contact links.
       </noscript>
-      <label>
-        Your name
-        <input name="name" autoComplete="name" maxLength={100} required />
-      </label>
-      <div className="field-pair">
-        <label>
-          Email
-          <input name="email" type="email" autoComplete="email" maxLength={254} />
-        </label>
-        <label>
-          Phone
-          <input name="phone" type="tel" autoComplete="tel" placeholder="+971…" maxLength={16} />
-        </label>
-      </div>
+      <EnquiryIdentity compact={compact} />
       <p className="muted">Provide an email address or international phone number.</p>
       <label>
         Preferred contact method
@@ -92,7 +87,7 @@ export function EnquiryForm({
       </label>
       <label>
         Your message
-        <textarea name="message" rows={5} maxLength={4000} required />
+        <textarea name="message" rows={compact ? 3 : 5} maxLength={4000} required />
       </label>
       <label className="privacy-choice">
         <input name="privacy" type="checkbox" required />

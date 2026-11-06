@@ -1,4 +1,5 @@
 import 'server-only';
+import { isCompanyDesign, companyDesignSample } from './company-design.ts';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { Query } from './types.ts';
@@ -39,11 +40,16 @@ export const loadPage = cache(async (pathname: string, serializedQuery: string) 
     site.kind !== 'platform'
   )
     notFound();
+  if (route.page === 'services' && !isCompanyDesign(site)) notFound();
   const query = JSON.parse(serializedQuery) as Query;
   if (site.sample) {
     const data = samplePage(
       site,
-      site.kind === 'platform' ? referenceSampleCatalogue() : sampleCatalogue(site),
+      site.kind === 'platform'
+        ? referenceSampleCatalogue()
+        : isCompanyDesign(site)
+          ? companyDesignSample(sampleCatalogue(site))
+          : sampleCatalogue(site),
       route.page,
       query,
       route.id,
@@ -52,7 +58,7 @@ export const loadPage = cache(async (pathname: string, serializedQuery: string) 
     return data;
   }
   try {
-    if (site.kind === 'platform' && route.page === 'agents')
+    if ((site.kind === 'platform' || isCompanyDesign(site)) && route.page === 'agents')
       return await platformAgents(site, host, query, livePage);
     return await livePage(site, host, route.page, query, route.id);
   } catch (error) {

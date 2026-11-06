@@ -1,3 +1,6 @@
+import { CompanyHeader, CompanyFooter } from '@/components/company/CompanyChrome';
+import { HomeverseHeader, HomeverseFooter } from '@/components/homeverse/HomeverseChrome';
+import { isCompanyDesign, isHomeverse } from '@/lib/company-design';
 import type { Metadata } from 'next';
 import { currentSite } from '@/lib/site';
 import { SiteHeader, SiteFooter } from '@/components/SiteChrome';
@@ -31,11 +34,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           children
         ) : (
           <>
-            <SiteHeader site={site} />
+            {isHomeverse(site) ? (
+              <HomeverseHeader site={site} />
+            ) : isCompanyDesign(site) ? (
+              <CompanyHeader site={site} />
+            ) : (
+              <SiteHeader site={site} />
+            )}
             <main id="main" tabIndex={-1}>
               {children}
             </main>
-            <SiteFooter site={site} />
+            {isHomeverse(site) ? (
+              <HomeverseFooter site={site} />
+            ) : isCompanyDesign(site) ? (
+              <CompanyFooter site={site} />
+            ) : (
+              <SiteFooter site={site} />
+            )}
           </>
         )}
       </body>

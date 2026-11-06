@@ -34,6 +34,7 @@ export function websiteRoute(path: string[] = []): { page: string; id?: string }
       'developers',
       'areas',
       'about',
+      'services',
       'contact',
       'enquiry',
       'privacy',

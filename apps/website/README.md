@@ -22,6 +22,13 @@ accepted for local development. With no value, links lead to professional-access
 The public API currently has no verified deal-price metadata; deal sections stay empty
 instead of manufacturing discount claims.
 
+## Second website design review
+
+Company theme 1 (`harbour.localhost:3000`) now has the monochrome architectural design
+selected on 6 November 2026. It adapts the main website's property/team/contact page
+structure for a single company. This work is local pending the owner's design review;
+see [preview scope and checks](../../docs/company-atelier-preview.md).
+
 ## Run locally
 
 Use Node 24, or Node 22.18 or newer. From the repository root:

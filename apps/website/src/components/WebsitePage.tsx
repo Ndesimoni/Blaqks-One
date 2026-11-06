@@ -1,3 +1,5 @@
+import { CompanyWebsite } from './company/CompanyWebsite';
+import { isCompanyDesign } from '../lib/company-design';
 import type { PageData } from '../lib/types';
 import { HomePage } from './HomePage';
 import { PropertiesPage } from './PropertiesPage';
@@ -25,6 +27,7 @@ export function WebsitePage(data: PageData) {
         }
       />
     );
+  if (isCompanyDesign(data.site)) return <CompanyWebsite {...data} />;
   if (data.page === 'home') return <HomePage {...data} />;
   if (data.page === 'properties') return <PropertiesPage {...data} />;
   if (data.page === 'property') return <PropertyPage {...data} />;

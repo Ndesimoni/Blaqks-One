@@ -92,13 +92,14 @@ test('out of range page clamps to the last complete UI page', async () => {
   );
 });
 
-test('sample platform uses five agents while company sample keeps twelve', () => {
+test('sample platform uses five agents while other company themes keep twelve', () => {
   assert.equal(
     samplePage({ ...site, sample: true }, catalogue, 'agents', {})?.directory?.pageSize,
     5,
   );
   assert.equal(
-    samplePage({ ...site, kind: 'company' }, catalogue, 'agents', {})?.directory?.pageSize,
+    samplePage({ ...site, kind: 'company', theme: '3' }, catalogue, 'agents', {})?.directory
+      ?.pageSize,
     12,
   );
 });

@@ -70,8 +70,23 @@ try {
   const imports = await fs.readFile(path.join(app, 'src/styles/index.css'), 'utf8');
   let companyStyles = '';
   for (const match of imports.matchAll(/@import ['"]\.\/([^'"]+)['"]/g)) {
-    companyStyles += await fs.readFile(path.join(app, 'src/styles', match[1]), 'utf8');
+    if (!match[1].startsWith('homeverse-'))
+      companyStyles += await fs.readFile(path.join(app, 'src/styles', match[1]), 'utf8');
   }
+  const inherited = companyStyles.match(/body\[data-site-kind='company'\]\[data-theme='1'\]/g);
+  if (!inherited?.length) throw Error('Company theme foundation is missing.');
+  let innerStyles = '';
+  for (const match of imports.matchAll(/@import ['"]\.\/([^'"]+)['"]/g)) {
+    if (match[1].startsWith('atelier-'))
+      innerStyles += (await fs.readFile(path.join(app, 'src/styles', match[1]), 'utf8')).replaceAll(
+        "[data-theme='1']",
+        "[data-theme='2']",
+      );
+  }
+  const homeverseImports = [...imports.matchAll(/@import ['"]\.\/(homeverse-[^'"]+)['"]/g)];
+  for (const match of homeverseImports)
+    innerStyles += await fs.readFile(path.join(app, 'src/styles', match[1]), 'utf8');
+  companyStyles += innerStyles;
   await fs.writeFile(
     output + '/company.css',
     (await transform(companyStyles, { loader: 'css', minify: true })).code,
