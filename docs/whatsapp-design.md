@@ -415,3 +415,185 @@ company until disconnected; recheck it when sends fail (21606/63007) or the send
 read, and give the Super Admin a release action (W1b/W2a). **L4** an API test that losing only
 the WhatsApp grant keeps the member's mailbox (the code is correct). **L5** tie a number's
 `connection_id` to its workspace with a composite foreign key.
+
+## 18. W1b build plan (2026-11-06)
+
+W1b builds templates, consents, sending (reply, Start message, Send again) and status
+callbacks against the local stand-in, plus the API the composer needs. Incoming messages,
+private review, personal senders, STOP and START from inbound, media, echoes, sender
+webhook setup and the next-token rotation stay in W2a and W2b (§16). Until W2a nothing sets
+`last_inbound_at`, so in practice only templates can be sent; the window is still built and
+tested (tests set `last_inbound_at` through SQL).
+
+**Migrations.**
+
+- `0096_integrations_whatsapp_templates.sql` (owner `integrations`):
+  `crm_provider_templates` (`id`, `workspace_id`, `connection_id`, `provider_template_id`
+  `HX` + 32 hex, `name`, `language`, `category`, `approval` (`approved`, `pending`,
+  `rejected`, `paused`, `disabled`, `other`), `kind` (`text`, `other`), `body` (text
+  templates only, at most 1,024 characters), `variable_count` (0–10), `synced_at`), unique
+  `(connection_id, provider_template_id)`; connection columns `templates_checked_at` and
+  `templates_synced_at`; a unique `(id, workspace_id)` on connections so templates and
+  numbers carry composite foreign keys `(connection_id, workspace_id)` (carried **L5**).
+- `0097_inbox_whatsapp_sending.sql` (owner `inbox`): conversations gain
+  `whatsapp_number_id` (WhatsApp only) and `last_inbound_at`; messages gain `template_sid`
+  and `template_variables` (bodies and variables stay only in `crm_inbox_messages`);
+  `crm_inbox_consents` as §3, insert-only by trigger, with the extra source
+  `recorded_stop` (a member records STOP on the client's behalf) and checks tying each
+  source to its state, `reason` to `admin_restored` and `recorded_by` to member sources.
+
+**Modules.** `integrations` owns templates, numbers, the Twilio adapter and the public
+status route; it offers the Inbox one facade, `integrations::whatsapp` (own number, number
+by ID, offered templates, the send adapter). `inbox` owns consents, sending rules, the
+composer state and the forward-only status change, which the status route calls inside its
+own transaction. Neither module reads the other's tables.
+
+**API** (all under `/api/crm/workspaces/{ws}`; writes need Origin and CSRF; Blaqks One is
+`403`; foreign, hidden and malformed IDs are `404 Record not found.`).
+
+| Route                                               | Who                            | Body                                                                                                                        | Reply                                                                                                       |
+| --------------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `GET /whatsapp-templates`                           | owning Admin                   | —                                                                                                                           | `{templates:[{id,name,language,category,approval,kind,body,variables,offered}], syncedAt, checkedAt, sync}` |
+| `POST /whatsapp-templates/refresh`                  | owning Admin                   | `{}`                                                                                                                        | the same, after reading Twilio                                                                              |
+| `GET /inbox/conversations/{id}`                     | as today                       | —                                                                                                                           | `conversation.whatsapp` (below); each message gains `template` (`HX…` or null)                              |
+| `POST /inbox/conversations/{id}/consent`            | see rules                      | `{change:"agreed",source:"phone"\|"in_person"\|"form"}`, `{change:"stopped"}` or `{change:"restored",reason}`               | `{consent}`                                                                                                 |
+| `GET /inbox/whatsapp/start?collection&recordId`     | members who can see the record | —                                                                                                                           | `{number, contact, consent, canStart, refusal, conversationId, templates}`                                  |
+| `POST /inbox/whatsapp/consent`                      | see rules                      | `{collection, recordId, change, source?, reason?}`                                                                          | `{consent}`                                                                                                 |
+| `POST /inbox/conversations/{id}/messages`           | the number's member            | `{body}` (free text) or `{template:{id, variables:[…]}}`                                                                    | `201 {message, draftRevision}`                                                                              |
+| `POST /inbox/conversations`                         | the number's member            | `{channel:"whatsapp", collection, recordId, template:{id, variables}}` (or `body` when an existing thread's window is open) | `201 {conversationId, message}`                                                                             |
+| `POST /inbox/conversations/{id}/messages/{m}/again` | the author                     | —                                                                                                                           | `201 {message}`                                                                                             |
+
+- `consent` is `{state:"opt_in"|"opt_out"|"none", source, at}`. Agreement: the Admin, or
+  staff with the WhatsApp grant; refused after STOP (`409 opted_out`). STOP: any member
+  who can see the conversation or record. Restore: the Admin only, only after STOP
+  (`409 not_stopped`), with a reason of 1–500 characters. Repeating the current state
+  writes nothing.
+- `conversation.whatsapp` (null on other channels): `{numberId, numberOwnerId, numberPhone,
+canSend, canSendText, canSendTemplate, refusal, window:{open, until}, consent,
+templates:[{id, name, language, category, body, variables}]}`. `refusal` is null or one
+  of `no_grant`, `no_number`, `other_number` (show "Sent from {owner}'s number" from
+  `numberOwnerId`), `number_disconnected`, `account_reconnect`, `not_sendable`,
+  `opted_out`, `unsupported`. Templates are listed only when the caller may send.
+- Start state `refusal`: `no_grant`, `no_number`, `account_reconnect`, `no_phone`,
+  `blocked`, `opted_out`, `no_agreement`, `conversation_held`. `conversationId` is the
+  caller's visible thread with this client on their number, which a Start message joins.
+- Sending refusals (status, code, message): `403 forbidden` without the grant; `409
+number_required` "Ask your Admin for a WhatsApp number before sending."; `409
+account_reconnect` "Reconnect the company's Twilio account before sending on WhatsApp.";
+  `409 other_number` "This conversation is on a colleague's WhatsApp number. Start your own
+  conversation instead."; `409 number_disconnected` "This conversation's WhatsApp number is
+  disconnected. Start a new conversation instead."; `409 not_sendable`; `409 opted_out`
+  "This client asked to stop messages."; `409 window_closed` "More than 24 hours have passed
+  since the client's last message. Send an approved template."; `409 agreement_required`
+  "Record the client's agreement before sending a template."; `409 conversation_held` "A
+  colleague holds this client's conversation on your number."; `400` "Choose an approved
+  WhatsApp template.", "Fill in each template variable: 1 to 200 characters, without line
+  breaks, tabs or four spaces in a row.", "Write a WhatsApp message of up to 4,096
+  characters.", "Attachments are not available on WhatsApp yet.", "This record has no
+  valid mobile number for WhatsApp.", "This number is blocked.".
+- Message `failureReason` codes: `outside_window`, `not_on_whatsapp`, `whatsapp_limited`,
+  `template_not_delivered`, `number_not_set_up`, `whatsapp_refused` (§11), and the CRM's
+  own `not_sendable`, `opted_out`, `no_agreement`, `sender_unavailable`,
+  `account_reconnect`, `template_unavailable`, `rate_limited`, `provider_unavailable`.
+
+**Worker.** The Inbox domain sends WhatsApp jobs: under the message lock it re-checks the
+conversation (Spam or blocked), the consent (`opt_out`; `opt_in` for templates) and the
+window for free text, marks `sending` and commits; `integrations::whatsapp::send` then
+re-checks the number (active, the author's, on the conversation's connection), the
+member's live state and grant, the connection (`connected`) and the template (offered, same
+variable count), and posts only `From`, `To`, `Body` or `ContentSid` + `ContentVariables`,
+and `StatusCallback` (only when `CRM_PUBLIC_URL` is set). `2xx` → `sent` with the `SM…` ID;
+`429` → retry after `Retry-After`; `401` → company connection `reconnect_required`;
+`400` → `failed` with the §11 reason; a refused connection → retry; timeout, reset, `5xx`
+or anything unclear → `unknown`, never re-sent. The settle guard keeps any status a
+callback set (`sent`, `delivered`, `read`, `failed`). A new `templates` loop syncs each
+connected account's templates once a day (checked hourly).
+
+**Status callbacks.** `POST /api/integrations/webhooks/twilio/{connection}/status?m=…`:
+cheap refusals first (form content type, a base64 signature of 20 bytes, the query exactly
+`m=` and a lower-case UUID, which also refuses `bodySHA256`, a declared length within 64
+KiB, a live Twilio connection with an openable token, `CRM_PUBLIC_URL` set), each counted;
+then the body, at most 64 KiB counted while streaming; a repeated parameter is refused;
+HMAC-SHA1 over `CRM_PUBLIC_URL` + path + `?` + raw query + sorted names and values,
+compared in constant time; `AccountSid` must match. Then `m` is looked up joined to its
+conversation on that connection and workspace; `To` must be the conversation's client and
+`From` its number row's phone; the `MessageSid` must equal a stored one, or be held by no
+other message of the connection. A receipt `(connection, status:{sid}:{status})` and the
+forward-only change commit together (sent from sending or unknown; delivered from those or
+sent; read from those or delivered; failed from sending, sent or unknown). Anything that
+changes nothing rolls back and answers `200`.
+
+**Stand-in.** `scripts/fake-twilio.mjs` gains `GET /v1/ContentAndApprovals` (three
+synthetic templates, one pending; `POST /test/templates?sid=` replaces them), `POST
+/2010-04-01/Accounts/{sid}/Messages.json` (`201` with an `SM…` ID, then signed `sent`,
+`delivered` and `read` callbacks; a `From` that is not an online sender is `400` 63007),
+and reserved recipients: `+99900000001` not on WhatsApp (`undelivered` 63003),
+`+99900000002` outside the window (`400` 63016), `+99900000003` a timeout (no answer for
+15 seconds), `+99900000004` `429` on the first attempt, `+99900000006` accepted with no
+callbacks. Every host still derives from `CRM_TWILIO_ENDPOINT` (W-L5).
+
+**Tests.** Rust unit tests for the window, variable rules, placeholders, status and error
+mapping, the signature base string and forward-only statuses. API suites: templates,
+consent, sending, refusals, failures and callbacks (§14 list), all against the stand-in
+with synthetic `+999` numbers.
+
+### Decisions taken while building
+
+The owner asked to keep building; each open choice took the recommended option.
+
+- **Two migrations**, one per owning module (0096 `integrations`, 0097 `inbox`). The L5
+  composite key also covers templates; the existing single-column foreign key on numbers
+  stays.
+- **STOP recorded by a member** has its own source, `recorded_stop`; §3's list had none.
+  Repeating the consent already in force writes no row. Consent changes are not copied into
+  Inbox events: the insert-only consent rows are the evidence (who, when, reason).
+- **Variables** are trimmed at the ends, control characters are refused as well as line
+  breaks and tabs, and a template takes at most ten. Only bodies of up to 1,024 characters
+  with placeholders exactly `{{1}}`…`{{k}}` are offered. The filled-in text is built in one
+  pass, so a typed value that looks like a placeholder is shown as typed.
+- **Template sync** forgets templates Twilio no longer lists only when the list was read to
+  its end; a failed read keeps the set. Its state comes from two connection times (no
+  events, so the daily read writes no history). The worker's `templates` loop checks hourly
+  (`CRM_TEMPLATE_SYNC_SECONDS`) for accounts not read for a day. Reconnect does not read
+  templates (connect, Refresh and daily only, as §8).
+- **Settle guard**: the worker's late result keeps `sent` too, not only `delivered`, `read`
+  and `failed`, because a callback's `sent` can arrive during the call and a late
+  `unknown` must not make the message repeatable. The first stored provider ID wins.
+- **The worker also re-checks the window** for free text (`outside_window`), besides the
+  consent; a queued retry could otherwise outlive the window.
+- **Start on an existing thread**: Start joins the caller's visible thread for that client
+  on their number; one they cannot see is `409 conversation_held`. A `body` is accepted
+  only when that thread's window is open, so a new thread starts with a template.
+- **A `2xx` without a readable `SM…` ID** is `sent` without an ID (Twilio accepted it); a
+  callback supplies the ID later, under the rules above.
+- **Status route**: the query must be exactly `m=` and a lower-case UUID; every refusal
+  before verification is the same `401`, counted in the process (every hundredth logged).
+  Hosting metrics and an event-age limit (X2-S7) stay open; a replay after the 30-day
+  receipt purge still cannot move a status backwards. Receipts use the existing
+  `crm_webhook_receipts` (`outcome = processed`). A signed `failed` may also resolve
+  `unknown`; failures never follow `delivered` or `read`.
+- **Carried L3**: on 21606 or 63007 the message fails with `number_not_set_up`, and the
+  worker then reads the account's sender list again (after settling, outside the call
+  budget); only a list read to its end that does not show the number disconnects it, with
+  a redacted `number_disconnected` event. Rechecking when the Admin reads the senders list,
+  and a Blaqks One release action, stay for W2a.
+- **One normaliser (W-M5)**: a trunk `0` is dropped only after the UAE code (`+971 0 50…`),
+  in `normalize::phone` and in the records matching SQL; other countries keep theirs (Italy
+  dials `+39 06…`).
+- **Attachments** are refused on WhatsApp until the media packet. Without `CRM_PUBLIC_URL`
+  sends carry no `StatusCallback` and the status route refuses everything.
+- **Stand-in**: "not on WhatsApp" fails by an `undelivered` callback (as Twilio reports
+  it), "outside the window" by a synchronous `400`, so both paths are tested; the timeout
+  number holds the request for 15 seconds; `429` happens once per message.
+- **Composer refusal order** (conversation): `no_grant`, `unsupported`, `other_number`,
+  `number_disconnected`, `account_reconnect`, `not_sendable`, `opted_out`. A send by a
+  member whose number was disconnected answers `number_required` until they have a number
+  again, then `number_disconnected` in the old thread.
+
+### To prove only with a live Twilio account
+
+The `ContentAndApprovals` field names and approval words; whether 63016 and 63003 come as a
+synchronous `400` or a callback (both are handled); that Twilio signs the callback URL with
+its `?m=` query exactly as given; `Retry-After` on `429`; the order callbacks arrive in
+(statuses only move forward, so any order is safe); and 21606 versus 63007 for a sender
+that moved accounts.

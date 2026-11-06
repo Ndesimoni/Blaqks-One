@@ -17,11 +17,17 @@ pub struct TwilioConfig {
     pub messaging_url: String,
     /// Content templates (`/v1/ContentAndApprovals`, packet W1b).
     pub content_url: String,
+    /// `CRM_PUBLIC_URL` (decision D7): where Twilio posts status callbacks and the origin
+    /// their signatures cover (W-L1). Without it sends carry no callback.
+    pub public_url: Option<String>,
 }
 
-/// Reads `CRM_TWILIO_ENDPOINT`, the local Twilio stand-in.
+/// Reads `CRM_TWILIO_ENDPOINT`, the local Twilio stand-in, and `CRM_PUBLIC_URL`.
 pub fn from_env(local: bool) -> Result<TwilioConfig, String> {
-    twilio_config(std::env::var("CRM_TWILIO_ENDPOINT").ok(), local)
+    let mut config = twilio_config(std::env::var("CRM_TWILIO_ENDPOINT").ok(), local)?;
+    let public = std::env::var("CRM_PUBLIC_URL").ok();
+    config.public_url = super::sendgrid_settings::public_url(public, local)?;
+    Ok(config)
 }
 
 pub fn twilio_config(endpoint: Option<String>, local: bool) -> Result<TwilioConfig, String> {
@@ -33,6 +39,7 @@ pub fn twilio_config(endpoint: Option<String>, local: bool) -> Result<TwilioConf
             api_url: API.into(),
             messaging_url: MESSAGING.into(),
             content_url: CONTENT.into(),
+            public_url: None,
         });
     };
     if !local {
@@ -49,6 +56,7 @@ pub fn twilio_config(endpoint: Option<String>, local: bool) -> Result<TwilioConf
         api_url: endpoint.clone(),
         messaging_url: endpoint.clone(),
         content_url: endpoint,
+        public_url: None,
     })
 }
 

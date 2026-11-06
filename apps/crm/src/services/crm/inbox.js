@@ -1,5 +1,6 @@
 /** Connected Inbox (docs/messaging-design.md §12): conversations, triage and lead rules. */
 import { inboxSavedRoutes } from './inboxSaved.js';
+import { inboxWhatsappRoutes } from './inboxWhatsapp.js';
 
 const query = (params = {}) => {
   const search = new URLSearchParams(
@@ -30,7 +31,7 @@ export function inboxRoutes({ request, scope }) {
     resolveConversation: action('resolve'),
     blockConversation: action('block'),
     unblockConversation: action('unblock'),
-    /** Email sending (E1b): reply, Start message and Send again. */
+    /** Sending (E1b; WhatsApp W1b with `{template}`): reply, Start message and Send again. */
     replyToConversation: action('messages'),
     startConversation: (workspace, body) => request(base(workspace), { method: 'POST', body }),
     /** A message's attachment (F3a), served after the conversation's access check. */
@@ -44,5 +45,6 @@ export function inboxRoutes({ request, scope }) {
     saveInboxRules: (workspace, body) =>
       request(`${scope(workspace)}/inbox/rules`, { method: 'PUT', body }),
     ...inboxSavedRoutes({ request, scope }),
+    ...inboxWhatsappRoutes({ request, scope }),
   };
 }

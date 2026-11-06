@@ -5,7 +5,8 @@
 //! a member their own. The Super Admin holds no company number and reads none.
 mod disconnect;
 mod give;
-mod senders;
+pub mod recheck;
+pub mod senders;
 pub mod store;
 pub mod write;
 

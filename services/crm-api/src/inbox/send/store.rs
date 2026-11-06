@@ -74,6 +74,6 @@ pub async fn queue(
     Ok(serde_json::json!({
         "id": id, "direction": "outbound", "status": "queued", "body": body,
         "hasMedia": false, "authorId": author, "failureReason": null, "at": at,
-        "repeatOf": repeat_of,
+        "repeatOf": repeat_of, "template": null,
     }))
 }

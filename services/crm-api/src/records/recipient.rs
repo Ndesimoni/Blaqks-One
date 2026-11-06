@@ -1,6 +1,7 @@
-//! The email recipient of a Client or Contact, for the Inbox's Start message (E1b, decision
-//! D7: other modules call records functions, never `crm_records`). Only the name and the
-//! stored address, and only when the viewer may see that record.
+//! The recipient of a Client or Contact, for the Inbox's Start message (E1b and WhatsApp
+//! W1b; decision D7: other modules call records functions, never `crm_records`). Only the
+//! name, the stored email and the stored phone, and only when the viewer may see that
+//! record.
 use super::visibility::{predicate, RecordScope};
 use crate::{auth::profile::UserRow, error::ApiResult};
 use sqlx::{FromRow, Postgres, Transaction};
@@ -10,6 +11,7 @@ use uuid::Uuid;
 pub struct Recipient {
     pub name: Option<String>,
     pub email: Option<String>,
+    pub phone: Option<String>,
 }
 
 pub async fn recipient(
@@ -23,7 +25,8 @@ pub async fn recipient(
         return Ok(None);
     }
     let sql = format!(
-        "SELECT r.payload->>'full_name' AS name,btrim(r.payload->>'email') AS email \
+        "SELECT r.payload->>'full_name' AS name,btrim(r.payload->>'email') AS email, \
+           btrim(r.payload->>'phone') AS phone \
          FROM crm_records r WHERE r.workspace_id=$1 AND r.collection=$2 AND r.id=$3 AND {}",
         predicate("r", "$1", "$4")
     );

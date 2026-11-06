@@ -1,6 +1,7 @@
 //! `GET /inbox/conversations/{id}`: one visible conversation with its latest 200 messages,
-//! internal notes and the linked record as far as the viewer may see it. Notes are a
-//! separate list and never part of anything a client receives.
+//! internal notes, the linked record as far as the viewer may see it, and on WhatsApp the
+//! composer's state (W1b). Notes are a separate list and never part of anything a client
+//! receives.
 use super::{
     access::{self, predicate, Viewer},
     view::{Row, COLUMNS},
@@ -48,22 +49,6 @@ pub async fn load(
 }
 
 #[derive(FromRow)]
-struct Message {
-    id: Uuid,
-    direction: String,
-    status: String,
-    body: String,
-    has_media: bool,
-    files_not_kept: i16,
-    author_user_id: Option<Uuid>,
-    repeat_of: Option<Uuid>,
-    sender: Option<String>,
-    sender_unverified: bool,
-    failure_reason: Option<String>,
-    at: String,
-}
-
-#[derive(FromRow)]
 struct Note {
     id: Uuid,
     author_user_id: Uuid,
@@ -84,18 +69,7 @@ pub async fn read(
     let row = load(&mut tx, &workspace, &viewer, id, false)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let messages: Vec<Message> = sqlx::query_as(&format!(
-        "SELECT * FROM (SELECT id,direction,body,has_media,files_not_kept,author_user_id,repeat_of,sender, \
-           sender_unverified, \
-           CASE WHEN status='sending' AND status_changed_at<now()-interval '2 minutes' \
-             THEN 'unknown' ELSE status END AS status, \
-           failure_reason,{STAMP} AS at,created_at FROM inbox.crm_inbox_messages \
-           WHERE conversation_id=$1 ORDER BY created_at DESC,id DESC LIMIT 200) latest \
-         ORDER BY created_at,id"
-    ))
-    .bind(id)
-    .fetch_all(&mut *tx)
-    .await?;
+    let messages = super::read_messages::messages(&mut tx, id).await?;
     let notes: Vec<Note> = sqlx::query_as(&format!(
         "SELECT id,author_user_id,body,{STAMP} AS at FROM inbox.crm_inbox_notes \
          WHERE conversation_id=$1 ORDER BY created_at,id"
@@ -116,20 +90,11 @@ pub async fn read(
         }
         _ => None,
     };
-    let ids: Vec<Uuid> = messages.iter().map(|m| m.id).collect();
-    let messages: Vec<Value> = messages
-        .iter()
-        .map(|m| {
-            json!({
-                "id": m.id, "direction": m.direction, "status": m.status, "body": m.body,
-                "hasMedia": m.has_media, "filesNotKept": m.files_not_kept, "authorId": m.author_user_id,
-                "failureReason": m.failure_reason, "repeatOf": m.repeat_of, "sender": m.sender,
-                "senderUnverified": m.sender_unverified, "at": m.at,
-            })
-        })
-        .collect();
-    // Email attachments (F3a) are listed on the message that carries them.
-    let messages = super::send::files::views(&mut tx, &ids, messages).await?;
+    // The WhatsApp composer's window, agreement and template states (W1b).
+    let whatsapp = match row.channel.as_str() {
+        "whatsapp" => super::composer::conversation(&mut tx, &workspace, &user, id).await?,
+        _ => Value::Null,
+    };
     tx.commit().await?;
     let notes: Vec<Value> = notes
         .iter()
@@ -141,6 +106,7 @@ pub async fn read(
         .collect();
     let mut conversation = row.view(record_visible);
     conversation["record"] = record.unwrap_or(Value::Null);
+    conversation["whatsapp"] = whatsapp;
     Ok(Json(
         json!({"conversation": conversation, "messages": messages, "notes": notes}),
     ))

@@ -23,9 +23,14 @@ pub mod routes;
 mod sendgrid;
 mod store;
 mod store_write;
+pub mod templates;
 mod twilio;
 mod vocabulary;
 pub mod webhooks;
+/// WhatsApp for the Inbox: numbers, offered templates and sending (W1b).
+pub mod whatsapp;
+mod whatsapp_answer;
+mod whatsapp_send;
 mod wire;
 
 /// Called by `team` when an Admin is archived; see `company.rs`.

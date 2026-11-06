@@ -20,3 +20,4 @@ console.log(`Connect with any Account SID and Auth Token of the right shape, for
 console.log(`  Account SID AC${randomBytes(16).toString('hex')}`);
 console.log(`  Auth Token  ${randomBytes(16).toString('hex')}`);
 console.log('Each account lists four synthetic +999 senders; the last one is OFFLINE.');
+console.log('It lists three templates (one pending) and answers sends with signed callbacks.');

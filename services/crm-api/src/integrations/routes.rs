@@ -1,9 +1,9 @@
 //! Channel routes under `/api/crm/workspaces/{workspace}/channels`, each member's own
 //! mailbox under `/mailbox`, SendGrid sending addresses under `/email-addresses`, members'
 //! WhatsApp numbers under `/whatsapp-numbers` (W1a), and Google's sign-in redirect, merged
-//! into the application router by `routes.rs`. Provider webhooks (X2) use their own
-//! public prefix.
-use super::{addresses, commands, google, handlers, listing, mailbox, numbers};
+//! into the application router by `routes.rs`; the company's WhatsApp templates under
+//! `/whatsapp-templates` (W1b). Provider webhooks (X2) use their own public prefix.
+use super::{addresses, commands, google, handlers, listing, mailbox, numbers, templates};
 use crate::{config::google_settings::CALLBACK_PATH, state::AppState};
 use axum::{
     extract::DefaultBodyLimit,
@@ -15,6 +15,7 @@ const BASE: &str = "/api/crm/workspaces/{workspace}/channels";
 const MAILBOX: &str = "/api/crm/workspaces/{workspace}/mailbox";
 const ADDRESSES: &str = "/api/crm/workspaces/{workspace}/email-addresses";
 const NUMBERS: &str = "/api/crm/workspaces/{workspace}/whatsapp-numbers";
+const TEMPLATES: &str = "/api/crm/workspaces/{workspace}/whatsapp-templates";
 
 pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(16 * 1024);
@@ -66,6 +67,11 @@ pub fn router() -> Router<AppState> {
         .route(
             &format!("{NUMBERS}/{{id}}/disconnect"),
             post(numbers::disconnect).layer(body()),
+        )
+        .route(TEMPLATES, get(templates::list))
+        .route(
+            &format!("{TEMPLATES}/refresh"),
+            post(templates::refresh).layer(body()),
         )
         .route(CALLBACK_PATH, get(google::callback::callback))
 }

@@ -10,10 +10,23 @@ fn every_common_uae_phone_form_becomes_the_same_digits() {
         "(050) 000-0001",
         "500000001",
         "whatsapp:+971500000001",
+        "+971 0 50 000 0001",
+        "00971 050 000 0001",
     ] {
         assert_eq!(phone(typed).as_deref(), Some("971500000001"), "{typed}");
     }
     assert_eq!(phone("+44 20 7946 0000").as_deref(), Some("442079460000"));
+    // Only the UAE trunk zero is dropped; other countries keep theirs (Italy: +39 06 …).
+    assert_eq!(phone("+39 06 1234 5678").as_deref(), Some("390612345678"));
+    assert_eq!(
+        whatsapp_key("+971 0 50 000 0001").as_deref(),
+        Some("+971500000001")
+    );
+    assert_eq!(
+        whatsapp_key("whatsapp:+99970000001").as_deref(),
+        Some("+99970000001")
+    );
+    assert_eq!(whatsapp_key("+0123456789"), None);
 }
 
 #[test]

@@ -7,6 +7,8 @@ pub mod blocks;
 pub mod change;
 pub mod commands;
 pub mod company_usage;
+pub mod composer;
+pub mod consent;
 mod draft_input;
 pub mod draft_sent;
 pub mod drafts;
@@ -25,6 +27,7 @@ pub mod normalize;
 pub mod notes;
 pub mod platform_counts;
 pub mod read;
+mod read_messages;
 pub mod routes;
 pub mod rules;
 pub mod rules_api;
@@ -34,6 +37,7 @@ pub mod send;
 pub mod summary;
 pub mod triage;
 pub mod view;
+pub mod whatsapp_api;
 
 #[cfg(test)]
 mod intake_fixtures;

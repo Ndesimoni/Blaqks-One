@@ -1,6 +1,7 @@
 //! Inbox routes under `/api/crm/workspaces/{workspace}/inbox`, merged by `routes.rs`.
 use super::{
     blocks, commands, drafts, list, notes, read, rules_api, saved_replies, send, summary, triage,
+    whatsapp_api,
 };
 use crate::state::AppState;
 use axum::{
@@ -11,6 +12,7 @@ use axum::{
 
 const BASE: &str = "/api/crm/workspaces/{workspace}/inbox/conversations";
 const SAVED: &str = "/api/crm/workspaces/{workspace}/inbox/saved-replies";
+const WHATSAPP: &str = "/api/crm/workspaces/{workspace}/inbox/whatsapp";
 
 pub fn router() -> Router<AppState> {
     let body = || DefaultBodyLimit::max(32 * 1024);
@@ -42,6 +44,15 @@ pub fn router() -> Router<AppState> {
         .route(
             &format!("{item}/notes"),
             post(notes::add_note).layer(body()),
+        )
+        .route(
+            &format!("{item}/consent"),
+            post(whatsapp_api::conversation).layer(body()),
+        )
+        .route(&format!("{WHATSAPP}/start"), get(whatsapp_api::start))
+        .route(
+            &format!("{WHATSAPP}/consent"),
+            post(whatsapp_api::record).layer(body()),
         )
         .route(&format!("{item}/lead"), post(triage::lead).layer(body()))
         .route(&format!("{item}/link"), post(triage::link).layer(body()))

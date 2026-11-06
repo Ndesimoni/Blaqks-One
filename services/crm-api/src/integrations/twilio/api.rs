@@ -3,16 +3,13 @@
 //! connect timeout, no redirects and bounded bodies. Results are fixed outcomes, never
 //! Twilio's text, so no token or provider message reaches a log or a response. Callers
 //! check the SID and token shapes first, so neither can alter a URL.
+use super::pages::{large, MAX_PAGES};
 use crate::{
     config::twilio_settings::TwilioConfig,
-    integrations::google::oauth::{bounded, client, Failure},
+    integrations::google::oauth::{client, Failure},
 };
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::Deserialize;
 
-/// Design §4: at most ten pages of senders are read.
-pub const MAX_PAGES: usize = 10;
-/// A page of 50 senders with their profiles fits well inside this.
-const MAX_PAGE_BYTES: usize = 512 * 1024;
 const SENDERS: &str = "/v2/Channels/Senders";
 
 #[derive(Deserialize)]
@@ -55,13 +52,13 @@ pub async fn account(config: &TwilioConfig, sid: &str, token: &str) -> Result<Ac
 }
 
 /// The account's WhatsApp senders, following Twilio's next-page links for at most
-/// `MAX_PAGES` pages. A link that leaves the senders list is refused, so the token is
-/// never sent anywhere else.
+/// `MAX_PAGES` pages, and whether the list was read to its end. A link that leaves the
+/// senders list is refused, so the token is never sent anywhere else.
 pub async fn senders(
     config: &TwilioConfig,
     sid: &str,
     token: &str,
-) -> Result<Vec<Sender>, Failure> {
+) -> Result<(Vec<Sender>, bool), Failure> {
     let mut url = Some(format!(
         "{}{SENDERS}?Channel=whatsapp&PageSize=50",
         config.messaging_url
@@ -80,34 +77,12 @@ pub async fn senders(
             None => None,
         };
     }
-    Ok(found)
+    Ok((found, url.is_none()))
 }
 
 /// Whether `next` is another page of this host's senders list.
 pub fn same_list(config: &TwilioConfig, next: &str) -> bool {
-    let (Ok(next), Ok(base)) = (
-        url::Url::parse(next),
-        url::Url::parse(&config.messaging_url),
-    ) else {
-        return false;
-    };
-    next.origin() == base.origin()
-        && next.path() == SENDERS
-        && next.username().is_empty()
-        && next.password().is_none()
-        && next.fragment().is_none()
-}
-
-/// As `oauth::read`, with room for a full page; failures follow [`status::failure`].
-async fn large<T: DeserializeOwned>(
-    sent: Result<reqwest::Response, reqwest::Error>,
-) -> Result<T, Failure> {
-    let response = sent.map_err(|_| Failure::Unavailable)?;
-    if let Some(failure) = super::status::failure(response.status()) {
-        return Err(failure);
-    }
-    serde_json::from_slice(&bounded(response, MAX_PAGE_BYTES).await?)
-        .map_err(|_| Failure::Unavailable)
+    super::pages::same_page(&config.messaging_url, SENDERS, next)
 }
 
 #[cfg(test)]

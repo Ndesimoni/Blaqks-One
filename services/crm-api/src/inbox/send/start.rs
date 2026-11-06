@@ -1,6 +1,7 @@
 //! `POST /inbox/conversations`: Start message. A new email thread to a Client or Contact
 //! the caller may see, sent through the caller's own mailbox, linked to that record and
 //! assigned to the caller. Gmail's thread ID replaces the `crm:` placeholder once sent.
+//! `channel: "whatsapp"` starts on WhatsApp instead (`whatsapp_start.rs`).
 use super::{body, object, sender, store, SUBJECT};
 use crate::{
     auth::session::Session,
@@ -31,6 +32,18 @@ pub async fn start(
 ) -> ApiResult<(StatusCode, Json<Value>)> {
     access::ensure_writer(&state, &session, &headers, &workspace).await?;
     let Json(mut request) = request.map_err(|_| ApiError::invalid(START))?;
+    // `channel` is optional for email (E1b) and names WhatsApp (W1b).
+    match request
+        .as_object_mut()
+        .and_then(|map| map.remove("channel"))
+    {
+        Some(Value::String(channel)) if channel == "whatsapp" => {
+            return super::whatsapp_start::start(&state, &session, &workspace, request).await
+        }
+        Some(Value::String(channel)) if channel == "email" => {}
+        None => {}
+        Some(_) => return Err(ApiError::invalid(START)),
+    }
     let attachments = super::files::take(&mut request)?;
     let map = object(
         request,

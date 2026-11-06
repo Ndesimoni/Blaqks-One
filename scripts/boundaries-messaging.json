@@ -21,7 +21,12 @@
       "crm_whatsapp_numbers",
       "crm_whatsapp_numbers_phone",
       "crm_whatsapp_numbers_member",
-      "crm_whatsapp_numbers_connection"
+      "crm_whatsapp_numbers_connection",
+      "crm_provider_templates",
+      "crm_provider_templates_template",
+      "crm_provider_templates_connection_scope",
+      "crm_channel_connections_scope",
+      "crm_whatsapp_numbers_connection_scope"
     ],
     "chat": [
       "crm_chat_rooms",
@@ -59,7 +64,12 @@
       "crm_inbox_events_immutable",
       "crm_inbox_saved_replies",
       "crm_inbox_saved_replies_title",
-      "crm_inbox_drafts"
+      "crm_inbox_drafts",
+      "crm_inbox_consents",
+      "crm_inbox_consents_latest",
+      "crm_inbox_consents_immutable",
+      "crm_inbox_conversations_whatsapp_number",
+      "crm_inbox_messages_template"
     ],
     "outbox": [
       "crm_outbox_jobs",

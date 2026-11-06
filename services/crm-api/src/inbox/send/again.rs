@@ -1,7 +1,7 @@
 //! `POST /inbox/conversations/{id}/messages/{message}/again`: Send again. Only the author,
 //! only for a message that failed or whose outcome is unknown, and always as a new message
 //! marked as a deliberate repeat; the old job and provider ID are never reused (design §5).
-use super::{same_mailbox, sender, store};
+use super::{same_mailbox, sender, store, whatsapp};
 use crate::{
     auth::session::Session,
     error::{ApiError, ApiResult},
@@ -19,6 +19,8 @@ use axum::{
     Json,
 };
 use serde_json::{json, Value};
+
+type Original = (String, Option<String>, Option<Vec<String>>);
 
 /// Failed, unknown, or left `sending` past two minutes (which reads as unknown).
 pub const REPEATABLE: &str = "(m.status IN ('failed','unknown') OR (m.status='sending' \
@@ -39,8 +41,9 @@ pub async fn again(
     load(&mut tx, &workspace, &Viewer::of(&user), id, true)
         .await?
         .ok_or_else(ApiError::missing)?;
-    let original: Option<String> = sqlx::query_scalar(&format!(
-        "SELECT m.body FROM inbox.crm_inbox_messages m WHERE m.id=$1 AND m.conversation_id=$2 \
+    let original: Option<Original> = sqlx::query_as(&format!(
+        "SELECT m.body,m.template_sid,m.template_variables FROM inbox.crm_inbox_messages m \
+         WHERE m.id=$1 AND m.conversation_id=$2 \
          AND m.direction='outbound' AND m.author_user_id=$3 AND {REPEATABLE} \
          AND NOT EXISTS (SELECT 1 FROM inbox.crm_inbox_messages r WHERE r.repeat_of=m.id)"
     ))
@@ -49,14 +52,24 @@ pub async fn again(
     .bind(user.id)
     .fetch_optional(&mut *tx)
     .await?;
-    let Some(text) = original else {
+    let Some((text, template, values)) = original else {
         return Err(ApiError::invalid(
             "Only your own failed message can be sent again, once.",
         ));
     };
-    let mailbox = sender(&mut tx, &workspace, &user).await?;
-    same_mailbox(&store::thread(&mut tx, id).await?, mailbox)?;
-    let repeat = store::queue(&mut tx, &workspace, id, user.id, &text, Some(message)).await?;
+    let thread = store::thread(&mut tx, id).await?;
+    let repeat = if thread.channel == "whatsapp" {
+        // The same text or the same template with the same values (W1b).
+        let content = match (template, values) {
+            (Some(sid), Some(values)) => whatsapp::Content::Template(sid, values),
+            _ => whatsapp::Content::Text(text),
+        };
+        whatsapp::send(&mut tx, &workspace, &user, id, content, Some(message)).await?
+    } else {
+        let mailbox = sender(&mut tx, &workspace, &user).await?;
+        same_mailbox(&thread, mailbox)?;
+        store::queue(&mut tx, &workspace, id, user.id, &text, Some(message)).await?
+    };
     events::append(&mut tx, &workspace, id, Some(user.id), "sent_again").await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(json!({ "message": repeat }))))

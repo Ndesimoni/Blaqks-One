@@ -3,7 +3,7 @@
 //! workspace path. The signature is verified over the raw body before anything else; a
 //! verified event gets a receipt and a sealed staging row, and the worker processes it.
 //! X2 ships the local `stub` provider; SendGrid's signed delivery events arrive on their
-//! own per-connection route (E3b, `sendgrid.rs`).
+//! own per-connection route (E3b, `sendgrid.rs`), as do Twilio's status callbacks (W1b).
 pub mod cleanup;
 pub mod inbound;
 mod inbound_slots;
@@ -16,6 +16,8 @@ pub mod signature;
 pub mod sink;
 mod store;
 mod stub;
+mod twilio_apply;
+mod twilio_status;
 
 #[cfg(test)]
 mod inbound_fixtures;
@@ -50,6 +52,11 @@ pub fn router() -> Router<AppState> {
             "/api/integrations/webhooks/sendgrid/{connection}/inbound",
             post(sendgrid_inbound::inbound)
                 .layer(DefaultBodyLimit::max(sendgrid_inbound::MAX_MAIL)),
+        )
+        // Twilio's signed WhatsApp status callbacks, one URL per connection (W1b).
+        .route(
+            "/api/integrations/webhooks/twilio/{connection}/status",
+            post(twilio_status::status).layer(DefaultBodyLimit::max(twilio_status::MAX_STATUS)),
         )
 }
 

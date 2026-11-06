@@ -130,6 +130,11 @@ pub async fn connect(
         .ok_or_else(ApiError::missing)?;
     tx.commit().await?;
     let mut body = json!({ "connection": row.view() });
+    if provider == Provider::Twilio {
+        let (pool, config, actor) = (&state.pool, &state.config.twilio, session.user.id);
+        let read = super::templates::after_connect(pool, &key, config, &workspace, id, actor);
+        body["templates"] = json!(read.await);
+    }
     if provider == Provider::Sendgrid {
         let (events, mail) = super::sendgrid::webhooks::ensure(&state, &workspace, id).await;
         body["deliveryUpdates"] = json!(events);

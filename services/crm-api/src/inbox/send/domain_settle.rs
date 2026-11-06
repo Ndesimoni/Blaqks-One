@@ -69,6 +69,9 @@ pub async fn apply(
     Ok(outcome)
 }
 
+/// Statuses only a provider event sets; the worker's own result never replaces them.
+const SETTLED: &str = "status IN ('sent','delivered','read','failed')";
+
 /// Moves the message to `status`; `code` is stored as the failure reason when not empty.
 pub async fn settle(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -78,19 +81,18 @@ pub async fn settle(
     code: &str,
 ) -> ApiResult<()> {
     // A signed provider event that arrived during the call (Delivered, or Failed by a
-    // bounce) is never overwritten by the call's own late result, so a timeout cannot
-    // turn a delivered message into a repeatable `unknown` (E3b review M1). The provider
-    // ID is still kept, so later events pass their prefix check.
-    sqlx::query(
+    // bounce; for WhatsApp also Sent and Read) is never overwritten by the call's own late
+    // result, so a timeout cannot turn a delivered message into a repeatable `unknown`
+    // (E3b review M1, WhatsApp W-M2). The provider ID is still kept, so later events pass
+    // their checks.
+    sqlx::query(&format!(
         "UPDATE inbox.crm_inbox_messages SET \
-           provider_message_id=COALESCE($4,provider_message_id), \
-           status=CASE WHEN status IN ('delivered','failed') THEN status ELSE $3 END, \
-           failure_reason=CASE WHEN status IN ('delivered','failed') THEN failure_reason \
-             ELSE NULLIF($5,'') END, \
-           status_changed_at=CASE WHEN status IN ('delivered','failed') THEN status_changed_at \
-             ELSE now() END \
-         WHERE id=$1 AND workspace_id=$2",
-    )
+           provider_message_id=COALESCE(provider_message_id,$4), \
+           status=CASE WHEN {SETTLED} THEN status ELSE $3 END, \
+           failure_reason=CASE WHEN {SETTLED} THEN failure_reason ELSE NULLIF($5,'') END, \
+           status_changed_at=CASE WHEN {SETTLED} THEN status_changed_at ELSE now() END \
+         WHERE id=$1 AND workspace_id=$2"
+    ))
     .bind(job.object_id)
     .bind(&job.workspace_id)
     .bind(status)

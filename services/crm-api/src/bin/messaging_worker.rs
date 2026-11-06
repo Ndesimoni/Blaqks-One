@@ -1,12 +1,12 @@
 //! The messaging worker process (docs/messaging-design.md §2): runs the outbox delivery
-//! loops, lease sweeps and retention purges, and hands verified webhook events to the
-//! Inbox. The API process never claims jobs. Stop it with Ctrl-C
+//! loops, lease sweeps and retention purges, hands verified webhook events to the Inbox,
+//! and reads WhatsApp templates daily. The API process never claims jobs. Stop it with Ctrl-C
 //! or SIGTERM; in-flight sends finish first.
 use kws_crm_api::{
     config::Config,
     inbox::{intake::InboxSink, send::domain::InboxSender},
     integrations::{
-        mail_sync, revocation,
+        mail_sync, revocation, templates,
         webhooks::inbound::{self, Sink},
     },
     media::sweep as media_sweep,
@@ -15,7 +15,7 @@ use kws_crm_api::{
 use sqlx::postgres::PgPoolOptions;
 use std::{sync::Arc, time::Duration};
 
-const ALL: &str = "outbox,revocations,inbound,mailsync,mediasweep";
+const ALL: &str = "outbox,revocations,inbound,mailsync,mediasweep,templates";
 
 /// A loop interval from the environment, 1–3600 seconds.
 fn seconds(name: &str, default: u64) -> Duration {
@@ -74,6 +74,7 @@ async fn run() -> Result<(), String> {
         key: key.clone(),
         google: config.google.clone(),
         sendgrid: config.sendgrid.clone(),
+        twilio: config.twilio.clone(),
         media: config.media.clone(),
     })];
     let mut handles = Vec::new();
@@ -120,6 +121,13 @@ async fn run() -> Result<(), String> {
             every,
             shutdown_rx.clone(),
         ));
+    }
+    // Each connected Twilio account's WhatsApp templates, read again once a day (W1b).
+    if wants("templates") {
+        let every = seconds("CRM_TEMPLATE_SYNC_SECONDS", 3600);
+        let (pool, twilio) = (pool.clone(), config.twilio.clone());
+        let sync = templates::sync::spawn(pool, key.clone(), twilio, every, shutdown_rx.clone());
+        handles.push(sync);
     }
     println!("CRM messaging worker running.");
     shutdown::signal().await;

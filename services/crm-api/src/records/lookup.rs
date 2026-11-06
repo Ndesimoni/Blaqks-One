@@ -6,11 +6,12 @@ use crate::{auth::profile::UserRow, error::ApiResult};
 use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
-/// The international digits of a stored phone value: a `00` prefix is dropped, and a
-/// single leading `0` or a bare 9-digit national number takes the UAE code (design §6).
-const PHONE: &str = "(CASE WHEN x.d LIKE '00%' THEN substr(x.d,3) \
+/// The international digits of a stored phone value: a `00` prefix is dropped, a single
+/// leading `0` or a bare 9-digit national number takes the UAE code (design §6), and a
+/// trunk `0` after the UAE code is dropped, as `inbox::normalize::phone` does (W-M5).
+const PHONE: &str = "regexp_replace((CASE WHEN x.d LIKE '00%' THEN substr(x.d,3) \
     WHEN x.d LIKE '0%' THEN '971'||substr(x.d,2) \
-    WHEN length(x.d)=9 THEN '971'||x.d ELSE x.d END)";
+    WHEN length(x.d)=9 THEN '971'||x.d ELSE x.d END),'^9710','971')";
 
 /// A Client or Contact whose phone or email matches exactly. No names or values.
 #[derive(Clone, Debug, FromRow, PartialEq)]

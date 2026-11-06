@@ -14,9 +14,7 @@ pub struct Listed {
 
 /// `+` and 8–15 digits, never starting with 0, from any form the Inbox accepts.
 pub fn e164(value: &str) -> Option<String> {
-    crate::inbox::normalize::phone(value)
-        .filter(|digits| !digits.starts_with('0'))
-        .map(|digits| format!("+{digits}"))
+    crate::inbox::normalize::whatsapp_key(value)
 }
 
 fn status(value: &str) -> String {

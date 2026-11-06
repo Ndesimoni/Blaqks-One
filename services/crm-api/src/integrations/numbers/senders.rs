@@ -65,7 +65,7 @@ pub async fn read(
         return Err(ApiError::invalid(RECONNECT));
     };
     match twilio::api::senders(&state.config.twilio, sid, &token).await {
-        Ok(found) => Ok((row.id, twilio::senders::canonical(found))),
+        Ok((found, _)) => Ok((row.id, twilio::senders::canonical(found))),
         Err(Failure::Refused) => {
             let mut tx = state.pool.begin().await?;
             workspaces::lock(&mut tx, workspace).await?;

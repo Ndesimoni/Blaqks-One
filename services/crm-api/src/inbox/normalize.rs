@@ -19,7 +19,9 @@ const UAE: &str = "971";
 
 /// International digits for a phone typed or sent in any common form: `+971 50 …`,
 /// `00971 50 …`, `050 …` or a bare 9-digit national number. Twilio's `whatsapp:` prefix
-/// is accepted. Between 8 and 15 digits (E.164), else `None`.
+/// is accepted, and a trunk `0` written after the UAE code (`+971 0 50 …`) is dropped, so
+/// one phone has one key (WhatsApp design W-M5). Between 8 and 15 digits (E.164), else
+/// `None`.
 pub fn phone(value: &str) -> Option<String> {
     let value = value.trim();
     let value = value.strip_prefix("whatsapp:").unwrap_or(value).trim();
@@ -39,9 +41,21 @@ pub fn phone(value: &str) -> Option<String> {
     } else {
         digits
     };
+    let international = match international.strip_prefix("9710") {
+        Some(rest) => format!("{UAE}{rest}"),
+        None => international,
+    };
     (8..=15)
         .contains(&international.len())
         .then_some(international)
+}
+
+/// The canonical WhatsApp key of a phone: `+` and its E.164 digits, never starting `+0`.
+/// Consents, conversations and Twilio's `From` and `To` all use it.
+pub fn whatsapp_key(value: &str) -> Option<String> {
+    phone(value)
+        .filter(|digits| !digits.starts_with('0'))
+        .map(|digits| format!("+{digits}"))
 }
 
 /// A lower-case address with one `@`, a non-empty local part and a dotted domain.
