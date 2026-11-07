@@ -4,6 +4,7 @@ import { HomeverseIcon } from './HomeverseIcon';
 import { CompanySampleForm } from '../company/CompanySampleForm';
 import { EnquiryForm } from '../EnquiryForm';
 import { ContactLinks } from '../ui';
+import { Arrow } from '../motion/Arrow';
 const benefits = [
   [
     'home',
@@ -67,7 +68,7 @@ export function HomeverseAbout({ site }: Pick<PageData, 'site'>) {
           <li>A dedicated point of contact for your enquiry</li>
         </ul>
         <Link className="v-button" href="/about">
-          Learn more about us <span aria-hidden="true">→</span>
+          Learn more about us <Arrow />
         </Link>
       </div>
     </section>
@@ -93,7 +94,7 @@ export function HomeverseContact({ site, catalogue }: PageData) {
             </>
           )}
           <Link className="v-contact-link" href="/contact">
-            Contact our team →
+            Contact our team <Arrow />
           </Link>
         </div>
         <div className="v-contact-card">

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Catalogue, Listing } from '../../lib/types';
 import { bedrooms, count, money, initials } from '../ui';
+import { Arrow } from '../motion/Arrow';
 
 export function CompanyGrid({
   listings,
@@ -58,7 +59,9 @@ export function CompanyTeam({ catalogue, limit = 4 }: { catalogue: Catalogue; li
             <p className="a-kicker">PROPERTY ADVISOR</p>
             <h3>{a.name}</h3>
             <p>{a.specialty}</p>
-            <Link href={`/agents/${encodeURIComponent(a.id)}`}>Meet {a.name.split(' ')[0]} ↗</Link>
+            <Link href={`/agents/${encodeURIComponent(a.id)}`}>
+              Meet {a.name.split(' ')[0]} <Arrow up />
+            </Link>
           </div>
         </article>
       ))}

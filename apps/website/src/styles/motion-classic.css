@@ -1,0 +1,108 @@
+/* Editorial (theme 3) and Nocturne (theme 4) motion, plus the shared inner pages every company
+   theme uses. Underlines draw in the theme's gold; Nocturne's gold reads on its deep green. */
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4']) {
+  --motion-line: var(--gold);
+}
+@media (prefers-reduced-motion: no-preference) {
+  body[data-site-kind='company'] :is(.hero-content > *, .home-search, .page-heading > *) {
+    animation: motion-rise var(--motion-rise) var(--motion-ease) backwards;
+  }
+  body[data-site-kind='company'] :is(.hero-content, .page-heading) > :nth-child(2) {
+    animation-delay: 90ms;
+  }
+  body[data-site-kind='company'] :is(.hero-content, .page-heading) > :nth-child(3) {
+    animation-delay: 180ms;
+  }
+  body[data-site-kind='company'] .hero-content > :nth-child(4) {
+    animation-delay: 270ms;
+  }
+  body[data-site-kind='company'] .home-search {
+    animation-delay: 380ms;
+  }
+  /* Nocturne's full-bleed photograph settles inside the clipped hero; Editorial's framed
+     photograph keeps its frame still and fades in. */
+  body[data-site-kind='company'][data-theme='4'] .hero > img {
+    animation: motion-settle 1800ms cubic-bezier(0.25, 0.6, 0.3, 1) backwards;
+  }
+  body[data-site-kind='company'][data-theme='3'] .hero > img {
+    animation: motion-fade 1200ms ease-out backwards;
+  }
+  body[data-site-kind='company'] :is(.property-image img, .area-card > img) {
+    transition: transform var(--motion-hover) var(--motion-ease);
+  }
+  body[data-site-kind='company']
+    :is(.property-card:has(:focus-visible) .property-image img, .area-card:focus-visible > img) {
+    transform: scale(1.04);
+  }
+  body[data-site-kind='company']:is([data-theme='3'], [data-theme='4']) .property-card {
+    transition:
+      transform 320ms var(--motion-ease),
+      box-shadow 320ms var(--motion-ease),
+      border-color 200ms ease;
+  }
+  body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+    .property-card:has(:focus-visible) {
+    transform: translateY(-3px);
+  }
+  body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+    :is(.desktop-nav a, .section-heading > a, .listing-agent)::after {
+    transition: transform 360ms var(--motion-ease);
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  body[data-site-kind='company']
+    :is(.property-card:hover .property-image img, .area-card:hover > img) {
+    transform: scale(1.04);
+  }
+  body[data-site-kind='company']:is([data-theme='3'], [data-theme='4']) .property-card:hover {
+    transform: translateY(-3px);
+  }
+}
+body[data-site-kind='company'] :is(.button, .developer-strip a) {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+/* Navigation and section links underline from the left instead of switching on. */
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+  :is(.desktop-nav a, .section-heading > a, .listing-agent) {
+  position: relative;
+  text-decoration: none;
+}
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+  :is(.desktop-nav a, .section-heading > a, .listing-agent)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  height: 1px;
+  background: var(--motion-line);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4']) .desktop-nav a::after {
+  bottom: 13px;
+}
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+  .property-card
+  .listing-agent::after {
+  bottom: 6px;
+}
+/* The current page keeps its existing inset gold bar, so it draws no second line. */
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+  .desktop-nav
+  a[aria-current='page']::after {
+  content: none;
+}
+body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+  :is(.desktop-nav a, .section-heading > a, .listing-agent):focus-visible::after {
+  transform: none;
+}
+@media (hover: hover) {
+  body[data-site-kind='company']:is([data-theme='3'], [data-theme='4'])
+    :is(.desktop-nav a, .section-heading > a, .listing-agent):hover::after {
+    transform: none;
+  }
+}

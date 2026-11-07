@@ -3,6 +3,7 @@ import type { Catalogue, Listing } from '../../lib/types';
 import { HomeverseSave } from './HomeverseSave';
 import { HomeverseIcon } from './HomeverseIcon';
 import { bedrooms, count, money } from '../ui';
+import { Arrow } from '../motion/Arrow';
 export function HomeverseCards({
   listings,
   catalogue,
@@ -49,7 +50,7 @@ export function HomeverseCards({
               <span>{p.size.toLocaleString('en-AE')} sq ft</span>
             </div>
             <Link className="v-card-details" href={`/properties/${encodeURIComponent(p.id)}`}>
-              View property <span aria-hidden="true">→</span>
+              View property <Arrow />
             </Link>
           </div>
         </article>

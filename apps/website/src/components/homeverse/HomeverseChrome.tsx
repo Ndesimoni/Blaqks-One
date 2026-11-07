@@ -4,6 +4,7 @@ import { CompanyNavigation } from '../company/CompanyNavigation';
 import { CompanyFooter } from '../company/CompanyChrome';
 import { MobileMenu } from '../MobileMenu';
 import { HomeverseIcon } from './HomeverseIcon';
+import { Arrow } from '../motion/Arrow';
 const links = [
   ['/', 'Home'],
   ['/about', 'About us'],
@@ -34,7 +35,7 @@ export function HomeverseHeader({ site }: { site: Site }) {
         <HomeverseBrand site={site} />
         <CompanyNavigation links={links} />
         <Link className="v-button" href="/contact">
-          Get in touch <span aria-hidden="true">↗</span>
+          Get in touch <Arrow up />
         </Link>
         <MobileMenu links={links} />
       </header>

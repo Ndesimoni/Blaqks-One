@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Catalogue, Site } from '../lib/types';
+import { Arrow } from './motion/Arrow';
 
 export function HomeHero({ site, catalogue }: { site: Site; catalogue: Catalogue }) {
   const company = catalogue.companies.find((item) => item.id === site.company);
@@ -52,7 +53,7 @@ export function HomeHero({ site, catalogue }: { site: Site; catalogue: Catalogue
               : company?.note || 'A personal perspective on property.')}
         </p>
         <Link className="button hero-button" href="/properties">
-          Explore the collection →
+          Explore the collection <Arrow />
         </Link>
       </div>
     </section>

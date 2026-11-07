@@ -63,7 +63,7 @@ try {
     });
     styles += css.toString().replaceAll('assets/', '/approved/assets/') + '\n';
   }
-  for (const name of ['native', 'polish', 'contrast', 'directory'])
+  for (const name of ['native', 'polish', 'contrast', 'directory', 'motion', 'motion-hover'])
     styles += await fs.readFile(path.join(app, `scripts/reference-${name}.css`), 'utf8');
   const css = await transform(styles, { loader: 'css', minify: true });
   await fs.writeFile(
@@ -95,7 +95,7 @@ try {
     (await transform(companyStyles, { loader: 'css', minify: true })).code,
   );
   await patchReference(root);
-  const modules = ['runtime', 'binding', 'after-render', 'extra', 'directory', 'profile'];
+  const modules = ['runtime', 'binding', 'after-render', 'extra', 'directory', 'profile', 'motion'];
   for (const name of [...modules, 'developers', 'live-text', 'pagination', 'public-details'])
     await fs.copyFile(
       path.join(app, `scripts/reference-${name}.mjs`),
@@ -105,6 +105,8 @@ try {
     path.join(app, 'src/lib/reference/identity.ts'),
     root + '/reference-identity.ts',
   );
+  // The scroll reveal is shared with the company websites.
+  await fs.cp(path.join(app, 'src/lib/motion'), root + '/motion', { recursive: true });
   await build({
     entryPoints: [root + '/reference-runtime.js'],
     bundle: true,

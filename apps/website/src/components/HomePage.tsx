@@ -5,6 +5,7 @@ import { AgentCard, PropertyGrid } from './Cards';
 import { HomeHero } from './HomeHero';
 import { count } from './ui';
 import { developersByListings } from '../lib/developer-order';
+import { Arrow } from './motion/Arrow';
 
 export function HomePage({ site, catalogue }: PageData) {
   return (
@@ -20,7 +21,9 @@ export function HomePage({ site, catalogue }: PageData) {
             <p className="eyebrow">A PLACE TO BEGIN</p>
             <h2>Find your next chapter.</h2>
           </div>
-          <Link href="/properties">View all properties →</Link>
+          <Link href="/properties">
+            View all properties <Arrow />
+          </Link>
         </div>
         <PropertyGrid listings={catalogue.listings.slice(0, 6)} catalogue={catalogue} />
       </section>
@@ -44,7 +47,7 @@ export function HomePage({ site, catalogue }: PageData) {
             behind your next move.
           </p>
           <Link className="button quiet" href="/about">
-            Our approach →
+            Our approach <Arrow />
           </Link>
         </div>
       </section>
@@ -54,7 +57,9 @@ export function HomePage({ site, catalogue }: PageData) {
             <p className="eyebrow">KNOW THE NEIGHBOURHOOD</p>
             <h2>A setting for your life.</h2>
           </div>
-          <Link href="/areas">Explore communities →</Link>
+          <Link href="/areas">
+            Explore communities <Arrow />
+          </Link>
         </div>
         <div className="area-grid">
           {catalogue.areas.map((area) => (
@@ -80,7 +85,9 @@ export function HomePage({ site, catalogue }: PageData) {
               {site.kind === 'platform' ? 'Meet the professionals.' : 'A personal introduction.'}
             </h2>
           </div>
-          <Link href="/agents">Meet the team →</Link>
+          <Link href="/agents">
+            Meet the team <Arrow />
+          </Link>
         </div>
         <div className="people-grid">
           {catalogue.agents.slice(0, 3).map((agent) => (
@@ -94,7 +101,9 @@ export function HomePage({ site, catalogue }: PageData) {
             <p className="eyebrow">UAE DEVELOPERS</p>
             <h2>Discover the developers.</h2>
           </div>
-          <Link href="/developers">View all developers →</Link>
+          <Link href="/developers">
+            View all developers <Arrow />
+          </Link>
         </div>
         <div className="developer-strip">
           {developersByListings(catalogue.developers)
@@ -119,7 +128,7 @@ export function HomePage({ site, catalogue }: PageData) {
           <em>to call your own.</em>
         </h2>
         <Link className="button" href="/contact">
-          Talk to us →
+          Talk to us <Arrow />
         </Link>
       </section>
     </>

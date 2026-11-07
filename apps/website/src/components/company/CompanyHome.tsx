@@ -4,6 +4,7 @@ import { CompanyGrid, CompanyTeam } from './CompanyCards';
 import { CompanyFAQ } from './CompanyFAQ';
 import { CompanyHero } from './CompanyHero';
 import { CompanyClosing, CompanyServices, CompanyStory } from './CompanySections';
+import { Arrow } from '../motion/Arrow';
 
 export function CompanyHome({ site, catalogue }: PageData) {
   return (
@@ -27,7 +28,7 @@ export function CompanyHome({ site, catalogue }: PageData) {
           <div className="a-section-head">
             <h2>New properties</h2>
             <Link className="a-text-link" href="/properties">
-              All properties ↗
+              All properties <Arrow up />
             </Link>
           </div>
           {catalogue.listings.length ? (
@@ -35,7 +36,9 @@ export function CompanyHome({ site, catalogue }: PageData) {
           ) : (
             <p className="notice">
               Our public property collection is being prepared.{' '}
-              <Link href="/contact">Talk to our team →</Link>
+              <Link href="/contact">
+                Talk to our team <Arrow />
+              </Link>
             </p>
           )}
         </section>
@@ -49,7 +52,7 @@ export function CompanyHome({ site, catalogue }: PageData) {
                 <h2>Good places. Good people.</h2>
               </div>
               <Link className="a-text-link" href="/agents">
-                Meet the team ↗
+                Meet the team <Arrow up />
               </Link>
             </div>
             <CompanyTeam catalogue={catalogue} />

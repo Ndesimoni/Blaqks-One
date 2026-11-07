@@ -87,6 +87,21 @@ Integration code lives in `scripts/reference-*.mjs` and `reference-{native,polis
 Playwright browser) checks main-site routes, click navigation, directories, focus, the pill
 and overflow at 390/1280, plus company-host overflow.
 
+## Motion
+
+The main site follows the shared [website motion](design-standards.md#website-motion--owner-7-november-2026)
+language. `scripts/reference-motion.css` replaces the recovered hero's single fade with a
+staggered rise (kicker, headline, introduction, link, then search) and settles the villa
+photograph on a clipped `::after` layer behind the gradient; inner-page introductions rise the
+same way. `reference-motion-hover.css` lifts cards 3px, zooms photographs to 104%, draws gold
+underlines and nudges arrows, for hover and `:focus-visible` alike. `reference-motion.mjs`
+runs after every engine render: it gives the gold text links an underline label and an
+`aria-hidden` arrow, continues an entrance already on screen when the engine replaces the
+markup (rather than restarting it), and re-arms the scroll reveal from `src/lib/motion/`,
+which the build bundles. Below-the-fold blocks are held by a paused Web Animation only after
+the script runs and only when reduced motion is off; scrolling past, printing or any
+observer gap shows them at once. The preview pill and header are never animated.
+
 ## Verification and limits
 
 The focused website suite includes 48 model/design checks plus one synthetic public API

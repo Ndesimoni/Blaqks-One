@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Site } from '../../lib/types';
+import { Arrow } from '../motion/Arrow';
 
 export function CompanyServices({ site, full = false }: { site: Site; full?: boolean }) {
   return (
@@ -26,7 +27,9 @@ export function CompanyServices({ site, full = false }: { site: Site; full?: boo
                   Explore homes by the way you want to live. Refine the location, space and budget,
                   then speak to the person who represents the property.
                 </p>
-                <Link href="/properties">Explore the collection ↗</Link>
+                <Link href="/properties">
+                  Explore the collection <Arrow up />
+                </Link>
               </details>
               <details>
                 <summary>
@@ -36,7 +39,9 @@ export function CompanyServices({ site, full = false }: { site: Site; full?: boo
                   Tell us what matters to you. Our team can discuss your property requirements and
                   the next steps.
                 </p>
-                <Link href="/enquiry">Make an enquiry ↗</Link>
+                <Link href="/enquiry">
+                  Make an enquiry <Arrow up />
+                </Link>
               </details>
               <details>
                 <summary>
@@ -46,13 +51,15 @@ export function CompanyServices({ site, full = false }: { site: Site; full?: boo
                   Discover the communities behind our collection and ask your advisor for a local
                   perspective.
                 </p>
-                <Link href="/areas">Explore neighbourhoods ↗</Link>
+                <Link href="/areas">
+                  Explore neighbourhoods <Arrow up />
+                </Link>
               </details>
             </>
           )}
           {!full && (
             <Link className="a-text-link" href="/services">
-              All our services ↗
+              All our services <Arrow up />
             </Link>
           )}
         </div>
@@ -95,7 +102,7 @@ export function CompanyStory({ site }: { site: Site }) {
             'We believe finding a property should feel considered, clear and personal. Start with the spaces that speak to you, then connect with the people who know them.'}
         </p>
         <Link className="a-text-link" href="/about">
-          Discover our approach ↗
+          Discover our approach <Arrow up />
         </Link>
       </div>
     </section>
@@ -112,7 +119,7 @@ export function CompanyClosing() {
           your place.
         </h2>
         <Link className="a-action" href="/contact">
-          Start a conversation <span aria-hidden="true">↗</span>
+          Start a conversation <Arrow up />
         </Link>
       </div>
     </section>

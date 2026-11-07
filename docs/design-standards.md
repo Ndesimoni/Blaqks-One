@@ -26,6 +26,20 @@ photo hero, overlapping filters, four featured cards, service band, company stor
 section. Inner pages retain the main site's flow using this theme. Theme 1 remains approved
 and unchanged in layout. See [third website preview](company-homeverse-preview.md).
 
+## Website motion — owner, 7 November 2026
+
+Every public website shares one calm, classic motion language in its own colours: the hero
+copy rises in turn (700 ms, 16px, 90 ms apart) while its photograph settles from 106% scale
+over 1.8 s and the search panel rises last; below-the-fold blocks fade up once as they arrive
+(70 ms stagger, capped at six); photographs zoom to 104% inside their frames, cards lift at
+most 3px where the theme already uses shadows, links underline from the left and arrows nudge
+3px, with keyboard focus showing the same states. FAQ and service answers open smoothly where
+supported. Only transform, translate, scale, opacity and colour animate. Content is visible
+without JavaScript and at rest; nothing is hidden or moved under reduced motion. Headers,
+footers, sample banners and the preview pill stay still. No parallax, bounce, counters,
+carousels or page curtains. See [main site](website-marketplace-adoption.md#motion) and
+[company sites](company-atelier-preview.md#motion).
+
 ## Approved visual direction
 
 The user-approved [CRM design refresh](design-refresh.md) is the visual baseline for all new and updated screens. Extend its shared patterns consistently. Use the [desktop and mobile reference previews](design-refresh.md#visual-previews) when reviewing a change.

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Arrow } from '../motion/Arrow';
 
 const questions = [
   [
@@ -51,7 +52,7 @@ export function CompanyFAQ() {
           </h3>
           <p>Start with a conversation about what matters to you.</p>
           <Link className="a-text-link" href="/contact">
-            Ask our team ↗
+            Ask our team <Arrow up />
           </Link>
         </aside>
       </div>

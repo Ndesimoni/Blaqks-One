@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { PageData } from '../../lib/types';
 import { initials, ContactLinks } from '../ui';
+import { Arrow } from '../motion/Arrow';
 
 export function HomeverseLifestyle({ catalogue }: Pick<PageData, 'catalogue'>) {
   const waterfront = catalogue.areas.find((a) => /marina|beach|waterfront/i.test(a.name));
@@ -62,7 +63,9 @@ export function HomeverseAdvisors({ site, catalogue }: Pick<PageData, 'site' | '
           <p className="v-eyebrow">THE PEOPLE BEHIND YOUR NEXT MOVE</p>
           <h2>Local knowledge. Personal service.</h2>
         </div>
-        <Link href="/agents">Meet the team →</Link>
+        <Link href="/agents">
+          Meet the team <Arrow />
+        </Link>
       </div>
       <div className="v-advisor-grid">
         {advisors.map((a) => (

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Agent, Catalogue, Company, Listing } from '../lib/types';
 import { ContactLinks, bedrooms, count, initials, money } from './ui';
+import { Arrow } from './motion/Arrow';
 
 export function PropertyCard({ listing, catalogue }: { listing: Listing; catalogue: Catalogue }) {
   const agent = catalogue.agents.find((item) => item.id === listing.agent);
@@ -40,7 +41,7 @@ export function PropertyCard({ listing, catalogue }: { listing: Listing; catalog
         )}
         {agent && (
           <Link className="listing-agent" href={`/agents/${encodeURIComponent(agent.id)}`}>
-            Listed by {agent.name} <span aria-hidden="true">→</span>
+            Listed by {agent.name} <Arrow />
           </Link>
         )}
         <ContactLinks agent={agent} listing={listing} />
@@ -79,7 +80,9 @@ export function AgentCard({ agent, catalogue }: { agent: Agent; catalogue: Catal
         <p>{count(agent.publicListingCount, 'public listing')}</p>
       )}
       <ContactLinks agent={agent} />
-      <Link href={`/agents/${encodeURIComponent(agent.id)}`}>View profile & properties →</Link>
+      <Link href={`/agents/${encodeURIComponent(agent.id)}`}>
+        View profile & properties <Arrow />
+      </Link>
     </article>
   );
 }
@@ -100,7 +103,9 @@ export function CompanyCard({ company, catalogue }: { company: Company; catalogu
       {company.publicAgentCount !== undefined && (
         <p>{count(company.publicAgentCount, 'agent')} with public listings</p>
       )}
-      <Link href={`/companies/${encodeURIComponent(company.id)}`}>View company & properties →</Link>
+      <Link href={`/companies/${encodeURIComponent(company.id)}`}>
+        View company & properties <Arrow />
+      </Link>
     </article>
   );
 }

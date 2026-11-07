@@ -217,3 +217,19 @@ Applied across all four company themes after a design review, keeping each theme
   primary hero action and a deeper scrim on theme 4, uppercase eyebrows, a COMPANY footer
   column, a soft card hover and an aligned phone menu.
 - Cedar's sample listings have their own names instead of reusing Harbour's.
+
+## Motion
+
+All four company themes follow the shared
+[website motion](design-standards.md#website-motion--owner-7-november-2026) language.
+`src/components/motion/Motion.tsx`, mounted once from the company layout, arms the scroll
+reveal from `src/lib/motion/` after hydration and after each client navigation; server
+components stay server-side. Styles: `motion.css` (keyframes, arrows, smooth FAQ/services
+answers), `motion-classic.css` (Editorial and Nocturne, plus the shared inner pages),
+`atelier-motion.css` (Harbour's inner pages, also copied to theme 2), `harbour-motion.css`
+(Harbour's homepage only) and `homeverse-motion.css` (Modern). Harbour's flat cards never lift:
+the photograph zooms inside its frame and the title underlines. Nocturne's and Modern's hero
+photographs settle; Editorial's framed photograph fades so its frame stays still. Link arrows
+on the homepages use the `Arrow` component (`aria-hidden`); other plain-text arrows only take
+the underline and colour change. `tests/motion.test.ts` covers the timing rules and checks
+that every movement sits inside a reduced-motion guard.

@@ -4,6 +4,7 @@ import { isCompanyDesign, isHomeverse } from '@/lib/company-design';
 import type { Metadata } from 'next';
 import { currentSite } from '@/lib/site';
 import { SiteHeader, SiteFooter } from '@/components/SiteChrome';
+import { Motion } from '@/components/motion/Motion';
 
 export const metadata: Metadata = {
   title: 'Blaqks One',
@@ -44,6 +45,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <main id="main" tabIndex={-1}>
               {children}
             </main>
+            <Motion />
             {isHomeverse(site) ? (
               <HomeverseFooter site={site} />
             ) : isCompanyDesign(site) ? (

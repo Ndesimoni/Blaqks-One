@@ -1,0 +1,104 @@
+/* Atelier motion: Harbour's inner pages, which prepare-reference also copies to theme 2.
+   Square, flat cards never lift: the photograph zooms inside its frame and the title
+   underlines. Underlines draw in from the left in the current ink colour. */
+body[data-site-kind='company'][data-theme='1'] .a-action {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+body[data-site-kind='company'][data-theme='1']
+  :is(.a-text-link, .a-card-heading a, .a-person-copy a, .a-service-list details > a) {
+  position: relative;
+  text-decoration: none;
+}
+body[data-site-kind='company'][data-theme='1']
+  :is(.a-text-link, .a-card-heading a, .a-person-copy a, .a-service-list details > a)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+body[data-site-kind='company'][data-theme='1']
+  :is(.a-card-heading a, .a-service-list details > a)::after {
+  bottom: -3px;
+}
+/* 44px tap targets centre their text, so their line sits just under the words. */
+body[data-site-kind='company'][data-theme='1'] :is(.a-text-link, .a-person-copy a)::after {
+  bottom: 11px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-nav > a:not([aria-current='page'])::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+/* Keyboard focus shows the same underline and zoom as the pointer, never less. */
+body[data-site-kind='company'][data-theme='1']
+  :is(
+    .a-text-link:focus-visible,
+    .a-card-heading a:focus-visible,
+    .a-person-copy a:focus-visible,
+    .a-service-list details > a:focus-visible,
+    .a-nav > a:focus-visible,
+    .a-card:has(.a-card-image:focus-visible) .a-card-heading a,
+    .a-person:has(.a-portrait:focus-visible) .a-person-copy a
+  )::after {
+  transform: none;
+}
+body[data-site-kind='company'][data-theme='1']
+  :is(.a-text-link, .a-card-heading a, .a-person-copy a, .a-service-list details > a, .a-nav > a) {
+  text-decoration: none;
+}
+@media (hover: hover) {
+  body[data-site-kind='company'][data-theme='1']
+    :is(
+      .a-text-link:hover,
+      .a-service-list details > a:hover,
+      .a-nav > a:hover,
+      .a-card:hover .a-card-heading a,
+      .a-person:hover .a-person-copy a
+    )::after {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body[data-site-kind='company'][data-theme='1']
+    :is(.a-text-link, .a-card-heading a, .a-person-copy a, .a-service-list details > a)::after,
+  body[data-site-kind='company'][data-theme='1'] .a-nav > a::after {
+    transition: transform 360ms var(--motion-ease);
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-card-image img {
+    transition: transform var(--motion-hover) var(--motion-ease);
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-card:has(:focus-visible) .a-card-image img {
+    transform: scale(1.04);
+  }
+  /* Page introductions on inner pages rise in, line by line. */
+  body[data-site-kind='company'][data-theme='1'] .a-page-intro > * {
+    animation: motion-rise var(--motion-rise) var(--motion-ease) backwards;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-page-intro > :nth-child(2) {
+    animation-delay: 90ms;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-page-intro > :nth-child(3) {
+    animation-delay: 180ms;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-page-intro > :nth-child(n + 4) {
+    animation-delay: 270ms;
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  body[data-site-kind='company'][data-theme='1'] .a-card:hover .a-card-image img {
+    transform: scale(1.04);
+  }
+}

@@ -4,6 +4,7 @@ import type { Site } from '../../lib/types';
 import { CompanyNavigation } from './CompanyNavigation';
 import { MobileMenu } from '../MobileMenu';
 import { SocialLinkList } from '../SocialLinkList';
+import { Arrow } from '../motion/Arrow';
 
 const links = [
   ['/properties', 'Properties'],
@@ -26,7 +27,7 @@ export function CompanyHeader({ site }: { site: Site }) {
         </Link>
         <CompanyNavigation links={links} />
         <Link className="a-header-contact" href="/contact">
-          List your property <span aria-hidden="true">↗</span>
+          List your property <Arrow up />
         </Link>
         <MobileMenu links={links} />
       </header>
