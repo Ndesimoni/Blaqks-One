@@ -2,6 +2,33 @@
 
 Native **Next.js 16 / React 19 / TypeScript** application for the general Blaqks One website and company websites. This is separate from the React/Vite CRM and Rust backend. There are no standalone individual-agent websites.
 
+## Main website design
+
+The general platform site now mounts the complete recovered approved navy/white/gold
+presentation in a Next.js client boundary. The original HTML/JavaScript renderer and all
+five original property pictures are preserved; this is not a JSX rewrite of each template.
+Next supplies routing, host resolution, public API projection and connected enquiry intake.
+Company themes remain independent. See [source, scope and checks](../../docs/website-marketplace-adoption.md).
+
+`npm run prepare:reference` generates the approved runtime, styles and SSR sample snapshots
+from `reference/approved-source.tar.gz`. The normal dev/test/typecheck/build commands run
+this automatically. Do not edit the generated `public/approved` or `src/generated` files.
+Saved/recent/compare and the full original account/onboarding UI are included. Social login
+and email verification in sample mode remain labelled simulations, not connected providers.
+
+Set `WEBSITE_CRM_URL` to the CRM application's absolute public base URL to enable the
+professional sign-in and company signup links. Use HTTPS in production; loopback HTTP is
+accepted for local development. With no value, links lead to professional-access guidance.
+The public API currently has no verified deal-price metadata; deal sections stay empty
+instead of manufacturing discount claims.
+
+## Second website design review
+
+Company theme 1 (`harbour.localhost:3000`) now has the monochrome architectural design
+selected on 6 November 2026. It adapts the main website's property/team/contact page
+structure for a single company. This work is local pending the owner's design review;
+see [preview scope and checks](../../docs/company-atelier-preview.md).
+
 ## Run locally
 
 Use Node 24, or Node 22.18 or newer. From the repository root:

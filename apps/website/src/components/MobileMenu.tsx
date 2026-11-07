@@ -36,6 +36,7 @@ export function MobileMenu({ links }: { links: string[][] }) {
           <Link
             key={href}
             href={href}
+            aria-current={path === href || path.startsWith(href + '/') ? 'page' : undefined}
             onClick={() => {
               if (menu.current) menu.current.open = false;
             }}

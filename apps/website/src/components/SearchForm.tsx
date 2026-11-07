@@ -19,10 +19,12 @@ export function SearchForm({
   query = {},
   catalogue,
   compact = false,
+  sidebar = false,
 }: {
   query?: Query;
   catalogue: Catalogue;
   compact?: boolean;
+  sidebar?: boolean;
 }) {
   const [purpose, setPurpose] = useState(first(query.purpose));
   const [emirate, setEmirate] = useState(first(query.emirate));
@@ -39,6 +41,7 @@ export function SearchForm({
   );
   return (
     <form className={`search-form${compact ? ' compact' : ''}`} action="/properties" method="get">
+      {sidebar && <input type="hidden" name="sort" value={sort} />}
       <div className="search-core">
         <LiveSelect
           label="Purpose"
@@ -102,7 +105,7 @@ export function SearchForm({
           Search properties →
         </button>
       </div>
-      {!compact && (
+      {!compact && !sidebar && (
         <label className="sort-field">
           Sort properties
           <select name="sort" value={sort} onChange={(event) => setSort(event.target.value)}>

@@ -5,6 +5,8 @@ node_modules/
 dist/
 legacy/
 public/
+# The website's generated reference outputs (apps/website/.gitignore), rebuilt on every run.
+apps/website/src/generated/
 package-lock.json
 coverage/
 playwright-report/

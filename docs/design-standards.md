@@ -2,6 +2,30 @@
 
 These are required working rules for every agent and contributor to Keys with Simoni. Apply them to every feature, including future screens. Preserve existing CRM behaviour while improving its presentation.
 
+## General website exception — owner, 5 November 2026
+
+The main Blaqks One public marketplace uses the owner-selected navy, white and restrained
+warm-gold design. Implement this in `apps/website` with Next.js, React and TypeScript,
+scoped to the platform site. This replaces the earlier general-site green presentation;
+it does not change the CRM palette or the four company website themes. Preserve the public
+API, enquiry ownership and fail-closed host/data boundaries. See
+[marketplace adoption](website-marketplace-adoption.md) for scope and verification.
+
+## Single-company website exception — owner, 6 November 2026
+
+The second website uses the owner's monochrome architectural Pinterest reference, adapted
+for one company using the main website's page structure. This replaces company theme 1
+only. It preserves the platform site, other company themes and the CRM visual system.
+See [single-company design review](company-atelier-preview.md). The owner requests a design
+preview before GitHub push.
+
+## Third website exception — owner, 6 November 2026
+
+Company theme 2 follows the supplied navy-and-gold Pinterest homepage, with serif headings,
+photo hero, overlapping filters, four featured cards, service band, company story and enquiry
+section. Inner pages retain the main site's flow using this theme. Theme 1 remains approved
+and unchanged in layout. See [third website preview](company-homeverse-preview.md).
+
 ## Approved visual direction
 
 The user-approved [CRM design refresh](design-refresh.md) is the visual baseline for all new and updated screens. Extend its shared patterns consistently. Use the [desktop and mobile reference previews](design-refresh.md#visual-previews) when reviewing a change.

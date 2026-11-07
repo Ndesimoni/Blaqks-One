@@ -1,0 +1,97 @@
+body[data-site-kind='company'][data-theme='2'] .v-contact {
+  background:
+    linear-gradient(110deg, #071b3af5, #071b3ae8),
+    url('/company/hero.jpg') center / cover;
+  padding-block: 48px;
+  color: #e2e8f1;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 100px;
+  align-items: center;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-layout > div:first-child > h2 {
+  font-size: clamp(31px, 3.3vw, 44px);
+  line-height: 1.15;
+  margin: 0 0 20px;
+  max-width: 460px;
+}
+body[data-site-kind='company'][data-theme='2']
+  .v-contact-layout
+  > div:first-child
+  > p:not(.v-eyebrow) {
+  color: #c3cfdf;
+  max-width: 440px;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-layout .contact-links a {
+  color: #edc789;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card {
+  border: 1px solid #65748a;
+  background: #071b3a8a;
+  padding: 25px;
+  border-radius: 4px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card .public-enquiry-form {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card :is(h2, h3) {
+  color: #fff;
+  font-size: 26px;
+  margin: 0 0 20px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card label {
+  color: #d9e2ef;
+  font-size: 12px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card :is(input, textarea, select) {
+  border-color: #7f8ea5;
+  background: #0b2345;
+  color: #fff;
+  border-radius: 2px;
+  min-height: 44px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card input[type='checkbox'] {
+  min-height: 18px;
+  accent-color: #c99b50;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card :is(input, textarea)::placeholder {
+  color: #aebed3;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card .notice {
+  color: #d9e2ef;
+  background: #142e50;
+  border-color: #c99b50;
+  font-size: 11px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card .privacy-choice {
+  color: #d9e2ef;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card .a-action {
+  background: #c99b50;
+  border-color: #c99b50;
+  color: #071b3a;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card :focus-visible {
+  outline-color: #edc789;
+}
+body[data-site-kind='company'][data-theme='2'] .v-contact-card .a-preview-result p {
+  color: #d9e2ef;
+}
+
+body[data-site-kind='company'][data-theme='2'] .v-contact-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 15px;
+  color: #edc789;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}

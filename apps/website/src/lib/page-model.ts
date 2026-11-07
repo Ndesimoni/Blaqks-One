@@ -1,3 +1,4 @@
+import { isCompanyDesign } from './company-design.ts';
 import type { Catalogue, PageData, Query, Site } from './types.ts';
 import { first } from './query.ts';
 import { searchProperties } from './property-search.ts';
@@ -36,13 +37,18 @@ export function samplePage(
               entry.emirate.toLowerCase().replaceAll(' ', '-') === emirate))) &&
         (first(query, 'availability') !== 'available' || (entry.publicListingCount || 0) > 0),
     );
+    const pageSize =
+      (site.kind === 'platform' || isCompanyDesign(site)) && page === 'agents' ? 5 : 12;
     const raw = first(query, 'page');
     const pageNumber = Math.min(
       Math.max(1, /^\d+$/.test(raw) ? Number(raw) : 1),
-      Math.max(1, Math.ceil(list.length / 12)),
+      Math.max(1, Math.ceil(list.length / pageSize)),
     );
-    data.directory = { total: list.length, page: pageNumber, pageSize: 12 };
-    data.catalogue = { ...catalogue, [key]: list.slice((pageNumber - 1) * 12, pageNumber * 12) };
+    data.directory = { total: list.length, page: pageNumber, pageSize };
+    data.catalogue = {
+      ...catalogue,
+      [key]: list.slice((pageNumber - 1) * pageSize, pageNumber * pageSize),
+    };
   }
   if (page === 'enquiry') {
     const listing = first(query, 'listing'),

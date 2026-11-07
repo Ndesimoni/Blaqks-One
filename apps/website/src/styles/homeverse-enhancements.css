@@ -1,0 +1,99 @@
+body[data-site-kind='company'][data-theme='2'] .v-card-media {
+  position: relative;
+}
+body[data-site-kind='company'][data-theme='2'] .v-save {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dce1e8;
+  border-radius: 50%;
+  background: #fff;
+  color: #071b3a;
+  box-shadow: 0 2px 8px #071b3a16;
+}
+body[data-site-kind='company'][data-theme='2'] .v-save[aria-pressed='true'] {
+  background: #edc789;
+  border-color: #edc789;
+}
+body[data-site-kind='company'][data-theme='2'] .v-photo-count {
+  position: absolute;
+  right: 10px;
+  bottom: 44px;
+  background: #071b3ae8;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #dce1e8;
+  color: #071b3a;
+  font-weight: 600;
+  font-size: 13px;
+}
+body[data-site-kind='company'][data-theme='2'] :is(.v-card-facts, .v-card-copy > p) {
+  font-size: 12px;
+  line-height: 1.6;
+}
+body[data-site-kind='company'][data-theme='2'] .v-section {
+  padding-block: 48px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-trust {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding-block: 24px;
+  border-block: 1px solid #dce1e8;
+}
+body[data-site-kind='company'][data-theme='2'] .v-trust :is(strong, span) {
+  display: block;
+  font-size: 13px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-trust span {
+  font-size: 12px;
+  color: #596575;
+  margin-top: 4px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-trust a {
+  min-height: 44px;
+  align-content: center;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-form-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-optional {
+  font-size: 12px;
+  color: #c3cfdf;
+}
+body[data-site-kind='company'][data-theme='2'] .v-compact-form {
+  gap: 16px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-compact-form textarea {
+  min-height: 95px;
+}
+@media (max-width: 900px) {
+  body[data-site-kind='company'][data-theme='2'] .v-trust {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  body[data-site-kind='company'][data-theme='2'] :is(.v-trust, .v-form-pair) {
+    grid-template-columns: 1fr;
+  }
+}

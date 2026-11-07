@@ -1,0 +1,75 @@
+body[data-site-kind='company'][data-theme='1'] .a-header-surface {
+  background: #232a32;
+  color: #f5f7fa;
+  border-bottom: 1px solid #ffffff16;
+}
+body[data-site-kind='company'][data-theme='1'] .a-header {
+  padding-block: 26px;
+  gap: 34px;
+  color: #f5f7fa;
+}
+body[data-site-kind='company'][data-theme='1'] .a-header .a-wordmark {
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  flex-shrink: 0;
+}
+body[data-site-kind='company'][data-theme='1'] .a-nav > a {
+  color: #e7ebf0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+body[data-site-kind='company'][data-theme='1'] .a-nav > a:hover,
+body[data-site-kind='company'][data-theme='1'] .a-nav > a[aria-current='page'] {
+  color: #fff;
+  text-decoration: none;
+}
+body[data-site-kind='company'][data-theme='1'] .a-nav > a[aria-current='page']::after {
+  height: 2px;
+  bottom: 4px;
+  background: #fff;
+}
+body[data-site-kind='company'][data-theme='1'] .a-header-contact {
+  color: #20262e;
+  background: #f5f7fa;
+  border: 1px solid #f5f7fa;
+  font-size: 13px;
+  min-height: 44px;
+  padding-inline: 16px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-header-contact:hover {
+  background: #fff;
+  border-color: #fff;
+  text-decoration: none;
+}
+body[data-site-kind='company'][data-theme='1'] .a-header :focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 5px;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-header {
+    padding-block: 18px;
+    gap: 16px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-header .mobile-menu > summary {
+    color: #fff;
+    border-color: #89929d;
+    background: transparent;
+    font-size: 14px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-header .mobile-menu nav {
+    background: #232a32;
+    color: #f5f7fa;
+    border-color: #46515e;
+    box-shadow: 0 12px 20px #0000001f;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-header .mobile-menu nav a {
+    color: #f5f7fa;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-header .mobile-menu nav a:hover {
+    color: #fff;
+    background: #343e49;
+  }
+}
