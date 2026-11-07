@@ -2,6 +2,7 @@ import { isCompanyDesign } from './company-design.ts';
 import type { Catalogue, PageData, Query, Site } from './types.ts';
 import { first } from './query.ts';
 import { searchProperties } from './property-search.ts';
+import { developersByListings } from './developer-order.ts';
 
 export const collections = {
   property: 'listings',
@@ -28,7 +29,11 @@ export function samplePage(
     const key = page as 'companies' | 'agents' | 'developers' | 'areas';
     const term = first(query, 'q').toLowerCase().trim(),
       emirate = first(query, 'emirate');
-    const list = catalogue[key].filter(
+    const entries =
+      key === 'developers' && site.kind === 'company'
+        ? developersByListings(catalogue.developers)
+        : catalogue[key];
+    const list = (entries as Catalogue[typeof key]).filter(
       (entry) =>
         (!term || entry.name.toLowerCase().includes(term)) &&
         (!emirate ||

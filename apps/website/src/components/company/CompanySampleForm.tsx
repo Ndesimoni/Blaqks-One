@@ -5,14 +5,20 @@ export function CompanySampleForm({
   propertyTitle,
   agentName,
   compact = false,
-}: { propertyTitle?: string; agentName?: string; compact?: boolean } = {}) {
+  actionClass = 'a-action',
+}: {
+  propertyTitle?: string;
+  agentName?: string;
+  compact?: boolean;
+  actionClass?: string;
+} = {}) {
   const [done, setDone] = useState(false);
   if (done)
     return (
       <div className="a-preview-result" role="status">
         <h2>That’s how your enquiry will look.</h2>
         <p>This is a design preview. No message was sent and no information was saved.</p>
-        <button className="a-action" onClick={() => setDone(false)}>
+        <button className={actionClass} onClick={() => setDone(false)}>
           Back to the form ↗
         </button>
       </div>
@@ -95,7 +101,7 @@ export function CompanySampleForm({
         <input type="checkbox" required />
         <span>I understand this is a preview and nothing will be sent.</span>
       </label>
-      <button className="a-action" type="submit">
+      <button className={actionClass} type="submit">
         Preview enquiry <span aria-hidden="true">↗</span>
       </button>
     </form>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { PageData } from '../lib/types';
 import { Heading } from './ui';
-import { SocialLinkList } from './SocialLinkList';
+import { InfoContact } from './InfoContact';
 
 export function InfoPage({ page, site, catalogue }: PageData) {
   const legal = page === 'privacy' || page === 'terms';
@@ -47,41 +47,7 @@ export function InfoPage({ page, site, catalogue }: PageData) {
           <Link href="/contact">Contact information →</Link>
         </div>
       ) : page === 'contact' ? (
-        <div className="contact-layout">
-          <div className="prose">
-            <p className="eyebrow">A PERSONAL INTRODUCTION</p>
-            <h2>Start with the right conversation.</h2>
-            <p>
-              {site.content?.contactText ||
-                'For a property enquiry, contact the named listing agent from the property page. For broader requirements, browse our professionals and choose a representative.'}
-            </p>
-            <Link className="button" href="/agents">
-              Find a representative →
-            </Link>
-            {site.kind === 'company' && !site.sample ? (
-              <Link className="button quiet" href="/enquiry">
-                Send a company enquiry →
-              </Link>
-            ) : (
-              <p className="muted">Choose a representative to discuss your enquiry.</p>
-            )}
-            <SocialLinkList
-              links={site.social}
-              owner={site.name}
-              label={`${site.name} on social media`}
-              title="FOLLOW US"
-              labelled
-              sample={site.sample}
-            />
-          </div>
-          <img
-            src="/property/apartment-interior.jpg"
-            alt="Illustrative living space"
-            width="1000"
-            height="750"
-            loading="lazy"
-          />
-        </div>
+        <InfoContact site={site} />
       ) : (
         <>
           <div className="editorial-block">

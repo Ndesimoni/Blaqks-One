@@ -5,6 +5,14 @@ export const first = (value: Query[string]) =>
   Array.isArray(value) ? value[0] || '' : value || '';
 export const money = (listing: Listing) =>
   `AED ${listing.price.toLocaleString('en-AE')}${listing.purpose === 'rent' ? ' / year' : listing.purpose === 'holiday' ? ' / night' : ''}`;
+export const count = (value: number, unit: string) =>
+  `${value.toLocaleString('en-AE')} ${unit}${value === 1 ? '' : 's'}`;
+export const bedrooms = (listing: Listing, commercial = 'Commercial') =>
+  listing.bedrooms === null
+    ? commercial
+    : listing.bedrooms === 0
+      ? 'Studio'
+      : count(listing.bedrooms, 'bed');
 export const initials = (name: string) =>
   name
     .split(' ')
@@ -69,16 +77,40 @@ export function ContactLinks({ agent, listing }: { agent?: Agent; listing?: List
           target="_blank"
           rel="noopener noreferrer"
         >
-          WhatsApp <span className="sr-only">{agent.name} (opens in a new tab)</span> →
+          WhatsApp <span className="sr-only">{agent.name} (opens in a new tab)</span>
+          <span aria-hidden="true">→</span>
         </a>
       )}
       {/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(agent.publicEmail || '') && (
         <a
           href={`mailto:${agent.publicEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`}
         >
-          Email <span className="sr-only">{agent.name}</span> →
+          Email <span className="sr-only">{agent.name}</span>
+          <span aria-hidden="true">→</span>
         </a>
       )}
     </div>
+  );
+}
+export function Pagination({
+  page,
+  pages,
+  href,
+  label,
+}: {
+  page: number;
+  pages: number;
+  href: (page: number) => string;
+  label: string;
+}) {
+  if (pages <= 1) return null;
+  return (
+    <nav className="pagination" aria-label={label}>
+      {page > 1 && <Link href={href(page - 1)}>← Previous</Link>}
+      <span>
+        Page {page} of {pages}
+      </span>
+      {page < pages && <Link href={href(page + 1)}>Next →</Link>}
+    </nav>
   );
 }

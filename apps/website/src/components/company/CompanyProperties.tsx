@@ -3,7 +3,7 @@ import type { PageData } from '../../lib/types';
 import { CompanyFilterPanel } from './CompanyFilterPanel';
 import { CompanyResultsToolbar } from './CompanyResultsToolbar';
 import { SearchForm } from '../SearchForm';
-import { Empty, queryHref } from '../ui';
+import { Empty, Pagination, queryHref } from '../ui';
 import { CompanyGrid } from './CompanyCards';
 
 export function CompanyProperties({ catalogue, results, query }: PageData) {
@@ -51,17 +51,12 @@ export function CompanyProperties({ catalogue, results, query }: PageData) {
           ) : (
             <Empty />
           )}
-          <nav className="pagination" aria-label="Property pages">
-            {page > 1 && (
-              <Link href={queryHref(query, { page: String(page - 1) })}>← Previous</Link>
-            )}
-            <span>
-              Page {page} of {pages}
-            </span>
-            {page < pages && (
-              <Link href={queryHref(query, { page: String(page + 1) })}>Next →</Link>
-            )}
-          </nav>
+          <Pagination
+            page={page}
+            pages={pages}
+            href={(number) => queryHref(query, { page: String(number) })}
+            label="Property pages"
+          />
         </section>
       </div>
     </div>

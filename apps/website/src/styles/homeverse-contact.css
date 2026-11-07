@@ -1,7 +1,7 @@
 body[data-site-kind='company'][data-theme='2'] .v-contact {
   background:
     linear-gradient(110deg, #071b3af5, #071b3ae8),
-    url('/company/hero.jpg') center / cover;
+    url('/company/hero-dusk.jpg') center / cover;
   padding-block: 48px;
   color: #e2e8f1;
 }

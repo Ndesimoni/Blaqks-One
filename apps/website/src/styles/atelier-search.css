@@ -55,7 +55,7 @@ body[data-site-kind='company'][data-theme='1'] .a-search-fields label {
   display: grid;
   gap: 7px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 body[data-site-kind='company'][data-theme='1'] .a-search-fields :where(input, select) {
   font-size: 11px;

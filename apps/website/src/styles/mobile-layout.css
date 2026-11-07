@@ -13,7 +13,7 @@
     gap: 9px;
   }
   .wordmark small {
-    font-size: 8px;
+    font-size: 11px;
   }
   .brand-mark {
     width: 34px;
@@ -114,11 +114,7 @@
     min-height: 290px;
   }
   .developer-strip {
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  .developer-strip a {
-    font-size: 21px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .site-footer {
     padding: 40px 24px;

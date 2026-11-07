@@ -2,10 +2,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-export function CompanyNavigation({ links }: { links: string[][] }) {
+export function CompanyNavigation({
+  links,
+  className = 'a-nav',
+}: {
+  links: string[][];
+  className?: string;
+}) {
   const path = usePathname();
   return (
-    <nav className="a-nav" aria-label="Main navigation">
+    <nav className={className} aria-label="Main navigation">
       {links.map(([href, label]) => (
         <Link
           key={href}

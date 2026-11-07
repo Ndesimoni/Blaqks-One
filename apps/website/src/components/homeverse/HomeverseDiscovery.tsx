@@ -14,7 +14,7 @@ export function HomeverseLifestyle({ catalogue }: Pick<PageData, 'catalogue'>) {
     {
       title: 'Room for family',
       text: 'Space for your next chapter.',
-      image: '/company/villa.jpg',
+      image: '/company/garden-house.jpg',
       href: '/properties?type=Villa',
     },
     {

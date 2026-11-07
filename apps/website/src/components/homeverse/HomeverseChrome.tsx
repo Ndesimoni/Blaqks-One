@@ -12,17 +12,26 @@ const links = [
   ['/agents', 'Our team'],
   ['/contact', 'Contact'],
 ];
+function HomeverseBrand({ site, footer = false }: { site: Site; footer?: boolean }) {
+  return (
+    <Link
+      href="/"
+      className={footer ? 'v-brand v-footer-brand' : 'v-brand'}
+      aria-label={`${site.name} home`}
+    >
+      <HomeverseIcon />
+      <span>
+        {site.name}
+        <small>REAL ESTATE</small>
+      </span>
+    </Link>
+  );
+}
 export function HomeverseHeader({ site }: { site: Site }) {
   return (
     <div className="v-header-surface">
       <header className="a-header a-container">
-        <Link href="/" className="v-brand" aria-label={`${site.name} home`}>
-          <HomeverseIcon />
-          <span>
-            {site.name}
-            <small>REAL ESTATE</small>
-          </span>
-        </Link>
+        <HomeverseBrand site={site} />
         <CompanyNavigation links={links} />
         <Link className="v-button" href="/contact">
           Get in touch <span aria-hidden="true">↗</span>
@@ -35,7 +44,7 @@ export function HomeverseHeader({ site }: { site: Site }) {
 export function HomeverseFooter({ site }: { site: Site }) {
   return (
     <div className="v-footer-surface">
-      <CompanyFooter site={site} />
+      <CompanyFooter site={site} brand={<HomeverseBrand site={site} footer />} />
     </div>
   );
 }

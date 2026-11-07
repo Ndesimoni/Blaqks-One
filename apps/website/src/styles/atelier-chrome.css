@@ -19,8 +19,8 @@ body[data-site-kind='company'][data-theme='1'] .a-wordmark {
 }
 body[data-site-kind='company'][data-theme='1'] .a-wordmark small {
   margin-top: 6px;
-  font-size: 8px;
-  letter-spacing: 0.18em;
+  font-size: 11px;
+  letter-spacing: 0.14em;
   font-weight: 400;
   text-transform: uppercase;
 }
@@ -90,7 +90,7 @@ body[data-site-kind='company'][data-theme='1'] .a-footer-bottom {
   flex-wrap: wrap;
   padding-top: 20px;
   border-top: 1px solid var(--line);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
 }
 body[data-site-kind='company'][data-theme='1'] .a-footer-bottom > div {

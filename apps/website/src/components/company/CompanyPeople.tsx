@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { PageData } from '../../lib/types';
 import { CompanyTeam } from './CompanyCards';
-import { first, queryHref } from '../ui';
+import { Pagination, first, queryHref } from '../ui';
 
 export function CompanyPeople({ site, catalogue, directory, query }: PageData) {
   const page = directory?.page || 1;
@@ -47,13 +47,7 @@ export function CompanyPeople({ site, catalogue, directory, query }: PageData) {
           </p>
         </div>
       )}
-      <nav className="pagination" aria-label="Team pages">
-        {page > 1 && <Link href={href(page - 1)}>← Previous</Link>}
-        <span>
-          Page {page} of {pages}
-        </span>
-        {page < pages && <Link href={href(page + 1)}>Next →</Link>}
-      </nav>
+      <Pagination page={page} pages={pages} href={href} label="Team pages" />
     </div>
   );
 }

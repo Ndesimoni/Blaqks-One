@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Catalogue, Listing } from '../../lib/types';
-import { money, initials } from '../ui';
+import { bedrooms, count, money, initials } from '../ui';
 
 export function CompanyGrid({
   listings,
@@ -32,15 +32,9 @@ export function CompanyGrid({
               {area?.name || p.emirate} · {p.type}
             </p>
             <div className="a-card-facts">
-              <span>
-                {p.bedrooms === null
-                  ? 'Commercial'
-                  : p.bedrooms === 0
-                    ? 'Studio'
-                    : `${p.bedrooms} beds`}
-              </span>
-              <span>{p.bathrooms} baths</span>
-              <span>{p.size.toLocaleString()} sq ft</span>
+              <span>{bedrooms(p)}</span>
+              <span>{count(p.bathrooms, 'bath')}</span>
+              <span>{p.size.toLocaleString('en-AE')} sq ft</span>
             </div>
           </article>
         );

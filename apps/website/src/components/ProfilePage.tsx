@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { Agent, Area, Company, Developer, PageData } from '../lib/types';
 import { AgentCard, PropertyGrid } from './Cards';
 import { ProfileLinks } from './ProfileLinks';
-import { Empty, Heading, initials } from './ui';
+import { Empty, Heading, count, initials } from './ui';
+import { CompanyGrid } from './company/CompanyCards';
+import { isCompanyDesign } from '../lib/company-design';
 
 export function ProfilePage({ page, entity, catalogue, site }: PageData) {
   const id = entity!.id;
@@ -63,10 +65,10 @@ export function ProfilePage({ page, entity, catalogue, site }: PageData) {
             }
           />
           {entity && 'publicListingCount' in entity && entity.publicListingCount !== undefined && (
-            <p>{entity.publicListingCount} public listings</p>
+            <p>{count(entity.publicListingCount, 'public listing')}</p>
           )}
           {page === 'company' && company?.publicAgentCount !== undefined && (
-            <p>{company.publicAgentCount} agents with public listings</p>
+            <p>{count(company.publicAgentCount, 'agent')} with public listings</p>
           )}
           <ProfileLinks
             page={page}
@@ -113,7 +115,9 @@ export function ProfilePage({ page, entity, catalogue, site }: PageData) {
           View all matching properties →
         </Link>
       </div>
-      {stock.length ? (
+      {stock.length && isCompanyDesign(site) ? (
+        <CompanyGrid listings={stock} catalogue={catalogue} />
+      ) : stock.length ? (
         <PropertyGrid listings={stock} catalogue={catalogue} />
       ) : (
         <Empty

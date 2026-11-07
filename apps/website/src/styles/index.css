@@ -16,6 +16,7 @@
 @import './mobile-layout.css';
 @import './mobile-detail.css';
 @import './mobile-themes.css';
+@import './classic-polish.css';
 @import './atelier-foundation.css';
 @import './atelier-chrome.css';
 @import './atelier-home.css';
@@ -38,6 +39,7 @@
 @import './atelier-catalogue-flow.css';
 @import './atelier-enquiry-flow.css';
 @import './atelier-clarity.css';
+@import './atelier-refinements.css';
 @import './homeverse-foundation.css';
 @import './homeverse-chrome.css';
 @import './homeverse-hero.css';
@@ -47,3 +49,4 @@
 @import './homeverse-responsive.css';
 @import './homeverse-enhancements.css';
 @import './homeverse-discovery.css';
+@import './homeverse-refinements.css';

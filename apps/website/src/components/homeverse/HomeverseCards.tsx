@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import type { Catalogue, Listing } from '../../lib/types';
 import { HomeverseSave } from './HomeverseSave';
-import { money } from '../ui';
+import { HomeverseIcon } from './HomeverseIcon';
+import { bedrooms, count, money } from '../ui';
 export function HomeverseCards({
   listings,
   catalogue,
@@ -28,7 +29,10 @@ export function HomeverseCards({
                     : 'Holiday home'}
               </span>
               <span className="v-card-price">{money(p)}</span>
-              <span className="v-photo-count">▧ {p.photos.length || 1} photos</span>
+              <span className="v-photo-count">
+                <HomeverseIcon name="photos" size={13} />
+                {count(p.photos.length || 1, 'photo')}
+              </span>
             </Link>
             <HomeverseSave id={p.id} title={p.title} company={p.company} />
           </div>
@@ -40,15 +44,9 @@ export function HomeverseCards({
               {catalogue.areas.find((a) => a.id === p.area)?.name || p.emirate} · {p.type}
             </p>
             <div className="v-card-facts">
-              <span>
-                {p.bedrooms === null
-                  ? 'Commercial'
-                  : p.bedrooms === 0
-                    ? 'Studio'
-                    : `${p.bedrooms} beds`}
-              </span>
-              <span>{p.bathrooms} baths</span>
-              <span>{p.size.toLocaleString()} sq ft</span>
+              <span>{bedrooms(p)}</span>
+              <span>{count(p.bathrooms, 'bath')}</span>
+              <span>{p.size.toLocaleString('en-AE')} sq ft</span>
             </div>
             <Link className="v-card-details" href={`/properties/${encodeURIComponent(p.id)}`}>
               View property <span aria-hidden="true">→</span>

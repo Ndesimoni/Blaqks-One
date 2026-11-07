@@ -27,3 +27,14 @@ Checks: TypeScript, production build, 42 website tests plus the API consumer, fo
 ## Source handoff authorization
 
 The owner approved committing and pushing the completed work on 6 November 2026. The earlier review hold is lifted for this source handoff. Push the company designs together on `website/single-company-atelier`; this does not authorize merging into main or a production deployment.
+
+## Company websites polish — 7 November 2026
+
+The sample hero and contact background now use the licensed Unsplash `hero-dusk.jpg`
+(`photo-1600585154340-be6161a56a0c`); the unlicensed `hero.jpg` was removed. Theme 2
+inherits the theme 1 phone-layout fix (mobile `:is()` overrides), so About, Contact and
+Services collapse to one column at 390px. The footer shows the same house-icon brand as the
+header, the hero search button uses a 16px search icon, the Developers directory is linked
+from the footer, and Cedar Gate's sample listings have their own names. See the
+[atelier preview](company-atelier-preview.md#company-websites-polish--7-november-2026) for
+the shared copy, data and type fixes.

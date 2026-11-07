@@ -49,7 +49,7 @@ body[data-site-kind='company'][data-theme='1'] .a-card-facts {
   padding-top: 11px;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 body[data-site-kind='company'][data-theme='1'] .a-team-grid {
   display: grid;

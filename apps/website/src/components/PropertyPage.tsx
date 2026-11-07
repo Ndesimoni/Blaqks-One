@@ -5,6 +5,7 @@ import { AreaMap } from './AreaMap';
 import { PhotoGallery } from './PhotoGallery';
 import { PropertyGrid } from './Cards';
 import { ListingInformation } from './ListingInformation';
+import { amenities, optionLabel } from '../lib/options';
 
 export function PropertyPage({ entity, catalogue }: PageData) {
   const listing = entity as Listing;
@@ -48,14 +49,17 @@ export function PropertyPage({ entity, catalogue }: PageData) {
               {listing.category === 'commercial'
                 ? 'Property type'
                 : listing.bedrooms === 0
-                  ? 'Apartment'
-                  : 'Bedrooms'}
+                  ? 'Layout'
+                  : listing.bedrooms === 1
+                    ? 'Bedroom'
+                    : 'Bedrooms'}
             </span>
             <span>
-              <b>{listing.bathrooms}</b>Bathrooms
+              <b>{listing.bathrooms}</b>
+              {listing.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}
             </span>
             <span>
-              <b>{listing.size.toLocaleString()}</b>sqft
+              <b>{listing.size.toLocaleString('en-AE')}</b>sq ft
             </span>
           </div>
           <div className="detail-quick-contact">
@@ -79,7 +83,7 @@ export function PropertyPage({ entity, catalogue }: PageData) {
             {listing.amenities.length ? (
               <ul className="amenities">
                 {listing.amenities.map((amenity) => (
-                  <li key={amenity}>{amenity.replaceAll('-', ' ')}</li>
+                  <li key={amenity}>{optionLabel(amenities, amenity)}</li>
                 ))}
               </ul>
             ) : (

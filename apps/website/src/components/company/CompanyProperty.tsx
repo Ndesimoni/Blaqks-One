@@ -8,6 +8,7 @@ import { AreaMap } from '../AreaMap';
 import { ListingInformation } from '../ListingInformation';
 import { ContactLinks, money, initials } from '../ui';
 import { CompanyGrid } from './CompanyCards';
+import { amenities, optionLabel } from '../../lib/options';
 
 export function CompanyProperty({ entity, catalogue }: PageData) {
   const p = entity as Listing;
@@ -42,17 +43,27 @@ export function CompanyProperty({ entity, catalogue }: PageData) {
           <div className="detail-facts">
             <span>
               <b>{p.bedrooms === null ? 'Commercial' : p.bedrooms === 0 ? 'Studio' : p.bedrooms}</b>
-              {p.bedrooms === null ? 'Property category' : 'Bedrooms'}
+              {p.bedrooms === null
+                ? 'Property category'
+                : p.bedrooms === 0
+                  ? 'Layout'
+                  : p.bedrooms === 1
+                    ? 'Bedroom'
+                    : 'Bedrooms'}
             </span>
             <span>
-              <b>{p.bathrooms}</b>Bathrooms
+              <b>{p.bathrooms}</b>
+              {p.bathrooms === 1 ? 'Bathroom' : 'Bathrooms'}
             </span>
             <span>
-              <b>{p.size.toLocaleString()}</b>Square feet
+              <b>{p.size.toLocaleString('en-AE')}</b>Square feet
             </span>
-            <span>
-              <b>{p.parking}</b>Parking spaces
-            </span>
+            {p.parking > 0 && (
+              <span>
+                <b>{p.parking}</b>
+                {p.parking === 1 ? 'Parking space' : 'Parking spaces'}
+              </span>
+            )}
           </div>
           <nav className="anchor-nav" aria-label="Property sections">
             <a href="#overview">Overview</a>
@@ -71,7 +82,7 @@ export function CompanyProperty({ entity, catalogue }: PageData) {
             {p.amenities.length ? (
               <ul className="amenities">
                 {p.amenities.map((a) => (
-                  <li key={a}>{a.replaceAll('-', ' ')}</li>
+                  <li key={a}>{optionLabel(amenities, a)}</li>
                 ))}
               </ul>
             ) : (

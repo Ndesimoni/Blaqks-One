@@ -7,7 +7,7 @@ import { HomeverseCards } from './HomeverseCards';
 import { HomeverseAbout, HomeverseBenefits, HomeverseContact } from './HomeverseSections';
 export function HomeverseHome(data: PageData) {
   const { site, catalogue } = data;
-  const heroImage = site.sample ? '/company/hero.jpg' : catalogue.listings[0]?.image;
+  const heroImage = site.sample ? '/company/hero-dusk.jpg' : catalogue.listings[0]?.image;
   return (
     <>
       <HomeverseMotion />
@@ -17,8 +17,8 @@ export function HomeverseHome(data: PageData) {
             className="v-hero-image"
             src={heroImage}
             alt="Contemporary home with generous glazing and warm interior light"
-            width={1980}
-            height={1080}
+            width={2560}
+            height={1440}
             fetchPriority="high"
           />
         )}

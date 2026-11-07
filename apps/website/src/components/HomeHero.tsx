@@ -6,32 +6,27 @@ export function HomeHero({ site, catalogue }: { site: Site; catalogue: Catalogue
   const heading =
     site.kind === 'platform' ? (
       <>
-        Find a place.
-        <br />
+        Find a place. <br />
         <em>Make it yours.</em>
       </>
     ) : site.theme === '2' ? (
       <>
-        Your next move
-        <br />
+        Your next move <br />
         <em>starts here.</em>
       </>
     ) : site.theme === '3' ? (
       <>
-        Considered homes.
-        <br />
+        Considered homes. <br />
         <em>Extraordinary living.</em>
       </>
     ) : site.theme === '4' ? (
       <>
-        Exceptional homes
-        <br />
+        Exceptional homes <br />
         <em>across the UAE.</em>
       </>
     ) : (
       <>
-        Some places
-        <br />
+        Some places <br />
         <em>feel like home.</em>
       </>
     );

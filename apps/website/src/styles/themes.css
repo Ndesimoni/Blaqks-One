@@ -32,10 +32,10 @@ body[data-theme='2'] .home-search {
 body[data-theme='3'] .hero {
   background: var(--paper);
   color: var(--ink);
-  height: 680px;
+  height: 610px;
 }
 body[data-theme='3'] .hero > img {
-  top: 270px;
+  top: 200px;
   height: 410px;
   width: min(1280px, calc(100% - 80px));
   left: max(40px, calc((100vw - 1280px) / 2));
@@ -90,4 +90,19 @@ body[data-theme='4'] .button:not(.quiet):not(.hero-button):hover {
 }
 body[data-theme='4'] .site-header {
   border-bottom: 1px solid var(--line);
+}
+body[data-theme='4'] .hero::after {
+  background:
+    linear-gradient(0deg, rgb(11 32 26 / 0.7), rgb(11 32 26 / 0) 32%),
+    linear-gradient(90deg, rgb(11 32 26 / 0.85), rgb(11 32 26 / 0.55) 45%, rgb(11 32 26 / 0.12) 80%);
+}
+body[data-theme='4'] .hero-button {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--on-green);
+}
+body[data-theme='4'] .hero-button:hover {
+  background: #e3cc98;
+  border-color: #e3cc98;
+  color: var(--on-green);
 }

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { PageData } from '../lib/types';
 import { PropertyGrid } from './Cards';
 import { SearchForm } from './SearchForm';
-import { Empty, Heading, queryHref } from './ui';
+import { Empty, Heading, Pagination, queryHref } from './ui';
 
 export function PropertiesPage({ catalogue, results, query }: PageData) {
   const total = results?.total || 0;
@@ -37,13 +37,12 @@ export function PropertiesPage({ catalogue, results, query }: PageData) {
       ) : (
         <Empty />
       )}
-      <nav className="pagination" aria-label="Property result pages">
-        {page > 1 && <Link href={queryHref(query, { page: String(page - 1) })}>← Previous</Link>}
-        <span>
-          Page {page} of {pages}
-        </span>
-        {page < pages && <Link href={queryHref(query, { page: String(page + 1) })}>Next →</Link>}
-      </nav>
+      <Pagination
+        page={page}
+        pages={pages}
+        href={(number) => queryHref(query, { page: String(number) })}
+        label="Property result pages"
+      />
     </section>
   );
 }
