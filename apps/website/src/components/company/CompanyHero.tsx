@@ -29,11 +29,15 @@ export function CompanyHero({ site, catalogue }: Pick<PageData, 'site' | 'catalo
         </div>
       </div>
       {site.sample ? (
-        <div
-          className="a-reference-house"
-          role="img"
-          aria-label="Illustrative two-storey contemporary house and sports car from the supplied design reference"
-        />
+        <div className="a-reference-house">
+          <img
+            src="/company/hero-dusk.jpg"
+            alt="Illustrative two-storey contemporary house at dusk"
+            width={2560}
+            height={1440}
+            fetchPriority="high"
+          />
+        </div>
       ) : (
         image && (
           <img

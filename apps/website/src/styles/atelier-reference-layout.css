@@ -32,6 +32,7 @@ body[data-site-kind='company'][data-theme='1'] .a-reference-hero {
   position: relative;
   padding: 35px 0 0;
   margin: 0;
+  background: #232a32;
 }
 body[data-site-kind='company'][data-theme='1'] .a-reference-hero .a-hero-intro {
   grid-template-columns: 1.85fr 1fr;
@@ -65,26 +66,22 @@ body[data-site-kind='company'][data-theme='1'] .a-reference-house {
   position: relative;
   width: 100%;
   aspect-ratio: 2.08;
-  background: #fbfbfb url('/company/reference-composition.png') 15.1786% 50.7143% / 153.8462% auto
-    no-repeat;
+  overflow: hidden;
+  background: #232a32;
 }
-body[data-site-kind='company'][data-theme='1'] .a-reference-house::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 52%;
-  height: 4.8%;
-  background: #fbfbfb;
+body[data-site-kind='company'][data-theme='1'] .a-reference-house > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
 }
 body[data-site-kind='company'][data-theme='1'] .a-reference-house::after {
   content: '';
   position: absolute;
-  left: 13%;
-  top: 9.5%;
-  width: 9%;
-  height: 7%;
-  background: #fbfbfb;
+  inset: 0 0 auto;
+  height: 38%;
+  background: linear-gradient(#232a32, #232a3200);
 }
 body[data-site-kind='company'][data-theme='1'] .a-home-content > .a-section {
   margin-block: 72px;

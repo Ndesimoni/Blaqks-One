@@ -22,6 +22,9 @@
   }
   body[data-site-kind='company'][data-theme='1'] .a-reference-hero {
     padding-top: 20px;
+    background:
+      linear-gradient(#232a32, #232a32) top / 100% calc(100% - 140px) no-repeat,
+      #fbfbfb;
   }
   body[data-site-kind='company'][data-theme='1'] .a-reference-hero .a-hero-intro {
     grid-template-columns: 1fr;
@@ -36,7 +39,7 @@
     padding: 0;
   }
   body[data-site-kind='company'][data-theme='1'] .a-reference-house {
-    aspect-ratio: 2.08;
+    aspect-ratio: 1.5;
   }
   body[data-site-kind='company'][data-theme='1'] .a-home-content > .a-section {
     margin-block: 46px;

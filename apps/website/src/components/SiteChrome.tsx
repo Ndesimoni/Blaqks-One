@@ -3,6 +3,7 @@ import type { Site } from '../lib/types';
 import { initials } from './ui';
 import { MobileMenu } from './MobileMenu';
 import { SocialLinkList } from './SocialLinkList';
+import { CompanyNavigation } from './company/CompanyNavigation';
 
 export function SiteHeader({ site }: { site: Site }) {
   const links = [
@@ -32,13 +33,7 @@ export function SiteHeader({ site }: { site: Site }) {
           </small>
         </span>
       </Link>
-      <nav className="desktop-nav" aria-label="Main navigation">
-        {links.map(([href, label]) => (
-          <Link key={href} href={href}>
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <CompanyNavigation links={links} className="desktop-nav" />
       <MobileMenu links={links} />
     </header>
   );
@@ -64,7 +59,7 @@ export function SiteFooter({ site }: { site: Site }) {
         <Link href="/agents">{site.kind === 'platform' ? 'Meet the agents' : 'Our people'}</Link>
       </div>
       <div>
-        <p className="eyebrow">GET IN TOUCH</p>
+        <p className="eyebrow">COMPANY</p>
         <Link href="/about">About us</Link>
         <Link href="/contact">Contact</Link>
         <Link href="/areas">Neighbourhoods</Link>

@@ -65,16 +65,23 @@ local until the owner approves the design/push.
 
 ## Illustrative asset provenance
 
-Hero: architect Zoran Bodrožić's public project image, image URL
-`https://framerusercontent.com/images/LWqXWLJJCePQcp6kIecaACvQCE.jpg` (found through image
-search at `https://zoranbodrozic.com/`). This is an architecture illustration, not a claim
-that the example company represents that property.
+All sample photography is now licensed Unsplash photography (Unsplash licence), saved under
+`public/company`:
 
-Other image URLs are Unsplash images: `photo-1600596542815-ffad4c1539a9` (residence),
-`photo-1600607687920-4e2a09cf159d` (courtyard), `photo-1600210492486-724fe5c67fb0`
-(interior), `photo-1600585154340-be6161a56a0c` (villa), and
-`photo-1600566753086-00f18fb6b3ea` (terrace). Local copies are under `public/company`.
-Final company publication should use its selected, approved property and branding assets.
+- `hero-dusk.jpg` (2560 × 1440, ~580 KB): `photo-1600585154340-be6161a56a0c`, the
+  two-storey contemporary house at dusk. Theme 1 and theme 2 sample heroes and the theme 2
+  contact background.
+- `pavilion.jpg`: `photo-1613490493576-7fde63acd811`; `garden-house.jpg`:
+  `photo-1580587771525-78b9dba3b914` (sample listing cards).
+- `residence.jpg`: `photo-1600596542815-ffad4c1539a9`; `courtyard.jpg`:
+  `photo-1600607687920-4e2a09cf159d`; `interior.jpg`: `photo-1600210492486-724fe5c67fb0`;
+  `terrace.jpg`: `photo-1600566753086-00f18fb6b3ea`.
+
+The earlier unlicensed images (architect Zoran Bodrožić's project photograph `hero.jpg` and
+the cropped design-reference screenshot `reference-composition.png`) were removed from the
+site and the repository on 7 November 2026, together with the duplicate low-resolution
+`villa.jpg`. These are illustrations, not a claim that the example company represents
+those properties. Final company publication should use its selected, approved property and branding assets.
 
 ## Owner correction: match the supplied composition
 
@@ -86,11 +93,10 @@ heading and tighter unboxed three-column cards. The services title now follows t
 
 A clearer image of the same reference was located at
 `https://cdn.dribbble.com/userupload/45867978/file/still-c5e25acb0e6a1805ec2951c79609a012.png`.
-Its unchanged local copy is `public/company/reference-composition.png`. The sample hero
-uses a CSS window into the house-photo region of that composition; headline, navigation,
-button and all filters remain real HTML controls. This is a preview image treatment, not a
-recovered standalone high-resolution photograph. The earlier architectural hero remains an
-illustrative listing asset only. Listing pictures, company name, UAE currency/units and the
+It was used only as a visual reference: the sample hero now shows the licensed
+`hero-dusk.jpg` photograph (see provenance above) as a full-bleed `object-fit: cover` image
+in the same composition; headline, navigation, button and all filters remain real HTML
+controls. Listing pictures, company name, UAE currency/units and the
 additional pages remain sample adaptations; exact parity for every asset is not certified.
 
 The updated four-tab search correctly maps Buy/Rent, new developments to `ready=off-plan`,
@@ -189,3 +195,25 @@ The company header now includes Contact alongside Properties, Company, Services 
 Rendered review covered 15 routes: home, catalogue, listing, team, advisor, company, services, contact, listing enquiry, areas, area profile, developers, developer profile, privacy and terms. Every route displayed the shared header and footer without horizontal overflow at the review viewport; linked primary sections highlighted correctly. Production build, TypeScript, website tests and file-size baseline checks passed. Mobile device visual acceptance remains separate. Changes remain local pending design review; no GitHub push performed.
 
 The owner approved the GitHub source handoff on 6 November 2026, after reviewing both company designs. The earlier push hold is lifted. The source branch is `website/single-company-atelier`; production deployment and merging remain separate.
+
+## Company websites polish — 7 November 2026
+
+Applied across all four company themes after a design review, keeping each theme's palette:
+
+- Phone layouts: mobile overrides for themes 1 and 2 used `:where()` and lost to desktop
+  rules, so headers never collapsed and sections stayed in columns. They now use `:is()`;
+  every company route is exactly 390px wide at 390px, with only the wordmark and Menu.
+- Licensed hero photograph (above), blended into the charcoal header; on phones the photo
+  is taller and the search card straddles the hero. Hero selects are 44px on phones and one
+  column at 420px and below.
+- Copy and data: "1 bath"/"2 beds" plurals, "sq ft" everywhere, readable furnishing and
+  amenity labels, "No parking" instead of 0, no "Page 1 of 1", developer listing counts only
+  when non-zero, developers with listings on the site first. Cards name the developer
+  ("Developer: Emaar (illustrative)") and the listing agent ("Listed by Maya Reed").
+- Type floor of 11px for taglines, eyebrows, captions and card facts.
+- Footer: Developers link for themes 1 and 2; theme 2's footer uses its own house-icon brand.
+- Themes 3 and 4: spacing fixes in the hero heading and image, current-page navigation,
+  developer tiles, a Contact enquiry form (sample preview or live company enquiry), a gold
+  primary hero action and a deeper scrim on theme 4, uppercase eyebrows, a COMPANY footer
+  column, a soft card hover and an aligned phone menu.
+- Cedar's sample listings have their own names instead of reusing Harbour's.

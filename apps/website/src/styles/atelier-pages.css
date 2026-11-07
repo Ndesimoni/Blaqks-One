@@ -29,7 +29,7 @@ body[data-site-kind='company'][data-theme='1'] .a-values {
 }
 body[data-site-kind='company'][data-theme='1'] .a-values article > span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 body[data-site-kind='company'][data-theme='1'] .a-values h3 {
   font-size: 23px;
@@ -119,7 +119,7 @@ body[data-site-kind='company'][data-theme='1'] .a-results-heading p {
   body[data-site-kind='company'][data-theme='1'] .a-page-intro {
     padding-block: 30px;
   }
-  body[data-site-kind='company'][data-theme='1'] :where(.a-values, .a-contact-layout) {
+  body[data-site-kind='company'][data-theme='1'] :is(.a-values, .a-contact-layout) {
     grid-template-columns: 1fr;
     gap: 30px;
   }

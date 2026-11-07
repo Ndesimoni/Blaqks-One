@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { Catalogue } from '../../lib/types';
+import { HomeverseIcon } from './HomeverseIcon';
 export function HomeverseSearch({ catalogue }: { catalogue: Catalogue }) {
   const [purpose, setPurpose] = useState('buy');
   const budgets =
@@ -85,7 +86,7 @@ export function HomeverseSearch({ catalogue }: { catalogue: Catalogue }) {
           </select>
         </label>
         <button className="v-button" type="submit">
-          Search property <span aria-hidden="true">⌕</span>
+          Search property <HomeverseIcon name="search" size={16} />
         </button>
       </div>
     </form>

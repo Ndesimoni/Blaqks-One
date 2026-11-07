@@ -54,8 +54,8 @@ export function SearchAdvanced({
         <fieldset>
           <legend>Size & amenities</legend>
           <div className="field-pair">
-            <NumberField label="Min size (sqft)" name="minSize" query={query} step="0.01" />
-            <NumberField label="Max size (sqft)" name="maxSize" query={query} step="0.01" />
+            <NumberField label="Min size (sq ft)" name="minSize" query={query} step="0.01" />
+            <NumberField label="Max size (sq ft)" name="maxSize" query={query} step="0.01" />
           </div>
           <div className="amenity-options">
             {amenities.map(([value, label]) => (

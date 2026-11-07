@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import type { Agent, Catalogue, Company, Listing } from '../lib/types';
-import { ContactLinks, initials, money } from './ui';
+import { ContactLinks, bedrooms, count, initials, money } from './ui';
 
 export function PropertyCard({ listing, catalogue }: { listing: Listing; catalogue: Catalogue }) {
   const agent = catalogue.agents.find((item) => item.id === listing.agent);
   const area = catalogue.areas.find((item) => item.id === listing.area);
+  const developer = catalogue.developers.find((item) => item.id === listing.developer);
   return (
     <article className="property-card">
       <Link className="property-image" href={`/properties/${encodeURIComponent(listing.id)}`}>
@@ -26,20 +27,20 @@ export function PropertyCard({ listing, catalogue }: { listing: Listing; catalog
           {area ? `${area.name}, ${area.city}` : 'Area details available from the agent'}
         </p>
         <p className="property-facts">
-          {listing.category === 'commercial'
-            ? listing.type
-            : listing.bedrooms === 0
-              ? 'Studio'
-              : `${listing.bedrooms} beds`}
-          <span>{listing.bathrooms} baths</span>
-          <span>{listing.size.toLocaleString()} sqft</span>
+          {listing.category === 'commercial' ? listing.type : bedrooms(listing)}
+          <span>{count(listing.bathrooms, 'bath')}</span>
+          <span>{listing.size.toLocaleString('en-AE')} sq ft</span>
         </p>
-        {listing.developerIllustrative && (
-          <small className="muted">Illustrative developer association</small>
+        {developer && (
+          <small className="muted card-developer">
+            Developer:{' '}
+            <Link href={`/developers/${encodeURIComponent(developer.id)}`}>{developer.name}</Link>
+            {listing.developerIllustrative && ' (illustrative)'}
+          </small>
         )}
         {agent && (
           <Link className="listing-agent" href={`/agents/${encodeURIComponent(agent.id)}`}>
-            {agent.name} →
+            Listed by {agent.name} <span aria-hidden="true">→</span>
           </Link>
         )}
         <ContactLinks agent={agent} listing={listing} />
@@ -74,7 +75,9 @@ export function AgentCard({ agent, catalogue }: { agent: Agent; catalogue: Catal
         <Link href={`/agents/${encodeURIComponent(agent.id)}`}>{agent.name}</Link>
       </h3>
       <p className="muted">{company?.name}</p>
-      {agent.publicListingCount !== undefined && <p>{agent.publicListingCount} public listings</p>}
+      {agent.publicListingCount !== undefined && (
+        <p>{count(agent.publicListingCount, 'public listing')}</p>
+      )}
       <ContactLinks agent={agent} />
       <Link href={`/agents/${encodeURIComponent(agent.id)}`}>View profile & properties →</Link>
     </article>
@@ -92,10 +95,10 @@ export function CompanyCard({ company, catalogue }: { company: Company; catalogu
       </h3>
       <p className="muted">{company.note}</p>
       {company.publicListingCount !== undefined && (
-        <p>{company.publicListingCount} public listings</p>
+        <p>{count(company.publicListingCount, 'public listing')}</p>
       )}
       {company.publicAgentCount !== undefined && (
-        <p>{company.publicAgentCount} agents with public listings</p>
+        <p>{count(company.publicAgentCount, 'agent')} with public listings</p>
       )}
       <Link href={`/companies/${encodeURIComponent(company.id)}`}>View company & properties →</Link>
     </article>

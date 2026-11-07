@@ -3,6 +3,8 @@ import type { PageData } from '../lib/types';
 import { SearchForm } from './SearchForm';
 import { AgentCard, PropertyGrid } from './Cards';
 import { HomeHero } from './HomeHero';
+import { count } from './ui';
+import { developersByListings } from '../lib/developer-order';
 
 export function HomePage({ site, catalogue }: PageData) {
   return (
@@ -89,17 +91,24 @@ export function HomePage({ site, catalogue }: PageData) {
       <section className="section developers-section">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">THE PEOPLE SHAPING THE UAE</p>
+            <p className="eyebrow">UAE DEVELOPERS</p>
             <h2>Discover the developers.</h2>
           </div>
           <Link href="/developers">View all developers →</Link>
         </div>
         <div className="developer-strip">
-          {catalogue.developers.slice(0, 6).map((developer) => (
-            <Link key={developer.id} href={`/developers/${encodeURIComponent(developer.id)}`}>
-              {developer.name}
-            </Link>
-          ))}
+          {developersByListings(catalogue.developers)
+            .slice(0, 6)
+            .map((developer) => (
+              <Link key={developer.id} href={`/developers/${encodeURIComponent(developer.id)}`}>
+                <strong>{developer.name}</strong>
+                <span>
+                  {developer.emirate}
+                  {!!developer.publicListingCount &&
+                    ` · ${count(developer.publicListingCount, 'listing')}`}
+                </span>
+              </Link>
+            ))}
         </div>
       </section>
       <section className="section closing-section">

@@ -22,7 +22,7 @@ body[data-site-kind='company'][data-theme='1'] .search-form {
   border: 1px solid var(--line);
 }
 body[data-site-kind='company'][data-theme='1'] .search-form label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   letter-spacing: 0;
 }

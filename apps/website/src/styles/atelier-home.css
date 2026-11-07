@@ -62,7 +62,7 @@ body[data-site-kind='company'][data-theme='1'] .a-service-list summary::-webkit-
 }
 body[data-site-kind='company'][data-theme='1'] .a-service-list summary > span:first-child {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0;
 }
 body[data-site-kind='company'][data-theme='1'] .a-service-list summary::after {
@@ -113,7 +113,7 @@ body[data-site-kind='company'][data-theme='1'] :where(.a-service-grid, .a-story)
 }
 body[data-site-kind='company'][data-theme='1'] figcaption {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   margin-top: 10px;
 }
 body[data-site-kind='company'][data-theme='1']

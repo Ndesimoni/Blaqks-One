@@ -21,7 +21,7 @@
     padding-block: 22px;
     gap: 16px;
   }
-  body[data-site-kind='company'][data-theme='1'] :where(.a-nav, .a-header-contact) {
+  body[data-site-kind='company'][data-theme='1'] :is(.a-nav, .a-header-contact) {
     display: none;
   }
   body[data-site-kind='company'][data-theme='1'] .a-header .mobile-menu {
@@ -75,7 +75,7 @@
   body[data-site-kind='company'][data-theme='1'] .a-section {
     margin-block: 64px;
   }
-  body[data-site-kind='company'][data-theme='1'] :where(.a-section-head, .a-closing > div) {
+  body[data-site-kind='company'][data-theme='1'] :is(.a-section-head, .a-closing > div) {
     align-items: start;
     flex-direction: column;
     gap: 20px;
@@ -88,7 +88,7 @@
     flex-direction: column;
     gap: 4px;
   }
-  body[data-site-kind='company'][data-theme='1'] :where(.a-service-grid, .a-story) {
+  body[data-site-kind='company'][data-theme='1'] :is(.a-service-grid, .a-story) {
     grid-template-columns: 1fr;
     gap: 30px;
   }

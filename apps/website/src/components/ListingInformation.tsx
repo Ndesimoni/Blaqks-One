@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import type { Agent, Company, Developer, Listing } from '../lib/types';
+import { furnishings, optionLabel } from '../lib/options';
+import { count } from './ui';
 
 export function ListingInformation({
   listing,
@@ -31,11 +33,13 @@ export function ListingInformation({
         </div>
         <div>
           <dt>Furnishing</dt>
-          <dd>{listing.furnishing.replaceAll('-', ' ') || 'Not specified'}</dd>
+          <dd>
+            {listing.furnishing ? optionLabel(furnishings, listing.furnishing) : 'Not specified'}
+          </dd>
         </div>
         <div>
-          <dt>Parking spaces</dt>
-          <dd>{listing.parking}</dd>
+          <dt>Parking</dt>
+          <dd>{listing.parking > 0 ? count(listing.parking, 'space') : 'No parking'}</dd>
         </div>
         {listing.purpose === 'holiday' && (
           <>
@@ -45,7 +49,7 @@ export function ListingInformation({
             </div>
             <div>
               <dt>Minimum stay</dt>
-              <dd>{listing.minimumStay} nights</dd>
+              <dd>{count(listing.minimumStay, 'night')}</dd>
             </div>
           </>
         )}

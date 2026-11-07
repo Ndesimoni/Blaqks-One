@@ -80,7 +80,7 @@ body[data-site-kind='company'][data-theme='1'] .a-listing-advisor .avatar {
   flex-shrink: 0;
 }
 @media (max-width: 760px) {
-  body[data-site-kind='company'][data-theme='1'] :where(.a-enquiry-layout, .a-listing-media > div) {
+  body[data-site-kind='company'][data-theme='1'] :is(.a-enquiry-layout, .a-listing-media > div) {
     grid-template-columns: 1fr;
   }
   body[data-site-kind='company'][data-theme='1'] .a-enquiry-form-panel {

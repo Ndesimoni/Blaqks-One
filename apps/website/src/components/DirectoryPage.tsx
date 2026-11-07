@@ -1,9 +1,14 @@
-import Link from 'next/link';
 import type { PageData } from '../lib/types';
 import { DirectoryControls } from './DirectoryControls';
 import { DirectoryContent } from './DirectoryContent';
-import { Empty, Heading, queryHref } from './ui';
+import { Empty, Heading, Pagination, queryHref } from './ui';
 
+const nouns: Record<string, [string, string]> = {
+  areas: ['community', 'communities'],
+  agents: ['agent', 'agents'],
+  companies: ['company', 'companies'],
+  developers: ['developer', 'developers'],
+};
 export function DirectoryPage({ page, catalogue, query, site, directory }: PageData) {
   const title =
     page === 'companies'
@@ -13,7 +18,7 @@ export function DirectoryPage({ page, catalogue, query, site, directory }: PageD
           ? 'A personal introduction.'
           : 'The people behind your next move.'
         : page === 'developers'
-          ? 'The people shaping the UAE.'
+          ? 'The developers shaping the UAE.'
           : 'Find your sense of place.';
   const count =
     directory?.total ??
@@ -31,7 +36,15 @@ export function DirectoryPage({ page, catalogue, query, site, directory }: PageD
   return (
     <section className="section page-top">
       <Heading
-        eyebrow={page === 'areas' ? 'THE NEIGHBOURHOODS' : 'PROPERTY & PEOPLE'}
+        eyebrow={
+          page === 'areas'
+            ? 'THE NEIGHBOURHOODS'
+            : page === 'developers'
+              ? 'UAE DEVELOPERS'
+              : page === 'agents' && site.kind === 'company'
+                ? 'OUR PEOPLE'
+                : 'PROPERTY & PEOPLE'
+        }
         title={title}
         text={
           page === 'developers'
@@ -41,22 +54,14 @@ export function DirectoryPage({ page, catalogue, query, site, directory }: PageD
       />
       <DirectoryControls page={page} query={query} />
       <p className="muted">
-        {count} {page === 'areas' ? 'communities' : page}
+        {count} {count === 1 ? nouns[page]?.[0] : nouns[page]?.[1]}
       </p>
       {count === 0 ? (
         <Empty title="No matches found." text="Try another search or emirate." />
       ) : (
         <DirectoryContent page={page} catalogue={catalogue} />
       )}
-      {pages > 1 && (
-        <nav className="pagination" aria-label="Directory pages">
-          {current > 1 && <Link href={href(current - 1)}>← Previous</Link>}
-          <span>
-            Page {current} of {pages}
-          </span>
-          {current < pages && <Link href={href(current + 1)}>Next →</Link>}
-        </nav>
-      )}
+      <Pagination page={current} pages={pages} href={href} label="Directory pages" />
     </section>
   );
 }

@@ -94,3 +94,10 @@ export const sortOptions: Choice[] = [
   ['size-asc', 'Size: small to large'],
   ['size-desc', 'Size: large to small'],
 ];
+const readable = (value: string) => {
+  const text = value.trim().replaceAll('-', ' ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+/** Public label for a stored option value; unknown values become readable text. */
+export const optionLabel = (choices: Choice[], value: string) =>
+  choices.find(([key]) => key === value)?.[1] || readable(value);

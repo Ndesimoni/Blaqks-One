@@ -67,13 +67,13 @@ body[data-site-kind='company'][data-theme='1'] .a-card-heading > span {
   font-size: 11px;
 }
 body[data-site-kind='company'][data-theme='1'] .a-card-location {
-  font-size: 10px;
+  font-size: 11px;
   margin-block: 4px 10px;
 }
 body[data-site-kind='company'][data-theme='1'] .a-card-facts {
   border: 0;
   padding: 0;
-  font-size: 9px;
+  font-size: 11px;
   gap: 12px;
 }
 body[data-site-kind='company'][data-theme='1'] .a-services .a-service-grid {

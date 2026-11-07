@@ -87,8 +87,8 @@ body[data-site-kind='company'][data-theme='1'] .a-portrait {
   color: #5c6358;
 }
 body[data-site-kind='company'][data-theme='1'] .a-person-copy .a-kicker {
-  font-size: 10px;
-  letter-spacing: 0.09em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
 }
 @media (max-width: 760px) {
   body[data-site-kind='company'][data-theme='1'] :where(input, select, textarea) {

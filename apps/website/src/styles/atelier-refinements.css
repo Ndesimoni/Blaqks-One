@@ -1,0 +1,29 @@
+body[data-site-kind='company'][data-theme='1'] .a-header-contact {
+  gap: 8px;
+}
+body[data-site-kind='company'][data-theme='1'] .developer-card {
+  padding: 28px;
+}
+body[data-site-kind='company'][data-theme='1'] .developer-card h2 {
+  font-size: 26px;
+  letter-spacing: -0.035em;
+  margin-bottom: 10px;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-search-fields select {
+    min-height: 44px;
+    padding-right: 36px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-search-bottom .a-action {
+    min-height: 44px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-header .mobile-menu nav a[aria-current='page'] {
+    background: #343e49;
+    color: #fff;
+  }
+}
+@media (max-width: 420px) {
+  body[data-site-kind='company'][data-theme='1'] .a-search-fields {
+    grid-template-columns: 1fr;
+  }
+}
