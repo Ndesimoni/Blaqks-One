@@ -35,6 +35,10 @@ pub struct Invitation {
     pub role_id: String,
     pub owner_name: String,
     pub expires_at: String,
+    /// The company a staff invitation joins, by its display name (the mockup's "Join Keys
+    /// with Simoni"); an Admin invited by Blaqks One starts their own, so none is named.
+    #[sqlx(skip)]
+    pub company: Option<String>,
 }
 
 pub fn unavailable() -> ApiError {
@@ -62,7 +66,9 @@ pub async fn find(pool: &sqlx::PgPool, token: &str) -> ApiResult<Invitation> {
          AND u.accepted_at IS NULL AND NOT u.active AND o.active \
          AND u.deleted_at IS NULL AND o.deleted_at IS NULL \
          AND ((u.role='staff' AND u.owner_id=i.owner_id AND u.workspace_id=i.workspace_id) \
-         OR (u.role='admin' AND o.role='super-admin' AND i.workspace_id='super-admin-workspace'))",
+         OR (u.role='admin' AND o.role='super-admin' AND i.workspace_id='super-admin-workspace') \
+         OR (u.role='platform' AND o.role='super-admin' AND u.owner_id=i.owner_id \
+           AND u.workspace_id=i.workspace_id AND i.workspace_id='super-admin-workspace'))",
     ).bind(crate::auth::session::digest(token)).fetch_optional(pool).await?
         .ok_or_else(unavailable)
 }
@@ -75,7 +81,13 @@ pub async fn inspect(
     protection::origin(&state, &headers)?;
     let Json(request) = body.map_err(|_| unavailable())?;
     throttle::invitation(&state.pool, &request.token).await?;
-    let invitation = find(&state.pool, &request.token).await?;
+    let mut invitation = find(&state.pool, &request.token).await?;
+    if invitation.role_id == "staff" {
+        invitation.company = crate::workspaces::company::get(&state.pool, &invitation.workspace_id)
+            .await
+            .ok()
+            .and_then(|company| company.display_name);
+    }
     Ok(Json(json!({"invitation":invitation})))
 }
 

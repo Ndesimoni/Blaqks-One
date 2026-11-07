@@ -1,5 +1,7 @@
 # Private workspaces and team activity
 
+> **Connected product (BO1a, owner 2026-11-05):** the Blaqks One account (formerly the Super Admin) has no CRM workspace, opens no company's workspace and never switches into one; see [Blaqks One console](blaqks-one-console.md). The Super Admin sections below describe the frozen browser demo only.
+
 Each member has a personal CRM workspace. Admins have full operations inside their own workspace; receptionists, staff and custom roles use their assigned modules inside theirs. Only the Super Admin can open another profile's workspace. The workspace banner identifies the profile whose records are currently displayed.
 
 ## Existing records and Aidah

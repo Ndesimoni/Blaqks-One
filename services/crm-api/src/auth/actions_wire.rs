@@ -1,7 +1,9 @@
 //! The JSON shape of [`Actions`]: each module lists only the keys it supports.
 //! Every key is required and unknown keys are refused, so requests decode strictly.
+//! `finance` may be omitted by older clients; when present it must be complete.
 use super::{
     actions::{Actions, ModuleActions},
+    finance_access::FinanceActions,
     permissions::Module,
 };
 use serde::{Deserialize, Serialize};
@@ -40,6 +42,8 @@ pub struct Wire {
     relationships: Relationships,
     properties: Properties,
     schedule: Schedule,
+    #[serde(default)]
+    finance: Option<FinanceActions>,
 }
 
 impl Wire {
@@ -78,6 +82,7 @@ impl From<Wire> for Actions {
                 delete_activity: s.delete_activity,
                 delete_main: false,
             },
+            finance: wire.finance.unwrap_or_default(),
         }
     }
 }
@@ -105,22 +110,7 @@ impl From<Actions> for Wire {
                 assign: s.assign,
                 delete_activity: s.delete_activity,
             },
+            finance: Some(actions.finance),
         }
     }
-}
-
-/// Invitations may omit `deleteMain` (it can only be false there); every other key
-/// stays required and unknown keys are still refused.
-pub fn invitation(mut value: serde_json::Value) -> Option<Actions> {
-    for module in [Module::Relationships, Module::Properties] {
-        if let Some(flags) = value
-            .get_mut(Wire::key(module))
-            .and_then(|flags| flags.as_object_mut())
-        {
-            flags
-                .entry("deleteMain")
-                .or_insert(serde_json::Value::Bool(false));
-        }
-    }
-    serde_json::from_value(value).ok()
 }

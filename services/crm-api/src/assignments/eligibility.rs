@@ -24,6 +24,19 @@ pub async fn eligible(
     collection: &str,
     candidate: Uuid,
 ) -> ApiResult<()> {
+    match can_hold(tx, workspace, collection, candidate).await? {
+        true => Ok(()),
+        false => Err(ApiError::invalid(INELIGIBLE)),
+    }
+}
+
+/// The same check as a yes or no, for moves that skip an ineligible member.
+pub async fn can_hold(
+    tx: &mut Tx<'_>,
+    workspace: &str,
+    collection: &str,
+    candidate: Uuid,
+) -> ApiResult<bool> {
     sqlx::query("SELECT 1 FROM crm_users WHERE id=$1 FOR SHARE")
         .bind(candidate)
         .fetch_optional(&mut **tx)
@@ -36,10 +49,7 @@ pub async fn eligible(
     .bind(workspace)
     .fetch_optional(&mut **tx)
     .await?;
-    match member {
-        Some(member) if member.can_collection(collection) => Ok(()),
-        _ => Err(ApiError::invalid(INELIGIBLE)),
-    }
+    Ok(member.is_some_and(|member| member.can_collection(collection)))
 }
 
 /// Step 7: team scope, or the current holder. A Follow-up's holder is its direct

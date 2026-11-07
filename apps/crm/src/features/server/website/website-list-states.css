@@ -1,0 +1,46 @@
+/* Website list loading rows; the shimmer stops for reduced-motion preferences. */
+.website-list-skeleton {
+  display: grid;
+  gap: 4px;
+}
+.website-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+.website-skeleton-row + .website-skeleton-row {
+  border-top: 1px solid var(--line);
+}
+.website-skeleton-lines {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+}
+.website-skeleton {
+  display: block;
+  width: min(100%, 260px);
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-subtle), var(--hover), var(--surface-subtle));
+  background-size: 200% 100%;
+  animation: website-shimmer 1.4s ease-in-out infinite;
+}
+.website-skeleton.short {
+  width: min(70%, 170px);
+}
+.website-skeleton.website-skeleton-chip {
+  width: 72px;
+  height: 22px;
+  border-radius: 999px;
+}
+@keyframes website-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .website-skeleton {
+    animation: none;
+  }
+}

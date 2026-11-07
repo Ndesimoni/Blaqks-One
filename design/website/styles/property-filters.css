@@ -1,0 +1,117 @@
+.results-layout {
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 30px;
+}
+.filter-panel form,
+.filter-location-fields {
+  display: grid;
+  gap: 18px;
+}
+.company-site .filter-panel .section-heading h2 {
+  font-size: 23px;
+  line-height: 1.2;
+}
+.filter-group {
+  border-top: 1px solid var(--line);
+}
+.filter-group summary {
+  cursor: pointer;
+  min-height: 48px;
+  padding-block: 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.filter-group-fields {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 24px;
+}
+.amenity-filter {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.amenity-filter legend {
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.amenity-filter label {
+  align-items: center;
+  min-height: 44px;
+}
+.filter-submit {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 14px 0 6px;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  z-index: 2;
+}
+.company-site .area-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+}
+.filter-submit > a {
+  text-align: center;
+  font-size: 12px;
+  padding: 8px;
+}
+.chip {
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.sort-hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+.detail-quick-contact {
+  display: none;
+}
+.privacy-inline {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.sort-label select {
+  max-width: 210px;
+}
+@media (max-width: 1150px) {
+  .search-fields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .search-fields .budget-range {
+    grid-column: span 2;
+  }
+  .search-advanced-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1000px) {
+  .results-layout {
+    grid-template-columns: 1fr;
+  }
+  .mobile-filter {
+    display: inline-flex;
+  }
+  .filter-panel {
+    display: none;
+    border: 1px solid var(--line);
+    padding: 20px;
+    background: var(--panel);
+  }
+  .filter-panel.open {
+    display: block;
+  }
+  .filter-submit {
+    background: var(--panel);
+  }
+  .detail-quick-contact {
+    display: block;
+    margin-block: 24px;
+  }
+  .detail-quick-contact > .button {
+    width: 100%;
+  }
+}

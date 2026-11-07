@@ -1,0 +1,5 @@
+screenshots/
+browser-report.json
+# Reproducible outputs from the immutable approved source snapshot.
+/public/approved/
+/src/generated/

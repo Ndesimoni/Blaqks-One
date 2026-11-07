@@ -1,0 +1,78 @@
+/** English catalogues: CRM records, agreements, deals, shares and tools. Registered through catalogs/index.js. */
+import enAgreementForm from './en/agreementForm.js';
+import enAgreementLifecycle from './en/agreementLifecycle.js';
+import enAgreements from './en/agreements.js';
+import enAgreementsBoard from './en/agreementsBoard.js';
+import enCalculators from './en/calculators.js';
+import enClientDesk from './en/clientDesk.js';
+import enCompany from './en/company.js';
+import enDashboard from './en/dashboard.js';
+import enDealPanel from './en/dealPanel.js';
+import enDealParties from './en/dealParties.js';
+import enDealsBoard from './en/dealsBoard.js';
+import enFieldHints from './en/fieldHints.js';
+import enFollowUps from './en/followUps.js';
+import enGuide from './en/guide.js';
+import enViewings from './en/viewings.js';
+import enHandoverOffer from './en/handoverOffer.js';
+import enHandoverRequests from './en/handoverRequests.js';
+import enHandoverReview from './en/handoverReview.js';
+import enInsights from './en/insights.js';
+import enLeadsBoard from './en/leadsBoard.js';
+import enListingShareViews from './en/listingShareViews.js';
+import enListingShares from './en/listingShares.js';
+import enMarketChats from './en/marketChats.js';
+import enPerformance from './en/performance.js';
+import enPlatformClients from './en/platformClients.js';
+import enPlatformCompanies from './en/platformCompanies.js';
+import enPlatformFigures from './en/platformFigures.js';
+import enPlatformMetrics from './en/platformMetrics.js';
+import enPlatformTeam from './en/platformTeam.js';
+import enHelp from './en/help.js';
+import enProperties from './en/properties.js';
+import enRecordGrid from './en/recordGrid.js';
+import enRecordKeeps from './en/recordKeeps.js';
+import enRecordPanel from './en/recordPanel.js';
+import enRecordShares from './en/recordShares.js';
+import enRecordSorting from './en/recordSorting.js';
+import enTeamFinance from './en/teamFinance.js';
+
+export const crmCatalogs = {
+  agreementForm: enAgreementForm,
+  agreements: enAgreements,
+  agreementsBoard: enAgreementsBoard,
+  agreementLifecycle: enAgreementLifecycle,
+  calculators: enCalculators,
+  company: enCompany,
+  guide: enGuide,
+  clientDesk: enClientDesk,
+  dashboard: enDashboard,
+  dealPanel: enDealPanel,
+  dealParties: enDealParties,
+  dealsBoard: enDealsBoard,
+  fieldHints: enFieldHints,
+  followUps: enFollowUps,
+  viewings: enViewings,
+  handoverOffer: enHandoverOffer,
+  handoverRequests: enHandoverRequests,
+  handoverReview: enHandoverReview,
+  insights: enInsights,
+  leadsBoard: enLeadsBoard,
+  listingShares: enListingShares,
+  marketChats: enMarketChats,
+  listingShareViews: enListingShareViews,
+  performance: enPerformance,
+  platformClients: enPlatformClients,
+  platformCompanies: enPlatformCompanies,
+  platformFigures: enPlatformFigures,
+  platformMetrics: enPlatformMetrics,
+  platformTeam: enPlatformTeam,
+  help: enHelp,
+  properties: enProperties,
+  recordGrid: enRecordGrid,
+  recordKeeps: enRecordKeeps,
+  recordPanel: enRecordPanel,
+  recordShares: enRecordShares,
+  recordSorting: enRecordSorting,
+  teamFinance: enTeamFinance,
+};

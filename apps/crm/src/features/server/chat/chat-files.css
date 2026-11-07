@@ -1,0 +1,36 @@
+/* Photos and files on sent messages (F1); files chosen for a new message sit inside the
+   shared message box (src/features/server/composer/). */
+.chat-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chat-attachments .is-photo img {
+  display: block;
+  max-inline-size: min(240px, 100%);
+  max-block-size: 240px;
+  min-inline-size: 96px;
+  min-block-size: 72px;
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  border-radius: 10px;
+  object-fit: cover;
+}
+.chat-attachments .is-file a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+}
+@media (max-width: 899px) {
+  .chat-attachments .is-file a {
+    min-block-size: 44px;
+  }
+}

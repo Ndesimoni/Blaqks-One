@@ -1,0 +1,136 @@
+/* Settings → Blaqks One team (BO1b): one card listing the team, each row with its areas. */
+.platform-team-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.platform-team-head p {
+  max-width: 64ch;
+  margin: 0;
+  color: var(--muted);
+}
+.platform-staff-list {
+  display: grid;
+  margin: 0;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  list-style: none;
+}
+.platform-staff {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+.platform-staff:first-child {
+  border-top: 0;
+}
+.platform-staff-who {
+  display: grid;
+  flex: 1 1 260px;
+  gap: 2px;
+  min-width: 0;
+}
+.platform-staff-who > span {
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.platform-staff-areas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.platform-staff-areas li {
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--gold) 14%, var(--panel));
+  font-size: 12px;
+  font-weight: 600;
+}
+.platform-staff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.platform-team-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.platform-areas {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.platform-areas legend {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.platform-area {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.platform-area input {
+  margin-top: 3px;
+}
+.platform-area > span:first-child {
+  display: grid;
+  gap: 2px;
+}
+.platform-area small {
+  color: var(--muted);
+}
+.platform-staff-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  flex-basis: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--danger) 8%, var(--panel));
+}
+.platform-staff-confirm p {
+  flex: 1 1 260px;
+  margin: 0;
+}
+.platform-area {
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.platform-area > span:first-child {
+  flex: 1 1 240px;
+}
+.platform-levels {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: center;
+}
+/* Off, View and Manage sit side by side (form labels elsewhere stack). */
+:root[data-theme] .platform-levels label {
+  display: inline-flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}

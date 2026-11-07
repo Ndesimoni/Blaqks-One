@@ -1,0 +1,70 @@
+/* Platform dashboard (BO1d): the toolbar row (period chips, when the figures were read,
+   Download CSV at the end), the company usage heading and its right-aligned counts. Tiles,
+   panels and the grid come from the CRM Dashboard and the shared grid styles. */
+.platform-toolbar .grid-presets {
+  flex-wrap: wrap;
+}
+.platform-toolbar .platform-download {
+  margin-inline-start: auto;
+}
+.platform-dashboard[aria-busy='true'] :is(.kpi-tiles, .platform-trends, .platform-figures) {
+  opacity: 0.7;
+  transition: opacity var(--duration) var(--ease);
+}
+.platform-usage {
+  display: grid;
+  /* One shrinkable column: a wide table scrolls inside its card, never the page. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.platform-usage-head {
+  display: grid;
+  gap: 2px;
+}
+:root[data-theme] .platform-usage-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+}
+:root[data-theme] .platform-usage-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.usage-table tbody tr {
+  cursor: pointer;
+}
+/* Long headings wrap so the grid fits a desktop without sideways scrolling. */
+:root[data-theme] .usage-table th:not(:first-child) {
+  white-space: normal;
+}
+:root[data-theme] .usage-table .usage-num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+/* Twelve months in a tile: thinner columns, and the trend moves below the figure when the tile
+   is too narrow for both, so neither overflows. */
+.platform-dashboard .kpi-row {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.platform-dashboard .sparkbars {
+  flex: 1 1 48px;
+  min-width: 48px;
+  max-width: 96px;
+}
+.platform-dashboard .sparkbar {
+  min-width: 2px;
+}
+@media (max-width: 750px) {
+  .platform-toolbar .platform-download {
+    margin-inline-start: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .platform-dashboard[aria-busy='true'] :is(.kpi-tiles, .platform-trends, .platform-figures) {
+    transition: none;
+  }
+}

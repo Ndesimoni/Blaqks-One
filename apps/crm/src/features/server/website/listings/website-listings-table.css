@@ -1,0 +1,58 @@
+/* Website → Properties desktop table. Cells wrap so Status, Published and Actions stay in
+   view beside the sidebar; the row header keeps body text styling and opens the property. */
+:root[data-theme] .website-listings-table {
+  min-width: 860px;
+  white-space: normal;
+}
+:root[data-theme] .website-listings-table :is(td, tbody th) {
+  vertical-align: middle;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+:root[data-theme] .website-listings-table tbody th {
+  min-width: 200px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  border-bottom: 1px solid var(--line);
+}
+:root[data-theme] .website-listings-table tbody tr:last-child th {
+  border-bottom: 0;
+}
+.website-listings-table :is(time, .website-listing-actions) {
+  white-space: nowrap;
+}
+.website-listings-table .website-listing-actions {
+  flex-wrap: nowrap;
+}
+:root[data-theme] .website-listing-open {
+  min-height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition:
+    color var(--duration) var(--ease),
+    text-decoration-color var(--duration) var(--ease);
+}
+:root[data-theme] .website-listing-open:hover:not(:disabled) {
+  color: var(--primary);
+  text-decoration-color: currentColor;
+}
+.website-listing-open:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}

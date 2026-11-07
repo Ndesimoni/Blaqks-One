@@ -1,0 +1,140 @@
+.company-site {
+  --paper: #f6f4ee;
+  --panel: #fffefa;
+}
+.company-header {
+  min-height: 104px;
+  padding-inline: 5vw;
+}
+.company-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+}
+.company-wordmark:hover {
+  text-decoration: none;
+}
+.company-wordmark small {
+  font-family: Arial, sans-serif;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  margin-top: 8px;
+  color: inherit;
+}
+.company-seal {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 56px;
+  border: 1px solid var(--gold);
+  border-radius: 26px 26px 0 0;
+  color: var(--gold);
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.company-header nav {
+  font-size: 12px;
+  gap: 28px;
+}
+.company-header nav a[aria-current] {
+  text-decoration: underline;
+  text-underline-offset: 8px;
+  text-decoration-color: var(--gold);
+}
+.company-header nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.company-site .section {
+  padding-block: 80px;
+}
+.company-site .section-heading {
+  margin-bottom: 36px;
+}
+.company-site .section-heading h2 {
+  font-size: clamp(36px, 4vw, 58px);
+}
+.company-site .property-card {
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+.company-site .property-card .card-content {
+  padding: 24px 0 0;
+}
+.company-site .property-card h3 {
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+.company-site .price {
+  font-size: 20px;
+}
+.company-site .photo-label {
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 0;
+  letter-spacing: 0.1em;
+  padding: 7px 10px;
+}
+.company-site .person-card {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 32px 0;
+}
+.company-site .page-heading h1 {
+  font-size: clamp(42px, 5vw, 72px);
+}
+.company-footer {
+  background: #102e25;
+  color: #f3f0e5;
+  padding-block: 60px 28px;
+}
+.company-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 1fr;
+  gap: 60px;
+  padding-bottom: 50px;
+}
+.company-footer-grid p {
+  color: #d2d7c9;
+  font-size: 13px;
+  max-width: 300px;
+  margin-block: 24px;
+}
+.company-footer-grid > div > a:not(.company-wordmark) {
+  display: block;
+  width: fit-content;
+  font-size: 13px;
+  margin-bottom: 12px;
+  padding-block: 5px;
+}
+.company-footer small {
+  color: #bdc7bb;
+  max-width: 290px;
+  font-size: 11px;
+}
+.company-footer .company-wordmark small {
+  color: #f3f0e5;
+}
+.company-footer .footer-links > span {
+  margin: 0 auto 0 0;
+}
+.review-theme select {
+  width: 120px;
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 11px;
+  background: #fffefa;
+  color: #17352b;
+  border-color: #cbd1c5;
+}

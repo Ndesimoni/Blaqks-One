@@ -1,0 +1,26 @@
+/* The mockup's listing summary in the record slider: the shared facts card
+   (record-panel-cards.css), then the dashed gold "Private to your CRM" box. */
+.property-summary {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.property-private-box {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px dashed var(--gold);
+  border-radius: 12px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.property-private-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}

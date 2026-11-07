@@ -1,0 +1,125 @@
+.company-story {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 8%;
+  align-items: center;
+  border-top: 1px solid var(--line);
+}
+.company-story-photo {
+  position: relative;
+  padding: 0 30px 30px 0;
+}
+.company-story-photo img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 0.96;
+}
+.story-caption {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 24px 28px;
+  background: var(--green);
+  color: var(--on-green);
+  font-family: Georgia, serif;
+  font-size: 25px;
+  line-height: 1.2;
+}
+.company-story h2 {
+  font-size: clamp(38px, 4vw, 62px);
+}
+.company-story-copy > p {
+  color: var(--muted);
+  line-height: 1.9;
+  font-size: 14px;
+  max-width: 430px;
+}
+.editorial-link {
+  display: inline-block;
+  padding-block: 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--gold);
+}
+.company-story-signature {
+  border-top: 1px solid var(--line);
+  margin-top: 30px;
+  padding-top: 25px;
+  font-family: Georgia, serif;
+  font-size: 22px;
+}
+.company-story-signature small {
+  margin-top: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+}
+.section-intro {
+  color: var(--muted);
+  max-width: 330px;
+  font-size: 14px;
+  line-height: 1.9;
+  margin-bottom: 0;
+}
+.company-locations {
+  background: var(--soft);
+}
+.company-area-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
+  gap: 30px;
+}
+.company-area-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+.company-area-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.7;
+  grid-column: 1 / -1;
+}
+.company-area-card h3 {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+.company-area-card p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+.area-number {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 12px;
+  background: var(--panel);
+  padding: 7px 10px;
+}
+.company-area-card b {
+  font-size: 24px;
+  font-weight: 400;
+}
+.company-people .people-grid {
+  gap: 45px;
+}
+.company-closing {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: end;
+  border-top: 1px solid var(--line);
+  gap: 0 80px;
+}
+.company-closing > .eyebrow {
+  grid-column: 1 / -1;
+}
+.company-closing h2 {
+  font-size: clamp(46px, 5.5vw, 80px);
+  margin: 8px 0 0;
+}
+.company-closing p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}

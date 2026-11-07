@@ -1,0 +1,117 @@
+/* Motion shared by every company website: one calm, classic language in each theme's colours.
+   Movement uses transform, translate, scale and opacity only, and sits inside
+   prefers-reduced-motion: no-preference. At rest every element looks exactly as before.
+   Scroll reveal is applied by src/lib/motion/reveal.ts after hydration, never by CSS. */
+body[data-site-kind='company'] {
+  --motion-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --motion-rise: 700ms;
+  --motion-hover: 600ms;
+}
+@keyframes motion-rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+@keyframes motion-settle {
+  from {
+    scale: 1.06;
+  }
+}
+@keyframes motion-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes motion-swap {
+  from {
+    opacity: 0;
+    rotate: -90deg;
+  }
+}
+@keyframes motion-swap-back {
+  from {
+    opacity: 0;
+    rotate: 90deg;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Arrows inside links and buttons nudge 3px towards where they lead. */
+  body[data-site-kind='company'] .motion-arrow {
+    display: inline-block;
+    transition: translate 240ms var(--motion-ease);
+  }
+  body[data-site-kind='company'] :is(a, button):focus-visible .motion-arrow {
+    translate: 3px 0;
+  }
+  body[data-site-kind='company'] :is(a, button):focus-visible .motion-arrow-up {
+    translate: 2px -2px;
+  }
+  /* Disclosure icons turn as their answer opens or closes. */
+  body[data-site-kind='company']
+    :is(
+      .a-home-faq summary > span,
+      .advanced-search > summary span,
+      .a-filter-sidebar > summary > span
+    ) {
+    transition: transform 300ms var(--motion-ease);
+  }
+  body[data-site-kind='company'] .a-service-list details[open] summary::after {
+    animation: motion-swap 320ms var(--motion-ease);
+  }
+  body[data-site-kind='company'] .a-service-list details:not([open]) summary::after {
+    animation: motion-swap-back 320ms var(--motion-ease);
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  body[data-site-kind='company'] :is(a, button):hover .motion-arrow {
+    translate: 3px 0;
+  }
+  body[data-site-kind='company'] :is(a, button):hover .motion-arrow-up {
+    translate: 2px -2px;
+  }
+}
+
+/* FAQ, services and advanced-search answers open smoothly where the browser can animate to an
+   automatic height, and instantly everywhere else. */
+@supports (interpolate-size: allow-keywords) {
+  @media (prefers-reduced-motion: no-preference) {
+    body[data-site-kind='company']
+      :is(.a-service-list details, .a-home-faq details, .a-faq details, .advanced-search) {
+      interpolate-size: allow-keywords;
+    }
+    body[data-site-kind='company']
+      :is(
+        .a-service-list details,
+        .a-home-faq details,
+        .a-faq details,
+        .advanced-search
+      )::details-content {
+      block-size: 0;
+      overflow: clip;
+      overflow-clip-margin: 8px;
+      transition:
+        block-size 420ms var(--motion-ease),
+        content-visibility 420ms allow-discrete;
+    }
+    body[data-site-kind='company']
+      :is(
+        .a-service-list details,
+        .a-home-faq details,
+        .a-faq details,
+        .advanced-search
+      )[open]::details-content {
+      block-size: auto;
+    }
+  }
+}
+
+/* Reduced motion: hover zooms and lifts stay still; colour changes remain. */
+@media (prefers-reduced-motion: reduce) {
+  body[data-site-kind='company']
+    :is(.a-card-image img, .v-card-image img, .v-lifestyle-grid img, .property-image img),
+  body[data-site-kind='company'] :is(.property-card, .v-property-card, .area-card img) {
+    transform: none !important;
+  }
+}

@@ -1,0 +1,16 @@
+export default {
+  freePlan: 'Free plan',
+  usage: '{used} of {limit} seats used',
+  explainer: 'The company owner, active teammates and pending invitations use seats.',
+  full: 'All {limit} seats are in use. Contact Blaqks One to add more seats.',
+  invite: 'Invite teammate',
+  change: 'Change seat limit',
+  changeTitle: 'Change company seat limit',
+  changeBody: '{used} seats are currently in use. The new limit cannot be lower than this.',
+  limitLabel: 'Total seats',
+  limitInvalid: 'Enter a whole number of at least {used}.',
+  close: 'Close',
+  cancel: 'Cancel',
+  save: 'Save seat limit',
+  saving: 'Saving…',
+};

@@ -1,0 +1,21 @@
+/* The Dashboard's toolbar row (approved mockup): the scope, then the workload filter. */
+.dashboard-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+.dashboard-scope {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.dashboard-workload {
+  margin-inline-start: auto;
+}
+@media (max-width: 750px) {
+  .dashboard-workload {
+    margin-inline-start: 0;
+    inline-size: 100%;
+  }
+}

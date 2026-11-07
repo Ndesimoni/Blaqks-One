@@ -1,0 +1,101 @@
+body[data-site-kind='company'][data-theme='1'] .a-search {
+  border: 0;
+  background: #fff;
+  padding: 14px 18px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-purpose {
+  padding: 0;
+  margin: -14px -18px 16px;
+  border: 0;
+  gap: 5px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-purpose label > span {
+  display: block;
+  padding: 13px 32px;
+  border: 0;
+  font-size: 11px;
+  background: #ededed;
+}
+body[data-site-kind='company'][data-theme='1'] .a-purpose input:checked + span {
+  background: #fff;
+  border: 0;
+}
+body[data-site-kind='company'][data-theme='1'] .a-search-fields {
+  gap: 12px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-search-fields select {
+  font-size: 12px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-color: #dedede;
+}
+body[data-site-kind='company'][data-theme='1'] .a-search-bottom {
+  margin-top: 16px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-search-bottom > div {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-search-bottom .a-action {
+  min-height: 36px;
+  padding: 7px 13px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-clear-filters {
+  border: 0;
+  padding: 8px 0;
+  font-size: 11px;
+  background: transparent;
+  color: #222;
+}
+body[data-site-kind='company'][data-theme='1'] .a-grid {
+  gap: 32px 18px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-image img {
+  aspect-ratio: 1.08;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-heading {
+  gap: 8px;
+  margin-top: 10px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-heading h3 {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-heading > span {
+  font-size: 11px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-location {
+  font-size: 11px;
+  margin-block: 4px 10px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-facts {
+  border: 0;
+  padding: 0;
+  font-size: 11px;
+  gap: 12px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-services .a-service-grid {
+  grid-template-columns: 0.65fr 1.35fr;
+  gap: 0;
+  background: #fff;
+}
+body[data-site-kind='company'][data-theme='1'] .a-services .a-service-list {
+  padding: 28px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-service-list details {
+  border: 0;
+  padding-block: 14px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-service-list summary {
+  font-size: 23px;
+  gap: 0;
+  line-height: 1.15;
+}
+body[data-site-kind='company'][data-theme='1'] .a-service-list summary > span:first-child {
+  display: none;
+}
+body[data-site-kind='company'][data-theme='1'] .a-service-list details > :where(p, a) {
+  margin-left: 0;
+}

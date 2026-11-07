@@ -1,0 +1,61 @@
+/* Performance chart labels: the selected month's value and the hover tooltip on each bar. */
+.perf-bar-value {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.perf-col:last-child .perf-bar-value {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.perf-chart-empty {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  margin: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted-dark);
+  font-size: 13px;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+.perf-bar::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 26px);
+  left: 50%;
+  z-index: 2;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--panel);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity var(--duration) var(--ease);
+}
+.perf-col:nth-last-child(-n + 4) .perf-bar::after {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+.perf-col:nth-child(-n + 4) .perf-bar::after {
+  left: 0;
+  transform: none;
+}
+.perf-bar:hover::after {
+  opacity: 1;
+}

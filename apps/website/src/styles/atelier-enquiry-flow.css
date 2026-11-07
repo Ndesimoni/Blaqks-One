@@ -1,0 +1,89 @@
+body[data-site-kind='company'][data-theme='1'] :where(.a-enquiry-layout, .a-listing-media > div) {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  align-items: start;
+  gap: 35px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-layout {
+  margin-bottom: 70px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-form-panel {
+  padding: 26px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-form-panel .public-enquiry-form {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-form-panel h2 {
+  font-size: 29px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-context {
+  padding: 24px;
+  background: #f1f2ef;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-context > img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.4;
+  object-fit: cover;
+  margin-bottom: 24px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-context h2 {
+  font-size: 27px;
+  line-height: 1.2;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-context > p {
+  font-size: 12px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-recipient {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-recipient h3 {
+  font-size: 24px;
+  margin-block: 16px 8px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-enquiry-recipient p {
+  font-size: 13px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-media > div {
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 24px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-media article {
+  padding: 20px;
+  height: 100%;
+  background: #f1f2ef;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-media h3 {
+  font-size: 21px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-media :where(p, a) {
+  font-size: 13px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-advisor > div {
+  display: flex;
+  gap: 24px;
+  align-items: start;
+  margin-top: 25px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-advisor h3 {
+  margin: 0;
+  font-size: 24px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-listing-advisor .avatar {
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] :is(.a-enquiry-layout, .a-listing-media > div) {
+    grid-template-columns: 1fr;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-enquiry-form-panel {
+    padding: 20px;
+  }
+}

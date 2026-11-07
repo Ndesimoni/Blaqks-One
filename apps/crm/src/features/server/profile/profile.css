@@ -1,0 +1,140 @@
+/* Connected My profile: settings rows (title beside card) built on the shared panel tokens. */
+.acct-sections {
+  display: grid;
+}
+.acct-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 248px) minmax(0, 1fr);
+  gap: 32px;
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+}
+.acct-row:first-child {
+  padding-top: 8px;
+  border-top: 0;
+}
+.acct-row-intro h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+.acct-row-intro p {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.acct-row-body {
+  min-width: 0;
+}
+:root[data-theme] .panel.acct-card {
+  padding: 0;
+}
+.acct-card-body {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+}
+.acct-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 24px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--surface-subtle);
+}
+.acct-foot-status {
+  display: flex;
+  flex: 1 1 240px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+.acct-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+.acct-muted {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+:root[data-theme] .acct-success {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+.acct-status:empty {
+  display: none;
+}
+.acct-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  background: var(--danger-surface);
+}
+:root[data-theme] .acct-alert .field-error {
+  margin: 0;
+  font-size: 13px;
+}
+.acct-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.acct-chip,
+.acct-badge {
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+:is(.acct-chip-role, .acct-badge) {
+  border-color: transparent;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+@media (max-width: 900px) {
+  .acct-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 24px 0;
+  }
+}
+@media (max-width: 650px) {
+  .acct-card-body {
+    padding: 16px;
+  }
+  .acct-card-foot {
+    padding: 12px 16px;
+  }
+  .acct-actions {
+    flex: 1 1 100%;
+  }
+  .acct-actions .btn,
+  .acct-card-foot > .btn {
+    flex: 1 1 0;
+  }
+}

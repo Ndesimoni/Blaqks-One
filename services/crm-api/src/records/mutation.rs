@@ -1,5 +1,5 @@
 use super::{
-    audit,
+    audit, deal_links,
     history::{self, Change},
     links, target,
     validation::ValidatedRecord,
@@ -66,13 +66,22 @@ pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
         Some(found.id),
     )
     .await?;
+    deal_links::ensure(
+        &mut transaction,
+        workspace,
+        &user,
+        &record.links,
+        Some(&previous),
+    )
+    .await?;
     target::ensure_client(scope, collection, &record.links)?;
     let clientless = record.links.client.is_none();
+    let files = super::media_links::referenced(&record.payload);
     // assignee_id is deliberately absent: plain edits never fire the eligibility trigger.
     let sql = format!(
         "UPDATE crm_records SET legacy_id=$1,payload=$2,contact_id=$3,client_ref=$4,\
-         property_ref=$5,referral_ref=$6,version=version+1,updated_at=now() \
-         WHERE id=$7 RETURNING {ENTRY_COLUMNS}"
+         property_ref=$5,referral_ref=$6,deal_ref=$7,version=version+1,updated_at=now() \
+         WHERE id=$8 RETURNING {ENTRY_COLUMNS}"
     );
     let mut saved = sqlx::query_as::<_, Entry>(&sql)
         .bind(record.legacy_id)
@@ -81,10 +90,12 @@ pub async fn update(pool: &PgPool, update: Update<'_>) -> ApiResult<Entry> {
         .bind(record.links.client)
         .bind(record.links.property)
         .bind(record.links.referral)
+        .bind(record.links.deal)
         .bind(found.id)
         .fetch_one(&mut *transaction)
         .await?;
     let actor = update.actor;
+    super::media_links::sync(&mut transaction, workspace, actor, found.id, &files).await?;
     audit::append(
         &mut transaction,
         actor,

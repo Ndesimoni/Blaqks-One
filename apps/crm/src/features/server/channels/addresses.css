@@ -1,0 +1,71 @@
+/* Sending addresses (E3d): one full-width card under the channel grid. */
+.addresses-card .channel-head {
+  flex-wrap: wrap;
+}
+.addresses-card .channel-head > div {
+  flex: 1 1 240px;
+  min-inline-size: 0;
+}
+.addresses-card .channel-head p {
+  max-inline-size: 70ch;
+}
+.address-list {
+  display: grid;
+  gap: 10px;
+}
+.address-list > .overflow-list-item {
+  min-inline-size: 0;
+}
+.address-row {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.address-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-inline-size: 0;
+}
+.address-main strong {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 15px;
+}
+.address-row small {
+  color: var(--muted-dark);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.address-rename {
+  display: grid;
+  gap: 10px;
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--line);
+}
+.address-form {
+  grid-template-columns: minmax(0, 1fr);
+}
+.address-preview {
+  overflow-wrap: anywhere;
+}
+@media (min-width: 900px) {
+  .address-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .address-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: start;
+  }
+  .address-form > .field-error,
+  .address-form > .channel-actions {
+    grid-column: 1 / -1;
+  }
+}

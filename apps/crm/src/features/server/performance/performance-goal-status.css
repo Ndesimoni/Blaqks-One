@@ -1,0 +1,35 @@
+/* Goal status indicators: the editable/read-only mode pill and each card's status chip. */
+.goals-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.kpi-chip-good {
+  background: var(--kpi-good-surface);
+  color: var(--kpi-good);
+}
+.kpi-chip-progress {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.kpi-chip-muted {
+  background: var(--hover);
+  color: var(--muted-dark);
+}

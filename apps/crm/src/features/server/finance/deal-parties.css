@@ -1,0 +1,21 @@
+/* H3b: the deal's client and listing, read from the caller's own records. */
+.deal-parties {
+  display: grid;
+  gap: 14px;
+}
+.deal-party {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+.deal-party .finance-facts {
+  width: 100%;
+}
+.deal-party-facts {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.deal-party-photos {
+  width: 100%;
+}

@@ -1,0 +1,11 @@
+{
+  "owners": {
+    "sample": [
+      "crm_sample_records",
+      "crm_sample_accounts",
+      "crm_sample_finance",
+      "crm_sample_platform",
+      "crm_environment"
+    ]
+  }
+}

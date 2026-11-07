@@ -2,11 +2,11 @@
 
 Three fictional listing images were generated with the built-in image-generation tool in **generate** mode, visually reviewed, and converted to compact JPEGs using Chrome canvas encoding. Original generated PNGs remain in the image-generation output directory. No external image hosts or stock-photo links are required.
 
-| Asset                                | Use                             |
-| ------------------------------------ | ------------------------------- |
-| `public/demo/apartment-interior.jpg` | Residential apartment interiors |
-| `public/demo/villa-exterior.jpg`     | Villas and townhouses           |
-| `public/demo/commercial-office.jpg`  | Commercial demo listings        |
+| Asset                                         | Use                             |
+| --------------------------------------------- | ------------------------------- |
+| `apps/crm/public/demo/apartment-interior.jpg` | Residential apartment interiors |
+| `apps/crm/public/demo/villa-exterior.jpg`     | Villas and townhouses           |
+| `apps/crm/public/demo/commercial-office.jpg`  | Commercial demo listings        |
 
 Property cards and empty galleries display a **Demo photo** label. Display fallbacks do not alter stored browser records or backups. The import checkbox optionally embeds a compressed sample in a property with no uploaded photos, marked `demo: true` and `source: generated-demo`. Existing images and floor plans are preserved. Deterministic sample metadata keeps repeated import previews identical.
 

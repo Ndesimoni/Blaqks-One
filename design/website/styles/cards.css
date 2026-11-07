@@ -1,0 +1,145 @@
+.property-grid,
+.company-grid,
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.property-grid.two-card {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.people-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+}
+.property-card,
+.company-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+.property-image {
+  display: block;
+  aspect-ratio: 1.52;
+  position: relative;
+  overflow: hidden;
+}
+.property-image img {
+  width: 100%;
+  height: 100%;
+  transition: transform 180ms;
+}
+.property-image:hover img {
+  transform: scale(1.025);
+}
+.photo-label {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  font-size: 9px;
+  padding: 4px 9px;
+  letter-spacing: 0.06em;
+  background: var(--green);
+  color: var(--on-green);
+  border-radius: 3px;
+}
+.card-content {
+  padding: 20px;
+}
+.price {
+  font-size: 19px;
+  letter-spacing: -0.03em;
+}
+.property-card h3 {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  margin: 7px 0;
+}
+.property-card p {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+.facts {
+  display: flex;
+  gap: 17px;
+  font-size: 11px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.card-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  margin-top: 14px;
+}
+.card-person small {
+  font-size: 10px;
+}
+.arrow {
+  margin-left: auto;
+  font-size: 18px;
+}
+.avatar {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--green);
+  flex-shrink: 0;
+}
+.avatar.big {
+  width: 80px;
+  height: 80px;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  margin-bottom: 22px;
+}
+.person-card {
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+}
+.person-card p {
+  margin-bottom: 8px;
+}
+.public-count {
+  padding-top: 18px;
+  color: var(--green);
+}
+.company-cover {
+  height: 155px;
+  background-position: center;
+  background-size: cover;
+}
+.company-mark {
+  display: inline-flex;
+  padding: 5px 0;
+  color: var(--gold);
+  font-family: Georgia, serif;
+  font-size: 36px;
+}
+.company-card h2 {
+  font-size: 27px;
+  margin: 14px 0;
+}
+.public-totals {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 18px 0;
+  font-size: 12px;
+}
+.public-totals strong {
+  font-size: 17px;
+  margin-right: 4px;
+}

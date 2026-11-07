@@ -1,0 +1,116 @@
+/* Website management lists (Companies, Enquiries): toolbar, notes, table, cards, loading. */
+.website-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+}
+.website-list-head h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+.website-list-head p,
+.website-list-note {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.website-list-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+.website-list-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.website-list-status {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+/* The live region stays rendered for announcements but takes no space while empty. */
+.website-list-status:empty {
+  position: absolute;
+}
+.website-list-filters {
+  display: grid;
+  grid-template-columns: minmax(200px, 2fr) minmax(180px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 16px;
+}
+.website-list-filters .field {
+  min-width: 0;
+  margin: 0;
+}
+.website-list-filters :is(input, select) {
+  width: 100%;
+}
+/* Unlike record tables, these cells wrap so the actions stay in view beside the sidebar. */
+.website-list-table {
+  min-width: 760px;
+  white-space: normal;
+}
+.website-list-table td {
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+.website-list-table :is(.badge, .btn, time, .website-list-nowrap) {
+  white-space: nowrap;
+}
+/* Room for a typical website address on one line; longer ones still wrap. */
+.website-list-table .website-list-address {
+  min-width: 15rem;
+}
+.website-list-sub {
+  display: block;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.website-list-cards {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.website-list-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+.website-list-card h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.website-list-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+.website-list-card dt {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.website-list-card dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.website-list-card .btn {
+  width: 100%;
+}
+@media (max-width: 800px) {
+  .website-list-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

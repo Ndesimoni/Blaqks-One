@@ -1,0 +1,113 @@
+/* NAV5 (owner, 2026-11-01): Bitrix24's top bar names the product and the page, then Create. */
+.connected-shell .top-left {
+  flex: 1 1 auto;
+  gap: 8px;
+}
+.header-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-inline-size: 0;
+}
+.header-crumb {
+  flex: none;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.header-page {
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.create-menu {
+  position: relative;
+  flex: none;
+}
+.create-button {
+  gap: 6px;
+}
+.create-panel {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: calc(100% + 8px);
+  z-index: 50;
+  display: grid;
+  inline-size: 220px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: 0 18px 40px rgba(13, 31, 23, 0.18);
+}
+.create-hint {
+  padding: 8px 10px 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.create-panel button {
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+.create-panel button:hover {
+  background: var(--hover);
+}
+/* A record page's View only chip and Import sit above its tools, at the end of the row. */
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-block-end: 16px;
+}
+.page-actions:empty {
+  display: none;
+}
+/* The company, named under the product in the always-dark section sidebar. */
+.section-sidebar-company {
+  margin: -12px 8px 16px;
+  overflow: hidden;
+  color: rgba(246, 244, 239, 0.72);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 750px) {
+  /* Phones keep 44px controls but tighter gaps, leaving the page name more room. */
+  :root[data-theme] .connected-shell .topbar {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+  :root[data-theme] .connected-shell .top-actions {
+    gap: 4px;
+  }
+  .header-crumb {
+    display: none;
+  }
+  .header-page {
+    font-size: 17px;
+  }
+  .create-button {
+    inline-size: 44px;
+    padding-inline: 0;
+    justify-content: center;
+  }
+  .create-label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

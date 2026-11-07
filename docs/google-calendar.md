@@ -6,7 +6,7 @@ The Calendar screen at `/#/calendar` combines follow-ups, property viewings, cli
 
 ## Connect your account
 
-The integration uses the Rust/Axum service in `backend/`. Install Rust 1.89 or later and Node.js 20 or later.
+The integration uses the Rust/Axum service in `services/calendar-companion/`. Install Rust 1.89 or later and Node.js 20 or later.
 
 1. Open the [Google Cloud console](https://console.cloud.google.com/), create or select a project, and enable the **Google Calendar API**.
 2. Configure the OAuth consent screen in Google Auth Platform. For a personal test, add your Google account as a test user. Request these scopes:
@@ -18,7 +18,7 @@ The integration uses the Rust/Axum service in `backend/`. Install Rust 1.89 or l
    http://localhost:5173/api/calendar/oauth/callback
    ```
 
-4. Open `backend/.env` and enter the client ID and client secret there. If this file is missing in a fresh checkout, copy `backend/.env.example` to `backend/.env`. Keep an existing `CALENDAR_ENCRYPTION_KEY`; if it is blank, generate it once with `openssl rand -hex 32`. Keep that key and the encrypted store together. Never place the secret or key in a `VITE_` variable or a frontend file.
+4. Open `services/calendar-companion/.env` and enter the client ID and client secret there. If this file is missing in a fresh checkout, copy `services/calendar-companion/.env.example` to `services/calendar-companion/.env`. Keep an existing `CALENDAR_ENCRYPTION_KEY`; if it is blank, generate it once with `openssl rand -hex 32`. Keep that key and the encrypted store together. Never place the secret or key in a `VITE_` variable or a frontend file.
 5. From the project root, start the service in one terminal:
 
    ```bash
@@ -51,7 +51,7 @@ This follows Google's [authorization code flow](https://developers.google.com/id
 
 CRM records remain in the existing browser storage. Scheduling fields are additional record metadata and survive version-2 full JSON backups. The original workbook remains a 17-sheet export; the new scheduling metadata is not exported to Excel, so use a full JSON backup to retain it.
 
-The backend persists encrypted Google tokens, event IDs and queued desired changes in `backend/data/calendar.enc`. Authorization uses a browser-bound, single-use OAuth state and PKCE; mutations also require an origin check and session CSRF token. The browser receives connection and activity status, never Google tokens. Failed disk writes do not acknowledge new queue changes, and retries reuse stable event IDs.
+The backend persists encrypted Google tokens, event IDs and queued desired changes in `services/calendar-companion/data/calendar.enc`. Authorization uses a browser-bound, single-use OAuth state and PKCE; mutations also require an origin check and session CSRF token. The browser receives connection and activity status, never Google tokens. Failed disk writes do not acknowledge new queue changes, and retries reuse stable event IDs.
 
 Keep the backend running for pending changes to finish while the browser is closed. Edits must reach the backend before closing the browser; changes made with the service offline upload on the next open session. A stale tab cannot upload over a newer browser-storage snapshot, and an unreadable local workspace does not upload an empty replacement schedule.
 
@@ -64,8 +64,8 @@ npm test
 npm run test:calendar
 npm run build
 PLAYWRIGHT_CHANNEL=chrome npm run test:e2e
-cargo clippy --locked --manifest-path backend/Cargo.toml --all-targets -- -D warnings
-cargo fmt --manifest-path backend/Cargo.toml -- --check
+cargo clippy --locked --manifest-path services/calendar-companion/Cargo.toml --all-targets -- -D warnings
+cargo fmt --manifest-path services/calendar-companion/Cargo.toml -- --check
 npm run format:check
 ```
 

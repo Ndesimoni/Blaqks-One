@@ -1,0 +1,84 @@
+/* Shared company-site refinements; theme 1 and 2 rules override these where they differ. */
+.contact-links a,
+.location-actions > a,
+.listing-agent {
+  gap: 6px;
+}
+.public-enquiry-form .button {
+  gap: 8px;
+}
+.desktop-nav a[aria-current='page'] {
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+.mobile-menu nav a[aria-current='page'] {
+  font-weight: 600;
+}
+.property-card {
+  transition:
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+.property-card:hover {
+  box-shadow: 0 14px 34px rgb(13 39 18 / 0.08);
+}
+body[data-theme='4'] .property-card:hover {
+  border-color: #4f6c5e;
+  box-shadow: 0 16px 36px rgb(0 0 0 / 0.28);
+}
+.card-developer {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+.card-developer a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 3px;
+}
+.card-developer a:hover {
+  text-decoration-color: currentColor;
+}
+.contact-form-panel {
+  padding: 32px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+.contact-layout {
+  align-items: start;
+}
+.contact-form-panel .public-enquiry-form {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.contact-form-panel .notice {
+  margin-block: 12px 20px;
+}
+.contact-layout .prose > .button {
+  margin-block: 8px 28px;
+}
+.a-preview-result h2 {
+  font-size: 28px;
+}
+.a-preview-result p {
+  margin-bottom: 20px;
+}
+@media (max-width: 760px) {
+  /* The header is 16px from each edge; this aligns the menu with the 20px page gutter. */
+  .mobile-menu nav {
+    left: 4px;
+    right: 4px;
+    width: auto;
+  }
+  .contact-form-panel {
+    padding: 20px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .property-card,
+  .developer-strip a {
+    transition: none;
+  }
+}

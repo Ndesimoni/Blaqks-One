@@ -1,7 +1,9 @@
 use super::{
+    finance_access::FinanceAccess,
     grants::RecordActions,
     permissions::{ChannelAccess, Permissions},
 };
+use crate::workspaces::platform::areas;
 use serde::Serialize;
 use serde_json::Value;
 use sqlx::{types::Json, FromRow};
@@ -24,14 +26,26 @@ pub struct UserRow {
     pub record_scope: String,
     /// Raw `crm_users.actions`, decoded leniently by `Actions::from_stored`.
     pub actions: Json<Value>,
+    /// Interface language (migration 0021). Only own-account payloads read it; rows from
+    /// views without the column (the team directory) leave it out.
+    #[sqlx(default)]
+    pub language: Option<String>,
+    /// Automatic field hints (migration 0026). Own-account rows only, like `language`.
+    #[sqlx(default)]
+    pub guidance_enabled: Option<bool>,
+    /// A Blaqks One team member's position and `{area: level}` access (migration 0091),
+    /// from the identity views; every other row leaves them empty.
+    #[sqlx(default)]
+    pub platform_preset: Option<String>,
+    #[sqlx(default)]
+    pub platform_access: Option<Json<Value>>,
 }
 
 impl UserRow {
-    /// Admins and the Super Admin see their whole team by role; staff need the grant.
-    /// An allowlist, so any other role string falls back to assigned-only.
+    /// Admins see their whole team by role; staff need the grant. An allowlist, so Blaqks
+    /// One (which holds no CRM, BO1a item 11) and any other role fall back to assigned-only.
     pub fn has_team_scope(&self) -> bool {
-        matches!(self.role.as_str(), "admin" | "super-admin")
-            || (self.role == "staff" && self.record_scope == "team")
+        self.role == "admin" || (self.role == "staff" && self.record_scope == "team")
     }
 
     pub fn record_scope_label(&self) -> &'static str {
@@ -42,10 +56,11 @@ impl UserRow {
         }
     }
 
-    /// Role allowlist: any role other than the three known ones gets nothing.
+    /// Role allowlist: Admins hold every module and staff their grants; Blaqks One and any
+    /// other role get nothing (BO1a item 11).
     pub fn effective_permissions(&self) -> Permissions {
         match self.role.as_str() {
-            "admin" | "super-admin" => Permissions::full(),
+            "admin" => Permissions::full(),
             "staff" => self.permissions.0.clone(),
             _ => Permissions::default(),
         }
@@ -63,6 +78,7 @@ pub struct Profile {
     pub name: String,
     pub email: String,
     pub phone: String,
+    pub phone_verified: bool,
     pub role: String,
     pub role_id: String,
     pub owner_id: Uuid,
@@ -75,6 +91,17 @@ pub struct Profile {
     pub record_scope: String,
     pub actions: Value,
     pub record_actions: BTreeMap<&'static str, RecordActions>,
+    pub finance_access: FinanceAccess,
+    /// Allowlisted; absent from team payloads, so no one sees another member's choice.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<&'static str>,
+    /// Own-account field hint preference; absent from team payloads like `language`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guidance_enabled: Option<bool>,
+    /// The Blaqks One `{area: level}` the browser shows pages for (BO1b): every area at its
+    /// highest level for the Owner, the saved levels for platform staff, none for company
+    /// members. The server decides every request.
+    pub platform_access: BTreeMap<&'static str, &'static str>,
 }
 
 impl From<UserRow> for Profile {
@@ -83,17 +110,17 @@ impl From<UserRow> for Profile {
         let record_scope = user.record_scope_label().into();
         let actions = user.profile_actions();
         let record_actions = user.record_actions();
+        let finance_access = user.finance_access();
+        let language = user.language.as_deref().map(super::account::language::code);
+        let platform_access = areas::to_map(&areas::granted(&user));
+        let role = user.role_label();
         Self {
             id: user.id,
             name: user.name,
             email: user.email,
             phone: user.phone,
-            role: match user.role.as_str() {
-                "super-admin" => "Super Admin",
-                "admin" => "Admin",
-                _ => "Staff",
-            }
-            .into(),
+            phone_verified: false,
+            role,
             manages_team: matches!(user.role.as_str(), "admin" | "super-admin"),
             role_id: user.role,
             owner_id: user.owner_id.unwrap_or(user.id),
@@ -105,6 +132,10 @@ impl From<UserRow> for Profile {
             record_scope,
             actions,
             record_actions,
+            finance_access,
+            language,
+            guidance_enabled: user.guidance_enabled,
+            platform_access,
         }
     }
 }

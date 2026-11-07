@@ -1,0 +1,5 @@
+@media (prefers-reduced-motion: reduce) {
+  .signup-step {
+    animation: none;
+  }
+}

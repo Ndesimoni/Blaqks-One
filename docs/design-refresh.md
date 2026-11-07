@@ -15,7 +15,7 @@ This stage implements the shared product design standards across the active fron
 
 ## Code organisation
 
-`src/app/App.jsx` owns providers and routing. `WorkspaceLayout.jsx` composes the shell; `WorkspaceNotices.jsx`, `WorkspaceNotifications.jsx` and `WorkspaceDialogs.jsx` own recovery notices, transient feedback and shared overlays/file inputs.
+`apps/crm/src/app/App.jsx` owns providers and routing. `WorkspaceLayout.jsx` composes the shell; `WorkspaceNotices.jsx`, `WorkspaceNotifications.jsx` and `WorkspaceDialogs.jsx` own recovery notices, transient feedback and shared overlays/file inputs.
 
 `PageHeading.jsx` delegates file actions to `DataExportMenu.jsx`. `WorkspaceSearch.jsx` owns keyboard/mobile search presentation without moving records or changing search contracts.
 

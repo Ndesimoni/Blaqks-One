@@ -1,0 +1,128 @@
+/* Inbox rules as the approved mockup's cards (design queue item 18). */
+.rules-tag {
+  justify-self: start;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--hover);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+.rules-route {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+  color: var(--ink);
+  font-size: 14px;
+}
+/* Suggest or create: the mockup's choice cards. */
+.rules-choices {
+  margin: 0;
+  border: 0;
+}
+.rules-choices label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.rules-choices label.is-selected {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.rules-choices input {
+  margin-block-start: 3px;
+  accent-color: var(--primary);
+}
+.rules-choices label > span,
+.rules-list li > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.rules-choices small,
+.rules-list small {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.rules-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rules-chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-block: 2px;
+  padding-inline: 10px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.rules-chips button {
+  inline-size: 24px;
+  block-size: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+}
+.rules-chips button:hover {
+  background: var(--line);
+  color: var(--ink);
+}
+.rules-add {
+  display: flex;
+  gap: 8px;
+  margin-block-start: 12px;
+}
+.rules-add input {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  min-block-size: 40px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+}
+/* The lead sources switch is the card's only row, so it needs no divider. */
+.rules-page .profile-switch-row {
+  padding-block-end: 0;
+  border-bottom: 0;
+}
+/* Blocked senders: one row each, Unblock on the right. */
+.rules-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rules-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--line);
+}
+@media (max-width: 899px) {
+  .rules-chips li {
+    min-block-size: 36px;
+  }
+  .rules-chips button {
+    inline-size: 44px;
+    block-size: 44px;
+    margin-block: -4px;
+    margin-inline-end: -6px;
+  }
+}

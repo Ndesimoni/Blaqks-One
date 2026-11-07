@@ -1,0 +1,76 @@
+@media (max-width: 760px) {
+  .admin-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .admin-header > .muted {
+    width: 100%;
+  }
+  .editor-layout,
+  .platform-layout {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 24px;
+  }
+  .editor-rail {
+    border: 0;
+    padding: 0;
+  }
+  .editor-rail nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 15px 0;
+  }
+  .editor-rail nav a {
+    padding: 10px 8px;
+    font-size: 11px;
+  }
+  .editor-header {
+    flex-direction: column;
+  }
+  .editor-header > div:last-child {
+    display: flex;
+  }
+  .row-list > div {
+    flex-wrap: wrap;
+  }
+  .overview-intro {
+    padding: 22px;
+  }
+  .overview-intro h2 {
+    font-size: 30px;
+  }
+  .footer {
+    padding: 35px 20px;
+  }
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .footer-top h2 {
+    font-size: 32px;
+  }
+  .footer-links {
+    gap: 20px;
+  }
+  .footer-links > span {
+    margin-left: 0;
+    width: 100%;
+  }
+  .review-bar {
+    padding: 7px 12px;
+    gap: 13px;
+    font-size: 10px;
+    flex-wrap: wrap;
+    min-height: 60px;
+  }
+  .review-bar strong {
+    font-size: 8px;
+  }
+  .review-note {
+    display: none;
+  }
+  .theme-links .button {
+    width: 100%;
+  }
+}

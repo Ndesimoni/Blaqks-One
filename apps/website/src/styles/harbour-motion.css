@@ -1,0 +1,25 @@
+/* Harbour (company theme 1) homepage entrance. Not an atelier-* file, so theme 2 never copies
+   it. The headline, introduction and Book a call rise in turn; the photograph settles inside
+   its clipped frame; the search panel rises last. The header never moves. */
+@media (prefers-reduced-motion: no-preference) {
+  body[data-site-kind='company'][data-theme='1']
+    :is(.a-hero h1, .a-hero-note p, .a-hero-intro .a-action, .a-hero-search) {
+    animation: motion-rise var(--motion-rise) var(--motion-ease) backwards;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-hero-note p {
+    animation-delay: 100ms;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-hero-intro .a-action {
+    animation-delay: 200ms;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-hero-search {
+    animation-delay: 360ms;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-house > img {
+    animation: motion-settle 1800ms cubic-bezier(0.25, 0.6, 0.3, 1) backwards;
+  }
+  /* Published heroes show the photograph unframed, so it only fades in. */
+  body[data-site-kind='company'][data-theme='1'] .a-hero > .a-hero-image {
+    animation: motion-fade 1200ms ease-out backwards;
+  }
+}

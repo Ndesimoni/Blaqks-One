@@ -1,0 +1,55 @@
+/* Posting a request (packet MK2): the client picker as a bounded, searchable list, then the
+   form, a preview of what the board shows and the client's consent. Light and dark. */
+.market-picker {
+  display: grid;
+  gap: 12px;
+}
+.market-client-list {
+  display: grid;
+  gap: 6px;
+  max-height: min(420px, 55dvh);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+}
+.market-client {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease);
+}
+.market-client:hover,
+.market-client:focus-visible {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.market-band {
+  grid-column: 1 / -1;
+}
+.market-preview {
+  margin-top: 4px;
+  box-shadow: none;
+}
+.market-preview .market-fields {
+  gap: 12px 20px;
+}
+.market-consent {
+  margin: 4px 0;
+}
+.field-wide {
+  grid-column: 1 / -1;
+}

@@ -1,0 +1,105 @@
+@import './team-finance-fields.css';
+
+/* Team & access → Finance settings (design queue item 16). */
+.team-finance {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.team-finance[hidden] {
+  display: none;
+}
+.team-finance-settings {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.team-finance-panel {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  padding: 20px 24px;
+}
+.team-finance-heading h3 {
+  margin: 0 0 4px;
+  font: 600 16px var(--display);
+}
+.team-finance-heading p,
+.team-finance-hint,
+.team-finance-empty {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.team-finance-approval-note,
+.team-finance-note {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.55;
+}
+:root[data-theme] .team-finance-approval-note {
+  padding: 14px 16px;
+  border-left: 3px solid var(--primary);
+  background: var(--accent-subtle);
+}
+.team-finance-note {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.team-finance-fixed,
+.team-finance-status,
+.team-finance-save-status {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.team-finance-fixed strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.team-finance-save-bar,
+.team-finance-actions,
+.team-finance-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+:root[data-theme] .team-finance-save-bar {
+  justify-content: space-between;
+  padding: 14px 24px;
+}
+.team-finance-save-status {
+  flex: 1 1 240px;
+}
+.team-finance-actions {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+.team-finance-recovery {
+  justify-content: flex-end;
+}
+.team-finance-status:empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (max-width: 650px) {
+  .team-finance-panel,
+  :root[data-theme] .team-finance-save-bar {
+    padding: 16px;
+  }
+  .team-finance-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+  .team-finance-actions .btn {
+    flex: 1 1 auto;
+  }
+}

@@ -1,0 +1,20 @@
+body[data-site-kind='company'][data-theme='2'] .v-search-fields .v-button {
+  gap: 10px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-footer-brand > svg {
+  width: 36px;
+  height: 36px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-footer-brand > span {
+  font-size: 22px;
+  max-width: 260px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-footer-brand small {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+body[data-site-kind='company'][data-theme='2'] .v-photo-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

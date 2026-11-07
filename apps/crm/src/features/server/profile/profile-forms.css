@@ -1,0 +1,131 @@
+/* My profile forms: details grid, password reveal toggle, strength meter and match hint. */
+.acct-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  align-items: start;
+}
+:root[data-theme] .acct-form .field {
+  gap: 6px;
+}
+:root[data-theme] .acct-form .field-error {
+  margin: 0;
+  font-size: 13px;
+}
+.acct-hint {
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.acct-password-fields > .field {
+  max-width: 480px;
+}
+.acct-password {
+  position: relative;
+}
+:root[data-theme] .field .acct-password input {
+  width: 100%;
+  padding-right: 48px;
+}
+:root[data-theme] .acct-reveal {
+  display: grid;
+  position: absolute;
+  inset: 0 0 0 auto;
+  place-items: center;
+  width: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0 9px 9px 0;
+  background: transparent;
+  color: var(--muted-dark);
+}
+:root[data-theme] .acct-reveal:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--ink);
+}
+:root[data-theme] .acct-reveal:focus-visible {
+  outline-offset: -3px;
+}
+.acct-strength {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-top: 4px;
+}
+.acct-strength-bar {
+  display: grid;
+  flex: 0 0 152px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.acct-strength-bar span {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background-color var(--duration) var(--ease);
+}
+.acct-strength[data-score='1'] .on {
+  background: var(--danger);
+}
+.acct-strength[data-score='2'] .on {
+  background: var(--gold);
+}
+:is(.acct-strength[data-score='3'], .acct-strength[data-score='4']) .on {
+  background: var(--primary);
+}
+:root[data-theme] .acct-strength-label {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.acct-strength-label strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+:root[data-theme] .acct-match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.acct-match svg {
+  color: var(--danger);
+}
+:root[data-theme] .acct-match.is-match,
+.acct-match.is-match svg {
+  color: var(--primary);
+}
+:root[data-theme] .btn.acct-btn-danger {
+  color: var(--danger);
+}
+:root[data-theme] .btn.acct-btn-danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--danger-surface);
+}
+.btn.acct-loading::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: acct-spin 0.7s linear infinite;
+}
+@keyframes acct-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn.acct-loading::before {
+    animation: none;
+    border-right-color: currentColor;
+    opacity: 0.6;
+  }
+}
+@media (max-width: 650px) {
+  .acct-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

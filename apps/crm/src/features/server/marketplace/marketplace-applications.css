@@ -1,0 +1,61 @@
+/* The platform queue for marketplace applications (packet MK1a): one card per company with
+   its state, who applied, the counts behind its checklist and the decisions it allows. */
+.market-applications {
+  display: grid;
+  gap: 12px;
+  max-width: 880px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-application {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.market-application-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.market-application-head > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.market-application-head strong {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.market-application .market-detail {
+  color: var(--muted);
+  font-size: 13px;
+}
+:root[data-theme] .market-application .market-counts {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.market-application .market-reason {
+  margin: 0;
+}
+.market-application .market-application-actions {
+  justify-content: flex-end;
+}
+.market-decision-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

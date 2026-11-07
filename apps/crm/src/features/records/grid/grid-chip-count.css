@@ -1,0 +1,13 @@
+/* A count on a preset chip (the approvers' Waiting for approval queue, Blaqks One's client
+   stages), set apart from the chip's name. */
+.grid-chip-count {
+  display: inline-block;
+  min-width: 22px;
+  margin-inline-start: 8px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}

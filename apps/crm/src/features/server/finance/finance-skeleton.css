@@ -1,0 +1,37 @@
+/* Finance page loading placeholders. Loaded after finance-decisions.css. */
+.finance-skeleton-block {
+  display: block;
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  animation: finance-skeleton-pulse 1.4s ease-in-out infinite;
+}
+.finance-skeleton-block.is-head {
+  height: 84px;
+  border: 1px solid var(--line);
+}
+.finance-skeleton-block.is-filters {
+  height: 44px;
+}
+.finance-skeleton-table {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--line);
+}
+.finance-skeleton-block.is-row {
+  height: 60px;
+  border-radius: 0;
+  background: var(--panel);
+}
+@keyframes finance-skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .finance-skeleton-block {
+    animation: none;
+  }
+}

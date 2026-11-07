@@ -3,10 +3,12 @@
 //!
 //! There is deliberately no password environment variable: the binary loads `.env`, so
 //! one could silently come from a file. The password comes only from a hidden terminal
-//! prompt (typed twice) or one piped line; blank generates a password per account.
+//! prompt (typed twice) or one piped line; blank generates a password per account. Both
+//! follow the new-password policy: the random part gets a fixed "-Kw1" suffix so every
+//! generated password has an uppercase and lowercase letter, a number and a symbol.
 use super::{failed, target::UNCHANGED, Outcome};
 use crate::{
-    auth::{password, session},
+    auth::{password, password_policy, session},
     bootstrap,
 };
 use std::io::{self, IsTerminal};
@@ -23,8 +25,8 @@ pub async fn credentials(count: usize) -> Outcome<Vec<Credential>> {
     }
     let prompt = "Sample staff password (leave blank to generate one per account): ";
     let shared = bootstrap::prompt_secret(prompt).map_err(failed)?;
-    if !shared.is_empty() && !password::valid_length(&shared) {
-        return Err(format!("Passwords need 8 to 1024 bytes.{UNCHANGED}"));
+    if !shared.is_empty() && !password_policy::strong(&shared) {
+        return Err(format!("{}{UNCHANGED}", password_policy::WEAK_PASSWORD));
     }
     if !shared.is_empty() && io::stdin().is_terminal() {
         let again = bootstrap::prompt_secret("Confirm password: ").map_err(failed)?;
@@ -36,7 +38,7 @@ pub async fn credentials(count: usize) -> Outcome<Vec<Credential>> {
     for _ in 0..count {
         let generated = shared
             .is_empty()
-            .then(|| session::random_token()[..20].to_owned());
+            .then(|| format!("{}-Kw1", &session::random_token()[..20]));
         let plain = generated.clone().unwrap_or_else(|| shared.clone());
         let hash = password::hash(plain).await.map_err(failed)?;
         credentials.push(Credential { generated, hash });

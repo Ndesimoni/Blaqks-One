@@ -6,6 +6,7 @@ Connected CRM teams are stored in Docker PostgreSQL and enforced by the Rust API
 
 - The single **Super Admin** oversees all Admins and teams. The owner may invite Admins from the organisation workspace and manage staff in the selected team.
 - An **Admin** owns a workspace and may invite, configure, suspend and restore only that workspace's staff. An Admin cannot create another Admin, change ownership or promote anyone to Super Admin.
+- The verified sign-up flow is the only other Admin-creation path. It creates one Admin and one new company together; it cannot create staff, a Super Admin or membership in an existing company. It remains local-development only until the hosted-delivery safeguards are complete.
 - A **staff member** joins the owning Admin's existing workspace. Their records remain in that workspace, rather than a new personal workspace. Staff cannot manage the team, invite members or switch to another Admin's workspace.
 - Existing account IDs, workspace IDs, CRM records and SQL migrations are preserved. Migration 4 adds team membership, permission grants, invitation state and redacted team activity. No example staff accounts are inserted into your real database.
 
@@ -75,7 +76,7 @@ Additional routes are `GET /workspaces/:workspace/team/:id/archive-preview`, `DE
 
 The API applies migrations 4 and 5 on startup. You can also run `npm run db:migrate` to apply pending migrations without starting another API listener. Stop the old Rust process and restart `npm run dev:api` after updating the code. Existing Docker volumes must remain intact. Refresh the frontend after its development server picks up the changes.
 
-Team routes are `GET /workspaces/:workspace/team`, `POST /workspaces/:workspace/team/invitations`, `PATCH /workspaces/:workspace/team/:id` and `POST /workspaces/:workspace/team/:id/invitations` for renewal. Public activation uses `POST /auth/invitations/inspect` and `POST /auth/invitations/accept`. All paths are under `/api/crm`; invitation secrets are sent in request bodies rather than API query strings. The browser activation link keeps its token in the hash route, which is not sent to the web server.
+Team routes are `GET /workspaces/:workspace/team`, `POST /workspaces/:workspace/team/invitations`, `PATCH /workspaces/:workspace/team/:id` and `POST /workspaces/:workspace/team/:id/invitations` for renewal. Every customer company starts with 3 total seats, including its owner; active staff and live pending invitations consume the rest. Invitation creation, renewal, activation, restoration and sample seeding all enforce the company limit under the workspace lock. The Super Admin can change a customer company's limit as platform metadata through `PUT /workspaces/:workspace/company/seat-limit`, but cannot set it below current usage; every change is versioned and audited. Public activation uses `POST /auth/invitations/inspect` and `POST /auth/invitations/accept`. All paths are under `/api/crm`; invitation secrets are sent in request bodies rather than API query strings. The browser activation link keeps its token in the hash route, which is not sent to the web server.
 
 ## Verification
 

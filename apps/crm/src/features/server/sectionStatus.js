@@ -1,0 +1,90 @@
+import { descriptions } from '../../config/navigation.js';
+
+import { connectedCollections } from './records.js';
+import { WEBSITE_ROUTES } from './website/websiteRoutes.js';
+import { isPlatformMember } from './platformAccess.js';
+
+const connectedSections = new Set([
+  ...Object.keys(WEBSITE_ROUTES),
+  ...connectedCollections,
+  'Leads',
+  'Company',
+  'Team & access',
+  'Blaqks One team',
+  'Help',
+  'Help requests',
+  'Dashboard',
+  'Client desk',
+  // Finance (finance-design §7): Deals, Payments and Expenses come from `GET /finance`.
+  'Deals',
+  'Payments',
+  'Expenses',
+  // Targets are served by `/performance/targets`; actuals come from scoped records and finance.
+  'Performance',
+  'CRM insights',
+  'Date search',
+  'Calculators',
+  'Guide',
+  // The member's own account under `/auth/account` and `/auth/sessions`.
+  'My profile',
+  'Website profile',
+  'Sign-in and security',
+  // `GET /activity`: the whole workspace for managers, the member's own actions for staff.
+  'Team activity',
+  // `/channels`: the Admin's connections registry (packet X1).
+  'Channels',
+  // `/inbox`: the shared Inbox (packets X3, U1).
+  'Inbox',
+  // `/chat`: team channels and private messages (packets C1, C2).
+  'Team chat',
+  // `/inbox-rules`: the Admin's lead rules (packet U2).
+  'Inbox rules',
+  // `/mailbox`: each member's own Google mailbox (packets E1a, E1d).
+  'My mailbox',
+  'Google sign-in',
+  // `/whatsapp-numbers`: the member's own WhatsApp number (packet W1a).
+  'My WhatsApp',
+  // `/agreements`: cross-company deal agreements (packet A2 screens).
+  'Agreements',
+  // `/marketplace`: company eligibility, the switch and the platform's decisions (MK1).
+  'Marketplace',
+  'My requests',
+  'Marketplace updates',
+  'Broker profile',
+  'Marketplace chats',
+  'Marketplace applications',
+  // `/platform/metrics`: Blaqks One's platform figures (BO1d).
+  'Platform dashboard',
+  // `/platform/clients`: Blaqks One's own sales clients (BO1e).
+  'Blaqks One clients',
+]);
+/** Workspaces is connected for the Super Admin only, as the platform's company list. */
+export const isConnectedSection = (name, user) =>
+  connectedSections.has(name) || (name === 'Workspaces' && isPlatformMember(user));
+export const isRecordSection = (name) => name === 'Leads' || connectedCollections.includes(name);
+
+const purposes = {
+  Dashboard: 'Review your business priorities and workspace overview.',
+  'Client desk': 'Search client requirements and find suitable properties.',
+  'CRM insights': 'Review opportunities and understand your CRM activity.',
+  'Date search': 'Find workspace records by their dates.',
+  Performance: 'Review targets and business performance.',
+  Guide: 'Learn how to use your CRM workspace.',
+  'My profile': 'Review your account, update your details and manage sign-in security.',
+  Company: 'Keep your company details, marketplace switch and seats in one place.',
+  'Website profile': 'Choose how you appear on your company website and the Blaqks One website.',
+  'Sign-in and security': 'Change your password and sign out devices you do not recognise.',
+  Workspaces: 'Review the workspaces this account is permitted to open.',
+  'Team activity': 'Review who changed what in this workspace, and when.',
+  'My activity': 'Review the changes you have made in this workspace.',
+  Marketplace:
+    'Post what your clients are looking for; brokers with a matching property answer privately.',
+  'Blaqks One clients':
+    'Brokerages and agents interested in Blaqks One, worked by your team. Never a company’s clients.',
+  'Marketplace applications':
+    'Companies that asked for marketplace access. You see their names, ages, who applied and the counts, never their records.',
+};
+
+export function sectionDescription(name) {
+  return purposes[name] || descriptions[name] || 'Review your selected workspace.';
+}

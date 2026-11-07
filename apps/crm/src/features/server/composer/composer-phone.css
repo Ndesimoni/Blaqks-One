@@ -1,0 +1,42 @@
+/* The message row on touch screens: a 44px "+", and on phones a round arrow for Send, as in
+   messenger apps, so the typing box keeps its width. The word stays for screen readers. */
+@media (max-width: 899px) {
+  .composer-tool {
+    inline-size: 40px;
+    block-size: 40px;
+  }
+  .composer-tools {
+    padding: 1px;
+  }
+  .composer-attach {
+    inline-size: 44px;
+    block-size: 44px;
+    margin-block-end: 0;
+  }
+  .composer-group.has-attach .composer-meta {
+    padding-inline-start: 67px;
+  }
+}
+@media (max-width: 599px) {
+  :root[data-theme] .composer-row > .btn {
+    position: relative;
+    inline-size: 44px;
+    padding: 0;
+    border-radius: 50%;
+  }
+  .composer-row > .btn > span {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+/* iPhone Safari zooms into any field under 16px when tapped; touch screens get 16px text. */
+@media (pointer: coarse) {
+  .composer-box .composer-input {
+    font-size: 16px;
+  }
+}

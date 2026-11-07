@@ -1,0 +1,39 @@
+/* Questions that open and close. */
+.faq {
+  max-width: 820px;
+  margin-inline: auto;
+  border-top: 1px solid var(--edge-2);
+}
+.faq-item {
+  border-bottom: 1px solid var(--edge-2);
+}
+.faq-item > h3 {
+  font-size: 19px;
+}
+.faq-item button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+}
+.faq-item i {
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--gold-ink);
+  display: inline-block;
+}
+.faq-body {
+  overflow: hidden;
+}
+.faq-body p {
+  padding-bottom: 20px;
+  color: var(--text-2);
+  max-width: 44em;
+}

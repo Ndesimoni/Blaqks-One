@@ -1,0 +1,44 @@
+/* Bitrix24's list toolbar (approved mockup): Add starts the filter row and the count lives in
+   the grid's footer ("Total"), so a CRM list opens with one toolbar row above its grid. */
+.record-directory,
+.leads-page {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px 12px;
+}
+.record-directory > *,
+.leads-page > * {
+  grid-column: 1 / -1;
+  min-inline-size: 0;
+}
+.record-directory > .record-directory-head,
+.leads-page > .record-directory-head {
+  grid-column: 1;
+}
+.record-directory > .grid-filterbar,
+.leads-page > .grid-filterbar {
+  grid-column: 2;
+}
+:root[data-theme] .record-directory-head {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+/* The count stays for screen readers; the grid's footer shows the total on screen. */
+.record-directory-head .record-count {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 750px) {
+  .record-directory > .record-directory-head,
+  .record-directory > .grid-filterbar,
+  .leads-page > .record-directory-head,
+  .leads-page > .grid-filterbar {
+    grid-column: 1 / -1;
+  }
+}

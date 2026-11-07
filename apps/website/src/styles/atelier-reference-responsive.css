@@ -1,0 +1,69 @@
+@media (max-width: 1000px) {
+  body[data-site-kind='company'][data-theme='1'] .a-header {
+    gap: 24px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero .a-hero-intro {
+    margin-bottom: -72px;
+    gap: 35px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero h1 {
+    margin-bottom: 24px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-purpose label > span {
+    padding-inline: 20px;
+  }
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] :where(.a-container, .a-inner > .section) {
+    width: calc(100% - 40px);
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-header {
+    padding-block: 22px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero {
+    padding-top: 20px;
+    background:
+      linear-gradient(#232a32, #232a32) top / 100% calc(100% - 140px) no-repeat,
+      #fbfbfb;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero .a-hero-intro {
+    grid-template-columns: 1fr;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero h1 {
+    font-size: clamp(38px, 8.7vw, 62px);
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero .a-hero-note {
+    max-width: 340px;
+    padding: 0;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-reference-house {
+    aspect-ratio: 1.5;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-home-content > .a-section {
+    margin-block: 46px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-home-content .a-section-head h2 {
+    font-size: 30px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-new-properties .a-section-head h2 {
+    font-size: 22px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-purpose {
+    flex-wrap: wrap;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-purpose label {
+    flex: 1 1 40%;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-purpose label > span {
+    padding: 12px;
+    text-align: center;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-search-bottom > div {
+    justify-content: space-between;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-services .a-service-grid {
+    grid-template-columns: 1fr;
+  }
+}

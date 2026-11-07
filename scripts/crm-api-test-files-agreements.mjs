@@ -1,0 +1,23 @@
+/** Agreement and linked hand-over contracts, in dependency order. */
+export const agreementTestFiles = [
+  'apps/crm/tests/api/agreements.test.mjs',
+  'apps/crm/tests/api/agreements-guards.test.mjs',
+  'apps/crm/tests/api/agreements-screens.test.mjs',
+  'apps/crm/tests/api/agreements-handovers.test.mjs',
+  'apps/crm/tests/api/agreements-handover-closes.test.mjs',
+  'apps/crm/tests/api/agreements-a3b-lifecycle.test.mjs',
+  'apps/crm/tests/api/agreements-a3b-payments.test.mjs',
+  'apps/crm/tests/api/agreements-payment-snapshot.test.mjs',
+  'apps/crm/tests/api/agreements-a3b-certificate.test.mjs',
+  'apps/crm/tests/api/agreements-a3b-guards.test.mjs',
+  'apps/crm/tests/api/finance-handover-preview.test.mjs',
+  'apps/crm/tests/api/finance-handover-preview-content.test.mjs',
+  'apps/crm/tests/api/finance-handover-approval.test.mjs',
+  'apps/crm/tests/api/finance-handover-approver-rules.test.mjs',
+  'apps/crm/tests/api/finance-handover-admin.test.mjs',
+  'apps/crm/tests/api/finance-handover-waiting.test.mjs',
+  'apps/crm/tests/api/finance-handover-review-fixes.test.mjs',
+  'apps/crm/tests/api/finance-handover-records.test.mjs',
+  'apps/crm/tests/api/finance-handover-photos.test.mjs',
+  'apps/crm/tests/api/finance-handover-keeps.test.mjs',
+];

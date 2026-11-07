@@ -24,6 +24,7 @@ pub struct Target {
     pub client_ref: Option<String>,
     pub property_ref: Option<String>,
     pub referral_ref: Option<String>,
+    pub deal_ref: Option<String>,
     /// Whether the assigned-only caller holds the currently linked client.
     pub holds_client: bool,
 }
@@ -35,6 +36,7 @@ impl Target {
             client: self.client_ref.clone(),
             property: self.property_ref.clone(),
             referral: self.referral_ref.clone(),
+            deal: self.deal_ref.clone(),
         }
     }
 }
@@ -50,7 +52,7 @@ pub async fn fetch(
 ) -> ApiResult<Target> {
     let sql = format!(
         "SELECT r.id,r.version,r.legacy_id,r.assignee_id,r.contact_id,r.client_ref,\
-         r.property_ref,r.referral_ref,EXISTS(SELECT 1 FROM crm_records c \
+         r.property_ref,r.referral_ref,r.deal_ref,EXISTS(SELECT 1 FROM crm_records c \
          WHERE c.workspace_id=$1 AND c.collection='Clients' AND c.legacy_id=r.client_ref \
          AND c.assignee_id=$4) AS holds_client \
          FROM crm_records r WHERE r.id=$3 AND r.workspace_id=$1 AND r.collection=$2 \

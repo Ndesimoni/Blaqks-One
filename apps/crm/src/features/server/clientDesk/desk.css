@@ -1,0 +1,117 @@
+/* The connected Client desk (approved mockup `.desk`): picker, client and matches, activity.
+   Columns follow the space the page has, not the window, since the sidebars vary. */
+.client-desk-wrap {
+  container-type: inline-size;
+}
+.client-desk {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 300px;
+  align-items: start;
+  gap: 14px;
+}
+.client-desk-main,
+.client-desk-side {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.client-desk-list,
+.client-desk-hero,
+.client-desk-match {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.client-desk-list {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+}
+:root[data-theme] .client-desk-list input {
+  min-height: 40px;
+  margin-bottom: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+}
+.client-desk-rows {
+  display: grid;
+  gap: 2px;
+}
+.client-desk-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.client-desk-row:hover {
+  background: var(--hover);
+}
+.client-desk-row[aria-current='true'] {
+  background: var(--accent-subtle);
+}
+.client-desk-row > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+.client-desk-row small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Phones choose from a select instead of the list (below). */
+.client-desk-select {
+  display: none;
+}
+:root[data-theme] .client-desk-empty {
+  margin: 8px;
+  color: var(--muted);
+}
+.client-desk-rule {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.client-desk-matches,
+.client-desk-match-list {
+  display: grid;
+  gap: 10px;
+}
+@container (max-width: 1000px) {
+  .client-desk {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .client-desk-side {
+    grid-column: 2;
+  }
+}
+@container (max-width: 640px) {
+  .client-desk {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .client-desk-side {
+    grid-column: auto;
+  }
+  .client-desk-scroll {
+    display: none;
+  }
+  .client-desk-select {
+    display: grid;
+    gap: 6px;
+  }
+}

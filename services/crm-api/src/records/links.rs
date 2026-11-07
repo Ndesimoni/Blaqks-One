@@ -20,6 +20,7 @@ fn value(links: &Links, slot: Slot) -> Option<&str> {
         Slot::Client => links.client.as_deref(),
         Slot::Property => links.property.as_deref(),
         Slot::Referral => links.referral.as_deref(),
+        Slot::Deal => links.deal.as_deref(),
     }
 }
 
@@ -38,11 +39,13 @@ pub fn missing_message(slot: Slot) -> &'static str {
             "The linked contact is missing from this workspace. \
              Choose another contact or clear it."
         }
+        Slot::Deal => crate::finance::deals::visible::DEAL_MISSING,
     }
 }
 
-/// Step 8 (contract §4): reports the first changed link whose target is missing from
-/// the workspace or hidden from the caller, with the same per-slot message for both.
+/// Step 8 (contract §4): reports the first changed record link whose target is missing
+/// from the workspace or hidden from the caller, with the same per-slot message for both.
+/// The deal slot is checked separately by `deal_links::ensure` (finance visibility).
 /// A link equal to `previous` (the locked row's columns) is allowed even when its
 /// target is hidden. Call under the workspace lock; the foreign keys stay the
 /// authoritative existence check. `saving` never counts as its own target, because
@@ -101,6 +104,8 @@ mod tests {
             .map(|(slot, _)| missing_message(*slot))
             .collect();
         assert_eq!(messages.len(), 4);
+        assert!(SLOTS.iter().all(|(slot, _)| slot.record()));
+        assert!(!messages.contains(missing_message(Slot::Deal)));
         let links = Links {
             referral: Some("CL-1".into()),
             ..Links::default()

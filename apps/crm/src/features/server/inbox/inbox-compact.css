@@ -1,0 +1,135 @@
+/* The approved mockup's three columns from 1280px leave the conversation narrow: the reply is
+   sent with a round arrow ("Send" stays its accessible name) and the status and assignee
+   menus take their own row, so the one-line composer (owner, 2026-10-22) keeps its line. */
+.inbox-reply-form .composer-row > .btn[type='submit'] {
+  flex: none;
+  inline-size: 44px;
+  min-inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border-radius: 50%;
+  justify-content: center;
+}
+.inbox-reply-form .composer-row > .btn[type='submit'] > span {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (min-width: 1280px) and (max-width: 1599px) {
+  .inbox-layout.has-panel .inbox-head {
+    flex-wrap: wrap;
+  }
+  .inbox-layout.has-panel .inbox-head-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+}
+/* Mine, Unassigned, Team and Spam run across the top like the header's section tabs. */
+.inbox-tabs.inbox-top-tabs {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  padding: 0 16px;
+  border-block-end: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--panel);
+}
+.inbox-top-tabs .inbox-tab {
+  flex: 0 0 auto;
+  min-block-size: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+:root[data-theme] .inbox-top-tabs .inbox-tab.is-active {
+  border-block-end-color: var(--gold);
+  background: none;
+  color: var(--ink);
+  box-shadow: none;
+}
+/* Channel chips (approved mockup) instead of a channel menu. */
+.inbox-channel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.inbox-channel-chips > button,
+.inbox-composer-tabs > [role='tab'] {
+  min-block-size: 32px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.inbox-channel-chips > button[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+/* The composer's Reply and Internal note read as underlined tabs. */
+.inbox-composer-tabs > [role='tab'] {
+  border-width: 0 0 2px;
+  border-color: transparent;
+  border-radius: 0;
+  background: none;
+}
+.inbox-composer-tabs > [role='tab'][aria-selected='true'] {
+  border-color: var(--gold);
+  color: var(--ink);
+}
+/* Saved replies sits after them as the mockup's third tab; it opens the picker. */
+.inbox-composer-slot {
+  display: contents;
+}
+.inbox-composer-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-block-size: 32px;
+  padding: 4px 12px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.inbox-composer-saved:hover,
+.inbox-composer-saved.is-open {
+  color: var(--ink);
+}
+@media (max-width: 899px) {
+  .inbox-top-tabs:not(.is-list) {
+    display: none;
+  }
+}
+/* The linked client as the mockup's card: facts with small labels, then two actions. */
+.inbox-panel .inbox-facts {
+  display: grid;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.inbox-panel .inbox-facts dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.inbox-panel-actions {
+  display: grid;
+  gap: 8px;
+}

@@ -1,0 +1,55 @@
+/* Lead cards on the Leads pipeline (NAV). The board itself lives in components/ui/kanban. */
+.lead-card {
+  display: grid;
+  gap: 4px;
+  inline-size: 100%;
+  padding: 12px 40px 12px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+.lead-card:focus-visible {
+  outline: 2px solid var(--focus, var(--gold));
+  outline-offset: -2px;
+}
+.lead-card-name {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.lead-card-need,
+.lead-card-next {
+  color: var(--muted);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+.lead-card-budget {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.lead-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-block-start: 4px;
+}
+.lead-card-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-subtle);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.lead-card-tag.is-hot {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+@media (max-width: 760px) {
+  .lead-card {
+    padding-inline-end: 48px;
+  }
+}
