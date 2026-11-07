@@ -21,8 +21,11 @@ export const listingsFor = (data, kind, id) =>
   data.catalogue.listings.filter((listing) => listing[field(kind)] === id);
 export const countFor = (data, kind, item) =>
   item.publicListingCount ?? listingsFor(data, kind, item.id).length;
+/** "3 published properties"; a developer or community without any reads "No properties yet". */
 export const propertyCount = (data, count) =>
-  `${count} ${data.site.sample ? 'sample' : 'published'} ${count === 1 ? 'property' : 'properties'}`;
+  count === 0
+    ? 'No properties yet'
+    : `${count} ${data.site.sample ? 'sample' : 'published'} ${count === 1 ? 'property' : 'properties'}`;
 export const placeLabel = (kind, item) =>
   kind === 'areas'
     ? `COMMUNITY · ${titleCase(item.city || item.emirate).toUpperCase()}`

@@ -7,6 +7,7 @@ legacy/
 public/
 # The website's generated reference outputs (apps/website/.gitignore), rebuilt on every run.
 apps/website/src/generated/
+apps/website/browser-report.json
 package-lock.json
 coverage/
 playwright-report/
