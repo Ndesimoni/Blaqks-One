@@ -1,0 +1,6 @@
+# Only the CRM API sources reach the build (never .env files, targets or other apps).
+*
+!services/crm-api/
+services/crm-api/target/
+services/crm-api/.env*
+**/.DS_Store

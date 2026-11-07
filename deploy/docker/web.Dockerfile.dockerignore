@@ -1,0 +1,13 @@
+# The website app (with its own lockfile) and the public Origin CA roots only.
+*
+!apps/website/
+!deploy/certs/cloudflare-origin-roots.pem
+apps/website/node_modules/
+apps/website/.next/
+apps/website/.env*
+apps/website/public/approved/
+apps/website/src/generated/
+apps/website/screenshots/
+apps/website/browser-report.json
+apps/website/tsconfig.tsbuildinfo
+**/.DS_Store
