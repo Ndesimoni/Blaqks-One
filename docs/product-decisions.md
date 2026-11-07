@@ -300,6 +300,21 @@ A board inside Blaqks One where brokers post what their clients are looking for 
 
 The owner accepted the recommended layout: the CRM frontend moves from the repository root to `apps/crm/`; the retained Calendar companion moves from `backend/` to `services/calendar-companion/`; `apps/website/` and `services/crm-api/` stay where they are; `docs/`, `scripts/`, `design/` and the Compose files stay shared at the root. The general website and the company websites remain **one** Next.js app, which chooses the site from the web address and shares its pages; it may be grouped into platform and company folders inside `apps/website/` if it grows. The website backend stays inside `crm-api` as separately owned modules until hosting needs the split planned in [Service boundaries](service-boundaries.md). The move runs as its own packet only once GitHub Actions runs again and no other branch or agent worktree has work in progress. **Built on 2026-10-30** (RL1, [roadmap §15](claude-implementation-roadmap.md#15-remaining-connected-crm-work-outside-the-integrations)).
 
+## First-year hosting (decided 2026-11-08)
+
+The owner set a first-year budget of **$150** for the CRM with its backend and two websites: the main Blaqks One site and one company's own website. The owner chose the recommended options:
+
+| Topic           | Decided                                                                                                                                                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Server          | **Oracle Cloud's free Arm server** (2 cores, 12 GB since June 2026) in a UAE home region (Dubai, or Abu Dhabi as the fallback), on a **Pay As You Go** account kept inside the free limits so Oracle does not stop it for being quiet, with a budget alert from day one. |
+| Next step       | Once `blaqks.one` is live, apply for **AWS Activate Founders** ($1,000 in credits; needs a working website and an AWS Paid plan, which has no fee). AWS on credits is the move-to option if Oracle stops the server or changes its rules.                                |
+| Fallback        | A small Dubai VPS (about $8.50 a month) if neither free option works. The hosting setup must move between providers in about an hour.                                                                                                                                    |
+| Backups         | Nightly encrypted backups kept in a second place outside the server's data centre (the AWS UAE region lost data in 2026). A UAE lawyer confirms where backups may be kept.                                                                                               |
+| Domains         | `blaqks.one` for the main site with the CRM at `app.blaqks.one`; the company's own domain for its website (a `.com` keeps the year under budget; a company paying for its own `.ae` is fine).                                                                            |
+| Company domains | **One domain per company, none per agent.** Agents keep their profile pages on their company's site. At launch each company domain is connected **by hand** (Cloudflare and the site's address); the self-service DOM1 flow is built later.                              |
+
+The CDN, certificates, DNS and bot check use Cloudflare's free plan; photos and backups use Cloudflare R2's free allowance; system email, uptime alerts and error tracking use free tiers. These replace the managed PostgreSQL and UAE object storage of the 2026-10-15 stack for the first year.
+
 ## Still open
 
 Business mail provider, WhatsApp number ownership, social account ownership, Super Admin communication visibility, marketing campaigns, calling, hosting/retention region and public languages remain open; see roadmap section 17. They do not block P1.
