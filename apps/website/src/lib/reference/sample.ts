@@ -1,5 +1,9 @@
 import fixtures from '../../generated/approved.json' with { type: 'json' };
 import type { Catalogue, Listing } from '../types.ts';
+import { sampleDevelopers } from '../sample-developers.ts';
+
+// Illustrative developer associations for the six design-collection homes; not partnerships.
+const illustrativeDevelopers = ['emaar', 'sobha', 'damac', 'nakheel', 'azizi', 'meraas'];
 
 export function referenceSampleCatalogue(): Catalogue {
   const areas = [...new Set(fixtures.homes.map((p) => p.area))].map((name, index) => ({
@@ -23,14 +27,15 @@ export function referenceSampleCatalogue(): Catalogue {
     company: String(a.companyId),
     specialty: a.focus,
   }));
-  const listings: Listing[] = fixtures.homes.map((p) => {
+  const listings: Listing[] = fixtures.homes.map((p, index) => {
     const agent = fixtures.people.find((a) => a.name === p.agent)!;
     return {
       id: String(p.id),
       title: p.title,
       company: String(agent.companyId),
       agent: String(agent.id),
-      developer: '',
+      developer: illustrativeDevelopers[index % illustrativeDevelopers.length],
+      developerIllustrative: true,
       area: areas.find((a) => a.name === p.area)!.id,
       emirate: 'dubai',
       type: p.type,
@@ -60,5 +65,5 @@ export function referenceSampleCatalogue(): Catalogue {
       reference: `BQ-${p.id.toString().padStart(4, '0')}`,
     };
   });
-  return { listings, companies, agents, areas, developers: [] };
+  return { listings, companies, agents, areas, developers: sampleDevelopers };
 }

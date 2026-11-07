@@ -1,5 +1,3 @@
-import { publicDetails } from './reference-public-details.js';
-import { publicPagination } from './reference-pagination.js';
 import { homes } from './estate.js';
 import { people } from './agent-components.js';
 import { companies } from './public-pages.js';
@@ -68,6 +66,7 @@ export function bind(data) {
       const area = source.areas.find((a) => a.id === p.area);
       return {
         id: identity('property', p.id),
+        publicId: p.id,
         title: escape(p.title),
         area: escape(area?.name),
         type: escape(p.type),
@@ -95,33 +94,4 @@ export function bind(data) {
     }),
   );
   for (const key of Object.keys(dealData)) delete dealData[key];
-}
-
-export function afterRender() {
-  const data = window.__blaqksReference;
-  if (!data) return;
-  if (!data.site.sample && data.page === 'enquiry') {
-    const form = document.querySelector('#public-contact-form');
-    if (form && !document.querySelector('#reference-enquiry')) {
-      const node = document.createElement('div');
-      node.id = 'reference-enquiry';
-      node.className = 'u-contact-form';
-      form.replaceWith(node);
-    }
-  }
-  if (data.site.sample) return;
-  publicPagination(data);
-  publicDetails(data);
-  document.querySelector('.d-spotlight')?.remove();
-  const property = data.entity && 'title' in data.entity ? data.entity : null;
-  document.querySelectorAll('.p-gallery img').forEach((img, index) => {
-    if (property) img.src = property.photos[index] || property.image;
-  });
-  const description = document.querySelector('#overview > p:not(.e-kicker):not(.p-small)');
-  if (description && property) description.textContent = property.description;
-  document
-    .querySelectorAll('.u-sample, .u-note, .p-gallery-note, .u-compact-note')
-    .forEach((node) => {
-      node.textContent = 'Public information published by the listing company.';
-    });
 }

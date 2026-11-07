@@ -21,13 +21,17 @@
   margin-top: 4px;
 }
 #reference-enquiry .button {
-  background: #bc9655;
-  color: #fff;
+  background: #c9a254;
+  color: #06233d;
   border: 0;
   border-radius: 5px;
   padding: 14px 20px;
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
+}
+#reference-enquiry .button:hover {
+  background: #b78d42;
 }
 #reference-enquiry .button:disabled {
   opacity: 0.65;

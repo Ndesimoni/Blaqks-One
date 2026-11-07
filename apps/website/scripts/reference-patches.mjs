@@ -1,5 +1,11 @@
 import fs from 'node:fs/promises';
 
+// Fails the build when an approved-source string moves, instead of silently skipping a fix.
+const exact = (source, from, to) => {
+  if (!source.includes(from)) throw Error('Approved source patch target is missing: ' + from);
+  return source.replace(from, () => to);
+};
+
 export async function patchReference(root) {
   const patch = async (file, transform) => {
     const path = root + '/' + file;
@@ -70,7 +76,44 @@ export async function patchReference(root) {
       'if (["privacy","terms","developers","areas","developer","area"].includes(route)) app.innerHTML=extraPage(); else if (route === "home") app.innerHTML',
     ),
   );
-  await patch('app.js', (s) => s.replace('function render() {', 'export function render() {'));
+  // Next remounts #app/#overlay on navigation, so render() re-queries them every time.
+  await patch('app.js', (s) =>
+    [
+      ['const app = document.querySelector("#app"),', 'let app = document.querySelector("#app"),'],
+      [
+        'function render() {',
+        'export function render() {\n  app = document.querySelector("#app");\n  overlay = document.querySelector("#overlay");',
+      ],
+      [
+        'document.body.classList.toggle("estate-page", ',
+        'document.body.classList.toggle("estate-page", ["privacy","terms","developers","areas","developer","area"].includes(route) || ',
+      ],
+    ].reduce((text, [from, to]) => exact(text, from, to), s),
+  );
+  await patch('property-extras.js', (s) =>
+    [
+      [
+        'Featured properties</a>',
+        'Featured properties</a><a href="/areas">Communities</a><a href="/developers">Developers</a>',
+      ],
+      [
+        '<button data-legal="Privacy">Privacy policy</button>',
+        '<a href="/privacy">Privacy policy</a>',
+      ],
+      [
+        '<button data-legal="Terms">Terms & conditions</button>',
+        '<a href="/terms">Terms & conditions</a>',
+      ],
+    ].reduce((text, [from, to]) => exact(text, from, to), s),
+  );
+  // The saved/recent/compare tabs had no current-page state.
+  await patch('property-journey.js', (s) =>
+    exact(
+      s,
+      '<a href="#saved">Saved properties</a><a href="#recent">Recently viewed</a><a href="#compare">Compare properties</a>',
+      '${[["saved","Saved properties"],["recent","Recently viewed"],["compare","Compare properties"]].map(([r,l])=>`<a href="#${r}"${r===route?\' aria-current="page"\':""}>${l}</a>`).join("")}',
+    ),
+  );
   await patch('app.js', (s) =>
     s.replace(
       'setupJourney({toast});',

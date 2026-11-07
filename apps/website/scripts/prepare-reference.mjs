@@ -56,12 +56,15 @@ try {
         if (/^(:root|html)(?=[\s.#[:]|$)/.test(selector))
           return selector.replace(/^(:root|html)/, prefix);
         if (/^body(?=[\s.#[:]|$)/.test(selector)) return selector.replace(/^body/, prefix);
+        // `.estate-page` is a class on <body> itself, so it joins the prefix without a space.
+        if (/^\.estate-page(?=[\s.#[:]|$)/.test(selector)) return prefix + selector;
         return prefix + ' ' + selector;
       });
     });
     styles += css.toString().replaceAll('assets/', '/approved/assets/') + '\n';
   }
-  styles += await fs.readFile(path.join(app, 'scripts/reference-native.css'), 'utf8');
+  for (const name of ['native', 'polish', 'contrast', 'directory'])
+    styles += await fs.readFile(path.join(app, `scripts/reference-${name}.css`), 'utf8');
   const css = await transform(styles, { loader: 'css', minify: true });
   await fs.writeFile(
     output + '/reference.css',
@@ -92,26 +95,15 @@ try {
     (await transform(companyStyles, { loader: 'css', minify: true })).code,
   );
   await patchReference(root);
-  await fs.copyFile(
-    path.join(app, 'scripts/reference-runtime.mjs'),
-    root + '/reference-runtime.js',
-  );
-  await fs.copyFile(
-    path.join(app, 'scripts/reference-binding.mjs'),
-    root + '/reference-binding.js',
-  );
+  const modules = ['runtime', 'binding', 'after-render', 'extra', 'directory', 'profile'];
+  for (const name of [...modules, 'developers', 'live-text', 'pagination', 'public-details'])
+    await fs.copyFile(
+      path.join(app, `scripts/reference-${name}.mjs`),
+      `${root}/reference-${name}.js`,
+    );
   await fs.copyFile(
     path.join(app, 'src/lib/reference/identity.ts'),
     root + '/reference-identity.ts',
-  );
-  await fs.copyFile(path.join(app, 'scripts/reference-extra.mjs'), root + '/reference-extra.js');
-  await fs.copyFile(
-    path.join(app, 'scripts/reference-pagination.mjs'),
-    root + '/reference-pagination.js',
-  );
-  await fs.copyFile(
-    path.join(app, 'scripts/reference-public-details.mjs'),
-    root + '/reference-public-details.js',
   );
   await build({
     entryPoints: [root + '/reference-runtime.js'],

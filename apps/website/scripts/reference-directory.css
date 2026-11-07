@@ -1,0 +1,130 @@
+/* Communities, developers and home developer tiles, built from the approved directory parts. */
+body[data-site-kind='platform'] .u-place-card {
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+body[data-site-kind='platform'] .u-place-card:hover {
+  border-color: #d9c49a;
+  box-shadow: 0 14px 36px #06233d0f;
+}
+body[data-site-kind='platform'] .u-place-card .u-company-photo {
+  height: 210px;
+  overflow: hidden;
+}
+body[data-site-kind='platform'] .u-place-card img {
+  transition: transform 0.6s ease;
+}
+body[data-site-kind='platform'] .u-place-card:hover img {
+  transform: scale(1.03);
+}
+body[data-site-kind='platform'] .u-place-card .u-card-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: 26px;
+}
+body[data-site-kind='platform'] .u-place-card .u-card-content > p:not(.e-kicker) {
+  margin: 6px 0 22px;
+}
+body[data-site-kind='platform'] .u-place-card .u-card-link {
+  margin-top: auto;
+}
+body[data-site-kind='platform'] .u-place-tile {
+  display: grid;
+  place-items: center;
+  height: 170px !important;
+  background: #06233d;
+}
+body[data-site-kind='platform'] :is(.u-place-monogram, .u-place-mark) {
+  display: grid;
+  place-items: center;
+  font-family: Georgia, serif;
+  color: #dfb767;
+  letter-spacing: 2px;
+}
+body[data-site-kind='platform'] .u-place-monogram {
+  width: 108px;
+  height: 108px;
+  border: 1px solid #c9a25466;
+  border-radius: 50%;
+  font-size: 40px;
+}
+body[data-site-kind='platform'] .u-place-hero .u-place-mark {
+  width: 64px;
+  height: 64px;
+  margin-top: 30px;
+  font-size: 28px;
+  border: 1px solid #c9a25466;
+}
+body[data-site-kind='platform'] .u-place-hero .u-place-mark + .e-kicker {
+  margin-top: 22px;
+}
+body[data-site-kind='platform'] .u-place-hero h1 {
+  margin-top: 14px;
+}
+body[data-site-kind='platform'] .u-place-pagination .u-page-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 9px 13px;
+  border: 1px solid #dfe6ea;
+  border-radius: 4px;
+  background: #fff;
+  color: #3f5b6f;
+  font-size: 13px;
+}
+body[data-site-kind='platform'] .u-place-pagination .u-page-link[aria-current] {
+  background: #06233d;
+  border-color: #06233d;
+  color: #e4c482;
+}
+body[data-site-kind='platform'] .u-place-pagination .u-page-link[aria-disabled] {
+  opacity: 0.45;
+}
+body[data-site-kind='platform'] .u-home-developers {
+  padding: 4px 0 56px;
+}
+body[data-site-kind='platform'] .u-developer-tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+body[data-site-kind='platform'] .u-developer-tiles .e-partner {
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+body[data-site-kind='platform'] .u-developer-tiles .e-partner:hover {
+  box-shadow: 0 12px 30px #06233d10;
+  transform: translateY(-2px);
+}
+body[data-site-kind='platform'] .u-developer-tiles .e-partner > span:not(.e-avatar) {
+  min-width: 0;
+}
+@media (max-width: 1050px) {
+  body[data-site-kind='platform'] .u-developer-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+body[data-site-kind='platform'] .estate .u-place-collection .e-section-head > a {
+  max-width: none;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='platform'] .u-developer-tiles {
+    grid-template-columns: 1fr;
+  }
+  body[data-site-kind='platform'] .u-place-tile {
+    height: 112px !important;
+  }
+  body[data-site-kind='platform'] .u-place-monogram {
+    width: 72px;
+    height: 72px;
+    font-size: 28px;
+  }
+  body[data-site-kind='platform'] .u-place-card .u-company-photo:not(.u-place-tile) {
+    height: 180px;
+  }
+}

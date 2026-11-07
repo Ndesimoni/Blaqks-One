@@ -56,9 +56,40 @@ The public contract does not expose verified discount/distress metadata, so live
 are not fabricated. Final legal text, provider authentication/delivery, broader content
 binding and production deployment remain separate work.
 
+## Polish pass (7 November 2026)
+
+A review of the rendered main site fixed these mistakes without changing the palette:
+
+- **Navigation.** Next remounts `#app`/`#overlay` on every route change, so the renderer now
+  re-queries both at the start of `render()`. Community, developer, pagination and footer
+  links are real paths; `ReferenceWebsite` sends plain clicks on `#app a[href^="/"]` through
+  the router, and footer Buy/Rent/Commercial shortcuts keep their purpose filter.
+- **Communities and developers.** Directories use the approved company-card grid (search,
+  count, 12 per page, page links); community cards take a cover photo from their first
+  listing and developer cards a navy monogram tile. Profiles list only their own listings,
+  with an empty state. Sample mode lists the 40 reference developers; the six sample homes
+  carry illustrative, labelled associations. The home page shows six developer tiles after
+  Featured Agents, and the footer links Communities, Developers, Privacy and Terms.
+- **Readability.** Body-level `.estate-page` selectors are scoped to `<body>` itself, so the
+  approved 3px gold focus ring and modal styles apply. Gold buttons and the header menu use
+  navy text (6.7:1). Navy bands, breadcrumbs, addresses, deal details, gold text links and
+  the main secondary copy now meet 4.5:1 through the existing tokens; some tiny decorative
+  labels in illustrative mock-ups (CRM preview, portrait placeholders) remain lighter.
+- **Sample and connected labels.** The sample-only design preview pill sits bottom-right on
+  desktop and at the page end on phones; connected mode removes it. Connected mode also
+  replaces design-preview and "sample" wording, removes sample badges and hides the empty
+  distress-deal strip. A navy/gold `icon.svg` and `favicon.ico` end the favicon 404.
+- The saved/recent/compare tabs mark the current tab.
+
+Integration code lives in `scripts/reference-*.mjs` and `reference-{native,polish,contrast,directory}.css`;
+`tests/reference-polish.test.ts` covers the data, patches and generated styles.
+`tests/check-browser.mjs` (set `WEBSITE_BROWSER_CHANNEL=chrome` on machines without the
+Playwright browser) checks main-site routes, click navigation, directories, focus, the pill
+and overflow at 390/1280, plus company-host overflow.
+
 ## Verification and limits
 
-The focused website suite includes 36 model/design checks plus one synthetic public API
+The focused website suite includes 48 model/design checks plus one synthetic public API
 consumer integration. The tests cover original image bytes, page snapshots, route mapping,
 site-scoped identity and embedded JSON escaping, alongside existing public-contract checks.
 Type generation/typecheck and the production webpack build pass. The repository file-size

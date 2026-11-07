@@ -1,0 +1,110 @@
+/* Readability and control fixes layered on the approved presentation; colours unchanged. */
+body[data-site-kind='platform'] .estate :is(.e-why, .u-company-hero) {
+  --read-copy: #d2dce5;
+  --read-muted: #c3d0da;
+  --read-gold: #dfb767;
+}
+body[data-site-kind='platform'] :is(.e-gold, .b-professional-menu > summary) {
+  color: #06233d !important;
+}
+body[data-site-kind='platform'] .b-professional-menu > summary {
+  transition: background 0.2s;
+}
+body[data-site-kind='platform'] .b-professional-menu > summary:hover {
+  background: #b78d42;
+}
+body[data-site-kind='platform'] .estate :is(.e-text, .u-card-link) {
+  color: var(--read-gold) !important;
+}
+body[data-site-kind='platform'] .estate :is(.e-text, .u-card-link):hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+/* The sample-only design preview pill sits bottom-right, clear of headings and controls. */
+body[data-site-kind='platform'] .preview-control {
+  left: auto;
+  right: 16px;
+  bottom: 16px;
+  transform: none;
+}
+body[data-site-kind='platform'] .screen-menu {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+/* Phones: the pill joins the page end instead of floating over the hero search and bars. */
+@media (max-width: 760px) {
+  body[data-site-kind='platform'] .preview-control {
+    position: relative;
+    inset: auto !important;
+    display: flex;
+    justify-content: center;
+    z-index: auto;
+    padding: 20px 16px 28px;
+    opacity: 1 !important;
+  }
+  body[data-site-kind='platform'] .estate ~ .preview-control {
+    background: #06233d;
+  }
+  body[data-site-kind='platform']:has(.p-mobile-contact, .d-compare-tray:not([hidden]))
+    .preview-control {
+    padding-bottom: 104px;
+  }
+  body[data-site-kind='platform'] .screen-menu {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-site-kind='platform'] .estate :is(.e-gold, .e-partner, .u-place-card img) {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+/* Saved, recent and compare: show the current tab and give the browser note room. */
+body[data-site-kind='platform'] .estate .j-tabs a[aria-current] {
+  color: var(--read-gold);
+  text-decoration: underline;
+  text-decoration-color: #c9a254;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 9px;
+}
+body[data-site-kind='platform'] .estate .j-tabs + p {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--read-muted);
+}
+body[data-site-kind='platform'] .estate .j-empty h2 {
+  margin: 0 0 10px;
+}
+
+/* Empty collections and the legal placeholder panel. */
+body[data-site-kind='platform'] .estate .e-empty h3 {
+  margin: 0 0 8px;
+  font-family: Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: #26465c;
+}
+body[data-site-kind='platform'] .estate .e-empty p {
+  margin: 0 0 12px;
+  color: var(--read-copy);
+}
+body[data-site-kind='platform'] .u-legal .u-contact-panel {
+  max-width: 760px;
+  padding: 32px;
+  border: 1px solid #e7ecef;
+  border-radius: 6px;
+  background: #f8f9f9;
+}
+body[data-site-kind='platform'] .u-legal h2 {
+  margin: 0 0 12px;
+  font-size: 30px;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='platform'] .u-legal .u-contact-panel {
+    padding: 22px;
+  }
+}

@@ -1,4 +1,5 @@
-import { bind, afterRender } from './reference-binding.js';
+import { bind } from './reference-binding.js';
+import { afterRender } from './reference-after-render.js';
 
 let ready;
 async function mount(data) {

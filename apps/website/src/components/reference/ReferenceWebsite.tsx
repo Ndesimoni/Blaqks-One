@@ -5,10 +5,12 @@ import { createPortal } from 'react-dom';
 import { EnquiryForm } from '../EnquiryForm';
 import { referenceQuery } from '../../lib/reference/queries';
 import { usePublicFilters } from './usePublicFilters';
+import { useDirectorySearch } from './useDirectorySearch';
+import { referenceClick } from './referenceClick';
 import { referenceJSON } from '../../lib/reference/serialize';
 import { useRouter } from 'next/navigation';
 import type { PageData } from '../../lib/types';
-import { publicDestination, referenceRoute, alias } from '../../lib/reference/navigation';
+import { publicDestination, referenceRoute } from '../../lib/reference/navigation';
 
 type WindowWithReference = Window & {
   __blaqksReferenceReady?: boolean;
@@ -26,6 +28,7 @@ export function ReferenceWebsite({
 }) {
   const router = useRouter();
   usePublicFilters(data);
+  useDirectorySearch(data);
   const latest = useRef(data);
   const [enquiryTarget, setEnquiryTarget] = useState<HTMLElement | null>(null);
   latest.current = data;
@@ -57,42 +60,8 @@ export function ReferenceWebsite({
       event.stopImmediatePropagation();
       router.push(destination, { scroll: true });
     };
-    const onClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const link = target.closest<HTMLAnchorElement>('a[href^="#"]');
-      if (link && !latest.current.site.sample && /^#(?:signin|signup)$/.test(link.hash)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        if (crm)
-          location.assign(link.hash === '#signup' ? crm.replace(/\/$/, '') + '/#/sign-up' : crm);
-        else router.push('/professionals');
-      }
-      const contact = target.closest<HTMLElement>('[data-public-contact], [data-company-contact]');
-      if (contact && !latest.current.site.sample) {
-        const kind = contact.hasAttribute('data-company-contact') ? 'company' : 'agent';
-        const number = Number(contact.dataset.companyContact ?? contact.dataset.publicContact);
-        const list =
-          kind === 'company' ? latest.current.catalogue.companies : latest.current.catalogue.agents;
-        const item = list.find((p) => alias(latest.current, kind, p.id) === number);
-        if (item) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          router.push('/enquiry?' + kind + '=' + encodeURIComponent(item.id));
-        }
-        return;
-      }
-      const enquiry = target.closest<HTMLElement>('[data-enquiry], [data-whatsapp]');
-      if (enquiry && !latest.current.site.sample) {
-        const number = Number(enquiry.dataset.id || enquiry.dataset.whatsapp);
-        const property = latest.current.catalogue.listings.find(
-          (p) => alias(latest.current, 'property', p.id) === number,
-        );
-        if (!property) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        router.push('/enquiry?listing=' + encodeURIComponent(property.id));
-      }
-    };
+    const onClick = (event: MouseEvent) =>
+      referenceClick(event, latest.current, crm, (href) => router.push(href));
     window.addEventListener('hashchange', onHash, true);
     document.addEventListener('click', onClick, true);
     window.addEventListener('blaqks:ready', configure);
