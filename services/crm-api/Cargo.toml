@@ -24,7 +24,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal
 time = { version = "0.3", features = ["parsing", "formatting"] }
 url = "2"
 uuid = { version = "1", features = ["v4", "serde"] }
-hmac = "0.12"
+hmac = "0.13"
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
