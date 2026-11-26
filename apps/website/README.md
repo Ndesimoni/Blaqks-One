@@ -22,6 +22,21 @@ accepted for local development. With no value, links lead to professional-access
 The public API currently has no verified deal-price metadata; deal sections stay empty
 instead of manufacturing discount claims.
 
+## Preview deployments
+
+The site is chosen from the request host, so a branch preview (for example
+`*.vercel.app`) matches no site and returns 404. In the Vercel **Preview** environment only,
+set:
+
+- `WEBSITE_DATA_MODE=sample`
+- `WEBSITE_DEFAULT_SITE=platform`, or a sample company such as `harbour`,
+  `harbour-nocturne` or `cedar`
+
+Then any unknown preview host renders that site. Leave `WEBSITE_DEFAULT_SITE` unset in
+production so unknown hosts keep failing closed. In `api` mode the fallback does not apply:
+register the preview host with the public API instead. Company sites remain reachable on
+their own domains.
+
 ## Second website design review
 
 Company theme 1 (`harbour.localhost:3000`) now has the monochrome architectural design

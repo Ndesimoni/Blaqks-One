@@ -2,7 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
-import { normalizeHost, sampleSite } from './host.ts';
+import { namedSite, normalizeHost, sampleSite } from './host.ts';
 import { publicGet, PublicNotFound } from './public-api.ts';
 import { decodeSite } from './public-shapes.ts';
 
@@ -12,7 +12,9 @@ export const currentSite = cache(async () => {
   if (!host) notFound();
   const mode = process.env.WEBSITE_DATA_MODE || 'api';
   if (mode === 'sample') {
-    const site = sampleSite(host);
+    // Preview deploys (for example *.vercel.app) have no registered host, so an
+    // explicit WEBSITE_DEFAULT_SITE renders that site instead of a 404.
+    const site = sampleSite(host) ?? namedSite(process.env.WEBSITE_DEFAULT_SITE || '');
     if (!site) notFound();
     return { site, host };
   }
