@@ -87,6 +87,7 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/test-setup
       - name: API tests
         run: >-
@@ -99,6 +100,7 @@ jobs:
     # validation.test.mjs saves the record the restart assertion reads afterwards.
     timeout-minutes: 20
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/test-setup
       - name: Restart check
         run: >-
@@ -117,6 +119,7 @@ jobs:
       matrix:
         shard: [1, 2, 3]
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/test-setup
       - name: Tool versions
         run: google-chrome --version

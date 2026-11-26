@@ -1,11 +1,11 @@
 # Shared setup for the connected API and browser jobs: Node, Rust, cached crates.
+# The calling job must run actions/checkout first; a local action cannot be resolved before it.
 # scripts/test-crm-api.mjs builds with --offline, so the crates are fetched here.
 name: Connected test setup
-description: Checkout, Node 22, Rust 1.89, cached dependencies and fetched crates.
+description: Node 22, Rust 1.89, cached dependencies and fetched crates.
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: 22
