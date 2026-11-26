@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeHost, sampleSite } from '../src/lib/host.ts';
+import { namedSite, normalizeHost, sampleSite } from '../src/lib/host.ts';
 import { sampleCatalogue } from '../src/lib/sample-catalogue.ts';
 import { samplePage, validateCatalogueScope } from '../src/lib/page-model.ts';
 import { websiteRoute } from '../src/lib/routing.ts';
@@ -19,6 +19,16 @@ test('only explicit local preview hosts resolve and forged hosts fail closed', (
   for (const host of ['evil.example', 'missing.localhost', '__proto__', 'toString'])
     assert.equal(sampleSite(host), null);
   assert.equal(sampleSite('harbour-nocturne.localhost')?.theme, '4');
+});
+
+test('the preview fallback resolves only known site names', () => {
+  assert.equal(namedSite('platform')?.kind, 'platform');
+  assert.equal(namedSite('harbour')?.theme, '1');
+  assert.equal(namedSite('harbour-nocturne')?.theme, '4');
+  assert.equal(namedSite('cedar.localhost')?.id, 'cedar');
+  for (const name of ['', '  ', 'evil', 'harbour.localhost/secret', 'x@y']) {
+    assert.equal(namedSite(name), null);
+  }
 });
 
 test('company catalogues and every profile/detail respect the host scope', () => {

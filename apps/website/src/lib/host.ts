@@ -43,3 +43,15 @@ export function sampleSite(host: string): Site | null {
     social: sampleSiteSocial[company.id],
   };
 }
+
+/**
+ * The site named by WEBSITE_DEFAULT_SITE, used only when a preview host is unknown.
+ * Accepts `platform` or a sample company name (`harbour`, `cedar`, `harbour-nocturne`).
+ * Unknown names resolve to null so a typo cannot silently show the wrong company.
+ */
+export function namedSite(name: string): Site | null {
+  const value = name.trim().toLowerCase();
+  if (!value || /[\s/@\\?#,]/.test(value)) return null;
+  if (value === 'platform') return sampleSite('localhost');
+  return sampleSite(value.includes('.') ? value : `${value}.localhost`);
+}
