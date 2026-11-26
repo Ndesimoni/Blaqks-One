@@ -109,29 +109,25 @@ jobs:
           npm run test:api
 
   browser:
-    name: Browser tests ${{ matrix.shard }}/3
+    name: Browser tests
     runs-on: ubuntu-latest
-    # 144 serial stories need 35–45 minutes; three Playwright shards cut that to
-    # roughly 15 minutes each, alongside the API jobs.
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3]
+    # The 144 stories share state across spec files, so they stay in one ordered job:
+    # 35–45 minutes on GitHub's shared runners.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/test-setup
       - name: Tool versions
         run: google-chrome --version
       - name: Connected browser tests
-        run: npm run test:server:e2e -- --browser-only --shard=${{ matrix.shard }}/3
+        run: npm run test:server:e2e -- --browser-only
         env:
           PLAYWRIGHT_CHANNEL: chrome
       - name: Upload browser test results
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: connected-browser-results-${{ strategy.job-index }}
+          name: connected-browser-results
           path: |
             apps/crm/test-results-server/
             apps/crm/playwright-report/
