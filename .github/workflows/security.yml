@@ -1,5 +1,6 @@
-# Dependency security and licence checks (docs/tech-stack.md, Quality).
+# Dependency security checks (docs/tech-stack.md, Quality).
 # Runs on every push and weekly, so new advisories surface even without code changes.
+# Licence checks were removed at the owner's request.
 name: Security
 
 on:
@@ -20,7 +21,7 @@ permissions:
 
 jobs:
   rust-dependencies:
-    name: Rust advisories, licences and sources
+    name: Rust advisories, bans and sources
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -34,7 +35,7 @@ jobs:
           manifest-path: ${{ matrix.crate }}/Cargo.toml
           arguments: --all-features --config deny.toml
           command: check
-          command-arguments: advisories licenses bans sources
+          command-arguments: advisories bans sources
 
   npm-dependencies:
     name: npm advisories

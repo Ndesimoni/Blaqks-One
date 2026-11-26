@@ -39,6 +39,8 @@ const generatedDirectories = new Set([
   '.claude',
 ]);
 const inactivePaths = new Set(['legacy', 'services/calendar-companion/data']);
+// Prose documentation is out of scope; docs one-pagers published as HTML follow it.
+const isDocumentationMarkup = (path) => path.startsWith('docs/') && path.endsWith('.html');
 const generatedFiles = new Set([
   'package-lock.json',
   'Cargo.lock',
@@ -62,7 +64,12 @@ async function collectFiles(path) {
       .filter((child) => !inactivePaths.has(projectPath(child)));
     return (await Promise.all(children.map(collectFiles))).flat();
   }
-  if (!extensions.has(extname(path)) || generatedFiles.has(basename(path))) {
+  const relativePath = projectPath(path);
+  if (
+    !extensions.has(extname(path)) ||
+    generatedFiles.has(basename(path)) ||
+    isDocumentationMarkup(relativePath)
+  ) {
     return [];
   }
   return [path];
