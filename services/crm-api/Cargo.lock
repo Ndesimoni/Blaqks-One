@@ -876,7 +876,7 @@ dependencies = [
  "base64 0.22.1",
  "dotenvy",
  "hmac",
- "rand 0.8.8",
+ "rand 0.10.3",
  "reqwest",
  "ring",
  "serde",
