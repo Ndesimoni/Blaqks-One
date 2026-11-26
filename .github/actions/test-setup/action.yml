@@ -1,0 +1,23 @@
+# Shared setup for the connected API and browser jobs: Node, Rust, cached crates.
+# scripts/test-crm-api.mjs builds with --offline, so the crates are fetched here.
+name: Connected test setup
+description: Checkout, Node 22, Rust 1.89, cached dependencies and fetched crates.
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+    - uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: services/crm-api -> target
+    - run: npm ci
+      shell: bash
+    - name: Fetch Rust dependencies
+      run: cargo fetch --locked --manifest-path services/crm-api/Cargo.toml
+      shell: bash

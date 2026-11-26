@@ -68,10 +68,14 @@ try {
   if (!process.argv.includes('--browser-only')) {
     await run('node', ['--test', '--test-concurrency=1', ...apiTestFiles], env);
   }
-  // The restart check reads records the full suite saves, so a filtered run skips it.
+  // The restart check reads a record validation.test.mjs saves, so a filtered run skips
+  // it unless CRM_RESTART_WITH_FILTER=1 pairs that file with the check.
   const filtered = Boolean(process.env.API_TEST_FILES?.trim());
-  if (filtered) console.log('API_TEST_FILES is set: skipping the restart check.');
-  if (!process.argv.includes('--browser-only') && !filtered) {
+  const restartWithFilter = process.env.CRM_RESTART_WITH_FILTER === '1';
+  if (filtered && !restartWithFilter) {
+    console.log('API_TEST_FILES is set: skipping the restart check.');
+  }
+  if (!process.argv.includes('--browser-only') && (!filtered || restartWithFilter)) {
     const identity = await fetch(`${env.CRM_TEST_API}/auth/login`, {
       method: 'POST',
       headers: { Origin: env.CRM_APP_ORIGIN, 'Content-Type': 'application/json' },
