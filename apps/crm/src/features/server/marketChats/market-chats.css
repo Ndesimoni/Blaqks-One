@@ -1,0 +1,65 @@
+/* Messages → Marketplace chats on Team chat's frame (chat.css, chat-frame.css): the request
+   above each row, the privacy note, the read-only line and the request pane. */
+.market-chat-list ul {
+  margin-inline: -12px;
+}
+.market-chat-request {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.market-chat-list .inbox-row-preview {
+  overflow: hidden;
+  color: var(--muted-dark);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.market-chat-none {
+  padding: 12px 4px;
+}
+.market-chat-more {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding-block: 12px;
+}
+.market-chat-window,
+.market-chat-readonly {
+  margin: 0;
+  padding: 8px 16px;
+  border-block-end: 1px solid var(--line);
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.market-chat-readonly {
+  border-block: 1px solid var(--line) 0;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+}
+/* The request pane shows from 1280px, as Team chat's Members pane does (chat-frame.css). */
+@media (min-width: 1280px) {
+  .market-chat-side {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+  }
+}
+.market-chat-side dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+.market-chat-side dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.market-chat-side dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}

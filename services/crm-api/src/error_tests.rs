@@ -78,3 +78,13 @@ fn existing_mappings_are_unchanged() {
     assert_eq!(mapped("23503", None).0, StatusCode::CONFLICT);
     assert_eq!(mapped("40001", None).0, StatusCode::SERVICE_UNAVAILABLE);
 }
+
+#[test]
+fn registered_domain_codes_run_before_the_generic_mapping() {
+    crate::routes::register_domain_errors();
+    let domain = mapped("P0F05", None);
+    assert_eq!((domain.0, domain.2), (StatusCode::FORBIDDEN, "forbidden"));
+    assert_eq!(domain.1, domain_code("P0F05").unwrap().1);
+    assert_eq!(mapped("23P01", None).0, StatusCode::CONFLICT);
+    assert_eq!(mapped("P0001", None).0, StatusCode::SERVICE_UNAVAILABLE);
+}

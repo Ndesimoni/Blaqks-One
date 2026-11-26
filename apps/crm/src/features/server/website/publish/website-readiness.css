@@ -1,0 +1,57 @@
+/* Publish readiness checklist: each rule in words with a Done/To do state. */
+.website-readiness {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.website-readiness.is-invalid {
+  border-color: var(--danger);
+}
+.website-readiness h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+.website-readiness p {
+  margin: 2px 0 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.website-readiness ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.website-readiness li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.website-readiness li svg {
+  flex: none;
+  align-self: center;
+}
+.website-readiness .is-done svg {
+  color: var(--primary);
+}
+.website-readiness .is-needed svg {
+  color: var(--danger);
+}
+.website-readiness-state {
+  flex: none;
+  min-width: 3.5em;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.website-readiness .btn {
+  justify-self: start;
+  min-height: 44px;
+}

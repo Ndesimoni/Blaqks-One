@@ -1,0 +1,98 @@
+/* NAV5: what is waiting for this person, in a narrow panel from the right edge. */
+:root[data-theme] .modal-right > .drawer.notices-drawer {
+  width: min(420px, 100vw);
+  max-width: none;
+  height: 100dvh;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--panel);
+  box-shadow: -18px 0 50px rgba(8, 24, 20, 0.2);
+  animation: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme] .modal-right > .drawer.notices-drawer {
+    animation: record-panel-in 220ms var(--ease);
+  }
+}
+.notices-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  block-size: 100%;
+  padding: 20px;
+  overflow-y: auto;
+}
+.notices-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.notices-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.notices-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  inline-size: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+}
+.notice:hover {
+  background: var(--hover);
+}
+.notice-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.notice-text {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.notice-text > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.notices-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  color: var(--muted);
+  text-align: center;
+}
+.notices-empty strong {
+  color: var(--ink);
+}
+.notices-empty p {
+  margin: 0;
+  max-inline-size: 30ch;
+}
+/* Phones keep the bell out of the crowded top bar, as the approved mockup does. */
+@media (max-width: 750px) {
+  .header-bell {
+    display: none;
+  }
+}

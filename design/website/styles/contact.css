@@ -1,0 +1,31 @@
+.agent-contact {
+  margin-block: 18px;
+}
+.contact-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.contact-actions .button {
+  min-width: 0;
+  min-height: 46px;
+  margin: 0;
+  padding-inline: 10px;
+}
+.contact-actions .contact-whatsapp {
+  color: var(--on-green);
+  background: var(--green);
+  border-color: var(--green);
+}
+.contact-actions .button:hover {
+  border-color: var(--green);
+}
+.contact-actions a:only-child {
+  grid-column: 1 / -1;
+}
+.contact-note {
+  margin-top: 10px;
+}
+.agent-profile .agent-contact {
+  max-width: 360px;
+}

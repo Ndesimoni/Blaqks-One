@@ -1,0 +1,21 @@
+/* Leads as the mockup's screen (design queue item 3): the scope note for someone who sees only
+   their own, then one filter row whose kept filters (Source with counts, Lead stage, Assigned
+   to) sit beside the presets as pill selects. */
+:root[data-theme] .leads-scope-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+/* A narrower field keeps the presets, List / Kanban and the gear on one row at 1280. */
+.leads-page .grid-filter-field {
+  flex-basis: 240px;
+}
+.lead-card-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.lead-card-agent {
+  color: var(--muted);
+  font-size: 12px;
+}

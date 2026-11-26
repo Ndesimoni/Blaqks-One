@@ -1,0 +1,139 @@
+# Connected-mode CI (see docs/getting-started.md#continuous-integration).
+# The frozen browser-local demo suite (npm run test:e2e) is deliberately not run.
+name: CI
+
+on:
+  # Branch work is checked through its pull request; main is checked on every push.
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # Matches rust-version in both Cargo.toml files; raise deliberately with them.
+  RUST_TOOLCHAIN: '1.89'
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Formatting
+        run: npm run format:check
+      - name: Unit and smoke tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: File size (shrink-only baseline)
+        run: npm run check:lines:ci
+      - name: Backend module boundaries
+        run: npm run check:boundaries
+      - name: Translation catalogues
+        run: npm run check:i18n
+
+  rust:
+    name: Rust checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            services/crm-api -> target
+            services/calendar-companion -> target
+      - name: CRM API formatting
+        run: cargo fmt --manifest-path services/crm-api/Cargo.toml --check
+      - name: CRM API Clippy
+        run: >-
+          cargo clippy --manifest-path services/crm-api/Cargo.toml
+          --all-targets --locked -- -D warnings
+      - name: CRM API tests
+        run: cargo test --manifest-path services/crm-api/Cargo.toml --locked
+      - name: Calendar companion formatting
+        run: cargo fmt --manifest-path services/calendar-companion/Cargo.toml --check
+      - name: Calendar companion Clippy
+        run: >-
+          cargo clippy --manifest-path services/calendar-companion/Cargo.toml
+          --all-targets --locked -- -D warnings
+
+  api:
+    name: API tests ${{ matrix.shard }}/4
+    runs-on: ubuntu-latest
+    # The 30-minute ordered suite is split into four disjoint shards, each with its own
+    # disposable database; the restart check that needs a saved record has its own job.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test-setup
+      - name: API tests
+        run: >-
+          API_TEST_FILES="$(node scripts/crm-api-shard.mjs ${{ matrix.shard }} 4)"
+          npm run test:api
+
+  restart:
+    name: API restart check
+    runs-on: ubuntu-latest
+    # validation.test.mjs saves the record the restart assertion reads afterwards.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test-setup
+      - name: Restart check
+        run: >-
+          CRM_RESTART_WITH_FILTER=1
+          API_TEST_FILES=apps/crm/tests/api/validation.test.mjs
+          npm run test:api
+
+  browser:
+    name: Browser tests ${{ matrix.shard }}/3
+    runs-on: ubuntu-latest
+    # 144 serial stories need 35–45 minutes; three Playwright shards cut that to
+    # roughly 15 minutes each, alongside the API jobs.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/test-setup
+      - name: Tool versions
+        run: google-chrome --version
+      - name: Connected browser tests
+        run: npm run test:server:e2e -- --browser-only --shard=${{ matrix.shard }}/3
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
+      - name: Upload browser test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: connected-browser-results-${{ strategy.job-index }}
+          path: |
+            apps/crm/test-results-server/
+            apps/crm/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7

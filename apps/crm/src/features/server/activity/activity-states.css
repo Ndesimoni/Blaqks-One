@@ -1,0 +1,76 @@
+/* Activity empty, error, forbidden and loading states. */
+:root[data-theme] .panel.activity-message {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 40px 24px;
+  text-align: center;
+}
+.activity-message-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 4px;
+  border-radius: 14px;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+}
+.activity-message.is-danger .activity-message-icon {
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+:root[data-theme] .activity-message h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+}
+:root[data-theme] .activity-message p {
+  max-width: 460px;
+  margin: 0 0 4px;
+  color: var(--muted-dark);
+  font-size: 14px;
+}
+.activity-message .btn {
+  min-height: 44px;
+}
+.activity-skeleton {
+  display: block;
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  animation: activity-skeleton-pulse 1.4s ease-in-out infinite;
+}
+.activity-skeleton.is-label {
+  width: 110px;
+  height: 14px;
+}
+.activity-skeleton.is-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+.activity-skeleton-lines {
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+.activity-skeleton.is-line {
+  width: min(420px, 90%);
+  height: 12px;
+}
+.activity-skeleton.is-short {
+  width: min(180px, 50%);
+}
+@keyframes activity-skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-skeleton {
+    animation: none;
+  }
+  .activity-row {
+    transition: none;
+  }
+}

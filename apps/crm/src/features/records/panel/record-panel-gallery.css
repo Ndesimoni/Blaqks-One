@@ -1,0 +1,49 @@
+/* The record slider's gallery (approved mockup `.gallery`): one large photo with the others
+   stacked beside it, a single column on phones; the demo preview stays low. */
+.record-panel .media-gallery-strip:has(.photo-strip) {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 6px;
+}
+:root[data-theme] .record-panel .media-photo-hero {
+  height: 280px;
+}
+/* The other photos scroll down beside the large one rather than across under it. */
+:root[data-theme] .record-panel .photo-strip > .overflow-list-scroll {
+  max-height: 280px;
+  padding-bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+:root[data-theme] .record-panel .photo-strip .media-photo-thumbs {
+  grid-auto-flow: row;
+  grid-auto-columns: auto;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 0;
+  gap: 6px;
+}
+:root[data-theme] .record-panel .photo-strip .overflow-list-item {
+  width: auto;
+}
+:root[data-theme] .record-panel .media-photo-thumbs img {
+  height: 137px;
+}
+:root[data-theme] .record-panel .property-demo-preview > img {
+  height: 220px;
+  object-fit: cover;
+}
+/* Phones: the large photo, then the others in a row of two that scrolls down. */
+@media (max-width: 760px) {
+  .record-panel .media-gallery-strip:has(.photo-strip) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-theme] .record-panel .photo-strip .media-photo-thumbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :root[data-theme] .record-panel .media-photo-thumbs img {
+    height: 110px;
+  }
+  :root[data-theme] .record-panel .media-photo-hero {
+    height: 210px;
+  }
+}

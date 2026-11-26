@@ -24,7 +24,7 @@ pub fn mutation(state: &AppState, headers: &HeaderMap, expected: &str) -> ApiRes
     Ok(())
 }
 
-fn constant_time_equal(left: &[u8], right: &[u8]) -> bool {
+pub(crate) fn constant_time_equal(left: &[u8], right: &[u8]) -> bool {
     if left.len() != right.len() {
         return false;
     }

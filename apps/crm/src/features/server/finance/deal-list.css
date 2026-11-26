@@ -1,0 +1,106 @@
+/* Deals list: page head, table, money, chips and phone cards. Loaded after
+   finance-skeleton.css; deal-only classes, so Payments/Expenses keep theirs. */
+/* The page head (design queue item 5): Deals / Commission statement, the scope, Add deal. */
+.deals-head > .finance-tabs {
+  margin: 0;
+}
+.deals-head > .entries-scope {
+  flex: 1 1 240px;
+}
+.finance-status-chip.deal-chip {
+  white-space: nowrap;
+}
+.deal-table {
+  white-space: normal;
+}
+:root[data-theme] .deal-table :is(th, td) {
+  padding-inline: 14px;
+}
+.deal-table td {
+  overflow-wrap: break-word;
+}
+/* The deal's name wraps; its ID sits below it. */
+.deal-table .deal-name-cell {
+  min-width: 180px;
+}
+.deal-name-cell .finance-sub {
+  display: block;
+}
+.deal-table tbody tr {
+  cursor: pointer;
+}
+.deal-table td.finance-num {
+  color: var(--ink);
+  font-weight: 600;
+}
+.deal-payment-cell .finance-sub {
+  margin-top: 6px;
+  white-space: nowrap;
+}
+.deal-money {
+  display: inline-grid;
+  justify-items: end;
+  gap: 3px;
+}
+.deal-money.is-estimate {
+  color: var(--muted-dark);
+  font-weight: 500;
+}
+.deal-money .finance-estimate-tag {
+  padding: 0 6px;
+  border: 1px dashed currentColor;
+  border-radius: 999px;
+  color: var(--muted-dark);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+.deal-card-list {
+  gap: 10px;
+}
+.deal-card > button {
+  gap: 8px;
+  padding: 14px 16px;
+}
+.deal-card-title {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+/* The mockup card's meta line: client on the left, value on the right. */
+.deal-card-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+:root[data-theme] .deal-card-line .deal-card-client {
+  font-size: 13px;
+  font-weight: 500;
+}
+.deal-card-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.deal-card-money {
+  align-items: baseline;
+  margin-top: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.deal-card-money .deal-money {
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+.deal-card-money .deal-money.is-estimate {
+  color: var(--muted-dark);
+  font-weight: 600;
+}
+.deal-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 10px;
+}

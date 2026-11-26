@@ -1,0 +1,84 @@
+/* Company email (E3d): SendGrid status lines, the setup checklist and suffixed inputs. */
+.channel-status {
+  display: grid;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 10px 0 0;
+  border-block-start: 1px solid var(--line);
+  list-style: none;
+}
+.channel-connections .channel-status li {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.channel-status-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.channel-setup {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.channel-setup p {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+.channel-setup ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-inline-start: 20px;
+}
+/* An email address reads left to right in every language, so the suffix stays physical. */
+.channel-suffixed {
+  display: flex;
+  align-items: stretch;
+  direction: ltr;
+  min-inline-size: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.channel-suffixed:focus-within {
+  border-color: var(--focus);
+  outline: 2px solid var(--focus-ring);
+}
+.channel-field .channel-suffixed input {
+  flex: 1 1 auto;
+  min-inline-size: 6ch;
+  border: 0;
+  border-radius: 10px 0 0 10px;
+  outline: none;
+}
+.channel-field .channel-suffixed input:focus-visible {
+  outline: none;
+}
+.channel-suffixed span {
+  display: flex;
+  align-items: center;
+  max-inline-size: 65%;
+  padding-inline: 10px;
+  overflow: hidden;
+  border-inline-start: 1px solid var(--line);
+  border-radius: 0 10px 10px 0;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

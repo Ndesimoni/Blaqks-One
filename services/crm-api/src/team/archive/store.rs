@@ -4,6 +4,7 @@ use super::{
     snapshot,
 };
 use crate::assignments::departure;
+use crate::auth::sessions;
 use crate::error::{ApiError, ApiResult};
 use crate::team::{audit, members};
 use serde_json::{json, Value};
@@ -54,10 +55,20 @@ pub async fn archive(
     .bind(&ids)
     .execute(&mut *transaction)
     .await?;
-    sqlx::query("DELETE FROM crm_sessions WHERE user_id=ANY($1)")
-        .bind(&ids)
-        .execute(&mut *transaction)
-        .await?;
+    sessions::revoke_all(&mut transaction, &ids).await?;
+    // Their mailboxes, addresses and WhatsApp numbers end with their accounts (messaging
+    // design §3, review M1; WhatsApp design §4), in their own company workspace (W-M1).
+    let leaving = crate::integrations::Leaving::ALL;
+    let target = &scope.target_workspace;
+    crate::integrations::departure(&mut transaction, target, &ids, leaving, actor).await?;
+    // An Admin archive also ends the company's channels, releasing its domain and numbers.
+    if admin {
+        crate::integrations::company_archived(&mut transaction, &scope.target_workspace, actor)
+            .await?;
+        // Listings shared with or from other companies end too (R2).
+        crate::agreements::listings::end_for_company(&mut transaction, &scope.target_workspace)
+            .await?;
+    }
     sqlx::query(
         "UPDATE crm_team_invitations SET revoked_at=COALESCE(revoked_at,now()) \
          WHERE user_id=ANY($1) OR owner_id=ANY($1)",
@@ -71,6 +82,8 @@ pub async fn archive(
         let all = crate::records::visibility::ASSIGNABLE;
         let workspace = &scope.target_workspace;
         departure::release(&mut transaction, workspace, id, &all, actor, "departure").await?;
+        crate::finance::departure::release(&mut transaction, workspace, id, actor, "departure")
+            .await?;
     }
     for member in &ids {
         audit::append(

@@ -1,0 +1,123 @@
+/* Public profile fields, consent and confirmation text: Team dialogs and My profile. */
+.wt-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  align-items: start;
+}
+:root[data-theme] .wt-fields .field {
+  gap: 6px;
+}
+:root[data-theme] .wt-fields .field-error {
+  margin: 0;
+  font-size: 13px;
+}
+.wt-hint {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.wt-consent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.wt-consent[data-state='given'] svg {
+  color: var(--primary);
+}
+.wt-consent:not([data-state='given']) svg {
+  color: var(--muted-dark);
+}
+:root[data-theme] .wt-link {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.wt-link:hover:not(:disabled) {
+  color: var(--primary-hover);
+}
+.wt-consent-note {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.wt-consent-note h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+.wt-confirm-text {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.55;
+}
+/* Contacts only their owner may change: shown as text with one shared note. */
+.wt-locked {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 10px;
+}
+.wt-locked-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 20px;
+  margin: 0;
+}
+.wt-locked-list dt {
+  margin-bottom: 6px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+.wt-locked-list dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.wt-locked-list dd.is-empty {
+  color: var(--muted-dark);
+}
+.wt-locked-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.wt-locked-note svg {
+  flex: none;
+  margin-top: 2px;
+}
+/* Sized to their content on wider screens; phones keep the shared full-screen layout. */
+.wt-dialog {
+  --dialog-width: 720px;
+}
+.wt-dialog.wt-confirm {
+  --dialog-width: 560px;
+}
+@media (min-width: 751px) {
+  .modal-centered > .drawer.wt-dialog {
+    height: auto;
+  }
+}
+@media (max-width: 650px) {
+  .wt-fields,
+  .wt-locked-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,83 @@
+/* The CRM dashboard drawn in the page: its frame, top bar and greeting. */
+.dash {
+  border-radius: 18px;
+  border: 1px solid var(--edge-2);
+  background: var(--dash-bg);
+  box-shadow: var(--big-shadow);
+  overflow: hidden;
+  text-align: left;
+}
+.dash-top {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--edge);
+  font-size: 13px;
+}
+.dash-top .wordmark {
+  font-size: 17px;
+}
+.dash-tabs {
+  display: flex;
+  gap: 6px;
+  color: var(--text-2);
+}
+.dash-tabs span {
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.dash-tabs span.on {
+  background: rgba(188, 151, 101, 0.14);
+  color: var(--gold-ink);
+}
+.dash-tabs svg {
+  width: 14px;
+  height: 14px;
+}
+.dash-me {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--text-2);
+}
+.dash-me svg {
+  width: 17px;
+  height: 17px;
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--gold-2), var(--gold));
+  color: var(--on-gold);
+  font-weight: 700;
+  font-size: 12px;
+}
+.dash-body {
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+}
+.dash-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dash-title h4 {
+  margin: 0;
+  font: 600 19px var(--display);
+}
+.dash-title span {
+  font-size: 12px;
+  color: var(--text-2);
+  border: 1px solid var(--edge-2);
+  padding: 4px 10px;
+  border-radius: 8px;
+}

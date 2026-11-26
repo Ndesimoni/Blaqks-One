@@ -1,0 +1,74 @@
+/* Record details as a panel from the right edge (NAV: Bitrix24's record slider, approved
+   mockup). Wide on desktop with its close button beside the edge; full screen on phones.
+   Scoped selectors outrank the shared drawer rules without changing other dialogs. */
+.modal-root.modal-right {
+  justify-content: flex-end;
+}
+:root[data-theme] .modal-right > .drawer.record-panel {
+  position: relative;
+  width: min(920px, calc(100vw - 96px));
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--bg);
+  box-shadow: -18px 0 50px rgba(8, 24, 20, 0.2);
+  animation: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme] .modal-right > .drawer.record-panel {
+    animation: record-panel-in 220ms var(--ease);
+  }
+}
+@keyframes record-panel-in {
+  from {
+    transform: translateX(40px);
+    opacity: 0.6;
+  }
+}
+/* Close sits beside the panel's edge on wide screens and in its top corner on phones. */
+:root[data-theme] .record-panel .record-panel-close {
+  position: absolute;
+  top: 14px;
+  inset-inline-start: -56px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgba(8, 24, 20, 0.18);
+}
+:root[data-theme] .record-panel .record-panel-close:hover:not(:disabled) {
+  background: var(--hover);
+}
+:root[data-theme] .record-panel .record-panel-close:active:not(:disabled) {
+  filter: brightness(0.95);
+}
+@media (max-width: 760px) {
+  :root[data-theme] .modal-right > .drawer.record-panel {
+    width: 100vw;
+  }
+  :root[data-theme] .record-panel .record-panel-close {
+    top: 12px;
+    inset-inline: auto 12px;
+    box-shadow: none;
+  }
+}
+/* Call, Message and Delete as square icon buttons in the slider header (approved mockup); the
+   name stays for screen readers and shows as the tooltip. */
+:root[data-theme] .record-panel .record-panel-actions .btn.record-icon-action {
+  inline-size: 44px;
+  padding-inline: 0;
+}
+.record-panel-actions .record-icon-action > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

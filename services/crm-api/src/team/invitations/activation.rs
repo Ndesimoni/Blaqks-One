@@ -1,14 +1,18 @@
 use super::inspect;
-use crate::team::{access, audit, validation};
+use crate::team::{access, account_type::seats, audit};
 use crate::{
-    auth::{password, protection, session, throttle},
+    auth::{
+        accounts, device, identity_rules, password, password_policy, profile::Profile, protection,
+        session, sessions, throttle,
+    },
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     state::AppState,
     workspaces,
 };
 use axum::{
     extract::{rejection::JsonRejection, State},
-    http::HeaderMap,
+    http::{header, HeaderMap},
     Json,
 };
 use serde::Deserialize;
@@ -22,30 +26,33 @@ pub struct AcceptRequest {
     phone: Option<String>,
 }
 
+/// Activates the invited account and signs the person in, as sign-up does once the account
+/// exists (design queue item 34: joining goes straight into the workspace). The session is
+/// issued in the activation's transaction, for the account's own workspace.
 pub async fn accept(
     State(state): State<AppState>,
     headers: HeaderMap,
     body: Result<Json<AcceptRequest>, JsonRejection>,
-) -> ApiResult<Json<Value>> {
+) -> ApiResult<(HeaderMap, Json<Value>)> {
     protection::origin(&state, &headers)?;
     let Json(request) =
         body.map_err(|_| ApiError::invalid("Provide an invitation and password."))?;
     throttle::invitation(&state.pool, &request.token).await?;
-    if !password::valid_length(&request.password) {
-        return Err(ApiError::invalid(
-            "Use a password of at least 8 characters and at most 1024 bytes.",
-        ));
+    // The new-password policy (account-self-service.md): rules first, the email once known.
+    if !password_policy::strong(&request.password) {
+        return Err(password_policy::weak());
     }
     if request
         .phone
         .as_ref()
-        .is_some_and(|phone| !validation::phone(phone))
+        .is_some_and(|phone| !identity_rules::phone(phone))
     {
         return Err(ApiError::invalid(
             "Provide a phone number including country code.",
         ));
     }
     let invitation = inspect::find(&state.pool, &request.token).await?;
+    password_policy::check(&request.password, None, &invitation.email)?;
     let permit = state
         .password_workers
         .acquire()
@@ -64,6 +71,15 @@ pub async fn accept(
     .fetch_one(&mut *transaction)
     .await?;
     if !pending {
+        return Err(inspect::unavailable());
+    }
+    if !seats::available(
+        &mut transaction,
+        &invitation.workspace_id,
+        Some(invitation.user_id),
+    )
+    .await?
+    {
         return Err(inspect::unavailable());
     }
     let consumed = sqlx::query(
@@ -97,6 +113,31 @@ pub async fn accept(
         "activated",
     )
     .await?;
+    let agent = headers
+        .get(header::USER_AGENT)
+        .and_then(|value| value.to_str().ok());
+    let label = device::label(agent);
+    let issued = sessions::issue(&mut transaction, invitation.user_id, label.as_deref()).await?;
+    let profile = accounts::live_profile(&mut transaction, invitation.user_id).await?;
+    let (team, role) = (profile.workspace_id.as_str(), Some(profile.role.as_str()));
+    let accepted = Event::usage(names::INVITATION_ACCEPTED, team, role, Source::Crm);
+    platform_metrics::record(&mut transaction, accepted).await?;
+    let company = workspaces::company::get(&mut *transaction, &profile.workspace_id).await?;
     transaction.commit().await?;
-    Ok(Json(json!({"ok":true})))
+    let mut response_headers = HeaderMap::new();
+    response_headers.insert(
+        header::SET_COOKIE,
+        session::cookie(&issued.token, state.config.secure_cookie, false)
+            .parse()
+            .unwrap(),
+    );
+    Ok((
+        response_headers,
+        Json(json!({
+            "ok": true,
+            "user": Profile::from(profile),
+            "csrfToken": issued.csrf_token,
+            "company": company,
+        })),
+    ))
 }

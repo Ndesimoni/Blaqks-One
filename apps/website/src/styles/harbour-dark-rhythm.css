@@ -1,0 +1,94 @@
+/* Harbour (company theme 1): the hero's charcoal gradient returns as the page's rhythm.
+   The services band and the closing-to-footer ending are dark and full width; listings,
+   story, people and FAQ stay light so photographs and reading stay crisp. Backgrounds reach
+   the screen edges through border-image outsets (ink overflow, so no sideways scrolling)
+   while the centred markup stays as it is. Not an atelier-* file, so theme 2 never copies it. */
+body[data-site-kind='company'][data-theme='1'] :is(.a-services, .a-closing, .a-footer) {
+  --line: #ffffff26;
+  --muted: #aeb6bf;
+  --soft: #ffffff14;
+  border-image-slice: fill 0;
+  /* Paint under the borders as well, so no light hairline shows where two dark parts meet. */
+  border-image-width: 0;
+  border-image-outset: 0 100vmax;
+  color: #f4f5f2;
+}
+body[data-site-kind='company'][data-theme='1'] :is(.a-services, .a-closing, .a-footer) :is(h2, h3) {
+  color: #fff;
+}
+body[data-site-kind='company'][data-theme='1']
+  :is(.a-services, .a-closing, .a-footer)
+  :is(p, small, figcaption, .a-kicker) {
+  color: var(--muted);
+}
+body[data-site-kind='company'][data-theme='1']
+  :is(.a-services, .a-closing, .a-footer)
+  :focus-visible {
+  outline-color: #fff;
+}
+
+/* Services: a dusk band, lighter at the top left like light falling on the facade. */
+body[data-site-kind='company'][data-theme='1'] .a-services {
+  padding-block: 96px;
+  border-image-source: linear-gradient(165deg, #2c343e 0%, #1c232c 50%, #121921 100%);
+}
+body[data-site-kind='company'][data-theme='1'] .a-services .a-service-grid {
+  background: transparent;
+}
+body[data-site-kind='company'][data-theme='1'] .a-services .a-service-list {
+  padding: 28px 44px 28px 0;
+}
+body[data-site-kind='company'][data-theme='1'] .a-services :is(summary, a) {
+  color: #fff;
+}
+body[data-site-kind='company'][data-theme='1'] .a-services a:hover {
+  color: #d9dee3;
+}
+
+/* The ending: "Let's find your place." darkens into the footer without a seam or a gap. */
+body[data-site-kind='company'][data-theme='1'] .a-closing {
+  padding-block: 104px 96px;
+  /* Only the rule lines go: the border shorthand would also reset the border-image above. */
+  border-block-width: 0;
+  border-image-source: linear-gradient(180deg, #2a313a 0%, #161c24 100%);
+}
+body[data-site-kind='company'][data-theme='1'] .a-closing .a-action {
+  background: #fff;
+  border-color: #fff;
+  color: #191a19;
+}
+body[data-site-kind='company'][data-theme='1'] .a-closing .a-action:hover {
+  background: #e7eaee;
+  border-color: #e7eaee;
+}
+/* More specific than each page's own section spacing, so the ending meets the footer. */
+body[data-site-kind='company'][data-theme='1'] :is(main, div) > .a-closing.a-section {
+  margin-bottom: 0;
+}
+body[data-site-kind='company'][data-theme='1'] .a-footer {
+  border-image-source: linear-gradient(180deg, #161c24 0%, #0d1218 100%);
+}
+body[data-site-kind='company'][data-theme='1']:has(.a-closing) .a-footer {
+  margin-top: 0;
+}
+body[data-site-kind='company'][data-theme='1'] .a-footer a {
+  color: #e7eaee;
+}
+body[data-site-kind='company'][data-theme='1'] .a-footer a:hover {
+  color: #fff;
+}
+body[data-site-kind='company'][data-theme='1'] .a-footer .a-wordmark :is(span, small) {
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-services {
+    padding-block: 64px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-services .a-service-list {
+    padding: 8px 0 28px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-closing {
+    padding-block: 72px 64px;
+  }
+}

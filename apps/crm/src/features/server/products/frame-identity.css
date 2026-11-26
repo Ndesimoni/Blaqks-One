@@ -1,0 +1,47 @@
+/* The approved mockup's identity in the Bitrix24 frame (owner, 2026-11-01): serif titles,
+   text-only section entries with gold count pills, and icon-only header controls. */
+.header-page,
+.section-sidebar-title,
+.start-hello h1,
+#search-results-title,
+#notices-title,
+.messenger-head h2,
+.record-panel-title h2 {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+:root[data-theme] .section-sidebar-title {
+  font-size: 19px;
+}
+/* Section entries read as plain text with their counts, as the mockup's sidebar does. */
+.section-sidebar .connected-nav-item > svg {
+  display: none;
+}
+:root[data-theme] .section-sidebar .connected-nav-item {
+  min-block-size: 40px;
+  padding: 9px 10px;
+  border-radius: 10px;
+}
+:root[data-theme] .section-sidebar .connected-nav-badge {
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: #2a4434;
+  color: var(--gold-light);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+/* The theme switch is an icon in the top bar; its name still says what it does. */
+:root[data-theme] .topbar .theme-switch {
+  inline-size: 40px;
+  min-inline-size: 40px;
+  block-size: 40px;
+  padding: 0;
+  justify-content: center;
+  border-color: transparent;
+  background: none;
+  color: var(--muted);
+}
+.topbar .theme-switch > span {
+  display: none;
+}

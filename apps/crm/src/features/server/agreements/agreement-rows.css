@@ -1,0 +1,101 @@
+/* Agreement rows: counterparty first, your side's share and the state. After agreements.css. */
+.agreements-list-panel {
+  display: grid;
+  gap: 12px;
+}
+.agreements-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  list-style: none;
+}
+.agreements-list li + li {
+  border-block-start: 1px solid var(--line);
+}
+.agreement-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+  inline-size: 100%;
+  min-block-size: 72px;
+  padding: 14px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: start;
+  transition: background-color var(--duration) var(--ease);
+}
+.agreement-row:hover {
+  background: var(--hover);
+}
+.agreement-row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.agreement-row > svg {
+  display: none;
+  color: var(--muted);
+}
+.agreement-row-main,
+.agreement-row-share,
+.agreement-row-status {
+  display: grid;
+  gap: 3px;
+  min-inline-size: 0;
+}
+.agreement-row-main strong {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+}
+.agreement-row-kind,
+.agreement-row-share small,
+.agreement-row-status small,
+.agreement-row-sub {
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.agreement-row-kind {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.agreement-row-share {
+  justify-items: end;
+  text-align: end;
+}
+.agreement-row-share strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.agreement-row-status {
+  grid-column: 1 / -1;
+  grid-auto-flow: column;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+}
+:is(.agreement-row-status, .agreement-status) .is-urgent {
+  color: var(--ink);
+  font-weight: 700;
+}
+@media (min-width: 760px) {
+  .agreement-row {
+    grid-template-columns: minmax(0, 1fr) 120px 210px 16px;
+  }
+  .agreement-row-status {
+    grid-column: auto;
+    grid-auto-flow: row;
+    justify-items: start;
+  }
+  .agreement-row > svg {
+    display: block;
+  }
+}

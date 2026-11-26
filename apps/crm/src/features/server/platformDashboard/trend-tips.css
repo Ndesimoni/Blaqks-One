@@ -1,0 +1,59 @@
+/* Platform trend charts: the hover tooltip over each month (the whole column is the target)
+   the quiet pill shown when a series is empty or not tracked yet, and the note explaining
+   shaded months that were not tracked yet. */
+.trend-slot::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 2;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--panel);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 6px));
+  transition: opacity var(--duration) var(--ease);
+}
+.trend-col:nth-child(-n + 4 of .trend-col) .trend-slot::after {
+  left: 0;
+  transform: translate(0, calc(-100% - 6px));
+}
+.trend-col:nth-last-child(-n + 4 of .trend-col) .trend-slot::after {
+  left: auto;
+  right: 0;
+  transform: translate(0, calc(-100% - 6px));
+}
+.trend-col:hover .trend-slot::after {
+  opacity: 1;
+}
+.trend-empty {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  z-index: 1;
+  margin: 0;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted-dark);
+  font-size: 12.5px;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+.trend-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trend-slot::after,
+  .trend-bar {
+    transition: none;
+  }
+}

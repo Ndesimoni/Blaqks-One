@@ -1,0 +1,138 @@
+/* Inbox internal notes, composer and the client panel. */
+.inbox-note {
+  display: grid;
+  gap: 4px;
+  margin-inline: auto;
+  inline-size: min(88%, 560px);
+  padding: 10px 14px;
+  border: 1px dashed var(--gold);
+  border-radius: 12px;
+  background: var(--accent-subtle);
+}
+.inbox-note-label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.inbox-note-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* Tabs and a one-line message box, compact as in messenger apps. */
+.inbox-composer {
+  padding: 6px 16px 8px;
+  border-block-start: 1px solid var(--line);
+  background: var(--panel);
+}
+.inbox-composer-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-block-end: 6px;
+}
+.inbox-composer-tabs {
+  display: flex;
+  gap: 6px;
+}
+.inbox-composer-tab {
+  min-block-size: 32px;
+  padding-inline: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13px;
+}
+.inbox-composer-tab.is-active {
+  border-color: var(--primary);
+  font-weight: 700;
+}
+.inbox-composer-tab.is-note.is-active {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.inbox-reply-notice {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--muted);
+  font-size: 13px;
+}
+/* Internal notes use the shared message box, tinted like the Internal note tab. */
+.composer-box.is-note {
+  background: var(--accent-subtle);
+}
+.inbox-note-actions {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  color: var(--muted);
+}
+.inbox-panel-section {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+.inbox-eyebrow {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.inbox-panel-name {
+  font-size: 18px;
+}
+.inbox-panel-sub,
+.inbox-panel-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.inbox-facts {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+.inbox-facts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.inbox-facts dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.inbox-coming {
+  display: grid;
+  gap: 8px;
+  padding-block-start: 10px;
+  border-block-start: 1px solid var(--line);
+}
+.inbox-coming ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.inbox-coming li {
+  display: grid;
+}
+.inbox-coming small {
+  color: var(--muted);
+}
+.inbox-link {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-weight: 600;
+}

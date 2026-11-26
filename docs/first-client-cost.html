@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Getting Our First Client — Cost Breakdown</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 15mm 14mm;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font:
+          9.8pt/1.42 -apple-system,
+          'Segoe UI',
+          Helvetica,
+          Arial,
+          sans-serif;
+        color: #1f2937;
+        margin: 0;
+      }
+      h1 {
+        font-size: 21pt;
+        margin: 0 0 2mm;
+        color: #0f172a;
+        letter-spacing: -0.4pt;
+      }
+      .sub {
+        color: #6b7280;
+        font-size: 9.5pt;
+        margin: 0 0 4mm;
+      }
+      .rule {
+        height: 2px;
+        background: linear-gradient(90deg, #b08d57, #e5d5b7 55%, #fff);
+        margin: 0 0 5mm;
+      }
+      h2 {
+        font-size: 10.5pt;
+        color: #0f172a;
+        margin: 3.4mm 0 1.6mm;
+        text-transform: uppercase;
+        letter-spacing: 0.7pt;
+      }
+      h2 i {
+        color: #b08d57;
+        font-style: normal;
+      }
+      p {
+        margin: 0 0 2mm;
+      }
+      .lead {
+        font-size: 11pt;
+        color: #111827;
+      }
+      .hero {
+        display: flex;
+        gap: 3mm;
+        margin: 0 0 1mm;
+      }
+      .kpi {
+        flex: 1;
+        border: 1px solid #e5e7eb;
+        border-top: 3px solid #b08d57;
+        border-radius: 3px;
+        padding: 3.5mm 3mm;
+      }
+      .kpi .v {
+        font-size: 17pt;
+        font-weight: 700;
+        color: #0f172a;
+        letter-spacing: -0.5pt;
+      }
+      .kpi .l {
+        font-size: 7.5pt;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.6pt;
+      }
+      .kpi .s {
+        font-size: 8.5pt;
+        color: #9ca3af;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9pt;
+      }
+      th {
+        text-align: left;
+        font-weight: 600;
+        color: #6b7280;
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        letter-spacing: 0.5pt;
+        border-bottom: 1px solid #d1d5db;
+        padding: 2mm;
+      }
+      td {
+        padding: 1.45mm 2mm;
+        border-bottom: 1px solid #f1f2f4;
+      }
+      td.n,
+      th.n {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      tr.total td {
+        font-weight: 700;
+        border-top: 1.5px solid #0f172a;
+        border-bottom: none;
+        color: #0f172a;
+      }
+      .muted {
+        color: #6b7280;
+      }
+      .ok {
+        color: #047857;
+        font-weight: 600;
+      }
+      ul {
+        margin: 0 0 2.5mm;
+        padding-left: 5mm;
+      }
+      li {
+        margin-bottom: 1.2mm;
+      }
+      .two {
+        display: flex;
+        gap: 6mm;
+      }
+      .two > div {
+        flex: 1;
+      }
+      .box {
+        background: #f8f7f4;
+        border-left: 3px solid #b08d57;
+        padding: 2.5mm 3.5mm;
+        margin: 2.5mm 0 0;
+      }
+      .box b {
+        color: #0f172a;
+      }
+      footer {
+        margin-top: 2.5mm;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 2.5mm;
+        font-size: 7.5pt;
+        color: #9ca3af;
+        display: flex;
+        justify-content: space-between;
+      }
+      .pb {
+        page-break-before: always;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Getting Our First Client</h1>
+    <div class="sub">
+      What it costs to run the platform for one paying company &nbsp;·&nbsp; Prepared for Aidah
+      &nbsp;·&nbsp; 4 November 2026
+    </div>
+    <div class="rule"></div>
+
+    <div class="hero">
+      <div class="kpi">
+        <div class="l">Year one</div>
+        <div class="v">$360</div>
+        <div class="s">≈ AED 1,322</div>
+      </div>
+      <div class="kpi">
+        <div class="l">Effective monthly</div>
+        <div class="v">$30</div>
+        <div class="s">≈ AED 110</div>
+      </div>
+      <div class="kpi">
+        <div class="l">Month 1 cash</div>
+        <div class="v">$105</div>
+        <div class="s">≈ AED 386</div>
+      </div>
+      <div class="kpi">
+        <div class="l">Each extra client</div>
+        <div class="v">$1.50</div>
+        <div class="s">per month</div>
+      </div>
+    </div>
+
+    <p class="lead" style="margin-top: 4mm">
+      <b>The short version.</b> One rented server runs the entire product: the CRM, the company
+      websites, the API and the database. Domains, security certificates, firewalls and backups are
+      either included or free. For our first client we would also cover their domain and their
+      email, so they receive one working system at no cost to them.
+    </p>
+
+    <h2><i>1</i> &nbsp;What we pay for</h2>
+    <table>
+      <tr>
+        <th>Service</th>
+        <th>Billing</th>
+        <th class="n">Month 1</th>
+        <th class="n">Year 1</th>
+      </tr>
+      <tr>
+        <td>Our domain (blaqks.one)</td>
+        <td class="muted">annual</td>
+        <td class="n">$12</td>
+        <td class="n">$12</td>
+      </tr>
+      <tr>
+        <td>Client's domain, paid by us for the first client</td>
+        <td class="muted">annual</td>
+        <td class="n">$12</td>
+        <td class="n">$12</td>
+      </tr>
+      <tr>
+        <td>Our mailboxes — 2 seats (Zoho Mail Lite)</td>
+        <td class="muted">annual</td>
+        <td class="n">$24</td>
+        <td class="n">$24</td>
+      </tr>
+      <tr>
+        <td>Client's mailboxes — 3 seats (Zoho Mail Lite)</td>
+        <td class="muted">annual</td>
+        <td class="n">$36</td>
+        <td class="n">$36</td>
+      </tr>
+      <tr>
+        <td>Server — 2 CPU / 4 GB, UAE region: CRM, websites, API, database</td>
+        <td class="muted">monthly</td>
+        <td class="n">$20</td>
+        <td class="n">$240</td>
+      </tr>
+      <tr>
+        <td>Photo and file storage (property photos, floor plans)</td>
+        <td class="muted">monthly</td>
+        <td class="n">$0.25</td>
+        <td class="n">$3</td>
+      </tr>
+      <tr>
+        <td>Nightly database backups</td>
+        <td class="muted">monthly</td>
+        <td class="n">$0.17</td>
+        <td class="n">$2</td>
+      </tr>
+      <tr>
+        <td>System email (invitations, password resets, enquiries)</td>
+        <td class="muted">monthly</td>
+        <td class="n">$0.50</td>
+        <td class="n">$6</td>
+      </tr>
+      <tr>
+        <td>Currency and rounding buffer</td>
+        <td class="muted">—</td>
+        <td class="n">—</td>
+        <td class="n">$25</td>
+      </tr>
+      <tr class="total">
+        <td>Total</td>
+        <td></td>
+        <td class="n">$105</td>
+        <td class="n">$360</td>
+      </tr>
+    </table>
+    <p class="muted" style="font-size: 8.5pt; margin-top: 2mm">
+      Mailboxes are billed yearly with no monthly option, which is why month one is higher than the
+      months that follow. Months 2–12 cost about $21.50 each.
+    </p>
+
+    <h2><i>2</i> &nbsp;What is already free</h2>
+    <div class="two">
+      <div>
+        <ul>
+          <li>Security certificate (SSL) for every domain — automatic and renewed for us</li>
+          <li>Firewall, attack protection and global content delivery</li>
+          <li>DNS and bot protection on sign-up</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li>Database, web server and application software — all open source</li>
+          <li>Uptime monitoring and alerts</li>
+          <li>Unlimited traffic within normal use</li>
+        </ul>
+      </div>
+    </div>
+    <p>
+      <span class="ok">$0 per year.</span> These are not trials — they are permanent free tiers we
+      can start on and grow out of later.
+    </p>
+
+    <div class="pb"></div>
+    <h2><i>3</i> &nbsp;What the client would pay if they cover it themselves</h2>
+    <p>
+      From client two onwards we would ask them to own these two items. Both are normal business
+      costs, and both are theirs to keep if they ever leave us.
+    </p>
+    <table>
+      <tr>
+        <th>Item</th>
+        <th>Option</th>
+        <th class="n">Cost</th>
+      </tr>
+      <tr>
+        <td rowspan="3">Their domain</td>
+        <td>.com</td>
+        <td class="n">$10–13 / year</td>
+      </tr>
+      <tr>
+        <td>.ae (strongest trust signal in the UAE)</td>
+        <td class="n">AED 150–250 / year</td>
+      </tr>
+      <tr>
+        <td>Security certificate</td>
+        <td class="n"><span class="ok">$0 — we provide it</span></td>
+      </tr>
+      <tr>
+        <td rowspan="4">Their email</td>
+        <td>Zoho Free — 5 users, webmail only</td>
+        <td class="n">$0</td>
+      </tr>
+      <tr>
+        <td>Zoho Mail Lite — recommended</td>
+        <td class="n">AED 3.65 per user / month</td>
+      </tr>
+      <tr>
+        <td>Microsoft 365 Business Basic</td>
+        <td class="n">≈ $6 per user / month</td>
+      </tr>
+      <tr>
+        <td>Google Workspace Starter</td>
+        <td class="n">≈ $7.20 per user / month</td>
+      </tr>
+    </table>
+    <p class="muted" style="margin-top: 2mm">
+      For a team of three, the recommended option is about <b>AED 132 per year</b>.
+    </p>
+
+    <h2><i>4</i> &nbsp;Why this stays cheap as we grow</h2>
+    <p>
+      One website application serves every company's site, matched by the address the visitor typed.
+      Ten clients do not mean ten servers — they mean ten names pointing at the same system.
+    </p>
+    <table>
+      <tr>
+        <th>Clients</th>
+        <th class="n">Platform cost / year</th>
+        <th>Note</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td class="n">$360</td>
+        <td class="muted">Includes domains and mailboxes for both sides</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td class="n">≈ $375</td>
+        <td class="muted">Infrastructure only; their own domains and mail are theirs</td>
+      </tr>
+      <tr>
+        <td>50</td>
+        <td class="n">≈ $430</td>
+        <td class="muted">Still one server at this stage</td>
+      </tr>
+    </table>
+
+    <h2><i>5</i> &nbsp;What we charge, and what we keep</h2>
+    <table>
+      <tr>
+        <th>Price per company / month</th>
+        <th class="n">Kept after costs</th>
+        <th class="n">Year one</th>
+      </tr>
+      <tr>
+        <td>AED 199</td>
+        <td class="n">AED 89</td>
+        <td class="n">AED 1,068</td>
+      </tr>
+      <tr>
+        <td><b>AED 499 — suggested</b></td>
+        <td class="n"><b>AED 389</b></td>
+        <td class="n"><b>AED 4,668</b></td>
+      </tr>
+      <tr>
+        <td>AED 999</td>
+        <td class="n">AED 889</td>
+        <td class="n">AED 10,668</td>
+      </tr>
+    </table>
+    <p class="muted" style="margin-top: 2mm">
+      At AED 499, one client covers the first year of the entire platform more than three times
+      over.
+    </p>
+
+    <h2><i>6</i> &nbsp;What still has to be finished before we can sell</h2>
+    <div class="two">
+      <div>
+        <ul>
+          <li>Connecting a client's own domain automatically</li>
+          <li>Showing them which address settings to add, and checking them</li>
+          <li>Removing a domain safely if they leave</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li>The Website settings screen inside the CRM</li>
+          <li>Reserved company names and address rules</li>
+          <li>Final terms, privacy notice and consent wording</li>
+        </ul>
+      </div>
+    </div>
+    <p>
+      This is roughly a few weeks of building, not a new budget line. The money is ready; the last
+      pieces of the product are not.
+    </p>
+
+    <div class="box">
+      <b>Recommendation.</b> Start on one server at about <b>$30 a month</b>, cover the first
+      client's domain and email ourselves, and price from <b>AED 499 per company per month</b>. Keep
+      security, certificates and backups on the free tiers until a paying client asks for more.
+      <b>Decision needed from Aidah:</b> confirm AED 499 as our starting price, and confirm we cover
+      the first client's domain and email as a launch offer.
+    </div>
+
+    <footer>
+      <div>Blaqks One — first client cost summary</div>
+      <div>List prices, November 2026, excluding 5% UAE VAT</div>
+    </footer>
+  </body>
+</html>

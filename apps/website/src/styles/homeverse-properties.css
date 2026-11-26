@@ -1,0 +1,100 @@
+body[data-site-kind='company'][data-theme='2'] .v-featured {
+  padding-top: 50px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-property-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-property-card {
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #dce1e8;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px #071b3a06;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-image {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background: #e4e8ee;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-image img {
+  height: auto;
+  width: 100%;
+  aspect-ratio: 1.4;
+  object-fit: cover;
+  display: block;
+  transition: transform 350ms ease;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-image:hover img {
+  transform: scale(1.035);
+}
+body[data-site-kind='company'][data-theme='2'] .v-status {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 8px;
+  background: #071b3a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-status-sale {
+  background: #c99b50;
+  color: #071b3a;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-price {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 26px 13px 9px;
+  background: linear-gradient(transparent, #06152de8);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-copy {
+  padding: 15px 13px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-copy h3 {
+  font-size: 19px;
+  line-height: 1.3;
+  margin: 0 0 7px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-copy h3 a {
+  text-decoration: none;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-copy h3 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-copy > p {
+  color: #596575;
+  font-size: 11px;
+  margin: 0 0 15px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-card-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  border-top: 1px solid #e4e8ee;
+  padding-top: 12px;
+  color: #596575;
+  font-size: 11px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-view-all > .v-button {
+  display: flex;
+  width: fit-content;
+  margin: 30px auto 0;
+  background: #071b3a;
+  border-color: #071b3a;
+  color: #fff;
+}
+
+body[data-site-kind='company'][data-theme='2'] .v-view-all {
+  text-align: center;
+}

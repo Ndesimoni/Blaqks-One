@@ -1,0 +1,71 @@
+/* The seat bar (approved mockup): plan and usage with a meter, actions at the end. */
+:root[data-theme] .connected-team-toolbar {
+  align-items: center;
+  padding: 16px 20px;
+}
+.team-seat-bar {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+  min-inline-size: 0;
+  max-inline-size: 520px;
+}
+.team-seat-bar .team-seat-summary {
+  gap: 10px;
+}
+.team-seat-meter {
+  block-size: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--hover);
+}
+.team-seat-meter > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--pipeline-active);
+}
+.team-seat-meter.is-full > span {
+  background: var(--gold);
+}
+.team-seat-bar p,
+.team-seat-note {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.team-seat-buttons {
+  flex: none;
+}
+@media (max-width: 650px) {
+  .team-seat-buttons {
+    flex-wrap: wrap;
+  }
+}
+/* People | Finance settings read like the header's section tabs (NAV). */
+:root[data-theme] .tabs.team-tabs {
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  border-block-end: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+:root[data-theme] .tabs.team-tabs button {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 0;
+  border-block-end: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+:root[data-theme] .tabs.team-tabs button.active {
+  border-block-end-color: var(--gold);
+  background: none;
+  color: var(--ink);
+  box-shadow: none;
+}

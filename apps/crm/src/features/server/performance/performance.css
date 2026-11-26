@@ -1,0 +1,142 @@
+/* Connected Performance: filter bar, page rhythm and the Admin target editor. */
+.connected-performance {
+  gap: 16px;
+}
+.perf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.perf-toolbar-context {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.perf-scope-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+:root[data-theme] .perf-toolbar h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+}
+.perf-toolbar p {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+.perf-toolbar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+.perf-month {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.perf-toolbar label {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+.perf-month .date-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+}
+:root[data-theme] .perf-month .date-select:focus-within {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+:root[data-theme] .perf-month .date-select {
+  align-self: stretch;
+  margin: 0;
+}
+.perf-month input:focus-visible {
+  outline: 0;
+}
+.perf-month input {
+  flex: 1 1 auto;
+  min-height: 42px;
+  border: 0;
+  outline: 0;
+  font-variant-numeric: tabular-nums;
+}
+.perf-toolbar .assigned-filter {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+:root[data-theme] .perf-toolbar .assigned-filter select {
+  min-height: 44px;
+}
+.target-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.target-form label {
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+.target-form-row {
+  display: flex;
+  gap: 8px;
+}
+.target-form input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  transition:
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.target-form input:hover {
+  border-color: var(--muted);
+}
+.target-form input:focus-visible {
+  border-color: var(--focus);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.target-form input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+.target-form .btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+.target-form .field-error {
+  margin: 0;
+  font-size: 12px;
+}
+@media (max-width: 750px) {
+  .perf-toolbar-controls,
+  .perf-month,
+  .perf-toolbar .assigned-filter {
+    width: 100%;
+  }
+}

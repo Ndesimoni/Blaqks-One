@@ -1,0 +1,21 @@
+# cargo-deny policy for both Rust crates (services/crm-api and services/calendar-companion).
+# CI runs: cargo deny --all-features --config deny.toml check advisories bans sources
+# The licence check was removed at the owner's request; dependency licences are no
+# longer a CI gate.
+
+[advisories]
+version = 2
+yanked = "deny"
+ignore = [
+  # chrono 0.4.45 is the newest release; the crate is labelled unmaintained with no
+  # patched version. Revisit when a maintained release or replacement lands.
+  { id = "RUSTSEC-2026-0543", reason = "chrono 0.4.45 is the newest release" },
+]
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

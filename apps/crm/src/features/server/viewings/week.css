@@ -1,0 +1,123 @@
+/* Connected Viewings as the mockup's week calendar: Today, the week arrows and range, then a
+   time grid of two-hour rows with event chips. Viewings are appointments, not duration
+   blocks; a chip's row only says when the visit starts. */
+.viewing-week {
+  display: grid;
+  gap: 14px;
+}
+.viewing-week-toolbar,
+.viewing-week-arrows {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.viewing-week-toolbar {
+  gap: 8px 12px;
+}
+.viewing-week-previous svg {
+  transform: scaleX(-1);
+}
+:root[data-theme] .viewing-week-range h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 18px var(--display, inherit);
+  letter-spacing: 0;
+}
+:root[data-theme] .viewing-week-range p,
+:root[data-theme] .viewing-week-empty {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.viewings-page .segmented-view-switch button {
+  min-height: 44px;
+}
+.viewing-grid-scroll {
+  overflow-x: auto;
+}
+.viewing-grid-scroll:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.viewing-grid {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.viewing-grid th,
+.viewing-grid td {
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  vertical-align: top;
+}
+.viewing-grid tr > :first-child {
+  width: 64px;
+  border-left: 0;
+}
+.viewing-grid tbody tr:last-child > * {
+  border-bottom: 0;
+}
+:root[data-theme] .viewing-grid thead th {
+  padding: 8px;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+:root[data-theme] .viewing-grid thead th.is-today {
+  color: var(--accent);
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+.viewing-grid td.is-today {
+  background: color-mix(in srgb, var(--accent-subtle) 45%, transparent);
+}
+:root[data-theme] .viewing-grid tbody th {
+  padding: 6px 8px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  text-align: start;
+}
+.viewing-grid td {
+  height: 52px;
+  padding: 3px;
+}
+.viewing-grid ol {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+:root[data-theme] .viewing-grid .event-chip {
+  display: grid;
+  gap: 1px;
+  width: 100%;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: start;
+  white-space: normal;
+  cursor: pointer;
+}
+.event-chip strong {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.event-chip span {
+  font-weight: 500;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+}
+.event-chip:hover {
+  filter: brightness(0.96);
+}
+:root[data-theme] .event-chip:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}

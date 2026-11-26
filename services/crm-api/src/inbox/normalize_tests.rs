@@ -1,0 +1,122 @@
+use super::*;
+
+#[test]
+fn every_common_uae_phone_form_becomes_the_same_digits() {
+    for typed in [
+        "+971 50 000 0001",
+        "+971-50-000-0001",
+        "00971 50 000 0001",
+        "050 000 0001",
+        "(050) 000-0001",
+        "500000001",
+        "whatsapp:+971500000001",
+        "+971 0 50 000 0001",
+        "00971 050 000 0001",
+    ] {
+        assert_eq!(phone(typed).as_deref(), Some("971500000001"), "{typed}");
+    }
+    assert_eq!(phone("+44 20 7946 0000").as_deref(), Some("442079460000"));
+    // Only the UAE trunk zero is dropped; other countries keep theirs (Italy: +39 06 …).
+    assert_eq!(phone("+39 06 1234 5678").as_deref(), Some("390612345678"));
+    assert_eq!(
+        whatsapp_key("+971 0 50 000 0001").as_deref(),
+        Some("+971500000001")
+    );
+    assert_eq!(
+        whatsapp_key("whatsapp:+99970000001").as_deref(),
+        Some("+99970000001")
+    );
+    assert_eq!(whatsapp_key("+0123456789"), None);
+}
+
+#[test]
+fn whatsapp_keys_guess_only_a_uae_mobile_from_a_national_form() {
+    for mobile in ["050 123 4567", "0501234567", "501234567", "(050) 123-4567"] {
+        assert_eq!(
+            whatsapp_key(mobile).as_deref(),
+            Some("+971501234567"),
+            "{mobile}"
+        );
+    }
+    // Landlines, other lengths and other countries' national forms are refused.
+    for national in [
+        "4 123 4567",
+        "04 123 4567",
+        "02 123 4567",
+        "0612345678",
+        "50123456",
+    ] {
+        assert_eq!(whatsapp_key(national), None, "{national}");
+    }
+    assert_eq!(
+        whatsapp_key("+966 51 234 5678").as_deref(),
+        Some("+966512345678")
+    );
+    assert_eq!(
+        whatsapp_key("00966 51 234 5678").as_deref(),
+        Some("+966512345678")
+    );
+    assert_eq!(
+        whatsapp_key("+971 4 123 4567").as_deref(),
+        Some("+97141234567")
+    );
+    assert!(contact("whatsapp", "4 123 4567").is_none());
+    let sender = contact("whatsapp", "whatsapp:+971501234567").unwrap();
+    assert_eq!(sender.key, "+971501234567");
+    assert_eq!(sender.phone_digits.as_deref(), Some("971501234567"));
+}
+
+#[test]
+fn invalid_phones_never_match() {
+    for bad in [
+        "",
+        "abc",
+        "+971 50 x",
+        "12345",
+        "+1234567890123456",
+        "+971+50",
+        "١٢٣",
+    ] {
+        assert!(phone(bad).is_none(), "{bad}");
+    }
+}
+
+#[test]
+fn emails_are_lower_case_and_plus_tags_stay_significant() {
+    assert_eq!(
+        email(" Client@Example.TEST ").as_deref(),
+        Some("client@example.test")
+    );
+    assert_eq!(
+        email("a+tag@example.test").as_deref(),
+        Some("a+tag@example.test")
+    );
+    for bad in [
+        "",
+        "no-at",
+        "@example.test",
+        "a@",
+        "a@nodot",
+        "a@.test",
+        "a b@x.test",
+    ] {
+        assert!(email(bad).is_none(), "{bad}");
+    }
+}
+
+#[test]
+fn each_channel_builds_its_own_key() {
+    let whatsapp = contact("whatsapp", "050 000 0001").unwrap();
+    assert_eq!(whatsapp.key, "+971500000001");
+    assert_eq!(whatsapp.phone_digits.as_deref(), Some("971500000001"));
+    let mail = contact("email", "Lead@Example.test").unwrap();
+    assert_eq!(
+        (mail.key.as_str(), mail.email.as_deref()),
+        ("lead@example.test", Some("lead@example.test"))
+    );
+    let tiktok = contact("tiktok", "user_123").unwrap();
+    assert_eq!(tiktok.key, "tiktok:user_123");
+    assert!(tiktok.phone_digits.is_none() && tiktok.email.is_none());
+    assert!(contact("instagram", "bad id").is_none());
+    assert!(contact("sms", "+971500000001").is_none());
+}

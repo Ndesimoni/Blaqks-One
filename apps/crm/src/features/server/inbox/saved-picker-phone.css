@@ -1,0 +1,18 @@
+/* The saved replies picker on phones: a bottom sheet over a dimmed page (designer spec §2). */
+@media (max-width: 599px) {
+  .saved-picker {
+    inset: auto 0 0;
+    inline-size: 100%;
+    max-inline-size: none;
+    border-radius: 18px 18px 0 0;
+  }
+  .saved-picker::backdrop {
+    background: rgb(0 0 0 / 0.35);
+  }
+  .saved-picker-inner {
+    max-block-size: 80dvh;
+  }
+  .saved-picker-option {
+    min-block-size: 56px;
+  }
+}

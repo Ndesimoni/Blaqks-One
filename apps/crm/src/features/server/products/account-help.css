@@ -1,0 +1,23 @@
+/* New answers to the member's help requests (BO1c): a dot on the initials, a count on Help. */
+.account-button {
+  position: relative;
+}
+.account-dot {
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-end: 2px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--gold);
+}
+.account-count {
+  margin-inline-start: 8px;
+  padding: 1px 7px;
+  border-radius: 99px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 11px;
+  font-weight: 700;
+}

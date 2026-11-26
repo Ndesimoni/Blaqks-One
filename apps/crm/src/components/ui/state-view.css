@@ -1,0 +1,105 @@
+/* Whole-page states (approved mockup `.state` and `.skeleton`, design queue item 38). */
+.state-view {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 56px 20px;
+  text-align: center;
+}
+.state-view-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--gold) 16%, var(--panel));
+  color: var(--accent);
+}
+.state-view-error .state-view-icon {
+  background: color-mix(in srgb, var(--danger) 12%, var(--panel));
+  color: var(--danger);
+}
+:root[data-theme] .state-view h2 {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font: 600 22px / 1.3 var(--display);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+.state-view p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.state-view-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.state-skeleton {
+  display: grid;
+  gap: 10px;
+}
+.state-skeleton > span[aria-hidden] {
+  display: block;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--hover), var(--panel), var(--hover));
+  background-size: 200% 100%;
+}
+.state-skeleton > span[aria-hidden]:nth-child(even) {
+  width: 92%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .state-skeleton > span[aria-hidden] {
+    animation: state-shimmer 1.2s ease-in-out infinite;
+  }
+}
+@keyframes state-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+/* The shared Empty block in the same style, a little tighter since it also sits in panels. */
+:root[data-theme] .empty {
+  gap: 10px;
+  min-height: 0;
+  padding: 44px 20px;
+}
+:root[data-theme] .empty .empty-icon {
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--gold) 16%, var(--panel));
+  color: var(--accent);
+}
+:root[data-theme] .empty h3 {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font: 600 20px / 1.3 var(--display);
+  text-wrap: balance;
+}
+:root[data-theme] .empty p {
+  max-width: 52ch;
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.state-view-note {
+  font-size: 13px;
+}
+:root[data-theme] .state-view h1 {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font: 600 24px / 1.3 var(--display);
+}
+:root[data-theme] .empty .state-view-error-icon {
+  background: color-mix(in srgb, var(--danger) 12%, var(--panel));
+  color: var(--danger);
+}

@@ -1,0 +1,90 @@
+/* The Client desk's client card and match cards (approved mockup `.desk-hero`, `.match`). */
+.client-desk-hero {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+.client-desk-person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.client-desk-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 700;
+}
+:root[data-theme] .client-desk-person h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 22px var(--display);
+  overflow-wrap: anywhere;
+}
+:root[data-theme] .client-desk-person p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.client-desk-pills,
+.client-desk-actions,
+.client-desk-reasons,
+.client-desk-match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.client-desk-pill {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--muted-dark);
+  font-size: 12px;
+  font-weight: 600;
+}
+:root[data-theme] .client-desk-actions a.btn,
+:root[data-theme] .client-desk-match-actions a.btn {
+  text-decoration: none;
+}
+.client-desk-match {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 14px 16px;
+}
+.client-desk-reasons,
+.client-desk-match-actions {
+  grid-column: 1 / -1;
+}
+.client-desk-match-title {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 650;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.client-desk-match-title:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.client-desk-match-price {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

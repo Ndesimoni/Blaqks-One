@@ -1,0 +1,68 @@
+/* Footer (the mockup's grid-foot): the filtered total, the numbered pages, the page size. */
+.grid-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+:root[data-theme] .grid-total {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.grid-total strong {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.grid-pager {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.grid-pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-inline: auto;
+}
+.grid-pages button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.grid-pages button:hover:not([aria-current]) {
+  background: var(--hover);
+}
+.grid-pages button[aria-current='page'] {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+}
+.grid-page-gap {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+}
+@media (max-width: 750px) {
+  .grid-foot {
+    padding: 10px 12px;
+  }
+  .grid-pages {
+    margin-inline: 0;
+  }
+}

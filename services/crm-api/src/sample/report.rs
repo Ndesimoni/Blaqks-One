@@ -1,5 +1,5 @@
 //! Terminal summaries. Generated passwords appear here once and are never stored.
-use super::{accounts::Status, clear::Cleared, seed::Seeded, target::Target};
+use super::{accounts::Status, clear::Cleared, finance, seed::Seeded, target::Target};
 use std::fmt::Write;
 
 fn heading(target: &Target, action: &str) -> String {
@@ -24,6 +24,7 @@ pub fn seeded(target: &Target, seeded: &Seeded) -> String {
         "  {:<16} {added:>3} added, {present:>3} already present",
         "Total"
     );
+    finance(&mut text, &seeded.finance);
     if seeded.members.is_empty() {
         text.push_str("No sample staff were requested.\n");
         return text;
@@ -68,6 +69,18 @@ pub fn cleared(target: &Target, cleared: &Cleared) -> String {
     }
     let total: i64 = cleared.counts.iter().map(|(_, removed)| removed).sum();
     let _ = writeln!(text, "  {:<16} {total:>3} removed", "Total");
+    if let Some(finance) = &cleared.finance {
+        text.push_str("Sample finance:\n");
+        for (kind, removed) in &finance.counts {
+            let _ = writeln!(text, "  {kind:<16} {removed:>3} removed");
+        }
+        if finance.settings_kept {
+            text.push_str(
+                "  Finance settings were kept: they were changed in the app or your own \
+                 finance uses them, so they are now your team's settings.\n",
+            );
+        }
+    }
     let _ = writeln!(
         text,
         "Sample staff suspended: {} (accounts are archive-only; seeding again \
@@ -75,4 +88,21 @@ pub fn cleared(target: &Target, cleared: &Cleared) -> String {
         cleared.suspended
     );
     text
+}
+
+/// The finance block of the seed summary: counts, then anything kept or skipped.
+fn finance(text: &mut String, seeded: &finance::Seeded) {
+    if !seeded.rows.is_empty() {
+        text.push_str("Sample finance:\n");
+    }
+    for (kind, tally) in &seeded.rows {
+        let _ = writeln!(
+            text,
+            "  {kind:<16} {:>3} added, {:>3} already present, {:>3} skipped",
+            tally.added, tally.present, tally.skipped
+        );
+    }
+    for note in &seeded.notes {
+        let _ = writeln!(text, "  Note: {note}");
+    }
 }

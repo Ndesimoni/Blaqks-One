@@ -1,0 +1,113 @@
+/* The client's agreement panel (W1b, WQ2): sources as chips, STOP's confirmation, restore. */
+.wa-agreement {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+}
+.wa-agreement-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.wa-agreement-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+.wa-agreement-head .wa-consent {
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.wa-agreement-head .wa-consent.is-opt_out {
+  color: var(--danger);
+}
+.wa-note {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.wa-sources {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.wa-sources legend {
+  margin-block-end: 6px;
+  padding: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.wa-source-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wa-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease);
+}
+.wa-source:hover {
+  border-color: var(--focus);
+}
+.wa-source.is-chosen {
+  border-color: var(--gold);
+  background: var(--accent-subtle);
+}
+.wa-source:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+/* Beats the Start drawer's own field and label sizes (inbox-start.css). */
+.wa-source-chips .wa-source {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+}
+.wa-source-chips .wa-source input {
+  inline-size: auto;
+  min-block-size: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--primary);
+}
+.wa-sources[aria-invalid='true'] .wa-source {
+  border-color: var(--danger);
+}
+.wa-spacer {
+  flex: 1 1 auto;
+}
+.wa-confirm {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--line));
+  border-radius: 10px;
+  background: var(--danger-surface);
+  font-size: 13px;
+}
+.wa-confirm span {
+  color: var(--muted-dark);
+}
+.wa-confirm > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

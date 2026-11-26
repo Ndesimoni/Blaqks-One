@@ -1,0 +1,101 @@
+/* The joined member's screen (MK1b): the newer-terms notice, "My marketplace profile" with the
+   photo beside its actions, the published facts and leaving apart; dialog sizes. */
+.market-mine,
+.market-profile {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.market-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.market-banner p {
+  flex: 1 1 260px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+}
+.market-profile-card {
+  gap: 18px;
+}
+.market-profile-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+}
+.market-profile-actions {
+  display: grid;
+  gap: 8px;
+}
+.market-person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.market-person > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.market-person strong {
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.market-person span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.market-avatar {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--hover);
+}
+.market-avatar.is-initials {
+  display: grid;
+  place-items: center;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 22px;
+  font-weight: 700;
+}
+.market-broker .market-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+}
+.market-leave {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.market-dialog-short {
+  --dialog-height: 380px;
+}
+.market-dialog-reason {
+  --dialog-height: 500px;
+}
+@media (max-width: 520px) {
+  .market-profile-head .market-actions .btn,
+  .market-banner .btn {
+    flex: 1 1 auto;
+  }
+  .market-avatar {
+    width: 56px;
+    height: 56px;
+  }
+}

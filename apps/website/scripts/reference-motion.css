@@ -1,0 +1,99 @@
+/* Main Blaqks One site motion, layered on the recovered design without changing its colours.
+   Entrances use opacity and translate/scale only, inside prefers-reduced-motion: no-preference;
+   reference-motion.mjs keeps them seamless across engine re-renders and arms the scroll reveal. */
+body[data-site-kind='platform'] {
+  --motion-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+@keyframes motion-rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+@keyframes motion-settle {
+  from {
+    scale: 1.06;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Home: kicker, headline, introduction and link rise in turn, then the search panel. */
+  body[data-site-kind='platform'] .e-hero-copy {
+    animation: none;
+  }
+  body[data-site-kind='platform']
+    :is(
+      .e-hero-copy > *,
+      .e-search,
+      :is(.u-intro, .l-intro, .u-company-hero, .u-profile-hero, .d-hero) .e-wrap > *,
+      .p-breadcrumb + .p-title-row > div > *
+    ) {
+    animation: motion-rise 700ms var(--motion-ease) backwards;
+  }
+  body[data-site-kind='platform']
+    :is(
+      .e-hero-copy,
+      :is(.u-intro, .l-intro, .u-company-hero, .u-profile-hero, .d-hero) .e-wrap,
+      .p-title-row > div
+    )
+    > :nth-child(2) {
+    animation-delay: 90ms;
+  }
+  body[data-site-kind='platform']
+    :is(
+      .e-hero-copy,
+      :is(.u-intro, .l-intro, .u-company-hero, .u-profile-hero, .d-hero) .e-wrap,
+      .p-title-row > div
+    )
+    > :nth-child(3) {
+    animation-delay: 180ms;
+  }
+  body[data-site-kind='platform']
+    :is(
+      .e-hero-copy,
+      :is(.u-intro, .l-intro, .u-company-hero, .u-profile-hero, .d-hero) .e-wrap,
+      .p-title-row > div
+    )
+    > :nth-child(n + 4) {
+    animation-delay: 270ms;
+  }
+  body[data-site-kind='platform'] .e-search {
+    animation-delay: 380ms;
+  }
+  /* The photograph settles on its own layer behind the gradient; the header never moves.
+     It grows from the bottom edge and the hero clips it sideways, so nothing overflows. */
+  body[data-site-kind='platform'] .e-hero {
+    overflow-x: clip;
+  }
+  body[data-site-kind='platform'] .e-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: inherit;
+    transform-origin: 50% 100%;
+    pointer-events: none;
+    animation: motion-settle 1800ms cubic-bezier(0.25, 0.6, 0.3, 1) backwards;
+  }
+  /* Help answers open smoothly where the browser can animate to an automatic height. */
+  body[data-site-kind='platform'] .u-faq b {
+    transition: transform 300ms var(--motion-ease);
+  }
+}
+@supports (interpolate-size: allow-keywords) {
+  @media (prefers-reduced-motion: no-preference) {
+    body[data-site-kind='platform'] .u-faq {
+      interpolate-size: allow-keywords;
+    }
+    body[data-site-kind='platform'] .u-faq::details-content {
+      block-size: 0;
+      overflow: clip;
+      overflow-clip-margin: 8px;
+      transition:
+        block-size 420ms var(--motion-ease),
+        content-visibility 420ms allow-discrete;
+    }
+    body[data-site-kind='platform'] .u-faq[open]::details-content {
+      block-size: auto;
+    }
+  }
+}

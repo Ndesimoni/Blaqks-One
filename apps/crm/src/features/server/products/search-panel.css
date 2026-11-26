@@ -1,0 +1,40 @@
+/* NAV5: every search match in a panel from the right edge, narrower than a record. */
+:root[data-theme] .modal-right > .drawer.search-drawer {
+  width: min(480px, 100vw);
+  max-width: none;
+  height: 100dvh;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--panel);
+  box-shadow: -18px 0 50px rgba(8, 24, 20, 0.2);
+  animation: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme] .modal-right > .drawer.search-drawer {
+    animation: record-panel-in 220ms var(--ease);
+  }
+}
+.search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  block-size: 100%;
+  padding: 20px 20px 0;
+}
+.search-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.search-panel-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+.search-panel-list {
+  flex: 1;
+  min-block-size: 0;
+  overflow-y: auto;
+  padding-block-end: 20px;
+}

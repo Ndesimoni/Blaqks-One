@@ -1,0 +1,85 @@
+/* Team finance fields and option groups; imported before the card and save-bar rules. */
+.team-finance-form {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.team-finance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.team-finance-form .field {
+  margin: 0;
+}
+.team-finance-form .field :is(input, select),
+.team-finance-actions .btn,
+.team-finance-recovery .btn,
+.team-agreement-timeline .btn {
+  min-height: 44px;
+}
+.team-finance-choice {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 16px 0 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+.team-finance-choice.is-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.team-finance-choice legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+.team-finance-choice > label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background var(--duration) var(--ease);
+}
+.team-finance-choice > label:hover,
+.team-finance-choice > label:has(input:checked) {
+  border-color: var(--focus);
+  background: var(--surface-subtle);
+}
+:root[data-theme] .team-finance-choice > label input {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--focus);
+}
+.team-finance-choice:not(.is-options) > label {
+  justify-self: start;
+}
+.team-finance-choice .field {
+  max-width: 360px;
+}
+.team-finance-choice:disabled > label {
+  cursor: not-allowed;
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-finance-choice > label {
+    transition: none;
+  }
+}
+@media (max-width: 650px) {
+  .team-finance-grid,
+  .team-finance-choice.is-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -4,6 +4,7 @@
 use super::{
     credentials::Credential, enrol, failed, staff::Spec, target::Target, target::UNCHANGED, Outcome,
 };
+use crate::team::account_type::seats;
 use sqlx::{FromRow, Postgres, Transaction};
 use uuid::Uuid;
 
@@ -65,10 +66,15 @@ pub async fn ensure(
     .map_err(failed)?;
     let hash = &credential.hash;
     let (holder, status) = match found {
-        None => (
-            Some(enrol::create(tx, target, spec, &email, hash).await?),
-            Status::Created,
-        ),
+        None => {
+            seats::ensure(tx, &target.workspace, None)
+                .await
+                .map_err(failed)?;
+            (
+                Some(enrol::create(tx, target, spec, &email, hash).await?),
+                Status::Created,
+            )
+        }
         Some(found) if !owned(&found, target) => {
             return Err(format!(
                 "{email} belongs to an account that is not sample staff of this team.{UNCHANGED}"
@@ -78,6 +84,9 @@ pub async fn ensure(
         Some(found) if found.active => (Some(found.id), Status::Existing),
         Some(found) if !found.cleared => (None, Status::Suspended),
         Some(found) => {
+            seats::ensure(tx, &target.workspace, Some(found.id))
+                .await
+                .map_err(failed)?;
             enrol::reactivate(tx, target, spec, hash, found.id).await?;
             (Some(found.id), Status::Reactivated)
         }

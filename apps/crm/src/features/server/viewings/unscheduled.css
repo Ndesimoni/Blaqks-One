@@ -1,0 +1,85 @@
+.viewing-unscheduled header {
+  padding: 16px 18px 8px;
+}
+:root[data-theme] .viewing-unscheduled h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+:root[data-theme] .viewing-unscheduled header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.viewing-unscheduled .viewing-unscheduled-cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  margin: 0;
+  padding: 12px 18px 18px;
+}
+/* The Unscheduled section keeps the earlier appointment cards. */
+.viewing-unscheduled-cards {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.viewing-week-card {
+  position: relative;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-subtle);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+  transition: background-color var(--duration) var(--ease);
+}
+.viewing-week-card:hover {
+  background: var(--hover);
+}
+.viewing-week-content {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+:root[data-theme] .viewing-week-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+:root[data-theme] .viewing-week-content .viewing-week-time {
+  min-height: 36px;
+  padding-right: 42px;
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.viewing-week-content strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.viewing-week-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+.viewing-week-actions .row-link {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+.viewing-week-actions .row-link:hover {
+  color: var(--ink);
+  background: var(--panel);
+}
+.viewing-week-actions .row-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}

@@ -1,0 +1,27 @@
+/* The mockup grid's first cell opens the record: it reads as the record's name, not a button,
+   and the whole row stays clickable around it. */
+.grid-open {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.grid-open:hover .cell-strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+:root[data-theme] .grid-open:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.grid-open + .record-kept-chip {
+  margin-inline-start: 8px;
+}

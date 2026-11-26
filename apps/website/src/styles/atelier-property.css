@@ -1,0 +1,38 @@
+body[data-site-kind='company'][data-theme='1'] .a-property-title {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 35px;
+  padding-block: 20px 35px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-property-title h1 {
+  max-width: 730px;
+  font-size: clamp(36px, 4vw, 56px);
+  margin-block: 16px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-property-title > strong {
+  flex-shrink: 0;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  padding-bottom: 8px;
+}
+body[data-site-kind='company'][data-theme='1'] .enquiry-panel small {
+  display: block;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  margin-top: 25px;
+}
+body[data-site-kind='company'][data-theme='1'] .detail-layout h2 {
+  font-size: 32px;
+}
+body[data-site-kind='company'][data-theme='1'] .detail-facts b {
+  font-family: Arial, Helvetica, sans-serif;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-property-title {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

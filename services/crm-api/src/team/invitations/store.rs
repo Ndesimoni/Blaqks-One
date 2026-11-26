@@ -1,9 +1,13 @@
 use super::create::InviteRequest;
-use crate::team::{access, audit};
+use crate::team::{access, account_type::seats, audit};
 use crate::{
     auth::{actions::Actions, permissions::Permissions, session},
     error::{ApiError, ApiResult},
-    workspaces,
+    platform_metrics::{self, names, Event, Source},
+    workspaces::{
+        self,
+        platform::{Area, Level},
+    },
 };
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -35,40 +39,80 @@ pub async fn create(
     let mut transaction = pool.begin().await?;
     workspaces::lock(&mut transaction, workspace).await?;
     access::lock_owner(&mut transaction, owner).await?;
-    sqlx::query(
+    // Blaqks One staff invite Admins for the Owner (BO1b): re-read them live here.
+    if actor != owner {
+        let manage = Level::Manage;
+        workspaces::platform::operator(&mut transaction, actor, Area::InviteAdmins, manage).await?;
+    }
+    if staff {
+        seats::ensure(&mut transaction, workspace, None).await?;
+    }
+    let inserted: Option<Uuid> = sqlx::query_scalar(
         "INSERT INTO crm_users (id,name,email,phone,password_hash,role,active,owner_id,workspace_id, \
          positions,permissions,channel_access,accepted_at,actions) \
-         VALUES ($1,$2,$3,$4,'',$5,false,$6,$7,$8,$9,$10,NULL,COALESCE($11,'{}'::jsonb))",
+         VALUES ($1,$2,$3,$4,'',$5,false,$6,$7,$8,$9,$10,NULL,COALESCE($11,'{}'::jsonb)) \
+         ON CONFLICT (email) DO NOTHING RETURNING id",
     ).bind(id).bind(&request.name).bind(&request.email).bind(&request.phone).bind(role)
         .bind(staff.then_some(owner)).bind(staff.then_some(workspace))
         .bind(sqlx::types::Json(&request.positions)).bind(sqlx::types::Json(permissions))
         .bind(sqlx::types::Json(request.channel_access.clone().unwrap_or_default()))
         .bind(actions.filter(|_| staff).map(sqlx::types::Json))
-        .execute(&mut *transaction).await?;
-    if !staff {
-        sqlx::query("INSERT INTO crm_workspaces (id,owner_id) VALUES ($1,$2)")
-            .bind(id.to_string())
-            .bind(id)
-            .execute(&mut *transaction)
-            .await?;
+        .fetch_optional(&mut *transaction).await?;
+    if inserted.is_none() {
+        return Err(ApiError(
+            axum::http::StatusCode::CONFLICT,
+            "The invitation could not be created.",
+            "invitation_unavailable",
+        ));
     }
-    let expires_at: String = sqlx::query_scalar(
-        "INSERT INTO crm_team_invitations (token_hash,user_id,owner_id,workspace_id,created_by) \
-         VALUES ($1,$2,$3,$4,$5) RETURNING \
-         to_char(expires_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')",
-    )
-    .bind(session::digest(&token))
-    .bind(id)
-    .bind(owner)
-    .bind(workspace)
-    .bind(actor)
-    .fetch_one(&mut *transaction)
-    .await?;
+    if !staff {
+        workspaces::create(
+            &mut transaction,
+            &id.to_string(),
+            id,
+            actor,
+            workspaces::company::NewCompany::OPERATOR_BROKERAGE,
+        )
+        .await?;
+    }
+    let expires_at = issue(&mut transaction, &token, id, owner, workspace, actor).await?;
     audit::append(&mut transaction, actor, workspace, id, "invited").await?;
+    // An Admin invitation starts a new company: the event belongs to that company.
+    let team = if staff {
+        workspace.to_owned()
+    } else {
+        id.to_string()
+    };
+    let sent = Event::usage(names::INVITATION_SENT, &team, None, Source::Crm);
+    platform_metrics::record(&mut transaction, sent).await?;
     transaction.commit().await?;
     Ok(Created {
         id,
         token,
         expires_at,
     })
+}
+
+/// Stores the activation link's digest for `user`, who joins `workspace` under `owner`;
+/// returns when it expires. The Blaqks One team's invitations use it too (BO1b).
+pub async fn issue(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    token: &str,
+    user: Uuid,
+    owner: Uuid,
+    workspace: &str,
+    actor: Uuid,
+) -> ApiResult<String> {
+    Ok(sqlx::query_scalar(
+        "INSERT INTO crm_team_invitations (token_hash,user_id,owner_id,workspace_id,created_by) \
+         VALUES ($1,$2,$3,$4,$5) RETURNING \
+         to_char(expires_at AT TIME ZONE 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')",
+    )
+    .bind(session::digest(token))
+    .bind(user)
+    .bind(owner)
+    .bind(workspace)
+    .bind(actor)
+    .fetch_one(&mut **transaction)
+    .await?)
 }

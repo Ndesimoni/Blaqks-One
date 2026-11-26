@@ -1,0 +1,133 @@
+/* Record panel body (approved mockup `.record` and `.fields`): a listing's gallery, then the
+   facts beside related content on wide screens and above it on narrow ones. */
+:root[data-theme] .record-panel .record-panel-body {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 20px 24px 32px;
+  background: var(--bg);
+}
+.record-panel-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+}
+.record-panel-main,
+.record-panel-side {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+}
+.record-panel-side:empty {
+  display: none;
+}
+/* Sections from other features stack by the gap here, not by their own outer margins. */
+.record-panel .record-panel-main > *,
+.record-panel .record-panel-side > * {
+  margin-block: 0;
+}
+.record-facts {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.record-facts-section {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+:root[data-theme] .record-facts-section h3 {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+:root[data-theme] .record-panel .details-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+:root[data-theme] .record-panel .detail-field {
+  gap: 2px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+:root[data-theme] .record-panel .detail-field > span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+:root[data-theme] .record-panel .detail-field strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+/* "Show N empty fields": a quiet link under the facts. */
+.record-facts-toggle {
+  justify-self: start;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.record-facts-toggle:hover {
+  color: var(--ink);
+}
+/* Wide panels: facts on the left, related content on the right; facts alone fill the row. */
+@media (min-width: 1024px) {
+  .record-panel-columns {
+    grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  }
+  .record-panel-columns:has(> .record-panel-side:empty) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :root[data-theme] .record-panel-columns:not(:has(> .record-panel-side:empty)) .details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Connected sections (assignment, sharing, website) stack as full-width rows below the
+   columns, a row's button dropping under its text when narrow; a listing's plans, amenities
+   and building contacts follow as cards that wrap, so none overflows another. */
+.record-panel-sections {
+  display: grid;
+  gap: 12px;
+}
+.record-panel .record-panel-sections > * {
+  min-width: 0;
+  margin: 0;
+}
+.record-panel-sections .assignment-row {
+  flex-wrap: wrap;
+}
+.record-panel-sections .assignment-current {
+  flex: 1 1 240px;
+}
+.record-panel .property-detail-studio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  align-items: start;
+  gap: 16px;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  :root[data-theme] .record-panel .record-panel-body {
+    padding: 14px 16px 24px;
+  }
+  :root[data-theme] .record-panel .details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

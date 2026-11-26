@@ -1,0 +1,59 @@
+body[data-site-kind='company'][data-theme='1'] .a-people-search {
+  display: flex;
+  gap: 18px;
+  align-items: end;
+  padding: 24px;
+  background: var(--soft);
+}
+body[data-site-kind='company'][data-theme='1'] .a-people-search label {
+  flex: 1;
+  font-size: 12px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-advisor-hero {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 50px;
+  align-items: center;
+  padding-block: 40px;
+  border-bottom: 1px solid var(--line);
+}
+body[data-site-kind='company'][data-theme='1'] .a-advisor-hero h1 {
+  font-size: clamp(42px, 5vw, 68px);
+  margin-bottom: 20px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-advisor-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 80px;
+  padding-top: 60px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-advisor-facts > div {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-block: 15px;
+  font-size: 13px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-advisor-facts dt {
+  color: var(--muted);
+}
+body[data-site-kind='company'][data-theme='1'] .a-advisor-facts dd {
+  margin: 0;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-advisor-hero {
+    grid-template-columns: 100px 1fr;
+    gap: 22px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-advisor-hero h1 {
+    font-size: 36px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-advisor-layout {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-people-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

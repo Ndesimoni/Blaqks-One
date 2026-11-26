@@ -1,0 +1,105 @@
+/* Connected Follow-ups as the mockup's deadline list: each group's pill and count above its own
+   card of one-line task rows (Done checkbox, title · client, time on the right), then the grid
+   footer. */
+.deadline-group + .deadline-group {
+  margin-top: 18px;
+}
+:root[data-theme] .deadline-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+:root[data-theme] .deadline-pill {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+:root[data-theme] .is-today .deadline-pill {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.deadline-count {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.deadline-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.deadline-row {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease);
+}
+.deadline-row:last-child {
+  border-bottom: 0;
+}
+.deadline-row:hover {
+  background: var(--hover);
+}
+.deadline-done {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.deadline-done:disabled {
+  cursor: not-allowed;
+}
+:root[data-theme] .deadline-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 0;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.deadline-line strong {
+  font-weight: 600;
+}
+.deadline-detail {
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+.deadline-line .badge {
+  margin-inline-start: 10px;
+}
+.is-done .deadline-line strong {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.deadline-when {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.deadline-list > .grid-foot {
+  margin-top: 8px;
+  padding-inline: 4px;
+  border-top: 0;
+}
+@media (max-width: 750px) {
+  .deadline-row {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+  .deadline-when {
+    grid-column: 2;
+  }
+}

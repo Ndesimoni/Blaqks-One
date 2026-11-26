@@ -1,4 +1,4 @@
-use crate::team::{access, catalogue};
+use crate::team::{access, account_type::seats, catalogue};
 use crate::{
     auth::{
         profile::{Profile, UserRow},
@@ -78,10 +78,9 @@ pub async fn list(
     Path(workspace): Path<String>,
     Query(query): Query<TeamQuery>,
 ) -> ApiResult<Json<Value>> {
-    if query.archived && session.user.role != "super-admin" {
-        return Err(crate::error::ApiError::forbidden());
-    }
-    let owner = access::read_owner(&state, &session, &workspace).await?;
+    // BO1a item 6: an Admin reads their own archived staff; Blaqks One keeps the archived
+    // Admins in its organisation; staff and other workspaces are refused by `owner`.
+    let owner = access::owner(&state, &session, &workspace).await?;
     let rows = sqlx::query_as::<_, MemberRow>(
         "SELECT * FROM crm_member_profiles \
          WHERE ((role='staff' AND owner_id=$1 AND workspace_id=$2) OR ($3 AND role='admin')) \
@@ -95,9 +94,12 @@ pub async fn list(
     .fetch_all(&state.pool)
     .await?;
     let members: Vec<Member> = rows.into_iter().map(Into::into).collect();
-    Ok(Json(
-        json!({"members":members,"roles":catalogue::positions()}),
-    ))
+    let (used, limit, version) = seats::usage(&state.pool, &workspace).await?;
+    Ok(Json(json!({
+        "members":members,
+        "roles":catalogue::positions(),
+        "seats":{"used":used,"limit":limit,"version":version}
+    })))
 }
 
 #[derive(Default, Deserialize)]

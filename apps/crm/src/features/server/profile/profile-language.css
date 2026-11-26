@@ -1,0 +1,140 @@
+/* My profile Language setting (docs/i18n.md): selectable language cards, written with
+   logical properties so the layout mirrors in right-to-left languages. */
+:root[data-theme] .acct-card-body.lang-body {
+  display: block;
+}
+.lang-body > * + * {
+  margin-block-start: 14px;
+}
+.lang-body > .lang-status:empty {
+  margin: 0;
+}
+.lang-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-block-size: 76px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.lang-option:hover {
+  border-color: var(--muted);
+  background: var(--hover);
+}
+.lang-option[data-selected] {
+  border-color: var(--primary);
+  background: var(--surface-subtle);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+.lang-option:has(.lang-radio:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lang-options:disabled .lang-option {
+  cursor: progress;
+}
+.lang-options:disabled .lang-option:not([data-selected]) {
+  opacity: 0.6;
+}
+:root[data-theme] .lang-radio {
+  flex: none;
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0;
+  border: 1.5px solid var(--muted);
+  border-radius: 50%;
+  background: var(--panel);
+  appearance: none;
+  transition: border-width var(--duration) var(--ease);
+}
+:root[data-theme] .lang-radio:checked {
+  border: 5px solid var(--primary);
+}
+:root[data-theme] .lang-radio:focus-visible {
+  outline: none;
+}
+.lang-option-text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.lang-option-name {
+  /* Each name is in its own script; isolate it so it aligns with the card's direction. */
+  unicode-bidi: isolate;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.lang-option-meta {
+  color: var(--muted-dark);
+  font-size: 12.5px;
+}
+.lang-badge {
+  flex: none;
+  align-self: flex-start;
+  margin-inline-start: auto;
+}
+.lang-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.lang-note svg {
+  flex: none;
+  margin-block-start: 2px;
+  color: var(--accent);
+}
+.lang-saving {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.lang-saving::before {
+  content: '';
+  inline-size: 12px;
+  block-size: 12px;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: acct-spin 0.7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-option,
+  :root[data-theme] .lang-radio {
+    transition: none;
+  }
+  .lang-saving::before {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+@media (max-width: 560px) {
+  .lang-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lang-option {
+    min-block-size: 64px;
+    padding: 14px 16px;
+  }
+}

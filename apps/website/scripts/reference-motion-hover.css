@@ -1,0 +1,110 @@
+/* Main site hover and keyboard focus: cards lift at most 3px, photographs zoom inside their
+   frames, links underline from the left in the site's gold and arrows nudge 3px. Focus gets
+   the same states as hover. Reduced motion keeps the colour changes and drops the movement. */
+@media (prefers-reduced-motion: no-preference) {
+  body[data-site-kind='platform'] .e-card {
+    transition:
+      transform 320ms var(--motion-ease),
+      box-shadow 320ms var(--motion-ease);
+  }
+  body[data-site-kind='platform'] :is(.e-photo img, .p-gallery img) {
+    transition: transform 600ms var(--motion-ease);
+  }
+  body[data-site-kind='platform'] :is(.e-card, .d-card):has(:focus-visible) {
+    transform: translateY(-3px);
+  }
+  body[data-site-kind='platform']
+    :is(.e-card:has(:focus-visible) .e-photo img, .p-gallery button:focus-visible img) {
+    transform: scale(1.04);
+  }
+  body[data-site-kind='platform'] :is(.motion-arrow, .e-hero-link span, .d-home-links a > span) {
+    transition: translate 240ms var(--motion-ease);
+  }
+  body[data-site-kind='platform'] :is(a, button):focus-visible .motion-arrow {
+    translate: 3px 0;
+  }
+  body[data-site-kind='platform']
+    :is(
+      :is(a, button):focus-visible .motion-arrow-up,
+      .d-home-links a:focus-visible > span:last-child
+    ) {
+    translate: 2px -2px;
+  }
+  body[data-site-kind='platform'] .e-hero-link:focus-visible span {
+    translate: 0 3px;
+  }
+  body[data-site-kind='platform'] :is(.b-header nav a, .motion-label)::after {
+    transition: transform 360ms var(--motion-ease);
+  }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  body[data-site-kind='platform'] .e-card:hover {
+    transform: translateY(-3px);
+  }
+  body[data-site-kind='platform'] :is(.e-card:hover .e-photo img, .p-gallery button:hover img) {
+    transform: scale(1.04);
+  }
+  body[data-site-kind='platform'] :is(a, button):hover .motion-arrow {
+    translate: 3px 0;
+  }
+  body[data-site-kind='platform']
+    :is(:is(a, button):hover .motion-arrow-up, .d-home-links a:hover > span:last-child) {
+    translate: 2px -2px;
+  }
+  body[data-site-kind='platform'] .e-hero-link:hover span {
+    translate: 0 3px;
+  }
+}
+body[data-site-kind='platform'] .motion-arrow {
+  display: inline-block;
+}
+/* Underlines that draw in from the left: header links and the gold text links. */
+body[data-site-kind='platform'] .b-header nav a:not([aria-current])::after,
+body[data-site-kind='platform'] .motion-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  height: 1px;
+  background: #c9a254;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+body[data-site-kind='platform'] .motion-label {
+  position: relative;
+}
+body[data-site-kind='platform'] .motion-label::after {
+  bottom: -2px;
+  background: currentColor;
+}
+body[data-site-kind='platform'] .estate :is(.e-text, .u-card-link):has(.motion-label):hover {
+  text-decoration: none;
+}
+body[data-site-kind='platform'] .b-header nav a:focus-visible::after,
+body[data-site-kind='platform'] :is(a, button):focus-visible > .motion-label::after {
+  transform: none;
+}
+@media (hover: hover) {
+  body[data-site-kind='platform'] .b-header nav a:hover::after,
+  body[data-site-kind='platform'] :is(a, button):hover > .motion-label::after {
+    transform: none;
+  }
+}
+@media (max-width: 1100px) {
+  body[data-site-kind='platform'] .b-header nav a:not([aria-current])::after {
+    bottom: 7px;
+  }
+}
+@media (max-width: 760px) {
+  body[data-site-kind='platform'] .b-header nav a:not([aria-current])::after {
+    bottom: 3px;
+    left: 22%;
+    right: 22%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-site-kind='platform'] :is(.e-card, .d-card, .e-gold, .e-card img, .p-gallery img) {
+    transform: none !important;
+  }
+}

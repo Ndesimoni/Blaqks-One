@@ -1,0 +1,75 @@
+.footer {
+  padding: 55px 5vw 25px;
+  background: var(--green);
+  color: var(--on-green);
+}
+.footer .eyebrow {
+  color: #c9ccbc;
+}
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 50px;
+  padding-bottom: 45px;
+}
+.footer-top h2 {
+  font-size: 42px;
+  max-width: 550px;
+}
+.footer-top > div:last-child {
+  padding-top: 25px;
+}
+.footer-top p {
+  color: #d2d7c9;
+  font-size: 12px;
+  margin-top: 15px;
+}
+.footer-links {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid #ffffff36;
+  padding-top: 25px;
+  font-size: 11px;
+}
+.footer-links > span {
+  margin-left: auto;
+  color: #d2d7c9;
+}
+.review-bar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #fffefa;
+  color: #17352b;
+  border-top: 1px solid #cbd1c5;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 22px;
+  z-index: 20;
+  font-size: 11px;
+}
+.review-bar strong {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.preview-dot {
+  background: #aa813f;
+  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+}
+.review-note {
+  margin-left: auto;
+  color: #58655d;
+}
+.admin-footer {
+  padding: 20px 3vw 35px;
+  color: var(--muted);
+  font-size: 11px;
+  border-top: 1px solid var(--line);
+}

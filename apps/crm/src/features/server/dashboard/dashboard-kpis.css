@@ -1,0 +1,105 @@
+/* Figure tiles (approved mockup `.tiles`, dataviz stat tiles) for the Dashboard and Performance,
+   and the Dashboard's Today table. Chart colours come from chart-tokens.css. */
+.kpi-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 12px;
+}
+.kpi-tile {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 116px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease);
+}
+.kpi-tile:hover {
+  border-color: var(--gold);
+}
+/* A figure that opens nothing reads as a tile, not a control. */
+.kpi-tile.is-static {
+  cursor: default;
+}
+.kpi-tile.is-static:hover {
+  border-color: var(--line);
+}
+.kpi-tile:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.kpi-label {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.kpi-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.kpi-value {
+  white-space: nowrap;
+  font-size: 28px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.kpi-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+.kpi-note.is-up {
+  color: var(--pipeline-active);
+  font-weight: 600;
+}
+.kpi-note.is-down,
+.kpi-note.is-alert {
+  color: var(--danger);
+  font-weight: 600;
+}
+/* The trend gives way before the figure does: it shrinks, the value never wraps. */
+.sparkbars {
+  display: flex;
+  flex: 0 1 96px;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 40px;
+  height: 34px;
+  border-bottom: 1px solid var(--line);
+}
+.sparkbar {
+  flex: 1;
+  min-width: 4px;
+  border-radius: 2px 2px 0 0;
+  background: var(--chart-quiet);
+}
+.sparkbar.is-current {
+  background: var(--chart-current);
+}
+:root[data-theme] .dashboard-section-title {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.today-table tbody tr {
+  cursor: pointer;
+}
+.today-when {
+  width: 90px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+:root[data-theme] .dashboard-today-empty {
+  margin: 0;
+  padding: 16px;
+  color: var(--muted);
+}

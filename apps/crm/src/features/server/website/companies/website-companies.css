@@ -1,0 +1,43 @@
+/* Company website eligibility: flag choices, impact warning and the saved note. */
+.website-flags.finance-choice {
+  gap: 12px;
+}
+.website-flag {
+  display: grid;
+  gap: 2px;
+}
+/* Saving disables the choices; unlike finance options they are not struck through. */
+.website-flags.finance-choice input:disabled + span {
+  text-decoration: none;
+}
+.website-flag small {
+  padding-left: 28px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.website-impact {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.website-impact ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.website-impact li + li {
+  margin-top: 4px;
+}
+/* Sized to its content on wider screens; phones keep the shared full-screen layout. */
+.website-eligibility-dialog {
+  --dialog-width: 640px;
+}
+@media (min-width: 751px) {
+  .modal-centered > .drawer.website-eligibility-dialog {
+    height: auto;
+  }
+}

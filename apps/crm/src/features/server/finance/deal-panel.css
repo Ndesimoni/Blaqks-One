@@ -1,0 +1,33 @@
+/* The deal slider (design queue item 5): its commission, history, client and listing and notes
+   as the mockup's cards beside the facts and payments cards, and every action in a footer. */
+.deal-panel .deal-calc,
+.deal-panel .finance-history,
+.deal-panel .deal-parties,
+.deal-panel .deal-notes {
+  min-width: 0;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.deal-panel .deal-panel-body > .finance-note {
+  margin: 0;
+}
+.deal-payment-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-theme] .deal-panel .deal-details-footer {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+}
+@media (max-width: 760px) {
+  :root[data-theme] .deal-panel .deal-details-footer {
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+  }
+}

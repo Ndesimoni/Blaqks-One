@@ -1,0 +1,130 @@
+/* Connected CRM insights: panel rhythm, ranked share bars, loading and qualification list. */
+.connected-insights .insights-grid {
+  gap: 16px;
+}
+.insight-panel {
+  min-width: 0;
+}
+.insight-panel .section-top {
+  margin-bottom: 16px;
+}
+.share-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.share-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.share-name {
+  color: var(--ink);
+  font-size: 13px;
+}
+.share-figure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.share-figure strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+.share-percent {
+  min-width: 36px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+.share-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--hover);
+}
+.share-track > div {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 400ms var(--ease);
+}
+.share-row.is-zero .share-name {
+  color: var(--muted);
+}
+.insight-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.insight-skeleton > span:not(.sr-only) {
+  display: block;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--hover) 30%, var(--line) 50%, var(--hover) 70%);
+  background-size: 300% 100%;
+  animation: insight-shimmer 1.4s linear infinite;
+}
+@keyframes insight-shimmer {
+  to {
+    background-position: -150% 0;
+  }
+}
+.insight-error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.insight-error .field-error {
+  margin: 0;
+}
+:root[data-theme] .qualify-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 8px 10px;
+  margin: 0 -10px;
+  width: calc(100% + 20px);
+  border-radius: 10px;
+  border-bottom: 0;
+  background: transparent;
+  transition: background-color var(--duration) var(--ease);
+}
+:root[data-theme] .qualify-row:hover {
+  background: var(--hover);
+}
+:root[data-theme] .qualify-row:active {
+  background: var(--surface-subtle);
+}
+:root[data-theme] .qualify-row:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0;
+}
+.qualify-row > svg {
+  color: var(--muted);
+}
+.qualify-row small {
+  font-size: 12px;
+}
+.qualify-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .share-track > div {
+    transition: none;
+  }
+  .insight-skeleton > span:not(.sr-only) {
+    animation: none;
+  }
+}

@@ -1,0 +1,21 @@
+body[data-site-kind='company'][data-theme='1']
+  :where(
+    .a-hero-image,
+    .a-card-image img,
+    .a-about-image,
+    .a-contact-image,
+    .a-story > figure img
+  ) {
+  height: auto;
+}
+body[data-site-kind='company'][data-theme='1'] .a-card-image img {
+  aspect-ratio: 1.21;
+}
+body[data-site-kind='company'][data-theme='1'] .a-hero-image {
+  aspect-ratio: 2.18;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-hero-image {
+    aspect-ratio: 1.35;
+  }
+}

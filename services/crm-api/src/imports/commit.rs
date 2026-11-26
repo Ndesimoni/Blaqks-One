@@ -1,14 +1,16 @@
 use super::{
-    insertion,
+    insertion, member,
     model::{conflict, ImportRecords},
     snapshot,
 };
+use crate::records::history;
 use crate::{
     auth::{
         protection,
         session::{self, Session},
     },
     error::{ApiError, ApiResult},
+    platform_metrics::{self, names, Event, Source},
     state::AppState,
     workspaces,
 };
@@ -20,6 +22,7 @@ use axum::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 use sqlx::FromRow;
+use uuid::Uuid;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -35,6 +38,7 @@ struct ImportPlan {
     skipped: Value,
     result: Option<Value>,
     expired: bool,
+    member_id: Option<Uuid>,
 }
 
 pub async fn commit(
@@ -44,10 +48,7 @@ pub async fn commit(
     Path(workspace): Path<String>,
     body: Result<Json<CommitRequest>, JsonRejection>,
 ) -> ApiResult<Json<Value>> {
-    if session.user.role != "super-admin" {
-        return Err(ApiError::forbidden());
-    }
-    workspaces::ensure_access(&state, &session, &workspace).await?;
+    member::ensure_importer(&state, &session, &workspace).await?;
     protection::mutation(&state, &headers, &session.csrf_token)?;
     let Json(request) = body.map_err(|_| ApiError::invalid("Provide an import preview token."))?;
     if request.token.len() != 43 {
@@ -56,9 +57,10 @@ pub async fn commit(
     let token_hash = session::digest(&request.token);
     let mut transaction = state.pool.begin().await?;
     workspaces::lock(&mut transaction, &workspace).await?;
-    workspaces::ensure_writable(&mut transaction, &workspace, session.user.id, None, None).await?;
+    member::relock(&mut transaction, &workspace, session.user.id).await?;
     let plan = sqlx::query_as::<_, ImportPlan>(
-        "SELECT records,fingerprint,counts,skipped,result,expires_at<=clock_timestamp() AS expired \
+        "SELECT records,fingerprint,counts,skipped,result,member_id,\
+         expires_at<=clock_timestamp() AS expired \
          FROM crm_import_plans WHERE token_hash=$1 AND actor_id=$2 AND workspace_id=$3 FOR UPDATE",
     )
     .bind(&token_hash)
@@ -83,13 +85,23 @@ pub async fn commit(
     }
     let records: ImportRecords = serde_json::from_value(plan.records)
         .map_err(|_| ApiError::invalid("This import plan is invalid. Preview the source again."))?;
-    insertion::insert(&mut transaction, &workspace, session.user.id, records).await?;
+    // The chosen member is checked again under this lock (BO1a item 10); without one,
+    // the parents go to the owning Admin.
+    let holder = match plan.member_id {
+        Some(id) => Some(member::holder(&mut transaction, &workspace, id, &records).await?),
+        None => history::active_owner(&mut transaction, &workspace).await?,
+    };
+    let tx = &mut transaction;
+    insertion::insert_held(tx, &workspace, session.user.id, holder, records).await?;
     let result = json!({"imported":plan.counts,"skipped":plan.skipped,"replayed":false});
     sqlx::query("UPDATE crm_import_plans SET result=$1,records='{}'::jsonb WHERE token_hash=$2")
         .bind(&result)
         .bind(token_hash)
         .execute(&mut *transaction)
         .await?;
+    let role = Some(session.user.role.as_str());
+    let event = Event::usage(names::IMPORT_COMMITTED, &workspace, role, Source::Crm);
+    platform_metrics::record(&mut transaction, event).await?;
     transaction.commit().await?;
     Ok(Json(result))
 }

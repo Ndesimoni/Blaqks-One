@@ -1,0 +1,94 @@
+/* Team member form: each fieldset reads as a titled card with helper text, tick rows show
+   hover feedback, and the review step groups each answer under a small heading.
+   Loads after team.css and team-actions.css. */
+.connected-team-options {
+  padding: 16px 20px 20px;
+}
+.connected-team-options > legend {
+  float: left;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+.connected-team-options > legend + * {
+  clear: both;
+}
+.connected-team-options > p {
+  margin: 0 0 8px;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.connected-team-options > small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted-dark);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.connected-team-options > label,
+.connected-team-role-list label {
+  margin-inline: -8px;
+  padding-inline: 8px;
+  border-radius: 8px;
+  transition: background-color var(--duration) var(--ease);
+}
+.connected-team-options > label:hover,
+.connected-team-role-list label:hover {
+  background: var(--hover);
+}
+.connected-team-review-step {
+  gap: 0;
+}
+.connected-team-review-step h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+.connected-team-review-step .connected-team-review {
+  margin: 0;
+  padding-bottom: 16px;
+}
+.connected-team-review-group {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.connected-team-review-group h4 {
+  margin: 0 0 6px;
+  color: var(--muted-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+.connected-team-review-group p,
+.connected-team-review-group .team-action-review {
+  margin: 0;
+}
+.connected-team-review-note {
+  margin: 4px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}
+@media (max-width: 650px) {
+  .connected-team-options {
+    padding: 14px 16px 16px;
+  }
+  /* A phone shows every position in the page-height form instead of a nested scroll area. */
+  .connected-team-role-list .overflow-list-scroll {
+    max-height: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .connected-team-options > label,
+  .connected-team-role-list label {
+    transition: none;
+  }
+}

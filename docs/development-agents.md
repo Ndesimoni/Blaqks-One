@@ -60,6 +60,20 @@ Match the process to the risk so small changes ship quickly.
 
 Batch several small changes and run the full suites once at the end of the batch rather than after each change. The demo is frozen, so demo browser tests are not part of any tier.
 
+### Token-efficient working (owner decision 2026-10-15)
+
+The owner-approved [delivery protocol](token-efficient-delivery.md) is the default operational checklist for this section.
+
+- **Small changes** are made directly by the primary agent, without a specialist.
+- **Medium changes** use one implementing specialist; GitHub Actions CI is the QA pass.
+- **Sensitive changes** keep the full design and security review.
+- **Locally**, run only targeted tests for the touched area plus quick checks (`npm test`, format, `check:lines:ci`, `check:boundaries`, and `cargo fmt`/Clippy/tests when Rust changed).
+- **Full suites run in CI.** The API and connected browser suites run there after a push; read only the run summary, and fetch logs only for failing jobs. Run the full suites locally only to diagnose a CI failure, or before merging sensitive work.
+- **Specialist reports** are short: changes, check results and problems in about ten lines.
+- **Batch the work.** Batch owner decisions and small tasks, and update docs once per feature.
+- **Fresh sessions.** Start a new session per feature; decisions live in the docs, the roadmap queue and project memory.
+- **Model choice.** Routine mechanical work may use a lighter model. Design, security and finance stay on the strongest model.
+
 ## Configuration and compatibility
 
 `.codex/agents/<name>.toml` contains each agent's `name`, `description`, `developer_instructions` and sandbox default. `.codex/config.toml` enables agents and sets the concurrency cap. Model and reasoning settings are omitted so specialists inherit the parent/default selection. Live permission overrides and platform limits still apply.

@@ -1,0 +1,47 @@
+/* Phone cards inside the grid card (NAV): hairline rows, people's initials and quiet 44px
+   actions, matching the desktop table. Structure and facts are unchanged (cards.css). */
+.grid-card .record-card {
+  gap: 10px;
+  padding: 14px 16px;
+  background: transparent;
+}
+.grid-card .record-card-head {
+  align-items: center;
+}
+.grid-card .record-card-head .grid-person {
+  flex: 1 1 auto;
+}
+.grid-card .record-card-head .grid-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 12px;
+}
+.grid-card .record-card-title {
+  font-size: 15px;
+}
+.grid-card .record-card-facts {
+  gap: 8px 16px;
+  padding-top: 2px;
+}
+.grid-card .record-card-facts dt {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+}
+.grid-card .record-card-foot .row-link {
+  display: inline-grid;
+  place-items: center;
+  background: var(--panel);
+  color: var(--muted);
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
+}
+.grid-card .record-card-foot .row-link:hover:not(:disabled) {
+  border-color: var(--muted);
+  background: var(--hover);
+  color: var(--ink);
+}
+.grid-card .record-card-foot .row-link:active:not(:disabled) {
+  background: var(--surface-subtle);
+}

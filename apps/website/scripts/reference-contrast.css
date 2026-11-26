@@ -1,0 +1,76 @@
+/* Secondary text and gold text links raised to readable contrast; the palette is unchanged. */
+body[data-site-kind='platform'] .estate {
+  --read-muted: #5d7180;
+}
+body[data-site-kind='platform'] .estate .p-breadcrumb:not(.d-hero *, .u-company-hero *),
+body[data-site-kind='platform'] .estate .p-address {
+  color: #5f6f7b;
+}
+body[data-site-kind='platform'] .estate :is(.d-spec, .d-prices del) {
+  color: #5f6f7b;
+}
+body[data-site-kind='platform'] .estate .p-deal-context small {
+  font-size: 12px;
+  color: #76664a;
+}
+body[data-site-kind='platform'] .estate .p-deal-context :is(p, a) {
+  font-size: 13px;
+}
+body[data-site-kind='platform'] .estate .p-deal-context p {
+  color: #5f6f7b;
+}
+body[data-site-kind='platform'] .estate .d-reduction small {
+  font-size: 11px;
+}
+body[data-site-kind='platform']
+  .estate
+  :is(
+    .u-cta p:not(.e-kicker),
+    .u-company-intro p:not(.e-kicker),
+    .u-profile-heading > div > p,
+    .u-steps p,
+    .l-intro p:not(.e-kicker),
+    .p-advice p:not(.e-kicker),
+    .d-home-links small
+  ) {
+  color: var(--read-copy);
+}
+body[data-site-kind='platform'] .estate .d-home-links small {
+  font-size: 13px;
+}
+body[data-site-kind='platform']
+  .estate
+  :is(
+    .u-company-link,
+    .u-contact-card > a,
+    .u-contact-path a,
+    .u-profile-heading > div > a,
+    .p-broker-identity button,
+    .p-section-nav a:is(:first-child, :hover),
+    .u-faq small,
+    .d-note > a,
+    [data-l-clear],
+    [data-deals-reset],
+    .p-agent button,
+    .p-advice a,
+    .p-type,
+    .p-listed-label,
+    .l-page-number,
+    .e-tabs [aria-selected='true']
+  ) {
+  color: var(--read-gold) !important;
+}
+body[data-site-kind='platform']
+  .estate
+  :is(
+    [data-l-purpose]:not([aria-pressed='true']),
+    [data-l-view]:not([aria-pressed='true']),
+    .l-all-chip,
+    #d-count,
+    .d-spotlight del
+  ) {
+  color: #5f6f7b;
+}
+body[data-site-kind='platform'] .estate .d-spotlight-price small {
+  color: #76664a;
+}

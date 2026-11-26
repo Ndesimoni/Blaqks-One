@@ -1,0 +1,128 @@
+.hero {
+  margin-bottom: 0;
+}
+.general-search-wrap {
+  position: relative;
+  max-width: 1600px;
+  padding: 0 5vw;
+  margin: -24px auto 0;
+}
+.search-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.search-top .purpose {
+  margin: 0;
+  flex: 1 1 360px;
+  max-width: 480px;
+}
+.search-top .purpose span {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+}
+.price-basis {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.search-fields {
+  grid-template-columns: 1fr 1.2fr 1fr 1.7fr auto;
+  align-items: start;
+  margin-top: 22px;
+}
+.search-fields .button {
+  margin-top: 26px;
+  padding-inline: 18px;
+  gap: 18px;
+}
+.numeric-range {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.numeric-range > legend {
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.range-fields {
+  display: grid;
+  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.range-fields label,
+.search-fields > label,
+.range-fields input {
+  min-width: 0;
+}
+.search-advanced {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.search-advanced > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+.search-advanced > summary::after {
+  content: '+';
+  font-size: 22px;
+  margin-left: auto;
+}
+.search-advanced[open] > summary::after {
+  content: '−';
+}
+.search-advanced > summary span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.search-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.search-advanced-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.field-error {
+  color: var(--error, #a03123);
+  font-size: 11px;
+  font-weight: 400;
+}
+.field-error:empty,
+.filter-error-summary:empty {
+  display: none;
+}
+.form-error {
+  color: var(--error, #a03123);
+}
+body[data-theme='4'] {
+  --error: #ffb4a9;
+}
+[aria-invalid='true'] {
+  border-color: var(--error, #a03123);
+}
+[hidden] {
+  display: none !important;
+}
+body,
+body.company-site {
+  padding-bottom: calc(var(--preview-height, 64px) + 16px);
+}
+h1[tabindex='-1']:focus {
+  outline: none;
+}

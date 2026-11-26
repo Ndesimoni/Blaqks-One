@@ -35,7 +35,7 @@ pub async fn create(
     creation::ensure_id_allowed(RecordScope::of(&session.user), &record)?;
     let entry = creation::create(
         &state.pool,
-        session.user.id,
+        (session.user.id, &session.user.role),
         &workspace,
         &collection,
         record,

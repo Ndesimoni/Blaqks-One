@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::signup;
 use sqlx::PgPool;
 use std::sync::Arc;
 
@@ -8,4 +9,5 @@ pub struct AppState {
     pub config: Arc<Config>,
     pub dummy_hash: Arc<String>,
     pub password_workers: Arc<tokio::sync::Semaphore>,
+    pub signup: Arc<signup::Services>,
 }

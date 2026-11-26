@@ -1,0 +1,122 @@
+body[data-site-kind='company'][data-theme='2'] .v-hero {
+  position: relative;
+  min-height: 530px;
+  background: #122b4c;
+  isolation: isolate;
+  overflow: hidden;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 52%;
+  z-index: -2;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #071b3ae8 0%, #102d50c2 30%, #071b3a20 65%, #071b3a08 100%);
+  z-index: -1;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero-content {
+  padding-block: 84px 100px;
+  color: #fff;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero .v-eyebrow {
+  color: #edc789;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero h1 {
+  max-width: 550px;
+  font-size: clamp(40px, 4.6vw, 61px);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: #fff;
+  margin: 0 0 22px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero h1 span {
+  color: #edc789;
+}
+body[data-site-kind='company'][data-theme='2'] .v-hero-content > p:not(.v-eyebrow) {
+  color: #f0f3f8;
+  font-size: 14px;
+  line-height: 1.7;
+  max-width: 370px;
+  margin: 0 0 28px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search-wrap {
+  position: relative;
+  z-index: 2;
+  margin-top: -42px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search {
+  padding: 19px 22px 22px;
+  background: #fff;
+  border: 1px solid #e1e6ed;
+  border-radius: 5px;
+  box-shadow: 0 5px 24px #071b3a0d;
+}
+body[data-site-kind='company'][data-theme='2'] .v-purpose {
+  display: flex;
+  gap: 25px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e4e8ee;
+  padding-bottom: 12px;
+}
+body[data-site-kind='company'][data-theme='2'] .v-purpose label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #35465d;
+  cursor: pointer;
+}
+body[data-site-kind='company'][data-theme='2'] .v-purpose input {
+  accent-color: #8f611f;
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  padding: 0;
+  margin: 0;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 16px;
+  align-items: end;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search-fields label {
+  display: grid;
+  gap: 7px;
+  color: #35465d;
+  font-size: 12px;
+  font-weight: 500;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search-fields select {
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid #a3adbb;
+  border-radius: 3px;
+  background: #fff;
+  font-size: 12px;
+  color: #35465d;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search-fields .v-button {
+  background: #071b3a;
+  border-color: #071b3a;
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+}
+body[data-site-kind='company'][data-theme='2'] .v-search-fields .v-button:hover {
+  background: #1b365b;
+}

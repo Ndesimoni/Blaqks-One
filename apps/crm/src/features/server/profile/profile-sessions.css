@@ -1,0 +1,132 @@
+/* My profile sessions: device rows, inline confirmations and loading skeletons. */
+.acct-sessions {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.acct-session {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 14px;
+  padding: 14px 0;
+}
+.acct-session:first-child {
+  padding-top: 0;
+}
+.acct-session:last-child {
+  padding-bottom: 0;
+}
+.acct-session + .acct-session {
+  border-top: 1px solid var(--line);
+}
+.acct-device {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--muted-dark);
+}
+.is-current .acct-device {
+  border-color: transparent;
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+:root[data-theme] .acct-session-main p {
+  margin: 0;
+}
+.acct-session-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+.acct-session-title strong {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+:root[data-theme] .acct-session-main .acct-session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin-top: 2px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.acct-session-meta time {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.acct-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary);
+  font-weight: 600;
+}
+.acct-live::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.acct-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+.acct-confirm > span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.acct-session .acct-confirm {
+  grid-column: 2 / -1;
+}
+.acct-card-foot .acct-confirm {
+  flex: 1 1 100%;
+  background: var(--panel);
+}
+.acct-skeleton {
+  border: 0;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--surface-subtle), var(--hover), var(--surface-subtle));
+  background-size: 200% 100%;
+  animation: acct-shimmer 1.4s ease-in-out infinite;
+}
+.acct-skeleton-line {
+  display: block;
+  width: 100%;
+  height: 12px;
+  margin: 6px 0;
+}
+.acct-skeleton-line.short {
+  width: 45%;
+}
+@keyframes acct-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .acct-skeleton {
+    animation: none;
+  }
+}
+@media (max-width: 650px) {
+  .acct-session .acct-confirm {
+    grid-column: 1 / -1;
+  }
+}

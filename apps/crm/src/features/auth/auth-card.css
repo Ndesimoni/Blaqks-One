@@ -1,0 +1,98 @@
+/* The centred card: its heading, fields, password rules, the code entry, the gold buttons and
+   the small links under them, as in the approved website design. */
+.auth-card {
+  display: grid;
+  gap: 16px;
+  inline-size: min(440px, 100%);
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 40px 120px rgba(13, 28, 20, 0.16);
+}
+.auth-card h1 {
+  margin: 0;
+  font: 600 28px var(--display);
+  text-align: center;
+}
+.auth-card h1:focus {
+  outline: none;
+}
+.auth-card > p,
+.auth-card form > p:not(.field-error) {
+  margin: 0;
+  color: var(--muted);
+}
+.auth-card > p:not(.field-error):not(.auth-alt) {
+  text-align: center;
+}
+.auth-card form {
+  display: grid;
+  gap: 16px;
+}
+.auth-card .signup-field label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.auth-card .signup-field input,
+.auth-card .signup-field select {
+  min-block-size: 44px;
+}
+.auth-card input[readonly] {
+  background: var(--surface-subtle);
+  color: var(--muted);
+}
+.auth-card .password-rules {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 12.5px;
+}
+.auth-card .signup-code-field input {
+  font-size: 28px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+.auth-card .btn.signup-primary,
+.auth-card .btn.auth-submit {
+  inline-size: 100%;
+  min-block-size: 48px;
+  border: 0;
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+  color: #17251c;
+  box-shadow: 0 8px 30px rgba(188, 151, 101, 0.35);
+}
+.auth-alt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+.auth-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.auth-link:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+@media (max-width: 420px) {
+  .auth-card .password-rules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .auth-card {
+    padding: 22px;
+  }
+}

@@ -56,3 +56,20 @@ export async function stop(child) {
     await closed;
   }
 }
+
+/**
+ * The messaging worker for the suites: sends queued email, reads replies, retries
+ * revocations and sweeps media through the stand-ins. Webhook intake stays off so suites
+ * can inspect staged events.
+ */
+export function startWorker(binary, env) {
+  return spawn(binary.replace('kws-crm-api', 'messaging_worker'), [], {
+    env: {
+      ...env,
+      CRM_WORKER_LOOPS: 'outbox,revocations,mailsync,mediasweep',
+      CRM_MAIL_SYNC_SECONDS: '1',
+      CRM_MEDIA_SWEEP_SECONDS: '2',
+    },
+    stdio: 'inherit',
+  });
+}

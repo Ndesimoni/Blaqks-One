@@ -1,5 +1,9 @@
 use super::{audit, target, visibility::RecordScope};
-use crate::{auth::grants::Action, error::ApiResult};
+use crate::{
+    auth::grants::Action,
+    error::ApiResult,
+    platform_metrics::{self, names, Event, Source},
+};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -31,6 +35,8 @@ pub async fn delete(
         "This record changed. Reload before deleting.",
     )?;
     target::ensure_delete_allowed(scope, collection, &found)?;
+    // Its photos and floor plans go with it (packet F2).
+    crate::media::owned::remove(&mut transaction, super::media_links::KIND, found.id).await?;
     sqlx::query("DELETE FROM crm_records WHERE id=$1")
         .bind(found.id)
         .execute(&mut *transaction)
@@ -44,6 +50,9 @@ pub async fn delete(
         id,
     )
     .await?;
+    let name = names::record_event(names::RECORD_DELETED, collection);
+    let event = Event::usage(&name, workspace, Some(&user.role), Source::Crm);
+    platform_metrics::record(&mut transaction, event).await?;
     transaction.commit().await?;
     Ok(())
 }

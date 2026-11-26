@@ -1,7 +1,16 @@
 //! Command-line options for `seed-sample` and `clear-sample`.
 
 pub const USAGE: &str = "Usage: seed-sample [--no-staff] [--organisation] [--yes] | \
-     clear-sample [--organisation] [--include-edited] [--yes]";
+     clear-sample [--organisation] [--include-edited] [--yes] | \
+     seed-platform-sample [--no-staff] [--yes] | clear-platform-sample [--yes]";
+
+/// Every sample command name, for the binary's dispatch.
+pub const COMMANDS: [&str; 4] = [
+    "seed-sample",
+    "clear-sample",
+    "seed-platform-sample",
+    "clear-platform-sample",
+];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Command {
@@ -14,19 +23,24 @@ pub struct Options {
     pub command: Command,
     /// Seed only: create or reactivate the three sample staff accounts (default on).
     pub staff: bool,
-    /// Explicitly allow the Super Admin organisation workspace.
+    /// Names Blaqks One's organisation workspace, which holds no CRM records (BO1a), so
+    /// the command refuses it; kept so the old flag explains itself.
     pub organisation: bool,
     /// Skip the confirmation prompt; required when standard input is not a terminal.
     pub yes: bool,
     /// Clear only: also remove sample records people changed in the app.
     pub include_edited: bool,
+    /// Blaqks One's own sample data (`*-platform-sample`), never a company's.
+    pub platform: bool,
 }
 
 impl Options {
     pub fn parse(command: &str, args: &[String]) -> Result<Self, String> {
-        let command = match command {
-            "seed-sample" => Command::Seed,
-            "clear-sample" => Command::Clear,
+        let (command, platform) = match command {
+            "seed-sample" => (Command::Seed, false),
+            "clear-sample" => (Command::Clear, false),
+            "seed-platform-sample" => (Command::Seed, true),
+            "clear-platform-sample" => (Command::Clear, true),
             _ => return Err(USAGE.into()),
         };
         let mut options = Self {
@@ -35,13 +49,16 @@ impl Options {
             organisation: false,
             yes: false,
             include_edited: false,
+            platform,
         };
         for arg in args {
             match arg.as_str() {
-                "--organisation" | "--organization" => options.organisation = true,
+                "--organisation" | "--organization" if !platform => options.organisation = true,
                 "--yes" => options.yes = true,
                 "--no-staff" if command == Command::Seed => options.staff = false,
-                "--include-edited" if command == Command::Clear => options.include_edited = true,
+                "--include-edited" if command == Command::Clear && !platform => {
+                    options.include_edited = true
+                }
                 _ => return Err(format!("Unknown option {arg}. {USAGE}")),
             }
         }
@@ -72,5 +89,9 @@ mod tests {
         assert!(Options::parse("clear-sample", &args(&["--no-staff"])).is_err());
         assert!(Options::parse("seed-sample", &args(&["--force"])).is_err());
         assert!(Options::parse("drop-sample", &[]).is_err());
+        let platform = Options::parse("seed-platform-sample", &args(&["--no-staff"])).unwrap();
+        assert!(platform.platform && !platform.staff && platform.command == Command::Seed);
+        assert!(Options::parse("seed-platform-sample", &args(&["--organisation"])).is_err());
+        assert!(Options::parse("clear-platform-sample", &args(&["--include-edited"])).is_err());
     }
 }

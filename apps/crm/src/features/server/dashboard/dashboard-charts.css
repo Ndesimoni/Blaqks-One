@@ -1,0 +1,64 @@
+/* The Dashboard's kept panels as charts: one-hue lead bars with the count beside each label,
+   and the finance panel's collected meter (fill in the bar hue on a lighter track). */
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.lead-bars-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lead-bars .bar-row {
+  display: grid;
+  gap: 6px;
+}
+.lead-bars .bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.lead-bars .bar-label strong {
+  font-variant-numeric: tabular-nums;
+}
+.lead-bar {
+  display: block;
+  min-width: 4px;
+  height: 10px;
+  border-radius: 0 4px 4px 0;
+  background: var(--chart-bar);
+}
+.collection-meter {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.collection-meter-text {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.collection-meter-text strong {
+  color: var(--ink);
+}
+.collection-meter-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--chart-track);
+}
+.collection-meter-track span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--chart-bar);
+}

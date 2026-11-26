@@ -1,0 +1,42 @@
+/* Off-plan milestone editor (packet Q6). */
+:root[data-theme] .milestone-list {
+  display: grid;
+  gap: 8px;
+}
+
+:root[data-theme] .milestone-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px 170px 44px;
+  gap: 8px;
+}
+
+:root[data-theme] .milestone-row input {
+  inline-size: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--panel);
+  color: var(--ink);
+  font-size: 14px;
+}
+
+:root[data-theme] .milestone-row input:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  outline: none;
+}
+
+:root[data-theme] .milestone-row input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  :root[data-theme] .milestone-row {
+    grid-template-columns: minmax(0, 1fr) 96px 44px;
+  }
+
+  :root[data-theme] .milestone-row label:first-child {
+    grid-column: 1 / -1;
+  }
+}

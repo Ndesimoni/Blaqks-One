@@ -1,0 +1,37 @@
+/* The mockup's select column and bulk bar: a narrow checkbox column before the record's name,
+   and a bar pinned to the bottom of the grid while rows are ticked. */
+:root[data-theme] .grid-card .grid-table :is(th, td).grid-select {
+  width: 40px;
+  padding-right: 0;
+}
+.grid-select input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--primary);
+  vertical-align: middle;
+  cursor: pointer;
+}
+:root[data-theme] .grid-card .grid-table tbody tr.is-selected {
+  background: var(--accent-subtle);
+}
+.grid-selection {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--gold);
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+.grid-selection > strong {
+  margin-inline-end: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.grid-selection .grid-selection-clear {
+  margin-inline-start: auto;
+}

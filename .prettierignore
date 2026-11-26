@@ -1,15 +1,24 @@
 node_modules/
+.next/
+**/package-lock.json
+**/next-env.d.ts
 dist/
 legacy/
 public/
+# The website's generated reference outputs (apps/website/.gitignore), rebuilt on every run.
+apps/website/src/generated/
+apps/website/browser-report.json
 package-lock.json
 coverage/
 playwright-report/
 test-results/
 test-results-server/
-backend/target/
-backend/data/
-backend/Cargo.lock
+services/calendar-companion/target/
+services/calendar-companion/data/
+services/calendar-companion/Cargo.lock
 services/crm-api/target/
 services/crm-api/Cargo.lock
-public/demo/demo-workspace-backup.json
+apps/crm/public/demo/demo-workspace-backup.json
+
+# Local agent worktrees (Claude Code); never part of the repository.
+.claude/

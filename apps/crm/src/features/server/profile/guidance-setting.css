@@ -1,0 +1,22 @@
+/* Field guidance switch in My profile (packet Q1); logical properties for right-to-left. */
+:root[data-theme] .guidance-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* The switch itself is the shared `.profile-switch` (profile-cards.css). */
+:root[data-theme] .guidance-switch input {
+  flex: none;
+}
+
+:root[data-theme] .guidance-note {
+  margin-block: 8px 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+  line-height: 1.5;
+}

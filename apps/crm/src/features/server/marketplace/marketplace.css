@@ -1,0 +1,138 @@
+/* Broker marketplace (redesign to the approved mockup, 2026-10-31). Theme tokens only; the
+   two status pairs below repeat the shared badge tones (styles/ui/badges.css) for ticks and
+   warnings, which the shared palette does not name yet. Phone width first. */
+.marketplace-page {
+  --market-ok: #28603e;
+  --market-ok-subtle: #e5f1e8;
+  --market-warn: #805b24;
+  --market-warn-subtle: #f8efd9;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+:root[data-theme='dark'] .marketplace-page {
+  --market-ok: #b2dfbd;
+  --market-ok-subtle: #294735;
+  --market-warn: #efd09d;
+  --market-warn-subtle: #493d28;
+}
+.market-gate {
+  display: grid;
+  gap: 14px;
+  max-width: 760px;
+}
+/* One column that never grows past the card, so wide rows (step chips, tables) scroll inside. */
+.market-card,
+.market-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.market-section {
+  padding: 16px;
+}
+.market-card h2,
+.market-card h3,
+.market-section h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.market-card h3,
+.market-section h3 {
+  font-size: 15px;
+}
+.market-card p,
+.market-section p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.market-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+:root[data-theme] .marketplace-page :is(.market-hint, .market-note) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.market-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.market-actions:empty {
+  display: none;
+}
+.market-step-actions {
+  justify-content: flex-end;
+  padding-top: 4px;
+}
+:root[data-theme] .marketplace-page :is(.market-reason, .market-notice) {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--accent-subtle);
+  color: var(--ink);
+  font-size: 13px;
+}
+.market-reason span {
+  font-weight: 700;
+}
+.market-notice {
+  font-weight: 600;
+}
+.market-empty {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 24px 20px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+.market-empty strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+.market-empty p {
+  margin: 0;
+  color: var(--muted);
+}
+.market-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 14px 24px;
+  margin: 0;
+}
+.market-fields dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.market-fields dd {
+  margin: 3px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}

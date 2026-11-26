@@ -1,0 +1,142 @@
+.directory-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 16px 21px;
+  border-radius: 12px;
+}
+.directory-count {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.large-count {
+  font-size: 34px;
+  font-weight: 800;
+  color: #2b473c;
+  line-height: 1;
+}
+.directory-count strong {
+  color: #435a4e;
+  font-size: 12px;
+}
+.directory-count p {
+  font-size: 10px;
+  margin: 5px 0 0;
+}
+.filters-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 5px;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tabs button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: #8b9a92;
+  border-radius: 8px;
+  font-size: 11px;
+  padding: 9px 13px;
+  font-weight: 700;
+}
+.tabs button.active {
+  color: #34594b;
+  background: #e7eee9;
+}
+.filter-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.search-small {
+  height: 37px;
+  border: 1px solid #e6ebe8;
+  background: #fff;
+  border-radius: 9px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 0 11px;
+  color: #9eaba2;
+  min-width: 215px;
+}
+.search-small input {
+  border: 0;
+  outline: none;
+  width: 100%;
+  background: transparent;
+  color: #3d5147;
+  font-size: 10px;
+}
+.view-switch {
+  display: flex;
+  gap: 3px;
+  background: #fff;
+  border: 1px solid #e6ebe8;
+  border-radius: 8px;
+  padding: 3px;
+}
+.view-switch button {
+  border: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #a0aba5;
+}
+.view-switch button.on {
+  background: #e7eee8;
+  color: #345e4e;
+}
+/* UI3 directory heading: the authorized count beside the page's single primary action. The
+   shell owns the h1, so this states the count once and never repeats the description (B-02). */
+.record-directory-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.record-count {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+.record-count-number {
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.record-count-word {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+.record-directory .filters-toolbar {
+  margin-top: 0;
+}
+.record-directory .filter-right {
+  flex: 1;
+  justify-content: flex-end;
+}
+.record-directory .search-small {
+  min-width: 0;
+  width: min(320px, 100%);
+}
+/* Values wrap instead of pushing the action column out of view at directory widths (B-01). */
+.record-directory .data-table {
+  min-width: 0;
+  white-space: normal;
+}

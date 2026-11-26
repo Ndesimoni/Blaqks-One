@@ -1,0 +1,79 @@
+/* Who it is for, and before and after. */
+.who {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.who-card {
+  border: 1px solid var(--edge);
+  border-radius: 20px;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--card-2), var(--card));
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  transition: transform 0.25s;
+}
+.who-card:hover {
+  transform: translateY(-4px);
+}
+.who-card h3 {
+  font-size: 21px;
+}
+.who-card p {
+  color: var(--text-2);
+  font-size: 14.5px;
+}
+.compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.compare-col {
+  border: 1px solid var(--edge);
+  border-radius: 22px;
+  padding: 28px;
+  background: var(--card);
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.compare-col.with {
+  border-color: rgba(188, 151, 101, 0.5);
+  background:
+    radial-gradient(400px 200px at 50% 0%, rgba(188, 151, 101, 0.12), transparent 70%), var(--card);
+}
+.compare-col h3 {
+  font-size: 22px;
+}
+.compare-col ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.compare-col li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  color: var(--text-2);
+}
+.compare-col li::before {
+  content: '✕';
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  background: var(--tint-2);
+}
+.compare-col.with li::before {
+  content: '✓';
+  color: var(--gold-ink);
+  background: rgba(188, 151, 101, 0.16);
+}

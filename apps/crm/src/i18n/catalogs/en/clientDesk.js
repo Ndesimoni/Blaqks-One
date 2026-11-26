@@ -1,0 +1,30 @@
+/** The connected Client desk (design queue item 7, approved mockup). Keys are `clientDesk.<key>`. */
+export default {
+  clients: 'Clients',
+  find: 'Find a client',
+  client: 'Client',
+  needNone: 'Requirements not set',
+  noneFound: 'No clients found',
+  upTo: 'up to {budget}',
+  agent: 'Agent {name}',
+  from: 'From {source}',
+  quality: '{tier} · {score}/100',
+  open: 'Open client',
+  matches: {
+    one: '{count} matching property · same buy or rent, up to 8% over budget, preferred areas',
+    other: '{count} matching properties · same buy or rent, up to 8% over budget, preferred areas',
+  },
+  matchList: 'Matching properties',
+  openListing: 'Open {title}',
+  addShortlist: 'Add to shortlist',
+  sendWhatsapp: 'Send on WhatsApp',
+  whatsappText: '{title} · {price}',
+  noMatchTitle: 'No matching properties in your CRM',
+  noMatchDetail:
+    "Ask other brokers: post {name}'s request on the marketplace. Their name stays hidden.",
+  postRequest: 'Post a client request',
+  selectTitle: 'Select a client',
+  selectDetail: 'Clients you can work with appear here with their property matches.',
+  noMatchingClients: 'No matching clients',
+  tryAnother: 'Try another name, phone number or ID.',
+};

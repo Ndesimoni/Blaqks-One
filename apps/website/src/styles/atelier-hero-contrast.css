@@ -1,0 +1,73 @@
+body[data-site-kind='company'][data-theme='1'] :where(.a-reference-hero, .a-published-hero) {
+  isolation: isolate;
+}
+body[data-site-kind='company'][data-theme='1']
+  :where(.a-reference-hero, .a-published-hero)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #111821ed 0%,
+    #111821d9 22%,
+    #1118218c 42%,
+    #11182126 65%,
+    #11182100 85%
+  );
+}
+body[data-site-kind='company'][data-theme='1']
+  :where(.a-reference-hero, .a-published-hero)
+  .a-hero-intro {
+  position: relative;
+  z-index: 2;
+}
+body[data-site-kind='company'][data-theme='1'] :where(.a-reference-hero, .a-published-hero) h1 {
+  color: #fff;
+  text-shadow: 0 2px 18px #00000026;
+}
+body[data-site-kind='company'][data-theme='1']
+  :where(.a-reference-hero, .a-published-hero)
+  .a-hero-note
+  p {
+  color: #f5f5f5;
+  font-size: 15px;
+  line-height: 1.7;
+}
+body[data-site-kind='company'][data-theme='1']
+  :where(.a-reference-hero, .a-published-hero)
+  .a-hero-intro
+  .a-action {
+  background: #fff;
+  border-color: #fff;
+  color: #171a1e;
+  min-height: 44px;
+  padding-inline: 19px;
+}
+body[data-site-kind='company'][data-theme='1']
+  :where(.a-reference-hero, .a-published-hero)
+  .a-hero-intro
+  .a-action:hover {
+  background: #ededed;
+}
+body[data-site-kind='company'][data-theme='1']
+  :where(.a-reference-hero, .a-published-hero)
+  .a-hero-intro
+  :focus-visible {
+  outline-color: #fff;
+}
+body[data-site-kind='company'][data-theme='1'] .a-hero-search {
+  z-index: 3;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-reference-hero .a-hero-intro {
+    padding-bottom: 12px;
+  }
+  body[data-site-kind='company'][data-theme='1']
+    :where(.a-reference-hero, .a-published-hero)
+    .a-hero-note
+    p {
+    font-size: 14px;
+  }
+}

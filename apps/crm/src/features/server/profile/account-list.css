@@ -1,0 +1,54 @@
+/* My profile's account facts list (Account details). */
+.acct-list dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-dark);
+  font-size: 13px;
+  font-weight: 500;
+}
+.acct-list dd {
+  margin: 0;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.acct-list {
+  margin: 0;
+}
+.acct-item {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 24px;
+}
+.acct-item + .acct-item {
+  border-top: 1px solid var(--line);
+}
+.acct-value {
+  display: block;
+  font-weight: 600;
+}
+.acct-locked,
+.acct-card-foot.acct-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-dark);
+  font-size: 12px;
+}
+.acct-locked {
+  margin-top: 4px;
+}
+.acct-card-foot.acct-note {
+  flex-wrap: nowrap;
+  gap: 8px;
+  font-size: 13px;
+}
+@media (max-width: 650px) {
+  .acct-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding: 12px 16px;
+  }
+}

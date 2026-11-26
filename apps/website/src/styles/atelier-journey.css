@@ -1,0 +1,89 @@
+body[data-site-kind='company'][data-theme='1'] .a-home-faq-grid {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap: 80px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq details {
+  border-bottom: 1px solid var(--line);
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq details:first-child {
+  border-top: 1px solid var(--line);
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq summary {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  list-style: none;
+  font-size: 15px;
+  line-height: 1.4;
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq summary::-webkit-details-marker {
+  display: none;
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq details[open] summary > span {
+  transform: rotate(45deg);
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq details p {
+  padding: 0 24px 20px 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq aside {
+  padding-top: 18px;
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq aside h3 {
+  font-size: 29px;
+  line-height: 1.2;
+}
+body[data-site-kind='company'][data-theme='1'] .a-home-faq aside > p:not(.a-kicker) {
+  max-width: 240px;
+  font-size: 14px;
+  color: var(--muted);
+}
+body[data-site-kind='company'][data-theme='1'] .a-mobile-property-contact {
+  display: none;
+}
+@media (max-width: 760px) {
+  body[data-site-kind='company'][data-theme='1'] .a-home-faq-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  body[data-site-kind='company'][data-theme='1']:has(.a-mobile-property-contact) {
+    padding-bottom: 92px;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-mobile-property-contact {
+    display: flex;
+    position: fixed;
+    inset: auto 0 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    background: #fffffff5;
+    border-top: 1px solid var(--line);
+    padding: 13px 20px max(13px, env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-mobile-property-contact small {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: #666;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-mobile-property-contact strong {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  body[data-site-kind='company'][data-theme='1'] .a-mobile-property-contact .a-action {
+    min-width: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-site-kind='company'][data-theme='1']
+    :where(.a-card-image img, .a-home-faq summary > span) {
+    transition: none;
+  }
+}

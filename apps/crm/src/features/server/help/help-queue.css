@@ -1,0 +1,11 @@
+/* The Blaqks One help queue's request card and its actions (BO1c). */
+.help-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+.help-request-card p {
+  margin: 0 0 8px;
+  font-size: 13px;
+}

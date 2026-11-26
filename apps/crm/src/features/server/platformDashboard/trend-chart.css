@@ -1,0 +1,136 @@
+/* Platform trend charts (dataviz marks): one green hue from chart-tokens.css, earlier months a
+   lighter step of it (still 3:1 on the panel in both themes), this month at full strength with
+   its value on the cap; hairline grid, columns at most 20px wide with 4px rounded tops. */
+.platform-trends {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  align-items: start;
+  gap: 16px;
+}
+.trend-panel {
+  --trend-context: color-mix(in srgb, var(--chart-bar) 80%, var(--panel));
+  --trend-height: 150px;
+}
+.trend-total {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  margin: 0;
+}
+.trend-total span,
+.trend-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+.trend-total :is(span, strong) {
+  white-space: nowrap;
+}
+.trend-total strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 650;
+}
+.trend-multiples {
+  display: grid;
+  gap: 14px;
+}
+.trend-chart {
+  margin: 8px 0 0;
+}
+.trend-chart.is-compact {
+  --trend-height: 84px;
+}
+.trend-label {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.trend-plot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 8px;
+}
+.trend-axis {
+  position: relative;
+  height: var(--trend-height);
+  min-width: 32px;
+}
+.trend-axis span {
+  position: absolute;
+  right: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+.trend-axis span:nth-child(2) {
+  top: 50%;
+}
+.trend-axis span:nth-child(3) {
+  top: 100%;
+}
+.trend-cols {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 4px;
+}
+.trend-col {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.trend-slot {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: var(--trend-height);
+  background:
+    linear-gradient(var(--line), var(--line)) top / 100% 1px no-repeat,
+    linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat,
+    linear-gradient(var(--muted), var(--muted)) bottom / 100% 1px no-repeat;
+}
+/* A month not tracked yet is washed, so it never passes for a zero. */
+.trend-col.is-untracked .trend-slot {
+  background-color: color-mix(in srgb, var(--line) 45%, transparent);
+}
+.trend-bar {
+  position: relative;
+  width: min(100%, 20px);
+  border-radius: 4px 4px 0 0;
+  background: var(--trend-context);
+  transition: background-color var(--duration) var(--ease);
+}
+.trend-col.is-current .trend-bar,
+.trend-col:hover .trend-bar {
+  background: var(--chart-bar);
+}
+.trend-cap {
+  position: absolute;
+  right: 0;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.trend-col small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.trend-col.is-current small {
+  color: var(--ink);
+  font-weight: 700;
+}
+@media (max-width: 750px) {
+  .trend-cols {
+    gap: 2px;
+  }
+  /* Every other month is named (ending on this month) so names never touch. */
+  .trend-col:nth-child(odd of .trend-col) small {
+    visibility: hidden;
+  }
+}

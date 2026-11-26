@@ -1,0 +1,22 @@
+export default {
+  invalidName: 'Enter a name of 1 to 100 characters.',
+  invalidEmail: 'Enter a valid email address.',
+  invalidPhone: 'Enter a mobile number with its country code, such as +971501234567.',
+  weakPassword:
+    'Use at least 8 characters with uppercase, lowercase, number and special characters.',
+  consentRequired: 'Accept the Terms of Service and confirm you read the Privacy Notice.',
+  consentOutdated: 'The legal documents changed. Review them before continuing.',
+  invalidLanguage: 'Choose English or Arabic.',
+  botCheckFailed: 'The bot check could not be confirmed. Try again.',
+  botCheckUnavailable: 'The bot check is temporarily unavailable. Try again.',
+  rateLimited: 'Too many attempts. Wait a while and try again.',
+  signupBusy: 'Sign-up is temporarily busy. Try again.',
+  invalidCode: 'The verification code is incorrect or expired.',
+  codeLocked: 'Too many incorrect attempts. Request a new code.',
+  resendTooSoon: 'Wait before requesting another code.',
+  accountExists: 'This email cannot create a new account. Sign in or start again.',
+  invalidCompany: 'Enter valid company details.',
+  versionConflict: 'Your company changed elsewhere. Reload and try again.',
+  unavailable: 'This request could not be completed. Try again.',
+  codeRequired: 'Enter the 6-digit verification code.',
+};

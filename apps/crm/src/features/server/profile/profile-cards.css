@@ -1,0 +1,112 @@
+/* My profile's tabs as the approved mockup's settings cards (design queue item 14). */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+  gap: 14px;
+  align-items: start;
+}
+:root[data-theme] .panel.profile-card {
+  display: grid;
+  padding: 0;
+  overflow: hidden;
+}
+.profile-card-head {
+  display: grid;
+  gap: 4px;
+  padding: 20px 24px 0;
+}
+:root[data-theme] .profile-card-head h2 {
+  margin: 0;
+  color: var(--ink);
+  font: 600 16px var(--display);
+}
+.profile-card-head p,
+.profile-card-note .acct-muted {
+  margin: 0;
+  color: var(--muted-dark);
+  font-size: 13px;
+}
+.profile-card-note {
+  padding: 8px 24px 0;
+}
+/* The card is the panel: inner panels lose their own frame. */
+:root[data-theme] .profile-card .panel.acct-card,
+:root[data-theme] .profile-card .acct-card {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.profile-card .acct-card-foot {
+  border-radius: 0;
+}
+.profile-switch-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding-block: 4px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.profile-switch-row > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+:root[data-theme] input.profile-switch {
+  position: relative;
+  inline-size: 40px;
+  block-size: 24px;
+  margin: 0;
+  border-radius: 99px;
+  background: var(--line);
+  appearance: none;
+  cursor: pointer;
+}
+input.profile-switch::after {
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  inline-size: 18px;
+  block-size: 18px;
+  border-radius: 50%;
+  background: var(--panel);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+  content: '';
+  transition: transform 150ms ease;
+}
+:root[data-theme] input.profile-switch:checked {
+  background: var(--primary);
+}
+input.profile-switch:checked::after {
+  transform: translateX(16px);
+}
+input.profile-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+input.profile-switch:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+:root[data-theme] .panel.profile-save-bar {
+  padding: 0;
+  overflow: hidden;
+}
+.profile-save-bar .acct-card-foot {
+  border-top: 0;
+  background: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  input.profile-switch::after {
+    transition: none;
+  }
+}
+@media (max-width: 650px) {
+  .profile-card-head {
+    padding: 16px 16px 0;
+  }
+  .profile-card-note {
+    padding: 8px 16px 0;
+  }
+}

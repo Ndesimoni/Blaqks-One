@@ -18,6 +18,10 @@ pub type Counts = BTreeMap<String, usize>;
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct PreviewRequest {
     pub source_workspace_id: String,
+    /// The company member who receives the parent records: required for a personal
+    /// source; for the organisation source, absent means the owning Admin (BO1a item 10).
+    #[serde(default)]
+    pub member_id: Option<uuid::Uuid>,
     pub records: ImportRecords,
 }
 

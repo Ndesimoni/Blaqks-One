@@ -53,7 +53,8 @@ pub fn plan(source: ImportRecords, target: &[TargetRow]) -> ApiResult<Plan> {
 }
 
 /// Every linked ID must exist in the target workspace or arrive anywhere in the
-/// same import, including later rows of the same collection (deferred referrals).
+/// same import, including later rows of the same collection (deferred referrals). Deal
+/// links are not checked: imports always store `deal_ref` NULL (finance-design L-F7).
 fn ensure_links(source: &ImportRecords, target: &[TargetRow]) -> ApiResult<()> {
     let mut known: HashSet<(&str, &str)> = target
         .iter()
@@ -67,7 +68,11 @@ fn ensure_links(source: &ImportRecords, target: &[TargetRow]) -> ApiResult<()> {
         );
     }
     for (collection, rows) in source.collections() {
-        for link in find(collection)?.links {
+        for link in find(collection)?
+            .links
+            .iter()
+            .filter(|link| link.slot.record())
+        {
             let missing = rows.iter().any(|row| {
                 row.get(link.field)
                     .and_then(Value::as_str)

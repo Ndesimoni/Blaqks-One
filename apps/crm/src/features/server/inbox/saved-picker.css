@@ -1,0 +1,130 @@
+/* Saved replies picker (docs/saved-replies-drafts.md §5): a native popover that
+   SavedRepliesButton places above the button, end-aligned. Phones: saved-picker-phone.css. */
+.saved-picker {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  inline-size: min(360px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  cursor: auto;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.saved-picker:focus-visible {
+  outline: 2px solid var(--focus);
+}
+.saved-picker-inner {
+  display: flex;
+  flex-direction: column;
+  max-block-size: min(440px, calc(100dvh - 160px));
+}
+.saved-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-block-size: 44px;
+  padding: 6px 6px 2px 14px;
+}
+.saved-picker-close {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.saved-picker-close:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.saved-picker-search {
+  block-size: 40px;
+  margin: 0 10px 8px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--ink);
+  font: inherit;
+}
+.saved-picker-note,
+.saved-picker-state {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 14px 12px;
+  color: var(--muted);
+}
+.saved-picker-note {
+  color: var(--danger);
+}
+.saved-picker-state p {
+  margin: 0;
+}
+.saved-picker-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+.saved-picker-scroll > .overflow-list-scroll {
+  flex: 1 1 auto;
+  max-height: none;
+  padding: 0 6px 6px;
+}
+.saved-picker-list,
+.saved-picker-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.saved-picker-section {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 8px 4px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.saved-picker-option {
+  display: grid;
+  gap: 2px;
+  min-block-size: 52px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.saved-picker-option > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.saved-picker-option span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.saved-picker-option:hover,
+.saved-picker-option.is-active {
+  background: var(--hover);
+}
+.saved-picker-option.is-active {
+  box-shadow: inset 3px 0 0 var(--focus);
+}
+.saved-picker-foot {
+  display: grid;
+  padding: 8px 10px 10px;
+  border-block-start: 1px solid var(--line);
+}

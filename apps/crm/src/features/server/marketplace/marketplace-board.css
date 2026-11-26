@@ -1,0 +1,148 @@
+/* The board (packet MK2, marketplace redesign): one filter bar, then request cards in a grid
+   with the title, the buy-or-rent line, areas and preference tags, and the broker. */
+.market-board {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.market-board > .btn {
+  justify-self: center;
+}
+.market-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  align-items: end;
+  gap: 10px 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.market-filter {
+  min-width: 0;
+}
+.market-filter select {
+  width: 100%;
+}
+.market-filters-clear {
+  justify-self: start;
+}
+.market-board-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-board-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition:
+    border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+.market-board-card:hover {
+  border-color: var(--gold);
+}
+.market-board-card .market-card-head {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}
+.market-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.market-chip.is-own {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+.market-board-card .market-chip {
+  margin-top: 2px;
+}
+:root[data-theme] .marketplace-page .market-card-line {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+.market-areas {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: var(--ink);
+  font-size: 13.5px;
+}
+.market-areas svg {
+  margin-top: 2px;
+  color: var(--accent);
+}
+.market-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.market-tags li {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+}
+:root[data-theme] .marketplace-page .market-match-alert {
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--market-ok-subtle);
+  color: var(--market-ok);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.market-card-broker {
+  display: grid;
+  gap: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.market-broker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 2px 6px 2px 2px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--duration) var(--ease);
+}
+.market-broker:hover {
+  background: var(--hover);
+}
+.market-broker strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+}
+.market-broker span span {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.market-board-card > .market-actions {
+  margin-top: auto;
+}

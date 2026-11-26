@@ -1,0 +1,114 @@
+/* The contact page and the help centre. */
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 24px;
+  align-items: start;
+}
+.contact-form {
+  border: 1px solid var(--edge);
+  border-radius: 22px;
+  padding: 30px;
+  background: var(--card);
+  display: grid;
+  gap: 16px;
+}
+.two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.field {
+  display: grid;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  align-content: start;
+}
+.field input,
+.field select,
+.field textarea {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--edge-2);
+  border-radius: 12px;
+  background: var(--tint-2);
+  color: var(--text);
+  font-weight: 400;
+  width: 100%;
+}
+.field textarea {
+  min-height: 120px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+.field select option {
+  background: var(--card);
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--gold);
+  outline: 2px solid rgba(188, 151, 101, 0.3);
+  outline-offset: 0;
+}
+.field-error {
+  color: #c0533f;
+  font-size: 14px;
+}
+.contact-side {
+  display: grid;
+  gap: 14px;
+}
+.contact-card {
+  border: 1px solid var(--edge);
+  border-radius: 18px;
+  padding: 20px;
+  background: var(--card);
+  display: grid;
+  gap: 6px;
+}
+.contact-card span {
+  color: var(--text-2);
+  font-size: 14px;
+}
+.sent {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.help-search {
+  max-width: 560px;
+  margin: 0 auto 26px;
+}
+.help-search input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid var(--edge-2);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px;
+}
+.help-topics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+.help-topics button {
+  border: 1px solid var(--edge-2);
+  border-radius: 99px;
+  padding: 6px 14px;
+  background: none;
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 14px;
+}
+.help-topics button[aria-pressed='true'] {
+  border-color: var(--gold);
+  color: var(--gold-ink);
+  background: rgba(188, 151, 101, 0.1);
+}

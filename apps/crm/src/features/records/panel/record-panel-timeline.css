@@ -1,0 +1,102 @@
+/* A client's activity timeline in the record panel (approved mockup `.timeline` and
+   `.event`): newest first, each entry with its kind, date, status and notes. */
+.record-timeline {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.record-timeline-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+:root[data-theme] .record-timeline-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 650;
+}
+.record-timeline-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+:root[data-theme] .record-timeline .record-timeline-hint,
+:root[data-theme] .record-timeline .record-timeline-empty {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+:root[data-theme] .record-timeline .record-timeline-empty {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  text-align: center;
+}
+.record-timeline .record-timeline-list {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+.record-event {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.record-timeline-list > li:last-child .record-event {
+  border-bottom: 0;
+}
+.record-event-dot {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--hover);
+  color: var(--primary);
+}
+.record-event-body {
+  min-width: 0;
+}
+.record-event-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+}
+.record-event-head strong {
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 650;
+}
+.record-event-head time {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.record-event > .badge {
+  margin-top: 2px;
+}
+:root[data-theme] .record-event .record-event-title,
+:root[data-theme] .record-event .record-event-detail {
+  margin: 2px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+:root[data-theme] .record-event .record-event-title {
+  color: var(--ink);
+}
+:root[data-theme] .record-event .record-event-detail {
+  color: var(--muted);
+  white-space: pre-line;
+}
